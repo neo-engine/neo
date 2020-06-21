@@ -221,7 +221,7 @@ namespace STS {
         /*
          * @brief Focusses the pkmn at position p_selectedIdx. Returns when pkmn leaves focus.
          */
-        bool focus( u8 p_selectedIdx );
+        bool focus( );
 
 #ifdef DESQUID
         std::vector<desquidChoice> computeDesquidChoices( );

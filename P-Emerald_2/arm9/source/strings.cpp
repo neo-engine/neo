@@ -616,7 +616,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"%s became fully charged due to its Power Herb!", "Dank Energiekraut ist %s sofort bereit!"},
     {"%s looses some HP.", "%s verliert ein paar KP."},
-    {"%s made a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke vom %s."},
+    {"%s made a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke von seinem %s."},
     {"%s's wish for power was granted!", "Der Wunsch von %s wurde erh\xf6hrt!"},
     {"the wild %s", "%s (wild)"},
 

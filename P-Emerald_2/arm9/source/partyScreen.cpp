@@ -612,18 +612,18 @@ namespace STS {
     }
 #endif
 
-    bool partyScreen::focus( u8 p_selectedIdx ) {
+    bool partyScreen::focus( ) {
         u16 c[ 12 ] = {0};
         for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
             c[ i ] = getTextForChoice( _currentChoices[ i ] );
         }
         if( _currentChoiceSelection >= 6 ) {
-            _partyUI->drawPartyPkmnChoice( p_selectedIdx, c + 6,
+            _partyUI->drawPartyPkmnChoice( _currentSelection, c + 6,
                                            std::min( size_t( 6 ), _currentChoices.size( ) - 6 ),
                                            false, true, _currentChoiceSelection % 6 );
         } else {
             _partyUI->drawPartyPkmnChoice(
-                p_selectedIdx, c, std::min( size_t( 6 ), _currentChoices.size( ) ),
+                _currentSelection, c, std::min( size_t( 6 ), _currentChoices.size( ) ),
                 _currentChoices.size( ) > 6, false, _currentChoiceSelection % 6 );
         }
         bool ex  = false;
@@ -638,7 +638,7 @@ namespace STS {
             held    = keysHeld( );
 
             if( pressed & KEY_X ) {
-                ex = true;
+                ex = _allowCancel;
                 break;
             }
             if( pressed & KEY_B ) {
@@ -655,9 +655,9 @@ namespace STS {
                     if( _currentChoiceSelection >= _currentChoices.size( ) ) {
                         _currentChoiceSelection = 6;
                     }
-                    _partyUI->drawPartyPkmnSub( p_selectedIdx, true, false );
+                    _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
                     _partyUI->drawPartyPkmnChoice(
-                        p_selectedIdx, c + 6, std::min( size_t( 6 ), _currentChoices.size( ) - 6 ),
+                        _currentSelection, c + 6, std::min( size_t( 6 ), _currentChoices.size( ) - 6 ),
                         false, true, _currentChoiceSelection % 6 );
                 } else if( ( _currentChoiceSelection ^ 1 ) < _currentChoices.size( ) ) {
                     selectChoice( _currentChoiceSelection ^ 1 );
@@ -668,8 +668,8 @@ namespace STS {
                 if( !( _currentChoiceSelection & 1 ) && _currentChoiceSelection >= 6 ) {
                     // Switch to first page
                     _currentChoiceSelection -= 5;
-                    _partyUI->drawPartyPkmnSub( p_selectedIdx, true, false );
-                    _partyUI->drawPartyPkmnChoice( p_selectedIdx, c, 6, true, false,
+                    _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
+                    _partyUI->drawPartyPkmnChoice( _currentSelection, c, 6, true, false,
                                                    _currentChoiceSelection % 6 );
                 } else {
                     selectChoice( _currentChoiceSelection ^ 1 );
@@ -706,7 +706,8 @@ namespace STS {
                 cooldown = COOLDOWN_COUNT;
             } else if( pressed & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                ex       = executeChoice( _currentChoices[ _currentChoiceSelection ] );
+                ex       = executeChoice( _currentChoices[ _currentChoiceSelection ] )
+                    && _allowCancel;
                 cooldown = COOLDOWN_COUNT;
                 break;
             }
@@ -717,16 +718,17 @@ namespace STS {
             c[ i ] = getTextForChoice( _currentChoices[ i ] );
         }
         if( _currentChoices.size( ) <= 6 || _currentChoiceSelection >= 6 ) {
-            _partyUI->drawPartyPkmnSub( p_selectedIdx, true, false );
+            _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
         }
-        // Selecting CANCEL should result in a reset of the saved poesition
+
+        // Selecting CANCEL should result in a reset of the saved position
         _currentChoiceSelection %= _currentChoices.size( ) - 1;
         if( _currentChoiceSelection >= 6 && _currentChoices.size( ) > 7 ) {
-            _partyUI->drawPartyPkmnChoice( p_selectedIdx, c + 6,
+            _partyUI->drawPartyPkmnChoice( _currentSelection, c + 6,
                                            std::min( size_t( 6 ), _currentChoices.size( ) - 6 - 1 ),
                                            false, true, 255 );
         } else {
-            _partyUI->drawPartyPkmnChoice( p_selectedIdx, c,
+            _partyUI->drawPartyPkmnChoice( _currentSelection, c,
                                            std::min( size_t( 6 ), _currentChoices.size( ) - 1 ),
                                            _currentChoices.size( ) > 7, false, 255 );
         }
@@ -965,6 +967,7 @@ namespace STS {
         case STS::partyScreen::STATUS: {
             statusScreen::result stsres;
             u8                   curStsPage = 0;
+            u8 oldchoice = _currentSelection;
             do {
                 statusScreen sts
                     = statusScreen( _team + _currentSelection, _teamLength > 1, _teamLength > 1 );
@@ -977,10 +980,13 @@ namespace STS {
                 }
             } while( stsres != statusScreen::BACK && stsres != statusScreen::EXIT );
 
-            if( stsres == statusScreen::EXIT ) { return true; }
+            if( stsres == statusScreen::EXIT && _allowCancel ) { return true; }
+            else { stsres = statusScreen::BACK; }
             computeSelectionChoices( );
-            _partyUI->init( _currentSelection );
+            _partyUI->init( oldchoice );
+            _partyUI->select( _currentSelection );
             _frame = 0;
+
             break;
         }
         case STS::partyScreen::GIVE_ITEM: {
@@ -1145,7 +1151,7 @@ namespace STS {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( pressed & KEY_X ) {
+            if( ( pressed & KEY_X ) && _allowCancel ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             }
@@ -1164,10 +1170,10 @@ namespace STS {
                                                    std::min( size_t( 6 ), _currentChoices.size( ) ),
                                                    _currentChoices.size( ) > 7, false );
 
-                    cooldown = COOLDOWN_COUNT;
-                } else {
+                } else if( _allowCancel ) {
                     break;
                 }
+                cooldown = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
@@ -1196,7 +1202,7 @@ namespace STS {
                 cooldown = COOLDOWN_COUNT;
             } else if( pressed & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                if( focus( _currentSelection ) ) { // User pressed X
+                if( focus( ) && _allowCancel ) { // User pressed X
                     _currentMarksOrMove.m_selectedMove = 0;
                     break;
                 }
