@@ -143,7 +143,11 @@ namespace STS {
         constexpr u16 getTextForChoice( const choice p_choice ) {
             switch( p_choice ) {
                 case SELECT:
-                    return 323;
+                    if( !_inBattle ) {
+                        return 323;
+                    } else {
+                        return 151;
+                    }
                 case UNSELECT:
                     return 331;
                 case STATUS:

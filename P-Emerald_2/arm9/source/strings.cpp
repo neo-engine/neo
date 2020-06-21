@@ -375,7 +375,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 150
 
     {"In Battle", "Im Kampf"},
-    {"Cannot Battle", "Schon besiegt"},
+    {"Send In", "In den Kampf"},
     {"To be sent", "Schon ausgew\xe4hlt"},
     {"Eggs can't", "Ein Ei kann"},
     {"battle!", "nicht k\xe4mpfen!"},
