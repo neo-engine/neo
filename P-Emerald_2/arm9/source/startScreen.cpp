@@ -100,10 +100,12 @@ namespace SAVE {
             //                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( )
             //                % 2, 3 * i ==
             //                    490, rand( ) % 20 ) );
+
+            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
+            testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
+            testTeam[ i ].m_boxdata.m_heldItem = I_GYARADOSITE;
         }
 
-        testTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_FOCUS_BLAST;
-        testTeam[ 0 ].m_boxdata.m_heldItem = I_GYARADOSITE;
 
         // BOX::boxViewer bxv;
         // bxv.run( );

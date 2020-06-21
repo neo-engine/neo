@@ -37,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleField.h"
 #include "battleTrainer.h"
 #include "uio.h"
+#include "partyScreen.h"
 
 #include "pokemon.h"
 #include "sound.h"
@@ -234,8 +235,10 @@ namespace BATTLE {
 #endif
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
-                if( sortedMoves[ i ].m_megaEvolve ) {
+                if( sortedMoves[ i ].m_megaEvolve && sortedMoves[ i ].m_type == ATTACK ) {
                     megaEvolve( sortedMoves[ i ].m_user );
+                } else {
+                    sortedMoves[ i ].m_megaEvolve = false;
                 }
             }
 
@@ -545,10 +548,33 @@ namespace BATTLE {
                             return res;
                         }
                         break;
-                    case 1: // Choose pkmn
+                    case 1: { // Choose pkmn
                         SOUND::playSoundEffect( SFX_CHOOSE );
-                        // TODO
+
+                        STS::partyScreen pt = STS::partyScreen( _playerTeam, _playerTeamSize,
+                                false, false, false, 1, false, false, false, true,
+                                1 + u8( _policy.m_mode ), p_slot );
+
+                        auto r = pt.run( p_slot );
+
+                        _battleUI.init( );
+
+                        for( u8 i2 = 0; i2 < 2; ++i2 )
+                            for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                                auto st = _field.getSlotStatus( i2, j2 );
+                                if( st == slot::status::NORMAL ) {
+                                    _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                                }
+                            }
+
+                        if( r.getSelectedPkmn( ) < 255 ) {
+                            res.m_type = SWITCH;
+                            res.m_param = r.getSelectedPkmn( );
+                            _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                            return res;
+                        }
                         break;
+                    }
                     case 2: // Run / Cancel
                         if( _isWildBattle ) {
                             SOUND::playSoundEffect( SFX_CHOOSE );
@@ -566,7 +592,6 @@ namespace BATTLE {
                         break;
                 }
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
-                curSel = 0;
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ),
                         p_slot, curSel );
 
@@ -604,6 +629,15 @@ namespace BATTLE {
         }
 
         return res;
+    }
+
+    u8 battle::getNextAIPokemon( ) const {
+        for( u8 i = u8( _policy.m_mode ) + 1; i < _opponentTeamSize; ++i ) {
+            if( _opponentTeam[ i ].canBattle( ) ) {
+                return i;
+            }
+        }
+        return 255;
     }
 
     battleMoveSelection battle::getAIMove( u8 p_slot ) {
@@ -682,7 +716,7 @@ namespace BATTLE {
         // PLAYER
         u8 pkmnCnt = 0;
         for( u8 i = 0; i < _playerTeamSize; ++i ) {
-            if( _playerTeam[ _playerPkmnPerm[ i ] ].canBattle( ) ) {
+            if( _playerTeam[ i ].canBattle( ) ) {
                 pkmnCnt++;
             }
         }
@@ -694,7 +728,7 @@ namespace BATTLE {
         // OPPONENT
         pkmnCnt = 0;
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-            if( _opponentTeam[ _opponentPkmnPerm[ i ] ].canBattle( ) ) {
+            if( _opponentTeam[ i ].canBattle( ) ) {
                 pkmnCnt++;
             }
         }
@@ -749,18 +783,79 @@ namespace BATTLE {
 
     void battle::megaEvolve( fieldPosition p_position ) {
         _field.megaEvolve( &_battleUI, p_position.first, p_position.second );
-        _policy.m_allowMegaEvolution = false;
+        if( !p_position.first ) {
+            _policy.m_allowMegaEvolution = false;
+        }
     }
 
     void battle::checkAndRefillBattleSpots( slot::status p_checkType ) {
-        // TODO
-        (void) p_checkType;
+
+        for( u8 i = 0; i < 2; ++i )
+            for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+                if( _field.getSlotStatus( i, j ) == p_checkType ) {
+                    if( i && !_isWildBattle ) {
+                        // AI chooses a next pkmn
+                        auto nxt = getNextAIPokemon( );
+                        if( nxt != 255 ) {
+                            switchPokemon( { i, j }, nxt );
+                        }
+                    } else if( !i ) {
+                        // Check if the player has something to send out
+                        bool good = false;
+                        for( u8 k = j + 1; k < _playerTeamSize; ++k ) {
+                            if( _playerTeam[ k ].canBattle( ) ) {
+                                good = true;
+                            }
+                        }
+                        if( !good ) { continue; }
+
+                        // Make the player choose a pokemon
+
+                        STS::partyScreen pt = STS::partyScreen( _playerTeam, _playerTeamSize,
+                                false, false, false, 1, false, false, false, false,
+                                1 + u8( _policy.m_mode ), j );
+
+                        auto res = pt.run( j );
+
+                        if( res.getSelectedPkmn( ) == 255 ) [[unlikely]] {
+#ifdef DESQUID
+                            _battleUI.log( "Oh well, time to desquid..." );
+#endif
+                        }
+
+                        _battleUI.init( );
+
+                        for( u8 i2 = 0; i2 < 2; ++i2 )
+                            for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                                if ( i == i2 && j == j2 ) { continue; }
+                                _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                            }
+
+                        switchPokemon( { i, j }, res.getSelectedPkmn( ) );
+                    }
+                }
+            }
     }
 
     void battle::switchPokemon( fieldPosition p_toSwitch, u16 p_newIndex ) {
-        // TODO
-        (void) p_toSwitch;
-        (void) p_newIndex;
+        auto oldst = _field.getSlotStatus( p_toSwitch.first, p_toSwitch.second );
+        if( oldst != slot::status::FAINTED && oldst != slot::status::RECALLED ) {
+            _field.recallPokemon( &_battleUI, p_toSwitch.first, p_toSwitch.second, false, true );
+        }
+
+        if( p_toSwitch.first ) {
+            // opponent
+            std::swap( _opponentTeam[ p_toSwitch.second ], _opponentTeam[ p_newIndex ] );
+            std::swap( _opponentPkmnPerm[ p_toSwitch.second ], _opponentPkmnPerm[ p_newIndex ] );
+            _field.sendPokemon( &_battleUI, p_toSwitch.first, p_toSwitch.second,
+                    &_opponentTeam[ p_toSwitch.second ] ) ;
+        } else {
+            // player
+            std::swap( _playerTeam[ p_toSwitch.second ], _playerTeam[ p_newIndex ] );
+            std::swap( _playerPkmnPerm[ p_toSwitch.second ], _playerPkmnPerm[ p_newIndex ] );
+            _field.sendPokemon( &_battleUI, p_toSwitch.first, p_toSwitch.second,
+                    &_playerTeam[ p_toSwitch.second ] ) ;
+        }
     }
 
     void battle::useItem( fieldPosition p_target, u16 p_item ) {

@@ -239,11 +239,6 @@ namespace BATTLE {
         }
 
         /*
-         * @brief: Sends out a new pokemon to an EMPTY slot.
-         */
-        bool sendPokemon( pokemon* p_pokemon );
-
-        /*
          * @brief: Adds the specified amount of damage to the pkmn.
          */
         inline void damagePokemon( u16 p_damage ) {

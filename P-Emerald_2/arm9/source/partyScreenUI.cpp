@@ -125,10 +125,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace STS {
     char BUFFER[ 50 ];
 
-    partyScreenUI::partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength, u8 p_toSelect ) {
-        _team       = p_team;
-        _teamLength = p_teamLength;
-        _toSelect   = p_toSelect;
+    partyScreenUI::partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength, u8 p_toSelect,
+                                  bool p_allowCancel, u8 p_inBattle, u8 p_toSwap ) {
+        _team        = p_team;
+        _teamLength  = p_teamLength;
+        _toSelect    = p_toSelect;
+        _allowCancel = p_allowCancel;
+        _inBattle    = p_inBattle;
+        _toSwap      = p_toSwap;
     }
 
 #ifdef DESQUID
@@ -422,8 +426,8 @@ namespace STS {
 
         // x
         tileCnt = IO::loadSprite( SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 236, 172, 16, 16,
-                                  x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, false,
-                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+                                  x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false,
+                                  !_allowCancel, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // page windows
         tileCnt = IO::loadSprite( SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0 - 8, 57 - 12,
@@ -645,7 +649,10 @@ namespace STS {
         } else {
             if( p_redraw ) {
                 // general data
-                if( IO::regularFont->stringWidth( _team[ p_pos ].m_boxdata.m_name ) > 80 ) {
+                if( p_pos < _inBattle ) {
+                    IO::regularFont->printString( GET_STRING( 150 ), anchor_x + 32,
+                                                  anchor_y + 12, false );
+                } else if( IO::regularFont->stringWidth( _team[ p_pos ].m_boxdata.m_name ) > 80 ) {
                     IO::regularFont->printStringC( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
                                               anchor_y + 12, false );
                 } else {
@@ -1082,6 +1089,9 @@ namespace STS {
 
         for( u8 i = 0; i < 6; i++ ) { drawPartyPkmn( i, i == _selectedIdx ); }
         _needsInit = true;
+        if( _toSwap != 255 ) {
+            mark( _toSwap, SWAP_COLOR, false );
+        }
     }
 
     void partyScreenUI::animate( u8 p_frame ) {

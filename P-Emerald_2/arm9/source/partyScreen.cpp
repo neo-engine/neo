@@ -40,7 +40,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace STS {
     partyScreen::partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves,
                               bool p_allowItems, bool p_allowDex, u8 p_toSelect,
-                              bool p_confirmSelection, bool p_faintSelect, bool p_eggSelect ) {
+                              bool p_confirmSelection, bool p_faintSelect, bool p_eggSelect,
+                              bool p_allowCancel, u8 p_inBattle, u8 p_toSwap ) {
         _team               = p_team;
         _teamLength         = p_teamLength;
         _allowMoveSelection = p_allowMoves;
@@ -52,7 +53,11 @@ namespace STS {
         _eggSelect          = p_eggSelect;
         _currentSelection   = 0;
         _selectedCnt        = 0;
-        _partyUI            = new partyScreenUI( p_team, p_teamLength, _toSelect );
+        _allowCancel        = p_allowCancel;
+        _inBattle           = p_inBattle;
+        _toSwap             = p_toSwap;
+        _partyUI            = new partyScreenUI( p_team, p_teamLength, _toSelect,
+                                                 _allowCancel, _inBattle, _toSwap );
     }
 
     partyScreen::~partyScreen( ) {
@@ -904,7 +909,8 @@ namespace STS {
         if( _swapSelection == 255 ) {
             if( _toSelect && !_currentMarksOrMove.getMark( _currentSelection )
                 && _team[ _currentSelection ].isEgg( ) == _eggSelect
-                && ( _team[ _currentSelection ].m_stats.m_curHP || _faintSelect ) ) {
+                && ( _team[ _currentSelection ].m_stats.m_curHP || _faintSelect )
+                && _currentSelection >= _inBattle ) {
                 _currentChoices.push_back( SELECT );
             }
             if( _toSelect && _currentMarksOrMove.getMark( _currentSelection ) ) {
@@ -934,7 +940,7 @@ namespace STS {
                 }
             }
         }
-        if( _teamLength > 1 ) { _currentChoices.push_back( SWAP ); }
+        if( _teamLength > 1 &&  !_inBattle ) { _currentChoices.push_back( SWAP ); }
         if( _swapSelection == 255 ) {
             if( _allowDex && !_team[ _currentSelection ].isEgg( ) ) {
                 // TODO _currentChoices.push_back( DEX_ENTRY );

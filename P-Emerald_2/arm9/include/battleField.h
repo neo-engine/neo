@@ -251,10 +251,10 @@ namespace BATTLE {
          * @brief: Recalls the pokemon at the specified position.
          */
         inline void recallPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot,
-                                   bool p_keepChanges = false ) {
+                                   bool p_keepChanges = false, bool p_forced = false ) {
+            p_ui->recallPkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), p_forced );
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].recallPokemon(
                     p_slot, p_keepChanges );
-            p_ui->recallPkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ) );
         }
 
         /*
@@ -362,9 +362,16 @@ namespace BATTLE {
         }
 
         /*
-         * @brief: Sends out a new pokemon to an EMPTY slot.
+         * @brief: Sends out a new pokemon to a slot, overriding anything that was there
+         * beforehand
          */
-        bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, pokemon* p_pokemon );
+        inline bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot,
+                                    pokemon* p_pokemon ) {
+            setSlot( p_opponent, p_slot, p_pokemon );
+            p_ui->sendOutPkmn( p_opponent, p_slot, p_pokemon );
+            checkOnSendOut( p_ui, p_opponent, p_slot );
+            return true;
+        }
 
         /*
          * @brief: Handles anything a pkmn may do when sent out.

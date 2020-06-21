@@ -41,13 +41,21 @@ namespace STS {
             u32 m_selectedPkmn = 0;
             u16 m_selectedMove;
 
-            constexpr u8 getMark( u8 p_pos ) {
+            constexpr u8 getMark( u8 p_pos ) const {
                 return ( m_selectedPkmn >> ( 4 * p_pos ) ) & 0xF;
             }
-            inline void setMark( u8 p_pos, u8 p_mark ) {
+            constexpr void setMark( u8 p_pos, u8 p_mark ) {
                 p_mark &= 0xf;
                 m_selectedPkmn &= ~( 0xf << ( 4 * p_pos ) );
                 m_selectedPkmn |= ( p_mark << ( 4 * p_pos ) );
+            }
+            constexpr u8 getSelectedPkmn( ) const {
+                for( u8 i = 0; i < 6; ++i ) {
+                    if( getMark( i ) == 1 ) {
+                        return i;
+                    }
+                }
+                return 255;
             }
         };
 
@@ -184,6 +192,9 @@ namespace STS {
         bool     _eggSelect;           // player has to select eggs
         bool     _faintSelect;         // allow selection of fainted pkmn
         bool     _selectConfirm;       // player should confirm selection
+        bool     _allowCancel;         // player may close the screen without selecting anything
+        u8       _inBattle;            // number of pkmn currently in battle
+        u8       _toSwap;           // Pokemon to swap
 
         u8             _frame;
         partyScreenUI* _partyUI;
@@ -275,7 +286,8 @@ namespace STS {
         partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves = true,
                      bool p_allowItems = true, bool p_allowDex = true, u8 p_toSelect = 0,
                      bool p_confirmSelection = true, bool p_faintSelect = false,
-                     bool p_eggSelect = false );
+                     bool p_eggSelect = false,
+                     bool p_allowCancel = true, u8 p_inBattle = 0, u8 p_toSwap = 255 );
 
         ~partyScreen( );
 

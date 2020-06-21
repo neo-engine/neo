@@ -185,11 +185,6 @@ namespace BATTLE {
         }
 
         /*
-         * @brief: Sends out a new pokemon to an EMPTY slot.
-         */
-        bool sendPokemon( battleUI* p_ui, u8 p_slot, pokemon* p_pokemon );
-
-        /*
          * @brief: Sets the pokemon of the specified slot. Only used at battle start
          */
         inline void setSlot( u8 p_slot, pokemon* p_pokemon ) {

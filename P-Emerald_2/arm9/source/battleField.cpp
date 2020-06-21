@@ -419,7 +419,7 @@ namespace BATTLE {
 
         snprintf( buffer, 99, GET_STRING( 307 ), p_ui->getPkmnName(
                     getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
-                    getPkmn( p_opponent, p_slot )->getItem( ) );
+                    ITEM::getItemName( getPkmn( p_opponent, p_slot )->getItem( ) ).c_str( ) );
         p_ui->log( std::string( buffer ) );
 
         for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
@@ -1901,12 +1901,6 @@ namespace BATTLE {
         bool opponent = p_move.m_user.first;
         u8 slot = p_move.m_user.second;
 
-#ifdef DESQUID
-        p_ui->log( "slot::status::" + std::to_string( getSlotStatus( opponent, slot ) )
-                 + " (normal == " + std::to_string( slot::status::NORMAL ) );
-        for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-#endif
-
         if( getSlotStatus( opponent, slot ) != slot::status::NORMAL ) { return; }
 
         // Check if the move fails
@@ -2014,6 +2008,7 @@ namespace BATTLE {
                 strengthMod = 25;
             }
 
+            u8 hits = 0;
             for( u8 j = 0; j < numHits; ++j ) {
                 auto tgsc = getVolatileStatus( p_move.m_target[ i ].first,
                         p_move.m_target[ i ].second );
@@ -2039,17 +2034,18 @@ namespace BATTLE {
                                     p_move.m_target[ i ].first ).c_str( ) );
                         p_ui->log( buffer );
                         for( u8 k = 0; k < 30; ++k ) { swiWaitForVBlank( ); }
-                        break;
+                        continue;
                     }
 
                     if( !executeDamagingMove( p_ui, p_move, p_move.m_target[ i ], critical,
                                 j == 1 && strengthMod < 100 ? strengthMod : 100 ) ) {
                         break;
                     }
+                    hits++;
                 }
 
                 // Pkmn fainted
-                if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { return; }
+                if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { break; }
                 // Target fainted
                 if( getSlotStatus( p_move.m_target[ i ].first,
                             p_move.m_target[ i ].second ) == slot::status::FAINTED ) { break; }
@@ -2069,7 +2065,7 @@ namespace BATTLE {
                 }
 
                 // Pkmn fainted
-                if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { return; }
+                if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { break; }
                 // Target fainted
                 if( getSlotStatus( p_move.m_target[ i ].first,
                             p_move.m_target[ i ].second ) == slot::status::FAINTED ) { break; }
@@ -2081,7 +2077,7 @@ namespace BATTLE {
                 }
 
                 // Pkmn fainted
-                if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { return; }
+                if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { break; }
                 // Target fainted
                 if( getSlotStatus( p_move.m_target[ i ].first,
                             p_move.m_target[ i ].second ) == slot::status::FAINTED ) { break;; }
@@ -2110,7 +2106,16 @@ namespace BATTLE {
                     }
                 }
             }
+
+            if( hits > 1 ) {
+                snprintf( buffer, 99, GET_STRING( 400 ), hits );
+                p_ui->log( buffer );
+                for( u8 k = 0; k < 30; ++k ) { swiWaitForVBlank( ); }
+            }
+
+            if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { return; }
         }
+
 
         // Check for flags and stuff
 
@@ -2159,26 +2164,30 @@ namespace BATTLE {
                                 getPkmn( opponent, slot ), opponent ).c_str( ) );
                     p_ui->log( buffer );
 
-                    if( suppressesAbilities( ) ||
-                            !_sides[ opponent ? PLAYER_SIDE : OPPONENT_SIDE ].anyHasAbility(
-                                A_UNNERVE ) ) [[likely]] {
-                        if( canUseItem( opponent, slot ) &&
-                                ( getPkmn( opponent, slot )->getItem( ) == I_LUM_BERRY
-                                || getPkmn( opponent, slot )->getItem( ) == I_PERSIM_BERRY
-                                || getPkmn( opponent, slot )->getItem( ) == I_RIE_BERRY ) ) {
-                            auto berry = getPkmn( opponent, slot )->getItem( );
+                    if( getVolatileStatus( opponent, slot ) & CONFUSION ) {
+                        // empty!
+                    } else {
+                        if( suppressesAbilities( ) ||
+                                !_sides[ opponent ? PLAYER_SIDE : OPPONENT_SIDE ].anyHasAbility(
+                                    A_UNNERVE ) ) [[likely]] {
+                            if( canUseItem( opponent, slot ) &&
+                                    ( getPkmn( opponent, slot )->getItem( ) == I_LUM_BERRY
+                                      || getPkmn( opponent, slot )->getItem( ) == I_PERSIM_BERRY
+                                      || getPkmn( opponent, slot )->getItem( ) == I_RIE_BERRY ) ) {
+                                auto berry = getPkmn( opponent, slot )->getItem( );
 
-                            snprintf( buffer, 99, GET_STRING( 278 ), p_ui->getPkmnName(
-                                        getPkmn( opponent, slot ), opponent ).c_str( ),
+                                snprintf( buffer, 99, GET_STRING( 278 ), p_ui->getPkmnName(
+                                            getPkmn( opponent, slot ), opponent ).c_str( ),
                                         ITEM::getItemName( berry ).c_str( ) );
-                            p_ui->log( buffer );
+                                p_ui->log( buffer );
 
-                            checkOnEatBerry( p_ui, opponent, slot, berry );
+                                checkOnEatBerry( p_ui, opponent, slot, berry );
+                            } else {
+                                addVolatileStatus( opponent, slot, CONFUSION, 2 + ( rand( ) % 4 ) );
+                            }
                         } else {
                             addVolatileStatus( opponent, slot, CONFUSION, 2 + ( rand( ) % 4 ) );
                         }
-                    } else {
-                        addVolatileStatus( opponent, slot, CONFUSION, 2 + ( rand( ) % 4 ) );
                     }
                 }
             }

@@ -155,21 +155,6 @@ namespace BATTLE {
 #define WILD_BATTLE_SPRITE_X_START 144
 #define WILD_BATTLE_SPRITE_X 160
 
-#define PKMN_OPP_1_X 192
-#define PKMN_OPP_1_Y 20
-#define PKMN_OPP_1_X_SINGLE 160
-#define PKMN_OPP_1_Y_SINGLE 23
-#define PKMN_OPP_2_X 128
-#define PKMN_OPP_2_Y 14
-
-#define PKMN_OWN_1_X -40
-#define PKMN_OWN_1_Y 84
-#define PKMN_OWN_1_X_SINGLE 4
-#define PKMN_OWN_1_Y_SINGLE 92
-#define PKMN_OWN_2_X 40
-#define PKMN_OWN_2_Y 100
-
-
 #define OPP_PLAT_Y 72
 #define PLY_PLAT_Y 120
 #define OPP_2_HP_X 94
@@ -180,6 +165,21 @@ namespace BATTLE {
 #define OWN_2_HP_Y 152
 #define OWN_1_HP_X 124
 #define OWN_1_HP_Y 120
+
+#define PKMN_OPP_1_X 192
+#define PKMN_OPP_1_Y ( OPP_PLAT_Y + 32 - 96 )
+#define PKMN_OPP_1_X_SINGLE 160
+#define PKMN_OPP_1_Y_SINGLE ( OPP_PLAT_Y + 35 - 96 )
+#define PKMN_OPP_2_X 128
+#define PKMN_OPP_2_Y ( OPP_PLAT_Y + 38 - 96 )
+
+#define PKMN_OWN_1_X -40
+#define PKMN_OWN_1_Y 84
+#define PKMN_OWN_1_X_SINGLE 4
+#define PKMN_OWN_1_Y_SINGLE 92
+#define PKMN_OWN_2_X 40
+#define PKMN_OWN_2_Y 100
+
 
 #define HP_OUTLINE_COL 240
 #define OWN_HP_COL 241
@@ -1444,6 +1444,13 @@ namespace BATTLE {
     }
 
     void battleUI::sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
+        IO::fadeScreen( IO::UNFADE, true, true );
+        REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x02 << 8 );
+        bgUpdate( );
+
         char buffer[ 100 ];
         if( p_opponent ) {
             // TODO
@@ -1507,6 +1514,7 @@ namespace BATTLE {
             // initialize stuff
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "battlesub", 512,
                     49152, true );
+
             for( u8 i = 0; i < 2; ++i ) {
                 u16* pal             = IO::BG_PAL( i );
                 pal[ 0 ] = 0;
@@ -1523,6 +1531,13 @@ namespace BATTLE {
             for( u8 i = 0; i < 12; ++i ) {
                 oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = true;
             }
+
+            IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
+            REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA = 0xff | ( 0x06 << 8 );
+            REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+            REG_BLDALPHA_SUB = 0xff | ( 0x02 << 8 );
+            bgUpdate( );
 
 
             for( u8 i = 0; i < 8; ++i ) {

@@ -112,6 +112,11 @@ namespace BATTLE {
         battleMoveSelection getAIMove( u8 p_slot );
 
         /*
+         * @brief: Chooses which pokemon the ai sends out when one of its pokemon fainted.
+         */
+        u8 getNextAIPokemon( ) const;
+
+        /*
          * @brief: Checks whether the battle hit an end
          */
         bool endConditionHit( battleEndReason& p_out );

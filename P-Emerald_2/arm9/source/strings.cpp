@@ -374,7 +374,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 150
 
-    {"In Battle", "Bereits im Kampf"},
+    {"In Battle", "Im Kampf"},
     {"Cannot Battle", "Schon besiegt"},
     {"To be sent", "Schon ausgew\xe4hlt"},
     {"Eggs can't", "Ein Ei kann"},
@@ -616,7 +616,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"%s became fully charged due to its Power Herb!", "Dank Energiekraut ist %s sofort bereit!"},
     {"%s looses some HP.", "%s verliert ein paar KP."},
-    {"%s makes a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke vom %s."},
+    {"%s made a wish upon its %s.", "%s w\xfcnscht sich St\xe4rke vom %s."},
     {"%s's wish for power was granted!", "Der Wunsch von %s wurde erh\xf6hrt!"},
     {"the wild %s", "%s (wild)"},
 
@@ -753,4 +753,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"%s shudders.", "%s erschaudert."}, // Anticipation
     {"%s identifies %s.", "%s erkennt %s."}, // Frisk
     {"%s identifies %s and %s.", "%s erkennt %s und%s."}, // Frisk
+
+    // 400
+
+    {"Hit %hhu times.", "%hhu Mal getroffen."},
 };
