@@ -83,11 +83,11 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         m_heldItem = data.m_baseForme.m_items[ 3 ];
     else {
         u8 m_b1 = rand( ) % 100;
-        if( m_b1 < 5 && data.m_baseForme.m_items[ 0 ] )
+        if( m_b1 < 1 && data.m_baseForme.m_items[ 0 ] )
             m_heldItem = data.m_baseForme.m_items[ 0 ];
-        else if( m_b1 < 20 && data.m_baseForme.m_items[ 1 ] )
+        else if( m_b1 < 6 && data.m_baseForme.m_items[ 1 ] )
             m_heldItem = data.m_baseForme.m_items[ 1 ];
-        else if( m_b1 < 80 && data.m_baseForme.m_items[ 2 ] )
+        else if( m_b1 < 56 && data.m_baseForme.m_items[ 2 ] )
             m_heldItem = data.m_baseForme.m_items[ 2 ];
     }
 

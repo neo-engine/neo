@@ -38,6 +38,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleTrainer.h"
 #include "uio.h"
 #include "partyScreen.h"
+#include "dex.h"
 
 #include "pokemon.h"
 #include "sound.h"
@@ -775,10 +776,153 @@ namespace BATTLE {
     }
 
     bool battle::playerCaptures( u16 p_pokeball ) {
-        // TODO
-        (void) p_pokeball;
+        u16         ballCatchRate = 2;
 
-        return false;
+        auto plpk = _field.getPkmn( false, 0 );
+        auto wild = _field.getPkmn( true, 0 );
+        u16         specId        = wild->getSpecies( );
+
+        auto p = _field.getPkmnData( true, 0 );
+
+        switch( p_pokeball ) {
+            case I_SAFARI_BALL:
+            case I_SPORT_BALL:
+            case I_GREAT_BALL:
+                ballCatchRate = 3;
+                break;
+            case I_ULTRA_BALL:
+                ballCatchRate = 4;
+                break;
+            case I_MASTER_BALL:
+                ballCatchRate = 512;
+                break;
+
+            case I_LEVEL_BALL:
+                if( plpk->m_level > wild->m_level )
+                    ballCatchRate = 4;
+                if( plpk->m_level / 2 > wild->m_level )
+                    ballCatchRate = 8;
+                if( plpk->m_level / 4 > wild->m_level )
+                    ballCatchRate = 16;
+                break;
+            case I_LURE_BALL:
+                if( PLAYER_IS_FISHING ) ballCatchRate = 6;
+                break;
+            case I_MOON_BALL:
+                if( wild->canEvolve( I_MOON_STONE ) ) ballCatchRate = 16;
+                break;
+            case I_LOVE_BALL:
+                if( wild->isFemale( ) * plpk->isFemale( ) < 0 )
+                    ballCatchRate = 16;
+                break;
+            case I_HEAVY_BALL:
+                ballCatchRate = std::min( 128, p.m_baseForme.m_weight >> 2 );
+                break;
+            case I_FAST_BALL:
+                if( p.m_baseForme.m_bases[ 5 ] >= 100 ) ballCatchRate = 16;
+                break;
+
+            case I_REPEAT_BALL:
+                if( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ specId / 8 ]
+                        & ( 1 << ( specId % 8 ) ) )
+                    ballCatchRate = 6;
+                break;
+            case I_TIMER_BALL:
+                ballCatchRate = std::min( _round + 10 / 5, 8 );
+                break;
+            case I_NEST_BALL:
+                ballCatchRate = std::max( ( 40 - wild->m_level ) / 5, 2 );
+                break;
+            case I_NET_BALL:
+                if( p.m_baseForme.m_types[ 0 ] == type::BUG ||
+                        p.m_baseForme.m_types[ 1 ] == type::BUG
+                        || p.m_baseForme.m_types[ 0 ] == type::WATER ||
+                        p.m_baseForme.m_types[ 1 ] == type::WATER )
+                    ballCatchRate = 6;
+                break;
+            case I_DIVE_BALL:
+                if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::moveMode::DIVE )
+                    ballCatchRate = 7;
+                break;
+
+            case I_QUICK_BALL:
+                if( _round < 2 ) ballCatchRate = 10;
+                break;
+            case I_DUSK_BALL:
+                if( MOVE::possible( M_DIG, 0 ) || getCurrentDaytime( ) == 4 ) ballCatchRate = 7;
+                break;
+
+            default:
+                break;
+        }
+
+        u8 status = 2;
+        if( wild->m_status.m_isAsleep
+            || wild->m_status.m_isFrozen )
+            status = 4;
+        if( wild->m_status.m_isParalyzed
+            || wild->m_status.m_isPoisoned
+            || wild->m_status.m_isBadlyPoisoned
+            || wild->m_status.m_isBurned )
+            status = 3;
+
+        u32 catchRate = ( 3 * wild->m_stats.m_maxHP
+                          - 2 * wild->m_stats.m_curHP )
+                        * p.m_catchrate * ballCatchRate / 3
+                        / wild->m_stats.m_maxHP * status;
+        u32 pr   = u32( ( 65535 << 4 ) / ( sqrt( sqrt( ( 255L << 18 ) / catchRate ) ) ) );
+        u8  succ = 0;
+        for( u8 i = 0; i < 4; ++i ) {
+            u16 rn = rand( );
+            if( rn > pr ) break;
+            succ++;
+        }
+        _battleUI.animateCapturePkmn( p_pokeball, succ );
+        return ( succ == 4 );
+    }
+
+    void battle::handleCapture( ) {
+        _field.revertTransform( true, 0 );
+        u16  spid = _field.getPkmn( true, 0 )->getSpecies( );
+
+        char buffer[ 100 ];
+        if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1 << ( spid % 8 ) ) ) ) {
+            SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] |= ( 1 << ( spid % 8 ) );
+            snprintf( buffer, 99, GET_STRING( 174 ), getDisplayName( spid ).c_str( ) );
+            _battleUI.log( buffer );
+
+            DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( spid );
+        }
+        _battleUI.handleCapture( _field.getPkmn( true, 0 ) );
+
+        // Check whether the pkmn fits in the team
+        if( _playerTeamSize < 6 ) {
+            std::memcpy( &_playerTeam[ _playerTeamSize ], _field.getPkmn( true, 0 ),
+                    sizeof( pokemon ) );
+            _playerTeamSize++;
+        } else {
+            u8 oldbx = SAVE::SAV.getActiveFile( ).m_curBox;
+            u8 nb    = SAVE::SAV.getActiveFile( ).storePkmn( *_field.getPkmn( true, 0 ) );
+            if( nb != u8( -1 ) ) {
+                snprintf( buffer, 99, GET_STRING( 175 ),
+                        _field.getPkmn( 0, true )->m_boxdata.m_name );
+                _battleUI.log( buffer );
+
+                if( oldbx != nb ) {
+                    snprintf( buffer, 99, GET_STRING( 176 ),
+                             SAVE::SAV.getActiveFile( ).m_storedPokemon[ oldbx ].m_name );
+                    _battleUI.log( buffer );
+                }
+                sprintf( buffer, GET_STRING( 177 ), _field.getPkmn( 0, true )->m_boxdata.m_name,
+                         SAVE::SAV.getActiveFile( ).m_storedPokemon[ nb ].m_name );
+                _battleUI.log( buffer );
+            } else {
+                _battleUI.log( GET_STRING( 178 ) );
+                snprintf( buffer, 99,
+                        GET_STRING( 179 ), _field.getPkmn( 0, true )->m_boxdata.m_name );
+                _battleUI.log( buffer );
+            }
+        }
     }
 
     void battle::megaEvolve( fieldPosition p_position ) {

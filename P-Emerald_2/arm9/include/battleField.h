@@ -79,6 +79,10 @@ namespace BATTLE {
          */
         void age( battleUI* p_ui );
 
+        constexpr pkmnData getPkmnData( bool p_opponent, u8 p_slot ) const {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getPkmnData( p_slot );
+        }
+
         inline slot* getSlot( bool p_opponent, u8 p_slot ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getSlot( p_slot );
         }
@@ -434,6 +438,10 @@ namespace BATTLE {
         }
         inline boosts getBoosts( bool p_opponent, u8 p_slot ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getBoosts( p_slot );
+        }
+
+        inline void revertTransform( bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].revertTransform( p_slot );
         }
 
         /*

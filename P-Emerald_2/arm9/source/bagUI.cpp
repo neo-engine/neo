@@ -169,7 +169,7 @@ namespace BAG {
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
             display = ITEM::getItemName( p_itemId );
-            // descr   = ITEM::getDescription( p_itemId );
+            descr   = ITEM::getItemDescr( p_itemId );
             char buffer[ 100 ];
 
             if( p_data.m_itemType != ITEM::ITEMTYPE_KEYITEM
@@ -221,6 +221,7 @@ namespace BAG {
                 */
             }
         } else {
+            descr   = MOVE::getMoveDescr( p_data.m_param2 );
             MOVE::moveData move = MOVE::getMoveData( p_data.m_param2 );
             u16 tileCnt = IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data.m_param2 ), 112,
                                           44, 0, 0, 0, false );
@@ -260,7 +261,7 @@ namespace BAG {
 
         IO::regularFont->printStringC( display.c_str( ), 128, 26, false, IO::font::CENTER );
 
-        IO::regularFont->printBreakingString( descr.c_str( ), 33, 83, 196, false,
+        IO::regularFont->printBreakingStringC( descr.c_str( ), 33, 83, 196, false,
                 IO::font::LEFT, 11 );
         IO::updateOAM( false );
     }

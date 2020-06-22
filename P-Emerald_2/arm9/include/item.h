@@ -213,6 +213,11 @@ namespace ITEM {
     bool        getItemName( const u16 p_itemId, const u8 p_language, char* p_out );
     std::string getItemName( const u16 p_itemId, const u8 p_language );
     std::string getItemName( const u16 p_itemId );
+
+    bool        getItemDescr( const u16 p_itemId, const u8 p_language, char* p_out );
+    std::string getItemDescr( const u16 p_itemId, const u8 p_language );
+    std::string getItemDescr( const u16 p_itemId );
+
     itemData    getItemData( const u16 p_itemId );
     bool        getItemData( const u16 p_itemId, itemData* p_out );
 

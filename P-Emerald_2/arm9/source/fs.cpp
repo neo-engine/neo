@@ -52,6 +52,7 @@ const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
 
 const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/";
 const char ITEM_NAME_PATH[]     = "nitro:/DATA/ITEM_NAME/";
+const char ITEM_DSCR_PATH[]     = "nitro:/DATA/ITEM_DSCR/";
 const char ITEM_DATA_PATH[]     = "nitro:/DATA/ITEM_DATA/";
 const char ABILITY_NAME_PATH[]  = "nitro:/DATA/ABTY_NAME/";
 const char ABILITY_DSCR_PATH[]  = "nitro:/DATA/ABTY_DSCR/";
@@ -356,6 +357,32 @@ namespace ITEM {
     }
     std::string getItemName( const u16 p_itemId ) {
         return getItemName( p_itemId, CURRENT_LANGUAGE );
+    }
+
+    bool getItemDescr( const u16 p_itemId, const u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( ITEM_DSCR_PATH, p_itemId, ".str" );
+        if( !f ) return false;
+
+        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ITEM_DSCRLENGTH, f ); }
+        fclose( f );
+        return true;
+    }
+
+    std::string getItemDescr( const u16 p_itemId, const u8 p_language ) {
+        char tmpbuf[ ITEM_DSCRLENGTH ];
+        if( !getItemDescr( p_itemId, p_language, tmpbuf ) ) {
+            return "---"
+#ifdef DESQUID
+                   + std::string( " moveid " ) + std::to_string( p_itemId ) + " lang "
+                   + std::to_string( p_language )
+#endif
+                ;
+        }
+        return std::string( tmpbuf );
+    }
+
+    std::string getItemDescr( const u16 p_itemId ) {
+        return getItemDescr( p_itemId, CURRENT_LANGUAGE );
     }
 
     itemData getItemData( const u16 p_itemId ) {

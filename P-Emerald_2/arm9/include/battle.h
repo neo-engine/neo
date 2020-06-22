@@ -138,6 +138,11 @@ namespace BATTLE {
         bool playerCaptures( u16 p_pokeball );
 
         /*
+         * @brief: Handles the capture of the wild Pokémon.
+         */
+        void handleCapture( );
+
+        /*
          * @brief: Mega evolves the pokemon at the specified position.
          */
         void megaEvolve( fieldPosition p_position );

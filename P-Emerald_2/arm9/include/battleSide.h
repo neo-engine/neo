@@ -60,6 +60,10 @@ namespace BATTLE {
             std::memset( _sideConditionCounter, 0, sizeof( _sideConditionCounter ) );
         }
 
+        constexpr pkmnData getPkmnData( u8 p_slot ) const {
+            return _slots[ p_slot ].getPokemonData( );
+        }
+
         inline slot* getSlot( u8 p_slot ) {
             return &_slots[ p_slot ];
         }
@@ -214,6 +218,10 @@ namespace BATTLE {
         }
         inline boosts getBoosts( u8 p_slot ) const {
             return _slots[ p_slot ].getBoosts( );
+        }
+
+        inline void revertTransform( u8 p_slot ) {
+            return _slots[ p_slot ].revertTransform( );
         }
 
         /*

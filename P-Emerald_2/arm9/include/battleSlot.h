@@ -88,6 +88,10 @@ namespace BATTLE {
          */
         void age( battleUI* p_ui );
 
+        constexpr pkmnData getPokemonData( ) const {
+            return _pkmnData;
+        }
+
         constexpr u8 getConsecutiveMoveCount( ) const {
             return _consecutiveMoveCount;
         }
@@ -801,6 +805,15 @@ namespace BATTLE {
             } else {
                 return &_transformedPkmn;
             }
+        }
+
+        inline void revertTransform( ) {
+            if( !_isTransformed ) { return; }
+
+            _isTransformed = false;
+            std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
+
+            _pkmnData = getPkmnData( _pokemon->getSpecies( ), _pokemon->getForme( ) );
         }
 
         /*

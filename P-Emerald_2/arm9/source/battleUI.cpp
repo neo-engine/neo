@@ -1682,6 +1682,13 @@ namespace BATTLE {
         }
     }
 
+    void battleUI::animateCapturePkmn( u16 p_pokeball, u8 p_ticks ) {
+        // TODO
+
+        (void) p_pokeball;
+        (void) p_ticks;
+    }
+
     void battleUI::animateVolatileStatusCondition( bool p_opponent, u8 p_slot,
                                                    volatileStatus p_status ) {
         // TODO
@@ -1846,6 +1853,36 @@ namespace BATTLE {
         }
 
         IO::updateOAM( true );
+    }
+
+    void battleUI::handleCapture( pokemon* p_pokemon ) {
+        init( );
+        IO::initOAMTable( false );
+
+        char buffer[ 100 ];
+
+        u16   x      = 80;
+        u8    y      = 48;
+
+        IO::loadPKMNSprite( p_pokemon->getSpecies( ), x, y,
+                SPR_PKMN_START_OAM( 0 ), SPR_PKMN_PAL( 0 ), SPR_PKMN_GFX( 0 ), false,
+                p_pokemon->isShiny( ), p_pokemon->isFemale( ), false, false,
+                p_pokemon->getForme( ) );
+
+        IO::updateOAM( false );
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
+
+        IO::yesNoBox yn;
+        snprintf( buffer, 99, GET_STRING( 141 ), p_pokemon->m_boxdata.m_name );
+        if( yn.getResult( buffer ) ) {
+            IO::keyboard kbd;
+            auto         nick = kbd.getText( 10, GET_STRING( 142 ) );
+            if( strcmp( nick.c_str( ), p_pokemon->m_boxdata.m_name )
+                    && strcmp( "", nick.c_str( ) ) ) {
+                strcpy( p_pokemon->m_boxdata.m_name, nick.c_str( ) );
+                p_pokemon->m_boxdata.setIsNicknamed( true );
+            }
+        }
     }
 
 } // namespace BATTLE

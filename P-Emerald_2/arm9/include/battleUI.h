@@ -229,5 +229,16 @@ namespace BATTLE {
         void showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ],
                                   bool p_showMegaEvolution, u8 p_highlightedButton = -1,
                                   bool p_megaButtonActive = false );
+
+        /*
+         * @brief: Animates an attempt at capturing the wild pkmn with the given ball and
+         * the specified amount of ticks.
+         */
+        void animateCapturePkmn( u16 p_pokeball, u8 p_ticks );
+
+        /*
+         * @brief: Displays the pkmn capture screen.
+         */
+        void handleCapture( pokemon* p_pokemon );
     };
 } // namespace BATTLE
