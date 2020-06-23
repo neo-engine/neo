@@ -61,6 +61,7 @@ const char MOVE_DSCR_PATH[]     = "nitro:/DATA/MOVE_DSCR/";
 const char MOVE_DATA_PATH[]     = "nitro:/DATA/MOVE_DATA/";
 const char POKEMON_NAME_PATH[]  = "nitro:/DATA/PKMN_NAME/";
 const char POKEMON_DATA_PATH[]  = "nitro:/DATA/PKMN_DATA/";
+const char POKEMON_EVOS_PATH[]  = "nitro:/DATA/PKMN_EVOS/";
 const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
 
 const char BATTLE_TRAINER_PATH[] = "n/a";
@@ -570,21 +571,32 @@ bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
     return true;
 }
 
-bool getAll( u16 p_pkmnId, pokemonData& p_out, u8 p_forme ) {
+pkmnEvolveData getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme ) {
+    pkmnEvolveData res = pkmnEvolveData( );
+    if( getPkmnEvolveData( p_pkmnId, p_forme, &res ) ) { return res; }
+    return res;
+}
+bool getPkmnEvolveData( const u16 p_pkmnId, pkmnEvolveData* p_out ) {
+    return getPkmnEvolveData( p_pkmnId, 0, p_out );
+}
+bool getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_out ) {
     FILE* f;
     if( p_forme ) {
-        snprintf( FS::TMP_BUFFER_SHORT, 13, "%02hu/%hu-%hhu", p_pkmnId / FS::ITEMS_PER_DIR,
-                  p_pkmnId, p_forme );
-        f = FS::open( PKMNDATA_PATH, FS::TMP_BUFFER_SHORT, ".data" );
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.evo.data", p_forme );
+        f = FS::openSplit( POKEMON_EVOS_PATH, p_pkmnId, tmpbuf );
+        if( !f ) return false;
+        fread( p_out, sizeof( pkmnEvolveData ), 1, f );
+        fclose( f );
+    } else {
+        f = FS::openSplit( POKEMON_EVOS_PATH, p_pkmnId, ".evo.data" );
+        if( !f ) return false;
+        fread( p_out, sizeof( pkmnEvolveData ), 1, f );
+        fclose( f );
     }
-
-    if( !p_forme || !f ) f = FS::openSplit( PKMNDATA_PATH, p_pkmnId, ".data" );
-    if( !f ) return false;
-
-    FS::read( f, &p_out, sizeof( pokemonData ), 1 );
-    FS::close( f );
     return true;
 }
+
 
 u16  LEARNSET_BUFFER[ 700 ];
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, u16* p_result ) {

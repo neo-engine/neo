@@ -283,123 +283,231 @@ u16 pokemon::takeItem( ) {
     return res;
 }
 
-bool pokemon::canEvolve( u16 p_item, u16 p_method ) {
+u8 pokemon::canEvolve( u16 p_item, evolutionMethod p_method, pkmnEvolveData* p_edata ) {
     if( isEgg( ) ) return false;
     if( getItem( ) == I_EVERSTONE ) return false;
 
-    pokemonData data;
-    getAll( m_boxdata.m_speciesId, data, getForme( ) );
+    pkmnEvolveData edata;
+    if( p_edata != nullptr ) { edata = *p_edata; }
+    else { edata = getPkmnEvolveData( getSpecies( ), getForme( ) ); }
 
-    for( int i = 0; i < 7; ++i ) {
-        if( m_level < data.m_evolutions[ i ].m_e.m_evolveLevel ) continue;
-        if( m_boxdata.m_steps < data.m_evolutions[ i ].m_e.m_evolveFriendship ) continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveItem
-            && p_item != data.m_evolutions[ i ].m_e.m_evolveItem )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveDayTime != -1
-            && getCurrentDaytime( ) != data.m_evolutions[ i ].m_e.m_evolveDayTime )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolvesInto == 0 ) continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveGender
-            && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveLocation
-            && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveHeldItem
-            && m_boxdata.m_heldItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveKnownMove ) {
-            bool b = false;
-            for( int j = 0; j < 4; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_moves[ j ] );
-            if( !b ) continue;
-        }
-        if( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType ) {
-            bool b = false;
-            for( int j = 0; j < 4; ++j ) {
-                MOVE::moveData mdata = MOVE::getMoveData( m_boxdata.m_moves[ j ] );
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType == mdata.m_category );
+    for( u8 i = 0; i < edata.m_evolutionCount; ++i ) {
+        auto cur = edata.m_evolutions[ i ];
+
+        switch( cur.m_type ) {
+            case EVOLUTION_LEVEL:
+                if( p_method == EVOMETHOD_LEVEL_UP &&  m_level >= cur.m_param1 ) { return i + 1; }
+                break;
+            case EVOLUTION_ITEM:
+                if( p_method == EVOMETHOD_ITEM && p_item == cur.m_param1 ) { return i + 1; }
+                break;
+            case EVOLUTION_TRADE:
+                if( p_method == EVOMETHOD_TRADE ) { return i + 1; }
+                break;
+            case EVOLUTION_TRADE_ITEM:
+                if( p_method == EVOMETHOD_TRADE
+                        && getItem( ) == cur.m_param1 ) { return i + 1; }
+                break;
+            case EVOLUTION_TRADE_PKMN:
+                if( p_method == EVOMETHOD_TRADE
+                        && p_item == cur.m_param1 ) { return i + 1; }
+                break;
+
+            case EVOLUTION_TIME: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && cur.m_param1 == getCurrentDaytime( ) ) { return i + 1; }
+                break;
             }
-            if( !b ) continue;
+            case EVOLUTION_PLACE: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && cur.m_param1 == MAP::curMap->getCurrentLocationId( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_MOVE: {
+                if( p_method != EVOMETHOD_LEVEL_UP ) { break; }
+                for( u8 j = 0; j < 4; ++j ) { if( getMove( j ) == cur.m_param1 ) { return i + 1; } }
+                break;
+            }
+            case EVOLUTION_FRIEND: {
+                if( p_method == EVOMETHOD_LEVEL_UP && m_boxdata.m_steps >= 250 ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_LEVEL_PLACE: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && m_level >= cur.m_param1
+                        && cur.m_param2 == MAP::curMap->getCurrentLocationId( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_FRIEND_TIME: {
+                if( p_method == EVOMETHOD_LEVEL_UP && m_boxdata.m_steps >= 250
+                        && cur.m_param1 == getCurrentDaytime( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_LEVEL_TIME: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && m_level >= cur.m_param1
+                        && cur.m_param2 == getCurrentDaytime( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_LEVEL_GENDER: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && m_level >= cur.m_param1
+                        && cur.m_param2 - 1 == gender( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_ITEM_HOLD: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && getItem( ) == cur.m_param1
+                        && cur.m_param2 == getCurrentDaytime( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_CONTEST: {
+                if( p_method == EVOMETHOD_LEVEL_UP
+                        && m_boxdata.m_contestStats[ cur.m_param1 ] >= 250 ) { return i + 1; }
+                break;
+            }
+
+            case EVOLUTION_ITEM_PLACE: {
+                if( p_method == EVOMETHOD_ITEM
+                        && p_item >= cur.m_param1
+                        && cur.m_param2 == MAP::curMap->getCurrentLocationId( ) ) { return i + 1; }
+                break;
+            }
+            case EVOLUTION_ITEM_GENDER: {
+                if( p_method == EVOMETHOD_ITEM
+                        && p_item == cur.m_param1
+                        && cur.m_param2 - 1 == gender( ) ) { return i + 1; }
+                break;
+            }
+
+            case EVOLUTION_SPECIAL: {
+                if( p_method != EVOMETHOD_LEVEL_UP ) { break; }
+                switch( getSpecies( ) ) {
+                    case PKMN_TYROGUE:
+                        if( m_level < 20 ) { break; }
+                        if( cur.m_target == PKMN_HITMONLEE
+                                && m_stats.m_Atk > m_stats.m_Def ) { return i + 1; }
+                        if( cur.m_target == PKMN_HITMONCHAN
+                                && m_stats.m_Atk < m_stats.m_Def ) { return i + 1; }
+                        if( cur.m_target == PKMN_HITMONTOP
+                                && m_stats.m_Atk == m_stats.m_Def ) { return i + 1; }
+                        break;
+                    case PKMN_WURMPLE:
+                        if( m_level < 7 ) { break; }
+                        if( cur.m_target == PKMN_SILCOON
+                                && ( m_boxdata.m_pid >> 16 ) % 10 <= 4 ) { return i + 1; }
+                        if( cur.m_target == PKMN_CASCOON
+                                && ( m_boxdata.m_pid >> 16 ) % 10 > 4 ) { return i + 1; }
+                        break;
+                    case PKMN_MANTYKE:
+                        // Check for a Remoraid in the party
+                        for( u8 q = 0; q < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++q ) {
+                            if( SAVE::SAV.getActiveFile( ).getTeamPkmn( q )->getSpecies( )
+                                    == PKMN_REMORAID ) {
+                                return i + 1;
+                            }
+                        }
+                        break;
+                    case PKMN_PANCHAM:
+                        // Check for dark-type pkmn
+                        for( u8 q = 0; q < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++q ) {
+                            auto dt =
+                                getPkmnData(
+                                        SAVE::SAV.getActiveFile( ).getTeamPkmn( q )->getSpecies( ),
+                                        SAVE::SAV.getActiveFile( ).getTeamPkmn( q )->getForme( ) );
+                            if( dt.m_baseForme.m_types[ 0 ] == DARK
+                                    || dt.m_baseForme.m_types[ 1 ] == DARK ) {
+                                return i + 1;
+                            }
+                        }
+                        break;
+                    case PKMN_SLIGGOO:
+                        if( m_level < 50 ) { break; }
+                        if( MAP::curMap->getWeather( ) == MAP::mapWeather::RAINY
+                                || MAP::curMap->getWeather( ) == MAP::mapWeather::HEAVY_RAIN
+                                || MAP::curMap->getWeather( ) == MAP::mapWeather::FOG
+                                || MAP::curMap->getWeather( ) == MAP::mapWeather::DENSE_MIST ) {
+                            return i + 1;
+                        }
+                        break;
+                    case PKMN_TOXEL:
+                        if( m_level < 30 ) { break; }
+
+                        switch( getNature( ) ) {
+                            case HARDY:
+                            case BRAVE:
+                            case ADAMANT:
+                            case NAUGHY:
+                            case DOCILE:
+                            case IMPISH:
+                            case LAX:
+                            case HASTY:
+                            case JOLLY:
+                            case NAIVE:
+                            case RASH:
+                            case SASSY:
+                            case QUIRKY:
+                                if( cur.m_targetForme == 0 ) {
+                                    return i + 1;
+                                }
+                                break;
+                            default:
+                                if( cur.m_targetForme == 1 ) {
+                                    return i + 1;
+                                }
+                                break;
+                        }
+                        break;
+
+                    [[likely]] default:
+                        break;
+                }
+            }
+
+            [[unlikely]] default:
+                break;
         }
-        if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty
-            && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_contestStats[ 1 ] )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
-            bool b = false;
-            for( int j = 0; j < 6; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember
-                       == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
-            if( !b ) continue;
-        }
-        if( p_method != data.m_evolutions[ i ].m_e.m_evolutionTrigger ) continue;
-        return true;
     }
+
     return false;
 }
-void pokemon::evolve( u16 p_item, u16 p_method ) {
+
+void pokemon::evolve( u16 p_item, evolutionMethod p_method ) {
     if( isEgg( ) ) return;
     if( getItem( ) == I_EVERSTONE ) return;
 
-    pokemonData data;
-    getAll( m_boxdata.m_speciesId, data );
+    auto edata = getPkmnEvolveData( getSpecies( ), getForme( ) );
+    u8 tg = canEvolve( p_item, p_method, &edata );
+    if( !( tg-- ) ) { return; }
 
-    int into = 0;
+    m_boxdata.m_altForme = edata.m_evolutions[ tg ].m_targetForme;
+    setSpecies( edata.m_evolutions[ tg ].m_target );
 
-    for( int i = 0; i < 7; ++i ) {
-        if( m_level < data.m_evolutions[ i ].m_e.m_evolveLevel ) continue;
-        if( m_boxdata.m_steps < data.m_evolutions[ i ].m_e.m_evolveFriendship ) continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveItem
-            && p_item != data.m_evolutions[ i ].m_e.m_evolveItem )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveDayTime != -1
-            && getCurrentDaytime( ) != data.m_evolutions[ i ].m_e.m_evolveDayTime )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolvesInto == 0 ) continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveGender
-            && m_boxdata.gender( ) != data.m_evolutions[ i ].m_e.m_evolveGender )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveLocation
-            && MAP::curMap->getCurrentLocationId( ) != data.m_evolutions[ i ].m_e.m_evolveLocation )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveHeldItem
-            && m_boxdata.m_heldItem != data.m_evolutions[ i ].m_e.m_evolveHeldItem )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveKnownMove ) {
-            bool b = false;
-            for( int j = 0; j < 4; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMove == m_boxdata.m_moves[ j ] );
-            if( !b ) continue;
-        }
-        if( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType ) {
-            bool b = false;
-            for( int j = 0; j < 4; ++j ) {
-                MOVE::moveData mdata = MOVE::getMoveData( m_boxdata.m_moves[ j ] );
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveKnownMoveType == mdata.m_category );
-            }
-            if( !b ) continue;
-        }
-        if( data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty
-            && data.m_evolutions[ i ].m_e.m_evolveMinimumBeauty < m_boxdata.m_contestStats[ 1 ] )
-            continue;
-        if( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember ) {
-            bool b = false;
-            for( int j = 0; j < 6; ++j )
-                b |= ( data.m_evolutions[ i ].m_e.m_evolveAdditionalPartyMember
-                       == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId );
-            if( !b ) continue;
-        }
-        if( p_method != data.m_evolutions[ i ].m_e.m_evolutionTrigger ) continue;
-        into = data.m_evolutions[ i ].m_e.m_evolvesInto;
-        break;
-    }
-    if( into == 0 ) return;
-
-    m_boxdata.m_speciesId = into;
-    recalculateStats( );
-
-    if( !m_boxdata.isNicknamed( ) )
+    if( !m_boxdata.isNicknamed( ) ) {
         strcpy( m_boxdata.m_name,
                 getDisplayName( m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
+    }
+
+    // check for shedinja
+
+    if( getSpecies( ) == PKMN_NINJASK ) {
+        if( SAVE::SAV.getActiveFile( ).m_bag.count(
+                    BAG::toBagType( ITEM::ITEMTYPE_POKEBALL ), I_POKE_BALL ) ) {
+            if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) < 6 ) {
+                // Create a Shedinja
+                auto shed = *this;
+                shed.setSpecies( PKMN_SHEDINJA );
+                shed.m_boxdata.m_ball = ITEM::itemToBall( I_POKE_BALL );
+                shed.heal( );
+                shed.takeItem( );
+                strcpy( shed.m_boxdata.m_name,
+                        getDisplayName( PKMN_SHEDINJA, CURRENT_LANGUAGE ).c_str( ) );
+
+                SAVE::SAV.getActiveFile( ).m_bag.erase(
+                        BAG::toBagType( ITEM::ITEMTYPE_POKEBALL ), I_POKE_BALL, 1 );
+                SAVE::SAV.getActiveFile( ).
+                    setTeamPkmn( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &shed );
+            }
+        }
+    }
 }

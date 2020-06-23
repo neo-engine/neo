@@ -137,7 +137,7 @@ namespace BAG {
 
         if( p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
             // Use the item on the PKMN
-            if( !p_pokemon.canEvolve( p_itemId, 3 ) ) {
+            if( !p_pokemon.canEvolve( p_itemId, EVOMETHOD_ITEM ) ) {
                 IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
@@ -146,7 +146,7 @@ namespace BAG {
             } else {
                     u16 oldsp = p_pokemon.getSpecies( );
                     u8 oldfm = p_pokemon.getForme( );
-                    p_pokemon.evolve( p_itemId, 3 );
+                    p_pokemon.evolve( p_itemId, EVOMETHOD_ITEM );
                     u16 newsp = p_pokemon.getSpecies( );
                     u8 newfm = p_pokemon.getForme( );
 

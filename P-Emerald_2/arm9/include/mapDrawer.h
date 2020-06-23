@@ -94,6 +94,10 @@ namespace MAP {
 
             mapDrawer( );
 
+            constexpr mapWeather getWeather( ) const {
+                return _weather;
+            }
+
             void registerOnBankChangedHandler( std::function<void( u8 )> p_handler );
             void registerOnLocationChangedHandler( std::function<void( u16 )> p_handler );
             void registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler );

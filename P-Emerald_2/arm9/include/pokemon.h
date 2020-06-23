@@ -608,8 +608,9 @@ struct pokemon {
     inline bool learnMove( u16 p_move ) {
         return m_boxdata.learnMove( p_move );
     }
-    void evolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
-    bool canEvolve( u16 p_suppliedItem = 0, u16 p_Trigger = 1 );
+    void evolve( u16 p_suppliedItem = 0, evolutionMethod p_method = EVOMETHOD_LEVEL_UP );
+    u8 canEvolve( u16 p_suppliedItem = 0, evolutionMethod p_method = EVOMETHOD_LEVEL_UP,
+                    pkmnEvolveData* p_edata = nullptr );
 
     inline void hatch( ) {
         m_boxdata.hatch( );

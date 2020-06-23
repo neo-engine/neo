@@ -175,7 +175,7 @@ namespace SAVE {
         // save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) |
         // save3->unpackeddata[ 0xac ];
 
-        pokemonData p;
+        pkmnData p;
         for( u8 i = 0; i < 6; ++i ) {
             if( save3->pokemon[ i ]->personality ) {
 
@@ -227,9 +227,9 @@ namespace SAVE {
                 FS::gen3Pokemon::pokemon_misc_t*& acBM = save3->pokemon_misc[ i ];
                 acPkmn.m_boxdata.m_iVint               = acBM->IVint;
 
-                getAll( acPkmn.m_boxdata.m_speciesId, p );
+                p = getPkmnData( acPkmn.getSpecies( ) );
                 acPkmn.m_boxdata.m_ability
-                    = p.m_abilities[ acPkmn.isEgg( ) ];
+                    = p.m_baseForme.m_abilities[ acPkmn.isEgg( ) ];
                 acPkmn.m_boxdata.setIsEgg( acPkmn.m_boxdata.isNicknamed( ) );
                 acPkmn.m_boxdata.m_gotPlace = FS::getNLocation( acBM->locationcaught );
 

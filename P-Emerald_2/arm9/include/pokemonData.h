@@ -120,7 +120,7 @@ enum pkmnNatures {
     SCHEU   = 10,
     TIMID   = 10,
     HASTIG  = 11,
-    NASTY   = 11,
+    HASTY   = 11,
     ERNST   = 12,
     SERIOUS = 12,
     FROH    = 13,
@@ -177,53 +177,50 @@ struct pkmnData {
     }
 };
 
-// deprecated
-struct pokemonData {
-    type           m_types[ 2 ];
-    u16            m_bases[ 6 ];
-    u16            m_catchrate;
-    u16            m_items[ 4 ];
-    pkmnGenderType m_gender;
-    pkmnEggType    m_eggT[ 2 ];
-    u16            m_eggcyc;
-    u16            m_baseFriend;
-    u16            m_EVYield[ 6 ];
-    u16            m_EXPYield;
-    u16            m_formecnt;
-    u16            m_size;
-    u16            m_weight;
-    u16            m_expType;
-    u16            m_abilities[ 4 ];
+enum evolutionMethod : u8 {
+    EVOMETHOD_LEVEL_UP = 0,
+    EVOMETHOD_ITEM = 1,
+    EVOMETHOD_TRADE = 2,
+};
 
-    union {
-        struct evolvestruct {
-            s16 m_evolvesInto;
-            s16 m_evolutionTrigger;
-            s16 m_evolveItem;
-            s16 m_evolveLevel;
-            s16 m_evolveGender;
-            s16 m_evolveLocation;
-            s16 m_evolveHeldItem;
-            s16 m_evolveDayTime;
-            s16 m_evolveKnownMove;
-            s16 m_evolveKnownMoveType;
-            s16 m_evolveFriendship;
-            s16 m_evolveMinimumBeauty;
-            s16 m_evolveAtkDefRelation; // 1: >; 2: ==; 3 <
-            s16 m_evolveAdditionalPartyMember;
-            s16 m_evolveTradeSpecies;
-        } m_e;
-        s16 m_evolveData[ 15 ];
-    } m_evolutions[ 7 ];
-    char m_displayName[ 15 ];
-    char m_species[ 50 ];
-    char m_dexEntry[ 200 ];
+enum evolutionType : u8 {
+    EVOLUTION_NONE = 0,
+    EVOLUTION_LEVEL = 20,   // level up
+    EVOLUTION_ITEM = 1,       // evolution item
+    EVOLUTION_TRADE = 2,      // trade
+    EVOLUTION_TRADE_ITEM = 3, // trade while holding item
+    EVOLUTION_TRADE_PKMN = 4, // trade with specific species
 
-    u16  m_formeIdx[ 30 ];
-    char m_formeName[ 30 ][ 15 ];
+    EVOLUTION_TIME = 5,  // level up at specific time
+    EVOLUTION_PLACE = 6, // level up at specific place
+    EVOLUTION_MOVE = 7,  // level up with certain move known
+    EVOLUTION_FRIEND = 8,  // level up with high friendship
+    EVOLUTION_LEVEL_PLACE = 10, // level up at specific place with a minimum level
+    EVOLUTION_FRIEND_TIME = 11,  // level up with high friendship at a specific time
+    EVOLUTION_LEVEL_TIME = 12, // level up at a specific time with a minimum level
+    EVOLUTION_LEVEL_GENDER = 13, // level up with a specific gender
+    EVOLUTION_ITEM_HOLD = 24, // hold item + level up + time
 
-    u16 m_preEvolution;
-    u8  m_stage; // 0: Basic, 1: Stage 1, 2: Stage 2, 3 Restored (m_preEvolution: itemIdx)
+    EVOLUTION_ITEM_PLACE = 22,  // evolution item at a special place
+    EVOLUTION_ITEM_GENDER = 25,  // evolution item with special condition
+
+    EVOLUTION_CONTEST = 15, // A specific contest stat
+
+    EVOLUTION_SPECIAL = 16,   // totally crazy stuff
+};
+
+struct pkmnEvolution {
+    evolutionType m_type;
+    u8            m_targetForme;
+    u16           m_target;
+    u16           m_param1;
+    u16           m_param2;
+};
+
+struct pkmnEvolveData {
+    u16             m_evolutionCount;
+    u16             m_preEvolution;
+    pkmnEvolution   m_evolutions[ 8 ];
 };
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme );
@@ -234,7 +231,9 @@ pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme = 0 );
 bool     getPkmnData( const u16 p_pkmnId, pkmnData* p_out );
 bool     getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out );
 
-[[deprecated]] bool getAll( u16 p_pkmnId, pokemonData& out, u8 p_forme = 0 );
+pkmnEvolveData getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme = 0 );
+bool           getPkmnEvolveData( const u16 p_pkmnId, pkmnEvolveData* p_out );
+bool           getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_out );
 
 const u16 LEARN_TM = 200;
 const u16 LEARN_TUTOR = 201;

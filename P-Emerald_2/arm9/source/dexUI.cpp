@@ -273,18 +273,20 @@ namespace DEX {
         for( u8 i = 0; i < 3; ++i ) IO::Oam->oamBuffer[ PAGE_START + i ].isHidden = i == p_page;
         IO::updateOAM( true );
 
-        pokemonData data;
-        getAll( p_pkmnIdx, data );
+        pkmnData data = getPkmnData( p_pkmnIdx );
 
         bool isFixed = !FS::exists( "nitro:/PICS/SPRITES/PKMN/", p_pkmnIdx, "f" );
 
         if( p_page <= 1 )
-            p_forme %= data.m_formecnt ? ( ( 2 - isFixed ) * data.m_formecnt ) : ( 2 - isFixed );
+            p_forme %= data.getFormeCnt( )
+                ? ( ( 2 - isFixed ) * data.getFormeCnt( ) ) : ( 2 - isFixed );
 
-        u8 currFormeIdx = data.m_formecnt ? p_forme / ( 2 - isFixed ) : p_forme;
-        u8 formeCnt     = data.m_formecnt;
+        u8 currFormeIdx = data.getFormeCnt( ) ? p_forme / ( 2 - isFixed ) : p_forme;
+        u8 formeCnt     = data.getFormeCnt( );
 
-        if( currFormeIdx ) getAll( p_pkmnIdx, data, currFormeIdx );
+        if( currFormeIdx ) {
+            data = getPkmnData( p_pkmnIdx, currFormeIdx );
+        }
 
         for( u8 i = 0; i < PKMN_SPRITE_START( 5 ); ++i ) IO::OamTop->oamBuffer[ i ].isHidden = true;
 
@@ -346,7 +348,7 @@ namespace DEX {
                 break;
             }
             */
-            switch( data.m_types[ 0 ] ) {
+            switch( data.m_baseForme.m_types[ 0 ] ) {
             case NORMAL:
             case FLYING:
             case UNKNOWN:
@@ -396,10 +398,10 @@ namespace DEX {
                                      128 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 2 );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-                if( data.m_stage == 0 || data.m_stage == 3 ) {
-                    IO::boldFont->setColor( IO::BLACK_IDX, 1 );
-                    IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-                }
+//                if( data.m_stage == 0 || data.m_stage == 3 ) {
+//                    IO::boldFont->setColor( IO::BLACK_IDX, 1 );
+//                    IO::boldFont->setColor( IO::WHITE_IDX, 2 );
+//                }
                 break;
             default:
                 break;
@@ -409,19 +411,22 @@ namespace DEX {
             BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
 
-            IO::boldFont->printString( data.m_displayName, 58, 11, false );
+            IO::boldFont->printString( getDisplayName( p_pkmnIdx ).c_str( ), 58, 11, false );
 
-            if( data.m_types[ 0 ] != data.m_types[ 1 ] ) {
-                IO::loadTypeIcon( data.m_types[ 0 ], 183, 28, PKMN_SPRITE_START( 2 ) + 1, 3,
+            if( data.m_baseForme.m_types[ 0 ] != data.m_baseForme.m_types[ 1 ] ) {
+                IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 183, 28,
+                        PKMN_SPRITE_START( 2 ) + 1, 3,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 1 ].gfxIndex,
-                                  false, SAVE::SAV.getActiveFile( ).m_options.m_language );
-                IO::loadTypeIcon( data.m_types[ 1 ], 215, 28, PKMN_SPRITE_START( 2 ) + 2, 4,
+                                  false, CURRENT_LANGUAGE );
+                IO::loadTypeIcon( data.m_baseForme.m_types[ 1 ], 215, 28,
+                        PKMN_SPRITE_START( 2 ) + 2, 4,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].gfxIndex,
-                                  false, SAVE::SAV.getActiveFile( ).m_options.m_language );
+                                  false, CURRENT_LANGUAGE );
             } else {
-                IO::loadTypeIcon( data.m_types[ 0 ], 199, 28, PKMN_SPRITE_START( 2 ) + 1, 3,
+                IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], 199, 28,
+                        PKMN_SPRITE_START( 2 ) + 1, 3,
                                   IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 1 ].gfxIndex,
-                                  false, SAVE::SAV.getActiveFile( ).m_options.m_language );
+                                  false, CURRENT_LANGUAGE );
                 IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) + 2 ].isHidden = true;
             }
 
@@ -441,11 +446,11 @@ namespace DEX {
             for( u8 i = 0; i < 30; ++i ) {
                 u8 bs;
                 if( i / 5 == 0 )
-                    bs = data.m_bases[ i / 5 ];
+                    bs = data.m_baseForme.m_bases[ i / 5 ];
                 else if( i / 5 == 1 )
-                    bs = data.m_bases[ 5 ];
+                    bs = data.m_baseForme.m_bases[ 5 ];
                 else
-                    bs = data.m_bases[ i / 5 - 1 ];
+                    bs = data.m_baseForme.m_bases[ i / 5 - 1 ];
 
                 IO::OamTop->oamBuffer[ i + STAR_START ].isHidden = ( bs < 60 + 20 * ( i % 5 ) );
             }
@@ -463,11 +468,11 @@ namespace DEX {
                 NO_DATA /* FS::breakString( data.m_dexEntry, IO::regularFont, 224 ).c_str( ) */, 16,
                 134, false, IO::font::LEFT, 12 );
 
-            consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
-            if( strlen( data.m_species ) >= 13 ) consoleSetWindow( &IO::Top, 2, 22, 32, 23 );
-            if( strlen( data.m_species ) == 8 || strlen( data.m_species ) == 9 ) printf( " " );
-            printf( "%8s %4.1fm %5.1fkg", data.m_species, data.m_size / 10.0,
-                    data.m_weight / 10.0 );
+//            consoleSetWindow( &IO::Top, 3, 22, 32, 23 );
+//            if( strlen( data.m_species ) >= 13 ) consoleSetWindow( &IO::Top, 2, 22, 32, 23 );
+//            if( strlen( data.m_species ) == 8 || strlen( data.m_species ) == 9 ) printf( " " );
+//            printf( "%8s %4.1fm %5.1fkg", data.m_species, data.m_size / 10.0,
+//                    data.m_weight / 10.0 );
             break;
         }
         case 1: {
@@ -491,7 +496,7 @@ namespace DEX {
             BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
 
-            IO::boldFont->printString( data.m_displayName, 32, 4, false );
+            IO::boldFont->printString( getDisplayName( p_pkmnIdx ).c_str( ), 32, 4, false );
             IO::loadPKMNIcon( p_pkmnIdx, 0, -4, PKMN_SPRITE_START( 2 ), 2,
                               IO::OamTop->oamBuffer[ PKMN_SPRITE_START( 2 ) ].gfxIndex, false );
 
@@ -544,9 +549,8 @@ namespace DEX {
                 IO::boldFont->printString( getDisplayName( id ).c_str( ), 100, 28 + 32 * i, true );
 
                 if( i == p_selectedIdx ) {
-                    pokemonData p;
-                    getAll( id, p );
-                    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
+                    pkmnData p = getPkmnData( id );
+                    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::getColor( p.m_baseForme.m_types[ 0 ] );
                 }
                 IO::printRectangle( 64 + 3, 24 + 32 * i + 2, 64 + 28, 24 + 32 * i + 26, true,
                                     i == p_selectedIdx ? IO::COLOR_IDX : IO::WHITE_IDX );
@@ -583,10 +587,9 @@ namespace DEX {
                 bool inDex = IN_DEX( id );
                 loadPkmnIconToSlot( inDex * id, i, true );
                 if( i == p_selectedIdx ) {
-                    pokemonData p;
-                    getAll( id * inDex, p );
+                    pkmnData p = getPkmnData( id * inDex );
                     IO::Oam->oamBuffer[ PKMN_ICON_START + i ].priority = OBJPRIORITY_1;
-                    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::getColor( p.m_types[ 0 ] );
+                    BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::getColor( p.m_baseForme.m_types[ 0 ] );
                     IO::printRectangle( IO::Oam->oamBuffer[ FRAME_START + i ].x + 3,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].y + 2,
                                         IO::Oam->oamBuffer[ FRAME_START + i ].x + 29,

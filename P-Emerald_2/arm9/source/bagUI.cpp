@@ -325,7 +325,8 @@ namespace BAG {
                                                   11 );
                 } else {
                     if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
-                        if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId, 3 ) ) {
+                        if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId,
+                                    EVOMETHOD_ITEM ) ) {
                             BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                             IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                             IO::regularFont->setColor( IO::BLACK_IDX, 2 );

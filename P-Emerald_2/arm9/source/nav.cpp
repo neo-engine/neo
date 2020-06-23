@@ -388,7 +388,8 @@ namespace NAV {
             }
         } else {
             // StartBag
-            if( GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) ) {
+            if( ( pressed & KEY_X ) ||
+                    GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) ) {
                 BAG::bagViewer bv;
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;

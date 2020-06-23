@@ -746,7 +746,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Accuracy: %hhu", "Genauigkeit: %hhu"},
     {"(never misses)", "(trifft immer)"},
     {"%s's\n%s%.0s", "%.0s%s\nvon %s"},
-    {"A wild %s appeared!", "Ein wildes %s erscheint!"},
+    {"You encountered a wild %s!", "Ein wildes %s erscheint!"},
 
     {"Go %s!", "Los %s!"},
     {"%s detects %s.", "%s erkennt %s."}, // Forewarn

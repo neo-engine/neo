@@ -96,7 +96,7 @@ u8 getCurrentDaytime( ) {
     u8 t = achours, m = acmonth;
 
     for( u8 i = 0; i < 5; ++i )
-        if( DayTimes[ m / 4 ][ i ] >= t ) return i;
+        if( DayTimes[ m / 4 ][ i ] <= t ) return i;
     return 254;
 }
 
