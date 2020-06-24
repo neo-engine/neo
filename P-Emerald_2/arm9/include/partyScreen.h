@@ -290,8 +290,8 @@ namespace STS {
         partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves = true,
                      bool p_allowItems = true, bool p_allowDex = true, u8 p_toSelect = 0,
                      bool p_confirmSelection = true, bool p_faintSelect = false,
-                     bool p_eggSelect = false,
-                     bool p_allowCancel = true, u8 p_inBattle = 0, u8 p_toSwap = 255 );
+                     bool p_eggSelect = false, bool p_allowCancel = true, u8 p_inBattle = 0,
+                     u8 p_toSwap = 255 );
 
         ~partyScreen( );
 

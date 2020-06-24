@@ -350,6 +350,8 @@ namespace BOX {
             }
         }
         IO::updateOAM( true );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
@@ -940,6 +942,8 @@ namespace BOX {
 
     void boxUI::showParty( box* p_box, pokemon* p_party, u8 p_partyLen ) {
         dmaCopy( boxsub2Bitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
         SpriteEntry* oam = IO::Oam->oamBuffer;
         // Load some placeholder
@@ -984,6 +988,8 @@ namespace BOX {
 
     void boxUI::hideParty( box* p_box ) {
         dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
         SpriteEntry* oam = IO::Oam->oamBuffer;
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + 6; ++i ) {

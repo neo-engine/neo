@@ -40,6 +40,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "partyScreen.h"
 #include "dex.h"
 
+#include "bagViewer.h"
 #include "pokemon.h"
 #include "sound.h"
 
@@ -585,10 +586,50 @@ namespace BATTLE {
                             res.m_type = CANCEL;
                         }
                         return res;
-                    case 3: // Choose item
+                    case 3: { // Choose item
                         SOUND::playSoundEffect( SFX_CHOOSE );
-                        // TODO
+
+                        BAG::bagViewer bv = BAG::bagViewer( _playerTeam );
+                        u16 itm     = bv.getItem( BAG::bagViewer::BATTLE );
+
+                        // If the item is a medicine, make the player choose a pkmn to
+                        // use it on
+
+                        if( itm ) {
+                            auto idata = ITEM::getItemData( itm );
+
+                            if( idata.m_itemType == ITEM::ITEMTYPE_POKEBALL ) {
+                                // Player throws a ball
+                                SAVE::SAV.getActiveFile( ).m_bag.erase(
+                                        BAG::toBagType( idata.m_itemType ), itm, 1 );
+                                res.m_type = CAPTURE;
+                                res.m_param = itm;
+                            } else if( idata.m_itemType == ITEM::ITEMTYPE_BATTLEITEM ) {
+                                SAVE::SAV.getActiveFile( ).m_bag.erase(
+                                        BAG::toBagType( idata.m_itemType ), itm, 1 );
+                                res.m_type = USE_ITEM;
+                                res.m_param = itm;
+                            } else if( ( idata.m_itemType & 15 ) == 2 ) {
+                                res.m_type = NO_OP;
+                            }
+                        }
+
+                        _battleUI.init( );
+
+                        for( u8 i2 = 0; i2 < 2; ++i2 )
+                            for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                                auto st = _field.getSlotStatus( i2, j2 );
+                                if( st == slot::status::NORMAL ) {
+                                    _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                                }
+                            }
+
+                        if( itm ) {
+                            _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                            return res;
+                        }
                         break;
+                    }
                     default:
                         break;
                 }
@@ -742,8 +783,14 @@ namespace BATTLE {
     }
 
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
-        // TODO
-        (void) p_battleEndReason;
+        switch( p_battleEndReason ) {
+            case BATTLE_CAPTURE:
+                handleCapture( );
+                break;
+            default:
+                break;
+        }
+
 
         restoreInitialOrder( false );
         resetBattleTransformations( false );
@@ -896,16 +943,17 @@ namespace BATTLE {
         _battleUI.handleCapture( _field.getPkmn( true, 0 ) );
 
         // Check whether the pkmn fits in the team
-        if( _playerTeamSize < 6 ) {
-            std::memcpy( &_playerTeam[ _playerTeamSize ], _field.getPkmn( true, 0 ),
-                    sizeof( pokemon ) );
+        auto pkmn = _field.getPkmn( true, 0 );
+        if( pkmn == nullptr ) [[unlikely]] {
+            return;
+        } else if( _playerTeamSize < 6 ) {
+            std::memcpy( &_playerTeam[ _playerTeamSize ], pkmn, sizeof( pokemon ) );
             _playerTeamSize++;
         } else {
             u8 oldbx = SAVE::SAV.getActiveFile( ).m_curBox;
-            u8 nb    = SAVE::SAV.getActiveFile( ).storePkmn( *_field.getPkmn( true, 0 ) );
+            u8 nb    = SAVE::SAV.getActiveFile( ).storePkmn( *pkmn );
             if( nb != u8( -1 ) ) {
-                snprintf( buffer, 99, GET_STRING( 175 ),
-                        _field.getPkmn( 0, true )->m_boxdata.m_name );
+                snprintf( buffer, 99, GET_STRING( 175 ), pkmn->m_boxdata.m_name );
                 _battleUI.log( buffer );
 
                 if( oldbx != nb ) {
@@ -913,15 +961,16 @@ namespace BATTLE {
                              SAVE::SAV.getActiveFile( ).m_storedPokemon[ oldbx ].m_name );
                     _battleUI.log( buffer );
                 }
-                sprintf( buffer, GET_STRING( 177 ), _field.getPkmn( 0, true )->m_boxdata.m_name,
+                sprintf( buffer, GET_STRING( 177 ), pkmn->m_boxdata.m_name,
                          SAVE::SAV.getActiveFile( ).m_storedPokemon[ nb ].m_name );
                 _battleUI.log( buffer );
             } else {
                 _battleUI.log( GET_STRING( 178 ) );
                 snprintf( buffer, 99,
-                        GET_STRING( 179 ), _field.getPkmn( 0, true )->m_boxdata.m_name );
+                        GET_STRING( 179 ), pkmn->m_boxdata.m_name );
                 _battleUI.log( buffer );
             }
+            for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
         }
     }
 

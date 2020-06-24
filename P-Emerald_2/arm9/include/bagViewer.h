@@ -39,38 +39,82 @@ namespace BAG {
     class bagViewer {
       public:
         enum context {
+            NO_SPECIAL_CONTEXT,
             BATTLE,       // Allow only items usable in-battle
+            WILD_BATTLE,  // Allow only items usable in-battle and pokeballs
             GIVE_TO_PKMN, // Allow only items, medicine and berries
             // TODO: USE_ON_PKMN,  // Allow only evo items, medicine, berries, and forme change
         };
 
       private:
-        std::function<bool( std::pair<u16, u16>, std::pair<u16, u16> )> _currCmp;
+        /*
+         * @brief: Returns true if the current context allows the gaven item to be
+         * displayed.
+         */
+        bool isAllowed( ITEM::itemData* p_data );
+
+        void initView( );
 
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> _ranges;
+
+        std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>> _view;
 
         bagUI* _bagUI;
         bool   _hasSprite;
         u8     _currSelectedIdx;
 
+        pokemon* _playerTeam;
+
+        u16 _currentViewStart;
+        u16 _currentViewEnd;
+
+        context _context;
+
         void initUI( );
 
-        bool confirmChoice( context p_context, u16 p_targetItem );
-        bool useItemOnPkmn( pokemon& p_pokemon, u16 p_item, ITEM::itemData& p_data );
+        bool confirmChoice( u16 p_targetItem );
+
+        inline std::pair<std::pair<u16, u16>, ITEM::itemData>
+            currentItem( ) const {
+            return _view[ _currSelectedIdx ];
+        }
+
+        /*
+         * @brief: Uses the specified item on the given pkmn.
+         * @returns: true if the item needs to be removed from the bag, false otherwise.
+         */
+        bool useItemOnPkmn( pokemon& p_pokemon, u16 p_item, ITEM::itemData* p_data );
+
+        /*
+         * @brief: Gives the specified item to the given pkmn.
+         * @returns: True iff the item needs to bo removed from the bag.
+         */
         bool giveItemToPkmn( pokemon& p_pokemon, u16 p_item );
+
+        /*
+         * @brief: Removes any item the given pkmn holds and adds it to bag.
+         */
         void takeItemFromPkmn( pokemon& p_pokemon );
 
         u16  handleSelection( );
-        bool handleSomeInput( touchPosition p_touch, int p_pressed );
+        bool handleSomeInput( bool p_allowSort = true );
 
       public:
-        bagViewer( );
+        bagViewer( pokemon* p_playerTeam, context p_context = NO_SPECIAL_CONTEXT );
         ~bagViewer( ) {
             delete _bagUI;
         }
-        // Returns an item which shall be used
+
+        /*
+         * @brief: Runs the bag viewer. May return an item that is to be used in the OW
+         * (e.g. Honey or Repel).
+         */
         u16 run( );
 
+        /*
+         * @brief: Runs the bag viewer to make the player select an item from the bag that
+         * fits the specified context.
+         */
         u16 getItem( context p_context );
     };
 } // namespace BAG

@@ -63,7 +63,7 @@ extern GameMod gMod;
 u8 getCurrentDaytime( );
 
 // num frames between button input
-#define COOLDOWN_COUNT 8
+#define COOLDOWN_COUNT 6
 
 extern bool DRAW_TIME;
 extern bool UPDATE_TIME;

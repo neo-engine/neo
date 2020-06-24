@@ -26,20 +26,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
+#include <string>
 #include <nds.h>
 
 #include "bag.h"
 #include "uio.h"
 
 namespace BAG {
-    const u8 GIVE_ITEM = 1;
-    const u8 TAKE_ITEM = 2;
-    const u8 MOVE_ITEM = 3;
-    const u8 MOVE_BAG  = 4;
+    constexpr u8 GIVE_ITEM = 1;
+    constexpr u8 TAKE_ITEM = 2;
+    constexpr u8 MOVE_ITEM = 3;
+    constexpr u8 MOVE_BAG  = 4;
 
-    const u8 BAG_CNT = 5;
+    constexpr u8 BAG_CNT = 5;
 
-    const u8 MAX_ITEMS_PER_PAGE = 9;
+    constexpr u8 MAX_ITEMS_PER_PAGE = 8;
     class bagUI {
       public:
         struct targetInfo {
@@ -48,22 +49,57 @@ namespace BAG {
         };
 
       private:
-        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16             p_itemId,
-                                                                      ITEM::itemData& p_data );
+        pokemon* _playerTeam;
 
+        u8       _selectedIdx = 255;
+        bag::bagType  _currentPage;
+
+        std::pair<u16, std::string> _teamItemCache[ 6 ];
+        std::pair<u16, std::string> _itemCache[ MAX_ITEMS_PER_PAGE ];
+
+        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16             p_itemId,
+                                                                      const ITEM::itemData* p_data );
+
+        void drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx, bool p_selected,
+                bool p_pressed, bool p_clearOnly = false );
       public:
+        bagUI( pokemon* p_playerTeam ) : _playerTeam( p_playerTeam ) { }
+
         u16  drawPkmnIcons( );
+
+        /*
+         * @brief: Initializes the bag UI. Destroys anything on the screens.
+         */
         void init( );
 
-        std::vector<std::pair<IO::inputTarget, targetInfo>> drawBagPage( bag::bagType,
-                                                                         u16 p_firstDisplayedItem );
-        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data,
-                         bool p_pressed = false );
-        void unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item, ITEM::itemData& p_data );
+        /*
+         * @brief: Redraws the specified page and displays the given items.
+         */
+        std::vector<std::pair<IO::inputTarget, targetInfo>>
+            drawBagPage( bag::bagType,
+                    const std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>& p_items,
+                    u8 p_selection = 0 );
 
-        bool getSprite( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data );
+        /*
+         * @brief: Selects and highlights the specified item.
+         */
+        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data,
+                         bool p_pressed = false );
+
+        /*
+         * @brief: Attaches the sprite corresponding to the specified item to the player's
+         * touch input.
+         */
+        bool getSprite( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data );
+
+        /*
+         * @brief: Updates the current position of the sprite at hand.
+         */
         void updateSprite( touchPosition p_touch );
-        void dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item,
-                         ITEM::itemData& p_data );
+
+        /*
+         * @brief: Removes any sprite attached from the player's touch input.
+         */
+        void dropSprite( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data );
     };
 } // namespace BAG

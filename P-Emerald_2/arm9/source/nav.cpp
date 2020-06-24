@@ -390,7 +390,7 @@ namespace NAV {
             // StartBag
             if( ( pressed & KEY_X ) ||
                     GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) ) {
-                BAG::bagViewer bv;
+                BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;
                 SOUND::dimVolume( );

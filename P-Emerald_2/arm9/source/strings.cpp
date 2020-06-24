@@ -191,16 +191,16 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Accuracy", "Genauigkeit"},
     {"Egg", "Ei"},
 
-    {"Already\nlearned", "Bereits\nerlernt"},
+    {"Already learned", "Bereits erlernt"},
     {"Possible", "Erlernbar"},
-    {"Not\npossible", "Nicht\nerlernbar"},
+    {"Not possible", "Nicht erlernbar"},
     {"Level %3d\n%3d/%3d HP", "Level %3d\n%3d/%3d KP"},
     {"Level %3d\n Fainted", "Level %3d\n Besiegt"},
 
     // 40
 
     {"Possible", "M\xf6glich"},
-    {"Not\npossible", "Nicht\nm\xf6glich"},
+    {"Not possible", "Nicht m\xf6glich"},
     {"No item", "Kein Item"},
     {"No items", "Keine Items"},
     {"Give", "Geben"},
@@ -405,18 +405,18 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     {"The wild %s fled!", "%s (wild) floh."},
     {"[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]"},
-    {"It got wasted[A]", "Es hat keine Wirkung[A]"},
-    {"Used %s.[A]", "%s eingesetzt.[A]"},
-    {"%s's data was\nregistred to the Pok\xe9 Dex.[A]", "Die Daten von %s\nwurden im Pok\xe9"
-                                                        "Dex gespeichert.[A]"},
+    {"It got wasted|", "Es hat keine Wirkung|"},
+    {"Used %s.", "%s eingesetzt."},
+    {"%s's data was\nregistred to the Pok\xe9 Dex.", "Die Daten von %s\nwurden im Pok\xe9"
+                                                        "Dex gespeichert."},
 
-    {"%s was sent to\nthe Pok\xe9mon Storage System.[A]",
-     "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt.[A]"},
-    {"Box %s is full.[A]", "Box %s ist voll.[A]"},
-    {"%s was deposited\nto Box %s.[A]", "%s wurde in\nBox %s abgelegt.[A]"},
-    {"There is no space left\nfor additional Pok\xe9mon.[A]",
-     "Du hast keinen Platz\nf\xfcr weitere Pok\xe9mon.[A]"},
-    {"%s was released.[A]", "%s wurde wieder\nfreigelassen.[A]"},
+    {"%s was sent to\nthe Pok\xe9mon Storage System.",
+     "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt."},
+    {"Box %s is full.", "Box %s ist voll."},
+    {"%s was deposited\nto Box %s.", "%s wurde in\nBox %s abgelegt."},
+    {"There is no space left\nfor additional Pok\xe9mon.",
+     "Du hast keinen Platz\nf\xfcr weitere Pok\xe9mon."},
+    {"%s was released.", "%s wurde wieder\nfreigelassen."},
 
     // 180
 

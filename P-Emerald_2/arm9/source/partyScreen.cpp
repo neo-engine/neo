@@ -990,7 +990,7 @@ namespace STS {
             break;
         }
         case STS::partyScreen::GIVE_ITEM: {
-            BAG::bagViewer bv;
+            BAG::bagViewer bv = BAG::bagViewer( _team );
             u16            itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
             computeSelectionChoices( );
             _partyUI->init( _currentSelection );

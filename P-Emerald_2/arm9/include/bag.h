@@ -53,64 +53,70 @@ namespace BAG {
         }
 
         /*
-         * Adds cnt items with no. item_id to the bag.
+         * @brief: Sorts the specified bag. (slow)
+         */
+        void sort( bagType );
+
+        /*
+         * @brief: Adds cnt items with no. item_id to the bag.
          */
         void insert( bagType, u16 p_itemId, u16 p_cnt );
 
         /*
-         * Removes cnt items with no. item_id from the bag.
+         * @brief: Removes cnt items with no. item_id from the bag.
          * cnt == -1: removes all items of desired kind
          */
         void erase( bagType, u16 p_itemId, u16 p_cnt = -1 );
 
         /*
-         * Returns the number of items with no. item_id in the bag.
+         * @brief: Returns the number of items with no. item_id in the bag.
          */
         u16 count( bagType, u16 p_itemId );
 
         /*
-         * Returns true if the specified bag is empty.
+         * @brief: Returns true if the specified bag is empty.
          */
         bool empty( bagType );
 
         /*
-         * Clears the specified bag.
+         * @brief: Clears the specified bag.
          */
         void clear( bagType );
 
         /*
-         * Swaps the items at the specified positions.
+         * @brief: Swaps the items at the specified positions.
          */
         void swap( bagType, u16 p_idx1, u16 p_idx2 );
 
         /*
-         * Returns the number of items in the specified bag.
+         * @brief: Returns the number of items in the specified bag.
          */
         std::size_t size( bagType );
 
         /*
-         * Returns the pointer to the first element in the bag.
+         * @brief: Returns the pointer to the first element in the bag.
          */
         std::pair<u16, u16>* begin( bagType );
 
         /*
-         * Returns the pointer to the first element in the bag.
+         * @brief: Returns the pointer to the first element in the bag.
          */
         const std::pair<u16, u16>* cbegin( bagType ) const;
 
         /*
-         * Returns the pointer after the last element of the bag.
+         * @brief: Returns the pointer after the last element of the bag.
          */
         std::pair<u16, u16>* end( bagType );
 
         /*
-         * Returns the pointer after the last element of the bag.
+         * @brief: Returns the pointer after the last element of the bag.
          */
         const std::pair<u16, u16>* cend( bagType ) const;
 
         std::pair<u16, u16>& operator( )( bagType p_bagType, u16 p_idx ) {
             return begin( p_bagType )[ p_idx ];
         }
+
         const std::pair<u16, u16>& operator( )( bagType p_bagType, u16 p_idx ) const {
             return cbegin( p_bagType )[ p_idx ];
         }

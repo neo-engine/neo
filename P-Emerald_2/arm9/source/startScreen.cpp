@@ -48,6 +48,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "partyScreen.h"
 #include "statusScreen.h"
 #include "pokemonNames.h"
+#include "bagViewer.h"
 
 #include "battle.h"
 // END TEST
@@ -106,6 +107,8 @@ namespace SAVE {
             testTeam[ i ].m_boxdata.m_heldItem = I_GYARADOSITE;
         }
 
+        BAG::bagViewer btv = BAG::bagViewer( testTeam );
+        btv.run( );
 
         // BOX::boxViewer bxv;
         // bxv.run( );

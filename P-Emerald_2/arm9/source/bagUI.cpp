@@ -40,7 +40,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 // Sprites
-#include "Back.h"
 #include "BagBall1.h"
 #include "BagBall2.h"
 #include "BagBerry1.h"
@@ -51,8 +50,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "BagKey2.h"
 #include "BagMediine1.h"
 #include "BagMediine2.h"
-#include "Down.h"
+#include "backarrow.h"
+#include "NoItem.h"
 #include "Up.h"
+#include "Down.h"
+#include "Back.h"
+
+#include "noselection_64_32.h"
+#include "noselection_64_20.h"
+#include "noselection_96_32_4.h"
 
 namespace BAG {
     const unsigned short* bagPals[ 10 ]
@@ -62,20 +68,45 @@ namespace BAG {
         = {BagBall1Tiles, BagBall2Tiles,  BagMediine1Tiles, BagMediine2Tiles, BagHm1Tiles,
            BagHm2Tiles,   BagBerry1Tiles, BagBerry2Tiles,   BagKey1Tiles,     BagKey2Tiles};
 
-    //#define BACK_ID 0
-#define PKMN_SUB 1
-#define BAG_SUB 7
-    //#define SORT_SUB 12
-    //#define UP_SUB 13
-    //#define DOWN_SUB 14
-#define TRANSFER_SUB 15
 
-    void showActiveBag( u8 p_bagNo, bool p_active = true ) {
-        u16 tileIdx = IO::Oam->oamBuffer[ BAG_SUB + p_bagNo ].gfxIndex;
-        IO::loadSprite( BAG_SUB + p_bagNo, BAG_SUB + p_bagNo, tileIdx,
-                        26 * p_bagNo /*SAV.getActiveFile( ).m_bagPoses[ p_bagNo ]*/, 3, 32, 32,
-                        bagPals[ 2 * p_bagNo + p_active ], bagTiles[ 2 * p_bagNo + p_active ],
-                        BackTilesLen, false, false, false, OBJPRIORITY_3, true );
+#define SPR_TRANSFER_OAM_SUB 0
+#define SPR_MESSAGE_WINDOW_OAM_SUB 1
+#define SPR_ARROW_UP_OAM_SUB 18
+#define SPR_ARROW_DOWN_OAM_SUB 19
+#define SPR_X_OAM_SUB 20
+#define SPR_ARROW_BACK_OAM_SUB 21
+#define SPR_ITEM_WINDOW_OAM_SUB( p_window ) ( 22 + 6 * ( p_window ) )
+#define SPR_PKMN_START_OAM_SUB 80
+#define SPR_BAG_ICON_OAM_SUB 87
+
+#define SPR_BOX_PAL_SUB 0
+#define SPR_SELECTED_PAL_SUB 1
+#define SPR_ARROW_X_PAL_SUB 2
+#define SPR_PKMN_PAL_SUB 3
+#define SPR_BAG_ICON_PAL_SUB 9
+#define SPR_BAG_ICON_SEL_PAL_SUB 10
+#define SPR_ITEM_ICON_PAL_SUB 11
+#define SPR_BACK_PAL_SUB 12
+#define SPR_DOWN_PAL_SUB 13
+#define SPR_TRANSFER_PAL_SUB 15
+
+    void showActiveBag( u8 p_bagNo ) {
+        u16 tileIdx = IO::Oam->oamBuffer[ SPR_BAG_ICON_OAM_SUB + p_bagNo ].gfxIndex;
+
+        for( u8 i = 0; i < 5; ++i ) {
+            IO::loadSprite( SPR_BAG_ICON_OAM_SUB + i, SPR_BAG_ICON_PAL_SUB,
+                        IO::Oam->oamBuffer[ SPR_BAG_ICON_OAM_SUB + i ].gfxIndex,
+                        27 * i, 0, 32, 32,
+                        bagPals[ 2 * i ], bagTiles[ 2 * i ],
+                        NoItemTilesLen, false, false, false, OBJPRIORITY_3, true,
+                        OBJMODE_BLENDED );
+        }
+
+        IO::loadSprite( SPR_BAG_ICON_OAM_SUB + p_bagNo, SPR_BAG_ICON_SEL_PAL_SUB, tileIdx,
+                27 * p_bagNo, 0, 32, 32,
+                bagPals[ 2 * p_bagNo + 1 ], bagTiles[ 2 * p_bagNo + 1 ],
+                NoItemTilesLen, false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
     }
 
     void initColors( ) {
@@ -110,60 +141,100 @@ namespace BAG {
         bgUpdate( );
         initColors( );
 
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !_playerTeam[ i ].getSpecies( ) ) { break; }
+
+            _teamItemCache[ i ] = std::pair( _playerTeam[ i ].getItem( ),
+                ITEM::getItemName( _playerTeam[ i ].getItem( ) ) );
+        }
+
         IO::initOAMTable( false );
         // Don't init anything else for the top screen here
 
         IO::initOAMTable( true );
-        u16 tileCnt = 0;
+        SpriteEntry* oam = IO::Oam->oamBuffer;
 
-        tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26,
+        u16 tileCnt = drawPkmnIcons( );
+
+        tileCnt = IO::loadSprite( SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB,
+                                  tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26,
                                   32, 32, BackPal, BackTiles, BackTilesLen, false, false, false,
                                   OBJPRIORITY_3, true );
-        tileCnt = drawPkmnIcons( );
+
+        tileCnt = IO::loadSprite( SPR_ARROW_DOWN_OAM_SUB, SPR_DOWN_PAL_SUB, tileCnt,
+                                  SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26,
+                                  32, 32, DownPal, DownTiles, DownTilesLen, false, false, false,
+                                  OBJPRIORITY_3, true );
+        tileCnt = IO::loadSprite( SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
+                                  SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26,
+                                  32, 32, UpPal, UpTiles, UpTilesLen, false, false, false,
+                                  OBJPRIORITY_3, true );
+
+
         for( u8 i = 0; i < 5; ++i ) {
-            tileCnt = IO::loadSprite( BAG_SUB + i, BAG_SUB + i, tileCnt,
-                                      26 * i /*SAVE::SAV.getActiveFile( ).m_bagPoses[ i ]*/, 3, 32,
-                                      32, bagPals[ 2 * i ], bagTiles[ 2 * i ], BackTilesLen, false,
+            tileCnt = IO::loadSprite( SPR_BAG_ICON_OAM_SUB + i, SPR_BAG_ICON_PAL_SUB, tileCnt,
+                                      26 * i, 0, 32, 32, bagPals[ 2 * i ], bagTiles[ 2 * i ],
+                                      NoItemTilesLen, false,
                                       false, false, OBJPRIORITY_3, true );
         }
 
-        tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt, SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26,
-                                  32, 32, DownPal, DownTiles, DownTilesLen, false, false, false,
-                                  OBJPRIORITY_3, true );
-        tileCnt = IO::loadSprite( BWD_ID, BWD_ID, tileCnt, SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26,
-                                  32, 32, UpPal, UpTiles, UpTilesLen, false, false, false,
-                                  OBJPRIORITY_3, true );
-        tileCnt = IO::loadSprite( TRANSFER_SUB, TRANSFER_SUB, tileCnt, SCREEN_WIDTH - 92,
-                                  SCREEN_HEIGHT - 26, 32, 32, UpPal, UpTiles, UpTilesLen, false,
+        tileCnt = IO::loadSprite( SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB,
+                                  tileCnt, SCREEN_WIDTH - 92,
+                                  SCREEN_HEIGHT - 26, 32, 32, 0, 0, NoItemTilesLen, false,
                                   false, true, OBJPRIORITY_3, true );
 
+        // item windows
+
+        tileCnt =
+            IO::loadSprite( SPR_ITEM_WINDOW_OAM_SUB( 0 ), SPR_BOX_PAL_SUB,
+                                  tileCnt, 0, 0, 32, 32, noselection_64_20Pal,
+                                  noselection_64_20Tiles, NoItemTilesLen, false,
+                                  false, true, OBJPRIORITY_3, true,
+                                  OBJMODE_BLENDED );
+
+        for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
+            for( u8 j = 0; j < 4; ++j ) {
+                IO::loadSprite( SPR_ITEM_WINDOW_OAM_SUB( i ) + j, SPR_BOX_PAL_SUB,
+                        oam[ SPR_ITEM_WINDOW_OAM_SUB( 0 ) ].gfxIndex,
+                        136 + 24 * j, 6 + 20 * i, 32, 32, 0, 0, NoItemTilesLen, false,
+                        false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
+            IO::loadSprite( SPR_ITEM_WINDOW_OAM_SUB( i ) + 4, SPR_BOX_PAL_SUB,
+                        oam[ SPR_ITEM_WINDOW_OAM_SUB( 0 ) ].gfxIndex,
+                        254 - 32, 6 + 20 * i - 12, 32, 32, 0, 0, NoItemTilesLen, true,
+                        true, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+
+        IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( true );
     }
 
     u16 bagUI::drawPkmnIcons( ) {
-        u16 tileCnt = 32;
+        u16 tileCnt = 0;
         for( u8 i = 0; i < 6; ++i ) {
-            auto acPkmn = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
-            if( !acPkmn.m_boxdata.m_speciesId ) break;
+            auto acPkmn = _playerTeam[ i ];
+            if( !acPkmn.getSpecies( ) ) break;
             if( acPkmn.isEgg( ) )
-                tileCnt = IO::loadEggIcon( 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i, tileCnt );
+                tileCnt = IO::loadEggIcon( 4, 30 + i * 26, SPR_PKMN_START_OAM_SUB + i,
+                        SPR_PKMN_PAL_SUB + i, tileCnt );
             else
                 tileCnt = IO::loadPKMNIcon(
-                    acPkmn.m_boxdata.m_speciesId, 8, 26 + i * 26, PKMN_SUB + i, PKMN_SUB + i,
+                    acPkmn.getSpecies( ), 4, 30 + i * 26, SPR_PKMN_START_OAM_SUB + i,
+                    SPR_PKMN_PAL_SUB + i,
                     tileCnt, true, acPkmn.getForme( ), acPkmn.isShiny( ), acPkmn.isFemale( ) );
-            IO::Oam->oamBuffer[ PKMN_SUB + i ].priority = OBJPRIORITY_3;
+            IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + i ].priority = OBJPRIORITY_3;
         }
         return tileCnt;
     }
 
-    void drawItemTop( u16 p_itemId, ITEM::itemData& p_data, u16 p_count ) {
+    void drawItemTop( u16 p_itemId, const ITEM::itemData* p_data, u16 p_count ) {
         std::string display;
         std::string descr;
         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
         IO::OamTop->oamBuffer[ 1 ].isHidden = true;
         IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
-        if( p_data.m_itemType != ITEM::ITEMTYPE_TM ) {
+        if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
             IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
             IO::OamTop->oamBuffer[ 1 ].isHidden = true;
             IO::OamTop->oamBuffer[ 2 ].isHidden = true;
@@ -172,13 +243,13 @@ namespace BAG {
             descr   = ITEM::getItemDescr( p_itemId );
             char buffer[ 100 ];
 
-            if( p_data.m_itemType != ITEM::ITEMTYPE_KEYITEM
-                && p_data.m_itemType != ITEM::ITEMTYPE_FORMECHANGE ) {
+            if( p_data->m_itemType != ITEM::ITEMTYPE_KEYITEM
+                && p_data->m_itemType != ITEM::ITEMTYPE_FORMECHANGE ) {
                 snprintf( buffer, 99, "x %d", p_count );
                 IO::regularFont->printStringC( buffer, 146, 52, false );
             }
 
-            if( p_data.m_itemType & ITEM::ITEMTYPE_BERRY ) {
+            if( p_data->m_itemType & ITEM::ITEMTYPE_BERRY ) {
                 /*
                 IO::regularFont->setColor( IO::RED_IDX, 1 );
                 snprintf( buffer, 99, GET_STRING( 16 ),
@@ -221,13 +292,13 @@ namespace BAG {
                 */
             }
         } else {
-            descr   = MOVE::getMoveDescr( p_data.m_param2 );
-            MOVE::moveData move = MOVE::getMoveData( p_data.m_param2 );
-            u16 tileCnt = IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data.m_param2 ), 112,
+            descr   = MOVE::getMoveDescr( p_data->m_param2 );
+            MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
+            u16 tileCnt = IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data->m_param2 ), 112,
                                           44, 0, 0, 0, false );
 
             display = ITEM::getItemName( p_itemId ) + ": "
-                      + MOVE::getMoveName( p_data.m_param2 );
+                      + MOVE::getMoveName( p_data->m_param2 );
 
             IO::regularFont->printStringC( GET_STRING( 29 ), 33, 145, false );
             tileCnt
@@ -267,93 +338,125 @@ namespace BAG {
     }
 
     std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
-    bagUI::drawPkmn( u16 p_itemId, ITEM::itemData& p_data ) {
+    bagUI::drawPkmn( u16 p_itemId, const ITEM::itemData* p_data ) {
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
         for( u8 i = 0; i < 6; ++i ) {
-            if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
-            IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
-            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            const u8 FIRST_LINE = 33 + 26 * i;
+            const u8 SECOND_LINE = 44 + 26 * i;
+            const u8 SINGLE_LINE = 38 + 26 * i;
 
-            if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].isEgg( ) ) {
-                IO::regularFont->printStringC( GET_STRING( 34 ), 45, 38 + 26 * i, true );
+            if( !_playerTeam[ i ].m_boxdata.m_speciesId ) break;
+
+            if( _playerTeam[ i ].getItem( )
+                    != _teamItemCache[ i ].first ) {
+                // Cache miss, check whether the item can be found somewhere else
+                bool gd = false;
+                for( u8 j = 0; j < 6; ++j ) {
+                    if( _playerTeam[ i ].getItem( ) == _teamItemCache[ j ].first ) {
+                        // Found the item on a pkmn, probably the items got swapped
+                        std::swap(  _teamItemCache[ i ], _teamItemCache[ j ] );
+                        gd = true;
+                        break;
+                    }
+                }
+                for( u8 j = 0; j < MAX_ITEMS_PER_PAGE; ++j ) {
+                    if( _playerTeam[ i ].getItem( ) == _itemCache[ j ].first ) {
+                        // Found the item in the bag cache, probably the item was given to
+                        // the pkmn
+                        _teamItemCache[ i ] = _itemCache[ j ];
+                        gd = true;
+                        break;
+                    }
+                }
+
+                if( !gd ) {
+                    // Complete cache miss, need to reload
+                    _teamItemCache[ i ].first = _playerTeam[ i ].getItem( );
+                    _teamItemCache[ i ].second = ITEM::getItemName( _playerTeam[ i ].getItem( ) );
+                }
+            }
+
+            if( p_data != nullptr ) {
+                IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            }
+
+            if( _playerTeam[ i ].isEgg( ) ) {
+                if( p_data != nullptr ) {
+                    IO::regularFont->printStringC( GET_STRING( 34 ), 45, SINGLE_LINE, true );
+                }
                 res.push_back(
                     {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {0, true}} );
             } else {
                 res.push_back( {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
-                                {SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ), true}} );
-                if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
-                    u16 currMv = p_data.m_param2;
-                    if( currMv == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 0 ]
+                                {_playerTeam[ i ].getItem( ), true}} );
+                if( p_data == nullptr ) { continue; }
+
+                IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 40,
+                            FIRST_LINE, true );
+                if( p_itemId && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
+                    u16 currMv = p_data->m_param2;
+                    if( currMv == _playerTeam[ i ].getMove( 0 )
                         || currMv
-                               == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 1 ]
+                               == _playerTeam[ i ].getMove( 1 )
                         || currMv
-                               == SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_moves[ 2 ]
+                               == _playerTeam[ i ].getMove( 2 )
                         || currMv
-                               == SAVE::SAV.getActiveFile( )
-                                      .m_pkmnTeam[ i ]
-                                      .m_boxdata.m_moves[ 3 ] ) {
+                               == _playerTeam[ i ].getMove( 3 ) ) {
                         IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 35 ), 40, 33 + 26 * i, true,
+                        IO::regularFont->setColor( 0, 2 );
+                        IO::regularFont->printStringC( GET_STRING( 35 ), 40, SECOND_LINE, true,
                                                       IO::font::LEFT, 11 );
-                    } else if( canLearn(
-                                   SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId,
-                                   currMv, LEARN_TM ) ) {
+                    } else if( canLearn( _playerTeam[ i ].getSpecies( ), currMv, LEARN_TM ) ) {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
-                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 36 ), 40, 38 + 26 * i, true );
+                        IO::regularFont->setColor( 0, 2 );
+                        IO::regularFont->printStringC( GET_STRING( 36 ), 40, SECOND_LINE, true );
                     } else {
                         IO::regularFont->setColor( IO::RED_IDX, 1 );
-                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 37 ), 40, 33 + 26 * i, true,
+                        IO::regularFont->setColor( 0, 2 );
+                        IO::regularFont->printStringC( GET_STRING( 37 ), 40, SECOND_LINE, true,
                                                       IO::font::LEFT, 11 );
                     }
-                } else if( p_itemId && ( p_data.m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
-                    char buffer[ 100 ];
-                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_curHP ) {
-                        snprintf( buffer, 99, GET_STRING( 38 ),
-                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_level,
-                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_curHP,
-                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_stats.m_maxHP );
-                    } else {
-                        snprintf( buffer, 99, GET_STRING( 39 ),
-                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_level );
-                    }
-                    IO::regularFont->printStringC( buffer, 40, 33 + 26 * i, true, IO::font::LEFT,
-                                                  11 );
+                } else if( p_itemId && ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
+                    IO::smallFont->setColor( 0, 0 );
+                    IO::smallFont->setColor( IO::GRAY_IDX, 1 );
+                    IO::smallFont->setColor( 0, 2 );
+                    IO::smallFont->printString( "!", 40, SECOND_LINE - 2, true );
+                    char buffer[ 10 ];
+                    snprintf( buffer, 8, "%d", _playerTeam[ i ].m_level );
+                    IO::smallFont->printStringC( buffer, 48, SECOND_LINE - 1, true );
+
+                    snprintf( buffer, 8, "%3d", _playerTeam[ i ].m_stats.m_curHP );
+                    IO::smallFont->printStringC( buffer, 40 + 78 - 44, SECOND_LINE - 1,
+                            true );
+                    snprintf( buffer, 8, "/%d", _playerTeam[ i ].m_stats.m_maxHP );
+                    IO::smallFont->printStringC( buffer, 40 + 76 - 20, SECOND_LINE - 1, true );
                 } else {
-                    if( p_itemId && p_data.m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
-                        if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].canEvolve( p_itemId,
-                                    EVOMETHOD_ITEM ) ) {
+                    if( p_itemId && p_data->m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
+                        if( _playerTeam[ i ].canEvolve( p_itemId, EVOMETHOD_ITEM ) ) {
                             BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                             IO::regularFont->setColor( IO::COLOR_IDX, 1 );
-                            IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                            IO::regularFont->printStringC( GET_STRING( 40 ), 40, 38 + 26 * i, true );
+                            IO::regularFont->setColor( 0, 2 );
+                            IO::regularFont->printStringC( GET_STRING( 40 ), 40, SECOND_LINE,
+                                    true );
                         } else {
                             IO::regularFont->setColor( IO::RED_IDX, 1 );
-                            IO::regularFont->setColor( IO::BLACK_IDX, 2 );
-                            IO::regularFont->printStringC( GET_STRING( 41 ), 40, 33 + 26 * i, true,
-                                                          IO::font::LEFT, 11 );
+                            IO::regularFont->setColor( 0, 2 );
+                            IO::regularFont->printStringC( GET_STRING( 41 ), 40, SECOND_LINE, true,
+                                    IO::font::LEFT, 11 );
                         }
                     } else {
-                        IO::regularFont->printStringC(
-                            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_name, 45,
-                            33 + 26 * i, true );
 
-                        IO::regularFont->setColor( IO::BLACK_IDX, 2 );
+                        IO::regularFont->setColor( 0, 2 );
                         IO::regularFont->setColor( IO::GRAY_IDX, 1 );
 
-                        if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ) ) {
-                            IO::regularFont->printStringC(
-                                ITEM::getItemName(
-                                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].getItem( ),
-                                    CURRENT_LANGUAGE )
-                                    .c_str( ),
-                                40, 44 + 26 * i, true );
+                        if( _playerTeam[ i ].getItem( ) ) {
+                            IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ),
+                                40, SECOND_LINE, true );
                         } else
-                            IO::regularFont->printStringC( GET_STRING( 42 ), 40, 44 + 26 * i, true );
+                            IO::regularFont->printStringC( GET_STRING( 42 ), 40, SECOND_LINE, true );
                     }
                 }
             }
@@ -363,105 +466,143 @@ namespace BAG {
         return res;
     }
 
-    void drawItemSub( u16 p_itemId, ITEM::itemData& p_data, u16 p_x, u16 p_y, bool p_selected,
-                      bool p_pressed, bool p_clearOnly = false ) {
-        IO::printRectangle( p_x, p_y, 255, p_y + 18, true, 0 );
-        if( p_clearOnly || !p_itemId ) return;
-        /* if( p_item->m_itemType != item::itemType::GOODS
-            && toBagType( p_data.m_itemType ) == bag::bagType::ITEMS ) {
-            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
-            IO::boldFont->printChar( 490 - 22 + u16( p_item->m_itemType ),
-                                     p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed, true );
-        } else */
-        if( p_itemId == SAVE::SAV.getActiveFile( ).m_registeredItem ) {
-            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
-            IO::boldFont->printChar( 'Y', p_x + 106 + 2 * p_pressed, p_y - 2 + p_pressed, true );
-        } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM
-                   && MOVE::isFieldMove( p_data.m_param2 ) ) {
-            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
+    void bagUI::drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx, bool p_selected,
+                      bool p_pressed, bool p_clearOnly ) {
+        (void) p_pressed;
+
+        if( p_itemId != _itemCache[ p_idx ].first && p_data != nullptr ) {
+
+            // Cache miss, check whether the item can be found somewhere else
+            bool gd = false;
+            for( u8 j = 0; j < MAX_ITEMS_PER_PAGE; ++j ) {
+                if( p_itemId == _itemCache[ j ].first ) {
+                    // Found the item at a different place in the bag, probably the items got swapped
+                    std::swap(  _itemCache[ p_idx ], _itemCache[ j ] );
+                    gd = true;
+                    break;
+                }
+            }
+            for( u8 j = 0; j < 6; ++j ) {
+                if( p_itemId == _teamItemCache[ j ].first ) {
+                    // Found the item in the pkmn cache, probably the item was taken from
+                    // the pkmn
+                    _itemCache[ p_idx ] = _teamItemCache[ j ];
+                    gd = true;
+                    break;
+                }
+            }
+
+            if( !gd ) {
+                // Full cache miss
+                _itemCache[ p_idx ].first = p_itemId;
+                if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
+                    _itemCache[ p_idx ].second = ITEM::getItemName( p_itemId );
+                } else {
+                    _itemCache[ p_idx ].second = MOVE::getMoveName( p_data->m_param2 );
+                }
+            }
+        }
+
+        for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
+            for( u8 j = 0; j < 5; ++j ) {
+                IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( i ) + j ].palette
+                    = SPR_BOX_PAL_SUB;
+            }
+        }
+
+        for( u8 j = 0; j < 5; ++j ) {
+            IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( p_idx ) + j ].isHidden = p_clearOnly
+                || !p_itemId;
+            if( p_selected ) {
+                IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( p_idx ) + j ].palette
+                    = SPR_SELECTED_PAL_SUB;
+            }
+        }
+
+        IO::updateOAM( true );
+
+        u16 x = IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( p_idx ) ].x;
+        u16 y = IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( p_idx ) ].y;
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::printRectangle( x, y, 255, y + 20, true, 0 );
+        if( p_clearOnly || !p_itemId || p_data == nullptr ) return;
+
+        if( ITEM::getItemChar( p_data->m_itemType )
+                != ITEM::getItemChar( ITEM::ITEMTYPE_COLLECTIBLE )
+            && toBagType( p_data->m_itemType ) == bag::bagType::ITEMS ) {
+            IO::boldFont->printChar( ITEM::getItemChar( p_data->m_itemType ), 236, y + 2, true );
+        } else if( p_itemId == SAVE::SAV.getActiveFile( ).m_registeredItem ) {
+            IO::boldFont->printChar( 'Y', 238, y + 2, true );
+        } else if( p_data->m_itemType == ITEM::ITEMTYPE_TM
+                   && MOVE::isFieldMove( p_data->m_param2 ) ) {
             IO::boldFont->setColor( IO::BLUE_IDX, 2 );
-            IO::boldFont->printChar( 468 + 2, p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed,
-                                     true );
+            IO::boldFont->printChar( 468 + 2, 236, y + 2, true );
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-        } else if( p_data.m_itemType == ITEM::ITEMTYPE_TM ) {
-            IO::printChoiceBox( p_x, p_y, p_x + 106 + 13, p_y + 16, 3, 16,
-                                p_selected ? IO::RED_IDX : IO::GRAY_IDX, p_pressed );
-            IO::boldFont->printChar( 468 + 2, p_x + 102 + 2 * p_pressed, p_y - 2 + p_pressed,
-                                     true );
-        } else
-            IO::printChoiceBox( p_x, p_y, p_x + 106, p_y + 16, 3, p_selected ? IO::RED_IDX : IO::GRAY_IDX,
-                                p_pressed );
-        if( p_data.m_itemType != ITEM::ITEMTYPE_TM )
-            IO::regularFont->printStringC( ITEM::getItemName( p_itemId ).c_str( ),
-                                          p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
-        else
-            IO::regularFont->printStringC(
-                MOVE::getMoveName( p_data.m_param2 ).c_str( ),
-                p_x + 3 + 2 * p_pressed, p_y + 1 + p_pressed, true );
+        } else if( p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
+            IO::boldFont->printChar( 468 + 2, 236, y + 2, true );
+        }
+
+        IO::regularFont->printStringC( _itemCache[ p_idx ].second.c_str( ), x + 6, y + 2, true );
+
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
 
     void drawTop( u8 p_page ) {
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        initColors( );
         IO::regularFont->printStringC( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
     }
 
-    void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data,
+    void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data,
                             bool p_pressed ) {
+        if( p_idx != _selectedIdx ) {
+            // Unselecd old item
+            drawTop( _currentPage );
+        }
+        _selectedIdx = p_idx;
+
         drawPkmn( p_item.first, p_data );
         drawItemTop( p_item.first, p_data, p_item.second );
         if( p_idx < MAX_ITEMS_PER_PAGE )
-            drawItemSub( p_item.first, p_data, 132, 4 + p_idx * 18, true, p_pressed, false );
-    }
-    void bagUI::unselectItem( bag::bagType p_page, u8 p_idx, u16 p_item, ITEM::itemData& p_data ) {
-        drawPkmn( 0, p_data );
-        drawTop( p_page );
-        if( p_idx < MAX_ITEMS_PER_PAGE )
-            drawItemSub( p_item, p_data, 132, 4 + p_idx * 18, false, false, false );
+            drawItemSub( p_item.first, p_data, p_idx, true, p_pressed, false );
     }
 
     std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
-    bagUI::drawBagPage( bag::bagType p_page, u16 p_firstDisplayedItem ) {
+    bagUI::drawBagPage( bag::bagType p_page,
+            const std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>& p_items,
+            u8 p_selection ) {
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
+        _currentPage = p_page;
+        _selectedIdx = 255;
 
-        for( u8 i = 0; i < 5; ++i ) {
-            showActiveBag( i, i == p_page );
-            // if( i != p_page )
-            //    res.push_back( IO::inputTarget( 26 * i + 13, 3 + 13, 13 ) );
-        }
+        showActiveBag( p_page );
         IO::updateOAM( true );
 
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152,
-                             true );
         drawTop( p_page );
         initColors( );
 
-        ITEM::itemData empty  = {0, 0, 0, 0, 0, 0, 0};
-        auto           pkmnTg = drawPkmn( 0, empty );
-        if( !SAVE::SAV.getActiveFile( ).m_bag.empty( p_page ) ) {
-            u16 sz = SAVE::SAV.getActiveFile( ).m_bag.size( p_page );
-            for( u8 i = 0; i < 9; ++i ) {
-                u16 curitem = SAVE::SAV.getActiveFile( )
-                                  .m_bag( p_page, ( p_firstDisplayedItem + i ) % sz )
-                                  .first;
-                ITEM::itemData data = ITEM::getItemData( curitem );
+        auto           pkmnTg = drawPkmn( 0, nullptr );
+        if( p_items.size( ) ) {
+            for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
+                if( i < p_items.size( ) ) {
+                    u16 curitem = p_items[ i ].first.first;
+                    auto& data = p_items[ i ].second;
 
-                drawItemSub( curitem, data, 132, 4 + i * 18, false, false, i >= sz );
+                    drawItemSub( curitem, &data, i, i == p_selection, false, false );
 
-                if( i < sz ) {
+                    u16 x = IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].x;
+                    u16 y = IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].y;
                     res.push_back(
-                        {IO::inputTarget( 132, 4 + i * 18, 256, 20 + i * 18 ), {curitem, 0}} );
+                            {IO::inputTarget( x, y, 256, y + 20 ), {curitem, 0}} );
+                } else {
+                    drawItemSub( 0, nullptr, i, false, false, true );
                 }
             }
         } else {
-            for( u8 i = 0; i < 5; ++i ) {
-                drawItemSub( 0, empty, 132, 76 + 18 * i, false, false, true );
-                drawItemSub( 0, empty, 132, 76 - 18 * i, false, false, true );
-                IO::OamTop->oamBuffer[ i ].isHidden = true;
+            for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
+                drawItemSub( 0, nullptr, i, false, false, true );
             }
             IO::regularFont->printStringC( GET_STRING( 43 ), 182, 89, true, IO::font::CENTER );
             IO::updateOAM( false );
@@ -472,41 +613,38 @@ namespace BAG {
     }
 
     void bagUI::updateSprite( touchPosition p_touch ) {
-        IO::Oam->oamBuffer[ TRANSFER_SUB ].x = p_touch.px - 16;
-        IO::Oam->oamBuffer[ TRANSFER_SUB ].y = p_touch.py - 16;
+        IO::Oam->oamBuffer[ SPR_TRANSFER_OAM_SUB ].x = p_touch.px - 16;
+        IO::Oam->oamBuffer[ SPR_TRANSFER_OAM_SUB ].y = p_touch.py - 16;
         IO::updateOAM( true );
     }
 
-    bool bagUI::getSprite( u8 p_idx, std::pair<u16, u16> p_item, ITEM::itemData& p_data ) {
+    bool bagUI::getSprite( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data ) {
         if( !p_item.first ) return false;
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) { // It's a PKMN
-            if( !SAVE::SAV.getActiveFile( )
-                     .m_pkmnTeam[ p_idx - MAX_ITEMS_PER_PAGE ]
-                     .getItem( ) ) // Something went wrong
+            if( !_playerTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) ) [[unlikely]] {
+                // Something went wrong
                 return false;
+            }
         }
 
-        if( p_data.m_itemType != ITEM::ITEMTYPE_TM ) {
-            IO::loadItemIcon( p_item.first, 0, 0, TRANSFER_SUB, TRANSFER_SUB,
-                              IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
+        if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
+            IO::loadItemIcon( p_item.first, 0, 0, SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB,
+                              IO::Oam->oamBuffer[ SPR_TRANSFER_OAM_SUB ].gfxIndex );
         } else {
-            MOVE::moveData move = MOVE::getMoveData( p_data.m_param2 );
+            MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
 
-            IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data.m_param2 ), 0, 0, TRANSFER_SUB,
-                            TRANSFER_SUB, IO::Oam->oamBuffer[ TRANSFER_SUB ].gfxIndex );
+            IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data->m_param2 ), 0, 0,
+                    SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB,
+                    IO::Oam->oamBuffer[ SPR_TRANSFER_OAM_SUB ].gfxIndex );
         }
 
         selectItem( p_idx, p_item, p_data, true );
         return true;
     }
 
-    void bagUI::dropSprite( bag::bagType p_page, u8 p_idx, std::pair<u16, u16> p_item,
-                            ITEM::itemData& p_data ) {
-        IO::Oam->oamBuffer[ TRANSFER_SUB ].isHidden = true;
-        IO::updateOAM( true );
-
-        unselectItem( p_page, p_idx, p_item.first, p_data );
+    void bagUI::dropSprite( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data ) {
+        IO::Oam->oamBuffer[ SPR_TRANSFER_OAM_SUB ].isHidden = true;
         selectItem( p_idx, p_item, p_data );
     }
 } // namespace BAG
