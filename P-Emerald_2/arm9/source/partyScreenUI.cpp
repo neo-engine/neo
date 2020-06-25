@@ -942,6 +942,13 @@ namespace STS {
         oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_BOX_PAL_SUB;
 
         if( p_selectedChoice > 100 && p_selectedChoice < 255 ) {
+            for( u8 i = 0; i < 6; i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = i >= p_choiceCnt;
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette = SPR_BOX_PAL_SUB;
+                }
+            }
+
             if( p_selectedChoice == NEXT_PAGE_TARGET ) {
                 oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_WINDOW_PAL_SUB;
             } else if( p_selectedChoice == PREV_PAGE_TARGET ) {

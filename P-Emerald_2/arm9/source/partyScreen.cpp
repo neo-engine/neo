@@ -716,6 +716,12 @@ namespace STS {
                 cooldown = COOLDOWN_COUNT;
                 break;
             }
+
+            if( handleTouch( true ) == 2 ) {
+                ex = _allowCancel;
+                break;
+            }
+
             swiWaitForVBlank( );
         }
 
@@ -1111,7 +1117,11 @@ namespace STS {
         }
     }
 
-    u8 partyScreen::handleTouch( ) {
+    u8 partyScreen::handleTouch( bool p_autoSel ) {
+        u16 c[ 12 ] = {0};
+        for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
+            c[ i ] = getTextForChoice( _currentChoices[ i ] );
+        }
         u8 change = false;
         for( auto i : _partyUI->getTouchPositions( ) ) {
             if( IN_RANGE_I( touch, i.first ) ) {
@@ -1132,14 +1142,22 @@ namespace STS {
             }
         }
         if( change ) {
+            for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
+                c[ i ] = getTextForChoice( _currentChoices[ i ] );
+            }
+            _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
+            _ranges = _partyUI->drawPartyPkmnChoice( _currentSelection, c
+                    + ( _currentChoiceSelection / 6 * 6 ),
+                    std::min( size_t( 6 ), _currentChoices.size( )
+                        - ( _currentChoiceSelection / 6 * 6 ) - !( p_autoSel ) ),
+                    _currentChoiceSelection < 6 && _currentChoices.size( ) >
+                    size_t( 6 + p_autoSel ), _currentChoiceSelection >= 6,
+                    p_autoSel ? _currentChoiceSelection : 255 );
             return change;
         }
 
-        u16 c[ 12 ] = {0};
-        for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
-            c[ i ] = getTextForChoice( _currentChoices[ i ] );
-        }
         u8 res = 0;
+        bool bad = false;
         for( auto i : _ranges ) {
             if( IN_RANGE_I( touch, i.first ) ) {
                 swiWaitForVBlank( );
@@ -1151,11 +1169,11 @@ namespace STS {
                 _partyUI->drawPartyPkmnChoice( _currentSelection, c
                         + ( _currentChoiceSelection / 6 * 6 ),
                         std::min( size_t( 6 ), _currentChoices.size( )
-                            - ( _currentChoiceSelection / 6 * 6 ) - 1 ),
-                        _currentChoiceSelection < 6 && _currentChoices.size( ) > 7,
+                            - ( _currentChoiceSelection / 6 * 6 ) - !( p_autoSel ) ),
+                        _currentChoiceSelection < 6 && _currentChoices.size( ) >
+                        size_t( 6 + p_autoSel ),
                         _currentChoiceSelection >= 6, i.second );
 
-                bool bad = false;
                 while( touch.px || touch.py ) {
                     _partyUI->animate( _frame++ );
                     swiWaitForVBlank( );
@@ -1180,39 +1198,42 @@ namespace STS {
                     } else if( i.second == NEXT_PAGE_TARGET ) {
                         _currentChoiceSelection = 6;
                         _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
+                        bad = true;
                     } else if( i.second == PREV_PAGE_TARGET ) {
                         _currentChoiceSelection = 0;
                         _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
+                        bad = true;
                     }
                 }
                 break;
             }
         }
-
-        swiWaitForVBlank( );
-        if( res ) {
-            if( _currentChoices.size( ) <= 6 || _currentChoiceSelection >= 6 ) {
-                _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
-            }
-
-            // Selecting CANCEL should result in a reset of the saved position
-            _currentChoiceSelection %= _currentChoices.size( ) - 1;
-            if( _currentChoiceSelection >= 6 && _currentChoices.size( ) > 7 ) {
-                _ranges = _partyUI->drawPartyPkmnChoice( _currentSelection, c + 6,
-                        std::min( size_t( 6 ), _currentChoices.size( ) - 6 - 1 ),
-                        false, true, 255 );
-            } else {
-                _ranges = _partyUI->drawPartyPkmnChoice( _currentSelection, c,
-                        std::min( size_t( 6 ), _currentChoices.size( ) - 1 ),
-                        _currentChoices.size( ) > 7, false, 255 );
-            }
-        } else {
+        if( bad ) {
             _ranges = _partyUI->drawPartyPkmnChoice( _currentSelection, c
                     + ( _currentChoiceSelection / 6 * 6 ),
                     std::min( size_t( 6 ), _currentChoices.size( )
-                        - ( _currentChoiceSelection / 6 * 6 ) - 1 ),
-                    _currentChoiceSelection < 6 && _currentChoices.size( ) > 7,
-                    _currentChoiceSelection >= 6 );
+                        - ( _currentChoiceSelection / 6 * 6 ) - !( p_autoSel ) ),
+                    _currentChoiceSelection < 6 && _currentChoices.size( ) >
+                    size_t( 6 + p_autoSel ), _currentChoiceSelection >= 6,
+                    p_autoSel ? _currentChoiceSelection : 255 );
+        }
+
+        if( res ) {
+            swiWaitForVBlank( );
+            _partyUI->drawPartyPkmnSub( _currentSelection, true, false );
+
+            // Selecting CANCEL should result in a reset of the saved position
+            _currentChoiceSelection %= _currentChoices.size( ) - !( p_autoSel );
+            if( _currentChoiceSelection >= 6 && _currentChoices.size( ) > size_t( 6 + p_autoSel ) ) {
+                _ranges = _partyUI->drawPartyPkmnChoice( _currentSelection, c + 6,
+                        std::min( size_t( 6 ), _currentChoices.size( ) - 6 - !( p_autoSel ) ),
+                        false, true, p_autoSel ? _currentChoiceSelection : 255 );
+            } else {
+                _ranges = _partyUI->drawPartyPkmnChoice( _currentSelection, c,
+                        std::min( size_t( 6 ), _currentChoices.size( ) - !( p_autoSel ) ),
+                        _currentChoices.size( ) > size_t( 6 + p_autoSel ), false,
+                        p_autoSel ? _currentChoiceSelection : 255 );
+            }
         }
 
         return res;
@@ -1284,7 +1305,7 @@ namespace STS {
                     select( _currentSelection - 2 );
                 }
                 cooldown = COOLDOWN_COUNT;
-            } else if( ( pressed & KEY_A ) || ( tc = handleTouch( ) ) ) {
+            } else if( ( pressed & KEY_A ) || ( tc = handleTouch( false  ) ) ) {
                 if( pressed & KEY_A ) { SOUND::playSoundEffect( SFX_CHOOSE ); }
                 if( ( tc == 2 || ( tc == 0 && focus( ) ) ) && _allowCancel ) { // User pressed X
                     _currentMarksOrMove.m_selectedMove = 0;

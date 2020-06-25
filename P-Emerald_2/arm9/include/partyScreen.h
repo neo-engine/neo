@@ -277,7 +277,7 @@ namespace STS {
          * @brief: Handles touch input.
          * @returns: 1 if the player's touches had any effect; 2 if the user pressed X
          */
-        u8 handleTouch( );
+        u8 handleTouch( bool p_autoSel );
       public:
         /*
          * @brief: Creates a new party screen; does nothing else.
