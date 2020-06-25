@@ -39,14 +39,17 @@ namespace STS {
         statusScreenUI* _ui;
 
         u8 _currentPage;
+        u8       _currentDetailChoice = 0;
         u8 _frame;
+        bool _detailsMode = false;
 
         bool _allowKeyUp;
         bool _allowKeyDown;
 
-        bool runDetails( );
+        bool runDetails( u8 p_initialSelection = 0 );
         void select( u8 p_newPage );
 
+        u8 handleTouch( );
       public:
         enum result { BACK, NEXT_PKMN, PREV_PKMN, EXIT };
 

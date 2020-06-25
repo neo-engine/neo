@@ -50,9 +50,61 @@ namespace STS {
         }
     }
 
-    bool statusScreen::runDetails( ) {
-        u8 currentDetailChoice = 0;
-        _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+    u8 statusScreen::handleTouch( ) {
+        u8 change = false;
+        for( auto i : _ui->getTouchPositions( ) ) {
+            if( IN_RANGE_I( touch, i.first ) ) {
+                swiWaitForVBlank( );
+                change = 5;
+                if( i.second == statusScreenUI::BACK_TARGET ) {
+                    change = 1;
+                } else if( i.second == statusScreenUI::EXIT_TARGET ) {
+                    change = 2;
+                } else if( i.second == statusScreenUI::NEXT_TARGET ) {
+                    change = 3;
+                } else if( i.second == statusScreenUI::PREV_TARGET ) {
+                    change = 4;
+                }
+                _ui->highlightButton( i.second );
+
+                while( touch.px || touch.py ) {
+                    _ui->animate( _frame++ );
+                    swiWaitForVBlank( );
+                    scanKeys( );
+
+                    if( !IN_RANGE_I( touch, i.first ) ) {
+                        change = 0;
+                        _ui->highlightButton( );
+                        break;
+                    }
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
+
+                if( change ) {
+                    if( change == 5 ) {
+                        if( i.second < 4 ) {
+                            SOUND::playSoundEffect( SFX_SELECT );
+                            _currentDetailChoice = i.second;
+                            _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
+                            _detailsMode = true;
+                        } else if( i.second >= 50 ) {
+                            select( i.second - 50 );
+                        }
+                        return 0;
+                    } else {
+                        _ui->highlightButton( );
+                        return change;
+                    }
+                }
+            }
+        }
+        return change;
+    }
+
+    bool statusScreen::runDetails( u8 p_initialChoice ) {
+        _currentDetailChoice = p_initialChoice;
+        _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
         loop( ) {
             _ui->animate( _frame++ );
             scanKeys( );
@@ -70,30 +122,36 @@ namespace STS {
                 break;
             } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
-                currentDetailChoice = ( currentDetailChoice + 2 )
+                _currentDetailChoice = ( _currentDetailChoice + 2 )
                                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
-                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
             } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
-                currentDetailChoice = ( currentDetailChoice
+                _currentDetailChoice = ( _currentDetailChoice
                                         + _ui->getDetailsPageCount( _pokemon, _currentPage ) - 2 )
                                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
-                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
             } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
-                currentDetailChoice = ( currentDetailChoice + 1 )
+                _currentDetailChoice = ( _currentDetailChoice + 1 )
                                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
-                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
             } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
-                currentDetailChoice = ( currentDetailChoice
+                _currentDetailChoice = ( _currentDetailChoice
                                         + _ui->getDetailsPageCount( _pokemon, _currentPage ) - 1 )
                                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
-                _ui->showDetails( _pokemon, _currentPage, currentDetailChoice );
+                _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
+            }
+            auto tc = handleTouch( );
+            if( tc == 2 ) {
+                return true;
+            } else if( tc == 1 ) {
+                break;
             }
             swiWaitForVBlank( );
         }
@@ -144,6 +202,21 @@ namespace STS {
             } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 return result::PREV_PKMN;
+            }
+
+            auto tc = handleTouch( );
+            if( tc == 2 ) {
+                return result::EXIT;
+            } else if( tc == 1 ) {
+                return result::BACK;
+            } else if( tc == 3 ) {
+                return result::NEXT_PKMN;
+            } else if( tc == 4 ) {
+                return result::PREV_PKMN;
+            }
+            if( _detailsMode ) {
+                if( runDetails( _currentDetailChoice ) ) { return result::EXIT; }
+                _detailsMode = false;
             }
             swiWaitForVBlank( );
         }

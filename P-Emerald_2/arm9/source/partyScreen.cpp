@@ -935,7 +935,7 @@ namespace STS {
                     _currentChoices.push_back( TAKE_ITEM );
                 }
                 _currentChoices.push_back( GIVE_ITEM );
-                 _currentChoices.push_back( USE_ITEM );
+               //  _currentChoices.push_back( USE_ITEM );
             }
             if( _allowMoveSelection && !_team[ _currentSelection ].isEgg( ) ) {
                 for( u8 i = 0; i < 4; i++ ) {
@@ -955,9 +955,9 @@ namespace STS {
         }
         if( _teamLength > 1 &&  !_inBattle ) { _currentChoices.push_back( SWAP ); }
         if( _swapSelection == 255 ) {
-            if( _allowDex && !_team[ _currentSelection ].isEgg( ) ) {
-                _currentChoices.push_back( DEX_ENTRY );
-            }
+          //  if( _allowDex && !_team[ _currentSelection ].isEgg( ) ) {
+          //      _currentChoices.push_back( DEX_ENTRY );
+          //  }
 #ifdef DESQUID
             _currentChoices.push_back( _DESQUID );
 #endif

@@ -26,13 +26,22 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
+#include <vector>
+
 #include "pokemon.h"
 #include "pokemonData.h"
 #include "move.h"
+#include "uio.h"
 
 namespace STS {
     class statusScreenUI {
+      public:
+        static constexpr u8 BACK_TARGET = 252;
+        static constexpr u8 EXIT_TARGET = 251;
+        static constexpr u8 NEXT_TARGET = 250;
+        static constexpr u8 PREV_TARGET = 249;
       private:
+
         u8       _currentPage = 255;
         bool     _allowKeyUp;
         bool     _allowKeyDown;
@@ -59,8 +68,6 @@ namespace STS {
         void writeLineTop( const char* p_stringLeft,  const char* p_stringRight,
                            u8 p_line, u8 p_colorLeft = 250, u8 p_colorRight = 252,
                            bool p_bottom = false );
-
-
       public:
         /*
          * @brief: Initializes the status screen UI. Destroys anything that was previously on the
@@ -94,6 +101,11 @@ namespace STS {
         }
 
         /*
+         * @brief: Highlights the specified button.
+         */
+        void highlightButton( u8 p_button = 255, bool p_bottom = true );
+
+        /*
          * @brief: Draws the specified info page for the given pokemon.
          */
         void draw( pokemon* p_pokemon, u8 p_page );
@@ -107,5 +119,10 @@ namespace STS {
          * @brief: Draws the p_frame-th frame. Needs to be called every frame.
          */
         void animate( u8 p_frame );
+
+        /*
+         * @brief: Returns information for the current buttons on the screen.
+         */
+        std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( bool p_bottom = true );
     };
 } // namespace STS
