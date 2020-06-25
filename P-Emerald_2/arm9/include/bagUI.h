@@ -60,6 +60,8 @@ namespace BAG {
         std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16             p_itemId,
                                                                       const ITEM::itemData* p_data );
 
+        u8 _lastPkmnItemType = 255; // itemtype of the last item for which the pkmn info was drawn
+
         void drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx, bool p_selected,
                 bool p_pressed, bool p_clearOnly = false );
       public:

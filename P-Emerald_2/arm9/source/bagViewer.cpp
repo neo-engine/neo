@@ -68,10 +68,12 @@ namespace BAG {
         for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
             for( bool done = false; !done; ) {
                 auto ci = SAVE::SAV.getActiveFile( ).m_bag( (bag::bagType) curBg, _currentViewEnd );
-                auto idata = ITEM::getItemData( ci.first );
 
-                done = isAllowed( &idata ) ;
-                if( done ) { _view.push_back( std::pair( ci, idata ) ); }
+                done = isAllowed( ci.first ) ;
+                if( done ) {
+                    auto idata = ITEM::getItemData( ci.first );
+                    _view.push_back( std::pair( ci, idata ) );
+                }
                 _currentViewEnd = ( _currentViewEnd + 1 ) % sz;
             }
             if( _currentViewEnd == _currentViewStart ) {
@@ -82,19 +84,73 @@ namespace BAG {
 
     }
 
-    bool bagViewer::isAllowed( ITEM::itemData* p_data ) {
+    bool bagViewer::isAllowed( u16 p_itemId ) {
         if( _context == NO_SPECIAL_CONTEXT ) {
             return true;
-        } else if( _context == BATTLE ) {
-            return ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE
-                || p_data->m_itemType == ITEM::ITEMTYPE_BATTLEITEM;
-        } else if( _context == WILD_BATTLE ) {
-            return ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE
-                || p_data->m_itemType == ITEM::ITEMTYPE_BATTLEITEM
-                || p_data->m_itemType == ITEM::ITEMTYPE_POKEBALL;
+        } else if( _context == BATTLE || _context == WILD_BATTLE ) {
+            constexpr u16 BATTLE_ITEMS[ 75 ] = {
+                I_POTION, I_ANTIDOTE, I_BURN_HEAL, I_ICE_HEAL, I_AWAKENING,
+                I_PARALYZE_HEAL, I_FULL_RESTORE, I_MAX_POTION, I_HYPER_POTION, I_SUPER_POTION,
+                I_FULL_HEAL, I_REVIVE, I_MAX_REVIVE, I_FRESH_WATER, I_SODA_POP,
+                I_LEMONADE, I_MOOMOO_MILK, I_ENERGY_POWDER, I_ENERGY_ROOT, I_HEAL_POWDER,
+                I_REVIVAL_HERB, I_ETHER, I_MAX_ETHER, I_ELIXIR, I_MAX_ELIXIR,
+                I_LAVA_COOKIE, I_BERRY_JUICE, I_OLD_GATEAU, I_GUARD_SPEC, I_DIRE_HIT,
+                I_X_ATTACK, I_X_DEFENSE, I_X_SPEED, I_X_ACCURACY, I_X_SP_ATK,
+                I_X_SP_DEF, I_POKE_DOLL, I_FLUFFY_TAIL, I_BLUE_FLUTE, I_YELLOW_FLUTE,
+                I_RED_FLUTE, I_SWEET_HEART, I_CHERI_BERRY, I_CHESTO_BERRY, I_PECHA_BERRY,
+                I_RAWST_BERRY, I_ASPEAR_BERRY, I_LEPPA_BERRY, I_ORAN_BERRY, I_PERSIM_BERRY,
+
+                I_LUM_BERRY, I_SITRUS_BERRY, I_POKE_TOY, I_CASTELIACONE, I_LUMIOSE_GALETTE,
+                I_SHALOUR_SABLE, I_BIG_MALASADA, I_PUMKIN_BERRY, I_DRASH_BERRY, I_CHRO_BERRY,
+                I_PEWTER_CRUNCHIES, I_NION_BERRY, I_RIE_BERRY, I_GARC_BERRY,
+            };
+
+            for( u8 i = 0; i < 75; ++i ) {
+                if( p_itemId && p_itemId == BATTLE_ITEMS[ i ] ) { return true; }
+            }
+            if( _context == WILD_BATTLE ) {
+                constexpr u16 POKEBALLS[ 30 ] = {
+                    I_MASTER_BALL, I_ULTRA_BALL, I_GREAT_BALL, I_POKE_BALL, I_SAFARI_BALL,
+                    I_NET_BALL, I_DIVE_BALL, I_NEST_BALL, I_REPEAT_BALL, I_TIMER_BALL,
+                    I_LUXURY_BALL, I_PREMIER_BALL, I_DUSK_BALL, I_HEAL_BALL, I_QUICK_BALL,
+                    I_CHERISH_BALL, I_FAST_BALL, I_LEVEL_BALL, I_LURE_BALL, I_HEAVY_BALL,
+                    I_LOVE_BALL, I_FRIEND_BALL, I_MOON_BALL, I_SPORT_BALL, I_PARK_BALL,
+                    I_DREAM_BALL, I_BEAST_BALL,
+                };
+
+                for( u8 i = 0; i < 30; ++i ) {
+                    if( p_itemId && p_itemId == POKEBALLS[ i ] ) { return true; }
+                }
+            }
+            return false;
         } else if( _context == GIVE_TO_PKMN ) {
-            return p_data->m_itemType != ITEM::ITEMTYPE_APRICORN
-                && p_data->m_itemType != ITEM::ITEMTYPE_FORMECHANGE;
+            constexpr u16 NO_GIVE_ITEMS[ 30 ] = {
+                I_TEA, I_MYSTICTICKET, I_AUTOGRAPH, I_BIKE_VOUCHER, I_FAME_CHECKER,
+                I_BERRY_POUCH, I_TEACHY_TV, I_POWDER_JAR, I_EXP_SHARE, I_LOCK_CAPSULE,
+                I_ENIGMA_STONE, I_LIBERTY_PASS, I_PASS_ORB, I_PROP_CASE, I_DRAGON_SKULL,
+                I_HOLO_CASTER, I_PROF_S_LETTER, I_ROLLER_SKATES, I_POKE_FLUTE, I_PRISON_BOTTLE,
+                I_MEGA_CUFF, I_ENIGMATIC_CARD, I_SECRET_KEY2, I_SS_TICKET3, I_SILPH_SCOPE,
+                I_PARCEL2, I_CARD_KEY2, I_GOLD_TEETH, I_LIFT_KEY,
+            };
+
+            for( u8 i = 0; i < 30; ++i ) {
+                if( p_itemId == NO_GIVE_ITEMS[ i ] ) { return false; }
+            }
+
+            if( p_itemId >= I_TM01 && p_itemId <= I_BLACK_APRICORN ) { return false; }
+            if( p_itemId >= I_PHOTO_ALBUM && p_itemId <= I_DATA_CARD_27 ) { return false; }
+            if( p_itemId > I_CASTELIACONE && p_itemId <= I_REVEAL_GLASS ) { return false; }
+            if( p_itemId >= I_SPRINKLOTAD && p_itemId <= I_TRAVEL_TRUNK ) { return false; }
+            if( p_itemId >= I_LOOKER_TICKET && p_itemId <= I_METEORITE2 ) { return false; }
+            if( p_itemId >= I_METEORITE3 && p_itemId <= I_PIKANIUM_Z ) { return false; }
+            if( p_itemId >= I_Z_RING && p_itemId <= I_RAINBOW_PASS ) { return false; }
+            if( p_itemId >= I_RED_NECTAR && p_itemId <= I_MOON_FLUTE ) { return false; }
+            if( p_itemId > I_GRASSY_SEED && p_itemId < I_NULL_PLATE ) { return false; }
+            if( p_itemId > I_NULL_PLATE && p_itemId < I_PEWTER_CRUNCHIES ) { return false; }
+            if( p_itemId >= I_SOLGANIUM_Z && p_itemId < I_HEALTH_CANDY ) { return false; }
+            if( p_itemId > I_QUICK_CANDY_0 && p_itemId < I_RUSTED_SWORD ) { return false; }
+            if( p_itemId > I_EXP_CANDY_XL && p_itemId < I_LONELY_MINT ) { return false; }
+            if( p_itemId >= I_HI_TECH_EARBUDS && p_itemId <= I_ROTOM_CATALOG) { return false; }
         }
         return false;
     }
@@ -308,11 +364,13 @@ namespace BAG {
                     for( bool done = false; !done; ) {
                         auto ci = SAVE::SAV.getActiveFile( ).m_bag( (bag::bagType) curBg,
                                 _currentViewEnd );
-                        auto idata = ITEM::getItemData( ci.first );
 
-                        done = isAllowed( &idata ) ;
+                        done = isAllowed( ci.first ) ;
                         _currentViewEnd = ( _currentViewEnd + 1 ) % curBgsz;
-                        if( done ) { _view[ _currSelectedIdx ] = std::pair( ci, idata ); }
+                        if( done ) {
+                            auto idata = ITEM::getItemData( ci.first );
+                            _view[ _currSelectedIdx ] = std::pair( ci, idata );
+                        }
                     }
                 }
                 _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
@@ -337,13 +395,14 @@ namespace BAG {
                         _currentViewStart = ( _currentViewStart + curBgsz - 1 ) % curBgsz;
                         auto ci = SAVE::SAV.getActiveFile( ).m_bag( (bag::bagType) curBg,
                                 _currentViewStart );
-                        auto idata = ITEM::getItemData( ci.first );
-
-                        done = isAllowed( &idata ) ;
+                        done = isAllowed( ci.first ) ;
 
                         SAVE::SAV.getActiveFile( ).m_lstBagItem
                             = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + curBgsz - 1 ) % curBgsz;
-                        if( done ) { _view[ _currSelectedIdx ] = std::pair( ci, idata ); }
+                        if( done ) {
+                            auto idata = ITEM::getItemData( ci.first );
+                            _view[ _currSelectedIdx ] = std::pair( ci, idata );
+                        }
                     }
                 }
                 _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,

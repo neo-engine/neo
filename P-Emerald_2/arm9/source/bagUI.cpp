@@ -233,11 +233,12 @@ namespace BAG {
         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
         IO::OamTop->oamBuffer[ 1 ].isHidden = true;
         IO::OamTop->oamBuffer[ 2 ].isHidden = true;
+        IO::updateOAM( false );
+
+        if( !p_itemId || p_data == nullptr ) { return; }
 
         if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
             IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
-            IO::OamTop->oamBuffer[ 1 ].isHidden = true;
-            IO::OamTop->oamBuffer[ 2 ].isHidden = true;
 
             display = ITEM::getItemName( p_itemId );
             descr   = ITEM::getItemDescr( p_itemId );
@@ -340,6 +341,7 @@ namespace BAG {
     std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
     bagUI::drawPkmn( u16 p_itemId, const ITEM::itemData* p_data ) {
         std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
+
         for( u8 i = 0; i < 6; ++i ) {
             const u8 FIRST_LINE = 33 + 26 * i;
             const u8 SECOND_LINE = 44 + 26 * i;
@@ -376,22 +378,25 @@ namespace BAG {
                 }
             }
 
-            if( p_data != nullptr ) {
+            if( p_data != nullptr && ( _lastPkmnItemType != p_data->m_itemType
+                    || p_data->m_itemType == ITEM::ITEMTYPE_TM ) ) {
                 IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             }
 
             if( _playerTeam[ i ].isEgg( ) ) {
-                if( p_data != nullptr ) {
+                if( p_data != nullptr && _lastPkmnItemType != p_data->m_itemType ) {
                     IO::regularFont->printStringC( GET_STRING( 34 ), 45, SINGLE_LINE, true );
                 }
-                res.push_back(
-                    {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {0, true}} );
+                // res.push_back(
+                //    {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {0, true}} );
             } else {
                 res.push_back( {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
                                 {_playerTeam[ i ].getItem( ), true}} );
-                if( p_data == nullptr ) { continue; }
+                if( p_data == nullptr ||
+                        ( _lastPkmnItemType == p_data->m_itemType
+                          && p_data->m_itemType != ITEM::ITEMTYPE_TM ) ) { continue; }
 
                 IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 40,
                             FIRST_LINE, true );
@@ -463,6 +468,9 @@ namespace BAG {
         }
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        if( p_data != nullptr ) {
+            _lastPkmnItemType = p_data->m_itemType;
+        }
         return res;
     }
 
@@ -552,7 +560,11 @@ namespace BAG {
 
     void drawTop( u8 p_page ) {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
 
     void bagUI::selectItem( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data,

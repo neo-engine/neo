@@ -51,7 +51,7 @@ namespace BAG {
          * @brief: Returns true if the current context allows the gaven item to be
          * displayed.
          */
-        bool isAllowed( ITEM::itemData* p_data );
+        bool isAllowed( u16 p_itemId );
 
         void initView( );
 
