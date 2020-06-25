@@ -660,8 +660,9 @@ namespace BOX {
                     return 0;
                 }
                 case boxUI::BUTTON_PKMN_GIVE_ITEM: {
-                    BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
-                    u16            itm = bv.getItem( BAG::bagViewer::GIVE_TO_PKMN );
+                    BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                            BAG::bagViewer::GIVE_TO_PKMN );
+                    u16            itm = bv.getItem( );
                     if( itm ) {
                         if( curSel.getItem( ) ) {
                             auto curItm = curSel.getItem( );

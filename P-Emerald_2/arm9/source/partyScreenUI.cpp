@@ -907,10 +907,50 @@ namespace STS {
         IO::updateOAM( p_bottom );
     }
 
-    void partyScreenUI::drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[],
+    std::vector<std::pair<IO::inputTarget, u8>>
+        partyScreenUI::getTouchPositions( bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        if( !oam[ SPR_X_OAM_SUB ].isHidden ) {
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8,
+                           oam[ SPR_X_OAM_SUB ].y - 8, oam[ SPR_X_OAM_SUB ].x + 24,
+                           oam[ SPR_X_OAM_SUB ].y + 24 ), EXIT_TARGET ) );
+        }
+
+        for( u8 i = 0; i < _teamLength; ++i ) {
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_PKMN_BG_OAM_SUB( i ) ].x,
+                           oam[ SPR_PKMN_BG_OAM_SUB( i ) ].y,
+                           oam[ SPR_PKMN_BG_OAM_SUB( i ) ].x + 32,
+                           oam[ SPR_PKMN_BG_OAM_SUB( i ) ].y + 32 ), i ) );
+        }
+
+        return res;
+    }
+
+    std::vector<std::pair<IO::inputTarget, u8>>
+        partyScreenUI::drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[],
                                              u8 p_choiceCnt, bool p_nextButton, bool p_prevButton,
                                              u8 p_selectedChoice, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        oam[ SPR_PAGE_LEFT_OAM_SUB ].palette = SPR_BOX_PAL_SUB;
+        oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_BOX_PAL_SUB;
+
+        if( p_selectedChoice > 100 && p_selectedChoice < 255 ) {
+            if( p_selectedChoice == NEXT_PAGE_TARGET ) {
+                oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_WINDOW_PAL_SUB;
+            } else if( p_selectedChoice == PREV_PAGE_TARGET ) {
+                oam[ SPR_PAGE_LEFT_OAM_SUB ].palette = SPR_WINDOW_PAL_SUB;
+            }
+
+            IO::updateOAM( p_bottom );
+            return res;
+        }
         // show choice bgs
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 6; j++ ) {
@@ -937,11 +977,31 @@ namespace STS {
                     GET_STRING( p_choices[ i ] ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom, IO::font::CENTER );
             }
+            res.push_back( std::pair( IO::inputTarget(
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ), i ) );
         }
         oam[ SPR_PAGE_LEFT_OAM_SUB ].isHidden   = !p_prevButton;
         oam[ SPR_ARROW_LEFT_OAM_SUB ].isHidden  = !p_prevButton;
+
+        if( p_prevButton ) {
+            res.push_back( std::pair( IO::inputTarget(
+                            oam[ SPR_ARROW_LEFT_OAM_SUB ].x, oam[ SPR_ARROW_LEFT_OAM_SUB ].y,
+                            oam[ SPR_ARROW_LEFT_OAM_SUB ].x + 16,
+                            oam[ SPR_ARROW_LEFT_OAM_SUB ].y + 16 ), PREV_PAGE_TARGET ) );
+        }
+
         oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden  = !p_nextButton;
         oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = !p_nextButton;
+
+        if( p_nextButton ) {
+            res.push_back( std::pair( IO::inputTarget(
+                            oam[ SPR_ARROW_RIGHT_OAM_SUB ].x, oam[ SPR_ARROW_RIGHT_OAM_SUB ].y,
+                            oam[ SPR_ARROW_RIGHT_OAM_SUB ].x + 16,
+                            oam[ SPR_ARROW_RIGHT_OAM_SUB ].y + 16 ), NEXT_PAGE_TARGET ) );
+        }
         IO::updateOAM( p_bottom );
 
         if( _needsInit ) {
@@ -987,6 +1047,8 @@ namespace STS {
             REG_BLDALPHA     = 0xff | ( 0x06 << 8 );
             bgUpdate( );
         }
+
+        return res;
     }
 
     std::pair<u16, u16> partyScreenUI::getChoiceAnchorPosition( u8 p_choiceIdx, bool p_bottom ) {
@@ -1207,8 +1269,12 @@ namespace STS {
         IO::updateOAM( p_bottom );
     }
 
-    void partyScreenUI::printYNMessage( const char* p_message, u8 p_selection, u16 p_itemIcon,
+    std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+        partyScreenUI::printYNMessage( const char* p_message, u8 p_selection, u16 p_itemIcon,
                                         bool p_bottom ) {
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
+            = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
+
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 7; i++ ) {
             if( p_message ) {
@@ -1216,6 +1282,7 @@ namespace STS {
                 oam[ SPR_MSG_BOX_OAM_SUB + i ].y -= 18;
             }
         }
+        oam[ SPR_X_OAM_SUB ].isHidden = true;
         if( p_itemIcon ) {
             oam[ SPR_ITEM_OAM_SUB ].isHidden = false;
             IO::loadItemIcon( p_itemIcon, oam[ SPR_ITEM_OAM_SUB ].x, oam[ SPR_ITEM_OAM_SUB ].y,
@@ -1253,11 +1320,26 @@ namespace STS {
             IO::regularFont->printString(
                 GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 4 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
+
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 4 - shift ) ].y,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 96,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 4 - shift ) ].y + 32 ),
+                        IO::yesNoBox::YES ) );
+
             IO::regularFont->printString(
                 GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 5 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
+
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 5 - shift ) ].y,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 96,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 5 - shift ) ].y + 32 ),
+                        IO::yesNoBox::NO ) );
         }
         IO::updateOAM( p_bottom );
+
+        return res;
     }
 
     void partyScreenUI::hideYNMessageBox( bool p_bottom ) {
@@ -1266,6 +1348,7 @@ namespace STS {
             oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = true;
             oam[ SPR_MSG_BOX_OAM_SUB + i ].y += 18;
         }
+        oam[ SPR_X_OAM_SUB ].isHidden = false;
         oam[ SPR_ITEM_OAM_SUB ].isHidden = true;
         for( u8 i = 4; i < 6; i++ ) {
             for( u8 j = 0; j < 6; j++ ) {

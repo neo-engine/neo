@@ -45,7 +45,7 @@ namespace BAG {
       public:
         struct targetInfo {
             u16  m_item;
-            bool m_isHeld;
+            bool m_isHeld; // item is held by a pkmn
         };
 
       private:

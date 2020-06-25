@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "uio.h"
 #include "yesNoBox.h"
+#include "sound.h"
 
 #include <nds.h>
 
@@ -294,18 +295,23 @@ namespace BAG {
 
         if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X )
             || ( !_hasSprite && GET_AND_WAIT_C( SCREEN_WIDTH - 12, SCREEN_HEIGHT - 10, 16 ) ) ) {
+            SOUND::playSoundEffect( SFX_CANCEL );
             return false;
-        } /*else if( p_allowSort && GET_AND_WAIT( KEY_SELECT ) ) {
+        } else if( p_allowSort && GET_AND_WAIT( KEY_SELECT ) ) {
+            SOUND::playSoundEffect( SFX_CHOOSE );
             SAVE::SAV.getActiveFile( ).m_bag.sort(
                      (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag );
+
+            initView( );
             _ranges = _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
-                                           SAVE::SAV.getActiveFile( ).m_lstBagItem );
-            if( SAVE::SAV.getActiveFile( ).m_bag.size(
-                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
-                auto nw = ITEM::getItemData( CURRENT_ITEM.first );
-                _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
+                    _view, _currSelectedIdx );
+
+            if( curBgsz ) {
+                auto idata =  currentItem( ).second;
+                _bagUI->selectItem( _currSelectedIdx, currentItem( ).first, &idata );
             }
-        } */ else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+        } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+            SOUND::playSoundEffect( SFX_SELECT );
              _currSelectedIdx = 0;
             SAVE::SAV.getActiveFile( ).m_lstBag = ( curBg + BAG_CNT - 1 ) % BAG_CNT;
             curBg = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
@@ -326,6 +332,7 @@ namespace BAG {
             }
             cooldown = COOLDOWN_COUNT;
         } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+            SOUND::playSoundEffect( SFX_SELECT );
             _currSelectedIdx = 0;
             SAVE::SAV.getActiveFile( ).m_lstBag = ( curBg + 1 ) % BAG_CNT;
             curBg = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
@@ -350,6 +357,7 @@ namespace BAG {
                 cooldown = COOLDOWN_COUNT;
                 return true;
             }
+            SOUND::playSoundEffect( SFX_SELECT );
 
             if( _currSelectedIdx < _view.size( ) - 1 ) {
                 _currSelectedIdx++;
@@ -384,6 +392,7 @@ namespace BAG {
                 cooldown = COOLDOWN_COUNT;
                 return true;
             }
+            SOUND::playSoundEffect( SFX_SELECT );
 
             if( _currSelectedIdx > 0 ) {
                 _currSelectedIdx--;
@@ -413,6 +422,7 @@ namespace BAG {
             cooldown = COOLDOWN_COUNT;
         } else if( !_hasSprite && GET_AND_WAIT_C( SCREEN_WIDTH - 44, SCREEN_HEIGHT - 10, 16 ) ) {
             if( !curBgsz ) return true;
+            SOUND::playSoundEffect( SFX_CHOOSE );
             SAVE::SAV.getActiveFile( ).m_lstBagItem
                 = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + MAX_ITEMS_PER_PAGE - 1 ) % curBgsz;
             initView( );
@@ -422,6 +432,7 @@ namespace BAG {
             _bagUI->selectItem( _currSelectedIdx, currentItem( ).first, &idata );
         }  else if( !_hasSprite && GET_AND_WAIT_C( SCREEN_WIDTH - 76, SCREEN_HEIGHT - 10, 16 ) ) {
             if( !curBgsz ) return true;
+            SOUND::playSoundEffect( SFX_CHOOSE );
             SAVE::SAV.getActiveFile( ).m_lstBagItem
                 = ( SAVE::SAV.getActiveFile( ).m_lstBagItem + curBgsz - MAX_ITEMS_PER_PAGE + 1 )
                 % curBgsz;
@@ -435,6 +446,7 @@ namespace BAG {
         for( u8 i = 0; i < 5; ++i )
             if( i != SAVE::SAV.getActiveFile( ).m_lstBag && !_hasSprite
                 && GET_AND_WAIT_C( 26 * i + 13, 3 + 13, 13 ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 _currSelectedIdx = 0;
                 SAVE::SAV.getActiveFile( ).m_lstBag = i;
                 curBg = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
@@ -647,6 +659,7 @@ namespace BAG {
             } else */ if( !handleSomeInput( ) )
                 break;
             else if( GET_AND_WAIT( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 u16 res = handleSelection( );
                 if( res & 2 ) return ( res >> 2 );
             }
@@ -734,13 +747,11 @@ namespace BAG {
         return 0;
     }
 
-    u16 bagViewer::getItem( context p_context ) {
-        /*
+    u16 bagViewer::getItem( ) {
         _currSelectedIdx = 0;
         initUI( );
         _hasSprite = false;
 
-        touchPosition touch;
         cooldown = COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
@@ -749,17 +760,17 @@ namespace BAG {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( !handleSomeInput( touch, pressed ) ) return 0;
+            if( !handleSomeInput( ) ) return 0;
             if( GET_AND_WAIT( KEY_A ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 if( SAVE::SAV.getActiveFile( ).m_bag.empty(
                         (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
                     continue;
-                u16 targetItem = CURRENT_ITEM.first;
-                if( targetItem && confirmChoice( p_context, targetItem ) ) {
-                    if( p_context != context::BATTLE )
+                u16 targetItem = currentItem( ).first.first;
+                if( targetItem && confirmChoice( targetItem ) ) {
+                    if( _context != context::BATTLE && _context != context::WILD_BATTLE )
                         SAVE::SAV.getActiveFile( ).m_bag.erase(
-                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, CURRENT_ITEM.first,
-                            1 );
+                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, targetItem, 1 );
                     return targetItem;
                 }
                 initUI( );
@@ -781,11 +792,11 @@ namespace BAG {
                                 touchRead( &touch );
                             }
                             u16 targetItem = i.second.m_item;
-                            if( !i.second.m_isHeld && confirmChoice( p_context, targetItem ) ) {
-                                if( p_context != context::BATTLE )
+                            if( !i.second.m_isHeld && confirmChoice( targetItem ) ) {
+                                if( _context != context::BATTLE )
                                     SAVE::SAV.getActiveFile( ).m_bag.erase(
                                         (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
-                                        CURRENT_ITEM.first, 1 );
+                                        targetItem, 1 );
                                 return targetItem;
                             } else {
                                 initUI( );
@@ -793,33 +804,10 @@ namespace BAG {
                             }
                         }
                         if( !touch.px && !touch.py ) {
-                            if( !i.second.m_isHeld || i.second.m_item ) {
-                                if( SAVE::SAV.getActiveFile( ).m_bag.size(
-                                    (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
-                                    auto nw = ITEM::getItemData( CURRENT_ITEM.first );
-//                                    _bagUI->unselectItem(
-//                                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
-//                                        _currSelectedIdx, CURRENT_ITEM.first, nw );
-                                } else { // the current bag is empty
-//                                    ITEM::itemData empty = {0, 0, 0, 0, 0, 0, 0};
-//                                    _bagUI->unselectItem(
-//                                        (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
-//                                        MAX_ITEMS_PER_PAGE, 0, empty );
-                                }
-                            }
                             if( !i.second.m_isHeld ) {
                                 _currSelectedIdx = j;
-                                auto nw          = ITEM::getItemData( CURRENT_ITEM.first );
-                                _bagUI->selectItem( _currSelectedIdx, CURRENT_ITEM, nw );
-                            } else if( i.second.m_item ) {
-                                u8 vl = j;
-                                if( j < MAX_ITEMS_PER_PAGE )
-                                    vl += MAX_ITEMS_PER_PAGE
-                                          - SAVE::SAV.getActiveFile( ).m_bag.size(
-                                                (bag::bagType) SAVE::SAV.getActiveFile( )
-                                                    .m_lstBag );
-                                auto nw = ITEM::getItemData( i.second.m_item );
-                                _bagUI->selectItem( vl, {i.second.m_item, 1}, nw );
+                                auto idt = currentItem( ).second;
+                                _bagUI->selectItem( _currSelectedIdx, currentItem( ).first, &idt );
                             }
                             break;
                         }
@@ -829,7 +817,6 @@ namespace BAG {
             }
             swiWaitForVBlank( );
         }
-    */
         return 0;
     }
 } // namespace BAG

@@ -112,9 +112,8 @@ namespace BAG {
         u16 run( );
 
         /*
-         * @brief: Runs the bag viewer to make the player select an item from the bag that
-         * fits the specified context.
+         * @brief: Runs the bag viewer to make the player select an item from the bag.
          */
-        u16 getItem( context p_context );
+        u16 getItem( );
     };
 } // namespace BAG

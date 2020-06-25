@@ -379,7 +379,8 @@ namespace BAG {
             }
 
             if( p_data != nullptr && ( _lastPkmnItemType != p_data->m_itemType
-                    || p_data->m_itemType == ITEM::ITEMTYPE_TM ) ) {
+                    || p_data->m_itemType == ITEM::ITEMTYPE_TM
+                    || p_data->m_itemType == ITEM::ITEMTYPE_EVOLUTION ) ) {
                 IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -396,7 +397,8 @@ namespace BAG {
                                 {_playerTeam[ i ].getItem( ), true}} );
                 if( p_data == nullptr ||
                         ( _lastPkmnItemType == p_data->m_itemType
-                          && p_data->m_itemType != ITEM::ITEMTYPE_TM ) ) { continue; }
+                          && p_data->m_itemType != ITEM::ITEMTYPE_TM
+                          && p_data->m_itemType != ITEM::ITEMTYPE_EVOLUTION ) ) { continue; }
 
                 IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 40,
                             FIRST_LINE, true );

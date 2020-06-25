@@ -203,23 +203,25 @@ namespace STS {
         u8             _frame;
         partyScreenUI* _partyUI;
 
+        std::vector<std::pair<IO::inputTarget, u8>> _ranges;
+
         /*
-         * @brief Checks if enough pkmn are marked.
+         * @brief: Checks if enough pkmn are marked.
          */
         bool checkReturnCondition( );
 
         /*
-         * @brief Checks whether player is satisfied with the set of selected Pkmn.
+         * @brief: Checks whether player is satisfied with the set of selected Pkmn.
          */
         bool confirmSelection( );
 
         /*
-         * @brief Selects the specified choice window
+         * @brief: Selects the specified choice window
          */
         void selectChoice( u8 p_choice, u8 p_numChoices = 255 );
 
         /*
-         * @brief Focusses the pkmn at position p_selectedIdx. Returns when pkmn leaves focus.
+         * @brief: Focusses the pkmn at position p_selectedIdx. Returns when pkmn leaves focus.
          */
         bool focus( );
 
@@ -231,54 +233,54 @@ namespace STS {
         bool executeDesquidChoice( desquidChoice p_choice );
 
         /*
-         * @brief Opens the desquid menu for the speciefied pkmn. Returns when menu is closed.
+         * @brief: Opens the desquid menu for the speciefied pkmn. Returns when menu is closed.
          */
         bool desquid( u8 p_selectedIdx );
 #endif
 
         /*
-         * @brief Changes the selection to p_selectedIdx. Unselects old selected idx.
+         * @brief: Changes the selection to p_selectedIdx. Unselects old selected idx.
          */
         void select( u8 p_selectedIdx );
 
         /*
-         * @brief Adds p_markIdx to the marked indices. Does nothing for already marked indices.
+         * @brief: Adds p_markIdx to the marked indices. Does nothing for already marked indices.
          */
         void mark( u8 p_markIdx );
 
         /*
-         * @brief Removes p_markIdx from the marked indices. Does nothing for unmarked indices.
+         * @brief: Removes p_markIdx from the marked indices. Does nothing for unmarked indices.
          */
         void unmark( u8 p_markIdx );
 
         /*
-         * @brief Swaps two Pkmn.
+         * @brief: Swaps two Pkmn.
          */
         void swap( u8 p_idx1, u8 p_idx2 );
 
         /*
-         * @brief Computes the possible selections for the currently selected pkmn.
+         * @brief: Computes the possible selections for the currently selected pkmn.
          */
         void computeSelectionChoices( );
 
         /*
-         * @brief Executes the given choice.
+         * @brief: Executes the given choice.
          */
         bool executeChoice( choice p_choice );
 
         /*
-         * @brief Waits till the player touches the touch screen or presses the A or B button.
+         * @brief: Waits till the player touches the touch screen or presses the A or B button.
          */
         void waitForInteract( );
 
         /*
-         * @brief Runs a YN message box
+         * @brief: Handles touch input.
+         * @returns: 1 if the player's touches had any effect; 2 if the user pressed X
          */
-        bool runYNChoice( );
-
+        u8 handleTouch( );
       public:
         /*
-         * @brief Creates a new party screen; does nothing else.
+         * @brief: Creates a new party screen; does nothing else.
          * @param p_team: Pkmn party to display
          * @param p_teamLenth: Num Pkmn in team (max 6)
          * @param p_allowMoves: Allow to select a field move
@@ -296,7 +298,7 @@ namespace STS {
         ~partyScreen( );
 
         /*
-         * @brief Runs the party screen. Destroys anything that was previously on the screen.
+         * @brief: Runs the party screen. Destroys anything that was previously on the screen.
          * @param p_initialSelection: initially selected Pkmn
          * @returns Either a move selected or a (bitmask) of selected indices
          */

@@ -589,8 +589,10 @@ namespace BATTLE {
                     case 3: { // Choose item
                         SOUND::playSoundEffect( SFX_CHOOSE );
 
-                        BAG::bagViewer bv = BAG::bagViewer( _playerTeam );
-                        u16 itm     = bv.getItem( BAG::bagViewer::BATTLE );
+                        BAG::bagViewer bv = BAG::bagViewer( _playerTeam,
+                                _isWildBattle ? BAG::bagViewer::WILD_BATTLE
+                                : BAG::bagViewer::BATTLE );
+                        u16 itm     = bv.getItem( );
 
                         // If the item is a medicine, make the player choose a pkmn to
                         // use it on

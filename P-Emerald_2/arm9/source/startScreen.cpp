@@ -106,7 +106,7 @@ namespace SAVE {
             testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
             testTeam[ i ].m_boxdata.m_heldItem = I_GYARADOSITE;
         }
-
+/*
         BAG::bagViewer
         btv = BAG::bagViewer( testTeam );
         btv.run( );
@@ -116,12 +116,12 @@ namespace SAVE {
         btv.run( );
  //       btv = BAG::bagViewer( testTeam, BAG::bagViewer::GIVE_TO_PKMN );
  //       btv.run( );
-
+*/
         // BOX::boxViewer bxv;
         // bxv.run( );
 
-        //        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true
-        //        ); sts.run( );
+        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+        sts.run( );
 
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );

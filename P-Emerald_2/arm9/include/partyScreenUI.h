@@ -26,12 +26,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
+#include <vector>
 
+#include "yesNoBox.h"
 #include "pokemon.h"
 
 namespace STS {
-    const u16 CHOICE_FIELD_MOVE = ( 1 << 14 );
-    const u8  SWAP_COLOR        = 255;
+    constexpr u16 CHOICE_FIELD_MOVE = ( 1 << 14 );
+    constexpr u8  SWAP_COLOR        = 255;
+    constexpr u8  NEXT_PAGE_TARGET = 250;
+    constexpr u8  PREV_PAGE_TARGET = 249;
+    constexpr u8  EXIT_TARGET = 251;
 
     extern char BUFFER[ 50 ];
 
@@ -107,7 +112,8 @@ namespace STS {
         /*
          * @brief Draws the specified choice box.
          */
-        void drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
+        std::vector<std::pair<IO::inputTarget, u8>>
+            drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
                                   bool p_nextButton, bool p_prevButton, u8 p_selectedChoice = 255,
                                   bool p_bottom = true );
 
@@ -151,9 +157,14 @@ namespace STS {
         /*
          * @brief Prints the given yes no message
          */
-        void printYNMessage( const char* p_message, u8 p_selection = 255, u16 p_itemIcon = 0,
-                             bool p_bottom = true );
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+            printYNMessage( const char* p_message, u8 p_selection = 255, u16 p_itemIcon = 0,
+                            bool p_bottom = true );
 
+        /*
+         * @brief: Returns touch positions for the pkmn team and the exit (X) button.
+         */
+        std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( bool p_bottom = true );
         /*
          * @brief Hides the yes no message box.
          */
