@@ -151,7 +151,7 @@ namespace DEX {
             touchRead( &touch );
 
             int pressed = keysCurrent( );
-            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
+            if( GET_AND_WAIT( KEY_B ) /* || GET_AND_WAIT_R( 224, 164, 300, 300 ) */ )
                 break;
             else if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT( KEY_Y ) ) {
                 if( _page ) {
@@ -162,11 +162,11 @@ namespace DEX {
             if( CURR_PKMN && IN_DEX( CURR_PKMN ) )
                 for( u8 i = 0; i < 3; ++i ) {
                     if( IO::Oam->oamBuffer[ 1 + i ].isHidden ) continue;
-                    if( GET_AND_WAIT_C( 94 + 32 * i, 4, 14 ) ) {
+                    /*if( GET_AND_WAIT_C( 94 + 32 * i, 4, 14 ) ) {
                         _page = i;
                         DRAW_TOP( );
                         break;
-                    }
+                    }*/
                 }
 
             if( GET_AND_WAIT( KEY_R ) ) {
@@ -179,7 +179,7 @@ namespace DEX {
 
             if( _mode != SHOW_SINGLE )
                 if( GET_AND_WAIT( KEY_START )
-                    || GET_AND_WAIT_R( 1, 1, 30 * ( 1 + ( _mode == SHOW_CAUGHT ) ), 16 ) )
+                   /* || GET_AND_WAIT_R( 1, 1, 30 * ( 1 + ( _mode == SHOW_CAUGHT ) ), 16 ) */ )
                     changeMode( mode( !_mode ), CURR_PKMN );
             if( _mode != SHOW_ALL ) {
                 if( GET_AND_WAIT( KEY_RIGHT ) ) {
@@ -214,9 +214,9 @@ namespace DEX {
                 }
                 for( u8 i = FRAME_START_2; i < FRAME_START_2 + MAX_PKMN_CAUGHT; ++i )
                     if( !IO::Oam->oamBuffer[ i ].isHidden
-                        && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
+                       /* && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
                                            IO::Oam->oamBuffer[ i ].x + 32,
-                                           IO::Oam->oamBuffer[ i ].y + 28 ) ) {
+                                           IO::Oam->oamBuffer[ i ].y + 28 ) */ ) {
                         _selectedIdx                        = i - FRAME_START_2;
                         SAVE::SAV.getActiveFile( ).m_lstDex = CURR_PKMN;
                         DRAW_TOP( );
@@ -236,9 +236,9 @@ namespace DEX {
 
                 for( u8 i = FRAME_START; i < FRAME_START + MAX_PKMN_ALL; ++i )
                     if( !IO::Oam->oamBuffer[ i ].isHidden
-                        && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
+                       /* && GET_AND_WAIT_R( IO::Oam->oamBuffer[ i ].x, IO::Oam->oamBuffer[ i ].y,
                                            IO::Oam->oamBuffer[ i ].x + 32,
-                                           IO::Oam->oamBuffer[ i ].y + 28 ) )
+                                           IO::Oam->oamBuffer[ i ].y + 28 ) */ )
                         select( i - FRAME_START );
             }
         }

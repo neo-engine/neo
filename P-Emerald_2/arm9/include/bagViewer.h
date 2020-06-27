@@ -47,17 +47,19 @@ namespace BAG {
         };
 
       private:
-        /*
-         * @brief: Returns true if the current context allows the gaven item to be
-         * displayed.
-         */
-        bool isAllowed( u16 p_itemId );
+        enum choice {
+            DEREGISTER_ITEM,
+            REGISTER_ITEM,
+            TOSS_ITEM,
+            USE_ITEM,
+            USE_TM,
+            APPLY_ITEM,
+            GIVE_ITEM,
+            VIEW_DETAILS,
+            BACK,
+        };
 
-        void initView( );
-
-        std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> _ranges;
-
-        std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>> _view;
+       std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>> _view;
 
         bagUI* _bagUI;
         bool   _hasSprite;
@@ -70,14 +72,68 @@ namespace BAG {
 
         context _context;
 
+        std::vector<choice> _choices;
+        u8 _currentChoice;
+
         void initUI( );
+
+        constexpr u16 getTextForChoice( const choice p_choice ) const {
+            switch( p_choice ) {
+                case DEREGISTER_ITEM:
+                    return 402;
+                case REGISTER_ITEM:
+                    return 46;
+                case TOSS_ITEM:
+                    return 48;
+                    return 47;
+                case GIVE_ITEM:
+                    return 44;
+                case USE_ITEM:
+                case USE_TM:
+                case APPLY_ITEM:
+                    return 47;
+                case VIEW_DETAILS:
+                    return 401;
+                case BACK:
+                    return 330;
+            }
+            return 0;
+        }
+
+        u16 executeChoice( choice p_choice );
+
+        std::vector<choice> getItemChoices( u16 p_itemId, ITEM::itemData* p_data );
 
         bool confirmChoice( u16 p_targetItem );
 
-        inline std::pair<std::pair<u16, u16>, ITEM::itemData>
-            currentItem( ) const {
+        inline std::pair<std::pair<u16, u16>, ITEM::itemData> currentItem( ) const {
             return _view[ _currSelectedIdx ];
         }
+
+        /*
+         * @brief: Returns true if the current context allows the gaven item to be
+         * displayed.
+         */
+        bool isAllowed( u16 p_itemId );
+
+        void initView( );
+
+        /*
+         * @brief: Selects the item at the specified index. If p_index is negative or
+         * larger than _view.size(), new items are loaded into the view.
+         */
+        void selectItem( s8 p_index );
+
+        /*
+         * @brief: Selects and shows the new page.
+         */
+        void selectPage( u8 p_page );
+
+        /*
+         * @brief: Handles all touch input related things.
+         * @returns: 1 if the player pressed back.
+         */
+        u8 handleTouch( );
 
         /*
          * @brief: Uses the specified item on the given pkmn.
@@ -96,7 +152,13 @@ namespace BAG {
          */
         void takeItemFromPkmn( pokemon& p_pokemon );
 
+        /*
+         * @brief: Handles the interaction of a player with a specific item.
+         * @returns: 0 if nothing happened; 1 if the item got consumed and 2 if the bag is exited.
+         * If an item has yet to be used the 14 highest bits contain its id
+         */
         u16  handleSelection( );
+
         bool handleSomeInput( bool p_allowSort = true );
 
       public:

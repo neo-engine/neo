@@ -61,8 +61,9 @@ namespace SAVE {
             swiWaitForVBlank( );
 
             int pressed = keysCurrent( );
-            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || GET_AND_WAIT_R( 1, 1, 256, 192 ) ) {
+            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START ) ||
+                ( IO::inputTarget( 0, 0, 256, 192 ).inRange( touch )
+                  && IO::waitForInput( IO::inputTarget( 0, 0, 256, 192 ) ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 break;
             }

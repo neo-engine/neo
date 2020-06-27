@@ -208,7 +208,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Apply", "Anwenden"},
     {"Register", "Registrieren"},
     {"Use", "Einsetzen"},
-    {"Trash", "Wegwerfen"},
+    {"Toss", "Wegwerfen"},
     {"Select a move!", "Welche Attacke?"},
 
     // 50
@@ -757,4 +757,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 400
 
     {"Hit %hhu times.", "%hhu Mal getroffen."},
+    {"Details", "Details"},
+    {"Deregister", "Registrieren"},
 };

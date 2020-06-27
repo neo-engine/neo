@@ -153,22 +153,14 @@ namespace IO {
     }
     bool waitForTouchUp( inputTarget p_inputTarget ) {
         touchPosition touch;
-        if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH ) {
+        if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH
+                || p_inputTarget.m_inputType == inputTarget::inputType::TOUCH_CIRCLE ) {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
                 touchRead( &touch );
                 if( TOUCH_UP ) return true;
-                if( !IN_RANGE_I( touch, p_inputTarget ) ) return false;
-            }
-        }
-        if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH_CIRCLE ) {
-            loop( ) {
-                swiWaitForVBlank( );
-                scanKeys( );
-                touchRead( &touch );
-                if( TOUCH_UP ) return true;
-                if( !IN_RANGE_I_C( touch, p_inputTarget ) ) return false;
+                if( !p_inputTarget.inRange( touch ) ) return false;
             }
         }
         return false;

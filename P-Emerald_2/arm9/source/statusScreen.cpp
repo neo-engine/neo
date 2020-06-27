@@ -53,7 +53,7 @@ namespace STS {
     u8 statusScreen::handleTouch( ) {
         u8 change = false;
         for( auto i : _ui->getTouchPositions( ) ) {
-            if( IN_RANGE_I( touch, i.first ) ) {
+            if( i.first.inRange( touch ) ) {
                 swiWaitForVBlank( );
                 change = 5;
                 if( i.second == statusScreenUI::BACK_TARGET ) {
@@ -72,7 +72,7 @@ namespace STS {
                     swiWaitForVBlank( );
                     scanKeys( );
 
-                    if( !IN_RANGE_I( touch, i.first ) ) {
+                    if( !i.first.inRange( touch ) ) {
                         change = 0;
                         _ui->highlightButton( );
                         break;

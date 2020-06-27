@@ -106,22 +106,22 @@ namespace SAVE {
             testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
             testTeam[ i ].m_boxdata.m_heldItem = I_GYARADOSITE;
         }
-/*
+
         BAG::bagViewer
         btv = BAG::bagViewer( testTeam );
         btv.run( );
-        btv = BAG::bagViewer( testTeam, BAG::bagViewer::BATTLE );
-        btv.run( );
-        btv = BAG::bagViewer( testTeam, BAG::bagViewer::WILD_BATTLE );
-        btv.run( );
+//        btv = BAG::bagViewer( testTeam, BAG::bagViewer::BATTLE );
+//        btv.run( );
+//        btv = BAG::bagViewer( testTeam, BAG::bagViewer::WILD_BATTLE );
+//        btv.run( );
  //       btv = BAG::bagViewer( testTeam, BAG::bagViewer::GIVE_TO_PKMN );
  //       btv.run( );
-*/
+
         // BOX::boxViewer bxv;
         // bxv.run( );
 
-        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-        sts.run( );
+       // STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+       // sts.run( );
 
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );
@@ -166,7 +166,7 @@ namespace SAVE {
 
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || GET_AND_WAIT_R( 1, 1, 256, 192 ) ) {
+               /* || GET_AND_WAIT_R( 1, 1, 256, 192 ) */ ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true, false, false );
@@ -332,6 +332,7 @@ namespace SAVE {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 return res[ selectedIdx ];
             }
+            /*
             for( u8 i = 0; i < vis.size( ); ++i )
                 if( IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) {
                     selectedIdx = i;
@@ -350,6 +351,7 @@ namespace SAVE {
                     }
                     drawMainChoice( p_lang, vis, selectedIdx );
                 }
+                */
         }
     }
 
@@ -393,6 +395,7 @@ namespace SAVE {
                     continue;
                 return selectedIdx;
             }
+            /*
             for( u8 i = 0; i < MAX_SAVE_FILES; ++i )
                 if( IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) {
                     selectedIdx = i;
@@ -409,6 +412,7 @@ namespace SAVE {
                     }
                     drawSlotChoice( p_lang, selectedIdx );
                 }
+                */
         }
     }
 

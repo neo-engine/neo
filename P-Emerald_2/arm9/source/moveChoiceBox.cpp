@@ -201,6 +201,7 @@ namespace IO {
                 draw( -1 );
             }
 
+            /*
             for( u8 i = 0; i < 4 + !!_moveToLearn; ++i )
                 if( IN_RANGE_R( CHOICE_POS[ !!_moveToLearn ][ i ][ 0 ],
                                 CHOICE_POS[ !!_moveToLearn ][ i ][ 1 ],
@@ -216,6 +217,7 @@ namespace IO {
                         return i;
                     draw( -1 );
                 }
+                */
         }
         return result;
     }

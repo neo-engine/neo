@@ -33,31 +33,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 
 namespace IO {
-#define IN_RANGE_I( p_touch, p_input )                                                     \
-    ( ( p_touch ).px >= ( p_input ).m_targetX1 && ( p_touch ).py >= ( p_input ).m_targetY1 \
-      && ( p_touch ).px <= ( p_input ).m_targetX2 && ( p_touch ).py <= ( p_input ).m_targetY2 )
-#define IN_RANGE_I_C( p_touch, p_input )                      \
-    ( sqrt( sq( ( p_touch ).px - ( p_input ).m_targetX1 )     \
-            + sq( ( p_touch ).py - ( p_input ).m_targetY1 ) ) \
-      <= ( p_input ).m_targetR )
-
-#define IN_RANGE_R( p_x1, p_y1, p_x2, p_y2 ) \
-    IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) )
-#define IN_RANGE_C( p_x, p_y, p_r ) IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) )
 
 #define TOUCH_UP ( !touch.px && !touch.py )
-
 #define GET_KEY_COOLDOWN( p_key ) \
     ( ( pressed & ( p_key ) ) || ( ( held & ( p_key ) ) && !( --cooldown ) ) )
-
 #define GET_AND_WAIT( p_key ) \
     ( ( pressed & ( p_key ) ) && IO::waitForInput( IO::inputTarget( p_key ) ) )
-#define GET_AND_WAIT_R( p_x1, p_y1, p_x2, p_y2 )                     \
-    ( IN_RANGE_I( touch, IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) \
-      && IO::waitForInput( IO::inputTarget( p_x1, p_y1, p_x2, p_y2 ) ) )
-#define GET_AND_WAIT_C( p_x, p_y, p_r )                       \
-    ( IN_RANGE_I_C( touch, IO::inputTarget( p_x, p_y, p_r ) ) \
-      && IO::waitForInput( IO::inputTarget( p_x, p_y, p_r ) ) )
 
     constexpr u16 RGB( u8 p_r, u8 p_g, u8 p_b ) {
         return RGB15( p_r, p_g, p_b ) | BIT( 15 );
@@ -166,6 +147,18 @@ namespace IO {
         inputTarget( u16 p_targetX1, u16 p_targetY1, u16 p_targetR )
             : m_inputType( TOUCH_CIRCLE ), m_targetX1( p_targetX1 ), m_targetY1( p_targetY1 ),
               m_targetR( p_targetR ) {
+        }
+
+        constexpr bool inRange( touchPosition& p_touch ) const {
+            if( m_inputType == TOUCH ) {
+                return p_touch.px >= m_targetX1 && p_touch.py >= m_targetY1
+                    && p_touch.px <= m_targetX2 && p_touch.py <= m_targetY2;
+            } else if( m_inputType == TOUCH_CIRCLE ) {
+                return sq( p_touch.px - m_targetX1 ) + sq( p_touch.py - m_targetY1 )
+                    <= sq( m_targetR );
+            } else {
+                return false;
+            }
         }
     };
 

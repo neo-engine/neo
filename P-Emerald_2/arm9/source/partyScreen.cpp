@@ -1124,7 +1124,7 @@ namespace STS {
         }
         u8 change = false;
         for( auto i : _partyUI->getTouchPositions( ) ) {
-            if( IN_RANGE_I( touch, i.first ) ) {
+            if( i.first.inRange( touch ) ) {
                 swiWaitForVBlank( );
                 if( i.second < 6 ) {
                     select( i.second );
@@ -1159,7 +1159,7 @@ namespace STS {
         u8 res = 0;
         bool bad = false;
         for( auto i : _ranges ) {
-            if( IN_RANGE_I( touch, i.first ) ) {
+            if( i.first.inRange( touch ) ) {
                 swiWaitForVBlank( );
                 if( _currentChoiceSelection >= 6 && i.second < 6 ) {
                     _currentChoiceSelection = i.second + 6;
@@ -1177,7 +1177,7 @@ namespace STS {
                 while( touch.px || touch.py ) {
                     _partyUI->animate( _frame++ );
                     swiWaitForVBlank( );
-                    if( !IN_RANGE_I( touch, i.first ) ) {
+                    if( !i.first.inRange( touch ) ) {
                         bad = true;
                         break;
                     }

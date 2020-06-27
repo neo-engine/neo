@@ -108,7 +108,7 @@ namespace STS {
             std::string getString( );
         };
 
-        constexpr u16 getTextForDesquidChoice( const desquidChoice p_choice ) {
+        constexpr u16 getTextForDesquidChoice( const desquidChoice p_choice ) const {
             switch( p_choice ) {
                 case DESQUID_SPECIES:
                     return DESQUID_STRING + 1;
@@ -140,7 +140,7 @@ namespace STS {
 
         std::vector<desquidItem> getDesquidItemsForChoice( const desquidChoice p_choice );
 #endif
-        constexpr u16 getTextForChoice( const choice p_choice ) {
+        constexpr u16 getTextForChoice( const choice p_choice ) const {
             switch( p_choice ) {
                 case SELECT:
                     if( !_inBattle ) {

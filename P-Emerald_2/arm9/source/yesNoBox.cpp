@@ -74,13 +74,13 @@ namespace IO {
             }
 
             for( auto i : choices ) {
-                if( IN_RANGE_I( touch, i.first ) ) {
+                if( i.first.inRange( touch ) ) {
                     sel = i.second;
                     p_selectFunction( sel );
                     bool bad = false;
                     while( touch.px || touch.py ) {
                         swiWaitForVBlank( );
-                        if( !IN_RANGE_I( touch, i.first ) ) {
+                        if( !i.first.inRange( touch ) ) {
                             bad = true;
                             break;
                         }

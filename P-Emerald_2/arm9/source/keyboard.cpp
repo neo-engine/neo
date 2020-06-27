@@ -177,10 +177,10 @@ namespace IO {
             pressed = keysCurrent( );
 
             if( GET_AND_WAIT( KEY_START ) || GET_AND_WAIT( KEY_A )
-                || GET_AND_WAIT_R( 224, 164, 300, 300 ) )
+                /*|| GET_AND_WAIT_R( 224, 164, 300, 300 ) */)
                 return '\n';
-            if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT_C( 248, 162, 16 ) ) return '\a';
-            if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT_C( 220, 184, 16 ) ) return '\b';
+            if( GET_AND_WAIT( KEY_SELECT ) /* || GET_AND_WAIT_C( 248, 162, 16 ) */ ) return '\a';
+            if( GET_AND_WAIT( KEY_B ) /* || GET_AND_WAIT_C( 220, 184, 16 ) */ ) return '\b';
 
             for( u8 y = 0; y < numRows; ++y )
                 for( u8 x = 0; x < charsPerRow; ++x ) {

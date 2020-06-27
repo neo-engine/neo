@@ -379,17 +379,17 @@ namespace NAV {
             */
         }
 
-        if( STATE != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+/*        if( STATE != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
             STATE = backTransition[ STATE ];
             draw( false );
             if( STATE == HOME ) {
                 IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
                 IO::updateOAM( true );
             }
-        } else {
+        } else {*/
             // StartBag
-            if( ( pressed & KEY_X ) ||
-                    GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) ) {
+            if( ( pressed & KEY_X ) /*||
+                    GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) */) {
                 BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;
@@ -420,7 +420,7 @@ namespace NAV {
                     draw( true );
                 }
             } else if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
-                       && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) ) {
+                      /* && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) */ ) {
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;
                 SOUND::dimVolume( );
@@ -463,7 +463,7 @@ namespace NAV {
                         }
                     }
                 }
-            } else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
+            } /*else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
                 ANIMATE_MAP = false;
                 SOUND::dimVolume( );
                 STATE = HOME;
@@ -554,7 +554,7 @@ namespace NAV {
                                               IO::messageBox( "Lost :(" );
                                               break;
                                               }
-                                        }*/
+                                        }
 
                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
@@ -604,11 +604,11 @@ namespace NAV {
             test_battle.start( );
             SAVE::SAV.getActiveFile( ).updateTeam( bt );
             delete bt;
-            */
+
                     break;
                 }
                 case 4: {
-                    /*
+
             std::vector<pokemon> cpy;
 
             for( u8 i = 0; i < 6; ++i ) {
@@ -632,7 +632,7 @@ namespace NAV {
             test_battle.start( );
             SAVE::SAV.getActiveFile( ).updateTeam( bt );
             delete bt;
-            */
+
                     break;
                 }
                 case 5: {
@@ -706,6 +706,6 @@ namespace NAV {
                 }
                 draw( true );
             }
-        }
+        }*/
     }
 } // namespace NAV

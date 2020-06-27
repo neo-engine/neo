@@ -44,8 +44,15 @@ namespace BAG {
     class bagUI {
       public:
         struct targetInfo {
-            u16  m_item;
-            bool m_isHeld; // item is held by a pkmn
+            u8 m_idx;
+            enum type {
+                PKMN_ITEM = 0,
+                BAG_ITEM = 1,
+                BAG_PAGE = 2,
+                NEXT = 3,
+                PREV = 4,
+                BACK = 5
+            } m_type;
         };
 
       private:
@@ -62,12 +69,18 @@ namespace BAG {
 
         u8 _lastPkmnItemType = 255; // itemtype of the last item for which the pkmn info was drawn
 
-        void drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx, bool p_selected,
-                bool p_pressed, bool p_clearOnly = false );
+        void drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx );
       public:
         bagUI( pokemon* p_playerTeam ) : _playerTeam( p_playerTeam ) { }
 
         u16  drawPkmnIcons( );
+
+        /*
+         * @brief: Returns positions and types of all buttons currently visible on the
+         * screen.
+         */
+        std::vector<std::pair<IO::inputTarget, targetInfo>>
+            getTouchPositions( );
 
         /*
          * @brief: Initializes the bag UI. Destroys anything on the screens.
@@ -77,16 +90,25 @@ namespace BAG {
         /*
          * @brief: Redraws the specified page and displays the given items.
          */
-        std::vector<std::pair<IO::inputTarget, targetInfo>>
-            drawBagPage( bag::bagType,
+        void drawBagPage( bag::bagType,
                     const std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>& p_items,
                     u8 p_selection = 0 );
 
         /*
          * @brief: Selects and highlights the specified item.
          */
-        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data,
-                         bool p_pressed = false );
+        void selectItem( u8 p_idx, std::pair<u16, u16> p_item, const ITEM::itemData* p_data );
+
+        /*
+         * @brief: Draws a choiceBox for the specified item.
+         */
+        std::vector<std::pair<IO::inputTarget, u8>>
+            drawChoice( u16 p_item, const std::vector<u16>& p_texts );
+
+        /*
+         * @brief: Selects the specified choice in the currently displayed choiceBox.
+         */
+        void selectChoice( u8 p_selection );
 
         /*
          * @brief: Attaches the sprite corresponding to the specified item to the player's
