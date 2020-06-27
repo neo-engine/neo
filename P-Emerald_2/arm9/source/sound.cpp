@@ -43,6 +43,8 @@ void initSFX( ) {
     mmLoadEffect( SFX_BATTLE_BALLDROP );
     mmLoadEffect( SFX_BATTLE_BALLSHAKE );
     mmLoadEffect( SFX_BATTLE_DAMAGE_NORMAL );
+    mmLoadEffect( SFX_BATTLE_DAMAGE_SUPER );
+    mmLoadEffect( SFX_BATTLE_DAMAGE_WEAK );
     mmLoadEffect( SFX_BATTLE_DECREASE );
     mmLoadEffect( SFX_BATTLE_ESCAPE );
     mmLoadEffect( SFX_BATTLE_EXPFULL );
@@ -52,6 +54,8 @@ void initSFX( ) {
     mmLoadEffect( SFX_BATTLE_RECALL );
     mmLoadEffect( SFX_BATTLE_THROW );
     mmLoadEffect( SFX_SHINY );
+
+    mmLoadEffect( SFX_CRY_123 );
 
     mmLoadEffect( SFX_BUMP );
     mmLoadEffect( SFX_CAVE_WARP );
@@ -71,6 +75,8 @@ void initBattleSFX( ) {
     mmLoadEffect( SFX_BATTLE_BALLDROP );
     mmLoadEffect( SFX_BATTLE_BALLSHAKE );
     mmLoadEffect( SFX_BATTLE_DAMAGE_NORMAL );
+    mmLoadEffect( SFX_BATTLE_DAMAGE_SUPER );
+    mmLoadEffect( SFX_BATTLE_DAMAGE_WEAK );
     mmLoadEffect( SFX_BATTLE_DECREASE );
     mmLoadEffect( SFX_BATTLE_ESCAPE );
     mmLoadEffect( SFX_BATTLE_EXPFULL );
@@ -100,6 +106,8 @@ void deinitBattleSFX( ) {
     mmUnloadEffect( SFX_BATTLE_BALLDROP );
     mmUnloadEffect( SFX_BATTLE_BALLSHAKE );
     mmUnloadEffect( SFX_BATTLE_DAMAGE_NORMAL );
+    mmUnloadEffect( SFX_BATTLE_DAMAGE_SUPER );
+    mmUnloadEffect( SFX_BATTLE_DAMAGE_WEAK );
     mmUnloadEffect( SFX_BATTLE_DECREASE );
     mmUnloadEffect( SFX_BATTLE_ESCAPE );
     mmUnloadEffect( SFX_BATTLE_EXPFULL );

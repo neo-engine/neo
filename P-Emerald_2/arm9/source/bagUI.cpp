@@ -35,6 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "screenFade.h"
 #include "choiceBox.h"
+#include "yesNoBox.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -57,6 +58,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Down.h"
 #include "Back.h"
 
+#include "noselection_blank_32_32.h"
+#include "noselection_64_20.h"
 #include "noselection_64_32.h"
 #include "noselection_64_20.h"
 #include "noselection_96_32_4.h"
@@ -75,24 +78,25 @@ namespace BAG {
 #define SPR_TRANSFER_OAM_SUB 0
 #define SPR_MSG_BOX_OAM_SUB 1
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 14 + 6 * ( p_pos ) )
-#define SPR_ARROW_DOWN_OAM_SUB 51
-#define SPR_X_OAM_SUB 52
+#define SPR_ARROW_DOWN_OAM_SUB 52
 #define SPR_ARROW_BACK_OAM_SUB 53
 #define SPR_ARROW_UP_OAM_SUB 54
-#define SPR_ITEM_WINDOW_OAM_SUB( p_window ) ( 55 + 6 * ( p_window ) )
+#define SPR_ITEM_WINDOW_OAM_SUB( p_window ) ( 55 + 5 * ( p_window ) )
+#define SPR_MSG_BOX_SMALL_OAM_SUB 109
 #define SPR_PKMN_START_OAM_SUB 114
 #define SPR_BAG_ICON_OAM_SUB 120
 
 #define SPR_BOX_PAL_SUB 0
 #define SPR_SELECTED_PAL_SUB 1
-#define SPR_ARROW_X_PAL_SUB 2
-#define SPR_PKMN_PAL_SUB 3
-#define SPR_BAG_ICON_PAL_SUB 9
-#define SPR_BAG_ICON_SEL_PAL_SUB 10
-#define SPR_ITEM_ICON_PAL_SUB 11
+#define SPR_PKMN_PAL_SUB 2
+#define SPR_BAG_ICON_PAL_SUB 8
+#define SPR_BAG_ICON_SEL_PAL_SUB 9
+#define SPR_ITEM_ICON_PAL_SUB 10
+#define SPR_ARROW_X_PAL_SUB 11
 #define SPR_BACK_PAL_SUB 12
 #define SPR_DOWN_PAL_SUB 13
 #define SPR_TRANSFER_PAL_SUB 15
+#define SPR_TYPE_PAL_SUB( p_type ) ( 11 + ( p_type ) )
 
     void showActiveBag( u8 p_bagNo ) {
         u16 tileIdx = IO::Oam->oamBuffer[ SPR_BAG_ICON_OAM_SUB + p_bagNo ].gfxIndex;
@@ -291,6 +295,19 @@ namespace BAG {
                 noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, true,
                 OBJMODE_NORMAL );
 
+        // Small message box
+        for( u8 i = 1; i < 5; ++i ) {
+            IO::loadSprite( SPR_MSG_BOX_SMALL_OAM_SUB + i, SPR_BOX_PAL_SUB,
+                    tileCnt, 3 + 24 * ( 5 - i ), -9, 32, 32,
+                    noselection_64_20Pal, noselection_64_20Tiles,
+                    noselection_64_20TilesLen, true, true, true, OBJPRIORITY_3,
+                    true, OBJMODE_NORMAL );
+        }
+        tileCnt = IO::loadSprite( SPR_MSG_BOX_SMALL_OAM_SUB, SPR_BOX_PAL_SUB,
+                tileCnt, 3, 3, 32, 32,
+                noselection_64_20Pal, noselection_64_20Tiles,
+                noselection_64_20TilesLen, false, false, true, OBJPRIORITY_3,
+                true, OBJMODE_NORMAL );
 
 
         IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
@@ -394,33 +411,35 @@ namespace BAG {
             display = ITEM::getItemName( p_itemId ) + ": "
                       + MOVE::getMoveName( p_data->m_param2 );
 
-            IO::regularFont->printStringC( GET_STRING( 29 ), 33, 145, false );
+            IO::regularFont->printStringC( GET_STRING( 29 ), 56, 147, false, IO::font::RIGHT );
             tileCnt
-                = IO::loadTypeIcon( move.m_type, 62, 144, 1, 1, tileCnt, false, CURRENT_LANGUAGE );
+                = IO::loadTypeIcon( move.m_type, 62, 146, 1, 1, tileCnt, false, CURRENT_LANGUAGE );
 
-            IO::regularFont->printStringC( GET_STRING( 30 ), 100, 145, false );
-            IO::loadDamageCategoryIcon( move.m_category, 152, 144, 2, 2, tileCnt, false );
+            IO::regularFont->printStringC( GET_STRING( 30 ), 146, 147, false, IO::font::RIGHT );
+            IO::loadDamageCategoryIcon( move.m_category, 152, 146, 2, 2, tileCnt, false );
 
-            IO::regularFont->printStringC( GET_STRING( 31 ), 190, 145, false );
-            char buffer[ 100 ];
-            snprintf( buffer, 99, "%2d", move.m_pp );
-            IO::regularFont->printStringC( buffer, 229, 145, false, IO::font::RIGHT );
+            snprintf( buffer, 99, "%s  %2d", GET_STRING( 31 ), move.m_pp );
+            IO::regularFont->printStringC( buffer, 225, 147, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( IO::RED_IDX, 1 );
-            IO::regularFont->printStringC( GET_STRING( 32 ), 33, 160, false );
-            if( move.m_category != MOVE::STATUS && move.m_basePower > 1 )
-                snprintf( buffer, 99, "%3d", move.m_basePower );
-            else
-                snprintf( buffer, 99, "---" );
-            IO::regularFont->printStringC( buffer, 108, 160, false, IO::font::RIGHT );
 
+            // power / acc
+            if( move.m_basePower ) {
+                snprintf( buffer, 24, GET_STRING( 390 ), move.m_basePower );
+                IO::regularFont->printStringC( buffer, 80, 166, false, IO::font::CENTER );
+            }
+
+            if( move.m_accuracy > 0 && move.m_accuracy <= 100 ) {
+                snprintf( buffer, 24, GET_STRING( 391 ), move.m_accuracy );
+            } else {
+                snprintf( buffer, 24, GET_STRING( 392 ) );
+            }
             IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-            IO::regularFont->printStringC( GET_STRING( 33 ), 124, 160, false );
-            if( move.m_accuracy )
-                snprintf( buffer, 99, "%3d", move.m_accuracy );
-            else
-                std::sprintf( buffer, "---" );
-            IO::regularFont->printStringC( buffer, 229, 160, false, IO::font::RIGHT );
+            if( move.m_basePower ) {
+                IO::regularFont->printStringC( buffer, 176, 166, false, IO::font::CENTER );
+            } else {
+                IO::regularFont->printStringC( buffer, 128, 166, false, IO::font::CENTER );
+            }
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         }
 
@@ -431,10 +450,7 @@ namespace BAG {
         IO::updateOAM( false );
     }
 
-    std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
-    bagUI::drawPkmn( u16 p_itemId, const ITEM::itemData* p_data ) {
-        std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>> res;
-
+    void bagUI::drawPkmn( u16 p_itemId, const ITEM::itemData* p_data ) {
         for( u8 i = 0; i < 6; ++i ) {
             const u8 FIRST_LINE = 33 + 26 * i;
             const u8 SECOND_LINE = 44 + 26 * i;
@@ -480,14 +496,10 @@ namespace BAG {
             }
 
             if( _playerTeam[ i ].isEgg( ) ) {
-                if( p_data != nullptr && _lastPkmnItemType != p_data->m_itemType ) {
+                if( p_data != nullptr ) {
                     IO::regularFont->printStringC( GET_STRING( 34 ), 45, SINGLE_LINE, true );
                 }
-                // res.push_back(
-                //    {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), {0, true}} );
             } else {
-//                res.push_back( {IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
-//                                {_playerTeam[ i ].getItem( ), true}} );
                 if( p_data == nullptr ||
                         ( _lastPkmnItemType == p_data->m_itemType
                           && p_data->m_itemType != ITEM::ITEMTYPE_TM
@@ -566,7 +578,6 @@ namespace BAG {
         if( p_data != nullptr ) {
             _lastPkmnItemType = p_data->m_itemType;
         }
-        return res;
     }
 
     void bagUI::drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx ) {
@@ -641,6 +652,11 @@ namespace BAG {
     }
 
     void drawTop( u8 p_page ) {
+        IO::OamTop->oamBuffer[ 0 ].isHidden = true;
+        IO::OamTop->oamBuffer[ 1 ].isHidden = true;
+        IO::OamTop->oamBuffer[ 2 ].isHidden = true;
+        IO::updateOAM( false );
+
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -649,8 +665,132 @@ namespace BAG {
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
 
+    void bagUI::drawPkmnChoice( ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        oam[ SPR_ARROW_UP_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_DOWN_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden = false;
+        for( u8 i = 0; i < 5; ++i ) { oam[ SPR_MSG_BOX_SMALL_OAM_SUB + i ].isHidden = false; }
+
+        IO::updateOAM( true );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::regularFont->printStringC( GET_STRING( 166 ), 67, 5, true, IO::font::CENTER );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+    }
+
+    void bagUI::undrawPkmnChoice( ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        oam[ SPR_ARROW_UP_OAM_SUB ].isHidden = false;
+        oam[ SPR_ARROW_DOWN_OAM_SUB ].isHidden = false;
+        oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden = false;
+        for( u8 i = 0; i < 5; ++i ) { oam[ SPR_MSG_BOX_SMALL_OAM_SUB + i ].isHidden = true; }
+
+        IO::updateOAM( true );
+        IO::printRectangle( 0, 0, 5 * 24 + 4, 31, true, 0 );
+    }
+
+    void bagUI::printMessage( const char* p_message ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        _lastPkmnItemType = 255;
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        if( p_message ) {
+            for( u8 i = 0; i < 13; ++i ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
+
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y,
+                   256 - oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y + 31, true, 0 );
+            IO::regularFont->printStringC( p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8,
+                    true, IO::font::CENTER );
+        }
+
+        oam[ SPR_ARROW_UP_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_DOWN_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden = true;
+
+        IO::updateOAM( true );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+    }
+
+    std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+        bagUI::printYNMessage( const char* p_message, u8 p_selection, bool p_bottom ) {
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
+            = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        _lastPkmnItemType = 255;
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        if( p_message ) {
+            for( u8 i = 0; i < 13; ++i ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
+
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y,
+                   256 - oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y + 31, true, 0 );
+            auto lineCnt =
+                IO::regularFont->printStringC( p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8,
+                    p_bottom, IO::font::CENTER, 14, 0, false, false, -1 ) - 1;
+            IO::regularFont->printStringC( p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8
+                    - lineCnt * 7,
+                    p_bottom, IO::font::CENTER, 14 );
+        }
+
+        oam[ SPR_ARROW_UP_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_DOWN_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden = true;
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_SELECTED_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+
+        if( p_message ) {
+            for( u8 i = 0; i < 2; i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                }
+            }
+
+            IO::printRectangle( oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x,
+                    oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y,
+                    oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 95,
+                    oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 31, true, 0 );
+            IO::regularFont->printString(
+                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8, p_bottom, IO::font::CENTER );
+
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 96,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 32 ),
+                        IO::yesNoBox::YES ) );
+
+            IO::printRectangle( oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x,
+                    oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y,
+                    oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 95,
+                    oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 31, true, 0 );
+            IO::regularFont->printString(
+                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, p_bottom, IO::font::CENTER );
+
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 96,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 32 ),
+                        IO::yesNoBox::NO ) );
+        }
+        IO::updateOAM( p_bottom );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        return res;
+    }
+
     std::vector<std::pair<IO::inputTarget, u8>>
-        bagUI::drawChoice( u16 p_item, const std::vector<u16>& p_texts ) {
+        bagUI::drawChoice( u16 p_item, const ITEM::itemData* p_data,
+                           const std::vector<u16>& p_texts ) {
         auto res = std::vector<std::pair<IO::inputTarget, u8>>( );
         auto& oam = IO::Oam->oamBuffer;
         _lastPkmnItemType = 255;
@@ -681,24 +821,28 @@ namespace BAG {
         IO::updateOAM( true );
 
         char buffer[ 100 ];
-        bool found = false;
-        for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
-            if( _itemCache[ i ].first == p_item ) {
-                snprintf( buffer, 99, GET_STRING( 57 ), _itemCache[ i ].second.c_str( ) );
-                found = true;
-                break;
-            }
-        }
-        if( !found ) {
-            for( u8 i = 0; i < 6; ++i ) {
-                if( _teamItemCache[ i ].first == p_item ) {
-                    snprintf( buffer, 99, GET_STRING( 57 ), _teamItemCache[ i ].second.c_str( ) );
+        if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
+            bool found = false;
+            for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
+                if( _itemCache[ i ].first == p_item ) {
+                    snprintf( buffer, 99, GET_STRING( 57 ), _itemCache[ i ].second.c_str( ) );
                     found = true;
                     break;
                 }
             }
-        }
-        if( !found ) [[unlikely]] {
+            if( !found ) {
+                for( u8 i = 0; i < 6; ++i ) {
+                    if( _teamItemCache[ i ].first == p_item ) {
+                        snprintf( buffer, 99, GET_STRING( 57 ), _teamItemCache[ i ].second.c_str( ) );
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if( !found ) [[unlikely]] {
+                snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
+            }
+        } else {
             snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
         }
 
@@ -787,7 +931,7 @@ namespace BAG {
             selectItem( p_selection, p_items[ p_selection ].first, &idat );
         }
 
-        auto           pkmnTg = drawPkmn( 0, nullptr );
+        drawPkmn( 0, nullptr );
         if( p_items.size( ) ) {
             for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
                 if( i < p_items.size( ) ) {
@@ -808,9 +952,43 @@ namespace BAG {
         IO::updateOAM( true );
     }
 
-    std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>
-        bagUI::getTouchPositions( ) {
-        auto res = std::vector<std::pair<IO::inputTarget, bagUI::targetInfo>>( );
+    std::vector<std::pair<IO::inputTarget, u8>> bagUI::getPkmnInputTarget( ) const {
+        auto res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !_playerTeam[ i ].getSpecies( ) ) {
+                break;
+            }
+            res.push_back( std::pair( IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ),
+                        i ) );
+        }
+        return res;
+    }
+
+    std::pair<IO::inputTarget, u8> bagUI::getButtonInputTarget( u8 p_button ) const {
+        auto& oam = IO::Oam->oamBuffer;
+        switch( p_button ) {
+            case IO::choiceBox::BACK_CHOICE:
+                return std::pair( IO::inputTarget( oam[ SPR_ARROW_BACK_OAM_SUB ].x + 16,
+                            oam[ SPR_ARROW_BACK_OAM_SUB ].y + 16, 16 ), p_button );
+            case IO::choiceBox::NEXT_PAGE_CHOICE:
+                return std::pair( IO::inputTarget( oam[ SPR_ARROW_DOWN_OAM_SUB ].x + 16,
+                            oam[ SPR_ARROW_DOWN_OAM_SUB ].y + 16, 16 ), p_button );
+            case IO::choiceBox::PREV_PAGE_CHOICE:
+                return std::pair( IO::inputTarget( oam[ SPR_ARROW_UP_OAM_SUB ].x + 16,
+                            oam[ SPR_ARROW_UP_OAM_SUB ].y + 16, 16 ), p_button );
+            [[unlikely]] default:
+                break;
+        }
+
+        return std::pair( IO::inputTarget( 0, 0, 0 ), 0 );
+    }
+
+    void bagUI::selectPkmn( u8 p_selection ) {
+
+    }
+
+    std::vector<std::pair<IO::inputTarget, u8>> bagUI::getTouchPositions( ) {
+        auto res = std::vector<std::pair<IO::inputTarget, u8>>( );
 
         // TODO
 

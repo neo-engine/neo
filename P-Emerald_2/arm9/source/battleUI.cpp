@@ -762,9 +762,8 @@ namespace BATTLE {
     }
 
     void battleUI::animateHitPkmn( bool p_opponent, u8 p_pos, u8 p_effectiveness ) {
-        // FIXME: proper sfx
-        if( p_effectiveness > 100 ) { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_NORMAL ); }
-        else if( p_effectiveness < 100 ) { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_NORMAL ); }
+        if( p_effectiveness > 100 ) { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_SUPER ); }
+        else if( p_effectiveness < 100 ) { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_WEAK ); }
         else { SOUND::playSoundEffect( SFX_BATTLE_DAMAGE_NORMAL ); }
 
         for( u8 f = 0; f < 4; ++f ) {

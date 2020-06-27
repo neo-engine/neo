@@ -34,7 +34,7 @@ namespace SOUND {
     MAP::moveMode currentMoveMode = MAP::WALK;
 
     void playCry( u16 p_pokemonId, u8 p_formeId, bool p_female ) {
-//        playSoundEffect( SFX_132CRY );
+        playSoundEffect( SFX_CRY_123 );
     }
 
     void onLocationChange( u16 p_newLocation ) {

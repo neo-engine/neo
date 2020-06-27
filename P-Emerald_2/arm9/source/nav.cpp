@@ -306,7 +306,7 @@ namespace NAV {
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
                 if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem );
+                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem, []( const char* ){ } );
                     updateItems( );
                 } else {
                     IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
@@ -415,11 +415,12 @@ namespace NAV {
                 draw( true );
                 updateItems( );
                 if( res ) {
-                    ITEM::use( res );
+                    ITEM::use( res, []( const char* ){ } );
                     updateItems( );
                     draw( true );
                 }
-            } else if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
+            } else if( ( pressed & KEY_Y )
+                    && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
                       /* && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) */ ) {
                 ANIMATE_MAP = false;
                 UPDATE_TIME = false;

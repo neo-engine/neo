@@ -213,12 +213,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 50
 
-    {"Used %s on %s.", "%s auf %s angewendet."},
+    {"Used %s.", "%s eingesetzt."},
     {"What?\n%s is evolving!", "Nanu?\n%s entwickelt sich!"},
     {"Congratulations! Your %s\nevolved into %s!", "Gl\xfc""ckwunsch! Dein %s\nwurde zu einem %s!"},
-    {"It would be\nwasted", "Es w\xfcrde keine\nWirkung haben"},
-    {"%s holds\n%s already.\nSwap the items?",
-     "%s tr\xe4gt bereits\ndas Item %s.\nSollen die Items getauscht werden?"}, // TODO
+    {"It would be wasted|", "Es w\xfcrde keine Wirkung haben|"},
+    {"%s already has an item.\nSwap the items?",
+     "%s tr\xe4gt bereits ein Item.\nSollen die Items getauscht werden?"},
 
     {"You can't choose\nthis item.", "Dieses Item kann nicht\nausgew\xe4hlt werden."},
     {"Choose %s?", "%s ausw\xe4hlen?"},

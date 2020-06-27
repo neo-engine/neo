@@ -36,7 +36,6 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 
 #include "mapDefines.h"
 #include "mapDrawer.h"
-#include "messageBox.h"
 #include "saveGame.h"
 #include "uio.h"
 
@@ -286,8 +285,7 @@ namespace ITEM {
         return change;
     }
 
-    // Returns false if the original UI has not to be redrawn/will be exited
-    bool use( const u16 p_itemId, bool p_dryRun ) {
+    bool use( const u16 p_itemId, std::function<void( const char* )> p_message, bool p_dryRun ) {
         char buffer[ 50 ];
         if( !p_dryRun ) {
             bool ex = false;
@@ -309,61 +307,43 @@ namespace ITEM {
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 50 );
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                IO::messageBox( GET_STRING( 63 ), false );
+                p_message( GET_STRING( 63 ) );
             }
             return true;
         case I_SUPER_REPEL:
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 100 );
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                IO::messageBox( GET_STRING( 64 ), false );
+                p_message( GET_STRING( 64 ) );
             }
             return true;
         case I_MAX_REPEL:
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 250 );
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
-                IO::messageBox( GET_STRING( 65 ), false );
+                p_message( GET_STRING( 65 ) );
             }
             return true;
         case I_EXP_SHARE:
             if( !p_dryRun ) {
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
                 if( SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled )
-                    IO::messageBox( GET_STRING( 66 ), false );
+                    p_message( GET_STRING( 66 ) );
                 else
-                    IO::messageBox( GET_STRING( 67 ), false );
+                    p_message( GET_STRING( 67 ) );
                 SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled
                     = !SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled;
             }
             return true;
         case I_COIN_CASE:
             if( !p_dryRun ) {
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
                 snprintf( buffer, 50, GET_STRING( 68 ), SAVE::SAV.getActiveFile( ).m_coins );
-                IO::messageBox( buffer, false );
+                p_message( buffer );
             }
             return true;
         case I_POINT_CARD:
             if( !p_dryRun ) {
-                IO::Oam->oamBuffer[ FWD_ID ].isHidden  = true;
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::Oam->oamBuffer[ BWD_ID ].isHidden  = true;
                 snprintf( buffer, 50, GET_STRING( 69 ), SAVE::SAV.getActiveFile( ).m_battlePoints );
-                IO::messageBox( buffer, false );
+                p_message( buffer );
             }
             return true;
         case I_ESCAPE_ROPE:

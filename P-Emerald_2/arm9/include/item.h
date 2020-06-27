@@ -224,9 +224,11 @@ namespace ITEM {
     bool isUsable( const u16 p_itemId );
 
     /*
-     * @brief: Uses a usable item/ key item.
+     * @brief: Uses a usable item/ key item. Returns false if the item needs to be used in
+     * the OW.
      */
-    bool use( const u16 p_itemId, const bool p_dryRun = false );
+    bool use( const u16 p_itemId, std::function<void( const char* )> p_message,
+              bool p_dryRun = false );
 
     /*
      * @brief: Use specified item on given pokemon. (Item needs to be either medicine,

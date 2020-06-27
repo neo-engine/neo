@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "bag.h"
 #include "uio.h"
+#include "yesNoBox.h"
 
 namespace BAG {
     constexpr u8 GIVE_ITEM = 1;
@@ -42,19 +43,6 @@ namespace BAG {
 
     constexpr u8 MAX_ITEMS_PER_PAGE = 8;
     class bagUI {
-      public:
-        struct targetInfo {
-            u8 m_idx;
-            enum type {
-                PKMN_ITEM = 0,
-                BAG_ITEM = 1,
-                BAG_PAGE = 2,
-                NEXT = 3,
-                PREV = 4,
-                BACK = 5
-            } m_type;
-        };
-
       private:
         pokemon* _playerTeam;
 
@@ -64,8 +52,7 @@ namespace BAG {
         std::pair<u16, std::string> _teamItemCache[ 6 ];
         std::pair<u16, std::string> _itemCache[ MAX_ITEMS_PER_PAGE ];
 
-        std::vector<std::pair<IO::inputTarget, targetInfo>> drawPkmn( u16             p_itemId,
-                                                                      const ITEM::itemData* p_data );
+        void drawPkmn( u16 p_itemId, const ITEM::itemData* p_data );
 
         u8 _lastPkmnItemType = 255; // itemtype of the last item for which the pkmn info was drawn
 
@@ -79,8 +66,7 @@ namespace BAG {
          * @brief: Returns positions and types of all buttons currently visible on the
          * screen.
          */
-        std::vector<std::pair<IO::inputTarget, targetInfo>>
-            getTouchPositions( );
+        std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( );
 
         /*
          * @brief: Initializes the bag UI. Destroys anything on the screens.
@@ -103,7 +89,38 @@ namespace BAG {
          * @brief: Draws a choiceBox for the specified item.
          */
         std::vector<std::pair<IO::inputTarget, u8>>
-            drawChoice( u16 p_item, const std::vector<u16>& p_texts );
+            drawChoice( u16 p_item, const ITEM::itemData* p_data, const std::vector<u16>& p_texts );
+
+
+        /*
+         * @brief: Returns inputTargets for each teamPkmn
+         */
+        std::vector<std::pair<IO::inputTarget, u8>> getPkmnInputTarget( ) const;
+
+        /*
+         * @brief: Returns an input target for the specified button.
+         */
+        std::pair<IO::inputTarget, u8> getButtonInputTarget( u8 p_button ) const;
+
+        void drawPkmnChoice( );
+
+        void undrawPkmnChoice( );
+
+        /*
+         * @brief: Selects the specified pkmn.
+         */
+        void selectPkmn( u8 p_selection );
+
+        /*
+         * @brief: Draws a yesNoBox.
+         */
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+            printYNMessage( const char* p_message, u8 p_selection, bool p_bottom = true );
+
+        /*
+         * @brief: Prints the specified message.
+         */
+        void printMessage( const char* p_message );
 
         /*
          * @brief: Selects the specified choice in the currently displayed choiceBox.

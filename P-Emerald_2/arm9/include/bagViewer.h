@@ -77,6 +77,8 @@ namespace BAG {
 
         void initUI( );
 
+        void waitForInteract( );
+
         constexpr u16 getTextForChoice( const choice p_choice ) const {
             switch( p_choice ) {
                 case DEREGISTER_ITEM:
