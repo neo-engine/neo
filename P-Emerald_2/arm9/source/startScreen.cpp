@@ -146,19 +146,18 @@ namespace SAVE {
                 "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
 
         if( gMod == DEVELOPER )
-            printf( "    " __DATE__ " " __TIME__ " v%02hhu-dev\n", VERSION );
+            printf( "   " __DATE__ " " __TIME__ " v%hhu.%hhu-dev\n", VERSION / 10, VERSION % 10 );
         else if( gMod == BETA )
-            printf( "   " __DATE__ " " __TIME__ " v%02hhu-beta\n", VERSION );
+            printf( "  " __DATE__ " " __TIME__ " v%hhu.%hhu-beta\n", VERSION / 10, VERSION % 10 );
         else if( gMod == ALPHA )
-            printf( "  " __DATE__ " " __TIME__ " v%02hhu-alpha\n", VERSION );
+            printf( " " __DATE__ " " __TIME__ " v%hhu.%hhu-alpha\n", VERSION / 10, VERSION % 10 );
         else if( gMod == EMULATOR )
-            printf( "    " __DATE__ " " __TIME__ " v%02hhu-emu\n", VERSION );
+            printf( "   " __DATE__ " " __TIME__ " v%hhu.%hhu-emu\n", VERSION / 10, VERSION % 10 );
         printf( "%32s", VERSION_NAME );
 
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );
         consoleSelect( &IO::Top );
         u8            frame = 0;
-        touchPosition touch;
         loop( ) {
             scanKeys( );
             touchRead( &touch );
@@ -166,7 +165,7 @@ namespace SAVE {
 
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-               /* || GET_AND_WAIT_R( 1, 1, 256, 192 ) */ ) {
+                    || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true, false, false );
