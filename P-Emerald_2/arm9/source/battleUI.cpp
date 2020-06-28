@@ -38,7 +38,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "item.h"
 #include "keyboard.h"
 #include "move.h"
-#include "moveChoiceBox.h"
 #include "moveNames.h"
 #include "pokemon.h"
 #include "pokemonNames.h"

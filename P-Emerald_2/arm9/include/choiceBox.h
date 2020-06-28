@@ -69,8 +69,6 @@ namespace IO {
 
         [[deprecated]]
         choiceBox( int p_num, const char** p_choices, const char* p_name, bool p_big );
-        [[deprecated]]
-        choiceBox( pokemon p_pokemon, u16 p_moveToLearn );
 
         [[deprecated]]
         void draw( u8 p_pressedIdx );

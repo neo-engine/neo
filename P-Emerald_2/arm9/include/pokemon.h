@@ -28,6 +28,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <algorithm>
 #include <type_traits>
+#include <functional>
+
 #include "defines.h"
 #include "pokemonData.h"
 #include "pokemonNames.h"
@@ -267,7 +269,9 @@ struct boxPokemon {
         }
     }
 
-    bool learnMove( u16 p_move );
+    bool learnMove( u16 p_move, std::function<void( const char*)> p_message,
+                                std::function<u8( boxPokemon*, u16 )> p_getMove,
+                                std::function<bool( const char* )> p_yesNoMessage );
     void hatch( );
 
     // Recalculates form based on held item
@@ -605,8 +609,10 @@ struct pokemon {
         return m_boxdata.isEgg( );
     }
 
-    inline bool learnMove( u16 p_move ) {
-        return m_boxdata.learnMove( p_move );
+    inline bool learnMove( u16 p_move, std::function<void( const char*)> p_message,
+                           std::function<u8( boxPokemon*, u16 )> p_getMove,
+                           std::function<bool( const char* )> p_yesNoMessage ) {
+        return m_boxdata.learnMove( p_move, p_message, p_getMove, p_yesNoMessage );
     }
     void evolve( u16 p_suppliedItem = 0, evolutionMethod p_method = EVOMETHOD_LEVEL_UP );
     u8 canEvolve( u16 p_suppliedItem = 0, evolutionMethod p_method = EVOMETHOD_LEVEL_UP,

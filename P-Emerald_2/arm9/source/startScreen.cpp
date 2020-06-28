@@ -107,9 +107,9 @@ namespace SAVE {
             testTeam[ i ].m_boxdata.m_heldItem = I_GYARADOSITE;
         }
 
-        BAG::bagViewer
-        btv = BAG::bagViewer( testTeam );
-        btv.run( );
+//        BAG::bagViewer
+//        btv = BAG::bagViewer( testTeam );
+//        btv.run( );
 //        btv = BAG::bagViewer( testTeam, BAG::bagViewer::BATTLE );
 //        btv.run( );
 //        btv = BAG::bagViewer( testTeam, BAG::bagViewer::WILD_BATTLE );

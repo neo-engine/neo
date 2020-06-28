@@ -295,8 +295,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Took %s\nfrom %s.", "%s von\n%s verstaut."},
     {"%s already\nknows %s!", "%s beherrscht\n%s bereits!"},
     {"%s learned\n%s!", "%s erlernt\n%s!"},
-    {"%s already\nknows 4 moves.\nForget a move?",
-     "%s beherrscht\nbereits 4 Attacken.\nSoll eine verlernt werden?"},
+    {"%s already knows 4 moves. Forget a move?",
+     "%s beherrscht bereits 4 Attacken. Soll eine verlernt werden?"},
 
     {"Select a move!", "Welche Attacke?"},
     {"%s can't\nforget %s!", "%s kann\n%s nicht vergessen!"},
@@ -377,7 +377,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"In Battle", "Im Kampf"},
     {"Send In", "In den Kampf"},
     {"To be sent", "Schon ausgew\xe4hlt"},
-    {"Eggs can't", "Ein Ei kann"},
+    {"Eggs can't hold items!", "Ein Ei kann kein Item tragen."},
     {"battle!", "nicht k\xe4mpfen!"},
 
     {"Status", "Bericht"},
@@ -759,4 +759,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     {"Hit %hhu times.", "%hhu Mal getroffen."},
     {"Details", "Details"},
     {"Deregister", "Registrieren"},
+    {"%s did not learn %s.", "%s hat %s nicht erlernt."},
 };

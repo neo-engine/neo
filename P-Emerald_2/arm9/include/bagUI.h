@@ -91,6 +91,11 @@ namespace BAG {
         std::vector<std::pair<IO::inputTarget, u8>>
             drawChoice( u16 p_item, const ITEM::itemData* p_data, const std::vector<u16>& p_texts );
 
+        /*
+         * @brief: Draws a choice box for the moves of the pokemon.
+         */
+        std::vector<std::pair<IO::inputTarget, u8>> drawMoveChoice( const boxPokemon* p_pokemon,
+                u16 p_extraMove = 0 );
 
         /*
          * @brief: Returns inputTargets for each teamPkmn
@@ -126,6 +131,11 @@ namespace BAG {
          * @brief: Selects the specified choice in the currently displayed choiceBox.
          */
         void selectChoice( u8 p_selection );
+
+        /*
+         * @brief: Selects a move choice.
+         */
+        void selectMoveChoice( u8 p_selection );
 
         /*
          * @brief: Attaches the sprite corresponding to the specified item to the player's

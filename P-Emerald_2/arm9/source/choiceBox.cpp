@@ -291,61 +291,6 @@ namespace IO {
         swiWaitForVBlank( );
     }
 
-    std::vector<const char*> names;
-    choiceBox::choiceBox( pokemon p_pokemon, u16 p_move ) {
-        _num     = 4 + !!p_move;
-        names    = { MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 0 ] ).c_str( ),
-            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 1 ] ).c_str( ),
-            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 2 ] ).c_str( ),
-            MOVE::getMoveName( p_pokemon.m_boxdata.m_moves[ 3 ] ).c_str( ),
-            MOVE::getMoveName( p_move ).c_str( ) };
-        _choices = &names[ 0 ];
-        _big     = false;
-        _acPage  = 0;
-        _name    = 0;
-        _drawSub = false;
-
-        initTextField( );
-
-        initOAMTable( true );
-        u16 tileCnt = 0;
-
-        tileCnt = loadSprite( BACK_ID, 0, tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32,
-                              BackPal, BackTiles, BackTilesLen, false, false, true, OBJPRIORITY_0,
-                              true );
-        tileCnt = loadSprite( FWD_ID, 1, tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32,
-                              ForwardPal, ForwardTiles, ForwardTilesLen, false, false, true,
-                              OBJPRIORITY_1, true );
-        tileCnt = loadSprite( BWD_ID, 2, tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32,
-                              BackwardPal, BackwardTiles, BackwardTilesLen, false, false, true,
-                              OBJPRIORITY_1, true );
-
-        for( u8 i = 0; i < 4; ++i ) {
-            if( !p_pokemon.m_boxdata.m_moves[ i ] ) {
-                _num -= 4 - i;
-                break;
-            }
-            MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
-
-            tileCnt = loadTypeIcon( mdata.m_type,
-                                    ( ( i % 2 ) ? 122 : 12 ), 64 + ( i / 2 ) * 35, 3 + 2 * i, 3 + 2 * i,
-                                tileCnt, true, SAVE::SAV.getActiveFile( ).m_options.m_language );
-            tileCnt = loadDamageCategoryIcon( mdata.m_category,
-                ( ( i % 2 ) ? 154 : 44 ), 64 + ( i / 2 ) * 35, 4 + 2 * i, 4 + 2 * i, tileCnt,
-                true );
-        }
-        if( p_move ) {
-            MOVE::moveData mdata = MOVE::getMoveData( p_move );
-            tileCnt = loadTypeIcon( mdata.m_type, 12, 134, 11, 11, tileCnt,
-                                    true, SAVE::SAV.getActiveFile( ).m_options.m_language );
-            tileCnt = loadDamageCategoryIcon( mdata.m_category, 44, 134, 12, 12,
-                                              tileCnt, true );
-        }
-
-        updateOAM( true );
-        swiWaitForVBlank( );
-    }
-
     int fwdPos[ 2 ][ 2 ]
         = {{SCREEN_WIDTH - 12, SCREEN_HEIGHT - 12}, {SCREEN_WIDTH - 11, SCREEN_HEIGHT - 31}},
         bwdPos[ 2 ][ 2 ]

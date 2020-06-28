@@ -102,11 +102,13 @@ namespace BAG {
             return 0;
         }
 
+        u8 chooseMove( const boxPokemon* p_pokemon, u16 p_extraMove = 0 );
+
         u16 executeChoice( choice p_choice );
 
         std::vector<choice> getItemChoices( u16 p_itemId, ITEM::itemData* p_data );
 
-        bool confirmChoice( u16 p_targetItem );
+        u8 confirmChoice( u16 p_targetItem, ITEM::itemData* p_data );
 
         inline std::pair<std::pair<u16, u16>, ITEM::itemData> currentItem( ) const {
             return _view[ _currSelectedIdx ];

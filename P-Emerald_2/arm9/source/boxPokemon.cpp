@@ -25,6 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "itemNames.h"
 #include "mapDrawer.h"
 #include "move.h"
@@ -261,4 +263,56 @@ void boxPokemon::hatch( ) {
     m_hatchDate[ 0 ] = acday;
     m_hatchDate[ 1 ] = acmonth + 1;
     m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
+}
+
+bool boxPokemon::learnMove( u16 p_move, std::function<void( const char*)> p_message,
+                            std::function<u8( boxPokemon*, u16 )> p_getMove,
+                            std::function<bool( const char* )> p_yesNoMessage ) {
+    char buffer[ 50 ];
+    if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
+        || p_move == m_moves[ 3 ] ) {
+        snprintf( buffer, 49, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+        p_message( buffer );
+        return false;
+    } else if( canLearn( m_speciesId, p_move, LEARN_TM ) ) {
+        auto mdata    = MOVE::getMoveData( p_move );
+        bool freeSpot = false;
+        for( u8 i = 0; i < 4; ++i )
+            if( !m_moves[ i ] ) {
+                m_moves[ i ] = p_move;
+                m_curPP[ i ] = std::min( m_curPP[ i ], mdata.m_pp );
+
+                snprintf( buffer, 49, GET_STRING( 103 ), m_name,
+                          MOVE::getMoveName( p_move ).c_str( ) );
+                p_message( buffer );
+                freeSpot = true;
+                break;
+            }
+        if( !freeSpot ) {
+            snprintf( buffer, 49, GET_STRING( 104 ), m_name );
+            if( p_yesNoMessage( buffer ) ) {
+                u8 res = p_getMove( this, p_move );
+                if( res < 4 ) {
+                    if( MOVE::isFieldMove( m_moves[ res ] ) ) {
+                        snprintf( buffer, 49, GET_STRING( 106 ), m_name,
+                                  MOVE::getMoveName( m_moves[ res ] ).c_str( ) );
+                        p_message( buffer );
+                        return false;
+                    } else {
+                        m_moves[ res ] = p_move;
+                        m_curPP[ res ] = std::min( m_curPP[ res ], mdata.m_pp );
+                    }
+                    return true;
+                }
+            }
+            snprintf( buffer, 49, GET_STRING( 403 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+            p_message( buffer );
+            return false;
+        }
+    } else {
+        snprintf( buffer, 49, GET_STRING( 107 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+        p_message( buffer );
+        return false;
+    }
+    return true;
 }

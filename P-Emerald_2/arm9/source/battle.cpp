@@ -107,9 +107,11 @@ namespace BATTLE {
             loop( ) {
                 for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
-                // Compute player's first pokemon's move
-                moves[ field::PLAYER_SIDE ][ 0 ] = getMoveSelection( 0,
-                        _policy.m_allowMegaEvolution );
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type != NO_OP_NO_CANCEL ) {
+                    // Compute player's first pokemon's move
+                    moves[ field::PLAYER_SIDE ][ 0 ] = getMoveSelection( 0,
+                            _policy.m_allowMegaEvolution );
+                }
 
                 if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == RUN ) {
                     moves[ field::PLAYER_SIDE ][ 0 ] = NO_OP_SELECTION;
@@ -171,6 +173,12 @@ namespace BATTLE {
                             || moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_FLUFFY_TAIL
                             || moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_POKE_TOY ) ) )
                 [[likely]] {
+
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == USE_ITEM ) {
+                    SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::bag::ITEMS,
+                             moves[ field::PLAYER_SIDE ][ 0 ].m_param, 1 );
+                }
+
                 SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
                 _battleUI.log( std::string( GET_STRING( 163 ) ) );
                 for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
@@ -198,21 +206,23 @@ namespace BATTLE {
                             moves[ i ][ j ].m_type = SWITCH_PURSUIT;
                         }
                     }
+                    if( moves[ i ][ j ].m_type == NO_OP_NO_CANCEL ) {
+                        moves[ i ][ j ].m_type = NO_OP;
+                    }
                     selection.push_back( moves[ i ][ j ] );
                 }
 #ifdef DESQUID
-/*
+
             for( u8 i = 0; i < selection.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
                         + " tp: " + std::to_string( u16( selection[ i ].m_type ) )
                         + " param: " + std::to_string( selection[ i ].m_param )
                         + " " + MOVE::getMoveName( selection[ i ].m_param )
                         + " user: " + std::to_string( selection[ i ].m_user.first )
-                        + ", " + std::to_string( selection[ i ].m_user.second ) );
-//                        + " tg: " + std::to_string( selection[ i ].m_target.first )
-//                        + ", " + std::to_string( selection[ i ].m_target.second ) );
+                        + ", " + std::to_string( selection[ i ].m_user.second )
+                        + " tg: " + std::to_string( selection[ i ].m_target.first )
+                        + ", " + std::to_string( selection[ i ].m_target.second ) );
             }
-            */
 #endif
 
             auto sortedMoves = _field.computeSortedBattleMoves( &_battleUI, selection );
@@ -594,25 +604,20 @@ namespace BATTLE {
                                 : BAG::bagViewer::BATTLE );
                         u16 itm     = bv.getItem( );
 
-                        // If the item is a medicine, make the player choose a pkmn to
-                        // use it on
-
                         if( itm ) {
                             auto idata = ITEM::getItemData( itm );
 
                             if( idata.m_itemType == ITEM::ITEMTYPE_POKEBALL ) {
                                 // Player throws a ball
-                                SAVE::SAV.getActiveFile( ).m_bag.erase(
-                                        BAG::toBagType( idata.m_itemType ), itm, 1 );
                                 res.m_type = CAPTURE;
                                 res.m_param = itm;
-                            } else if( idata.m_itemType == ITEM::ITEMTYPE_BATTLEITEM ) {
-                                SAVE::SAV.getActiveFile( ).m_bag.erase(
-                                        BAG::toBagType( idata.m_itemType ), itm, 1 );
+                            } else if( ( idata.m_itemType & 15 ) == 2 ) {
+                                // Already used
+                                res.m_type = NO_OP_NO_CANCEL;
+                                res.m_param = 0;
+                            } else  {
                                 res.m_type = USE_ITEM;
                                 res.m_param = itm;
-                            } else if( ( idata.m_itemType & 15 ) == 2 ) {
-                                res.m_type = NO_OP;
                             }
                         }
 
@@ -825,6 +830,8 @@ namespace BATTLE {
     }
 
     bool battle::playerCaptures( u16 p_pokeball ) {
+        SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::bag::ITEMS, p_pokeball, 1 );
+
         u16         ballCatchRate = 2;
 
         auto plpk = _field.getPkmn( false, 0 );

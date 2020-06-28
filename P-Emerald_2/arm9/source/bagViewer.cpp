@@ -30,7 +30,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "choiceBox.h"
 #include "defines.h"
 #include "itemNames.h"
-#include "messageBox.h"
 #include "saveGame.h"
 #include "uio.h"
 #include "yesNoBox.h"
@@ -168,15 +167,36 @@ namespace BAG {
                 _currSelectedIdx );
     }
 
+    u8 bagViewer::chooseMove( const boxPokemon* p_pokemon, u16 p_extraMove ) {
+        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        auto res = cb.getResult( [&]( u8 ) {
+                return _bagUI->drawMoveChoice( p_pokemon, p_extraMove );
+                }, [&]( u8 p_selection ){ _bagUI->selectMoveChoice( p_selection ); } );
+        _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                _view, _currSelectedIdx );
+
+        return res;
+    }
+
     bool bagViewer::useItemOnPkmn( pokemon& p_pokemon, u16 p_itemId, ITEM::itemData* p_data ) {
         if( !p_pokemon.m_boxdata.m_speciesId || p_pokemon.isEgg( ) ) return false;
         if( p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
             u16 currMv = p_data->m_param2;
-
-            p_pokemon.learnMove( currMv );
-
-            // 0: HM, 1: TM, 2: TR
-            return p_data->m_effect == 2;
+            return p_pokemon.learnMove( currMv, [&]( const char* p_message ) {
+                _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag,
+                        _view, _currSelectedIdx );
+                _bagUI->printMessage( p_message );
+                waitForInteract( );
+            }, [&]( boxPokemon* p_pok, u16 p_extraMove ){
+                return chooseMove( p_pok, p_extraMove );
+            }, [&]( const char* p_message ) {
+                IO::yesNoBox yn;
+                return yn.getResult( [&]( ) {
+                        return _bagUI->printYNMessage( p_message, 254 );
+                        }, [&]( IO::yesNoBox::selection p_sel ) {
+                        _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
+                        }) == IO::yesNoBox::YES;
+            }) && p_data->m_effect == 2;
         }
 
         char buffer[ 100 ];
@@ -186,12 +206,10 @@ namespace BAG {
             u8 oldLv = p_pokemon.m_level;
 
             if( ITEM::use( p_itemId, *p_data, p_pokemon, [&]( u8 p_message ) -> u8 {
-                    if( p_message == 1 ) { // player should select 1 move
-                        IO::choiceBox cb( p_pokemon, 0 );
-                        _bagUI->drawPkmnIcons( );
-                        u8 res = cb.getResult( GET_STRING( 49 ), false, false );
-                        initUI( );
-                        return 1 << res;
+                if( p_message == 1 ) { // player should select 1 move
+                    auto res = chooseMove( &p_pokemon.m_boxdata );
+                    if( res < 4 ) { return 1 << res; }
+                    return 0;
                     }
                     if( p_message == 0xFF ) { // Sacred Ash
                         bool change = false;
@@ -275,6 +293,10 @@ namespace BAG {
     }
 
     bool bagViewer::giveItemToPkmn( pokemon& p_pokemon, u16 p_itemId ) {
+        if( p_pokemon.isEgg( ) ) {
+            return false;
+        }
+
         if( p_pokemon.getItem( ) ) {
             IO::yesNoBox yn;
             char         buffer[ 100 ];
@@ -299,7 +321,38 @@ namespace BAG {
         _bagUI->drawPkmnIcons( );
     }
 
-    bool bagViewer::confirmChoice( u16 p_targetItem ) {
+    u8 bagViewer::confirmChoice( u16 p_targetItem, ITEM::itemData* p_data ) {
+        if( _context == BATTLE || _context == WILD_BATTLE ) {
+            // Check if the item needs to be used on a pkmn
+            if( ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
+                IO::choiceBox cb2 = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+                auto tgpkmn = cb2.getResult( [&]( u8 ) {
+                        _bagUI->drawPkmnChoice( );
+                        auto tmp = _bagUI->getPkmnInputTarget( );
+                        tmp.push_back( _bagUI->getButtonInputTarget( IO::choiceBox::BACK_CHOICE ) );
+                        return tmp;
+                    }, [&]( u8 p_selection ){ _bagUI->selectPkmn( p_selection ); } );
+                _bagUI->undrawPkmnChoice( );
+
+                if( tgpkmn == IO::choiceBox::BACK_CHOICE ) { return false; }
+
+                if( useItemOnPkmn( _playerTeam[ tgpkmn ], p_targetItem, p_data ) ) {
+                    SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, p_targetItem, 1 );
+                    if( SAVE::SAV.getActiveFile( ).m_lstBagItem ==
+                            SAVE::SAV.getActiveFile( ).m_bag.size(
+                                (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) ) {
+                        if( SAVE::SAV.getActiveFile( ).m_lstBagItem > 0 ) {
+                            SAVE::SAV.getActiveFile( ).m_lstBagItem--;
+                        }
+                    }
+                    initView( );
+                }
+                _bagUI->selectPkmn( -1 );
+                return 2;
+            }
+        }
+
         IO::yesNoBox yn;
         char         buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 56 ), ITEM::getItemName( p_targetItem ).c_str( ) );
@@ -785,6 +838,7 @@ namespace BAG {
                         removeItem = true;
                     }
                 }
+                _bagUI->selectPkmn( -1 );
 
                 // remove item from bag
                 if( removeItem ) {
@@ -886,7 +940,9 @@ namespace BAG {
                         (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
                     continue;
                 u16 targetItem = currentItem( ).first.first;
-                if( targetItem && confirmChoice( targetItem ) ) {
+                auto itemData = currentItem( ).second;
+                u8 res = 0;
+                if( targetItem && ( res = confirmChoice( targetItem, &itemData ) ) ) {
                     if( _context != context::BATTLE && _context != context::WILD_BATTLE )
                         SAVE::SAV.getActiveFile( ).m_bag.erase(
                             (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, targetItem, 1 );

@@ -445,6 +445,7 @@ namespace BATTLE {
         SWITCH_PURSUIT, // Pursuit used on a switching target
         USE_ITEM,
         NO_OP,   // No operation (e.g. when trying to run in a double battle)
+        NO_OP_NO_CANCEL, // No operation, cannot be undone (e.g. player used an item)
         CAPTURE, // (try to) capture pokemon.
         RUN,
         CANCEL, // Cancel / go back to previous move selection
