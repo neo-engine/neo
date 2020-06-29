@@ -352,6 +352,9 @@ namespace BAG {
                         }
                     }
                     initView( );
+                } else {
+                    _bagUI->selectPkmn( -1 );
+                    return false;
                 }
                 _bagUI->selectPkmn( -1 );
                 return 2;

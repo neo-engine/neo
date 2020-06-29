@@ -283,12 +283,12 @@ namespace BAG {
 
         for( u8 i = 1; i < 5; ++i ) {
             IO::loadSprite( SPR_MSG_PKMN_SEL_OAM_SUB + i, SPR_SELECTED_PAL_SUB, tileCnt,
-                            -3 + 24 * ( 5 - i ), 35, 32, 32, 0, noselection_blank_32_24Tiles,
+                            4 + 24 * ( 5 - i ), 33, 32, 32, 0, noselection_blank_32_24Tiles,
                             noselection_blank_32_24TilesLen, false, false, true, OBJPRIORITY_3,
                             true, OBJMODE_BLENDED );
         }
         tileCnt
-            = IO::loadSprite( SPR_MSG_PKMN_SEL_OAM_SUB, SPR_SELECTED_PAL_SUB, tileCnt, 3, 35, 32,
+            = IO::loadSprite( SPR_MSG_PKMN_SEL_OAM_SUB, SPR_SELECTED_PAL_SUB, tileCnt, 8, 33, 32,
                               32, 0, noselection_blank_32_24Tiles, noselection_blank_32_24TilesLen,
                               false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
@@ -314,10 +314,10 @@ namespace BAG {
             auto acPkmn = _playerTeam[ i ];
             if( !acPkmn.getSpecies( ) ) break;
             if( acPkmn.isEgg( ) )
-                tileCnt = IO::loadEggIcon( 4, 30 + i * 26, SPR_PKMN_START_OAM_SUB + i,
+                tileCnt = IO::loadEggIcon( 10, 23 + i * 26, SPR_PKMN_START_OAM_SUB + i,
                                            SPR_PKMN_PAL_SUB + i, tileCnt );
             else
-                tileCnt = IO::loadPKMNIcon( acPkmn.getSpecies( ), 4, 30 + i * 26,
+                tileCnt = IO::loadPKMNIcon( acPkmn.getSpecies( ), 9, 25 + i * 26,
                                             SPR_PKMN_START_OAM_SUB + i, SPR_PKMN_PAL_SUB + i,
                                             tileCnt, true, acPkmn.getForme( ), acPkmn.isShiny( ),
                                             acPkmn.isFemale( ) );
@@ -445,9 +445,9 @@ namespace BAG {
 
     void bagUI::drawPkmn( u16 p_itemId, const ITEM::itemData* p_data ) {
         for( u8 i = 0; i < 6; ++i ) {
-            const u8 FIRST_LINE  = 33 + 26 * i;
-            const u8 SECOND_LINE = 44 + 26 * i;
-            const u8 SINGLE_LINE = 38 + 26 * i;
+            const u8 FIRST_LINE  = 27 + 26 * i;
+            const u8 SECOND_LINE = 39 + 26 * i;
+            const u8 SINGLE_LINE = 32 + 26 * i;
 
             if( !_playerTeam[ i ].m_boxdata.m_speciesId ) break;
 
@@ -485,7 +485,7 @@ namespace BAG {
                 || ( _lastPkmnItemType != p_data->m_itemType
                      || p_data->m_itemType == ITEM::ITEMTYPE_TM
                      || p_data->m_itemType == ITEM::ITEMTYPE_EVOLUTION ) ) {
-                IO::printRectangle( 0, 33 + 26 * i, 128, 33 + 26 * i + 26, true, 0 );
+                IO::printRectangle( 0, 28 + 26 * i, 133, 28 + 26 * i + 26, true, 0 );
             }
 
             if( _playerTeam[ i ].isEgg( ) ) {
@@ -494,15 +494,15 @@ namespace BAG {
                 IO::regularFont->printStringC( GET_STRING( 34 ), 45, SINGLE_LINE, true );
             } else {
                 if( p_data == nullptr ) {
-                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 40,
+                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45,
                                                    FIRST_LINE, true );
                     IO::regularFont->setColor( 0, 2 );
                     IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                     if( _playerTeam[ i ].getItem( ) ) {
-                        IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 40,
+                        IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 45,
                                                        SECOND_LINE, true );
                     } else
-                        IO::regularFont->printStringC( GET_STRING( 42 ), 40, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( 42 ), 45, SECOND_LINE, true );
 
                     continue;
                 }
@@ -512,7 +512,7 @@ namespace BAG {
                     continue;
                 }
 
-                IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 40, FIRST_LINE,
+                IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45, FIRST_LINE,
                                                true );
                 if( p_itemId && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
                     u16 currMv = p_data->m_param2;
@@ -522,52 +522,52 @@ namespace BAG {
                         || currMv == _playerTeam[ i ].getMove( 3 ) ) {
                         IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 35 ), 40, SECOND_LINE, true,
+                        IO::regularFont->printStringC( GET_STRING( 35 ), 45, SECOND_LINE, true,
                                                        IO::font::LEFT, 11 );
                     } else if( canLearn( _playerTeam[ i ].getSpecies( ), currMv, LEARN_TM ) ) {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 36 ), 40, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( 36 ), 45, SECOND_LINE, true );
                     } else {
                         IO::regularFont->setColor( IO::RED_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 37 ), 40, SECOND_LINE, true,
+                        IO::regularFont->printStringC( GET_STRING( 37 ), 45, SECOND_LINE, true,
                                                        IO::font::LEFT, 11 );
                     }
                 } else if( p_itemId && ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
                     IO::smallFont->setColor( 0, 0 );
                     IO::smallFont->setColor( IO::GRAY_IDX, 1 );
                     IO::smallFont->setColor( 0, 2 );
-                    IO::smallFont->printString( "!", 40, SECOND_LINE - 2, true );
+                    IO::smallFont->printString( "!", 45, SECOND_LINE - 2, true );
                     char buffer[ 10 ];
                     snprintf( buffer, 8, "%d", _playerTeam[ i ].m_level );
-                    IO::smallFont->printStringC( buffer, 48, SECOND_LINE - 1, true );
+                    IO::smallFont->printStringC( buffer, 53, SECOND_LINE - 1, true );
 
                     snprintf( buffer, 8, "%3d", _playerTeam[ i ].m_stats.m_curHP );
-                    IO::smallFont->printStringC( buffer, 40 + 78 - 44, SECOND_LINE - 1, true );
+                    IO::smallFont->printStringC( buffer, 45 + 80 - 44, SECOND_LINE - 1, true );
                     snprintf( buffer, 8, "/%d", _playerTeam[ i ].m_stats.m_maxHP );
-                    IO::smallFont->printStringC( buffer, 40 + 76 - 20, SECOND_LINE - 1, true );
+                    IO::smallFont->printStringC( buffer, 45 + 78 - 20, SECOND_LINE - 1, true );
                 } else if( p_itemId && p_data->m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
                     if( _playerTeam[ i ].canEvolve( p_itemId, EVOMETHOD_ITEM ) ) {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 40 ), 40, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( 40 ), 45, SECOND_LINE, true );
                     } else {
                         IO::regularFont->setColor( IO::RED_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 41 ), 40, SECOND_LINE, true,
+                        IO::regularFont->printStringC( GET_STRING( 41 ), 45, SECOND_LINE, true,
                                                        IO::font::LEFT, 11 );
                     }
                 } else {
                     IO::regularFont->setColor( 0, 2 );
                     IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                     if( _playerTeam[ i ].getItem( ) ) {
-                        IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 40,
+                        IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 45,
                                                        SECOND_LINE, true );
                     } else
-                        IO::regularFont->printStringC( GET_STRING( 42 ), 40, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( 42 ), 45, SECOND_LINE, true );
                 }
             }
         }
@@ -616,7 +616,7 @@ namespace BAG {
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::printRectangle( x - 8, y, 255, y + 20, true, 0 );
+        IO::printRectangle( x - 3, y, 255, y + 20, true, 0 );
         if( !p_itemId || p_data == nullptr ) {
             for( u8 j = 0; j < 5; ++j ) {
                 IO::Oam->oamBuffer[ SPR_ITEM_WINDOW_OAM_SUB( p_idx ) + j ].isHidden = true;
@@ -685,7 +685,7 @@ namespace BAG {
         for( u8 i = 0; i < 5; ++i ) { oam[ SPR_MSG_BOX_SMALL_OAM_SUB + i ].isHidden = true; }
 
         IO::updateOAM( true );
-        IO::printRectangle( 0, 0, 5 * 24 + 4, 31, true, 0 );
+        IO::printRectangle( 0, 0, 5 * 24 + 4, 28, true, 0 );
     }
 
     void bagUI::printMessage( const char* p_message ) {
@@ -1007,6 +1007,7 @@ namespace BAG {
             auto& idat = p_items[ p_selection ].second;
             selectItem( p_selection, p_items[ p_selection ].first, &idat );
         } else {
+            _lastPkmnItemType = 255;
             drawPkmn( 0, nullptr );
         }
 
@@ -1033,7 +1034,7 @@ namespace BAG {
         for( u8 i = 0; i < 6; ++i ) {
             if( !_playerTeam[ i ].getSpecies( ) ) { break; }
             res.push_back(
-                std::pair( IO::inputTarget( 0, 33 + 26 * i, 128, 33 + 26 * i + 26 ), i ) );
+                std::pair( IO::inputTarget( 0, 28 + 26 * i, 128, 28 + 26 * i + 26 ), i ) );
         }
         return res;
     }
@@ -1064,7 +1065,7 @@ namespace BAG {
         if( p_selection < 6 ) {
             for( u8 i = 0; i < 5; ++i ) {
                 oam[ SPR_MSG_PKMN_SEL_OAM_SUB + i ].isHidden = false;
-                oam[ SPR_MSG_PKMN_SEL_OAM_SUB + i ].y        = 35 + 26 * p_selection;
+                oam[ SPR_MSG_PKMN_SEL_OAM_SUB + i ].y        = 29 + 26 * p_selection;
             }
         } else {
             for( u8 i = 0; i < 5; ++i ) { oam[ SPR_MSG_PKMN_SEL_OAM_SUB + i ].isHidden = true; }
