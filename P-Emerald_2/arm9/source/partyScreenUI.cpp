@@ -1018,12 +1018,14 @@ namespace STS {
         if( _needsInit ) {
             _needsInit = false;
             dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
+            dmaCopy( partysubPal + 3, BG_PALETTE + 3, 8 * 2 );
             dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
             dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
 
             IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
 
             dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
+            dmaCopy( partysubPal + 3, BG_PALETTE + 3, 8 * 2 );
             dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
             dmaCopy( partysubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
 
