@@ -34,20 +34,20 @@
 
 #include <nds.h>
 
-#include "move.h"
+#include "abilityNames.h"
 #include "battleDefines.h"
-#include "battleUI.h"
 #include "battleField.h"
 #include "battleTrainer.h"
+#include "battleUI.h"
 #include "defines.h"
+#include "move.h"
 #include "pokemon.h"
-#include "type.h"
-#include "abilityNames.h"
 #include "pokemonNames.h"
+#include "type.h"
 
 namespace BATTLE {
     class battle {
-        public:
+      public:
         enum battleEndReason {
             BATTLE_ROUND_LIMIT  = 0,
             BATTLE_OPPONENT_WON = -1,
@@ -77,8 +77,8 @@ namespace BATTLE {
                                        //  teams to their real in-battle positions
 
         battlePolicy _policy;
-        bool        _isWildBattle;
-        bool        _opponentRuns; // wild pkmn tries to run whenever possible
+        bool         _isWildBattle;
+        bool         _opponentRuns; // wild pkmn tries to run whenever possible
 
         /*
          * @brief: Initializes the battle.
@@ -163,7 +163,6 @@ namespace BATTLE {
          */
         void useItem( fieldPosition p_target, u16 p_item );
 
-
         /*
          * @brief: Moves pkmn that cannot battle to the end of the list.
          */
@@ -178,20 +177,20 @@ namespace BATTLE {
          * @brief: Resets any battle-time only transformations of pkmn.
          */
         void resetBattleTransformations( bool p_opponent );
+
       public:
         /*
          * @brief: Creates a new trainer battle.
          */
-        battle( pokemon* p_playerTeam, u8 p_playerTeamSize,
-                u16 p_opponentId, u8 p_platform = 10, u8 p_platform2 = 10, u8 p_background = 0,
-                battlePolicy = DEFAULT_TRAINER_POLICY );
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId, u8 p_platform = 10,
+                u8 p_platform2 = 10, u8 p_background = 0, battlePolicy = DEFAULT_TRAINER_POLICY );
 
         /*
          * @brief: Creates a new wild pkmn battle.
          */
-        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent,
-                u8 p_platform = 10, u8 p_platform2 = 10, u8 p_background = 0,
-                battlePolicy = DEFAULT_WILD_POLICY, bool p_wildPkmnRuns = false );
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform = 10,
+                u8 p_platform2 = 10, u8 p_background = 0, battlePolicy = DEFAULT_WILD_POLICY,
+                bool p_wildPkmnRuns = false );
 
         /*
          * @brief: Starts the battle.
@@ -199,6 +198,5 @@ namespace BATTLE {
          * player lost.
          */
         battleEndReason start( );
-
     };
 } // namespace BATTLE

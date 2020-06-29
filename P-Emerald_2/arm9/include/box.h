@@ -37,13 +37,13 @@ namespace BOX {
         char m_name[ 12 ];
 #define MAX_PKMN_PER_BOX 30
         boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
-        u8                  m_wallpaper;
+        u8         m_wallpaper;
 
         /*
          * @brief: Returns the first non-occupied spot in the box or -1 if the box is
          * full.
          */
-        constexpr s8 getFirstFreeSpot( )  {
+        constexpr s8 getFirstFreeSpot( ) {
             for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i )
                 if( !( m_pokemon + i )->m_speciesId ) return i;
             return -1;
@@ -54,14 +54,10 @@ namespace BOX {
          */
         constexpr u8 getNextFilledSpot( u8 p_position ) {
             for( u8 i = p_position + 1; i < MAX_PKMN_PER_BOX; ++i ) {
-                if( m_pokemon[ i ].getSpecies( ) ) {
-                    return i;
-                }
+                if( m_pokemon[ i ].getSpecies( ) ) { return i; }
             }
             for( u8 i = 0; i < p_position; ++i ) {
-                if( m_pokemon[ i ].getSpecies( ) ) {
-                    return i;
-                }
+                if( m_pokemon[ i ].getSpecies( ) ) { return i; }
             }
             return p_position;
         }
@@ -71,14 +67,10 @@ namespace BOX {
          */
         constexpr u8 getPrevFilledSpot( u8 p_position ) {
             for( s8 i = p_position - 1; i > 0; --i ) {
-                if( m_pokemon[ i ].getSpecies( ) ) {
-                    return i;
-                }
+                if( m_pokemon[ i ].getSpecies( ) ) { return i; }
             }
             for( u8 i = MAX_PKMN_PER_BOX - 1; i > p_position; --i ) {
-                if( m_pokemon[ i ].getSpecies( ) ) {
-                    return i;
-                }
+                if( m_pokemon[ i ].getSpecies( ) ) { return i; }
             }
             return p_position;
         }

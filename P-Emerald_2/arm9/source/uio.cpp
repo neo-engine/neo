@@ -154,7 +154,7 @@ namespace IO {
     bool waitForTouchUp( inputTarget p_inputTarget ) {
         touchPosition touch;
         if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH
-                || p_inputTarget.m_inputType == inputTarget::inputType::TOUCH_CIRCLE ) {
+            || p_inputTarget.m_inputType == inputTarget::inputType::TOUCH_CIRCLE ) {
             loop( ) {
                 swiWaitForVBlank( );
                 scanKeys( );
@@ -411,21 +411,19 @@ namespace IO {
         }
     }
 
-
-
     std::string formatDate( u8 p_date[ 3 ], u8 p_language ) {
         char buffer[ 20 ];
         switch( p_language ) {
-            default:
-            case 0: // EN
-                // I know that this will "break" in 2100.
-                snprintf( buffer, 19, "%s %hhu, 20%02hhu", MONTHS[ p_date[ 1 ] ][ p_language ],
-                          p_date[ 0 ] + 1, p_date[ 2 ] );
-                break;
-            case 1: // DE
-                snprintf( buffer, 19, "%hhu. %s 20%02hhu", p_date[ 0 ] + 1,
-                          MONTHS[ p_date[ 1 ] ][ p_language ], p_date[ 2 ] );
-                break;
+        default:
+        case 0: // EN
+            // I know that this will "break" in 2100.
+            snprintf( buffer, 19, "%s %hhu, 20%02hhu", MONTHS[ p_date[ 1 ] ][ p_language ],
+                      p_date[ 0 ] + 1, p_date[ 2 ] );
+            break;
+        case 1: // DE
+            snprintf( buffer, 19, "%hhu. %s 20%02hhu", p_date[ 0 ] + 1,
+                      MONTHS[ p_date[ 1 ] ][ p_language ], p_date[ 2 ] );
+            break;
         }
         return std::string( buffer );
     }

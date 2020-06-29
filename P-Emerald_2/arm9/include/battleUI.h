@@ -35,16 +35,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BATTLE {
     class battleUI {
-        u8   _platform;
-        u8   _platform2;
-        u8   _background;
-        battleMode _mode;
-        bool _isWildBattle;
+        u8             _platform;
+        u8             _platform2;
+        u8             _background;
+        battleMode     _mode;
+        bool           _isWildBattle;
         battleTrainer* _battleTrainer = nullptr;
 
-        u8   _currentLogLine = 0;
+        u8 _currentLogLine = 0;
 
-        u8   _curHP[ 2 ][ 2 ] = { { 0 } };
+        u8 _curHP[ 2 ][ 2 ] = {{0}};
 
         void initTop( );
         void initSub( );
@@ -80,8 +80,10 @@ namespace BATTLE {
          * @brief: Plays the boosts animation for the given stat change.
          */
         void animateStatChange( bool p_opponent, u8 p_slot, bool p_down ) const;
-     public:
-        battleUI( ) { }
+
+      public:
+        battleUI( ) {
+        }
 
         battleUI( u8 p_platform, u8 p_platform2, u8 p_background, battleMode p_mode,
                   bool p_isWildBattle )

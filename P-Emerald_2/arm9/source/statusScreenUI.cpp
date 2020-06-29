@@ -33,8 +33,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "locationNames.h"
 #include "pokemonNames.h"
 #include "screenFade.h"
-#include "sprite.h"
 #include "sound.h"
+#include "sprite.h"
 #include "uio.h"
 
 #include "NoItem.h"
@@ -53,13 +53,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "movebox3.h"
 #include "noselection_160_64_1.h"
 #include "noselection_160_64_2.h"
+#include "noselection_32_32.h"
 #include "noselection_32_64.h"
 #include "noselection_64_20.h"
 #include "noselection_64_32.h"
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
-#include "noselection_32_32.h"
-#include "noselection_32_64.h"
 #include "noselection_blank_32_32.h"
 #include "noselection_faint_32_32.h"
 #include "selection_32_32.h"
@@ -555,11 +554,10 @@ namespace STS {
                                         oam[ SPR_MOVE_OAM_SUB( i ) ].y - 8, SPR_TYPE_OAM_SUB( i ),
                                         SPR_TYPE_PAL_SUB( i ), tileCnt, true, CURRENT_LANGUAGE );
 
-            tileCnt = IO::loadDamageCategoryIcon( _moves[ i ].m_category,
-                                        oam[ SPR_MOVE_OAM_SUB( i ) ].x - 4 + 32,
-                                        oam[ SPR_MOVE_OAM_SUB( i ) ].y - 8,
-                                        SPR_CATEGORY_OAM_SUB( i ), SPR_CATEGORY_PAL_SUB( i ),
-                                        tileCnt, true );
+            tileCnt = IO::loadDamageCategoryIcon(
+                _moves[ i ].m_category, oam[ SPR_MOVE_OAM_SUB( i ) ].x - 4 + 32,
+                oam[ SPR_MOVE_OAM_SUB( i ) ].y - 8, SPR_CATEGORY_OAM_SUB( i ),
+                SPR_CATEGORY_PAL_SUB( i ), tileCnt, true );
 
             IO::copySpritePal( movebox1Pal + 4, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, p_bottom );
         }
@@ -625,7 +623,6 @@ namespace STS {
         IO::copySpritePal( noselection_blank_32_32Pal + 7, SPR_WINDOW_PAL_SUB, 7, 2 * 1, p_bottom );
         IO::copySpritePal( selection_32_32Pal + 8, SPR_WINDOW_PAL_SUB, 8, 2 * 4, p_bottom );
         IO::copySpritePal( selection_faint_32_32Pal + 12, SPR_WINDOW_PAL_SUB, 12, 2 * 4, p_bottom );
-
 
         return tileCnt;
     }
@@ -903,7 +900,7 @@ namespace STS {
         for( u8 i = 0; i < 12; ++i ) { oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = true; }
 
         for( u8 i = 0; i < 4; ++i ) {
-            oamSub[ SPR_TYPE_OAM_SUB( i ) ].isHidden = true;
+            oamSub[ SPR_TYPE_OAM_SUB( i ) ].isHidden     = true;
             oamSub[ SPR_CATEGORY_OAM_SUB( i ) ].isHidden = true;
             for( u8 j = 0; j < 6; j++ ) { oamSub[ SPR_MOVE_OAM_SUB( i ) + j ].isHidden = true; }
         }
@@ -1274,7 +1271,7 @@ namespace STS {
             for( int i = 0; i < 4; i++ ) {
                 if( !p_pokemon->getMove( i ) ) continue;
 
-                oamSub[ SPR_TYPE_OAM_SUB( i ) ].isHidden = false;
+                oamSub[ SPR_TYPE_OAM_SUB( i ) ].isHidden     = false;
                 oamSub[ SPR_CATEGORY_OAM_SUB( i ) ].isHidden = false;
                 for( u8 j = 0; j < 6; j++ ) {
                     oamSub[ SPR_MOVE_OAM_SUB( i ) + j ].isHidden = false;
@@ -1356,7 +1353,6 @@ namespace STS {
         for( u8 i = 0; i < getPageCount( ); ++i ) {
             oam[ SPR_PAGE_OAM_SUB( i ) ].palette
                 = ( p_button == 50 + i ) ? SPR_WINDOW_PAL_SUB : SPR_BOX_PAL_SUB;
-
         }
 
         for( u8 i = 0; i < 4; ++i ) {
@@ -1370,49 +1366,57 @@ namespace STS {
         IO::updateOAM( p_bottom );
     }
 
-    std::vector<std::pair<IO::inputTarget, u8>>
-        statusScreenUI::getTouchPositions( bool p_bottom ) {
+    std::vector<std::pair<IO::inputTarget, u8>> statusScreenUI::getTouchPositions( bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        auto res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        auto         res = std::vector<std::pair<IO::inputTarget, u8>>( );
 
         // navigation buttons
         if( !oam[ SPR_X_OAM_SUB ].isHidden ) {
-            res.push_back( std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8,
-                            oam[ SPR_X_OAM_SUB ].y - 8, oam[ SPR_X_OAM_SUB ].x + 24,
-                            oam[ SPR_X_OAM_SUB ].y + 24 ), EXIT_TARGET ) );
+            res.push_back( std::pair(
+                IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                 oam[ SPR_X_OAM_SUB ].x + 24, oam[ SPR_X_OAM_SUB ].y + 24 ),
+                EXIT_TARGET ) );
         }
 
         if( !oam[ SPR_ARROW_UP_OAM_SUB ].isHidden ) {
             res.push_back( std::pair( IO::inputTarget( oam[ SPR_ARROW_UP_OAM_SUB ].x,
-                            oam[ SPR_ARROW_UP_OAM_SUB ].y, oam[ SPR_ARROW_UP_OAM_SUB ].x + 16,
-                            oam[ SPR_ARROW_UP_OAM_SUB ].y + 16 ), PREV_TARGET ) );
+                                                       oam[ SPR_ARROW_UP_OAM_SUB ].y,
+                                                       oam[ SPR_ARROW_UP_OAM_SUB ].x + 16,
+                                                       oam[ SPR_ARROW_UP_OAM_SUB ].y + 16 ),
+                                      PREV_TARGET ) );
         }
         if( !oam[ SPR_ARROW_DOWN_OAM_SUB ].isHidden ) {
             res.push_back( std::pair( IO::inputTarget( oam[ SPR_ARROW_DOWN_OAM_SUB ].x,
-                            oam[ SPR_ARROW_DOWN_OAM_SUB ].y, oam[ SPR_ARROW_DOWN_OAM_SUB ].x + 16,
-                            oam[ SPR_ARROW_DOWN_OAM_SUB ].y + 16 ), NEXT_TARGET ) );
+                                                       oam[ SPR_ARROW_DOWN_OAM_SUB ].y,
+                                                       oam[ SPR_ARROW_DOWN_OAM_SUB ].x + 16,
+                                                       oam[ SPR_ARROW_DOWN_OAM_SUB ].y + 16 ),
+                                      NEXT_TARGET ) );
         }
         if( !oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden ) {
             res.push_back( std::pair( IO::inputTarget( oam[ SPR_ARROW_BACK_OAM_SUB ].x,
-                            oam[ SPR_ARROW_BACK_OAM_SUB ].y, oam[ SPR_ARROW_BACK_OAM_SUB ].x + 16,
-                            oam[ SPR_ARROW_BACK_OAM_SUB ].y + 16 ), BACK_TARGET ) );
+                                                       oam[ SPR_ARROW_BACK_OAM_SUB ].y,
+                                                       oam[ SPR_ARROW_BACK_OAM_SUB ].x + 16,
+                                                       oam[ SPR_ARROW_BACK_OAM_SUB ].y + 16 ),
+                                      BACK_TARGET ) );
         }
 
         for( u8 i = 0; i < getPageCount( ); ++i ) {
             if( !oam[ SPR_PAGE_OAM_SUB( i ) ].isHidden ) {
                 res.push_back( std::pair( IO::inputTarget( oam[ SPR_PAGE_OAM_SUB( i ) ].x,
-                               oam[ SPR_PAGE_OAM_SUB( i ) ].y + 4,
-                               oam[ SPR_PAGE_OAM_SUB( i ) ].x + 32,
-                               oam[ SPR_PAGE_OAM_SUB( i ) ].y + 36 ), 50 + i ) );
+                                                           oam[ SPR_PAGE_OAM_SUB( i ) ].y + 4,
+                                                           oam[ SPR_PAGE_OAM_SUB( i ) ].x + 32,
+                                                           oam[ SPR_PAGE_OAM_SUB( i ) ].y + 36 ),
+                                          50 + i ) );
             }
         }
 
         for( u8 i = 0; i < 4; ++i ) {
             if( !oam[ SPR_MOVE_OAM_SUB( i ) ].isHidden ) {
                 res.push_back( std::pair( IO::inputTarget( oam[ SPR_MOVE_OAM_SUB( i ) ].x,
-                                oam[ SPR_MOVE_OAM_SUB( i ) ].y - 2,
-                                oam[ SPR_MOVE_OAM_SUB( i ) ].x + 96,
-                                oam[ SPR_MOVE_OAM_SUB( i ) ].y + 32 ), i ) );
+                                                           oam[ SPR_MOVE_OAM_SUB( i ) ].y - 2,
+                                                           oam[ SPR_MOVE_OAM_SUB( i ) ].x + 96,
+                                                           oam[ SPR_MOVE_OAM_SUB( i ) ].y + 32 ),
+                                          i ) );
             }
         }
 

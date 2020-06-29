@@ -28,15 +28,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <vector>
 
-#include "yesNoBox.h"
 #include "pokemon.h"
+#include "yesNoBox.h"
 
 namespace STS {
     constexpr u16 CHOICE_FIELD_MOVE = ( 1 << 14 );
     constexpr u8  SWAP_COLOR        = 255;
-    constexpr u8  NEXT_PAGE_TARGET = 250;
-    constexpr u8  PREV_PAGE_TARGET = 249;
-    constexpr u8  EXIT_TARGET = 251;
+    constexpr u8  NEXT_PAGE_TARGET  = 250;
+    constexpr u8  PREV_PAGE_TARGET  = 249;
+    constexpr u8  EXIT_TARGET       = 251;
 
     extern char BUFFER[ 50 ];
 
@@ -45,13 +45,13 @@ namespace STS {
         pokemon* _team;
         u8       _teamLength;
         u8       _selectedIdx;
-        bool     _swapping   = false;
-        u8       _toSelect   = 0;
-        bool     _animateMsg = false;
-        bool     _needsInit = false;
+        bool     _swapping    = false;
+        u8       _toSelect    = 0;
+        bool     _animateMsg  = false;
+        bool     _needsInit   = false;
         bool     _allowCancel = true;
-        u8       _inBattle = 0;
-        u8       _toSwap = 255;
+        u8       _inBattle    = 0;
+        u8       _toSwap      = 255;
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
             return ( p_pos & 1 ) * 8 + 8 + 61 * ( p_pos >> 1 );
@@ -113,9 +113,9 @@ namespace STS {
          * @brief Draws the specified choice box.
          */
         std::vector<std::pair<IO::inputTarget, u8>>
-            drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
-                                  bool p_nextButton, bool p_prevButton, u8 p_selectedChoice = 255,
-                                  bool p_bottom = true );
+        drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
+                             bool p_nextButton, bool p_prevButton, u8 p_selectedChoice = 255,
+                             bool p_bottom = true );
 
         /*
          * @brief Returns the upper left corner of the specified choice box. Must be called after
@@ -158,8 +158,8 @@ namespace STS {
          * @brief Prints the given yes no message
          */
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
-            printYNMessage( const char* p_message, u8 p_selection = 255, u16 p_itemIcon = 0,
-                            bool p_bottom = true );
+        printYNMessage( const char* p_message, u8 p_selection = 255, u16 p_itemIcon = 0,
+                        bool p_bottom = true );
 
         /*
          * @brief: Returns touch positions for the pkmn team and the exit (X) button.

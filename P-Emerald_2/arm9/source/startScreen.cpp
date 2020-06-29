@@ -42,13 +42,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 // BEGIN TEST
 #include "animations.h"
+#include "bagViewer.h"
 #include "boxViewer.h"
 #include "itemNames.h"
 #include "moveNames.h"
 #include "partyScreen.h"
-#include "statusScreen.h"
 #include "pokemonNames.h"
-#include "bagViewer.h"
+#include "statusScreen.h"
 
 #include "battle.h"
 // END TEST
@@ -95,7 +95,7 @@ namespace SAVE {
 
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
-            testTeam[ i ] = pokemon( PKMN_GYARADOS, 100, 0, 0, 255, false, i == 3 );
+            testTeam[ i ]                 = pokemon( PKMN_GYARADOS, 100, 0, 0, 255, false, i == 3 );
             testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //            SAVE::SAV.getActiveFile( ).storePkmn(
             //                pokemon( 1 + ( 3 * i ) % MAX_PKMN, 1 + rand( ) % 100, 0, 0, i, rand( )
@@ -104,24 +104,24 @@ namespace SAVE {
 
             testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
             testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
-            testTeam[ i ].m_boxdata.m_heldItem = I_GYARADOSITE;
+            testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
         }
 
-//        BAG::bagViewer
-//        btv = BAG::bagViewer( testTeam );
-//        btv.run( );
-//        btv = BAG::bagViewer( testTeam, BAG::bagViewer::BATTLE );
-//        btv.run( );
-//        btv = BAG::bagViewer( testTeam, BAG::bagViewer::WILD_BATTLE );
-//        btv.run( );
- //       btv = BAG::bagViewer( testTeam, BAG::bagViewer::GIVE_TO_PKMN );
- //       btv.run( );
+        //        BAG::bagViewer
+        //        btv = BAG::bagViewer( testTeam );
+        //        btv.run( );
+        //        btv = BAG::bagViewer( testTeam, BAG::bagViewer::BATTLE );
+        //        btv.run( );
+        //        btv = BAG::bagViewer( testTeam, BAG::bagViewer::WILD_BATTLE );
+        //        btv.run( );
+        //       btv = BAG::bagViewer( testTeam, BAG::bagViewer::GIVE_TO_PKMN );
+        //       btv.run( );
 
         // BOX::boxViewer bxv;
         // bxv.run( );
 
-       // STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-       // sts.run( );
+        // STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+        // sts.run( );
 
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );
@@ -130,7 +130,7 @@ namespace SAVE {
 
         BATTLE::battle bt
             = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
-                    rand( ) % 46, rand( ) % 46, rand( ) % 58 );
+                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
 
         bt.start( );
 
@@ -157,7 +157,7 @@ namespace SAVE {
 
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );
         consoleSelect( &IO::Top );
-        u8            frame = 0;
+        u8 frame = 0;
         loop( ) {
             scanKeys( );
             touchRead( &touch );
@@ -165,7 +165,7 @@ namespace SAVE {
 
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                    || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
+                || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true, false, false );

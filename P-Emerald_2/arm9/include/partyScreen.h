@@ -51,9 +51,7 @@ namespace STS {
             }
             constexpr u8 getSelectedPkmn( ) const {
                 for( u8 i = 0; i < 6; ++i ) {
-                    if( getMark( i ) == 1 ) {
-                        return i;
-                    }
+                    if( getMark( i ) == 1 ) { return i; }
                 }
                 return 255;
             }
@@ -110,30 +108,30 @@ namespace STS {
 
         constexpr u16 getTextForDesquidChoice( const desquidChoice p_choice ) const {
             switch( p_choice ) {
-                case DESQUID_SPECIES:
-                    return DESQUID_STRING + 1;
-                case DESQUID_STATUS:
-                    return DESQUID_STRING + 2;
-                case DESQUID_EGG:
-                    return DESQUID_STRING + 3;
-                case DESQUID_NATURE:
-                    return DESQUID_STRING + 4;
-                case DESQUID_ITEM:
-                    return DESQUID_STRING + 5;
-                case DESQUID_MOVES:
-                    return DESQUID_STRING + 6;
-                case DESQUID_IV:
-                    return DESQUID_STRING + 7;
-                case DESQUID_EV:
-                    return DESQUID_STRING + 8;
-                case DESQUID_DUPLICATE:
-                    return DESQUID_STRING + 9;
-                case DESQUID_DELETE:
-                    return DESQUID_STRING + 10;
-                case DESQUID_HEAL:
-                    return DESQUID_STRING + 11;
-                case DESQUID_CANCEL:
-                    return 330;
+            case DESQUID_SPECIES:
+                return DESQUID_STRING + 1;
+            case DESQUID_STATUS:
+                return DESQUID_STRING + 2;
+            case DESQUID_EGG:
+                return DESQUID_STRING + 3;
+            case DESQUID_NATURE:
+                return DESQUID_STRING + 4;
+            case DESQUID_ITEM:
+                return DESQUID_STRING + 5;
+            case DESQUID_MOVES:
+                return DESQUID_STRING + 6;
+            case DESQUID_IV:
+                return DESQUID_STRING + 7;
+            case DESQUID_EV:
+                return DESQUID_STRING + 8;
+            case DESQUID_DUPLICATE:
+                return DESQUID_STRING + 9;
+            case DESQUID_DELETE:
+                return DESQUID_STRING + 10;
+            case DESQUID_HEAL:
+                return DESQUID_STRING + 11;
+            case DESQUID_CANCEL:
+                return 330;
             }
             return 0;
         }
@@ -142,39 +140,39 @@ namespace STS {
 #endif
         constexpr u16 getTextForChoice( const choice p_choice ) const {
             switch( p_choice ) {
-                case SELECT:
-                    if( !_inBattle ) {
-                        return 323;
-                    } else {
-                        return 151;
-                    }
-                case UNSELECT:
-                    return 331;
-                case STATUS:
-                    return 324;
-                case GIVE_ITEM:
-                    return 325;
-                case TAKE_ITEM:
-                    return 326;
-                case USE_ITEM:
-                    return 327;
-                case FIELD_MOVE_1:
-                    return CHOICE_FIELD_MOVE | 0;
-                case FIELD_MOVE_2:
-                    return CHOICE_FIELD_MOVE | 1;
-                case FIELD_MOVE_3:
-                    return CHOICE_FIELD_MOVE | 2;
-                case FIELD_MOVE_4:
-                    return CHOICE_FIELD_MOVE | 3;
-                case SWAP:
-                    return 328;
-                case DEX_ENTRY:
-                    return 329;
-                case CANCEL:
-                    return 330;
+            case SELECT:
+                if( !_inBattle ) {
+                    return 323;
+                } else {
+                    return 151;
+                }
+            case UNSELECT:
+                return 331;
+            case STATUS:
+                return 324;
+            case GIVE_ITEM:
+                return 325;
+            case TAKE_ITEM:
+                return 326;
+            case USE_ITEM:
+                return 327;
+            case FIELD_MOVE_1:
+                return CHOICE_FIELD_MOVE | 0;
+            case FIELD_MOVE_2:
+                return CHOICE_FIELD_MOVE | 1;
+            case FIELD_MOVE_3:
+                return CHOICE_FIELD_MOVE | 2;
+            case FIELD_MOVE_4:
+                return CHOICE_FIELD_MOVE | 3;
+            case SWAP:
+                return 328;
+            case DEX_ENTRY:
+                return 329;
+            case CANCEL:
+                return 330;
 #ifdef DESQUID
-                case _DESQUID:
-                    return DESQUID_STRING + 0;
+            case _DESQUID:
+                return DESQUID_STRING + 0;
 #endif
             }
             return 0;
@@ -198,7 +196,7 @@ namespace STS {
         bool     _selectConfirm;       // player should confirm selection
         bool     _allowCancel;         // player may close the screen without selecting anything
         u8       _inBattle;            // number of pkmn currently in battle
-        u8       _toSwap;           // Pokemon to swap
+        u8       _toSwap;              // Pokemon to swap
 
         u8             _frame;
         partyScreenUI* _partyUI;
@@ -278,6 +276,7 @@ namespace STS {
          * @returns: 1 if the player's touches had any effect; 2 if the user pressed X
          */
         u8 handleTouch( bool p_autoSel );
+
       public:
         /*
          * @brief: Creates a new party screen; does nothing else.

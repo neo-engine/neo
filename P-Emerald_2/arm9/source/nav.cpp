@@ -141,9 +141,8 @@ namespace NAV {
             IO::boldFont->setColor( 0, 1 );
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
 
-            IO::boldFont->printString(
-                ( FS::getLocation( CURRENT_MAP ) ).c_str( ), 7, 4,
-                !SCREENS_SWAPPED );
+            IO::boldFont->printString( ( FS::getLocation( CURRENT_MAP ) ).c_str( ), 7, 4,
+                                       !SCREENS_SWAPPED );
         }
 
         DRAW_TIME = true;
@@ -306,7 +305,7 @@ namespace NAV {
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
                 if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem, []( const char* ){ } );
+                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem, []( const char* ) {} );
                     updateItems( );
                 } else {
                     IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
@@ -379,334 +378,334 @@ namespace NAV {
             */
         }
 
-/*        if( STATE != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
-            STATE = backTransition[ STATE ];
-            draw( false );
-            if( STATE == HOME ) {
-                IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                IO::updateOAM( true );
-            }
-        } else {*/
-            // StartBag
-            if( ( pressed & KEY_X ) /*||
+        /*        if( STATE != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
+                    STATE = backTransition[ STATE ];
+                    draw( false );
+                    if( STATE == HOME ) {
+                        IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
+                        IO::updateOAM( true );
+                    }
+                } else {*/
+        // StartBag
+        if( ( pressed & KEY_X ) /*||
                     GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) */) {
-                BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
-                ANIMATE_MAP = false;
-                UPDATE_TIME = false;
-                SOUND::dimVolume( );
+            BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
+            ANIMATE_MAP       = false;
+            UPDATE_TIME       = false;
+            SOUND::dimVolume( );
 
-                IO::clearScreen( false );
-                videoSetMode( MODE_5_2D );
-                bgUpdate( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
 
-                u16 res = bv.run( );
+            u16 res = bv.run( );
 
-                FADE_TOP_DARK( );
-                IO::clearScreen( false );
-                videoSetMode( MODE_5_2D );
-                bgUpdate( );
+            FADE_TOP_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
 
-                IO::clearScreenConsole( true, true );
-                STATE       = HOME;
-                UPDATE_TIME = true;
-                MAP::curMap->draw( );
-                ANIMATE_MAP = true;
-                SOUND::restoreVolume( );
-                draw( true );
+            IO::clearScreenConsole( true, true );
+            STATE       = HOME;
+            UPDATE_TIME = true;
+            MAP::curMap->draw( );
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+            draw( true );
+            updateItems( );
+            if( res ) {
+                ITEM::use( res, []( const char* ) {} );
                 updateItems( );
-                if( res ) {
-                    ITEM::use( res, []( const char* ){ } );
-                    updateItems( );
-                    draw( true );
+                draw( true );
+            }
+        } else if( ( pressed & KEY_Y )
+                   && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
+                   /* && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) */ ) {
+            ANIMATE_MAP = false;
+            UPDATE_TIME = false;
+            SOUND::dimVolume( );
+            STATE = HOME;
+            IO::initOAMTable( true );
+            videoSetMode( MODE_5_2D );
+            u8 teamSize = 0;
+            for( ; teamSize < 6; ++teamSize ) {
+                if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamSize ].m_boxdata.m_speciesId ) {
+                    break;
                 }
-            } else if( ( pressed & KEY_Y )
-                    && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
-                      /* && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) */ ) {
-                ANIMATE_MAP = false;
-                UPDATE_TIME = false;
-                SOUND::dimVolume( );
-                STATE = HOME;
-                IO::initOAMTable( true );
-                videoSetMode( MODE_5_2D );
-                u8 teamSize = 0;
-                for( ; teamSize < 6; ++teamSize ) {
-                    if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamSize ].m_boxdata.m_speciesId ) {
+            }
+            STS::partyScreen sts
+                = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam, teamSize );
+
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            auto res = sts.run( );
+
+            FADE_TOP_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            IO::resetScale( true, false );
+            bgUpdate( );
+
+            IO::clearScreenConsole( true, true );
+            ANIMATE_MAP = true;
+            UPDATE_TIME = true;
+            SOUND::restoreVolume( );
+            draw( true );
+            MAP::curMap->draw( );
+
+            if( res.m_selectedMove ) {
+                for( u8 j = 0; j < 2; ++j ) {
+                    if( MOVE::possible( res.m_selectedMove, j ) ) {
+                        MOVE::use( res.m_selectedMove, j );
                         break;
                     }
                 }
-                STS::partyScreen sts
-                    = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam, teamSize );
+            }
+        } /*else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
+            ANIMATE_MAP = false;
+            SOUND::dimVolume( );
+            STATE = HOME;
 
-                IO::clearScreen( false );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN )
+                .run( SAVE::SAV.getActiveFile( ).m_lstDex );
+
+            FADE_TOP_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            IO::clearScreenConsole( true, true );
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+            draw( true );
+            MAP::curMap->draw( );
+        } else if( GET_AND_WAIT_C( POS[ OPTS_ID ][ 0 ], POS[ OPTS_ID ][ 1 ], 16 ) ) {
+
+        } else if( GET_AND_WAIT_C( POS[ ID_ID ][ 0 ], POS[ ID_ID ][ 1 ], 16 ) ) {
+
+            STATE = HOME;
+
+            const char* someText[ 12 ]
+                = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
+                   "Sgl Battle",   "Chg NavScrn",  "---", "View Boxes",
+                   "Hoenn Badges", "Kanto Badges", "Keyboard",     "Plate Spawn"};
+            IO::choiceBox test( 12, &someText[ 0 ], 0, false );
+            int           res = test.getResult( "Tokens of god-being..." );
+            draw( );
+            switch( res ) {
+            case 0: {
+                memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
+                        sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
+                std::vector<u16> tmp
+                    = {201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN};
+                for( int i = 0; i < 6; ++i ) {
+                    pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
+
+                    a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
+
+                    a.m_stats.m_curHP *= i / 5.0;
+                    a.m_boxdata.m_experienceGained += 750;
+
+                    // Hand out some ribbons
+                    for( u8 j = 0; j < 4; ++j ) {
+                        a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
+                        a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
+                        a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
+                    }
+                    a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
+                    a.m_boxdata.m_ribbons1[ 3 ] = 0;
+                    if( a.m_boxdata.m_speciesId == 493 ) {
+                        u8 plate = rand( ) % 17;
+                        if( plate < 16 )
+                            a.giveItem( I_FLAME_PLATE + plate );
+                        else
+                            a.giveItem( I_PIXIE_PLATE );
+                    } else {
+                        a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
+                    }
+
+                    for( u16 j = 1; j <= MAX_PKMN; ++j )
+                        SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
+                }
+                /*
+                                    for( u16 j : {493, 649, 648, 647, 487, 492, 641, 642,
+                   646,
+                   645, 643, 644} ) {
+                                        auto a       = pokemon( j, 50, 0, j ).m_boxdata;
+                                        a.m_gotPlace = j;
+                                        SAVE::SAV.storePkmn( a );
+                                        if( a.isShiny( ) ) {
+                                          IO::messageBox( "YAAAY" );
+                                          s8 idx = SAVE::SAV.getCurrentBox(
+                   )->getFirstFreeSpot( );
+                                          if( idx == -1 && !( *SAVE::SAV.getCurrentBox( )
+                   )[ 17
+                   ].isShiny( ) )
+                                          IO::messageBox( "Lost :(" );
+                                          else if( !( *SAVE::SAV.getCurrentBox( ) )[ idx -
+                   1
+                   ].isShiny( ) )
+                                          IO::messageBox( "Lost :(" );
+                                          break;
+                                          }
+                                    }
+
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ]
+                    = M_ROCK_CLIMB;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ]
+                    = M_SWEET_SCENT;
+
+                swiWaitForVBlank( );
+                break;
+            }
+            case 1:
+                for( u16 j = 1; j < MAX_ITEMS; ++j ) {
+                    auto c = ITEM::getItemData( j );
+                    if( c.m_itemType )
+                        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( c.m_itemType ),
+                                                                 j, 1 );
+                }
+                break;
+            case 2: {
+                // item* curr = ItemList[ rand( ) % 638 ];
+                // while( curr->m_itemName == "Null" ) curr = ItemList[ rand( ) % 638 ];
+                // IO::messageBox( curr, 31 );
+                break;
+            }
+            case 3: {
+                /*
+        std::vector<pokemon> cpy;
+
+        for( u8 i = 0; i < 3; ++i ) {
+            pokemon a( 0, i + 456, 0, 30, SAVE::SAV.getActiveFile( ).m_id + 1,
+                       SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
+            // a.stats.acHP = i*a.stats.maxHP/5;
+            cpy.push_back( a );
+        }
+        BATTLE::battleTrainer opp(
+                {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
+                {"Hmpf\x85 You're not too bad\x85",
+                "Hm\x85 Du bist gar nicht so schlecht\x85"},
+                {"Yay, I won!", "Yay gewonnen!"},
+                {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
+                cpy, 0, 0 );
+        auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
+        BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
+                                    0, 5, BATTLE::battle::DOUBLE );
+        ANIMATE_MAP = false;
+        test_battle.start( );
+        SAVE::SAV.getActiveFile( ).updateTeam( bt );
+        delete bt;
+
+                break;
+            }
+            case 4: {
+
+        std::vector<pokemon> cpy;
+
+        for( u8 i = 0; i < 6; ++i ) {
+            pokemon a( 0, 435 + i, 0, 15, SAVE::SAV.getActiveFile( ).m_id + 1,
+                       SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
+            // a.stats.acHP = i*a.stats.maxHP/5;
+            cpy.push_back( a );
+        }
+        BATTLE::battleTrainer opp(
+                {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
+                {"Hmpf\x85 You're not too bad\x85",
+                "Hm\x85 Du bist gar nicht so schlecht\x85"},
+                {"Yay, I won!", "Yay gewonnen!"},
+                {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
+                cpy, 0, 0 );
+        auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
+        BATTLE::battle test_battle( bt, &opp, 100,
+                                    BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
+                                    BATTLE::battle::SINGLE );
+        ANIMATE_MAP = false;
+        test_battle.start( );
+        SAVE::SAV.getActiveFile( ).updateTeam( bt );
+        delete bt;
+
+                break;
+            }
+            case 5: {
+                const char* bgNames[ MAXBG ];
+                for( u8 o = 0; o < MAXBG; ++o ) bgNames[ o ] = NAV::BGs[ o ].m_name.c_str( );
+
+                IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
+                draw( true,
+                      scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
+                break;
+            }
+            case 7: {
+                BOX::boxViewer bxv;
+                ANIMATE_MAP = false;
+                UPDATE_TIME = false;
                 videoSetMode( MODE_5_2D );
                 bgUpdate( );
+                SOUND::dimVolume( );
 
-                auto res = sts.run( );
+                bxv.run( );
 
                 FADE_TOP_DARK( );
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
-                IO::resetScale( true, false );
                 bgUpdate( );
 
-                IO::clearScreenConsole( true, true );
+                IO::initVideoSub( );
+                IO::resetScale( true, false );
                 ANIMATE_MAP = true;
                 UPDATE_TIME = true;
                 SOUND::restoreVolume( );
                 draw( true );
                 MAP::curMap->draw( );
-
-                if( res.m_selectedMove ) {
-                    for( u8 j = 0; j < 2; ++j ) {
-                        if( MOVE::possible( res.m_selectedMove, j ) ) {
-                            MOVE::use( res.m_selectedMove, j );
-                            break;
-                        }
-                    }
+                break;
+            }
+            case 8:
+                SAVE::SAV.getActiveFile( ).m_HOENN_Badges <<= 1;
+                SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= 1;
+                break;
+            case 9:
+                SAVE::SAV.getActiveFile( ).m_KANTO_Badges <<= 1;
+                SAVE::SAV.getActiveFile( ).m_KANTO_Badges |= 1;
+                break;
+            case 10: {
+                IO::keyboard kbd;
+                IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
+                break;
+            }
+            case 11: {
+                for( u16 j = I_FLAME_PLATE; j <= I_FLAME_PLATE + 17; ++j ) {
+                    SAVE::SAV.getActiveFile( ).m_bag.insert(
+                        BAG::toBagType( ITEM::ITEMTYPE_COLLECTIBLE ), j, 1 );
                 }
-            } /*else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
-                ANIMATE_MAP = false;
-                SOUND::dimVolume( );
-                STATE = HOME;
-
-                IO::clearScreen( false );
-                videoSetMode( MODE_5_2D );
-                bgUpdate( );
-
-                DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN )
-                    .run( SAVE::SAV.getActiveFile( ).m_lstDex );
-
+            }
+            }
+            if( res != 10 ) draw( true );
+            swiWaitForVBlank( );
+            if( res == 3 || res == 4 ) {
                 FADE_TOP_DARK( );
-                IO::clearScreen( false );
-                videoSetMode( MODE_5_2D );
-                bgUpdate( );
-
-                IO::clearScreenConsole( true, true );
                 ANIMATE_MAP = true;
-                SOUND::restoreVolume( );
-                draw( true );
                 MAP::curMap->draw( );
-            } else if( GET_AND_WAIT_C( POS[ OPTS_ID ][ 0 ], POS[ OPTS_ID ][ 1 ], 16 ) ) {
-
-            } else if( GET_AND_WAIT_C( POS[ ID_ID ][ 0 ], POS[ ID_ID ][ 1 ], 16 ) ) {
-
-                STATE = HOME;
-
-                const char* someText[ 12 ]
-                    = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
-                       "Sgl Battle",   "Chg NavScrn",  "---", "View Boxes",
-                       "Hoenn Badges", "Kanto Badges", "Keyboard",     "Plate Spawn"};
-                IO::choiceBox test( 12, &someText[ 0 ], 0, false );
-                int           res = test.getResult( "Tokens of god-being..." );
+            }
+        } else if( GET_AND_WAIT_C( POS[ NAV_ID ][ 0 ], POS[ NAV_ID ][ 1 ], 16 ) ) { // Save
+            IO::yesNoBox Save( GET_STRING( 91 ) );
+            if( Save.getResult( GET_STRING( 92 ) ) ) {
                 draw( );
-                switch( res ) {
-                case 0: {
-                    memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
-                            sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
-                    std::vector<u16> tmp
-                        = {201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN};
-                    for( int i = 0; i < 6; ++i ) {
-                        pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
-
-                        a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
-
-                        a.m_stats.m_curHP *= i / 5.0;
-                        a.m_boxdata.m_experienceGained += 750;
-
-                        // Hand out some ribbons
-                        for( u8 j = 0; j < 4; ++j ) {
-                            a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
-                            a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
-                            a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
-                        }
-                        a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
-                        a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                        if( a.m_boxdata.m_speciesId == 493 ) {
-                            u8 plate = rand( ) % 17;
-                            if( plate < 16 )
-                                a.giveItem( I_FLAME_PLATE + plate );
-                            else
-                                a.giveItem( I_PIXIE_PLATE );
-                        } else {
-                            a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
-                        }
-
-                        for( u16 j = 1; j <= MAX_PKMN; ++j )
-                            SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
-                    }
-                    /*
-                                        for( u16 j : {493, 649, 648, 647, 487, 492, 641, 642,
-                       646,
-                       645, 643, 644} ) {
-                                            auto a       = pokemon( j, 50, 0, j ).m_boxdata;
-                                            a.m_gotPlace = j;
-                                            SAVE::SAV.storePkmn( a );
-                                            if( a.isShiny( ) ) {
-                                              IO::messageBox( "YAAAY" );
-                                              s8 idx = SAVE::SAV.getCurrentBox(
-                       )->getFirstFreeSpot( );
-                                              if( idx == -1 && !( *SAVE::SAV.getCurrentBox( )
-                       )[ 17
-                       ].isShiny( ) )
-                                              IO::messageBox( "Lost :(" );
-                                              else if( !( *SAVE::SAV.getCurrentBox( ) )[ idx -
-                       1
-                       ].isShiny( ) )
-                                              IO::messageBox( "Lost :(" );
-                                              break;
-                                              }
-                                        }
-
-                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ]
-                        = M_ROCK_CLIMB;
-                    SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ]
-                        = M_SWEET_SCENT;
-
-                    swiWaitForVBlank( );
-                    break;
-                }
-                case 1:
-                    for( u16 j = 1; j < MAX_ITEMS; ++j ) {
-                        auto c = ITEM::getItemData( j );
-                        if( c.m_itemType )
-                            SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( c.m_itemType ),
-                                                                     j, 1 );
-                    }
-                    break;
-                case 2: {
-                    // item* curr = ItemList[ rand( ) % 638 ];
-                    // while( curr->m_itemName == "Null" ) curr = ItemList[ rand( ) % 638 ];
-                    // IO::messageBox( curr, 31 );
-                    break;
-                }
-                case 3: {
-                    /*
-            std::vector<pokemon> cpy;
-
-            for( u8 i = 0; i < 3; ++i ) {
-                pokemon a( 0, i + 456, 0, 30, SAVE::SAV.getActiveFile( ).m_id + 1,
-                           SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
-                // a.stats.acHP = i*a.stats.maxHP/5;
-                cpy.push_back( a );
+                if( FS::writeSave( p_path ) )
+                    IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
+                else
+                    IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
             }
-            BATTLE::battleTrainer opp(
-                    {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
-                    {"Hmpf\x85 You're not too bad\x85",
-                    "Hm\x85 Du bist gar nicht so schlecht\x85"},
-                    {"Yay, I won!", "Yay gewonnen!"},
-                    {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
-                    cpy, 0, 0 );
-            auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
-            BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
-                                        0, 5, BATTLE::battle::DOUBLE );
-            ANIMATE_MAP = false;
-            test_battle.start( );
-            SAVE::SAV.getActiveFile( ).updateTeam( bt );
-            delete bt;
-
-                    break;
-                }
-                case 4: {
-
-            std::vector<pokemon> cpy;
-
-            for( u8 i = 0; i < 6; ++i ) {
-                pokemon a( 0, 435 + i, 0, 15, SAVE::SAV.getActiveFile( ).m_id + 1,
-                           SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
-                // a.stats.acHP = i*a.stats.maxHP/5;
-                cpy.push_back( a );
-            }
-            BATTLE::battleTrainer opp(
-                    {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
-                    {"Hmpf\x85 You're not too bad\x85",
-                    "Hm\x85 Du bist gar nicht so schlecht\x85"},
-                    {"Yay, I won!", "Yay gewonnen!"},
-                    {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
-                    cpy, 0, 0 );
-            auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
-            BATTLE::battle test_battle( bt, &opp, 100,
-                                        BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
-                                        BATTLE::battle::SINGLE );
-            ANIMATE_MAP = false;
-            test_battle.start( );
-            SAVE::SAV.getActiveFile( ).updateTeam( bt );
-            delete bt;
-
-                    break;
-                }
-                case 5: {
-                    const char* bgNames[ MAXBG ];
-                    for( u8 o = 0; o < MAXBG; ++o ) bgNames[ o ] = NAV::BGs[ o ].m_name.c_str( );
-
-                    IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
-                    draw( true,
-                          scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
-                    break;
-                }
-                case 7: {
-                    BOX::boxViewer bxv;
-                    ANIMATE_MAP = false;
-                    UPDATE_TIME = false;
-                    videoSetMode( MODE_5_2D );
-                    bgUpdate( );
-                    SOUND::dimVolume( );
-
-                    bxv.run( );
-
-                    FADE_TOP_DARK( );
-                    IO::clearScreen( false );
-                    videoSetMode( MODE_5_2D );
-                    bgUpdate( );
-
-                    IO::initVideoSub( );
-                    IO::resetScale( true, false );
-                    ANIMATE_MAP = true;
-                    UPDATE_TIME = true;
-                    SOUND::restoreVolume( );
-                    draw( true );
-                    MAP::curMap->draw( );
-                    break;
-                }
-                case 8:
-                    SAVE::SAV.getActiveFile( ).m_HOENN_Badges <<= 1;
-                    SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= 1;
-                    break;
-                case 9:
-                    SAVE::SAV.getActiveFile( ).m_KANTO_Badges <<= 1;
-                    SAVE::SAV.getActiveFile( ).m_KANTO_Badges |= 1;
-                    break;
-                case 10: {
-                    IO::keyboard kbd;
-                    IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
-                    break;
-                }
-                case 11: {
-                    for( u16 j = I_FLAME_PLATE; j <= I_FLAME_PLATE + 17; ++j ) {
-                        SAVE::SAV.getActiveFile( ).m_bag.insert(
-                            BAG::toBagType( ITEM::ITEMTYPE_COLLECTIBLE ), j, 1 );
-                    }
-                }
-                }
-                if( res != 10 ) draw( true );
-                swiWaitForVBlank( );
-                if( res == 3 || res == 4 ) {
-                    FADE_TOP_DARK( );
-                    ANIMATE_MAP = true;
-                    MAP::curMap->draw( );
-                }
-            } else if( GET_AND_WAIT_C( POS[ NAV_ID ][ 0 ], POS[ NAV_ID ][ 1 ], 16 ) ) { // Save
-                IO::yesNoBox Save( GET_STRING( 91 ) );
-                if( Save.getResult( GET_STRING( 92 ) ) ) {
-                    draw( );
-                    if( FS::writeSave( p_path ) )
-                        IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
-                    else
-                        IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
-                }
-                draw( true );
-            }
-        }*/
+            draw( true );
+        }
+    }*/
     }
 } // namespace NAV

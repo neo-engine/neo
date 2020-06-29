@@ -231,8 +231,7 @@ int main( int, char** p_argv ) {
     // TODO remove
     SAVE::SAV.getActiveFile( ).m_options.m_enableBGM = true;
     SAVE::SAV.getActiveFile( ).m_options.m_enableSFX = true;
-    SAVE::SAV.m_version = VERSION;
-
+    SAVE::SAV.m_version                              = VERSION;
 
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
@@ -249,9 +248,8 @@ int main( int, char** p_argv ) {
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
-
-    bool          stopped = true;
-    u8            bmp     = false;
+    bool stopped = true;
+    u8   bmp     = false;
     loop( ) {
         swiWaitForVBlank( );
         touchRead( &touch );

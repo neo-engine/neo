@@ -67,13 +67,13 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         while( isShiny( ) ) m_pid = rand( );
     } else if( p_shiny ) { // Try p_shiny - 2 additional times to generate a shiny PId
         for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) {
-            m_pid = rand( );
+            m_pid       = rand( );
             m_shinyType = 1;
         }
-        if( SAVE::SAV.getActiveFile( ).m_bag.count(
-                BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM ) ) {
+        if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+                                                    I_SHINY_CHARM ) ) {
             for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) {
-                m_pid = rand( );
+                m_pid       = rand( );
                 m_shinyType = 1;
             }
         }
@@ -265,9 +265,9 @@ void boxPokemon::hatch( ) {
     m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
 }
 
-bool boxPokemon::learnMove( u16 p_move, std::function<void( const char*)> p_message,
+bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_message,
                             std::function<u8( boxPokemon*, u16 )> p_getMove,
-                            std::function<bool( const char* )> p_yesNoMessage ) {
+                            std::function<bool( const char* )>    p_yesNoMessage ) {
     char buffer[ 50 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {

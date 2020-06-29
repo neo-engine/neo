@@ -46,8 +46,8 @@ namespace BAG {
       private:
         pokemon* _playerTeam;
 
-        u8       _selectedIdx = 255;
-        bag::bagType  _currentPage;
+        u8           _selectedIdx = 255;
+        bag::bagType _currentPage;
 
         std::pair<u16, std::string> _teamItemCache[ 6 ];
         std::pair<u16, std::string> _itemCache[ MAX_ITEMS_PER_PAGE ];
@@ -57,10 +57,12 @@ namespace BAG {
         u8 _lastPkmnItemType = 255; // itemtype of the last item for which the pkmn info was drawn
 
         void drawItemSub( u16 p_itemId, const ITEM::itemData* p_data, u16 p_idx );
-      public:
-        bagUI( pokemon* p_playerTeam ) : _playerTeam( p_playerTeam ) { }
 
-        u16  drawPkmnIcons( );
+      public:
+        bagUI( pokemon* p_playerTeam ) : _playerTeam( p_playerTeam ) {
+        }
+
+        u16 drawPkmnIcons( );
 
         /*
          * @brief: Returns positions and types of all buttons currently visible on the
@@ -76,9 +78,10 @@ namespace BAG {
         /*
          * @brief: Redraws the specified page and displays the given items.
          */
-        void drawBagPage( bag::bagType,
-                    const std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>& p_items,
-                    u8 p_selection = 0 );
+        void
+        drawBagPage( bag::bagType,
+                     const std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>& p_items,
+                     u8 p_selection = 0 );
 
         /*
          * @brief: Selects and highlights the specified item.
@@ -89,13 +92,13 @@ namespace BAG {
          * @brief: Draws a choiceBox for the specified item.
          */
         std::vector<std::pair<IO::inputTarget, u8>>
-            drawChoice( u16 p_item, const ITEM::itemData* p_data, const std::vector<u16>& p_texts );
+        drawChoice( u16 p_item, const ITEM::itemData* p_data, const std::vector<u16>& p_texts );
 
         /*
          * @brief: Draws a choice box for the moves of the pokemon.
          */
         std::vector<std::pair<IO::inputTarget, u8>> drawMoveChoice( const boxPokemon* p_pokemon,
-                u16 p_extraMove = 0 );
+                                                                    u16 p_extraMove = 0 );
 
         /*
          * @brief: Returns inputTargets for each teamPkmn
@@ -120,7 +123,7 @@ namespace BAG {
          * @brief: Draws a yesNoBox.
          */
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
-            printYNMessage( const char* p_message, u8 p_selection, bool p_bottom = true );
+        printYNMessage( const char* p_message, u8 p_selection, bool p_bottom = true );
 
         /*
          * @brief: Prints the specified message.

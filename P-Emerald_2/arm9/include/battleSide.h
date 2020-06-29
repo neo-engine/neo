@@ -34,14 +34,14 @@
 
 #include <nds.h>
 
-#include "move.h"
-#include "battleSlot.h"
-#include "battleDefines.h"
-#include "defines.h"
-#include "pokemon.h"
-#include "type.h"
 #include "abilityNames.h"
+#include "battleDefines.h"
+#include "battleSlot.h"
+#include "defines.h"
+#include "move.h"
+#include "pokemon.h"
 #include "pokemonNames.h"
+#include "type.h"
 
 namespace BATTLE {
     /*
@@ -105,7 +105,6 @@ namespace BATTLE {
             return _slots[ p_slot ].hasType( p_type );
         }
 
-
         /*
          * @brief: Tries to add the specified side condition(s).
          * @param p_duration: The duration of the condition in turns. (0 for the
@@ -124,20 +123,17 @@ namespace BATTLE {
         constexpr bool removeSideCondition( sideCondition p_sideCondition ) {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
                 if( p_sideCondition & ( 1 << i ) ) {
-                    _sideConditionAmount[ i ] = 0;
+                    _sideConditionAmount[ i ]  = 0;
                     _sideConditionCounter[ i ] = 0;
                 }
             }
             return true;
         }
 
-
         constexpr sideCondition getSideCondition( ) const {
             sideCondition res = sideCondition( 0 );
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
-                if( _sideConditionAmount[ i ] ) {
-                    res = sideCondition( res | ( 1 << i ) );
-                }
+                if( _sideConditionAmount[ i ] ) { res = sideCondition( res | ( 1 << i ) ); }
             }
             return res;
         }
@@ -152,13 +148,11 @@ namespace BATTLE {
         /*
          * @brief: returns the volatile statuses of the pkmn in the given slot.
          */
-        constexpr u8 getVolatileStatusCounter( u8 p_slot,
-                                               volatileStatus p_volatileStatus ) const {
+        constexpr u8 getVolatileStatusCounter( u8 p_slot, volatileStatus p_volatileStatus ) const {
             return _slots[ p_slot ].getVolatileStatusCounter( p_volatileStatus );
         }
 
-        constexpr bool removeVolatileStatus( u8 p_slot,
-                                             volatileStatus p_volatileStatus ) {
+        constexpr bool removeVolatileStatus( u8 p_slot, volatileStatus p_volatileStatus ) {
             return _slots[ p_slot ].removeVolatileStatus( p_volatileStatus );
         }
 
@@ -167,7 +161,7 @@ namespace BATTLE {
          */
         constexpr bool addVolatileStatus( u8 p_slot, volatileStatus p_volatileStatus,
                                           u8 p_duration ) {
-            return  _slots[ p_slot ].addVolatileStatus( p_volatileStatus, p_duration );
+            return _slots[ p_slot ].addVolatileStatus( p_volatileStatus, p_duration );
         }
 
         constexpr bool setStatusCondition( u8 p_slot, u8 p_status, u8 p_duration = 255 ) {
@@ -183,7 +177,7 @@ namespace BATTLE {
 
         /*
          * @brief: Returns the if the pkmn has the specified status condition.
-        */
+         */
         constexpr u8 hasStatusCondition( u8 p_slot, u8 p_status ) const {
             return _slots[ p_slot ].hasStatusCondition( p_status );
         }
@@ -213,7 +207,7 @@ namespace BATTLE {
         boosts addBoosts( u8 p_slot, boosts p_boosts, bool p_allowAbilities = true ) {
             return _slots[ p_slot ].addBoosts( p_boosts, p_allowAbilities );
         }
-        bool   resetBoosts( u8 p_slot ) {
+        bool resetBoosts( u8 p_slot ) {
             return _slots[ p_slot ].resetBoosts( );
         }
         inline boosts getBoosts( u8 p_slot ) const {
@@ -244,8 +238,7 @@ namespace BATTLE {
          * @brief: Checks whether any pkmn on the field has the specified ability.
          */
         constexpr bool anyHasAbility( u16 p_ability ) const {
-            return _slots[ 0 ].hasAbility( p_ability )
-                || _slots[ 1 ].hasAbility( p_ability );
+            return _slots[ 0 ].hasAbility( p_ability ) || _slots[ 1 ].hasAbility( p_ability );
         }
 
         /*
@@ -318,34 +311,35 @@ namespace BATTLE {
             _slots[ p_slot ].healPokemon( p_damage );
         }
 
-
         /*
          * @brief: Gets the current value of the specified stat (with all modifiers
          * applied). (HP: 0, ATK 1, etc)
          */
-        constexpr u16 getStat( u8 p_slot, u8 p_stat,
-                               bool p_allowAbilities = true,
+        constexpr u16 getStat( u8 p_slot, u8 p_stat, bool p_allowAbilities = true,
                                bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
-            if( getPkmn( p_slot ) == nullptr ) [[unlikely]] { return 0; }
-            u16 base = _slots[ p_slot ].getStat( p_stat, p_allowAbilities,
-                                                 p_ignoreNegative, p_ignorePositive );
+            if( getPkmn( p_slot ) == nullptr )
+                [[unlikely]] { return 0; } u16 base = _slots[ p_slot ].getStat(
+                    p_stat, p_allowAbilities, p_ignoreNegative, p_ignorePositive );
 
-            if( !p_ignorePositive && p_stat == SPEED
-                    && _sideConditionAmount[ 8 ] ) [[unlikely]] { // Tailwind
-                base *= 2;
-            }
-
-            // plus / minus
-            if( p_allowAbilities && !p_ignorePositive ) [[likely]] {
-                if( p_stat == SATK && ( getPkmn( p_slot )->getAbility( ) == A_PLUS
-                        || getPkmn( p_slot )->getAbility( ) == A_MINUS ) ) [[unlikely]] {
-                    auto ot = getPkmn( !p_slot );
-                    if( ot != nullptr &&
-                            ( ot->getAbility( ) == A_MINUS || ot->getAbility( ) == A_PLUS ) ) {
-                        base = 3 * base / 2;
-                    }
+            if( !p_ignorePositive && p_stat == SPEED && _sideConditionAmount[ 8 ] )
+                [[unlikely]] { // Tailwind
+                    base *= 2;
                 }
-            }
+
+                // plus / minus
+                if( p_allowAbilities && !p_ignorePositive )[ [likely] ] {
+                    if( p_stat == SATK
+                        && ( getPkmn( p_slot )->getAbility( ) == A_PLUS
+                             || getPkmn( p_slot )->getAbility( ) == A_MINUS ) )
+                        [[unlikely]] {
+                            auto ot = getPkmn( !p_slot );
+                            if( ot != nullptr
+                                && ( ot->getAbility( ) == A_MINUS
+                                     || ot->getAbility( ) == A_PLUS ) ) {
+                                base = 3 * base / 2;
+                            }
+                        }
+                }
 
             return std::max( u16( 1 ), base );
         }
@@ -362,19 +356,19 @@ namespace BATTLE {
         constexpr bool canSelectMove( u8 p_slot, u8 p_moveIdx ) {
 
             if( getPkmn( !p_slot ) == nullptr
-                    && MOVE::getMoveData( getPkmn( p_slot )->getMove( p_moveIdx ) ).m_target
-                    == MOVE::ALLY ) [[unlikely]] {
-                return false;
-            }
+                && MOVE::getMoveData( getPkmn( p_slot )->getMove( p_moveIdx ) ).m_target
+                       == MOVE::ALLY )
+                [[unlikely]] { return false; }
 
-            return _slots[ p_slot ].canSelectMove( p_moveIdx );
+                return _slots[ p_slot ]
+                    .canSelectMove( p_moveIdx );
         }
 
         /*
          * @brief: Returns the move the pkmn in this slot is forced/preparing to use.
          */
         inline battleMoveSelection getStoredMove( u8 p_slot ) {
-            auto tmp = _slots[ p_slot ].getStoredMove( );
+            auto tmp          = _slots[ p_slot ].getStoredMove( );
             tmp.m_user.second = p_slot;
             return tmp;
         }
@@ -430,4 +424,4 @@ namespace BATTLE {
             return _slots[ p_slot ].canSwitchOut( );
         }
     };
-}
+} // namespace BATTLE

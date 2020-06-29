@@ -28,13 +28,13 @@
 #include <algorithm>
 #include <nds.h>
 
+#include "abilityNames.h"
 #include "battleTrainer.h"
 #include "fs.h"
+#include "itemNames.h"
 #include "messageBox.h"
 #include "saveGame.h"
 #include "uio.h"
-#include "itemNames.h"
-#include "abilityNames.h"
 
 namespace SAVE {
     saveGame SAV;
@@ -140,11 +140,10 @@ namespace SAVE {
         s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );
         u8 i   = 0;
         for( ; idx == -1 && i < MAX_BOXES; )
-            idx = m_storedPokemon[ ( ( ++i ) + m_curBox ) % MAX_BOXES ]
-                      .getFirstFreeSpot( );
+            idx = m_storedPokemon[ ( ( ++i ) + m_curBox ) % MAX_BOXES ].getFirstFreeSpot( );
         if( idx == -1 ) // Everything's full :/
             return -1;
-        m_curBox = ( m_curBox + i ) % MAX_BOXES;
+        m_curBox                           = ( m_curBox + i ) % MAX_BOXES;
         m_storedPokemon[ m_curBox ][ idx ] = p_pokemon;
         return m_curBox;
     }
@@ -159,8 +158,7 @@ namespace SAVE {
         u16 res = 0;
         for( u8 i = 0; i < MAX_BOXES; i++ ) res += m_storedPokemon[ i ].count( p_pkmnIdx );
         for( u8 i = 0; i < 6; ++i ) {
-            if( !m_pkmnTeam[ i ].isEgg( )
-                && m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
+            if( !m_pkmnTeam[ i ].isEgg( ) && m_pkmnTeam[ i ].m_boxdata.m_speciesId == p_pkmnIdx )
                 ++res;
         }
         return res;
@@ -170,9 +168,7 @@ namespace SAVE {
         if( p_pokemon != nullptr ) {
             m_pkmnTeam[ p_position ] = *p_pokemon;
         } else {
-            if( countAlivePkmn( ) - m_pkmnTeam[ p_position ].canBattle( ) == 0 ) {
-                return false;
-            }
+            if( countAlivePkmn( ) - m_pkmnTeam[ p_position ].canBattle( ) == 0 ) { return false; }
             memset( &m_pkmnTeam[ p_position ], 0, sizeof( pokemon ) );
         }
         return true;
@@ -182,9 +178,7 @@ namespace SAVE {
         if( p_pokemon != nullptr ) {
             m_pkmnTeam[ p_position ] = pokemon( *p_pokemon );
         } else {
-            if( countAlivePkmn( ) - m_pkmnTeam[ p_position ].canBattle( ) == 0 ) {
-                return false;
-            }
+            if( countAlivePkmn( ) - m_pkmnTeam[ p_position ].canBattle( ) == 0 ) { return false; }
             memset( &m_pkmnTeam[ p_position ], 0, sizeof( pokemon ) );
         }
         return true;
@@ -192,7 +186,7 @@ namespace SAVE {
 
     u8 saveGame::playerInfo::consolidatePkmn( ) {
         u8 currentGap = 0;
-        u8 res = u8( -1 );
+        u8 res        = u8( -1 );
         for( u8 i = 0; i < 6; ++i ) {
             if( !m_pkmnTeam[ i ].getSpecies( ) ) {
                 currentGap++;
@@ -207,9 +201,7 @@ namespace SAVE {
 
     bool saveGame::isGood( ) {
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
-            if( SAV.m_saveFile[ i ].isGood( ) ) {
-                return true;
-            }
+            if( SAV.m_saveFile[ i ].isGood( ) ) { return true; }
         }
         // return VERSION == m_version;
         return false;

@@ -41,8 +41,8 @@ namespace BAG {
         static const u16 BERRIES_START   = 850;
         static const u16 KEY_ITEMS_START = 950;
 
-        u16           _startIdx[ 6 ] = {ITEM_START,    MEDICINE_START,  TM_HM_START,
-                                    BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG};
+        u16                 _startIdx[ 6 ] = {ITEM_START,    MEDICINE_START,  TM_HM_START,
+                              BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG};
         std::pair<u16, u16> _items[ MAX_ITEMS_IN_BAG ];
         u16                 _nextFree[ 5 ];
 

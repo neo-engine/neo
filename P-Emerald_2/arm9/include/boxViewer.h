@@ -38,10 +38,10 @@ namespace BOX {
       private:
         enum mode {
             STATUS = 0, // pressing A on a pkmn shows menu
-            MOVE = 1,   // pressing A on a pkmn picks it up
+            MOVE   = 1, // pressing A on a pkmn picks it up
         };
 
-        mode                         _mode;
+        mode _mode;
 
         std::vector<IO::inputTarget> _ranges;
         u8                           _selectedIdx;
@@ -106,8 +106,8 @@ namespace BOX {
         void setPkmn( u8 p_position, pokemon* p_pokemon );
         void setPkmn( std::pair<u8, u8> p_position, boxPokemon* p_pokemon );
         void setPkmn( std::pair<u8, u8> p_position, pokemon* p_pokemon );
-      public:
 
+      public:
         /*
          * @brief: Runs the box interface. Bottom screen requires complete re-init
          * afterwards (including setMode)

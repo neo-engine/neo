@@ -79,8 +79,9 @@ namespace IO {
     }
 
     void font::_charDelay( ) const {
-        for( u8 i = 0; i < 80 / ( TEXTSPEED
-                    + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier ); ++i )
+        for( u8 i = 0;
+             i < 80 / ( TEXTSPEED + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
+             ++i )
             swiWaitForVBlank( );
     }
 
@@ -148,7 +149,7 @@ namespace IO {
     }
 
     u16 font::printCharB( u16 p_ch, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x,
-                           s16 p_y ) const {
+                          s16 p_y ) const {
         _shiftchar( p_ch );
 
         s16 putX, putY;
@@ -197,8 +198,8 @@ namespace IO {
     }
 
     u16 font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                           alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
-                           u8 p_charShift, bool p_delay, bool p_mb, u8 p_layer ) const {
+                           alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
+                           bool p_delay, bool p_mb, u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
         u16 lines = 1;
@@ -227,7 +228,7 @@ namespace IO {
             }
 
             putX += printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer )
-                - p_charShift;
+                    - p_charShift;
 
             if( p_delay ) { _charDelay( ); }
 
@@ -237,27 +238,27 @@ namespace IO {
     }
 
     u16 font::printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
-                            bool p_delay, bool p_mb, u8 p_layer ) const {
-        return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX,
-                            1, p_delay, p_mb, p_layer );
+                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX, bool p_delay,
+                            bool p_mb, u8 p_layer ) const {
+        return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX, 1,
+                            p_delay, p_mb, p_layer );
     }
 
     u16 font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX,
-                            u8 p_charShift, bool p_mb, u8 p_layer ) const {
+                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
+                            bool p_mb, u8 p_layer ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX,
                             p_charShift, true, p_mb, p_layer );
     }
 
-    u16 font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                             u8 p_charShift, bool p_delay, u8 p_layer ) const {
+    u16 font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_charShift,
+                             bool p_delay, u8 p_layer ) const {
         return printString( p_string, p_x, p_y, p_bottom, font::LEFT, FONT_HEIGHT - 2, 0,
                             p_charShift, p_delay, true, p_layer );
     }
 
-    u16 font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                              u8 p_charShift, u8 p_layer ) const {
+    u16 font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_charShift,
+                              u8 p_layer ) const {
         return printMBString( p_string, p_x, p_y, p_bottom, p_charShift, true, p_layer );
     }
 
@@ -266,9 +267,7 @@ namespace IO {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
         u16 lines = 1;
-        if( p_alignment == RIGHT ) {
-            putX = p_bufferWidth - stringWidth( p_string, p_charShift );
-        }
+        if( p_alignment == RIGHT ) { putX = p_bufferWidth - stringWidth( p_string, p_charShift ); }
         if( p_alignment == CENTER ) {
             putX = ( p_bufferWidth - stringWidth( p_string, p_charShift ) ) / 2;
         }
@@ -280,25 +279,27 @@ namespace IO {
                     putX = p_bufferWidth - stringWidth( p_string + current_char + 1, p_charShift );
                 }
                 if( p_alignment == CENTER ) {
-                    putX = ( p_bufferWidth - stringWidth( p_string + current_char + 1,
-                                p_charShift ) ) / 2;
+                    putX = ( p_bufferWidth
+                             - stringWidth( p_string + current_char + 1, p_charShift ) )
+                           / 2;
                 }
 
                 current_char++;
                 lines++;
                 continue;
             }
-            putX += printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth,
-                                putX, putY ) - p_charShift;
+            putX += printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX,
+                                putY )
+                    - p_charShift;
             current_char++;
         }
         return lines;
     }
 
-    u16 font::printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer,
-                              u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance ) const {
-        return printStringB( p_string, p_palette, p_buffer, p_bufferWidth, p_alignment,
-                             p_yDistance, 1 );
+    u16 font::printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
+                             alignment p_alignment, u8 p_yDistance ) const {
+        return printStringB( p_string, p_palette, p_buffer, p_bufferWidth, p_alignment, p_yDistance,
+                             1 );
     }
 
     u16 font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
@@ -376,8 +377,8 @@ namespace IO {
 
     void font::printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
                                 u16 p_breakChar, bool p_delay, u8 p_layer ) const {
-        return printMaxString( p_string, p_x, p_y, p_bottom, p_maxX, p_breakChar, 1,
-                               p_delay, p_layer );
+        return printMaxString( p_string, p_x, p_y, p_bottom, p_maxX, p_breakChar, 1, p_delay,
+                               p_layer );
     }
 
 } // namespace IO

@@ -25,11 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "defines.h"
 #include "choiceBox.h"
-#include "uio.h"
+#include "defines.h"
 #include "saveGame.h"
 #include "sound.h"
+#include "uio.h"
 
 #include "Back.h"
 #include "Backward.h"
@@ -40,33 +40,35 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace IO {
 
-#define UPDATE_PAGE_STATS do { \
-    for( auto g : choices ) { \
-        if( g.second == BACK_CHOICE ) { back = true; } \
-        if( g.second == EXIT_CHOICE ) { ext = true; } \
-        if( g.second == PREV_PAGE_CHOICE ) { prvpg = true; } \
-        if( g.second == NEXT_PAGE_CHOICE ) { nxtpg = true; } \
-        if( g.second < 6 ) { mxchoice = std::max( u8( g.second + 1 ), mxchoice ); } \
-    } \
-} while( false )
-
+#define UPDATE_PAGE_STATS                                                               \
+    do {                                                                                \
+        for( auto g : choices ) {                                                       \
+            if( g.second == BACK_CHOICE ) { back = true; }                              \
+            if( g.second == EXIT_CHOICE ) { ext = true; }                               \
+            if( g.second == PREV_PAGE_CHOICE ) { prvpg = true; }                        \
+            if( g.second == NEXT_PAGE_CHOICE ) { nxtpg = true; }                        \
+            if( g.second < 6 ) { mxchoice = std::max( u8( g.second + 1 ), mxchoice ); } \
+        }                                                                               \
+    } while( false )
 
     choiceBox::selection choiceBox::getResult(
-            std::function<std::vector<std::pair<inputTarget, selection>>(u8)> p_drawFunction,
-            std::function<void(selection)> p_selectFunction,
-            selection p_initialSelection, std::function<void( )> p_tick ) {
-        u8 page = 0;
+        std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
+        std::function<void( selection )> p_selectFunction, selection p_initialSelection,
+        std::function<void( )> p_tick ) {
+        u8   page    = 0;
         auto choices = p_drawFunction( page );
-        if( !choices.size( ) ) [[unlikely]] { return BACK_CHOICE; }
+        if( !choices.size( ) )
+            [[unlikely]] { return BACK_CHOICE; }
 
-        auto sel = p_initialSelection;
+            auto sel
+                = p_initialSelection;
         p_selectFunction( sel );
 
         bool prvpg = false, nxtpg = false, back = false, ext = false;
-        u8 mxchoice = 0;
+        u8   mxchoice = 0;
         UPDATE_PAGE_STATS;
 
-        cooldown     = COOLDOWN_COUNT;
+        cooldown = COOLDOWN_COUNT;
         loop( ) {
             p_tick( );
             scanKeys( );
@@ -76,22 +78,25 @@ namespace IO {
             held    = keysHeld( );
 
             if( pressed & KEY_A ) {
-                if( sel < choices.size( ) ) { SOUND::playSoundEffect( SFX_CHOOSE ); }
-                else  { SOUND::playSoundEffect( SFX_CANCEL ); }
+                if( sel < choices.size( ) ) {
+                    SOUND::playSoundEffect( SFX_CHOOSE );
+                } else {
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                }
                 cooldown = COOLDOWN_COUNT;
                 break;
             }
             if( back && ( pressed & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown  = COOLDOWN_COUNT;
-                sel = choiceBox::BACK_CHOICE;
+                cooldown = COOLDOWN_COUNT;
+                sel      = choiceBox::BACK_CHOICE;
                 p_selectFunction( sel );
                 break;
             }
             if( ext && ( pressed & KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown  = COOLDOWN_COUNT;
-                sel = choiceBox::EXIT_CHOICE;
+                cooldown = COOLDOWN_COUNT;
+                sel      = choiceBox::EXIT_CHOICE;
                 p_selectFunction( sel );
                 break;
             }
@@ -218,7 +223,7 @@ namespace IO {
     }
 
     constexpr u8 NEW_PAGE = 9;
-    void choiceBox::draw( u8 p_pressedIdx ) {
+    void         choiceBox::draw( u8 p_pressedIdx ) {
         if( p_pressedIdx == NEW_PAGE ) {
             if( _drawSub ) NAV::draw( );
             initTextField( );
@@ -395,8 +400,9 @@ namespace IO {
                 }
                 if( p_backButton
                     && (
-                        /* GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 )
-                         || */ GET_AND_WAIT( KEY_B ) ) ) { // Back pressed
+                           /* GET_AND_WAIT_C( fwdPos[ 0 ][ 0 ], fwdPos[ 0 ][ 1 ] + 2, 16 )
+                            || */
+                           GET_AND_WAIT( KEY_B ) ) ) { // Back pressed
                     result = -1;
                     goto END;
                 }
@@ -404,7 +410,8 @@ namespace IO {
                     if( /*( !IO::Oam->oamBuffer[ FWD_ID ].isHidden
                           && GET_AND_WAIT_C( IO::Oam->oamBuffer[ FWD_ID ].x + 16,
                                              IO::Oam->oamBuffer[ FWD_ID ].y + 16, 16 ) )
-                        || */ GET_AND_WAIT( KEY_RIGHT ) ) {
+                        || */
+                        GET_AND_WAIT( KEY_RIGHT ) ) {
                         if( ( _acPage + 1 ) * 3 < _num ) {
                             ++_acPage;
                             while( _selectedIdx + 3 * _acPage >= _num ) --_selectedIdx;
@@ -414,7 +421,8 @@ namespace IO {
                     } else if( /*( !IO::Oam->oamBuffer[ BWD_ID ].isHidden
                                  && GET_AND_WAIT_C( IO::Oam->oamBuffer[ BWD_ID ].x + 16,
                                                     IO::Oam->oamBuffer[ BWD_ID ].y + 16, 16 ) )
-                               ||*/ GET_AND_WAIT( KEY_LEFT ) ) {
+                               ||*/
+                               GET_AND_WAIT( KEY_LEFT ) ) {
                         if( _acPage ) {
                             --_acPage;
                             draw( NEW_PAGE );
@@ -564,4 +572,4 @@ namespace IO {
         }
         return result;
     }
-}
+} // namespace IO

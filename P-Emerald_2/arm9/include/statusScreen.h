@@ -38,9 +38,9 @@ namespace STS {
         pokemon*        _pokemon;
         statusScreenUI* _ui;
 
-        u8 _currentPage;
-        u8       _currentDetailChoice = 0;
-        u8 _frame;
+        u8   _currentPage;
+        u8   _currentDetailChoice = 0;
+        u8   _frame;
         bool _detailsMode = false;
 
         bool _allowKeyUp;
@@ -50,6 +50,7 @@ namespace STS {
         void select( u8 p_newPage );
 
         u8 handleTouch( );
+
       public:
         enum result { BACK, NEXT_PKMN, PREV_PKMN, EXIT };
 

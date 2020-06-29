@@ -20,6 +20,9 @@
     <ClInclude Include="arm9\include\bagViewer.h" />
     <ClInclude Include="arm9\include\battle.h" />
     <ClInclude Include="arm9\include\battleDefines.h" />
+    <ClInclude Include="arm9\include\battleField.h" />
+    <ClInclude Include="arm9\include\battleSide.h" />
+    <ClInclude Include="arm9\include\battleSlot.h" />
     <ClInclude Include="arm9\include\battleTrainer.h" />
     <ClInclude Include="arm9\include\battleUI.h" />
     <ClInclude Include="arm9\include\berry.h" />
@@ -46,7 +49,6 @@
     <ClInclude Include="arm9\include\mapSprite.h" />
     <ClInclude Include="arm9\include\messageBox.h" />
     <ClInclude Include="arm9\include\move.h" />
-    <ClInclude Include="arm9\include\moveChoiceBox.h" />
     <ClInclude Include="arm9\include\moveNames.h" />
     <ClInclude Include="arm9\include\nav.h" />
     <ClInclude Include="arm9\include\partyScreen.h" />
@@ -102,12 +104,10 @@
     <ClCompile Include="arm9\source\mapSprite.cpp" />
     <ClCompile Include="arm9\source\mapWarps.cpp" />
     <ClCompile Include="arm9\source\messageBox.cpp" />
-    <ClCompile Include="arm9\source\moveChoiceBox.cpp" />
     <ClCompile Include="arm9\source\nav.cpp" />
     <ClCompile Include="arm9\source\partyScreen.cpp" />
     <ClCompile Include="arm9\source\partyScreenUI.cpp" />
     <ClCompile Include="arm9\source\pokemon.cpp" />
-    <ClCompile Include="arm9\source\pokemonIO.cpp" />
     <ClCompile Include="arm9\source\ribbon.cpp" />
     <ClCompile Include="arm9\source\saveGame.cpp" />
     <ClCompile Include="arm9\source\screenFade.cpp" />

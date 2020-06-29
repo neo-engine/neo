@@ -204,9 +204,6 @@
     <ClInclude Include="arm9\include\messageBox.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
-    <ClInclude Include="arm9\include\moveChoiceBox.h">
-      <Filter>Header Files\arm9\io</Filter>
-    </ClInclude>
     <ClInclude Include="arm9\include\screenFade.h">
       <Filter>Header Files\arm9\io</Filter>
     </ClInclude>
@@ -269,6 +266,15 @@
     </ClInclude>
     <ClInclude Include="arm9\include\animations.h">
       <Filter>Header Files\arm9\io</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battleField.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battleSide.h">
+      <Filter>Header Files\arm9\battle</Filter>
+    </ClInclude>
+    <ClInclude Include="arm9\include\battleSlot.h">
+      <Filter>Header Files\arm9\battle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -368,9 +374,6 @@
     <ClCompile Include="arm9\source\bag.cpp">
       <Filter>Source Files\arm9\bag</Filter>
     </ClCompile>
-    <ClCompile Include="arm9\source\pokemonIO.cpp">
-      <Filter>Source Files\arm9\data structures</Filter>
-    </ClCompile>
     <ClCompile Include="arm9\source\nav.cpp">
       <Filter>Source Files\arm9\nav</Filter>
     </ClCompile>
@@ -388,9 +391,6 @@
     </ClCompile>
     <ClCompile Include="arm9\source\gameStart.cpp">
       <Filter>Source Files\arm9\saves</Filter>
-    </ClCompile>
-    <ClCompile Include="arm9\source\moveChoiceBox.cpp">
-      <Filter>Source Files\arm9\io</Filter>
     </ClCompile>
     <ClCompile Include="arm9\source\partyScreen.cpp">
       <Filter>Source Files\arm9\sts</Filter>

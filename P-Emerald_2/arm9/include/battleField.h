@@ -34,14 +34,14 @@
 
 #include <nds.h>
 
-#include "move.h"
-#include "battleSide.h"
-#include "battleDefines.h"
-#include "defines.h"
-#include "pokemon.h"
-#include "type.h"
 #include "abilityNames.h"
+#include "battleDefines.h"
+#include "battleSide.h"
+#include "defines.h"
+#include "move.h"
+#include "pokemon.h"
 #include "pokemonNames.h"
+#include "type.h"
 
 namespace BATTLE {
     /*
@@ -49,16 +49,16 @@ namespace BATTLE {
      */
     class field {
       public:
-        static constexpr u8 PLAYER_SIDE   = 0;
-        static constexpr u8 OPPONENT_SIDE = 1;
-        static constexpr u8 NORMAL_DURATION = 5;
+        static constexpr u8 PLAYER_SIDE       = 0;
+        static constexpr u8 OPPONENT_SIDE     = 1;
+        static constexpr u8 NORMAL_DURATION   = 5;
         static constexpr u8 EXTENDED_DURATION = 8;
 
       private:
         weather _weather;
         u8      _weatherTimer; // Number of turns the weather is still active
 
-        u8      _pseudoWeatherTimer[ MAX_PSEUDO_WEATHER ];
+        u8 _pseudoWeatherTimer[ MAX_PSEUDO_WEATHER ];
 
         terrain _terrain;
         u8      _terrainTimer;
@@ -96,24 +96,24 @@ namespace BATTLE {
          * @param p_extended: If true, the duration is extended to 8 turns instead of the
          * usual 5.
          */
-        bool    setWeather( battleUI* p_ui, weather p_newWeather, bool p_extended = false );
-        bool    removeWeather( battleUI* p_ui );
-        constexpr weather getWeather( ) const { return _weather; }
+        bool setWeather( battleUI* p_ui, weather p_newWeather, bool p_extended = false );
+        bool removeWeather( battleUI* p_ui );
+        constexpr weather getWeather( ) const {
+            return _weather;
+        }
 
         /*
          * @brief: Tries to set a new pseudo weather; returns false iff that fails.
          * @param p_extended: If true, the duration is extended to 8 turns instead of the
          * usual 5.
          */
-        bool          setPseudoWeather( battleUI* p_ui, pseudoWeather p_newPseudoWeather,
-                                        bool p_extended = false );
-        bool          removePseudoWeather( battleUI* p_ui, pseudoWeather p_newPseudoWeather );
+        bool setPseudoWeather( battleUI* p_ui, pseudoWeather p_newPseudoWeather,
+                               bool p_extended = false );
+        bool removePseudoWeather( battleUI* p_ui, pseudoWeather p_newPseudoWeather );
         constexpr pseudoWeather getPseudoWeather( ) const {
             pseudoWeather res = pseudoWeather( 0 );
             for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
-                if( _pseudoWeatherTimer[ i ] ) {
-                    res = pseudoWeather( res | ( 1 << i ) );
-                }
+                if( _pseudoWeatherTimer[ i ] ) { res = pseudoWeather( res | ( 1 << i ) ); }
             }
             return res;
         }
@@ -123,32 +123,31 @@ namespace BATTLE {
          * @param p_extended: If true, the duration is extended to 8 turns instead of the
          * usual 5.
          */
-        bool    setTerrain( battleUI* p_ui, terrain p_newTerrain, bool p_extended = false );
-        bool    removeTerrain( battleUI* p_ui );
-        constexpr terrain getTerrain( ) const { return _terrain; }
-
+        bool setTerrain( battleUI* p_ui, terrain p_newTerrain, bool p_extended = false );
+        bool removeTerrain( battleUI* p_ui );
+        constexpr terrain getTerrain( ) const {
+            return _terrain;
+        }
 
         constexpr sideCondition getSideCondition( bool p_opponent ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getSideCondition( );
         }
 
-
         /*
          * @brief: Adds the given side conditions to the specified side
          */
-        constexpr bool addSideCondition( bool p_opponent,
-                                      sideCondition p_sideCondition, u8 p_duration = 0 ) {
+        constexpr bool addSideCondition( bool p_opponent, sideCondition p_sideCondition,
+                                         u8 p_duration = 0 ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addSideCondition(
-                     p_sideCondition, p_duration );
+                p_sideCondition, p_duration );
         }
 
         /*
          * @brief: Removes the given side conditions from the specified side
          */
-        constexpr bool removeSideCondition( bool p_opponent,
-                                         sideCondition p_sideCondition ) {
+        constexpr bool removeSideCondition( bool p_opponent, sideCondition p_sideCondition ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeSideCondition(
-                     p_sideCondition );
+                p_sideCondition );
         }
 
         /*
@@ -164,28 +163,28 @@ namespace BATTLE {
         constexpr u8 getVolatileStatusCounter( bool p_opponent, u8 p_slot,
                                                volatileStatus p_volatileStatus ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getVolatileStatusCounter(
-                    p_slot, p_volatileStatus );
+                p_slot, p_volatileStatus );
         }
 
         constexpr bool removeVolatileStatus( bool p_opponent, u8 p_slot,
                                              volatileStatus p_volatileStatus ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeVolatileStatus(
-                    p_slot, p_volatileStatus );
+                p_slot, p_volatileStatus );
         }
 
         /*
          * @brief: returns the volatile statuses of the pkmn in the given slot.
          */
         constexpr bool addVolatileStatus( bool p_opponent, u8 p_slot,
-                                     volatileStatus p_volatileStatus, u8 p_duration ) {
+                                          volatileStatus p_volatileStatus, u8 p_duration ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addVolatileStatus(
-                    p_slot, p_volatileStatus, p_duration );
+                p_slot, p_volatileStatus, p_duration );
         }
 
         constexpr bool setStatusCondition( bool p_opponent, u8 p_slot, u8 p_status,
                                            u8 p_duration = 255 ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setStatusCondition(
-                        p_slot, p_status, p_duration );
+                p_slot, p_status, p_duration );
         }
 
         /*
@@ -193,15 +192,15 @@ namespace BATTLE {
          */
         constexpr bool removeStatusCondition( bool p_opponent, u8 p_slot ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeStatusCondition(
-                    p_slot );
+                p_slot );
         }
 
         /*
          * @brief: Returns the if the pkmn has the specified status condition.
-        */
+         */
         constexpr u8 hasStatusCondition( bool p_opponent, u8 p_slot, u8 p_status ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].hasStatusCondition(
-                    p_slot, p_status );
+                p_slot, p_status );
         }
 
         /*
@@ -209,9 +208,9 @@ namespace BATTLE {
          * p_duration turns.
          */
         inline void addLockedMove( bool p_opponent, u8 p_slot, battleMoveSelection p_move,
-                u8 p_duration = 1 ) {
-            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addLockedMove(
-                    p_slot, p_move, p_duration );
+                                   u8 p_duration = 1 ) {
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addLockedMove( p_slot, p_move,
+                                                                              p_duration );
         }
 
         /*
@@ -233,8 +232,7 @@ namespace BATTLE {
          * @brief: Sets the move the specified pkmn used last.
          */
         inline void setLastUsedMove( bool p_opponent, u8 p_slot, battleMove p_move ) {
-            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setLastUsedMove(
-                    p_slot, p_move );
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setLastUsedMove( p_slot, p_move );
         }
 
         inline battleMove getLastUsedMove( bool p_opponent, u8 p_slot ) const {
@@ -257,8 +255,8 @@ namespace BATTLE {
         inline void recallPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot,
                                    bool p_keepChanges = false, bool p_forced = false ) {
             p_ui->recallPkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), p_forced );
-            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].recallPokemon(
-                    p_slot, p_keepChanges );
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].recallPokemon( p_slot,
+                                                                              p_keepChanges );
         }
 
         /*
@@ -266,8 +264,7 @@ namespace BATTLE {
          * faint pokemon.
          */
         inline void damagePokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_damage ) {
-            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].damagePokemon(
-                    p_slot, p_damage );
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].damagePokemon( p_slot, p_damage );
             p_ui->updatePkmnStats( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), false );
         }
 
@@ -279,12 +276,11 @@ namespace BATTLE {
             p_ui->updatePkmnStats( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), false );
         }
 
-
         /*
          * @brief: Sorts the give moves, computes targets. May use up I_CUSTAP_BERRY
          */
         std::vector<battleMove>
-        computeSortedBattleMoves( battleUI* p_ui,
+        computeSortedBattleMoves( battleUI*                               p_ui,
                                   const std::vector<battleMoveSelection>& p_selectedMoves );
 
         /*
@@ -296,13 +292,11 @@ namespace BATTLE {
         constexpr void deducePP( bool p_opponent, u8 p_slot, u16 p_moveId, u8 p_amount = 255 ) {
             if( p_amount == 255 ) {
                 p_amount = 1;
-                if( !suppressesAbilities( ) && anyHasAbility( A_PRESSURE ) ) {
-                    p_amount = 2;
-                }
+                if( !suppressesAbilities( ) && anyHasAbility( A_PRESSURE ) ) { p_amount = 2; }
             }
 
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].deducePP( p_slot, p_moveId,
-                    p_amount );
+                                                                         p_amount );
         }
 
         /*
@@ -360,8 +354,7 @@ namespace BATTLE {
         /*
          * @brief: Sets the pokemon of the specified slot. Only used at battle start
          */
-        inline void setSlot( bool p_opponent, u8 p_slot,
-                             pokemon* p_pokemon ) {
+        inline void setSlot( bool p_opponent, u8 p_slot, pokemon* p_pokemon ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setSlot( p_slot, p_pokemon );
         }
 
@@ -369,8 +362,7 @@ namespace BATTLE {
          * @brief: Sends out a new pokemon to a slot, overriding anything that was there
          * beforehand
          */
-        inline bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot,
-                                    pokemon* p_pokemon ) {
+        inline bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, pokemon* p_pokemon ) {
             setSlot( p_opponent, p_slot, p_pokemon );
             p_ui->sendOutPkmn( p_opponent, p_slot, p_pokemon );
             checkOnSendOut( p_ui, p_opponent, p_slot );
@@ -390,8 +382,7 @@ namespace BATTLE {
         /*
          * @brief: Returns a list of all types the pkmn currently has. May be empty
          */
-        inline std::vector<type> getTypes( bool p_opponent,
-                                           u8 p_slot ) const {
+        inline std::vector<type> getTypes( bool p_opponent, u8 p_slot ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getTypes( p_slot );
         }
 
@@ -407,33 +398,31 @@ namespace BATTLE {
          */
         inline void setExtraType( bool p_opponent, u8 p_slot, type p_type ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setExtraType( p_slot,
-                    p_type );
+                                                                                    p_type );
         }
-
 
         /*
          * @brief: Checks whether the pkmn currently has the specified type.
          */
-        constexpr bool hasType( bool p_opponent, u8 p_slot,
-                                type p_type ) const {
+        constexpr bool hasType( bool p_opponent, u8 p_slot, type p_type ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].hasType( p_slot, p_type );
         }
 
-
         constexpr u8 getConsecutiveMoveCount( bool p_opponent, u8 p_slot ) const {
-            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getConsecutiveMoveCount( p_slot );
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getConsecutiveMoveCount(
+                p_slot );
         }
 
         /*
          * @brief: Adds the specified boost to the specified pkmn, returns true iff
          * successful
          */
-        boosts   addBoosts( bool p_opponent, u8 p_slot, boosts p_boosts,
+        boosts addBoosts( bool p_opponent, u8 p_slot, boosts p_boosts,
                           bool p_allowAbilities = true ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addBoosts(
-                    p_slot, p_boosts, p_allowAbilities && suppressesAbilities( ) );
+                p_slot, p_boosts, p_allowAbilities && suppressesAbilities( ) );
         }
-        bool   resetBoosts( bool p_opponent, u8 p_slot ) {
+        bool resetBoosts( bool p_opponent, u8 p_slot ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].resetBoosts( p_slot );
         }
         inline boosts getBoosts( bool p_opponent, u8 p_slot ) const {
@@ -448,20 +437,18 @@ namespace BATTLE {
          * @brief: Transforms the pkmn at the specified position to the specified pkmn.
          * @returns: true iff the transformation succeeded.
          */
-        inline bool transformPkmn( bool p_opponent, u8 p_slot,
-                                   slot* p_target ) {
+        inline bool transformPkmn( bool p_opponent, u8 p_slot, slot* p_target ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].transformPkmn( p_slot,
-                    p_target );
+                                                                                     p_target );
         }
 
         /*
          * @brief: Changes the ability of the specified pkmn to p_newAbility.
          * Does nothing and returns false if p_newAbility is 0.
          */
-        inline bool changeAbility( bool p_opponent, u8 p_slot,
-                                   u16 p_newAbility ) {
+        inline bool changeAbility( bool p_opponent, u8 p_slot, u16 p_newAbility ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].changeAbility( p_slot,
-                    p_newAbility );
+                                                                                     p_newAbility );
         }
 
         /*
@@ -476,7 +463,7 @@ namespace BATTLE {
          */
         constexpr bool anyHasAbility( u16 p_ability ) const {
             return _sides[ true ].anyHasAbility( p_ability )
-                || _sides[ false ].anyHasAbility( p_ability );
+                   || _sides[ false ].anyHasAbility( p_ability );
         }
 
         /*
@@ -499,16 +486,17 @@ namespace BATTLE {
          * @brief: Gets the current value of the specified stat (with all modifiers
          * applied). (HP: 0, ATK 1, etc)
          */
-        constexpr u16 getStat( bool p_opponent, u8 p_slot, u8 p_stat,
-                               bool p_allowAbilities = true,
+        constexpr u16 getStat( bool p_opponent, u8 p_slot, u8 p_stat, bool p_allowAbilities = true,
                                bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
-            if( getPkmn( p_opponent, p_slot ) == nullptr ) [[unlikely]] { return 0; }
+            if( getPkmn( p_opponent, p_slot ) == nullptr )
+                [[unlikely]] { return 0; }
 
-            bool allowAbilities = p_allowAbilities && !suppressesAbilities( );
+                bool allowAbilities
+                    = p_allowAbilities && !suppressesAbilities( );
             bool allowWeather = suppressesWeather( );
 
             u16 base = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getStat(
-                    p_slot, p_stat, allowAbilities, p_ignoreNegative, p_ignorePositive );
+                p_slot, p_stat, allowAbilities, p_ignoreNegative, p_ignorePositive );
 
             if( allowWeather && allowAbilities && !p_ignorePositive ) {
                 if( _weather == SUN || _weather == HEAVY_SUNSHINE ) {
@@ -517,45 +505,38 @@ namespace BATTLE {
 
                     // flower gift
                     if( ( p1 != nullptr && p1->getAbility( ) == A_FLOWER_GIFT )
-                            || ( p2 != nullptr && p2->getAbility( ) == A_FLOWER_GIFT ) ) {
-                        if( p_stat == ATK || p_stat == SDEF ) {
-                            base = ( 3 * base ) >> 1;
-                        }
+                        || ( p2 != nullptr && p2->getAbility( ) == A_FLOWER_GIFT ) ) {
+                        if( p_stat == ATK || p_stat == SDEF ) { base = ( 3 * base ) >> 1; }
                     }
 
                     // solar power
-                    if( p1 != nullptr && p1->getAbility( ) == A_SOLAR_POWER &&
-                            p_stat == SATK ) {
+                    if( p1 != nullptr && p1->getAbility( ) == A_SOLAR_POWER && p_stat == SATK ) {
                         base = ( 3 * base ) >> 1;
                     }
 
                     // chlorophyll
-                    if( p1 != nullptr && p1->getAbility( ) == A_CHLOROPHYLL &&
-                            p_stat == SPEED ) {
+                    if( p1 != nullptr && p1->getAbility( ) == A_CHLOROPHYLL && p_stat == SPEED ) {
                         base <<= 1;
                     }
                 }
                 if( _weather == SANDSTORM ) {
                     auto p1 = getPkmn( p_opponent, p_slot );
                     // sand rush
-                    if( p1 != nullptr && p1->getAbility( ) == A_SAND_RUSH &&
-                            p_stat == SPEED ) {
+                    if( p1 != nullptr && p1->getAbility( ) == A_SAND_RUSH && p_stat == SPEED ) {
                         base <<= 1;
                     }
                 }
                 if( _weather == RAIN || _weather == HEAVY_RAIN ) {
                     auto p1 = getPkmn( p_opponent, p_slot );
                     // swift swin
-                    if( p1 != nullptr && p1->getAbility( ) == A_SWIFT_SWIM &&
-                            p_stat == SPEED ) {
+                    if( p1 != nullptr && p1->getAbility( ) == A_SWIFT_SWIM && p_stat == SPEED ) {
                         base <<= 1;
                     }
                 }
                 if( _weather == HAIL ) {
                     auto p1 = getPkmn( p_opponent, p_slot );
                     // slush rush
-                    if( p1 != nullptr && p1->getAbility( ) == A_SLUSH_RUSH &&
-                            p_stat == SPEED ) {
+                    if( p1 != nullptr && p1->getAbility( ) == A_SLUSH_RUSH && p_stat == SPEED ) {
                         base <<= 1;
                     }
                 }
@@ -572,7 +553,6 @@ namespace BATTLE {
                         if( p_stat == SPEED ) { base <<= 1; }
                     }
                 }
-
             }
 
             return std::max( u16( 1 ), base );
@@ -594,8 +574,8 @@ namespace BATTLE {
          * @brief: Checks whether the pokemon can use its i-th move.
          */
         constexpr bool canSelectMove( bool p_opponent, u8 p_slot, u8 p_moveIdx ) {
-            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].
-                canSelectMove( p_slot, p_moveIdx );
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canSelectMove( p_slot,
+                                                                                     p_moveIdx );
         }
 
         /*
@@ -616,12 +596,11 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pokemon can use an item (from the bag).
          */
-        constexpr bool canUseItem( bool p_opponent, u8 p_slot,
-                                   bool p_allowAbilities = true ) {
+        constexpr bool canUseItem( bool p_opponent, u8 p_slot, bool p_allowAbilities = true ) {
             if( getPseudoWeather( ) & MAGICROOM ) { return false; }
 
-            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canUseItem( p_slot,
-                    p_allowAbilities && !suppressesAbilities( ) );
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canUseItem(
+                p_slot, p_allowAbilities && !suppressesAbilities( ) );
         }
 
         /*
@@ -629,37 +608,34 @@ namespace BATTLE {
          */
         inline bool canSwitchOut( bool p_opponent, u8 p_slot ) {
             if( !_sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canSwitchOut( p_slot ) )
-            [[unlikely]] {
-                return false;
-            }
+                [[unlikely]] { return false; }
 
-            if( !suppressesAbilities( ) ) [[likely]] {
-                auto p1 = getPkmn( !p_opponent, 0 );
-                auto p2 = getPkmn( !p_opponent, 1 );
-                // Shadow tag
-                if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG ) [[likely]] {
-                    if( ( p1 != nullptr && p1->getAbility( ) == A_SHADOW_TAG )
-                            || ( p2 != nullptr && p2->getAbility( ) == A_SHADOW_TAG ) ) [[unlikely]] {
-                        return false;
-                    }
-                }
+                if( !suppressesAbilities( ) )[ [likely] ] {
+                    auto p1 = getPkmn( !p_opponent, 0 );
+                    auto p2 = getPkmn( !p_opponent, 1 );
+                    // Shadow tag
+                    if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG )
+                        [[likely]] {
+                            if( ( p1 != nullptr && p1->getAbility( ) == A_SHADOW_TAG )
+                                || ( p2 != nullptr && p2->getAbility( ) == A_SHADOW_TAG ) )
+                                [[unlikely]] { return false; }
+                        }
 
-                // Arena trap
-                if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
-                        || ( p2 != nullptr && p2->getAbility( ) == A_ARENA_TRAP ) ) [[unlikely]] {
-                    if( isGrounded( p_opponent, p_slot ) ) [[likely]] {
-                        return false;
-                    }
-                }
+                        // Arena trap
+                        if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
+                            || ( p2 != nullptr
+                                 && p2->getAbility( ) == A_ARENA_TRAP ) )[ [unlikely] ] {
+                            if( isGrounded( p_opponent, p_slot ) ) [[likely]] { return false; }
+                        }
 
-                // Magnet pull
-                if( ( p1 != nullptr && p1->getAbility( ) == A_MAGNET_PULL )
-                        || ( p2 != nullptr && p2->getAbility( ) == A_MAGNET_PULL ) ) [[unlikely]] {
-                    if( hasType( p_opponent, p_slot, STEEL ) ) [[unlikely]] {
-                        return false;
-                    }
+                    // Magnet pull
+                    if( ( p1 != nullptr && p1->getAbility( ) == A_MAGNET_PULL )
+                        || ( p2 != nullptr && p2->getAbility( ) == A_MAGNET_PULL ) )
+                        [[unlikely]] {
+                            if( hasType( p_opponent, p_slot, STEEL ) )
+                                [[unlikely]] { return false; }
+                        }
                 }
-            }
 
             return true;
         }
@@ -671,90 +647,96 @@ namespace BATTLE {
                               u8 p_targetSlot ) {
             auto tg = getPkmn( p_targetOpp, p_targetSlot );
             auto sc = getPkmn( p_sourceOpp, p_sorceSlot );
-            if( tg == nullptr || sc == nullptr ) [[unlikely]] { return; }
+            if( tg == nullptr || sc == nullptr )
+                [[unlikely]] { return; }
 
-            u16 item = sc->getItem( ); removeItem( p_ui, p_sourceOpp, p_sorceSlot, false );
+                u16 item
+                    = sc->getItem( );
+            removeItem( p_ui, p_sourceOpp, p_sorceSlot, false );
             char buffer[ 100 ];
 
             // Check for move item effects
 
-
             switch( item ) {
-                case I_CHILAN_BERRY2: {
-                    auto itemname = ITEM::getItemName( item );
-                    snprintf( buffer, 99, GET_STRING( 281 ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                            itemname.c_str( ), itemname.c_str( ) );
-                    p_ui->log( buffer );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    boosts bt = boosts( ); bt.setBoost( DEF, 7 );
-                    auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                    p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
-                    return;
-                }
-                case I_EGGANT_BERRY: {
-                    auto itemname = ITEM::getItemName( item );
-                    snprintf( buffer, 99, GET_STRING( 281 ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                            itemname.c_str( ), itemname.c_str( ) );
-                    p_ui->log( buffer );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    boosts bt = boosts( ); bt.setBoost( SDEF, 7 );
-                    auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                    p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
-                    return;
-                }
-                case I_NUTPEA_BERRY: {
-                    auto itemname = ITEM::getItemName( item );
-                    snprintf( buffer, 99, GET_STRING( 281 ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                            itemname.c_str( ), itemname.c_str( ) );
-                    p_ui->log( buffer );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    boosts bt = boosts( ); bt.setBoost( ATK, 7 );
-                    auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                    p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
-                    return;
-                }
-                case I_STRIB_BERRY: {
-                    auto itemname = ITEM::getItemName( item );
-                    snprintf( buffer, 99, GET_STRING( 281 ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                            itemname.c_str( ), itemname.c_str( ) );
-                    p_ui->log( buffer );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    boosts bt = boosts( ); bt.setBoost( SATK, 7 );
-                    auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                    p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
-                    return;
-                }
-                case I_YAGO_BERRY: {
-                    auto itemname = ITEM::getItemName( item );
-                    snprintf( buffer, 99, GET_STRING( 281 ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                            itemname.c_str( ), itemname.c_str( ) );
-                    p_ui->log( buffer );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    boosts bt = boosts( ); bt.setBoost( SPEED, 7 );
-                    auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                    p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
-                    return;
-                }
-                case I_TOPO_BERRY: {
-                    auto itemname = ITEM::getItemName( item );
-                    snprintf( buffer, 99, GET_STRING( 281 ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                            itemname.c_str( ), itemname.c_str( ) );
-                    p_ui->log( buffer );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    addVolatileStatus( p_sourceOpp, p_sorceSlot, PROTECT, 1 );
-                    snprintf( buffer, 99, GET_STRING( 282 ), itemname.c_str( ),
-                            p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ) );
-                    for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                    return;
-                }
-                [[likely]] default:
-                    break;
+            case I_CHILAN_BERRY2: {
+                auto itemname = ITEM::getItemName( item );
+                snprintf( buffer, 99, GET_STRING( 281 ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
+                p_ui->log( buffer );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                boosts bt = boosts( );
+                bt.setBoost( DEF, 7 );
+                auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
+                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                return;
+            }
+            case I_EGGANT_BERRY: {
+                auto itemname = ITEM::getItemName( item );
+                snprintf( buffer, 99, GET_STRING( 281 ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
+                p_ui->log( buffer );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                boosts bt = boosts( );
+                bt.setBoost( SDEF, 7 );
+                auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
+                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                return;
+            }
+            case I_NUTPEA_BERRY: {
+                auto itemname = ITEM::getItemName( item );
+                snprintf( buffer, 99, GET_STRING( 281 ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
+                p_ui->log( buffer );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                boosts bt = boosts( );
+                bt.setBoost( ATK, 7 );
+                auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
+                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                return;
+            }
+            case I_STRIB_BERRY: {
+                auto itemname = ITEM::getItemName( item );
+                snprintf( buffer, 99, GET_STRING( 281 ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
+                p_ui->log( buffer );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                boosts bt = boosts( );
+                bt.setBoost( SATK, 7 );
+                auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
+                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                return;
+            }
+            case I_YAGO_BERRY: {
+                auto itemname = ITEM::getItemName( item );
+                snprintf( buffer, 99, GET_STRING( 281 ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
+                p_ui->log( buffer );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                boosts bt = boosts( );
+                bt.setBoost( SPEED, 7 );
+                auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
+                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                return;
+            }
+            case I_TOPO_BERRY: {
+                auto itemname = ITEM::getItemName( item );
+                snprintf( buffer, 99, GET_STRING( 281 ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
+                p_ui->log( buffer );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                addVolatileStatus( p_sourceOpp, p_sorceSlot, PROTECT, 1 );
+                snprintf( buffer, 99, GET_STRING( 282 ), itemname.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ) );
+                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                return;
+            }
+                [[likely]] default : break;
             }
 
             giveItem( p_ui, p_targetOpp, p_targetSlot, item );
@@ -765,8 +747,8 @@ namespace BATTLE {
 
             char buffer[ 100 ];
             snprintf( buffer, 99, GET_STRING( 284 ),
-                    p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
-                    ITEM::getItemName( p_item ).c_str( ) );
+                      p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
+                      ITEM::getItemName( p_item ).c_str( ) );
             p_ui->log( buffer );
             for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         }
@@ -774,19 +756,19 @@ namespace BATTLE {
         /*
          * @brief: Removes any held item.
          */
-        inline void removeItem( battleUI* p_ui, bool p_opponent, u8 p_slot,
-                                  bool p_used = true ) {
+        inline void removeItem( battleUI* p_ui, bool p_opponent, u8 p_slot, bool p_used = true ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeItem( p_slot, p_used );
 
             // Check for symbiosis
             auto p2 = getPkmn( p_opponent, !p_slot );
-            if( p2 == nullptr ) [[likely]] { return; }
+            if( p2 == nullptr )
+                [[likely]] { return; }
 
-            if( !suppressesAbilities( ) && p_used
-                    && p2->getAbility( ) == A_SYMBIOSIS && p2->getItem( ) ) {
-                p_ui->logAbility( p2, p_opponent );
-                moveItem( p_ui, p_opponent, !p_slot, p_opponent, p_slot );
-            }
+                if( !suppressesAbilities( ) && p_used && p2->getAbility( ) == A_SYMBIOSIS
+                    && p2->getItem( ) ) {
+                    p_ui->logAbility( p2, p_opponent );
+                    moveItem( p_ui, p_opponent, !p_slot, p_opponent, p_slot );
+                }
         }
 
         /*
@@ -815,16 +797,16 @@ namespace BATTLE {
         /*
          * @brief: returns whether the specified pkmn currently touches the ground.
          */
-        inline bool isGrounded( bool p_opponent, u8 p_slot,
-                                bool p_allowAbilities = true ) {
-            bool ab = p_allowAbilities && suppressesAbilities( );
+        inline bool isGrounded( bool p_opponent, u8 p_slot, bool p_allowAbilities = true ) {
+            bool ab  = p_allowAbilities && suppressesAbilities( );
             bool grn = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].isGrounded( p_slot, ab );
 
-            if( _pseudoWeatherTimer[ 4 ] ) [[unlikely]] { // gravity
-                grn = false;
-            }
+            if( _pseudoWeatherTimer[ 4 ] )
+                [[unlikely]] { // gravity
+                    grn = false;
+                }
 
-            return grn;
+                return grn;
         }
     };
-}
+} // namespace BATTLE

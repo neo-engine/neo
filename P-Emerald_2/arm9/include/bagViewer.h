@@ -59,7 +59,7 @@ namespace BAG {
             BACK,
         };
 
-       std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>> _view;
+        std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>> _view;
 
         bagUI* _bagUI;
         bool   _hasSprite;
@@ -73,7 +73,7 @@ namespace BAG {
         context _context;
 
         std::vector<choice> _choices;
-        u8 _currentChoice;
+        u8                  _currentChoice;
 
         void initUI( );
 
@@ -81,23 +81,23 @@ namespace BAG {
 
         constexpr u16 getTextForChoice( const choice p_choice ) const {
             switch( p_choice ) {
-                case DEREGISTER_ITEM:
-                    return 402;
-                case REGISTER_ITEM:
-                    return 46;
-                case TOSS_ITEM:
-                    return 48;
-                    return 47;
-                case GIVE_ITEM:
-                    return 44;
-                case USE_ITEM:
-                case USE_TM:
-                case APPLY_ITEM:
-                    return 47;
-                case VIEW_DETAILS:
-                    return 401;
-                case BACK:
-                    return 330;
+            case DEREGISTER_ITEM:
+                return 402;
+            case REGISTER_ITEM:
+                return 46;
+            case TOSS_ITEM:
+                return 48;
+                return 47;
+            case GIVE_ITEM:
+                return 44;
+            case USE_ITEM:
+            case USE_TM:
+            case APPLY_ITEM:
+                return 47;
+            case VIEW_DETAILS:
+                return 401;
+            case BACK:
+                return 330;
             }
             return 0;
         }
@@ -161,7 +161,7 @@ namespace BAG {
          * @returns: 0 if nothing happened; 1 if the item got consumed and 2 if the bag is exited.
          * If an item has yet to be used the 14 highest bits contain its id
          */
-        u16  handleSelection( );
+        u16 handleSelection( );
 
         bool handleSomeInput( bool p_allowSort = true );
 

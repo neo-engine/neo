@@ -31,26 +31,26 @@
 #include "type.h"
 
 namespace BATTLE {
-    constexpr u8 HP = 0;
-    constexpr u8 ATK = 1;
-    constexpr u8 DEF = 2;
-    constexpr u8 SATK = 3;
-    constexpr u8 SDEF = 4;
-    constexpr u8 SPEED = 5;
-    constexpr u8 EVASION = 6;
+    constexpr u8 HP       = 0;
+    constexpr u8 ATK      = 1;
+    constexpr u8 DEF      = 2;
+    constexpr u8 SATK     = 3;
+    constexpr u8 SDEF     = 4;
+    constexpr u8 SPEED    = 5;
+    constexpr u8 EVASION  = 6;
     constexpr u8 ACCURACY = 7;
 
-    constexpr u8 BURN = 1;
+    constexpr u8 BURN      = 1;
     constexpr u8 PARALYSIS = 2;
-    constexpr u8 FROZEN = 3;
-    constexpr u8 SLEEP = 4;
-    constexpr u8 POISON = 5;
-    constexpr u8 TOXIC = 6;
+    constexpr u8 FROZEN    = 3;
+    constexpr u8 SLEEP     = 4;
+    constexpr u8 POISON    = 5;
+    constexpr u8 TOXIC     = 6;
 
     struct battleTrainer;
 
     struct boosts {
-        u32  m_boosts;
+        u32 m_boosts;
 
         constexpr boosts( ) {
             m_boosts = 0;
@@ -83,8 +83,8 @@ namespace BATTLE {
             boosts res = boosts( );
             for( u8 i = 0; i < 8; ++i ) {
                 s8 old = getBoost( i );
-                setBoost( i, std::min( s8( 6 ), std::max( s8( -6 ),
-                                s8( old + p_other.getBoost( i ) ) ) ) );
+                setBoost( i, std::min( s8( 6 ),
+                                       std::max( s8( -6 ), s8( old + p_other.getBoost( i ) ) ) ) );
                 res.setBoost( i, getBoost( i ) - old );
             }
             return res;
@@ -94,9 +94,7 @@ namespace BATTLE {
          * @brief: Inverts all boosts.
          */
         inline void invert( ) {
-            for( u8 i = 0; i < 8; ++i ) {
-                setBoost( i, -getBoost( i ) );
-            }
+            for( u8 i = 0; i < 8; ++i ) { setBoost( i, -getBoost( i ) ); }
         }
     };
 
@@ -106,11 +104,11 @@ namespace BATTLE {
     enum volatileStatus : u64 {
         NONE             = 0,
         CONFUSION        = ( 1 << 0 ),
-        OBSTRUCT         = ( 1 << 1 ),  // TODO
-        PARTIALLYTRAPPED = ( 1 << 2 ),  // TODO
+        OBSTRUCT         = ( 1 << 1 ), // TODO
+        PARTIALLYTRAPPED = ( 1 << 2 ), // TODO
         FLINCH           = ( 1 << 3 ),
-        OCTOLOCK         = ( 1 << 4 ),  // TODO
-        TARSHOT          = ( 1 << 5 ),  // TODO
+        OCTOLOCK         = ( 1 << 4 ), // TODO
+        TARSHOT          = ( 1 << 5 ), // TODO
         NORETREAT        = ( 1 << 6 ),
         LASERFOCUS       = ( 1 << 7 ),
         SPOTLIGHT        = ( 1 << 8 ),  // TODO
@@ -132,10 +130,10 @@ namespace BATTLE {
         SUBSTITUTE       = ( 1 << 24 ), // TODO
         BIDE             = ( 1 << 25 ), // TODO
         FOCUSENERGY      = ( 1 << 26 ),
-        DEFENSECURL      = ( 1 << 27 ), // TODO
-        MINIMIZE         = ( 1 << 28 ), // TODO
-        LEECHSEED        = ( 1 << 29 ), // TODO
-        DISABLE          = ( 1 << 30 ), // TODO
+        DEFENSECURL      = ( 1 << 27 ),    // TODO
+        MINIMIZE         = ( 1 << 28 ),    // TODO
+        LEECHSEED        = ( 1 << 29 ),    // TODO
+        DISABLE          = ( 1 << 30 ),    // TODO
         FORESIGHT        = ( 1LLU << 31 ), // TODO
         SNATCH           = ( 1LLU << 32 ), // TODO
         GRUDGE           = ( 1LLU << 33 ), // TODO
@@ -236,22 +234,19 @@ namespace BATTLE {
     enum battleMode { SINGLE = 0, DOUBLE = 1 };
 
     struct battlePolicy {
-        battleMode  m_mode;
-        bool        m_allowMegaEvolution;
-        bool        m_distributeEXP;
-        bool        m_allowNextPkmnPreview; // Preview of next opp. pkmn
-        bool        m_allowCapture;
-        weather     m_weather;
-        u16         m_aiLevel;
-        u16         m_roundLimit;
+        battleMode m_mode;
+        bool       m_allowMegaEvolution;
+        bool       m_distributeEXP;
+        bool       m_allowNextPkmnPreview; // Preview of next opp. pkmn
+        bool       m_allowCapture;
+        weather    m_weather;
+        u16        m_aiLevel;
+        u16        m_roundLimit;
     };
 
-    constexpr battlePolicy DEFAULT_TRAINER_POLICY = {
-        SINGLE, true, true, true, false, NO_WEATHER, 5, 0
-    };
-    constexpr battlePolicy DEFAULT_WILD_POLICY = {
-        SINGLE, true, true, true, true, NO_WEATHER, 0, 0
-    };
+    constexpr battlePolicy DEFAULT_TRAINER_POLICY
+        = {SINGLE, true, true, true, false, NO_WEATHER, 5, 0};
+    constexpr battlePolicy DEFAULT_WILD_POLICY = {SINGLE, true, true, true, true, NO_WEATHER, 0, 0};
 
 } // namespace BATTLE
 
@@ -277,7 +272,7 @@ namespace MOVE {
         /** Prevented from being executed or selected during Gravity's effect. */
         GRAVITY = ( 1 << 8 ), // TODO: Add to canSelectMove
         /** Prevented from being executed or selected during Heal Block's effect. */
-        HEAL = ( 1 << 9 ),  // TODO: Add to canselectmove
+        HEAL = ( 1 << 9 ), // TODO: Add to canselectmove
         /** Can be copied by Mirror Move. */
         MIRROR = ( 1 << 10 ), // TODO
         /** Recoil halves HP */
@@ -348,7 +343,7 @@ namespace MOVE {
         /** Forces the target to switch out */
         FORCESWITCH = ( 1LLU << 42 ),
         /** Will always land a critical hit */
-        WILLCRIT = ( 1LLU << 43 ),// TODO
+        WILLCRIT = ( 1LLU << 43 ), // TODO
         /** Move uses atk/satk of the target */
         TARGETOFFENSIVES = ( 1LLU << 44 ), // TODO
         /** Move hits at a later time */
@@ -362,49 +357,49 @@ namespace MOVE {
     enum moveHitTypes : u8 { NOOP = 0, PHYSICAL = 1, SPECIAL = 2, STATUS = 3 };
 
     enum target : u8 {
-        NO_TARGET             = 0,
-        ANY                   = 1,
-        ANY_FOE               = 3,
-        ALLY                  = 2,
-        SELF                  = 5,
-        ALLY_OR_SELF          = 4,
-        RANDOM                = 6, // single-target, automatic
-        ALL_ALLIES            = 13,
-        ALL_FOES              = 8, // spread
-        ALL_FOES_AND_ALLY     = 7,
-        ALLY_SIDE             = 9,
-        FOE_SIDE              = 10,
-        FIELD                 = 11, // field
-        SCRIPTED              = 14,
-        ALLY_TEAM             = 15,
+        NO_TARGET         = 0,
+        ANY               = 1,
+        ANY_FOE           = 3,
+        ALLY              = 2,
+        SELF              = 5,
+        ALLY_OR_SELF      = 4,
+        RANDOM            = 6, // single-target, automatic
+        ALL_ALLIES        = 13,
+        ALL_FOES          = 8, // spread
+        ALL_FOES_AND_ALLY = 7,
+        ALLY_SIDE         = 9,
+        FOE_SIDE          = 10,
+        FIELD             = 11, // field
+        SCRIPTED          = 14,
+        ALLY_TEAM         = 15,
     };
 
     struct moveData {
-        type        m_type    : 8     = UNKNOWN;         // ???
+        type        m_type : 8        = UNKNOWN;         // ???
         contestType m_contestType : 8 = NO_CONTEST_TYPE; // Clever, Smart, ...
-        u8          m_basePower   = 0;
-        u8          m_pp          = 1;
+        u8          m_basePower       = 0;
+        u8          m_pp              = 1;
 
-        moveHitTypes m_category  : 8        = (moveHitTypes) 0;
+        moveHitTypes m_category : 8          = (moveHitTypes) 0;
         moveHitTypes m_defensiveCategory : 8 = (moveHitTypes) 0; // category used for defending pkmn
-        u8           m_accuracy          = 0;                // 255: always hit
-        s8           m_priority          = 0;
+        u8           m_accuracy              = 0;                // 255: always hit
+        s8           m_priority              = 0;
 
         BATTLE::sideCondition m_sideCondition : 32
             = BATTLE::NO_SIDE_CONDITION; // side introduced by the move (reflect, etc)
 
         BATTLE::weather       m_weather : 8 = BATTLE::NO_WEATHER; // weather introduced by the move
         BATTLE::pseudoWeather m_pseudoWeather : 8
-            = BATTLE::NO_PSEUDO_WEATHER;                // pseudo weather introduced by the move
+            = BATTLE::NO_PSEUDO_WEATHER;                    // pseudo weather introduced by the move
         BATTLE::terrain m_terrain : 8 = BATTLE::NO_TERRAIN; // terrain introduced by the move
-        u8              m_status  = 0;
+        u8              m_status      = 0;
 
         BATTLE::slotCondition m_slotCondition : 8
             = (BATTLE::slotCondition) 0; // stuff introduced on the slot (wish, etc)
-        u8     m_fixedDamage    = 0;
-        target m_target     : 8    = (target) 0;
-        target m_pressureTarget : 8 = (target) 0; // restrictions are computed based on different target
-                                              // than resulting effect
+        u8     m_fixedDamage        = 0;
+        target m_target : 8         = (target) 0;
+        target m_pressureTarget : 8 = (target) 0; // restrictions are computed based on different
+                                                  // target than resulting effect
 
         u8 m_heal     = 0; // as m_heal / 240
         u8 m_recoil   = 0; // as dealt damage * m_recoil / 240
@@ -420,8 +415,9 @@ namespace MOVE {
         BATTLE::volatileStatus m_secondaryVolatileStatus
             = (BATTLE::volatileStatus) 0; // confusion, etc
 
-        BATTLE::boosts m_boosts     = BATTLE::boosts( ); // Status ``boosts'' for the target
-        BATTLE::boosts m_selfBoosts = BATTLE::boosts( ); // Status ``boosts'' for the user (if target != user)
+        BATTLE::boosts m_boosts = BATTLE::boosts( ); // Status ``boosts'' for the target
+        BATTLE::boosts m_selfBoosts
+            = BATTLE::boosts( ); // Status ``boosts'' for the user (if target != user)
         BATTLE::boosts m_secondaryBoosts = BATTLE::boosts( ); // Stat ``boosts'' for the target
         BATTLE::boosts m_secondarySelfBoosts
             = BATTLE::boosts( ); // Stat ``boosts'' for the user (if target != user)
@@ -444,27 +440,27 @@ namespace BATTLE {
         SWITCH,
         SWITCH_PURSUIT, // Pursuit used on a switching target
         USE_ITEM,
-        NO_OP,   // No operation (e.g. when trying to run in a double battle)
+        NO_OP,           // No operation (e.g. when trying to run in a double battle)
         NO_OP_NO_CANCEL, // No operation, cannot be undone (e.g. player used an item)
-        CAPTURE, // (try to) capture pokemon.
+        CAPTURE,         // (try to) capture pokemon.
         RUN,
-        CANCEL, // Cancel / go back to previous move selection
+        CANCEL,       // Cancel / go back to previous move selection
         MESSAGE_ITEM, // Extra message for certain items
         MESSAGE_MOVE, // Extra message for certain moves
     };
 
     struct battleMoveSelection {
         battleMoveType m_type;
-        u16            m_param; // move id for attack/ m attack; target pkmn
-                                // for swtich; tg item
+        u16            m_param;  // move id for attack/ m attack; target pkmn
+                                 // for swtich; tg item
         fieldPosition  m_target; // If the move has a selectable, single target, it is stored here
         fieldPosition  m_user;
         bool           m_megaEvolve;
         MOVE::moveData m_moveData;
     };
 
-    constexpr battleMoveSelection NO_OP_SELECTION = {
-        NO_OP, 0, {255, 255}, {255, 255}, false, MOVE::moveData( ) };
+    constexpr battleMoveSelection NO_OP_SELECTION
+        = {NO_OP, 0, {255, 255}, {255, 255}, false, MOVE::moveData( )};
 
     struct battleMove {
         battleMoveType             m_type;
@@ -483,4 +479,4 @@ namespace BATTLE {
             return this->m_pertubation <=> p_other.m_pertubation;
         }
     };
-}
+} // namespace BATTLE

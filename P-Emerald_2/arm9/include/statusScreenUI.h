@@ -28,9 +28,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 
+#include "move.h"
 #include "pokemon.h"
 #include "pokemonData.h"
-#include "move.h"
 #include "uio.h"
 
 namespace STS {
@@ -40,13 +40,13 @@ namespace STS {
         static constexpr u8 EXIT_TARGET = 251;
         static constexpr u8 NEXT_TARGET = 250;
         static constexpr u8 PREV_TARGET = 249;
-      private:
 
-        u8       _currentPage = 255;
-        bool     _allowKeyUp;
-        bool     _allowKeyDown;
-        bool     _needsInit;
-        pkmnData _data;
+      private:
+        u8             _currentPage = 255;
+        bool           _allowKeyUp;
+        bool           _allowKeyDown;
+        bool           _needsInit;
+        pkmnData       _data;
         MOVE::moveData _moves[ 4 ];
 
         u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
@@ -65,9 +65,9 @@ namespace STS {
         /*
          * @brief: Writes the given string to the specified line to the text field.
          */
-        void writeLineTop( const char* p_stringLeft,  const char* p_stringRight,
-                           u8 p_line, u8 p_colorLeft = 250, u8 p_colorRight = 252,
-                           bool p_bottom = false );
+        void writeLineTop( const char* p_stringLeft, const char* p_stringRight, u8 p_line,
+                           u8 p_colorLeft = 250, u8 p_colorRight = 252, bool p_bottom = false );
+
       public:
         /*
          * @brief: Initializes the status screen UI. Destroys anything that was previously on the
