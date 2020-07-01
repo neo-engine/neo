@@ -39,6 +39,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "startScreen.h"
 #include "uio.h"
 #include "yesNoBox.h"
+#include "choiceBox.h"
+
+#include "noselection_96_32_1.h"
+#include "noselection_96_32_2.h"
+#include "noselection_96_32_4.h"
+#include "noselection_64_20.h"
+#include "noselection_32_64.h"
+#include "arrow.h"
 
 // BEGIN TEST
 #include "animations.h"
@@ -54,16 +62,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // END TEST
 
 namespace SAVE {
-    void initColors( ) {
-        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
-        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::NORMAL_COLOR;
-        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::GREEN;
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-    }
+
+#define SPR_SMALL_CHOICE_OAM_SUB 0
+#define SPR_LARGE_CHOICE_OAM_SUB 1
+#define SPR_ARROW_LEFT_OAM_SUB 5
+#define SPR_ARROW_RIGHT_OAM_SUB 6
+#define SPR_PAGE_LEFT_OAM_SUB 7
+#define SPR_PAGE_RIGHT_OAM_SUB 8
+#define SPR_MSG_BOX_OAM_SUB 9
+#define SPR_CHOICE_OAM_SUB( p_choice ) ( 30 + 10 * ( p_choice ) )
+#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 30 + 6 * ( p_pos ) )
+
+#define SPR_BOX_PAL_SUB 0
+#define SPR_SELECTED_PAL_SUB 1
+#define SPR_ARROW_X_PAL_SUB 2
+
 
     constexpr language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
@@ -87,12 +100,27 @@ namespace SAVE {
         }
     }
 
-    void drawSplash( language p_lang ) {
+    void startScreen::drawSplash( ) {
+        IO::initOAMTable( false );
+        IO::initOAMTable( true );
+        IO::clearScreen( true, true, false );
+        consoleSelect( &IO::Top );
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "Title" );
-        IO::clearScreen( true, false, false );
+
+        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE[ IO::COLOR_IDX ] = IO::CHOICE_COLOR;
+        BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE[ IO::RED_IDX ]   = IO::GREEN;
+
+
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
+        IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
         // BEGIN TEST
 
+        /*
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
             testTeam[ i ]                 = pokemon( PKMN_GYARADOS, 100, 0, 0, 255, false, i == 3 );
@@ -106,6 +134,7 @@ namespace SAVE {
             testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
             testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
         }
+        */
 
         //        BAG::bagViewer
         //        btv = BAG::bagViewer( testTeam );
@@ -128,11 +157,11 @@ namespace SAVE {
 
         //       SOUND::playBGM( MOD_SURFING );
 
-        BATTLE::battle bt
-            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
-                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
+//        BATTLE::battle bt
+//            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
+//                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
 
-        bt.start( );
+//        bt.start( );
 
         // END TEST
 
@@ -168,271 +197,506 @@ namespace SAVE {
                 || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 IO::clearScreenConsole( true, true );
-                IO::clearScreen( true, false, false );
-                IO::fadeScreen( IO::CLEAR_WHITE, true, true );
+                IO::clearScreen( true, false, true );
+                IO::fadeScreen( IO::CLEAR_DARK, true, true );
                 break;
             }
             ++frame;
             if( !( frame % 120 ) ) {
-                printf( STRINGS[ 70 ][ p_lang ] );
+                IO::boldFont->printString( STRINGS[ 70 ][ _currentLanguage ],
+                        128, 176, false, IO::font::CENTER );
                 frame = 0;
-            } else if( ( frame % 120 ) == 60 )
-                consoleClear( );
+            } else if( ( frame % 120 ) == 60 ) {
+                IO::printRectangle( 0, 176, 255, 192, false, 0 );
+            }
         }
 
         IO::clearScreenConsole( true, true );
         consoleSelect( &IO::Top );
     }
 
-    void startScreen::drawMainChoice( language p_lang, std::vector<u8> p_toDraw, s8 p_selected,
-                                      s8 p_pressed ) {
-        initColors( );
-        for( u8 i = 0; i < p_toDraw.size( ); ++i ) {
-            IO::printChoiceBox( 4, 4 + 48 * i, 136, 26 + 48 * i, 6,
-                                ( i == p_selected ) ? IO::RED_IDX : IO::COLOR_IDX, i == p_pressed );
-            IO::regularFont->printString( STRINGS[ p_toDraw[ i ] ][ p_lang ],
-                                          70 + 2 * ( i == p_pressed ),
-                                          8 + 48 * i + ( i == p_pressed ), true, IO::font::CENTER );
+    std::vector<startScreen::choice> startScreen::getMainChoicesForSlot( u8 p_slot ) {
+        std::vector<startScreen::choice> res;
+
+        if( SAV.m_saveFile[ p_slot ].m_gameType ) {
+            res.push_back( startScreen::CONTINUE );
         }
-        swiWaitForVBlank( );
-        IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
-        for( u8 i = 0; i < p_toDraw.size( ); ++i ) {
-            if( i == p_selected || i == p_pressed )
-                IO::boldFont->setColor( IO::BLACK_IDX, 2 );
-            else
-                IO::boldFont->setColor( IO::GRAY_IDX, 2 );
-            IO::boldFont->printString( STRINGS[ p_toDraw[ i ] + 4 ][ p_lang ], 248, 28 + 48 * i,
-                                       true, IO::font::RIGHT );
+        res.push_back( startScreen::NEW_GAME );
+        if( SAVE::SAV.getSpecialEpisodes( ).size( ) ) {
+            res.push_back( startScreen::SPECIAL_EPISODE );
         }
-    }
-
-    void fillResume( ) {
-        IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
-        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
-            if( !SAV.m_saveFile[ i ].m_gameType ) continue;
-
-            if( SAV.m_saveFile[ i ].m_isMale )
-                BG_PALETTE_SUB[ IO::BLUE_IDX ] = IO::BLUE2;
-            else
-                BG_PALETTE_SUB[ IO::BLUE_IDX ] = IO::RED2;
-
-            IO::regularFont->printString( SAV.m_saveFile[ i ].m_playername, 8, 30 + 64 * i, true );
-            IO::regularFont->printString(
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ), 248, 30 + 64 * i,
-                true, IO::font::RIGHT );
-
-            char buffer[ 50 ];
-            snprintf( buffer, 49, "%03d:%02d", SAV.m_saveFile[ i ].m_pt.m_hours,
-                      SAV.m_saveFile[ i ].m_pt.m_mins );
-            IO::regularFont->printString( buffer, 8, 46 + 64 * i, true );
-
-            snprintf( buffer, 49, STRINGS[ 108 ][ SAV.m_saveFile[ i ].m_options.m_language ],
-                      SAV.m_saveFile[ i ].getBadgeCount( ) );
-            IO::regularFont->printString( buffer, 110, 46 + 64 * i, true, IO::font::CENTER );
-
-            snprintf( buffer, 49, "PokéDex %03d", SAV.m_saveFile[ i ].getDexCount( ) );
-            IO::regularFont->printString( buffer, 248, 46 + 64 * i, true, IO::font::RIGHT );
-        }
-    }
-
-    void startScreen::drawSlotChoice( language p_current, s8 p_selected, s8 p_pressed ) {
-        initColors( );
-        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
-            IO::printChoiceBox( 4, 4 + 64 * i, 86, 26 + 64 * i, 6,
-                                ( i == p_selected ) ? IO::RED_IDX : IO::COLOR_IDX, i == p_pressed );
-            if( !SAV.m_saveFile[ i ].isGood( ) ) { SAV.m_saveFile[ i ].m_gameType = UNUSED; }
-            switch( SAV.m_saveFile[ i ].m_gameType ) {
-            case UNUSED:
-                IO::regularFont->printString(
-                    STRINGS[ 82 ][ p_current ], 45 + 2 * ( i == p_pressed ),
-                    8 + 64 * i + ( i == p_pressed ), true, IO::font::CENTER );
-                break;
-            case NORMAL:
-                IO::regularFont->printString(
-                    CHAPTER_NAMES[ 2 * SAV.m_saveFile[ i ].m_chapter ]
-                                 [ SAV.m_saveFile[ i ].m_options.m_language ],
-                    45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true,
-                    IO::font::CENTER );
-                IO::regularFont->printString(
-                    CHAPTER_NAMES[ 2 * SAV.m_saveFile[ i ].m_chapter + 1 ]
-                                 [ SAV.m_saveFile[ i ].m_options.m_language ],
-                    248, 8 + 64 * i, true, IO::font::RIGHT );
-                break;
-            case TRANSFER:
-                IO::regularFont->printString(
-                    STRINGS[ 83 ][ SAV.m_saveFile[ i ].m_options.m_language ],
-                    45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true,
-                    IO::font::CENTER );
-                break;
-            default:
-                IO::regularFont->printString(
-                    STRINGS[ 84 ][ SAV.m_saveFile[ i ].m_options.m_language ],
-                    45 + 2 * ( i == p_pressed ), 8 + 64 * i + ( i == p_pressed ), true,
-                    IO::font::CENTER );
-                IO::regularFont->printString(
-                    EPISODE_NAMES[ SAV.m_saveFile[ i ].m_options.m_language ]
-                                 [ SAV.m_saveFile[ i ].m_gameType - (u8) SPECIAL ],
-                    248, 8 + 64 * i, true, IO::font::RIGHT );
-            }
-        }
-        swiWaitForVBlank( );
-    }
-
-    startScreen::choiceType startScreen::runMainChoice( language p_lang ) {
-        std::vector<u8>         vis;
-        std::vector<choiceType> res;
-        bool                    hasSave = false;
-
-        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) hasSave |= !!( SAV.m_saveFile[ i ].m_gameType );
-
-        if( hasSave ) {
-            vis.push_back( 71 );
-            res.push_back( CONTINUE );
-        }
-        vis.push_back( 72 );
-        res.push_back( NEW_GAME );
-        vis.push_back( 73 );
-        res.push_back( SPECIAL_EPISODE );
+#ifdef DESQUID
         if( gMod == DEVELOPER ) {
-            vis.push_back( 74 );
-            res.push_back( TRANSFER_GAME );
+            res.push_back( startScreen::TRANSFER_GAME );
+            res.push_back( startScreen::MYSTERY_GIFT );
+        }
+#endif
+        return res;
+    }
+
+    std::vector<std::pair<IO::inputTarget, startScreen::choice>>
+        startScreen::drawMainChoice( const std::vector<choice>& p_choices, u8 p_slot ) {
+        std::vector<std::pair<IO::inputTarget, startScreen::choice>> res
+            = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
+        IO::initOAMTable( true );
+        IO::clearScreen( true, false, true );
+
+        // Sprites
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        u16 tileCnt =  0;
+
+        tileCnt = IO::loadSprite( SPR_LARGE_CHOICE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt,
+                0, 0, 16, 32, noselection_96_32_1Pal,
+                noselection_96_32_1Tiles, noselection_96_32_1TilesLen,
+                false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+        tileCnt
+            = IO::loadSprite( SPR_LARGE_CHOICE_OAM_SUB + 1, SPR_BOX_PAL_SUB, tileCnt,
+                    0, 0, 16, 32, noselection_96_32_2Pal,
+                    noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
+                    false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadSprite( SPR_SMALL_CHOICE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt,
+                0, 0, 32, 32, noselection_64_20Pal,
+                noselection_64_20Tiles, noselection_64_20TilesLen,
+                false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+
+        // Arrows
+        tileCnt = IO::loadSprite( SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4, 76, 16,
+                                  16, arrowPal, arrowTiles, arrowTilesLen, false, false, true,
+                                  OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_ARROW_RIGHT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
+                        oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, arrowPal,
+                        arrowTiles, arrowTilesLen, false, true, true, OBJPRIORITY_1, true,
+                        OBJMODE_NORMAL );
+
+        // page windows
+        tileCnt = IO::loadSprite( SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0 - 8, 57 - 12,
+                32, 64, noselection_32_64Pal, noselection_32_64Tiles,
+                noselection_32_64TilesLen, true, true, true, OBJPRIORITY_2,
+                true, OBJMODE_BLENDED );
+        IO::loadSprite( SPR_PAGE_RIGHT_OAM_SUB, SPR_BOX_PAL_SUB,
+                oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * 2, 32, 64,
+                noselection_32_64Pal, noselection_32_64Tiles, noselection_32_64TilesLen,
+                false, false, true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
+
+        // Pals
+        IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, true );
+        IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
+
+        if( _currentSlot != p_slot ) {
+            SAV.m_saveFile[ p_slot ].drawTrainersCard( false );
         }
 
-        u8 selectedIdx = 0;
-        drawMainChoice( p_lang, vis, 0 );
+        _currentSlot = p_slot;
+        if( SAV.m_saveFile[ p_slot ].m_gameType ) {
+            _currentLanguage = SAV.m_saveFile[ p_slot ].m_options.m_language;
+        } else {
+            _currentLanguage = translate( TWL_CONFIG ? *(u8*) 0x02000406 : PersonalData->language );
+        }
 
-        IO::fadeScreen( IO::UNFADE, true, true );
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
 
-        touchPosition touch;
-        consoleSelect( &IO::Bottom );
-        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-        loop( ) {
-            swiWaitForVBlank( );
-            scanKeys( );
-            touchRead( &touch );
-            u32 pressed = keysCurrent( );
-            if( GET_AND_WAIT( KEY_B ) ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
-                IO::clearScreenConsole( true, true );
-                IO::clearScreen( true );
-                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = IO::WHITE;
-                return ABORT;
-            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-                selectedIdx = ( selectedIdx + 1 ) % vis.size( );
-                drawMainChoice( p_lang, vis, selectedIdx );
-            } else if( GET_AND_WAIT( KEY_UP ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-                selectedIdx = ( selectedIdx + vis.size( ) - 1 ) % vis.size( );
-                drawMainChoice( p_lang, vis, selectedIdx );
-            } else if( GET_AND_WAIT( KEY_A ) ) {
-                SOUND::playSoundEffect( SFX_CHOOSE );
-                return res[ selectedIdx ];
-            }
-            /*
-            for( u8 i = 0; i < vis.size( ); ++i )
-                if( IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) {
-                    selectedIdx = i;
-                    drawMainChoice( p_lang, vis, selectedIdx, i );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::smallFont->setColor( 0, 0 );
+        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-                    loop( ) {
-                        swiWaitForVBlank( );
-                        scanKeys( );
-                        touchRead( &touch );
 
-                        if( TOUCH_UP ) {
-                            SOUND::playSoundEffect( SFX_CHOOSE );
-                            return res[ selectedIdx ];
-                        }
-                        if( !IN_RANGE_R( 4, 4 + 48 * i, 136, 26 + 48 * i ) ) break;
-                    }
-                    drawMainChoice( p_lang, vis, selectedIdx );
+        res.push_back( std::pair( IO::inputTarget( 0, 0, 0 ), IO::choiceBox::BACK_CHOICE ) );
+        if( p_slot > 0 ) {
+            // prev slot button
+            res.push_back( std::pair( IO::inputTarget( 1, oam[ SPR_PAGE_LEFT_OAM_SUB ].y + 8,
+                            24, oam[ SPR_PAGE_LEFT_OAM_SUB ].y + 48 ),
+                        IO::choiceBox::PREV_PAGE_CHOICE ) );
+
+            oam[ SPR_PAGE_LEFT_OAM_SUB ].isHidden = false;
+            oam[ SPR_ARROW_LEFT_OAM_SUB ].isHidden = false;
+        }
+        if( p_slot < MAX_SAVE_FILES - 1 ) {
+            // next slot button
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_PAGE_RIGHT_OAM_SUB ].x,
+                            oam[ SPR_PAGE_RIGHT_OAM_SUB ].y + 8,
+                            oam[ SPR_PAGE_RIGHT_OAM_SUB ].x + 23, oam[ SPR_PAGE_RIGHT_OAM_SUB
+                            ].y + 48 ), IO::choiceBox::NEXT_PAGE_CHOICE ) );
+
+            oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden = false;
+            oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = false;
+        }
+
+        u16 cury = 32;
+        u8 ln = 0;
+
+        for( auto c : p_choices ) {
+            if( c == CONTINUE ) {
+                IO::regularFont->printStringC( STRINGS[ getTextForMainChoice( c ) ]
+                        [ _currentLanguage ], 128, cury + 8, true, IO::font::CENTER );
+
+                res.push_back( std::pair( IO::inputTarget( 28, cury, 236, cury + 32 ), ln ) );
+                // load sprites
+
+                IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ), SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 48,
+                        cury, 16, 32, 0, 0, 0, false, false,
+                        false, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                for( u8 i = 1; i <= 8; ++i ) {
+                    IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + i, SPR_BOX_PAL_SUB,
+                            oam[ SPR_LARGE_CHOICE_OAM_SUB + 1 ].gfxIndex, 48 + 16 * i,
+                            cury, 16, 32, 0, 0, 0, false, false,
+                            false, OBJPRIORITY_3, true, OBJMODE_NORMAL );
                 }
-                */
-        }
-    }
+                IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + 9, SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 48 + 16 * 9,
+                        cury, 16, 32, 0, 0, 0, true, true,
+                        false, OBJPRIORITY_3, true, OBJMODE_NORMAL );
 
-    s8 startScreen::runSlotChoice( language p_lang, bool p_newGameMode ) {
-        u8 selectedIdx = 0;
-        drawSlotChoice( p_lang, 0 );
-        fillResume( );
+                cury += 34;
+            } else {
+                IO::regularFont->printStringC( STRINGS[ getTextForMainChoice( c ) ]
+                        [ _currentLanguage ], 128, cury + 2, true, IO::font::CENTER );
 
-        touchPosition touch;
-        consoleSelect( &IO::Bottom );
-        consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
-        loop( ) {
-            swiWaitForVBlank( );
-            scanKeys( );
-            touchRead( &touch );
-            u32 pressed = keysCurrent( );
-            if( GET_AND_WAIT( KEY_B ) ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
-                IO::clearScreenConsole( true, true );
-                IO::clearScreen( true );
-                for( u16 i = 1; i < 256; ++i ) BG_PALETTE_SUB[ i ] = IO::WHITE;
-                return -1;
-            } else if( GET_AND_WAIT( KEY_DOWN ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-                selectedIdx = ( selectedIdx + 1 ) % MAX_SAVE_FILES;
-                drawSlotChoice( p_lang, selectedIdx );
-            } else if( GET_AND_WAIT( KEY_UP ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-                selectedIdx = ( selectedIdx + MAX_SAVE_FILES - 1 ) % MAX_SAVE_FILES;
-                drawSlotChoice( p_lang, selectedIdx );
-            } else if( GET_AND_WAIT( KEY_A ) ) {
-                SOUND::playSoundEffect( SFX_CHOOSE );
-                if( SAV.m_saveFile[ selectedIdx ].m_gameType && p_newGameMode ) {
-                    IO::clearScreen( true, false, false );
-                    bool r = !IO::yesNoBox( p_lang ).getResult( STRINGS[ 79 ][ p_lang ] );
-                    IO::clearScreen( true, false, false );
-                    drawSlotChoice( p_lang, selectedIdx );
-                    fillResume( );
-                    if( r ) continue;
-                } else if( !SAV.m_saveFile[ selectedIdx ].m_gameType && !p_newGameMode )
-                    continue;
-                return selectedIdx;
-            }
-            /*
-            for( u8 i = 0; i < MAX_SAVE_FILES; ++i )
-                if( IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) {
-                    selectedIdx = i;
-                    drawSlotChoice( p_lang, selectedIdx, i );
-                    loop( ) {
-                        swiWaitForVBlank( );
-                        scanKeys( );
-                        touchRead( &touch );
-                        if( TOUCH_UP ) {
-                            SOUND::playSoundEffect( SFX_CHOOSE );
-                            return selectedIdx;
-                        }
-                        if( !IN_RANGE_R( 4, 4 + 64 * i, 86, 26 + 64 * i ) ) break;
-                    }
-                    drawSlotChoice( p_lang, selectedIdx );
+                res.push_back( std::pair( IO::inputTarget( 28, cury, 236, cury + 20 ), ln ) );
+
+                for( u8 i = 0; i <= 8; ++i ) {
+                    IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + i, SPR_BOX_PAL_SUB,
+                            oam[ SPR_SMALL_CHOICE_OAM_SUB ].gfxIndex, 48 + 14 * i,
+                            cury, 32, 32, 0, 0, 0, false, false,
+                            false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 }
-                */
+                IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + 9, SPR_BOX_PAL_SUB,
+                        oam[ SPR_SMALL_CHOICE_OAM_SUB ].gfxIndex, 48 + 16 * 8,
+                        cury - 12, 32, 32, 0, 0, 0, true, true,
+                        false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+                cury += 22;
+            }
+
+            ++ln;
         }
+
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->printString( std::to_string( p_slot + 1 ).c_str( ), 248, 3, false,
+                IO::font::RIGHT );
+
+        IO::updateOAM( true );
+        return res;
     }
 
-    gameType startScreen::runEpisodeChoice( language p_current ) {
-        IO::choiceBox cb
-            = IO::choiceBox( MAX_SPECIAL_EPISODES, EPISODE_NAMES[ p_current ], 0, true );
-        return ( gameType )( SPECIAL + cb.getResult( STRINGS[ 110 ][ p_current ], true, false ) );
-    }
+    std::vector<std::pair<IO::inputTarget, startScreen::choice>>
+        startScreen::drawEpisodeChoice( ) {
 
-    language startScreen::runLanguageChoice( language p_current ) {
-        IO::clearScreen( true, false, false );
-        while( IO::yesNoBox( p_current ).getResult( STRINGS[ 85 ][ p_current ] ) ) {
-            IO::clearScreen( true, false, false );
-            IO::choiceBox cb = IO::choiceBox( LANGUAGES, LANGUAGE_NAMES, 0, true );
-            p_current        = (language) cb.getResult( STRINGS[ 109 ][ p_current ], false, false );
-            IO::clearScreen( true, false, false );
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        IO::clearScreen( true, false, true );
+        std::vector<std::pair<IO::inputTarget, startScreen::choice>> res
+            = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
+
+        oam[ SPR_ARROW_LEFT_OAM_SUB ].isHidden = true;
+        oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = true;
+        oam[ SPR_PAGE_LEFT_OAM_SUB ].isHidden = true;
+        oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden = true;
+        for( u8 j = 0; j < 6; ++j ) {
+            for( u8 i = 0; i < 10; ++ i ) {
+                oam[ SPR_CHOICE_OAM_SUB( j ) + i ].isHidden = true;
+            }
         }
-        return p_current;
+
+
+        auto episodes = SAVE::SAV.getSpecialEpisodes( );
+        episodes.push_back( IO::choiceBox::BACK_CHOICE );
+
+        u16 cury = 32;
+        u8 ln = 0;
+        for( u8 c = 0; c < episodes.size( ); ++c ) {
+            res.push_back( std::pair( IO::inputTarget( 28, cury, 236, cury + 20 ), c ) );
+            if( episodes[ c ] != IO::choiceBox::BACK_CHOICE ) {
+                IO::regularFont->printStringC( EPISODE_NAMES[ episodes[ c ] ]
+                        [ _currentLanguage ], 128, cury + 2, true, IO::font::CENTER );
+            } else {
+                IO::regularFont->printStringC( STRINGS[ 330 ][ _currentLanguage ],
+                        128, cury + 2, true, IO::font::CENTER );
+                res.push_back( std::pair( IO::inputTarget( 0, 0, 0 ),
+                            IO::choiceBox::BACK_CHOICE ) );
+            }
+
+            for( u8 i = 0; i <= 8; ++i ) {
+                IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + i, SPR_BOX_PAL_SUB,
+                        oam[ SPR_SMALL_CHOICE_OAM_SUB ].gfxIndex, 48 + 14 * i,
+                        cury, 32, 32, 0, 0, 0, false, false,
+                        false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
+            IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + 9, SPR_BOX_PAL_SUB,
+                    oam[ SPR_SMALL_CHOICE_OAM_SUB ].gfxIndex, 48 + 16 * 8,
+                    cury - 12, 32, 32, 0, 0, 0, true, true,
+                    false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+                cury += 22;
+            ++ln;
+        }
+
+        IO::updateOAM( true );
+
+        return res;
     }
 
-    bool startScreen::initNewGame( u8 p_file, gameType p_type, language p_lang ) {
+    void startScreen::selectMainChoice( u8 p_selection ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        oam[ SPR_PAGE_LEFT_OAM_SUB ].palette = SPR_BOX_PAL_SUB;
+        oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_BOX_PAL_SUB;
+        for( u8 j = 0; j < 6; ++j ) {
+            for( u8 i = 0; i < 10; ++ i ) {
+                oam[ SPR_CHOICE_OAM_SUB( j ) + i ].palette = SPR_BOX_PAL_SUB;
+            }
+        }
+
+        if( p_selection < 6 ) {
+            for( u8 i = 0; i < 10; ++ i ) {
+                oam[ SPR_CHOICE_OAM_SUB( p_selection ) + i ].palette = SPR_SELECTED_PAL_SUB;
+            }
+        }
+        if( p_selection == IO::choiceBox::NEXT_PAGE_CHOICE ) {
+            oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_SELECTED_PAL_SUB;
+        }
+        if( p_selection == IO::choiceBox::PREV_PAGE_CHOICE ) {
+            oam[ SPR_PAGE_LEFT_OAM_SUB ].palette = SPR_SELECTED_PAL_SUB;
+        }
+        IO::updateOAM( true );
+    }
+
+    u8 startScreen::runEpisodeChoice( ) {
+        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+
+        auto res = cb.getResult( [&]( u8 ){ return drawEpisodeChoice( ); },
+                [&]( u8 p_choice ){ selectMainChoice( p_choice ); } );
+
+        auto eps = SAVE::SAV.getSpecialEpisodes( );
+
+        if( res == IO::choiceBox::BACK_CHOICE || res >= eps.size( ) ) {
+            return IO::choiceBox::BACK_CHOICE;
+        } else { return eps[ res ]; }
+    }
+
+    std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+        startScreen::printYNMessage( const char* p_message, u8 p_selection ) {
+
+        SpriteEntry* oam  = IO::Oam->oamBuffer;
+
+        if( p_message ) {
+            oam[ SPR_ARROW_LEFT_OAM_SUB ].isHidden = true;
+            oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = true;
+            oam[ SPR_PAGE_LEFT_OAM_SUB ].isHidden = true;
+            oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden = true;
+            for( u8 j = 0; j < 6; ++j ) {
+                for( u8 i = 0; i < 10; ++ i ) {
+                    oam[ SPR_CHOICE_OAM_SUB( j ) + i ].isHidden = true;
+                }
+            }
+
+            // message box
+            IO::loadSprite(
+                    SPR_MSG_BOX_OAM_SUB, SPR_BOX_PAL_SUB, oam[ SPR_LARGE_CHOICE_OAM_SUB
+                    ].gfxIndex, 29, 80 - 36, 16, 32, 0, 0, 0, false, false, true,
+                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            for( u8 j = 1; j < 12; j++ ) {
+                IO::loadSprite( SPR_MSG_BOX_OAM_SUB + j, SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB + 1 ].gfxIndex, 29 + j * 16, 80 - 36,
+                        16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
+                        OBJMODE_BLENDED );
+            }
+            IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 12, SPR_BOX_PAL_SUB,
+                    oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 20 + 12 * 16, 80 - 36, 16,
+                    32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+
+            // Choice boxes
+
+            for( u8 i = 0; i < 3; i++ ) {
+                u8 pos = 2 * i;
+
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 29, 80 + i * 36, 16,
+                        32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                        true, OBJMODE_BLENDED );
+                for( u8 j = 1; j < 5; j++ ) {
+                    IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
+                            oam[ SPR_LARGE_CHOICE_OAM_SUB + 1 ].gfxIndex, 29 + j * 16,
+                            80 + i * 36, 16, 32, 0, 0, 0, false, false,
+                            true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                }
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 29 + 5 * 16, 80 + i * 36,
+                        16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true,
+                        OBJMODE_BLENDED );
+            }
+
+
+            for( u8 i = 0; i < 3; i++ ) {
+                u8 pos = 2 * i + 1;
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 131, 80 + i * 36, 16, 32,
+                        0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                for( u8 j = 1; j < 5; j++ ) {
+                    IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
+                            oam[ SPR_LARGE_CHOICE_OAM_SUB + 1 ].gfxIndex, 131 + j * 16,
+                            80 + i * 36, 16, 32, 0, 0, 0, false, false,
+                            true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                }
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+                        oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 131 + 5 * 16,
+                        80 + i * 36, 16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true,
+                        OBJMODE_BLENDED );
+            }
+
+        }
+
+
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
+            = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        if( p_message ) {
+            for( u8 i = 0; i < 13; ++i ) { oam[ SPR_MSG_BOX_OAM_SUB + i ].isHidden = false; }
+
+            IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y,
+                    256 - oam[ SPR_MSG_BOX_OAM_SUB ].x,
+                    oam[ SPR_MSG_BOX_OAM_SUB ].y + 31, true, 0 );
+
+            auto lineCnt = IO::regularFont->printBreakingStringC(
+                    p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8, 196, true,
+                    IO::font::CENTER, 14, ' ', 0, false, false, -1 )
+                - 1;
+            IO::regularFont->printBreakingStringC( p_message, 128,
+                    oam[ SPR_MSG_BOX_OAM_SUB ].y + 8 - lineCnt * 7,
+                    196, true, IO::font::CENTER, 14 );
+        }
+
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_SELECTED_PAL_SUB :
+                    SPR_BOX_PAL_SUB;                }
+        }
+
+        if( p_message ) {
+            for( u8 i = 0; i < 2; i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                }
+            }
+
+            IO::printRectangle( oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 95,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 31, true, 0 );
+            IO::regularFont->printString(
+                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8, true, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 32 ),
+                           IO::yesNoBox::YES ) );
+
+            IO::printRectangle( oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 95,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 31, true, 0 );
+            IO::regularFont->printString(
+                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, true, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 32 ),
+                           IO::yesNoBox::NO ) );
+        }
+        IO::updateOAM( true );
+        return res;
+    }
+
+    language startScreen::runLanguageChoice( ) {
+        IO::initOAMTable( false );
+        IO::clearScreen( true, true, true );
+        IO::yesNoBox yn;
+        while( yn.getResult( [&]( ) { return printYNMessage( STRINGS[ 85 ][ _currentLanguage ],
+                        254 ); },
+                    [&]( IO::yesNoBox::selection p_sel ) {
+                    printYNMessage( 0, p_sel == IO::yesNoBox::NO );
+                    } ) == IO::yesNoBox::YES ) {
+            IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            _currentLanguage = (language) cb.getResult( [&]( u8 ) {
+                auto res = std::vector<std::pair<IO::inputTarget, u8>>( );
+                SpriteEntry* oam  = IO::Oam->oamBuffer;
+                IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y,
+                        256 - oam[ SPR_MSG_BOX_OAM_SUB ].x,
+                        oam[ SPR_MSG_BOX_OAM_SUB ].y + 31, true, 0 );
+
+                auto lineCnt = IO::regularFont->printBreakingStringC(
+                        STRINGS[ 109 ][ _currentLanguage ], 128, oam[ SPR_MSG_BOX_OAM_SUB
+                        ].y + 8, 196, true,
+                        IO::font::CENTER, 14, ' ', 0, false, false, -1 )
+                - 1;
+                IO::regularFont->printBreakingStringC( STRINGS[ 109 ][ _currentLanguage ], 128,
+                        oam[ SPR_MSG_BOX_OAM_SUB ].y + 8 - lineCnt * 7,
+                        196, true, IO::font::CENTER, 14 );
+
+                for( u8 i = 0; i < LANGUAGES; ++i ) {
+                    for( u8 j = 0; j < 6; j++ ) {
+                        oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                    }
+                    IO::printRectangle( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 95,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 31, true, 0 );
+                    IO::regularFont->printString(
+                            LANGUAGE_NAMES[ i ], oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
+
+                    res.push_back(
+                            std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ), i ) );
+
+                }
+                IO::updateOAM( true );
+                return res;
+            }, [&]( u8 p_selection ) {
+                SpriteEntry* oam  = IO::Oam->oamBuffer;
+                for( u8 i = 0; i < 6; ++i ) {
+                    for( u8 j = 0; j < 6; j++ ) {
+                        oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette = SPR_BOX_PAL_SUB;
+                    }
+                }
+
+                if( p_selection < 6 ) {
+                    for( u8 j = 0; j < 6; j++ ) {
+                        oam[ SPR_CHOICE_START_OAM_SUB( p_selection ) + j ].palette
+                            = SPR_SELECTED_PAL_SUB;
+                    }
+                }
+                IO::updateOAM( true );
+            }, _currentLanguage );
+            IO::clearScreen( true, false, true );
+        }
+        return _currentLanguage;
+    }
+
+    void cleanUp( ) {
+        IO::initOAMTable( true );
+        IO::initOAMTable( false );
+        IO::clearScreen( true, true, true );
+    }
+
+    bool startScreen::initNewGame( gameType p_type, language p_lang, u8 p_episode ) {
         // Check if this is the first save file
         bool hasSave = false;
 
@@ -440,79 +704,80 @@ namespace SAVE {
 
         if( !hasSave ) { SAV.clear( ); }
 
-        SAV.m_activeFile = p_file;
+        if( SAV.m_saveFile[ _currentSlot ].m_gameType != UNUSED ) {
+            // Ask the player if they want to override their save
 
+            IO::yesNoBox yn;
+            if( yn.getResult( [&]( ) { return printYNMessage( STRINGS[ 79 ][ _currentLanguage ],
+                            254 ); },
+                        [&]( IO::yesNoBox::selection p_sel ) {
+                        printYNMessage( 0, p_sel == IO::yesNoBox::NO );
+                        } ) == IO::yesNoBox::NO ) {
+
+                _currentSlot = 255;
+                return false;
+            }
+        }
+
+        cleanUp( );
+        SAV.m_activeFile = _currentSlot;
         SAV.getActiveFile( ).initialize( );
-        SAV.getActiveFile( ).m_curBox             = 0;
-        SAV.getActiveFile( ).m_options.m_language = p_lang;
-
-        SAV.getActiveFile( ).m_money = 3000;
-        SAV.getActiveFile( ).m_id    = rand( ) % 65536;
-        SAV.getActiveFile( ).m_sid   = rand( ) % 65536;
-
+        SAV.getActiveFile( ).m_options.m_language = _currentLanguage;
         SAV.getActiveFile( ).m_gameType        = p_type;
         SAV.getActiveFile( ).m_options.m_bgIdx = START_BG;
 
-        SAV.getActiveFile( ).m_playtime     = 0;
-        SAV.getActiveFile( ).m_HOENN_Badges = 0;
-        SAV.getActiveFile( ).m_KANTO_Badges = 0;
-        SAV.getActiveFile( ).m_JOHTO_Badges = 0;
-        SAV.getActiveFile( ).m_lstBag       = 0;
-        SAV.getActiveFile( ).m_lstBagItem   = 0;
-
-        return initSpecialEpisode( SAV.getActiveFile( ).m_gameType - (s8) SPECIAL );
+        if( p_type == SPECIAL ) {
+            return initSpecialEpisode( p_episode );
+        }
+        return true;
     }
 
     void startScreen::run( ) {
         // Check if a valid save is present and use its language.
         // If none is present, use the DS's language.
-        language cur;
-        if( SAV.getActiveFile( ).m_gameType )
-            cur = SAV.getActiveFile( ).m_options.m_language;
-        else
-            cur = translate( TWL_CONFIG ? *(u8*) 0x02000406 : PersonalData->language );
+        if( SAV.getActiveFile( ).m_gameType ) {
+            _currentLanguage = SAV.getActiveFile( ).m_options.m_language;
+            _currentSlot = SAV.m_activeFile;
+        } else {
+            _currentLanguage = translate( TWL_CONFIG ? *(u8*) 0x02000406 : PersonalData->language );
+            _currentSlot = 0;
+        }
 
         loop( ) {
-            drawSplash( cur );
-
-            choiceType res = runMainChoice( cur );
-
-            if( res == ABORT ) continue;
-
             IO::clearScreen( true, false, false );
-            s8 slot;
+            drawSplash( );
+            _currentSlot = 255;
 
-            if( res == SPECIAL_EPISODE ) {
-                gameType ep = runEpisodeChoice( cur );
-                IO::initOAMTable( true );
+            loop( ) {
+                IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+                auto res = cb.getResult( [&]( u8 p_slot ){ return drawMainChoice(
+                            getMainChoicesForSlot( p_slot ), p_slot ); },
+                        [&]( u8 p_choice ){ selectMainChoice( p_choice ); },
+                        0, IO::choiceBox::DEFAULT_TICK, _currentSlot == 255 ?
+                        SAVE::SAV.m_activeFile : _currentSlot );
 
-                if( ep < SPECIAL ) continue;
-                IO::clearScreen( true, false, false );
-                slot = runSlotChoice( cur, res != CONTINUE );
-
-                if( slot == (s8) -1 ) continue;
-
-                IO::clearScreen( true, false, false );
-                if( !initNewGame( slot, ep, runLanguageChoice( cur ) ) ) continue;
-                return;
-            }
-
-            slot = runSlotChoice( cur, res != CONTINUE );
-
-            if( slot == (s8) -1 ) continue;
-
-            switch( res ) {
-            case CONTINUE:
-                SAV.m_activeFile = slot;
-                return;
-            case NEW_GAME:
-                if( !initNewGame( slot, NORMAL, runLanguageChoice( cur ) ) ) continue;
-                return;
-            case TRANSFER_GAME:
-                if( !transferGame( slot ) ) continue;
-                return;
-            default:
-                continue;
+                if( res == IO::choiceBox::BACK_CHOICE ) { break; }
+                res = getMainChoicesForSlot( _currentSlot )[ res ];
+                switch( res ) {
+                    case CONTINUE:
+                        SAV.m_activeFile = _currentSlot;
+                        cleanUp( );
+                        return;
+                    case NEW_GAME:
+                        if( !initNewGame( NORMAL, runLanguageChoice( ) ) ) break;
+                        return;
+                    case TRANSFER_GAME:
+                        if( !transferGame( ) ) break;
+                        return;
+                    case SPECIAL_EPISODE: {
+                        u8 ep = runEpisodeChoice( );
+                        if( ep == IO::choiceBox::BACK_CHOICE
+                                || !initNewGame( SPECIAL, runLanguageChoice( ), ep ) ) break;
+                        return;
+                    }
+                    default:
+                        continue;
+                }
             }
         }
     }

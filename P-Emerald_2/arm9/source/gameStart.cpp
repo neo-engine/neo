@@ -38,8 +38,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "itemNames.h"
 
 namespace SAVE {
-    const u16 EP_INTRO_TEXT_START[] = {111};
-    const u8  EP_INTRO_TEXT_LEN[]   = {3};
+    constexpr u16 EP_INTRO_TEXT_START[] = {111};
+    constexpr u8  EP_INTRO_TEXT_LEN[]   = {3};
 
     void printTextAndWait( const char* p_text ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK );
@@ -62,8 +62,8 @@ namespace SAVE {
 
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START ) ||
-                ( IO::inputTarget( 0, 0, 256, 192 ).inRange( touch )
-                  && IO::waitForInput( IO::inputTarget( 0, 0, 256, 192 ) ) ) ) {
+                ( IO::inputTarget( 1, 1, 256, 192 ).inRange( touch )
+                  && IO::waitForInput( IO::inputTarget( 1, 1, 256, 192 ) ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 break;
             }
@@ -92,7 +92,7 @@ namespace SAVE {
             SAV.getActiveFile( ).m_player
                 = {MAP::mapObject::PLYR, {299, 53, 4}, 0, MAP::moveMode::WALK, 0, 0,
                    MAP::direction::RIGHT};
-            SAV.getActiveFile( ).m_isMale = rand( ) % 2;
+            SAV.getActiveFile( ).m_appearance = rand( ) % 2;
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
             SAV.getActiveFile( ).m_currentMap     = 10;
             SAV.getActiveFile( ).m_registeredItem = I_BIKE;
@@ -103,7 +103,8 @@ namespace SAVE {
         }
     }
 
-    bool startScreen::transferGame( u8 p_slot ) {
+    bool startScreen::transferGame( ) {
+        /*
         IO::clearScreen( true, false, false );
         char acSlot2Game[ 5 ] = {0};
 
@@ -264,6 +265,7 @@ namespace SAVE {
         SAV.getActiveFile( ).m_isMale     = true;
         SAV.getActiveFile( ).m_currentMap = 10;
 
-        return true;
+*/
+        return false;
     }
 } // namespace SAVE

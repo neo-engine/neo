@@ -1,29 +1,29 @@
 /*
-    Pokémon neo
-    ------------------------------
+   Pokémon neo
+   ------------------------------
 
-    file        : battleField.h
-    author      : Philip Wellnitz
-    description : Header file. Consult the corresponding source file for details.
+file        : battleField.h
+author      : Philip Wellnitz
+description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2020
-    Philip Wellnitz
+Copyright (C) 2012 - 2020
+Philip Wellnitz
 
-    This file is part of Pokémon neo.
+This file is part of Pokémon neo.
 
-    Pokémon neo is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon neo is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon neo is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon neo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 #include <cstring>
@@ -488,12 +488,12 @@ namespace BATTLE {
          */
         constexpr u16 getStat( bool p_opponent, u8 p_slot, u8 p_stat, bool p_allowAbilities = true,
                                bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
-            if( getPkmn( p_opponent, p_slot ) == nullptr )
-                [[unlikely]] { return 0; }
+            if( getPkmn( p_opponent, p_slot ) == nullptr ) [[unlikely]] {
+                    return 0;
+                }
 
-                bool allowAbilities
-                    = p_allowAbilities && !suppressesAbilities( );
-            bool allowWeather = suppressesWeather( );
+            bool allowAbilities = p_allowAbilities && !suppressesAbilities( );
+            bool allowWeather   = suppressesWeather( );
 
             u16 base = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getStat(
                 p_slot, p_stat, allowAbilities, p_ignoreNegative, p_ignorePositive );
@@ -608,32 +608,38 @@ namespace BATTLE {
          */
         inline bool canSwitchOut( bool p_opponent, u8 p_slot ) {
             if( !_sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canSwitchOut( p_slot ) )
-                [[unlikely]] { return false; }
+                [[unlikely]] {
+                    return false;
+                }
 
-                if( !suppressesAbilities( ) )[ [likely] ] {
+            if( !suppressesAbilities( ) ) [[likely]] {
                     auto p1 = getPkmn( !p_opponent, 0 );
                     auto p2 = getPkmn( !p_opponent, 1 );
                     // Shadow tag
-                    if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG )
-                        [[likely]] {
+                    if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG ) [[likely]] {
                             if( ( p1 != nullptr && p1->getAbility( ) == A_SHADOW_TAG )
                                 || ( p2 != nullptr && p2->getAbility( ) == A_SHADOW_TAG ) )
-                                [[unlikely]] { return false; }
+                                [[unlikely]] {
+                                    return false;
+                                }
                         }
 
-                        // Arena trap
-                        if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
-                            || ( p2 != nullptr
-                                 && p2->getAbility( ) == A_ARENA_TRAP ) )[ [unlikely] ] {
-                            if( isGrounded( p_opponent, p_slot ) ) [[likely]] { return false; }
+                    // Arena trap
+                    if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
+                        || ( p2 != nullptr && p2->getAbility( ) == A_ARENA_TRAP ) )
+                        [[unlikely]] {
+                            if( isGrounded( p_opponent, p_slot ) ) [[likely]] {
+                                    return false;
+                                }
                         }
 
                     // Magnet pull
                     if( ( p1 != nullptr && p1->getAbility( ) == A_MAGNET_PULL )
                         || ( p2 != nullptr && p2->getAbility( ) == A_MAGNET_PULL ) )
                         [[unlikely]] {
-                            if( hasType( p_opponent, p_slot, STEEL ) )
-                                [[unlikely]] { return false; }
+                            if( hasType( p_opponent, p_slot, STEEL ) ) [[unlikely]] {
+                                    return false;
+                                }
                         }
                 }
 
@@ -647,11 +653,11 @@ namespace BATTLE {
                               u8 p_targetSlot ) {
             auto tg = getPkmn( p_targetOpp, p_targetSlot );
             auto sc = getPkmn( p_sourceOpp, p_sorceSlot );
-            if( tg == nullptr || sc == nullptr )
-                [[unlikely]] { return; }
+            if( tg == nullptr || sc == nullptr ) [[unlikely]] {
+                    return;
+                }
 
-                u16 item
-                    = sc->getItem( );
+            u16 item = sc->getItem( );
             removeItem( p_ui, p_sourceOpp, p_sorceSlot, false );
             char buffer[ 100 ];
 
@@ -761,14 +767,15 @@ namespace BATTLE {
 
             // Check for symbiosis
             auto p2 = getPkmn( p_opponent, !p_slot );
-            if( p2 == nullptr )
-                [[likely]] { return; }
-
-                if( !suppressesAbilities( ) && p_used && p2->getAbility( ) == A_SYMBIOSIS
-                    && p2->getItem( ) ) {
-                    p_ui->logAbility( p2, p_opponent );
-                    moveItem( p_ui, p_opponent, !p_slot, p_opponent, p_slot );
+            if( p2 == nullptr ) [[likely]] {
+                    return;
                 }
+
+            if( !suppressesAbilities( ) && p_used && p2->getAbility( ) == A_SYMBIOSIS
+                && p2->getItem( ) ) {
+                p_ui->logAbility( p2, p_opponent );
+                moveItem( p_ui, p_opponent, !p_slot, p_opponent, p_slot );
+            }
         }
 
         /*
@@ -801,12 +808,11 @@ namespace BATTLE {
             bool ab  = p_allowAbilities && suppressesAbilities( );
             bool grn = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].isGrounded( p_slot, ab );
 
-            if( _pseudoWeatherTimer[ 4 ] )
-                [[unlikely]] { // gravity
+            if( _pseudoWeatherTimer[ 4 ] ) [[unlikely]] { // gravity
                     grn = false;
                 }
 
-                return grn;
+            return grn;
         }
     };
 } // namespace BATTLE

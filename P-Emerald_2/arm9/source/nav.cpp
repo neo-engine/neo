@@ -386,6 +386,19 @@ namespace NAV {
                         IO::updateOAM( true );
                     }
                 } else {*/
+
+        if( pressed & KEY_SELECT ) {
+            IO::yesNoBox Save( GET_STRING( 91 ) );
+            if( Save.getResult( GET_STRING( 92 ) ) ) {
+                draw( );
+                if( FS::writeSave( p_path ) )
+                    IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
+                else
+                    IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
+            }
+            draw( true );
+        }
+
         // StartBag
         if( ( pressed & KEY_X ) /*||
                     GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) */) {
@@ -418,7 +431,7 @@ namespace NAV {
                 updateItems( );
                 draw( true );
             }
-        } else if( ( pressed & KEY_Y )
+        } else if( ( pressed & KEY_START )
                    && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
                    /* && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) */ ) {
             ANIMATE_MAP = false;

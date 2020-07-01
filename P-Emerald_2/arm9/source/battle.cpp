@@ -45,7 +45,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound.h"
 
 namespace BATTLE {
-    std::string trainerClassNames[ 120 ] = {"Pokémon-Trainer"};
+    std::string trainerClassNames[ 120 ] = { "Pokémon-Trainer" };
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId, u8 p_platform,
                     u8 p_platform2, u8 p_background, battlePolicy p_policy ) {
@@ -98,7 +98,7 @@ namespace BATTLE {
         _round = 0;
         // Main battle loop
         while( !_maxRounds || ++_round < _maxRounds ) {
-            battleMoveSelection moves[ 2 ][ 2 ] = {{}}; // fieldPosition -> selected move
+            battleMoveSelection moves[ 2 ][ 2 ] = { {} }; // fieldPosition -> selected move
 
             // Compute player's moves
             bool playerWillRun   = false;
@@ -180,7 +180,9 @@ namespace BATTLE {
                     for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
                     endBattle( battleEnd = BATTLE_RUN );
                     return battleEnd;
-                } else if( playerWillRun )[ [unlikely] ] {
+                }
+            else if( playerWillRun )
+                [[unlikely]] {
                     _battleUI.log( std::string( GET_STRING( 164 ) ) );
                     for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
                 }
@@ -201,10 +203,13 @@ namespace BATTLE {
                                      [ moves[ i ][ j ].m_target.second ]
                                          .m_type
                                 == SWITCH )
-                                [[unlikely]] { moves[ i ][ j ].m_type = SWITCH_PURSUIT; }
-                        } if( moves[ i ][ j ].m_type == NO_OP_NO_CANCEL ) {
-                            moves[ i ][ j ].m_type = NO_OP;
+                                [[unlikely]] {
+                                    moves[ i ][ j ].m_type = SWITCH_PURSUIT;
+                                }
                         }
+                    if( moves[ i ][ j ].m_type == NO_OP_NO_CANCEL ) {
+                        moves[ i ][ j ].m_type = NO_OP;
+                    }
                     selection.push_back( moves[ i ][ j ] );
                 }
 #ifdef DESQUID
@@ -252,8 +257,7 @@ namespace BATTLE {
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
                 for( u8 j = 0; j < 30; ++j ) { swiWaitForVBlank( ); }
-                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_ITEM )
-                    [[unlikely]] {
+                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_ITEM ) [[unlikely]] {
                         auto itmnm = ITEM::getItemName( sortedMoves[ i ].m_param );
                         snprintf(
                             buffer, 99, GET_STRING( 169 ), itmnm.c_str( ),
@@ -266,7 +270,7 @@ namespace BATTLE {
                         _battleUI.log( std::string( buffer ) );
                     }
 
-                    if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE )[ [unlikely] ] {
+                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE ) [[unlikely]] {
                         switch( sortedMoves[ i ].m_param ) {
                         case M_SHELL_TRAP:
                             snprintf(
@@ -303,8 +307,7 @@ namespace BATTLE {
                         }
                     }
 
-                if( sortedMoves[ i ].m_type == battleMoveType::ATTACK )
-                    [[likely]] {
+                if( sortedMoves[ i ].m_type == battleMoveType::ATTACK ) [[likely]] {
                         std::vector<battleMove> targets    = std::vector<battleMove>( );
                         std::vector<battleMove> targetedBy = std::vector<battleMove>( );
 
@@ -321,9 +324,9 @@ namespace BATTLE {
                         checkAndRefillBattleSpots( slot::status::RECALLED );
                     }
 
-                    if( sortedMoves[ i ].m_type == battleMoveType::SWITCH ) {
-                        switchPokemon( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
-                    }
+                if( sortedMoves[ i ].m_type == battleMoveType::SWITCH ) {
+                    switchPokemon( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
+                }
 
                 if( sortedMoves[ i ].m_type == battleMoveType::USE_ITEM ) {
                     useItem( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
@@ -392,15 +395,15 @@ namespace BATTLE {
             case MOVE::ALL_FOES_AND_ALLY:
             case MOVE::ALL_FOES:
             case MOVE::RANDOM:
-                res.m_target = {true, 0};
+                res.m_target = { true, 0 };
                 return res;
             case MOVE::SELF:
             case MOVE::ALLY_OR_SELF:
             case MOVE::ALL_ALLIES:
-                res.m_target = {false, 0};
+                res.m_target = { false, 0 };
                 return res;
             default:
-                res.m_target = {255, 255};
+                res.m_target = { 255, 255 };
                 return res;
             }
         }
@@ -413,7 +416,7 @@ namespace BATTLE {
 
     battleMoveSelection battle::chooseAttack( u8 p_slot, bool p_allowMegaEvolution ) {
         battleMoveSelection res = NO_OP_SELECTION;
-        res.m_user              = {field::PLAYER_SIDE, p_slot};
+        res.m_user              = { field::PLAYER_SIDE, p_slot };
         res.m_type              = ATTACK;
 
         bool mega = _field.canMegaEvolve( false, p_slot ) && p_allowMegaEvolution;
@@ -539,7 +542,7 @@ namespace BATTLE {
 
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
         battleMoveSelection res = NO_OP_SELECTION;
-        res.m_user              = {field::PLAYER_SIDE, p_slot};
+        res.m_user              = { field::PLAYER_SIDE, p_slot };
 
         if( !_field.canSelectMove( false, p_slot ) ) {
             // pkmn is hibernating / charging
@@ -708,7 +711,7 @@ namespace BATTLE {
 
     battleMoveSelection battle::getAIMove( u8 p_slot ) {
         battleMoveSelection res = NO_OP_SELECTION;
-        res.m_user              = {true, p_slot};
+        res.m_user              = { true, p_slot };
         switch( _policy.m_aiLevel ) {
         default:
             [[likely]] case 0 : { // Wild pkmn
@@ -949,11 +952,13 @@ namespace BATTLE {
 
         // Check whether the pkmn fits in the team
         auto pkmn = _field.getPkmn( true, 0 );
-        if( pkmn == nullptr ) [[unlikely]] { return; } else if( _playerTeamSize < 6 ) {
-                std::memcpy( &_playerTeam[ _playerTeamSize ], pkmn, sizeof( pokemon ) );
-                _playerTeamSize++;
+        if( pkmn == nullptr ) [[unlikely]] {
+                return;
             }
-        else {
+        else if( _playerTeamSize < 6 ) {
+            std::memcpy( &_playerTeam[ _playerTeamSize ], pkmn, sizeof( pokemon ) );
+            _playerTeamSize++;
+        } else {
             u8 oldbx = SAVE::SAV.getActiveFile( ).m_curBox;
             u8 nb    = SAVE::SAV.getActiveFile( ).storePkmn( *pkmn );
             if( nb != u8( -1 ) ) {
@@ -990,7 +995,7 @@ namespace BATTLE {
                     if( i && !_isWildBattle ) {
                         // AI chooses a next pkmn
                         auto nxt = getNextAIPokemon( );
-                        if( nxt != 255 ) { switchPokemon( {i, j}, nxt ); }
+                        if( nxt != 255 ) { switchPokemon( { i, j }, nxt ); }
                     } else if( !i ) {
                         // Check if the player has something to send out
                         bool good = false;
@@ -1007,14 +1012,13 @@ namespace BATTLE {
 
                         auto res = pt.run( j );
 
-                        if( res.getSelectedPkmn( ) == 255 )
-                            [[unlikely]] {
+                        if( res.getSelectedPkmn( ) == 255 ) [[unlikely]] {
 #ifdef DESQUID
                                 _battleUI.log( "Oh well, time to desquid..." );
 #endif
                             }
 
-                            _battleUI.init( );
+                        _battleUI.init( );
 
                         for( u8 i2 = 0; i2 < 2; ++i2 )
                             for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
@@ -1022,7 +1026,7 @@ namespace BATTLE {
                                 _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
                             }
 
-                        switchPokemon( {i, j}, res.getSelectedPkmn( ) );
+                        switchPokemon( { i, j }, res.getSelectedPkmn( ) );
                     }
                 }
             }

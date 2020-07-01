@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "font.h"
 #include "nav.h"
 #include "sprite.h"
+#include "saveGame.h"
 
 namespace IO {
 
@@ -146,10 +147,13 @@ namespace IO {
         }
         inputTarget( u16 p_targetX1, u16 p_targetY1, u16 p_targetR )
             : m_inputType( TOUCH_CIRCLE ), m_targetX1( p_targetX1 ), m_targetY1( p_targetY1 ),
-              m_targetR( p_targetR ) {
+              m_targetX2( 0 ), m_targetY2( 0 ), m_targetR( p_targetR ) {
         }
 
         constexpr bool inRange( touchPosition& p_touch ) const {
+            if( !m_targetX1 && !m_targetY1 && !m_targetR
+                    && !m_targetX2 && !m_targetY2 ) { return false; }
+
             if( m_inputType == TOUCH ) {
                 return p_touch.px >= m_targetX1 && p_touch.py >= m_targetY1
                     && p_touch.px <= m_targetX2 && p_touch.py <= m_targetY2;
@@ -162,7 +166,7 @@ namespace IO {
         }
     };
 
-    bool waitForTouchUp( u16 p_targetX1 = 0, u16 p_targetY1 = 0, u16 p_targetX2 = 300,
+    bool waitForTouchUp( u16 p_targetX1 = 1, u16 p_targetY1 = 1, u16 p_targetX2 = 300,
                          u16 p_targetY2 = 300 );
     bool waitForTouchUp( inputTarget p_inputTarget );
 
@@ -192,6 +196,8 @@ namespace IO {
 
     std::string formatDate( u8 p_date[ 3 ] );
     std::string formatDate( u8 p_date[ 3 ], u8 p_language );
+    std::string formatDate( SAVE::date p_date );
+    std::string formatDate( SAVE::date p_date, u8 p_language );
 
     constexpr u16 getColor( type p_type ) {
         switch( p_type ) {

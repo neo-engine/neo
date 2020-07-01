@@ -40,12 +40,12 @@ boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_nam
     : boxPokemon::boxPokemon(
           nullptr, p_pkmnId, p_name, p_level, SAVE::SAV.getActiveFile( ).m_id,
           SAVE::SAV.getActiveFile( ).m_sid, SAVE::SAV.getActiveFile( ).m_playername,
-          !SAVE::SAV.getActiveFile( ).m_isMale, p_shiny, p_hiddenAbility, p_fatefulEncounter,
+          p_shiny, p_hiddenAbility, p_fatefulEncounter,
           p_isEgg, MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) {
 }
 
 boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id,
-                        u16 p_sid, const char* p_oT, bool p_oTFemale, u8 p_shiny,
+                        u16 p_sid, const char* p_oT, u8 p_shiny,
                         bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace,
                         u8 p_ball, u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
     pkmnData data;
@@ -95,16 +95,16 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
 
     if( p_isEgg ) {
         m_steps          = data.m_eggCycles;
-        m_gotDate[ 0 ]   = acday;
-        m_gotDate[ 1 ]   = acmonth;
-        m_gotDate[ 2 ]   = acyear % 100;
+        m_gotDate[ 0 ]   = SAVE::CURRENT_DATE.m_day;
+        m_gotDate[ 1 ]   = SAVE::CURRENT_DATE.m_month;
+        m_gotDate[ 2 ]   = SAVE::CURRENT_DATE.m_year % 100;
         m_gotPlace       = p_gotPlace;
         m_hatchDate[ 0 ] = m_hatchDate[ 1 ] = m_hatchDate[ 2 ] = m_hatchPlace = 0;
     } else {
         m_steps          = data.m_baseFriend;
-        m_hatchDate[ 0 ] = acday;
-        m_hatchDate[ 1 ] = acmonth;
-        m_hatchDate[ 2 ] = acyear % 100;
+        m_hatchDate[ 0 ] = SAVE::CURRENT_DATE.m_day;
+        m_hatchDate[ 1 ] = SAVE::CURRENT_DATE.m_month;
+        m_hatchDate[ 2 ] = SAVE::CURRENT_DATE.m_year % 100;
         m_hatchPlace     = p_gotPlace;
     }
     m_origLang = 5;
@@ -136,10 +136,14 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_pokerus    = p_pokerus;
     m_ball       = p_ball;
     m_gotLevel   = p_level;
-    m_oTisFemale = p_oTFemale;
 
     m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
     setSpecies( p_pkmnId, &data );
+}
+
+bool boxPokemon::isFullyEvolved( ) const {
+    auto edata = getPkmnEvolveData( getSpecies( ), getForme( ) );
+    return !!edata.m_evolutionCount;
 }
 
 bool boxPokemon::isForeign( ) const {
@@ -260,9 +264,9 @@ bool boxPokemon::swapAbilities( ) {
 void boxPokemon::hatch( ) {
     setIsEgg( false );
     m_hatchPlace     = MAP::curMap->getCurrentLocationId( );
-    m_hatchDate[ 0 ] = acday;
-    m_hatchDate[ 1 ] = acmonth + 1;
-    m_hatchDate[ 2 ] = ( acyear + 1900 ) % 100;
+    m_hatchDate[ 0 ] = SAVE::CURRENT_DATE.m_day;
+    m_hatchDate[ 1 ] = SAVE::CURRENT_DATE.m_month;
+    m_hatchDate[ 2 ] = SAVE::CURRENT_DATE.m_year % 100;
 }
 
 bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_message,

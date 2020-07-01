@@ -411,6 +411,15 @@ namespace IO {
         }
     }
 
+    std::string formatDate( SAVE::date p_date, u8 p_language ) {
+        u8 tmp[ 3 ] = { p_date.m_day, p_date.m_month, p_date.m_year };
+        return formatDate( tmp, p_language );
+    }
+
+    std::string formatDate( SAVE::date p_date ) {
+        return formatDate( p_date, CURRENT_LANGUAGE );
+    }
+
     std::string formatDate( u8 p_date[ 3 ], u8 p_language ) {
         char buffer[ 20 ];
         switch( p_language ) {
@@ -418,7 +427,7 @@ namespace IO {
         case 0: // EN
             // I know that this will "break" in 2100.
             snprintf( buffer, 19, "%s %hhu, 20%02hhu", MONTHS[ p_date[ 1 ] ][ p_language ],
-                      p_date[ 0 ] + 1, p_date[ 2 ] );
+                      p_date[ 0 ] + 1, p_date[ 2 ] % 100 );
             break;
         case 1: // DE
             snprintf( buffer, 19, "%hhu. %s 20%02hhu", p_date[ 0 ] + 1,

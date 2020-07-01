@@ -85,6 +85,50 @@ namespace ITEM {
     }
 
     /*
+     * @brief: Returns the number of the berry. Returns 0 for everything that is not a
+     * berry.
+     */
+    constexpr u8 itemToBerry( u16 p_itemIdx ) {
+        if( p_itemIdx >= I_CHERI_BERRY && p_itemIdx <= I_CHILAN_BERRY ) {
+            return p_itemIdx - I_CHERI_BERRY + 1;
+        }
+        if( p_itemIdx == I_ROSELI_BERRY ) { return 53; }
+        if( p_itemIdx >= I_LIECHI_BERRY && p_itemIdx <= I_ROWAP_BERRY ) {
+            return 54 + p_itemIdx - I_LIECHI_BERRY;
+        }
+        if( p_itemIdx >= I_KEE_BERRY && p_itemIdx <= I_MARANGA_BERRY ) {
+            return 66 + p_itemIdx - I_KEE_BERRY;
+        }
+        if( p_itemIdx == I_NION_BERRY ) { return 68; }
+        if( p_itemIdx >= I_PUMKIN_BERRY && p_itemIdx <= I_EGGANT_BERRY ) {
+            return 69 + p_itemIdx - I_PUMKIN_BERRY;
+        }
+        return 0;
+    }
+
+    /*
+     * @brief: Returns the item idx for the specified berry
+     */
+    constexpr u16 berryToItem( u8 p_berry ) {
+        if( p_berry >= itemToBerry( I_CHERI_BERRY ) && p_berry <= itemToBerry( I_CHILAN_BERRY ) ) {
+            return p_berry - itemToBerry( I_CHERI_BERRY ) + I_CHERI_BERRY;
+        }
+        if( p_berry == itemToBerry( I_ROSELI_BERRY ) ) { return I_ROSELI_BERRY; }
+        if( p_berry >= itemToBerry( I_LIECHI_BERRY ) && p_berry <= itemToBerry( I_ROWAP_BERRY ) ) {
+            return p_berry - itemToBerry( I_LIECHI_BERRY ) + I_LIECHI_BERRY;
+        }
+        if( p_berry >= itemToBerry( I_KEE_BERRY ) && p_berry <= itemToBerry( I_MARANGA_BERRY ) ) {
+            return p_berry - itemToBerry( I_KEE_BERRY ) + I_KEE_BERRY;
+        }
+        if( p_berry == itemToBerry( I_NION_BERRY ) ) { return I_NION_BERRY; }
+        if( p_berry >= itemToBerry( I_PUMKIN_BERRY ) && p_berry <= itemToBerry( I_EGGANT_BERRY ) ) {
+            return p_berry - itemToBerry( I_PUMKIN_BERRY ) + I_PUMKIN_BERRY;
+        }
+
+        return 0;
+    }
+
+    /*
      * @brief Converts an item idx to an idx for a pokemon
      */
     constexpr u8 itemToBall( u16 p_itemIdx ) {

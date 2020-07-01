@@ -28,24 +28,74 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <vector>
 #include "saveGame.h"
+#include "uio.h"
+#include "yesNoBox.h"
 
 namespace SAVE {
     class startScreen {
+      public:
+        typedef u8 choice;
       private:
-        enum choiceType { CONTINUE, NEW_GAME, SPECIAL_EPISODE, TRANSFER_GAME, ABORT };
+        u8 _currentSlot = 0;
+        language _currentLanguage;
 
-        void drawMainChoice( language p_lang, std::vector<u8> p_toDraw, s8 p_selected = -1,
-                             s8 p_pressed = -1 );
-        void drawSlotChoice( language p_current, s8 p_selected, s8 p_pressed = -1 );
+        static constexpr choice CONTINUE = 0;
+        static constexpr choice NEW_GAME = 1;
+        static constexpr choice SPECIAL_EPISODE = 2;
+        static constexpr choice TRANSFER_GAME = 3;
+        static constexpr choice MYSTERY_GIFT = 4;
 
-        choiceType runMainChoice( language p_lang );
-        s8         runSlotChoice( language p_lang, bool p_newGameMode = false );
-        gameType   runEpisodeChoice( language p_current );
+        constexpr u16 getTextForMainChoice( choice p_choice ) const {
+            switch( p_choice ) {
+                case CONTINUE:
+                    return 71;
+                case NEW_GAME:
+                    return 72;
+                case SPECIAL_EPISODE:
+                    return 73;
+                case TRANSFER_GAME:
+                    return 74;
+                case MYSTERY_GIFT:
+                    return 404;
+                default:
+                    return 0;
+            }
+        }
 
-        language runLanguageChoice( language p_current );
+        std::vector<choice> getMainChoicesForSlot( u8 p_slot );
 
-        bool initNewGame( u8 p_file, gameType p_type, language p_lang );
-        bool transferGame( u8 p_file );
+        std::vector<std::pair<IO::inputTarget, choice>>
+            drawMainChoice( const std::vector<choice>& p_choices, u8 p_slot );
+
+        std::vector<std::pair<IO::inputTarget, choice>>
+            drawEpisodeChoice( );
+
+        void selectMainChoice( u8 p_choice );
+
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+            printYNMessage( const char* p_message, u8 p_selection );
+
+        /*
+         * @brief: Makes the player select a special episode.
+         */
+        u8 runEpisodeChoice( );
+
+        /*
+         * @brief: Makes the player select a language.
+         */
+        language runLanguageChoice( );
+
+        bool initNewGame( gameType p_type, language p_lang, u8 p_episode = 0 );
+
+        /*
+         * @brief: Converts the GBA save file into a playable copy.
+         */
+        bool transferGame( );
+
+        /*
+         * @brief: Draws a splash screen with the game's name etc.
+         */
+        void drawSplash( );
 
       public:
         void run( );

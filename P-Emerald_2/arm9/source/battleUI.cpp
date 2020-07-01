@@ -580,13 +580,17 @@ namespace BATTLE {
         }
 
         constexpr s8 dirs[ 32 ][ 2 ] = {
-            {10, 0},  {10, 2},   {9, 4},   {8, 6},   {7, 7},   {6, 8},   {4, 9},   {2, 10},
+            { 10, 0 },  { 10, 2 },   { 9, 4 },   { 8, 6 },
+            { 7, 7 },   { 6, 8 },    { 4, 9 },   { 2, 10 },
 
-            {0, 10},  {-2, 10},  {-4, 9},  {-6, 8},  {-7, 7},  {-8, 6},  {-9, 4},  {-10, 2},
+            { 0, 10 },  { -2, 10 },  { -4, 9 },  { -6, 8 },
+            { -7, 7 },  { -8, 6 },   { -9, 4 },  { -10, 2 },
 
-            {-10, 0}, {-10, -2}, {-9, -4}, {-8, -6}, {-7, -7}, {-6, -8}, {-4, -9}, {-2, -10},
+            { -10, 0 }, { -10, -2 }, { -9, -4 }, { -8, -6 },
+            { -7, -7 }, { -6, -8 },  { -4, -9 }, { -2, -10 },
 
-            {0, -10}, {2, -10},  {4, -9},  {6, -8},  {7, -7},  {8, -6},  {9, -4},  {10, -2},
+            { 0, -10 }, { 2, -10 },  { 4, -9 },  { 6, -8 },
+            { 7, -7 },  { 8, -6 },   { 9, -4 },  { 10, -2 },
         };
 
         // init frame
@@ -692,8 +696,8 @@ namespace BATTLE {
         }
 
         constexpr s8 pos[ 15 ][ 2 ] = {
-            {-19, 5}, {-19, -5}, {-10, 0}, {-10, 10}, {-10, -10}, {0, 5},   {0, -5},
-            {0, 15},  {0, -15},  {10, 0},  {10, 10},  {10, -10},  {19, -5}, {19, 5},
+            { -19, 5 }, { -19, -5 }, { -10, 0 }, { -10, 10 }, { -10, -10 }, { 0, 5 },   { 0, -5 },
+            { 0, 15 },  { 0, -15 },  { 10, 0 },  { 10, 10 },  { 10, -10 },  { 19, -5 }, { 19, 5 },
         };
 
         for( u8 i = 0; i < 14; ++i ) {
@@ -1191,15 +1195,15 @@ namespace BATTLE {
         hidePkmn( p_opponent, p_pos );
         hidePkmnStats( p_opponent, p_pos );
 
-        if( p_pokemon != nullptr )
-            [[likely]] {
+        if( p_pokemon != nullptr ) [[likely]] {
                 snprintf( buffer, 99, GET_STRING( 289 ),
                           getPkmnName( p_pokemon, p_opponent ).c_str( ) );
-            } else {
-#ifdef DESQUID
-                snprintf( buffer, 99, GET_STRING( 289 ), "[it's a nullptr]" );
-#endif
             }
+        else {
+#ifdef DESQUID
+            snprintf( buffer, 99, GET_STRING( 289 ), "[it's a nullptr]" );
+#endif
+        }
         log( std::string( buffer ) );
         for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
     }
@@ -1239,7 +1243,7 @@ namespace BATTLE {
             oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].priority = OBJPRIORITY_3;
         }
 
-        u16 emptyPal[ 32 ]                = {0xffff, 0xffff, 0};
+        u16 emptyPal[ 32 ]                = { 0xffff, 0xffff, 0 };
         IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1 << 8 );
         IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
         IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1 << 9 );
@@ -1316,7 +1320,7 @@ namespace BATTLE {
                             p_pokemon->getForme( ) );
 
         for( u8 i = 0; i < 4; ++i ) { oam[ SPR_PKMN_START_OAM( 0 ) + i ].priority = OBJPRIORITY_3; }
-        u16 emptyPal[ 32 ]                = {0xffff, 0xffff, 0};
+        u16 emptyPal[ 32 ]                = { 0xffff, 0xffff, 0 };
         IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1 << 8 );
         IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
         IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1 << 9 );

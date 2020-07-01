@@ -75,9 +75,6 @@ extern bool INIT_NITROFS;
 
 extern char** ARGV;
 
-extern int achours, acseconds, acminutes, acday, acmonth, acyear;
-extern int hours, seconds, minutes, day, month, year;
-
 extern int           pressed, held, last;
 extern touchPosition touch;
 extern u8            cooldown;
@@ -89,8 +86,10 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 #define LANGUAGES 2
 #define MAX_STRINGS 500
+#define MAX_ACHIEVEMENTS 50
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
+extern const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 extern const char* const MONTHS[ 12 ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language

@@ -27,31 +27,32 @@
 
 #pragma once
 
+#include <bit>
 #include <memory>
 #include <string>
 #include <vector>
 #include <nds.h>
 #include "bag.h"
 #include "box.h"
-#include "pokemon.h"
 #include "mapObject.h"
+#include "pokemon.h"
 #include "saveOptions.h"
 
 namespace SAVE {
-#define MAX_SAVE_FILES 3
-#define MAX_CHAPTERS 12
-#define MAX_SPECIAL_EPISODES 1
+    constexpr u8 MAX_SAVE_FILES       = 3;
+    constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
-#define getActiveFile( ) m_saveFile[ SAVE::SAV.m_activeFile ]
+    constexpr u32 GOOD_MAGIC1 = 0x01234567;
+    constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
+    constexpr u8  MAX_BOXES   = 40;
+    constexpr u8  BERRY_SLOTS = 50;
 
-#define GOOD_MAGIC1 0x01234567
-#define GOOD_MAGIC2 0xFEDCBA98
-#define MAX_BOXES 40
+    constexpr u8 F_MEGA_EVOLUTION   = 1;
+    constexpr u8 F_NAV_OBTAINED     = 2;
+    constexpr u8 F_DEX_OBTAINED     = 3;
+    constexpr u8 F_NAT_DEX_OBTAINED = 4;
 
-    const u8 F_MEGA_EVOLUTION = 1;
-
-    extern const char* const CHAPTER_NAMES[ 2 * MAX_CHAPTERS ][ LANGUAGES ];
-    extern const char*       EPISODE_NAMES[ LANGUAGES ][ MAX_SPECIAL_EPISODES ];
+    extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 
     enum gameType {
         UNUSED   = 0,
@@ -61,31 +62,65 @@ namespace SAVE {
         SPECIAL = 3
     };
 
+    struct time {
+        u16 m_hours;
+        u8  m_mins;
+        u8  m_secs;
+
+        constexpr bool canIncrease( ) const {
+            if( m_hours == 999 && m_mins == 59 && m_secs == 59 ) { return false; }
+            return true;
+        }
+
+        auto operator<=>( const time& ) const = default;
+    };
+
+    extern time CURRENT_TIME;
+
+    struct date {
+        u8 m_year;
+        u8 m_month;
+        u8 m_day;
+
+        auto operator<=>( const date& ) const = default;
+    };
+
+    extern date CURRENT_DATE;
+
     struct saveGame {
         struct playerInfo {
-            u32      m_good1 = 0;
+            static constexpr u8 ACHIEVEMENT_HALL_OF_FAME    = 1 << 0; // entering the hall of fame
+            static constexpr u8 ACHIEVEMENT_DEX             = 1 << 1; // completing the hoenn dex
+            static constexpr u8 ACHIEVEMENT_BATTLE_FRONTIER = 1 << 2; // obtain all gold symbols
+            static constexpr u8 ACHIEVEMENT_CONTEST         = 1 << 3; // obtain all paintings
+            static constexpr u8 ACHIEVEMENT_BERRY           = 1 << 4; // collect all vars of berries
+            static constexpr u8 ACHIEVEMENT_GAME_CLEAR      = 1 << 5; // tbd
+
+            u32 m_good1 = 0;
 
             gameType m_gameType;
-            u8       m_chapter;
-            u8       m_isMale;
-            char     m_playername[ 12 ];
-            u16      m_id;
-            u16      m_sid;
-            union {
-                u32 m_playtime;
-                struct {
-                    u16 m_hours;
-                    u8  m_mins;
-                    u8  m_secs;
-
-                } m_pt;
-            };
-            u8             m_HOENN_Badges;
-            u8             m_KANTO_Badges;
-            u8             m_JOHTO_Badges;
+            u8       m_achievements; // Hall of Fame / Dex / Battle Frontier /
+                                     // Contest / Berries / Game clear
+            u8   m_appearance;       // sprite the player currently uses
+            char m_playername[ 12 ];
+            u16  m_id;
+            u16  m_sid;
+            time m_playTime;
+            date m_startDate;
+            date m_lastSaveDate;
+            time m_lastSaveTime;
+            u16  m_lastSaveLocation;
+            date m_lastAchievementDate; // Time player won last badge / entered hof
+            u8   m_HOENN_Badges;
+            u16  m_FRONTIER_Badges;
+            u8   m_KANTO_Badges;
+            u8   m_JOHTO_Badges;
+            u8   m_RESERVED_Badges;
+            u8   m_lastAchievementEvent; // id of a string to be printed on the second line of the
+                                         // trainer's card.
             u32            m_money;
-            u32            m_coins;
-            u32            m_battlePoints;
+            u16            m_coins;
+            u16            m_battlePoints;
             MAP::mapObject m_player;
             u8             m_currentMap;
             u8             m_stepCount;
@@ -95,22 +130,65 @@ namespace SAVE {
             u16            m_lstUsedItems[ 5 ];
             u8             m_lstUsedItemsIdx;
 
-            u32            m_good2 = 0;
+            u32 m_good2 = 0;
 
-            u16            m_registeredItem; // Item registered for fast-use
-            u8             m_lstBag;       // Last sub-bag used by the player
-            u16            m_lstBagItem;   // Most recently viewed bag item
-            s16            m_repelSteps;   // Steps remaining of the currently active repel
-            saveOptions    m_options;       // Various options and settings
-            pokemon        m_pkmnTeam[ 6 ];
-            u16            m_vars[ 256 ];  // variables to be set by map scripts etc.
-            u16            m_flags[ 244 ]; // flags tracking the progress of the player's adventure
-            BAG::bag       m_bag;
+            u16         m_registeredItem; // Item registered for fast-use
+            u8          m_lstBag;         // Last sub-bag used by the player
+            u16         m_lstBagItem;     // Most recently viewed bag item
+            s16         m_repelSteps;     // Steps remaining of the currently active repel
+            saveOptions m_options;        // Various options and settings
+            pokemon     m_pkmnTeam[ 6 ];
+            u16         m_vars[ 256 ];  // variables to be set by map scripts etc.
+            u16         m_flags[ 244 ]; // flags tracking the progress of the player's adventure
 
-            BOX::box       m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
+            u8   m_berryTrees[ BERRY_SLOTS ];       // berry indices for each berry tree
+            u8   m_berryHealth[ BERRY_SLOTS ];      // health of the berry (255 for default)
+            date m_berryPlantedDate[ BERRY_SLOTS ]; // Date when the berry was planted
+            time m_berryPlantedTime[ BERRY_SLOTS ]; // Time when the berry was planted
 
-            u8 m_caughtPkmn[ 1 + MAX_PKMN / 8 ]; // The pkmn the player has caught
-            u8 m_seenPkmn[ 1 + MAX_PKMN / 8 ]; // The pkmn the player has seen
+            u32 m_reserved[ 50 ]; // reserved for future things that need to be stored
+
+            BAG::bag m_bag;
+
+            BOX::box m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
+
+            u8 m_caughtPkmn[ 125 ]; // The pkmn the player has caught
+            u8 m_seenPkmn[ 125 ];   // The pkmn the player has seen
+
+            /*
+             * @brief: returns the number of stars on the trainer's card
+             */
+            constexpr u8 getAchievementCount( ) const {
+                u8 res = 0;
+                for( u8 i = 0; i < 6; ++i ) {
+                    if( ( 1 << i ) & m_achievements ) { ++res; }
+                }
+                return res;
+            }
+
+            /*
+             * @brief: Returns the number of seen pkmn.
+             */
+            constexpr u16 getSeenCount( ) const {
+                u16 res = 0;
+                for( u8 i = 0; i < 125; ++i ) {
+                    // Count the number of set bits
+                    res += std::popcount( m_seenPkmn[ i ] );
+                }
+                return res;
+            }
+
+            /*
+             * @brief: Returns the number of caught pkmn.
+             */
+            constexpr u16 getCaughtCount( ) const {
+                u16 res = 0;
+                for( u8 i = 0; i < 125; ++i ) {
+                    // Count the number of set bits
+                    res += std::popcount( m_caughtPkmn[ i ] );
+                }
+                return res;
+            }
 
             /*
              * @brief: Stores the given pkmn in the storage system at the next available
@@ -163,17 +241,17 @@ namespace SAVE {
              * @brief: Returns a suitable level for wild pkmn encounters for the current
              * number of badges that the player currently has.
              */
-            u8   getEncounterLevel( u8 p_tier );
+            u8 getEncounterLevel( u8 p_tier );
 
             /*
              * @brief: Returns the number of badges the player has obtained so far.
              */
-            u8   getBadgeCount( );
+            u8 getBadgeCount( );
 
             /*
              * @brief: Returns the number of pkmn currently in the player's party.
              */
-            u8   getTeamPkmnCount( );
+            u8 getTeamPkmnCount( );
 
             /*
              * @brief: Returns the team pkmn at the specified position or nullptr if there
@@ -203,9 +281,7 @@ namespace SAVE {
              */
             constexpr u8 countAlivePkmn( ) const {
                 u8 res = 0;
-                for( u8 i = 0; i < 6; ++i ) {
-                    res += m_pkmnTeam[ i ].canBattle( );
-                }
+                for( u8 i = 0; i < 6; ++i ) { res += m_pkmnTeam[ i ].canBattle( ); }
                 return res;
             }
 
@@ -221,10 +297,74 @@ namespace SAVE {
             inline bool isGood( ) const {
                 return m_good1 == GOOD_MAGIC1 && m_good2 == GOOD_MAGIC2;
             }
+
+            /*
+             * @brief: Draws the trainer's id card to the specified screen.
+             */
+            void drawTrainersCard( bool p_bottom = false );
+
+            /*
+             * @brief: Increases the time by 1 second.
+             */
+            constexpr void increaseTime( ) {
+                if( m_playTime.canIncrease( ) ) {
+                    if( ++m_playTime.m_secs == 60 ) {
+                        m_playTime.m_secs = 0;
+                        if( ++m_playTime.m_mins == 60 ) {
+                            m_playTime.m_mins = 0;
+                            ++m_playTime.m_hours;
+                        }
+                    }
+                }
+            }
+
+            /*
+             * @brief: Checks whether the specified berry plant is still alive.
+             */
+            bool berryIsAlive( u8 p_berrySlot ) const;
+
+            /*
+             * @brief: Returns the number of berries the specified plant yields when
+             * harvested.
+             */
+            u8 getBerryYield( u8 p_berrySlot ) const;
+
+            /*
+             * @brief: Returns the growth stage of the berry at the specified slot
+             * @returns: 0 if no berry is present, ow stage from [1, 4].
+             */
+            u8 getBerryStage( u8 p_berrySlot ) const;
+
+            /*
+             * @brief: Removes any berry in the specified berry slot.
+             */
+            inline void harvestBerry( u8 p_berrySlot ) {
+                m_berryHealth[ p_berrySlot ] = 0;
+                m_berryTrees[ p_berrySlot ]  = 0;
+            }
+
+            /*
+             * @brief: Plants the specified berry (given by itemid) in the specified slot.
+             */
+            void plantBerry( u8 p_berrySlot, u16 p_berry );
         } m_saveFile[ MAX_SAVE_FILES ];
 
-        u8 m_activeFile; // The save file the player is currently using.
-        u32 m_version; // The game version the save was created with.
+        u8  m_activeFile; // The save file the player is currently using.
+        u32 m_version;    // The game version the save was created with.
+        u16 m_specialEpisodes; // Unlocked special episodes
+
+        inline std::vector<u8> getSpecialEpisodes( ) const {
+            auto res = std::vector<u8>( );
+            for( u8 i = 0; i < MAX_SPECIAL_EPISODES; ++i ) {
+                if( m_specialEpisodes & ( 1 << i ) ) {
+                    res.push_back( i + 1 );
+                }
+            }
+#ifdef DESQUID
+            res.push_back( 0 );
+#endif
+            return res;
+        }
 
         /*
          * @brief: Returns whether the save is valid.
@@ -235,7 +375,12 @@ namespace SAVE {
          * @brief: Clears the save file.
          */
         void clear( );
+
+        inline playerInfo& getActiveFile( ) {
+            return m_saveFile[ m_activeFile ];
+        }
+
     };
 
     extern saveGame SAV;
-}
+} // namespace SAVE

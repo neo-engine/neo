@@ -44,6 +44,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "move.h"
 #include "pokemon.h"
 #include "uio.h"
+#include "mapDrawer.h"
 
 #include "messageBox.h"
 
@@ -327,6 +328,15 @@ namespace FS {
     }
 
     bool writeSave( const char* p_path, std::function<void( u16, u16 )> p_progress ) {
+
+        auto oldl = SAVE::SAV.getActiveFile( ).m_lastSaveLocation;
+        auto oldd = SAVE::SAV.getActiveFile( ).m_lastSaveDate;
+        auto oldt = SAVE::SAV.getActiveFile( ).m_lastSaveTime;
+
+        SAVE::SAV.getActiveFile( ).m_lastSaveLocation = MAP::curMap->getCurrentLocationId( );
+        SAVE::SAV.getActiveFile( ).m_lastSaveDate = SAVE::CURRENT_DATE;
+        SAVE::SAV.getActiveFile( ).m_lastSaveTime = SAVE::CURRENT_TIME;
+
         if( CARD::checkCard( ) ) {
             if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
                                  p_progress ) ) {
@@ -335,7 +345,13 @@ namespace FS {
         }
 
         FILE* f = FS::open( "", p_path, ".sav", "w" );
-        if( !f ) return false;
+        if( !f ) {
+            SAVE::SAV.getActiveFile( ).m_lastSaveLocation = oldl;
+            SAVE::SAV.getActiveFile( ).m_lastSaveDate = oldd;
+            SAVE::SAV.getActiveFile( ).m_lastSaveTime = oldt;
+
+            return false;
+        }
         FS::write( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
         return true;

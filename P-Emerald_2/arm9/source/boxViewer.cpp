@@ -42,8 +42,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BOX {
     // #define THRESHOLD 20
 
-#define PARTY_BUTTON ( MAX_PKMN_PER_BOX + 10 )
-#define BOXNAME_BUTTON ( MAX_PKMN_PER_BOX + 20 )
+    constexpr u8 PARTY_BUTTON   = MAX_PKMN_PER_BOX + 10;
+    constexpr u8 BOXNAME_BUTTON = MAX_PKMN_PER_BOX + 20;
 
     void boxViewer::run( ) {
         _boxUI = boxUI( );
@@ -87,14 +87,15 @@ namespace BOX {
             if( GET_KEY_COOLDOWN( KEY_L ) ) {
                 // previous box
                 SAVE::SAV.getActiveFile( ).m_curBox
-                    = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                    = ( SAVE::SAV.getActiveFile( ).m_curBox + SAVE::MAX_BOXES - 1 )
+                      % SAVE::MAX_BOXES;
                 _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ) );
                 select( _selectedIdx );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_R ) ) {
                 // next box
                 SAVE::SAV.getActiveFile( ).m_curBox
-                    = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                    = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % SAVE::MAX_BOXES;
                 _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ) );
                 select( _selectedIdx );
                 cooldown = COOLDOWN_COUNT;
@@ -133,7 +134,7 @@ namespace BOX {
                 } else if( _selectedIdx == BOXNAME_BUTTON ) {
                     // switch to next box
                     SAVE::SAV.getActiveFile( ).m_curBox
-                        = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % MAX_BOXES;
+                        = ( SAVE::SAV.getActiveFile( ).m_curBox + 1 ) % SAVE::MAX_BOXES;
                     _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ) );
                 }
                 cooldown = COOLDOWN_COUNT;
@@ -145,7 +146,8 @@ namespace BOX {
                 } else if( _selectedIdx == BOXNAME_BUTTON ) {
                     // switch to prev box
                     SAVE::SAV.getActiveFile( ).m_curBox
-                        = ( SAVE::SAV.getActiveFile( ).m_curBox + MAX_BOXES - 1 ) % MAX_BOXES;
+                        = ( SAVE::SAV.getActiveFile( ).m_curBox + SAVE::MAX_BOXES - 1 )
+                          % SAVE::MAX_BOXES;
                     _boxUI.draw( SAVE::SAV.getActiveFile( ).getCurrentBox( ) );
                 }
                 cooldown = COOLDOWN_COUNT;
@@ -390,7 +392,7 @@ namespace BOX {
             _boxUI.setNewHeldPkmn( nullptr, _selectedIdx );
         }
 
-        _heldPkmnPos = {0, 0};
+        _heldPkmnPos = { 0, 0 };
     }
 
     bool boxViewer::runParty( ) {
@@ -528,7 +530,7 @@ namespace BOX {
         _boxUI.selectPkmn( tmp, _selectedIdx );
 
         u8                         selectedBtn = 0;
-        std::vector<boxUI::button> btns = {boxUI::BUTTON_PKMN_MOVE, boxUI::BUTTON_PKMN_STATUS};
+        std::vector<boxUI::button> btns = { boxUI::BUTTON_PKMN_MOVE, boxUI::BUTTON_PKMN_STATUS };
 
         if( !curSel.isEgg( ) ) {
             btns.push_back( boxUI::BUTTON_PKMN_RELEASE );
@@ -660,8 +662,8 @@ namespace BOX {
                     return 0;
                 }
                 case boxUI::BUTTON_PKMN_GIVE_ITEM: {
-                    BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                            BAG::bagViewer::GIVE_TO_PKMN );
+                    BAG::bagViewer bv  = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                        BAG::bagViewer::GIVE_TO_PKMN );
                     u16            itm = bv.getItem( );
                     if( itm ) {
                         if( curSel.getItem( ) ) {

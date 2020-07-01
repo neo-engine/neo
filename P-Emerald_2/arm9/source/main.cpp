@@ -29,10 +29,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <filesystem.h>
 #include <nds.h>
 
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <memory>
 #include <string>
 #include <vector>
@@ -72,12 +72,10 @@ GameMod gMod = GameMod::DEVELOPER;
 GameMod gMod = GameMod::ALPHA;
 #endif
 
-u8 DayTimes[ 4 ][ 5 ]
-    = {{7, 10, 15, 17, 23}, {6, 9, 12, 18, 23}, {5, 8, 10, 20, 23}, {7, 9, 13, 19, 23}};
+constexpr u8 DAY_TIMES[ 4 ][ 5 ]
+    = { { 7, 10, 15, 17, 23 }, { 6, 9, 12, 18, 23 }, { 5, 8, 10, 20, 23 }, { 7, 9, 13, 19, 23 } };
 
 time_t        unixTime;
-int           hours = 0, seconds = 0, minutes = 0, day = 0, month = 0, year = 0;
-int           achours = 0, acseconds = 0, acminutes = 0, acday = 0, acmonth = 0, acyear = 0;
 int           pressed, held, last;
 touchPosition touch;
 u8            cooldown          = COOLDOWN_COUNT;
@@ -85,18 +83,20 @@ bool          DRAW_TIME         = false;
 bool          UPDATE_TIME       = true;
 bool          ANIMATE_MAP       = false;
 u8            FRAME_COUNT       = 0;
+u8            TIME_COUNT        = 0;
 bool          SCREENS_SWAPPED   = false;
 bool          PLAYER_IS_FISHING = false;
 bool          INIT_NITROFS      = false;
 bool          TWL_CONFIG        = false;
+bool          IN_GAME           = false;
 
 char** ARGV;
 
 u8 getCurrentDaytime( ) {
-    u8 t = achours, m = acmonth;
+    u8 t = SAVE::CURRENT_TIME.m_hours, m = SAVE::CURRENT_DATE.m_month;
 
     for( u8 i = 0; i < 5; ++i )
-        if( DayTimes[ m / 4 ][ i ] <= t ) return i;
+        if( DAY_TIMES[ m / 4 ][ i ] <= t ) return i;
     return 254;
 }
 
@@ -125,24 +125,50 @@ void initGraphics( ) {
     consoleSetFont( &IO::Bottom, IO::consoleFont );
 }
 void initTimeAndRnd( ) {
-    time_t uTime   = time( NULL );
-    tm*    tStruct = gmtime( (const time_t*) &uTime );
+    auto curTime = std::chrono::system_clock::now( );
+    auto ct      = std::chrono::system_clock::to_time_t( curTime );
+    auto tStruct = std::gmtime( &ct );
 
-    hours   = tStruct->tm_hour;
-    month   = tStruct->tm_min;
-    seconds = tStruct->tm_sec;
-    day     = tStruct->tm_mday;
-    month   = tStruct->tm_mon + 1;
-    year    = tStruct->tm_year + 1900;
+    if( tStruct != nullptr ) {
+        SAVE::CURRENT_TIME.m_hours = tStruct->tm_hour;
+        SAVE::CURRENT_TIME.m_mins  = tStruct->tm_min;
+        SAVE::CURRENT_TIME.m_secs  = tStruct->tm_sec;
+        SAVE::CURRENT_DATE.m_day   = tStruct->tm_mday;
+        SAVE::CURRENT_DATE.m_month = tStruct->tm_mon + 1;
+        SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
+    }
 
-    srand( hours ^ ( 100 * minutes ) ^ ( 10000 * seconds ) ^ ( day ^ ( 100 * month ) ^ year ) );
+    srand( SAVE::CURRENT_TIME.m_hours ^ ( 100 * SAVE::CURRENT_TIME.m_mins ) ^
+            ( 10000 * SAVE::CURRENT_TIME.m_secs ) ^ ( SAVE::CURRENT_DATE.m_day ^
+                ( 100 * SAVE::CURRENT_DATE.m_month ) ^ SAVE::CURRENT_DATE.m_year ) );
 }
 
 void vblankIRQ( ) {
+    if( IN_GAME ) {
+        if( ++TIME_COUNT == 60 ) {
+            TIME_COUNT = 0;
+            SAVE::SAV.getActiveFile( ).increaseTime( );
+        }
+    }
+
     if( !ANIMATE_MAP ) return;
     scanKeys( );
     FRAME_COUNT++;
     if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
+
+    auto curTime = std::chrono::system_clock::now( );
+    auto ct      = std::chrono::system_clock::to_time_t( curTime );
+    auto tStruct = std::gmtime( &ct );
+
+    if( tStruct != nullptr ) {
+        SAVE::CURRENT_TIME.m_hours = tStruct->tm_hour;
+        SAVE::CURRENT_TIME.m_mins  = tStruct->tm_min;
+        SAVE::CURRENT_TIME.m_secs  = tStruct->tm_sec;
+        SAVE::CURRENT_DATE.m_day   = tStruct->tm_mday;
+        SAVE::CURRENT_DATE.m_month = tStruct->tm_mon + 1;
+        SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
+    }
+
 
     /*
     if( INIT_NITROFS ) {
@@ -248,6 +274,7 @@ int main( int, char** p_argv ) {
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
+    IN_GAME = true;
     bool stopped = true;
     u8   bmp     = false;
     loop( ) {
@@ -264,7 +291,7 @@ int main( int, char** p_argv ) {
             char buffer[ 100 ];
             snprintf( buffer, 99,
                       "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx",
+                      "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx | %hhu %hhu %hhu",
                       SAVE::SAV.getActiveFile( ).m_currentMap,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
@@ -284,7 +311,9 @@ int main( int, char** p_argv ) {
                       MAP::curMap
                           ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_topbehave );
+                          .m_topbehave,
+                      SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
+                      SAVE::CURRENT_TIME.m_secs );
             IO::messageBox m( buffer );
             NAV::draw( true );
         }

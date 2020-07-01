@@ -65,7 +65,8 @@ namespace IO {
         selection getResult( std::function<std::vector<std::pair<inputTarget, selection>>(u8)>
                              p_drawFunction, std::function<void(selection)> p_selectFunction,
                              selection p_initialSelection = 0,
-                             std::function<void( )> p_tick = DEFAULT_TICK );
+                             std::function<void( )> p_tick = DEFAULT_TICK,
+                             u8 p_initialPage = 0 );
 
         [[deprecated]]
         choiceBox( int p_num, const char** p_choices, const char* p_name, bool p_big );
