@@ -89,6 +89,7 @@ bool          PLAYER_IS_FISHING = false;
 bool          INIT_NITROFS      = false;
 bool          TWL_CONFIG        = false;
 bool          IN_GAME           = false;
+bool          RTC_BAD           = false;
 
 char** ARGV;
 
@@ -125,16 +126,15 @@ void initGraphics( ) {
     consoleSetFont( &IO::Bottom, IO::consoleFont );
 }
 void initTimeAndRnd( ) {
-    auto curTime = std::chrono::system_clock::now( );
-    auto ct      = std::chrono::system_clock::to_time_t( curTime );
+    auto ct      = std::time( nullptr );
     auto tStruct = std::gmtime( &ct );
 
     if( tStruct != nullptr ) {
         SAVE::CURRENT_TIME.m_hours = tStruct->tm_hour;
         SAVE::CURRENT_TIME.m_mins  = tStruct->tm_min;
         SAVE::CURRENT_TIME.m_secs  = tStruct->tm_sec;
-        SAVE::CURRENT_DATE.m_day   = tStruct->tm_mday;
-        SAVE::CURRENT_DATE.m_month = tStruct->tm_mon + 1;
+        SAVE::CURRENT_DATE.m_day   = tStruct->tm_mday - 1;
+        SAVE::CURRENT_DATE.m_month = tStruct->tm_mon;
         SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
     }
 
@@ -143,86 +143,73 @@ void initTimeAndRnd( ) {
                 ( 100 * SAVE::CURRENT_DATE.m_month ) ^ SAVE::CURRENT_DATE.m_year ) );
 }
 
+constexpr u8 getMonthBound( u8 p_month, u8 p_year ) {
+    switch( p_month ) {
+        case 0: case 2: case 4: case 6: case 7: case 9: case 11:
+            return 31;
+        case 3: case 5: case 8: case 10:
+            return 30;
+        case 1:
+            if( p_year % 4 == 0 && p_year ) {
+                return 29;
+            } else {
+                return 28;
+            }
+        default:
+            return 0;
+    }
+}
+
 void vblankIRQ( ) {
-    if( IN_GAME ) {
-        if( ++TIME_COUNT == 60 ) {
+    auto ct      = std::time( nullptr );
+    auto tStruct = std::gmtime( &ct );
+    if( ( ++TIME_COUNT % 60 ) == 0 ) {
+        if( TIME_COUNT == 120 ) {
             TIME_COUNT = 0;
+
+            if( RTC_BAD || SAVE::CURRENT_TIME.m_secs == tStruct->tm_sec ) {
+                // RTC is not usable, do it ourselves
+                RTC_BAD = true;
+            }
+        }
+        if( RTC_BAD ) {
+            if( ++SAVE::CURRENT_TIME.m_secs >= 60 ) {
+                SAVE::CURRENT_TIME.m_secs = 0;
+                if( ++SAVE::CURRENT_TIME.m_mins >= 60 ) {
+                    SAVE::CURRENT_TIME.m_mins = 0;
+                    if( ++SAVE::CURRENT_TIME.m_hours >= 24 ) {
+                        SAVE::CURRENT_TIME.m_hours = 0;
+                        if( ++SAVE::CURRENT_DATE.m_day
+                                >= getMonthBound( SAVE::CURRENT_DATE.m_month,
+                                    SAVE::CURRENT_DATE.m_year ) ) {
+                            SAVE::CURRENT_DATE.m_day = 0;
+                            if( ++SAVE::CURRENT_DATE.m_month >= 12 ) {
+                                SAVE::CURRENT_DATE.m_month = 0;
+                                ++SAVE::CURRENT_DATE.m_year;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if( IN_GAME ) {
             SAVE::SAV.getActiveFile( ).increaseTime( );
         }
+    }
+
+    if( !RTC_BAD && tStruct != nullptr ) {
+        SAVE::CURRENT_TIME.m_hours = tStruct->tm_hour;
+        SAVE::CURRENT_TIME.m_mins  = tStruct->tm_min;
+        SAVE::CURRENT_TIME.m_secs  = tStruct->tm_sec;
+        SAVE::CURRENT_DATE.m_day   = tStruct->tm_mday - 1;
+        SAVE::CURRENT_DATE.m_month = tStruct->tm_mon;
+        SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
     }
 
     if( !ANIMATE_MAP ) return;
     scanKeys( );
     FRAME_COUNT++;
     if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
-
-    auto curTime = std::chrono::system_clock::now( );
-    auto ct      = std::chrono::system_clock::to_time_t( curTime );
-    auto tStruct = std::gmtime( &ct );
-
-    if( tStruct != nullptr ) {
-        SAVE::CURRENT_TIME.m_hours = tStruct->tm_hour;
-        SAVE::CURRENT_TIME.m_mins  = tStruct->tm_min;
-        SAVE::CURRENT_TIME.m_secs  = tStruct->tm_sec;
-        SAVE::CURRENT_DATE.m_day   = tStruct->tm_mday;
-        SAVE::CURRENT_DATE.m_month = tStruct->tm_mon + 1;
-        SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
-    }
-
-
-    /*
-    if( INIT_NITROFS ) {
-        nitroFSInit( ARGV );
-        INIT_NITROFS = false;
-    }
-
-    auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
-
-    IO::boldFont->setColor( 0, 0 );
-    u8 oldC1 = IO::boldFont->getColor( 1 );
-    u8 oldC2 = IO::boldFont->getColor( 2 );
-    IO::boldFont->setColor( 0, 1 );
-    IO::boldFont->setColor( IO::BLACK_IDX, 2 );
-    pal[ IO::BLACK_IDX ] = IO::BLACK;
-    time( &unixTime );
-    struct tm* timeStruct = gmtime( &unixTime );
-
-    if( true || acseconds != timeStruct->tm_sec || DRAW_TIME ) {
-        DRAW_TIME            = false;
-        pal[ IO::WHITE_IDX ] = IO::WHITE;
-        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
-        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-
-        char buffer[ 50 ];
-        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-        IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
-
-        SAVE::SAV.getActiveFile( ).m_pt.m_secs++; // I know, this is rather inaccurate
-
-        SAVE::SAV.getActiveFile( ).m_pt.m_mins += ( SAVE::SAV.getActiveFile( ).m_pt.m_secs / 60 );
-        SAVE::SAV.getActiveFile( ).m_pt.m_hours += ( SAVE::SAV.getActiveFile( ).m_pt.m_mins / 60 );
-
-        SAVE::SAV.getActiveFile( ).m_pt.m_secs %= 60;
-        SAVE::SAV.getActiveFile( ).m_pt.m_mins %= 60;
-
-        achours   = timeStruct->tm_hour;
-        acminutes = timeStruct->tm_min;
-        acseconds = timeStruct->tm_sec;
-
-        IO::boldFont->setColor( 0, 1 );
-        IO::boldFont->setColor( IO::BLACK_IDX, 2 );
-        sprintf( buffer, "%02i:%02i:%02i", achours, acminutes, acseconds );
-        IO::boldFont->printString( buffer, 18 * 8, 192 - 16, !SCREENS_SWAPPED );
-    }
-    achours   = timeStruct->tm_hour;
-    acminutes = timeStruct->tm_min;
-    acday     = timeStruct->tm_mday;
-    acmonth   = timeStruct->tm_mon + 1;
-    acyear    = timeStruct->tm_year + 1900;
-
-    IO::boldFont->setColor( oldC1, 1 );
-    IO::boldFont->setColor( oldC2, 2 );
-    */
 }
 
 int main( int, char** p_argv ) {
