@@ -71,18 +71,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Back.h"
 #include "BagSpr.h"
 
-#include "icon_bag_1.h"
-#include "icon_bag_2.h"
-#include "icon_dex_1.h"
-#include "icon_dex_2.h"
-#include "icon_id_1.h"
-#include "icon_id_2.h"
-#include "icon_party_1.h"
-#include "icon_party_2.h"
-#include "icon_save_1.h"
-#include "icon_save_2.h"
-#include "icon_settings_1.h"
-#include "icon_settings_2.h"
+#include "icon_bag.h"
+#include "icon_dex.h"
+#include "icon_id.h"
+#include "icon_party.h"
+#include "icon_save.h"
+#include "icon_select.h"
+#include "icon_settings.h"
 
 namespace NAV {
     state STATE        = HOME;
@@ -176,28 +171,29 @@ namespace NAV {
                                   32, 32, BackPal, BackTiles, BackTilesLen, false, false,
                                   !p_showBack, OBJPRIORITY_0, true );
 
-        // Main menu sprites
-        tileCnt
-            = IO::loadSprite( A_ID, A_ID, tileCnt, POS[ SAVE_ID ][ 0 ] - 16,
-                              POS[ SAVE_ID ][ 1 ] - 16, 32, 32, icon_save_1Pal, icon_save_1Tiles,
-                              icon_save_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt, POS[ BAG_ID ][ 0 ] - 16,
-                                  POS[ BAG_ID ][ 1 ] - 16, 32, 32, icon_bag_1Pal, icon_bag_1Tiles,
-                                  icon_bag_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt
-            = IO::loadSprite( BWD_ID, BWD_ID, tileCnt, POS[ PKMN_ID ][ 0 ] - 16,
-                              POS[ PKMN_ID ][ 1 ] - 16, 32, 32, icon_party_1Pal, icon_party_1Tiles,
-                              icon_party_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt, POS[ NAV_ID ][ 0 ] - 16,
-                                  POS[ NAV_ID ][ 1 ] - 16, 32, 32, icon_settings_1Pal,
-                                  icon_settings_1Tiles, icon_settings_1TilesLen, false, false,
-                                  false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt, POS[ ID_ID ][ 0 ] - 16,
-                                  POS[ ID_ID ][ 1 ] - 16, 32, 32, icon_id_1Pal, icon_id_1Tiles,
-                                  icon_id_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt, POS[ DEX_ID ][ 0 ] - 16,
-                                  POS[ DEX_ID ][ 1 ] - 16, 32, 32, icon_dex_1Pal, icon_dex_1Tiles,
-                                  icon_dex_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        //// Main menu sprites
+        // tileCnt
+        //    = IO::loadSprite( A_ID, A_ID, tileCnt, POS[ SAVE_ID ][ 0 ] - 16,
+        //                      POS[ SAVE_ID ][ 1 ] - 16, 32, 32, icon_save_1Pal, icon_save_1Tiles,
+        //                      icon_save_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        // tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt, POS[ BAG_ID ][ 0 ] - 16,
+        //                          POS[ BAG_ID ][ 1 ] - 16, 32, 32, icon_bag_1Pal, icon_bag_1Tiles,
+        //                          icon_bag_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        // tileCnt
+        //    = IO::loadSprite( BWD_ID, BWD_ID, tileCnt, POS[ PKMN_ID ][ 0 ] - 16,
+        //                      POS[ PKMN_ID ][ 1 ] - 16, 32, 32, icon_party_1Pal,
+        //                      icon_party_1Tiles, icon_party_1TilesLen, false, false, false,
+        //                      OBJPRIORITY_0, true );
+        // tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt, POS[ NAV_ID ][ 0 ] - 16,
+        //                          POS[ NAV_ID ][ 1 ] - 16, 32, 32, icon_settings_1Pal,
+        //                          icon_settings_1Tiles, icon_settings_1TilesLen, false, false,
+        //                          false, OBJPRIORITY_0, true );
+        // tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt, POS[ ID_ID ][ 0 ] - 16,
+        //                          POS[ ID_ID ][ 1 ] - 16, 32, 32, icon_id_1Pal, icon_id_1Tiles,
+        //                          icon_id_1TilesLen, false, false, false, OBJPRIORITY_0, true );
+        // tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt, POS[ DEX_ID ][ 0 ] - 16,
+        //                          POS[ DEX_ID ][ 1 ] - 16, 32, 32, icon_dex_1Pal, icon_dex_1Tiles,
+        //                          icon_dex_1TilesLen, false, false, false, OBJPRIORITY_0, true );
         // tileCnt = IO::loadItemIcon( "----", POS[ OPTS_ID ][ 0 ] - 16, POS[ OPTS_ID ][ 1 ] - 16,
         // 67,
         //                            OPTS_ID, tileCnt );
