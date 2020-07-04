@@ -41,22 +41,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 // Sprites
-#include "Back.h"
-#include "BagBall1.h"
-#include "BagBall2.h"
-#include "BagBerry1.h"
-#include "BagBerry2.h"
-#include "BagHm1.h"
-#include "BagHm2.h"
-#include "BagKey1.h"
-#include "BagKey2.h"
-#include "BagMediine1.h"
-#include "BagMediine2.h"
-#include "Down.h"
 #include "NoItem.h"
-#include "Up.h"
-#include "backarrow.h"
-
 #include "noselection_64_20.h"
 #include "noselection_64_32.h"
 #include "noselection_96_32_1.h"
@@ -65,13 +50,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_blank_32_24.h"
 
 namespace BAG {
-    const unsigned short* bagPals[ 10 ]
-        = {BagBall1Pal, BagBall2Pal,  BagMediine1Pal, BagMediine2Pal, BagHm1Pal,
-           BagHm2Pal,   BagBerry1Pal, BagBerry2Pal,   BagKey1Pal,     BagKey2Pal};
-    const unsigned int* bagTiles[ 10 ]
-        = {BagBall1Tiles, BagBall2Tiles,  BagMediine1Tiles, BagMediine2Tiles, BagHm1Tiles,
-           BagHm2Tiles,   BagBerry1Tiles, BagBerry2Tiles,   BagKey1Tiles,     BagKey2Tiles};
-
 #define SPR_TRANSFER_OAM_SUB 0
 #define SPR_MSG_BOX_OAM_SUB 1
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 14 + 6 * ( p_pos ) )
@@ -82,7 +60,8 @@ namespace BAG {
 #define SPR_PKMN_START_OAM_SUB 100
 #define SPR_MSG_PKMN_SEL_OAM_SUB 106
 #define SPR_MSG_BOX_SMALL_OAM_SUB 115
-#define SPR_BAG_ICON_OAM_SUB 120
+#define SPR_BAG_ICON_SEL_OAM_SUB 120
+#define SPR_BAG_ICON_OAM_SUB 121
 
 #define SPR_BOX_PAL_SUB 0
 #define SPR_SELECTED_PAL_SUB 1
@@ -97,19 +76,11 @@ namespace BAG {
     // #define SPR_TYPE_PAL_SUB( p_type ) ( 10 + ( p_type ) )
 
     void showActiveBag( u8 p_bagNo ) {
-        u16 tileIdx = IO::Oam->oamBuffer[ SPR_BAG_ICON_OAM_SUB + p_bagNo ].gfxIndex;
+        u16 tileIdx = IO::Oam->oamBuffer[ SPR_BAG_ICON_SEL_OAM_SUB ].gfxIndex;
 
-        for( u8 i = 0; i < 5; ++i ) {
-            IO::loadSprite( SPR_BAG_ICON_OAM_SUB + i, SPR_BAG_ICON_PAL_SUB,
-                            IO::Oam->oamBuffer[ SPR_BAG_ICON_OAM_SUB + i ].gfxIndex, 27 * i, 0, 32,
-                            32, bagPals[ 2 * i ], bagTiles[ 2 * i ], NoItemTilesLen, false, false,
-                            false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
-        }
-
-        IO::loadSprite( SPR_BAG_ICON_OAM_SUB + p_bagNo, SPR_BAG_ICON_SEL_PAL_SUB, tileIdx,
-                        27 * p_bagNo, 0, 32, 32, bagPals[ 2 * p_bagNo + 1 ],
-                        bagTiles[ 2 * p_bagNo + 1 ], NoItemTilesLen, false, false, false,
-                        OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        IO::loadSprite( ( "BG/" + std::to_string( p_bagNo + 1 ) + "_2" ).c_str( ),
+                        SPR_BAG_ICON_SEL_OAM_SUB, SPR_BAG_ICON_SEL_PAL_SUB, tileIdx, 27 * p_bagNo,
+                        0, 32, 32, false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
     }
 
     void initColors( ) {
@@ -159,22 +130,26 @@ namespace BAG {
 
         u16 tileCnt = drawPkmnIcons( );
 
-        tileCnt = IO::loadSprite( SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, BackPal, BackTiles,
-                                  BackTilesLen, false, false, false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSprite( "BG/Back", SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB, tileCnt,
+                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, false, false,
+                                  false, OBJPRIORITY_3, true );
 
-        tileCnt = IO::loadSprite( SPR_ARROW_DOWN_OAM_SUB, SPR_DOWN_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26, 32, 32, DownPal, DownTiles,
-                                  DownTilesLen, false, false, false, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSprite( SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, UpPal, UpTiles,
-                                  UpTilesLen, false, false, false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSprite( "BG/Down", SPR_ARROW_DOWN_OAM_SUB, SPR_DOWN_PAL_SUB, tileCnt,
+                                  SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26, 32, 32, false, false,
+                                  false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSprite( "BG/Up", SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
+                                  SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, false, false,
+                                  false, OBJPRIORITY_3, true );
 
         for( u8 i = 0; i < 5; ++i ) {
-            tileCnt = IO::loadSprite( SPR_BAG_ICON_OAM_SUB + i, SPR_BAG_ICON_PAL_SUB, tileCnt,
-                                      26 * i, 0, 32, 32, bagPals[ 2 * i ], bagTiles[ 2 * i ],
-                                      NoItemTilesLen, false, false, false, OBJPRIORITY_3, true );
+            tileCnt = IO::loadSprite( ( "BG/" + std::to_string( i + 1 ) + "_1" ).c_str( ),
+                                      SPR_BAG_ICON_OAM_SUB + i, SPR_BAG_ICON_PAL_SUB, tileCnt,
+                                      27 * i, 0, 32, 32, false, false, false, OBJPRIORITY_3, true,
+                                      OBJMODE_BLENDED );
         }
+        tileCnt = IO::loadSprite( "BG/1_2", SPR_BAG_ICON_SEL_OAM_SUB, SPR_BAG_ICON_SEL_PAL_SUB,
+                                  tileCnt, 27, 0, 32, 32, false, false, false, OBJPRIORITY_3, true,
+                                  OBJMODE_BLENDED );
 
         tileCnt = IO::loadSprite( SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB, tileCnt,
                                   SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, 0, 0,
@@ -849,8 +824,7 @@ namespace BAG {
                     }
                 }
             }
-            if( !found )
-                [[unlikely]] {
+            if( !found ) [[unlikely]] {
                     snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
                 }
         } else {
@@ -1091,8 +1065,7 @@ namespace BAG {
         if( !p_item.first ) return false;
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) { // It's a PKMN
-            if( !_playerTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) )
-                [[unlikely]] {
+            if( !_playerTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) ) [[unlikely]] {
                     // Something went wrong
                     return false;
                 }

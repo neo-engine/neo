@@ -65,19 +65,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Border.h"
 
-#include "icon_bag.h"
-#include "icon_dex.h"
-#include "icon_id.h"
-#include "icon_party.h"
-#include "icon_save.h"
-#include "icon_select.h"
-#include "icon_settings.h"
-#include "mbox1.h"
-#include "mbox2.h"
-#include "mbox3_1.h"
-#include "mbox3_2.h"
-#include "mbox3_3.h"
-#include "mbox3_4.h"
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
@@ -87,8 +74,8 @@ namespace NAV {
 #define SPR_MSGBOX_OAM 112
 #define SPR_MSGCONT_OAM 127
 
-#define SPR_MSGBOX_GFX 239
-#define SPR_MSG_GFX 287
+#define SPR_MSGBOX_GFX 351
+#define SPR_MSG_GFX 383
 #define SPR_MSGCONT_GFX 511
 
 #define SPR_MENU_OAM_SUB( p_idx ) ( 0 + ( p_idx ) )
@@ -143,33 +130,30 @@ namespace NAV {
         u16 tileCnt = 0;
 
         // Main menu icons
-        tileCnt = IO::loadSprite(
-            SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt, 256 - 29, 192 - 6 * 29, 32, 32,
-            icon_partyPal, icon_partyTiles, icon_partyTilesLen, false, false,
-            !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt, 256 - 29,
-                                  192 - 5 * 29, 32, 32, icon_dexPal, icon_dexTiles,
-                                  icon_dexTilesLen, false, false,
+        tileCnt = IO::loadSprite( "MM/party", SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt,
+                                  256 - 29, 192 - 6 * 29, 32, 32, false, false,
+                                  !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), OBJPRIORITY_2,
+                                  p_bottom );
+        tileCnt = IO::loadSprite( "MM/dex", SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt,
+                                  256 - 29, 192 - 5 * 29, 32, 32, false, false,
                                   !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ),
                                   OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 2 ), SPR_MENU_PAL_SUB( 2 ), tileCnt, 256 - 29,
-                                  192 - 4 * 29, 32, 32, icon_bagPal, icon_bagTiles,
-                                  icon_bagTilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 3 ), SPR_MENU_PAL_SUB( 3 ), tileCnt, 256 - 29,
-                                  192 - 3 * 29, 32, 32, icon_idPal, icon_idTiles, icon_idTilesLen,
-                                  false, false, false, OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 4 ), SPR_MENU_PAL_SUB( 4 ), tileCnt, 256 - 29,
-                                  192 - 2 * 29, 32, 32, icon_savePal, icon_saveTiles,
-                                  icon_saveTilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
-        tileCnt
-            = IO::loadSprite( SPR_MENU_OAM_SUB( 5 ), SPR_MENU_PAL_SUB( 5 ), tileCnt, 256 - 29,
-                              192 - 1 * 29, 32, 32, icon_settingsPal, icon_settingsTiles,
-                              icon_settingsTilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( "MM/bag", SPR_MENU_OAM_SUB( 2 ), SPR_MENU_PAL_SUB( 2 ), tileCnt,
+                                  256 - 29, 192 - 4 * 29, 32, 32, false, false, false,
+                                  OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( "MM/id", SPR_MENU_OAM_SUB( 3 ), SPR_MENU_PAL_SUB( 3 ), tileCnt,
+                                  256 - 29, 192 - 3 * 29, 32, 32, false, false, false,
+                                  OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( "MM/save", SPR_MENU_OAM_SUB( 4 ), SPR_MENU_PAL_SUB( 4 ), tileCnt,
+                                  256 - 29, 192 - 2 * 29, 32, 32, false, false, false,
+                                  OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( "MM/settings", SPR_MENU_OAM_SUB( 5 ), SPR_MENU_PAL_SUB( 5 ),
+                                  tileCnt, 256 - 29, 192 - 1 * 29, 32, 32, false, false, false,
+                                  OBJPRIORITY_2, p_bottom );
 
-        tileCnt
-            = IO::loadSprite( SPR_MENU_SEL_OAM_SUB, SPR_MENU_SEL_PAL_SUB, tileCnt, 256 - 31,
-                              192 - 1 * 31, 32, 32, icon_selectPal, icon_selectTiles,
-                              icon_selectTilesLen, false, false, true, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( "MM/select", SPR_MENU_SEL_OAM_SUB, SPR_MENU_SEL_PAL_SUB, tileCnt,
+                                  256 - 31, 192 - 1 * 31, 32, 32, false, false, true, OBJPRIORITY_2,
+                                  p_bottom );
 
         // Choice boxes
 
@@ -237,6 +221,9 @@ namespace NAV {
         IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( p_bottom );
         hideMessageBox( );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
+        bgUpdate( );
     }
 
     void _printMessage( const char* p_message ) {
@@ -244,31 +231,27 @@ namespace NAV {
     }
 
     void doPrintMessage( const char* p_message, style p_style ) {
-        u16 x = 10, y = 192 - 38;
+        u16 x = 12, y = 192 - 40;
         if( p_message ) {
             if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE ) {
-                IO::loadSpriteB( SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64, mbox1Pal,
-                                 mbox1Tiles, mbox1TilesLen, false, false, false, OBJPRIORITY_0,
-                                 false );
+                IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
+                                 false, false, false, OBJPRIORITY_0, false );
 
                 for( u8 i = 0; i < 13; ++i ) {
                     IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46,
-                                     32, 64, mbox1Pal, mbox1Tiles, mbox1TilesLen, false, true,
-                                     false, OBJPRIORITY_0, false );
+                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
                 }
-                x = 12, y = 192 - 40;
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 2, 2 );
             } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE ) {
-                IO::loadSpriteB( SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 44, 32, 64, mbox2Pal,
-                                 mbox2Tiles, mbox2TilesLen, false, false, false, OBJPRIORITY_0,
-                                 false );
+                IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
+                                 false, false, false, OBJPRIORITY_0, false );
 
                 for( u8 i = 0; i < 13; ++i ) {
-                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 44,
-                                     32, 64, mbox2Pal, mbox2Tiles, mbox2TilesLen, false, true,
-                                     false, OBJPRIORITY_0, false );
+                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 30 + 16 * i, 192 - 46,
+                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
                 }
+
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
             }
@@ -280,7 +263,7 @@ namespace NAV {
         } else {
             TEXT_CACHE = TEXT_CACHE + p_message;
             auto ln = IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF, 256,
-                                                      IO::font::LEFT, 17 );
+                                                      IO::font::LEFT, 16 );
             u16  tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, SPR_MSG_GFX, x, y, 64, 32, TEXT_BUF,
                                            64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
             tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32,
@@ -342,6 +325,9 @@ namespace NAV {
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
     printYNMessage( const char* p_message, style p_style, u8 p_selection ) {
         doPrintMessage( p_message, p_style );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
             = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
@@ -399,9 +385,50 @@ namespace NAV {
     printChoiceMessage( const char* p_message, style p_style, const std::vector<u16>& p_choices,
                         u8 p_selection ) {
         doPrintMessage( p_message, p_style );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
-        // TODO
-        return { };
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+
+        if( p_message || p_selection >= 254 ) {
+
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
+                                 true );
+            for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
+
+            for( u8 i = 0; i < p_choices.size( ); i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                }
+
+                IO::regularFont->printString(
+                    GET_STRING( p_choices[ i ] ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
+
+                res.push_back(
+                    std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                               i ) );
+            }
+        }
+
+        IO::updateOAM( true );
+
+        return res;
     }
 
     std::vector<std::pair<IO::inputTarget, menuOption>> getTouchPositions( bool p_bottom = true ) {
@@ -535,6 +562,7 @@ namespace NAV {
                         printMessage( buffer, MSG_INFO_NOCLOSE );
                     } ) ) {
                     printMessage( 0, MSG_INFO_NOCLOSE );
+                    SOUND::playSoundEffect( SFX_SAVE );
                     printMessage( GET_STRING( 94 ), MSG_INFO );
                 } else {
                     printMessage( 0, MSG_INFO_NOCLOSE );
@@ -557,6 +585,8 @@ namespace NAV {
     }
 
     void focusMenu( const char* p_path ) {
+        SOUND::playSoundEffect( SFX_MENU );
+
         // TODO
     }
 

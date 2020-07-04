@@ -31,10 +31,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "boxUI.h"
 #include "defines.h"
 #include "fs.h"
-#include "infopage1.h"
-#include "infopage2.h"
-#include "infopage3.h"
-#include "infopage4.h"
 #include "locationNames.h"
 #include "pokemon.h"
 #include "pokemonNames.h"
@@ -48,9 +44,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "box_arrow2.h"
 #include "boxsub.h"
 #include "boxsub2.h"
-#include "boxwp1.h"
-#include "boxwp2.h"
-#include "boxwp3.h"
 #include "noselection_128_32_1.h"
 #include "noselection_128_32_2.h"
 #include "noselection_64_20.h"
@@ -104,24 +97,20 @@ namespace BOX {
 #define ANCHOR_X ( 256 - 96 - 8 )
 #define ANCHOR_Y 8
 
-    const unsigned int* wallpaperTiles[ MAX_WALLPAPERS ]
-        = {boxwp1Bitmap, boxwp2Bitmap, boxwp3Bitmap};
-    const unsigned short* wallpaperPals[ MAX_WALLPAPERS ] = {boxwp1Pal, boxwp2Pal, boxwp3Pal};
-
     void boxUI::initTop( ) {
         IO::initVideo( true );
 
         IO::clearScreen( false, false, true );
         IO::initOAMTable( false );
         dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
+        dmaCopy( partybgPal, BG_PALETTE, 5 * 2 );
         bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
         bgSetScroll( IO::bg3, 0, 0 );
         REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA = 0xff | ( 0x06 << 8 );
     }
 
-    u16  TEXT_BUF[ 64 * 32 * 2 ] = {0};
+    u16  TEXT_BUF[ 64 * 32 * 2 ] = { 0 };
     void boxUI::initSub( ) {
         REG_BLDCNT_SUB = BLEND_NONE;
         IO::clearScreen( true, false, false );
@@ -331,9 +320,8 @@ namespace BOX {
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
-        dmaCopy( wallpaperTiles[ p_box->m_wallpaper % MAX_WALLPAPERS ], bgGetGfxPtr( IO::bg3sub ),
-                 256 * 256 );
-        dmaCopy( wallpaperPals[ p_box->m_wallpaper % MAX_WALLPAPERS ], BG_PALETTE_SUB, 64 * 2 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/BOX/",
+                std::to_string( p_box->m_wallpaper % MAX_WALLPAPERS ).c_str( ), 128, 49152, true );
         dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         dmaCopy( boxsub2Pal, BG_PALETTE_SUB, 13 * 2 );
 
@@ -587,48 +575,46 @@ namespace BOX {
                                   false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         // Info BG / Move window
         IO::loadSprite( SPR_MOVEWINDOW_START_OAM + 3, SPR_INFOPAGE_PAL, tileCnt, ANCHOR_X - 6,
-                        ANCHOR_Y + 119, 64, 64, 0, 0, infopage1TilesLen, false, false,
+                        ANCHOR_Y + 119, 64, 64, 0, 0, 64 * 64 / 2, false, false,
                         p_pokemon->isEgg( ), OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_MOVEWINDOW_START_OAM + 1, SPR_INFOPAGE_PAL, tileCnt, ANCHOR_X + 40,
-                        ANCHOR_Y + 119 + 64 - 52, 64, 64, 0, 0, infopage1TilesLen, true, true,
+                        ANCHOR_Y + 119 + 64 - 52, 64, 64, 0, 0, 64 * 64 / 2, true, true,
                         p_pokemon->isEgg( ), OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_INFOPAGE_START_OAM, SPR_INFOPAGE_PAL, tileCnt, INFO_X, INFO_Y, 64, 64,
-                        0, 0, infopage1TilesLen, false, false, false, OBJPRIORITY_3, false,
+                        0, 0, 64 * 64 / 2, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 8, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 64,
-                        INFO_Y + 64 - 15, 64, 64, 0, 0, infopage1TilesLen, true, true, false,
+                        INFO_Y + 64 - 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 4, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 80,
-                        INFO_Y + 64 - 15, 64, 64, 0, 0, infopage1TilesLen, true, true, false,
+                        INFO_Y + 64 - 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 3, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 80,
-                        INFO_Y + 64 + 15, 64, 64, 0, 0, infopage1TilesLen, true, true, false,
+                        INFO_Y + 64 + 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL, tileCnt,
-                                  INFO_X + 64, INFO_Y + 64 + 15, 64, 64, infopage1Pal,
-                                  infopage1Tiles, infopage1TilesLen, true, true, false,
+        tileCnt = IO::loadSprite( "UI/pg1", SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL, tileCnt,
+                                  INFO_X + 64, INFO_Y + 64 + 15, 64, 64, true, true, false,
                                   OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_MOVEWINDOW_START_OAM + 2, SPR_INFOPAGE_PAL, tileCnt, ANCHOR_X + 40,
-                        ANCHOR_Y + 119, 64, 64, 0, 0, infopage2TilesLen, false, false,
+                        ANCHOR_Y + 119, 64, 64, 0, 0, 64 * 64 / 2, false, false,
                         p_pokemon->isEgg( ), OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_MOVEWINDOW_START_OAM, SPR_INFOPAGE_PAL, tileCnt, ANCHOR_X - 6,
-                        ANCHOR_Y + 119 + 64 - 52, 64, 64, 0, 0, infopage2TilesLen, true, true,
+                        ANCHOR_Y + 119 + 64 - 52, 64, 64, 0, 0, 64 * 64 / 2, true, true,
                         p_pokemon->isEgg( ), OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 2, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 64, INFO_Y,
-                        64, 64, 0, 0, infopage2TilesLen, false, false, false, OBJPRIORITY_3, false,
+                        64, 64, 0, 0, 64 * 64 / 2, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 1, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 80, INFO_Y,
-                        64, 64, 0, 0, infopage2TilesLen, false, false, false, OBJPRIORITY_3, false,
+                        64, 64, 0, 0, 64 * 64 / 2, false, false, false, OBJPRIORITY_3, false,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 9, SPR_INFOPAGE_PAL, tileCnt, INFO_X,
-                        INFO_Y + 64 - 15, 64, 64, 0, 0, infopage2TilesLen, true, true, false,
+                        INFO_Y + 64 - 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL, tileCnt, INFO_X,
-                                  INFO_Y + 64 + 15, 64, 64, infopage2Pal, infopage2Tiles,
-                                  infopage2TilesLen, true, true, false, OBJPRIORITY_3, false,
-                                  OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "UI/pg2", SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL, tileCnt,
+                                  INFO_X, INFO_Y + 64 + 15, 64, 64, true, true, false,
+                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         oam[ SPR_BALL_ICON_OAM ].isHidden = true;
 
@@ -825,7 +811,7 @@ namespace BOX {
             tileCnt = IO::loadEggSprite( ANCHOR_X, ANCHOR_Y + 26, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
                                          tileCnt, false, p_pokemon->getSpecies( ) == PKMN_MANAPHY );
         }
-        u16 emptyPal[ 32 ]                = {0};
+        u16 emptyPal[ 32 ]                = { 0 };
         IO::OamTop->matrixBuffer[ 0 ].hdx = ( 1 << 8 );
         IO::OamTop->matrixBuffer[ 0 ].vdx = -( 1 << 8 );
 

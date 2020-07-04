@@ -89,6 +89,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define MAX_ACHIEVEMENTS 50
 #define INITIAL_NAVBG 11
 
+#define TRANSPARENCY_COEFF 0x0671
 enum style {
     MSG_NORMAL  = 0,
     MSG_INFO    = 1,

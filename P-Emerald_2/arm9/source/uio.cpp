@@ -61,8 +61,6 @@ namespace IO {
     int bg3;
     int bg2;
 
-#define TRANSPARENCY_COEFF 0x0671
-
     void initVideo( bool p_noFade ) {
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
         vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );

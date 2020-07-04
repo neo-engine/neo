@@ -33,13 +33,11 @@
 #include "fs.h"
 #include "item.h"
 #include "itemNames.h"
+#include "nav.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "uio.h"
-#include "nav.h"
 
-#include "main1.h"
-#include "main2.h"
 #include "star.h"
 
 namespace SAVE {
@@ -87,7 +85,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->printString( STRINGS[ 412 ][ m_options.m_language ], 128, 90, p_bottom,
-                    IO::font::CENTER );
+                                       IO::font::CENTER );
             IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
             return;
         }
@@ -104,15 +102,10 @@ namespace SAVE {
         pal[ IO::BLUE2_IDX ] = IO::RGB( 0, 0, 25 );
         pal[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
 
-
         // player sprite
-        if( m_appearance == 0 ) {
-            tileCnt = IO::loadSprite( 0, 0, tileCnt, 33, 45, 64, 64, main1Pal, main1Tiles,
-                                      main1TilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
-        } else {
-            tileCnt = IO::loadSprite( 0, 0, tileCnt, 33, 45, 64, 64, main2Pal, main2Tiles,
-                                      main2TilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
-        }
+        tileCnt
+            = IO::loadSprite( std::to_string( m_appearance ).c_str( ), 0, 0, tileCnt,
+                              33, 45, 64, 64, false, false, false, OBJPRIORITY_2, p_bottom );
 
         // stars
         IO::loadSprite( 1, 1, tileCnt, 100, 37, 16, 16, starPal, starTiles, starTilesLen, false,
@@ -137,7 +130,6 @@ namespace SAVE {
         // "TRAINER'S CARD"
         IO::boldFont->printString( STRINGS[ 405 ][ m_options.m_language ], 112, 13, p_bottom,
                                    IO::font::CENTER );
-
 
         if( achvs < 5 ) {
             snprintf( buffer, 99, "%s %05hu", STRINGS[ 340 ][ m_options.m_language ], m_id );
@@ -205,7 +197,7 @@ namespace SAVE {
         m_good1 = GOOD_MAGIC1;
         m_good2 = GOOD_MAGIC2;
 
-        m_startDate = CURRENT_DATE;
+        m_startDate    = CURRENT_DATE;
         m_currentNavBG = INITIAL_NAVBG;
 
         m_bag = BAG::bag( );
@@ -292,9 +284,7 @@ namespace SAVE {
         m_stepCount++;
         if( m_repelSteps > 0 ) {
             m_repelSteps--;
-            if( !m_repelSteps ) {
-                NAV::printMessage( GET_STRING( 4 ) );
-            }
+            if( !m_repelSteps ) { NAV::printMessage( GET_STRING( 4 ) ); }
         }
         if( !m_stepCount ) {
             bool hasHatchSpdUp

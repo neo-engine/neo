@@ -40,8 +40,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#include "BigCirc1.h"
-
 #ifdef DESQUID
 #include <cassert>
 #endif
@@ -55,7 +53,7 @@ namespace MAP {
 #define SPR_MAIN_PLAYER_PLAT_OAM 1
 
 #define SPR_MAIN_PLAYER_GFX 0
-#define SPR_MAIN_PLAYER_PLAT_GFX 384
+#define SPR_MAIN_PLAYER_PLAT_GFX 335
 
     mapDrawer* curMap = nullptr;
 #define CUR_SLICE _slices[ _curX ][ _curY ]
@@ -1586,8 +1584,8 @@ namespace MAP {
                                                                                           false );
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
         }
-        u16 tl = IO::loadSpriteB( 124, 0, 64, 32, 64, 64, BigCirc1Pal, BigCirc1Tiles,
-                                  BigCirc1TilesLen, false, false, false, OBJPRIORITY_1, false );
+        u16 tl = IO::loadSpriteB( "UI/cc", 124, 0, 64, 32, 64, 64, false, false, false,
+                                  OBJPRIORITY_1, false );
         IO::loadSpriteB( 125, 0, 128, 32, 64, 64, 0, 0, 0, false, true, false, OBJPRIORITY_1,
                          false );
         IO::loadSpriteB( 126, 0, 64, 96, 64, 64, 0, 0, 0, true, false, false, OBJPRIORITY_1,

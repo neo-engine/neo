@@ -62,7 +62,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleTrainer.h"
 #include "nav.h"
 
-#include "BigCirc1.h"
 #include "consoleFont.h"
 
 #ifdef DESQUID
@@ -206,7 +205,6 @@ void vblankIRQ( ) {
     }
 
     if( !ANIMATE_MAP ) return;
-    scanKeys( );
     FRAME_COUNT++;
     if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
 }
@@ -306,7 +304,6 @@ int main( int, char** p_argv ) {
         }
 #endif
 
-        /*
         if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
                 if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
@@ -325,20 +322,23 @@ int main( int, char** p_argv ) {
                                   mname.c_str( ) );
                         SOUND::playSoundEffect( SFX_CHOOSE );
                         IO::yesNoBox yn;
-                        if( yn.getResult( buffer ) ) {
-                            NAV::draw( );
+                        if( yn.getResult( buffer, MSG_NOCLOSE ) == IO::yesNoBox::YES ) {
+                            NAV::printMessage( 0, MSG_NOCLOSE );
                             swiWaitForVBlank( );
                             snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
                                       mname.c_str( ) );
-                            IO::messageBox( buffer, 0, false );
+                            NAV::printMessage( buffer, MSG_NOCLOSE );
                             MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
                                                   a.m_boxdata.isShiny( ) );
-                            NAV::draw( true );
+                            NAV::printMessage( 0, MSG_NOCLOSE );
+                            NAV::init( );
                             swiWaitForVBlank( );
 
                             MOVE::use( a.m_boxdata.m_moves[ j ], param );
+                        } else {
+                            NAV::printMessage( 0, MSG_NOCLOSE );
+                            NAV::init( );
                         }
-                        NAV::draw( true );
                         goto OUT;
                     }
             }
@@ -347,7 +347,6 @@ int main( int, char** p_argv ) {
             scanKeys( );
             continue;
         }
-        */
 
         // Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {

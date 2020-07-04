@@ -99,6 +99,7 @@ namespace BOX {
                 select( _selectedIdx );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx + 6 >= MAX_PKMN_PER_BOX
@@ -113,6 +114,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx < 6 ) {
@@ -126,6 +128,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx < MAX_PKMN_PER_BOX ) {
@@ -138,6 +141,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx < MAX_PKMN_PER_BOX ) {
@@ -151,6 +155,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( pressed & KEY_A ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx < MAX_PKMN_PER_BOX ) { // player selects a pkmn
@@ -429,6 +434,7 @@ namespace BOX {
             }
 
             if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( !_heldPkmn.getSpecies( )
@@ -449,6 +455,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx < MAX_PKMN_PER_BOX + 2 ) {
@@ -462,6 +469,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( !_heldPkmn.getSpecies( ) && _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
@@ -473,6 +481,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( !_heldPkmn.getSpecies( ) && _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
@@ -485,6 +494,7 @@ namespace BOX {
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( pressed & KEY_A ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
                 } else if( _selectedIdx < MAX_PKMN_PER_BOX + 6 ) { // player selects a pkmn
@@ -561,13 +571,16 @@ namespace BOX {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 _boxUI.selectButton( btns[ ( selectedBtn = ( selectedBtn + 1 ) % btns.size( ) ) ] );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
                 _boxUI.selectButton(
                     btns[ ( selectedBtn = ( selectedBtn + btns.size( ) - 1 ) % btns.size( ) ) ] );
                 cooldown = COOLDOWN_COUNT;
             } else if( pressed & KEY_A ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
                 switch( btns[ selectedBtn ] ) {
                 case boxUI::BUTTON_PKMN_MOVE:
                     return 1;
