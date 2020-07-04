@@ -30,7 +30,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <initializer_list>
 
 #include "fs.h"
-#include "messageBox.h"
 #include "pokemonNames.h"
 #include "sprite.h"
 #include "uio.h"
@@ -78,8 +77,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "type_water_de.h"
 #include "type_water_en.h"
 
-unsigned int   TEMP[ 12288 ]   = {0};
-unsigned short TEMP_PAL[ 256 ] = {0};
+unsigned int   TEMP[ 12288 ]   = { 0 };
+unsigned short TEMP_PAL[ 256 ] = { 0 };
 
 namespace IO {
     const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
@@ -90,30 +89,39 @@ namespace IO {
     const char* TRAINER_PATH   = "n/a";
 
     const unsigned int* TypeTiles[ 19 ][ LANGUAGES ]
-        = {{type_normal_enTiles, type_normal_deTiles},   {type_fight_enTiles, type_fight_deTiles},
-           {type_flying_enTiles, type_flying_deTiles},   {type_poison_enTiles, type_poison_deTiles},
-           {type_ground_enTiles, type_ground_deTiles},   {type_rock_enTiles, type_rock_deTiles},
-           {type_bug_enTiles, type_bug_deTiles},         {type_ghost_enTiles, type_ghost_deTiles},
-           {type_steel_enTiles, type_steel_deTiles},     {type_unknownTiles, type_unknownTiles},
-           {type_water_enTiles, type_water_deTiles},     {type_fire_enTiles, type_fire_deTiles},
-           {type_grass_enTiles, type_grass_deTiles},     {type_electr_enTiles, type_electr_deTiles},
-           {type_psychic_enTiles, type_psychic_deTiles}, {type_ice_enTiles, type_ice_deTiles},
-           {type_dragon_enTiles, type_dragon_deTiles},   {type_dark_enTiles, type_dark_deTiles},
-           {type_fairy_enTiles, type_fairy_deTiles}};
+        = { { type_normal_enTiles, type_normal_deTiles },
+            { type_fight_enTiles, type_fight_deTiles },
+            { type_flying_enTiles, type_flying_deTiles },
+            { type_poison_enTiles, type_poison_deTiles },
+            { type_ground_enTiles, type_ground_deTiles },
+            { type_rock_enTiles, type_rock_deTiles },
+            { type_bug_enTiles, type_bug_deTiles },
+            { type_ghost_enTiles, type_ghost_deTiles },
+            { type_steel_enTiles, type_steel_deTiles },
+            { type_unknownTiles, type_unknownTiles },
+            { type_water_enTiles, type_water_deTiles },
+            { type_fire_enTiles, type_fire_deTiles },
+            { type_grass_enTiles, type_grass_deTiles },
+            { type_electr_enTiles, type_electr_deTiles },
+            { type_psychic_enTiles, type_psychic_deTiles },
+            { type_ice_enTiles, type_ice_deTiles },
+            { type_dragon_enTiles, type_dragon_deTiles },
+            { type_dark_enTiles, type_dark_deTiles },
+            { type_fairy_enTiles, type_fairy_deTiles } };
     const unsigned short* TypePals[ 19 ][ LANGUAGES ]
-        = {{type_normal_enPal, type_normal_dePal},   {type_fight_enPal, type_fight_dePal},
-           {type_flying_enPal, type_flying_dePal},   {type_poison_enPal, type_poison_dePal},
-           {type_ground_enPal, type_ground_dePal},   {type_rock_enPal, type_rock_dePal},
-           {type_bug_enPal, type_bug_dePal},         {type_ghost_enPal, type_ghost_dePal},
-           {type_steel_enPal, type_steel_dePal},     {type_unknownPal, type_unknownPal},
-           {type_water_enPal, type_water_dePal},     {type_fire_enPal, type_fire_dePal},
-           {type_grass_enPal, type_grass_dePal},     {type_electr_enPal, type_electr_dePal},
-           {type_psychic_enPal, type_psychic_dePal}, {type_ice_enPal, type_ice_dePal},
-           {type_dragon_enPal, type_dragon_dePal},   {type_dark_enPal, type_dark_dePal},
-           {type_fairy_enPal, type_fairy_dePal}};
+        = { { type_normal_enPal, type_normal_dePal },   { type_fight_enPal, type_fight_dePal },
+            { type_flying_enPal, type_flying_dePal },   { type_poison_enPal, type_poison_dePal },
+            { type_ground_enPal, type_ground_dePal },   { type_rock_enPal, type_rock_dePal },
+            { type_bug_enPal, type_bug_dePal },         { type_ghost_enPal, type_ghost_dePal },
+            { type_steel_enPal, type_steel_dePal },     { type_unknownPal, type_unknownPal },
+            { type_water_enPal, type_water_dePal },     { type_fire_enPal, type_fire_dePal },
+            { type_grass_enPal, type_grass_dePal },     { type_electr_enPal, type_electr_dePal },
+            { type_psychic_enPal, type_psychic_dePal }, { type_ice_enPal, type_ice_dePal },
+            { type_dragon_enPal, type_dragon_dePal },   { type_dark_enPal, type_dark_dePal },
+            { type_fairy_enPal, type_fairy_dePal } };
 
-    const unsigned int*   HitTypeTiles[ 3 ] = {damage_0Tiles, damage_1Tiles, damage_2Tiles};
-    const unsigned short* HitTypePals[ 3 ]  = {damage_0Pal, damage_1Pal, damage_2Pal};
+    const unsigned int*   HitTypeTiles[ 3 ] = { damage_0Tiles, damage_1Tiles, damage_2Tiles };
+    const unsigned short* HitTypePals[ 3 ]  = { damage_0Pal, damage_1Pal, damage_2Pal };
 
     const u8  SPRITE_DMA_CHANNEL      = 2;
     const u16 BYTES_PER_16_COLOR_TILE = 32;
@@ -735,6 +743,92 @@ namespace IO {
                                p_bottom, false, false, p_flipx, p_topOnly );
     }
 
+    u16 loadPKMNSpriteB( const char* p_path, const u16 p_pkmnId, const s16 p_posX, const s16 p_posY,
+                         u8 p_oamIndex, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female,
+                         bool p_flipx, bool p_topOnly, u8 p_forme ) {
+
+        memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
+        memset( TEMP, 0, sizeof( TEMP ) );
+        if( !p_forme ) {
+            snprintf( BUFFER, 99, "%02d/%d/%d%s%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_shiny ? "s" : "", p_female ? "f" : "" );
+        } else {
+            snprintf( BUFFER, 99, "%02d/%d/%d-%hhu%s%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_pkmnId, p_forme, p_shiny ? "s" : "", p_female ? "f" : "" );
+        }
+        if( !FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
+                                                         TEMP ) ) {
+            return false;
+        }
+
+        loadSpriteB( p_oamIndex++, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY, 64, 64,
+                     TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
+        loadSpriteB( p_oamIndex++, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY, 32, 64,
+                     0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
+        if( !p_topOnly ) {
+            loadSpriteB( p_oamIndex++, p_tileCnt + 96, p_flipx ? 32 + p_posX : p_posX, p_posY + 64,
+                         64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
+            loadSpriteB( p_oamIndex, p_tileCnt + 128, p_flipx ? p_posX : 64 + p_posX, p_posY + 64,
+                         32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
+        }
+        updateOAM( p_bottom );
+        return p_tileCnt + 144;
+    }
+    u16 loadPKMNSpriteB( const u16 p_pkmnId, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                         u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female, bool p_flipx,
+                         bool p_topOnly, u8 p_forme ) {
+        u16 res = 0;
+        if( !existsPKMNSprite( p_pkmnId, true, false ) ) { p_flipx = false; }
+        if( !existsPKMNSprite( p_pkmnId, false, true ) ) { p_female = false; }
+
+        if( ( res
+              = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                 p_bottom, p_shiny, p_female, p_flipx, p_topOnly, p_forme ) ) ) {
+            return res;
+        }
+        if( p_female
+            && ( res
+                 = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                    p_bottom, p_shiny, false, p_flipx, p_topOnly, p_forme ) ) ) {
+            return res;
+        }
+        if( p_forme
+            && ( res = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                        p_bottom, p_shiny, p_female, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+        if( p_shiny
+            && ( res
+                 = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                    p_bottom, false, p_female, p_flipx, p_topOnly, p_forme ) ) ) {
+            return res;
+        }
+
+        if( p_female && p_forme
+            && ( res = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                        p_bottom, p_shiny, false, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+        if( p_female && p_shiny
+            && ( res = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                        p_bottom, false, false, p_flipx, p_topOnly, p_forme ) ) ) {
+            return res;
+        }
+        if( p_shiny && p_forme
+            && ( res = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                        p_bottom, false, p_female, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+
+        if( ( res = loadPKMNSpriteB( PKMN_PATH, p_pkmnId, p_posX, p_posY, p_oamIndex, p_tileCnt,
+                                     p_bottom, false, false, p_flipx, p_topOnly ) ) ) {
+            return res;
+        }
+
+        return loadPKMNSpriteB( PKMN_PATH, 0, p_posX, p_posY, p_oamIndex, p_tileCnt, p_bottom,
+                                false, false, p_flipx, p_topOnly );
+    }
+
     u16 loadPKMNSpriteBack( const u16 p_pkmnId, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                             u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female,
                             bool p_flipx, bool p_topOnly, u8 p_forme ) {
@@ -874,22 +968,36 @@ namespace IO {
     }
 
     u16 loadOWSpriteB( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
-                       u16 p_tileCnt ) {
+                       u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
         FILE* f = FS::open( OW_PATH, p_picnum, ".rsd" );
-        return loadAnimatedSpriteB( f, p_posX, p_posY, p_oamIndex, p_tileCnt, OBJPRIORITY_2,
-                                    false );
+
+        FS::read( f, p_palData, sizeof( u16 ), 16 );
+        u8 frameCount, width, height;
+        FS::read( f, &frameCount, sizeof( u8 ), 1 );
+        FS::read( f, &width, sizeof( u8 ), 1 );
+        FS::read( f, &height, sizeof( u8 ), 1 );
+        FS::read( f, p_dataBuffer, sizeof( u32 ), width * height * frameCount / 8 );
+        FS::close( f );
+
+        return loadSpriteB( p_oamIndex, p_tileCnt, p_posX, p_posY, width, height, p_palData,
+                            reinterpret_cast<unsigned int*>( p_dataBuffer ), width * height / 2,
+                            false, false, false, OBJPRIORITY_2, false );
     }
 
-    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt ) {
+    void setOWSpriteFrame( u8 p_frame, bool p_flip, u8 p_oamIndex, u16 p_palData[ 16 ],
+                           u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
         u8 frame = p_frame;
-        if( frame % 20 >= 9 ) frame -= 3;
-        if( p_frame % 20 == 15 ) frame--;
-        u8 memPos = frame / 20 * 9 + frame % 20;
+        u8 wd = spriteInfoTop[ p_oamIndex ].m_width, hg = spriteInfoTop[ p_oamIndex ].m_height;
 
-        setAnimatedSpriteFrame( memPos,
-                                ( frame != p_frame ) && ( p_frame % 20 < 12 || p_frame % 20 == 15 ),
-                                p_oamIndex, p_tileCnt );
+        loadSpriteB(
+            p_oamIndex, OamTop->oamBuffer[ p_oamIndex ].gfxIndex, OamTop->oamBuffer[ p_oamIndex ].x,
+            OamTop->oamBuffer[ p_oamIndex ].y, wd, hg, p_palData,
+            reinterpret_cast<unsigned int*>( p_dataBuffer ) + wd * hg * frame / 8, wd * hg / 2,
+            false, false, false, OamTop->oamBuffer[ p_oamIndex ].priority, false );
+
+        OamTop->oamBuffer[ p_oamIndex ].hFlip = p_flip;
     }
+
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt ) {
         u8 width  = spriteInfoTop[ p_oamIndex ].m_width,
            height = spriteInfoTop[ p_oamIndex ].m_height;
@@ -1132,10 +1240,10 @@ namespace IO {
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         std::string itemname
             = ( p_hm ? "VM" : "TM" )
-              + ( std::vector<std::string>{"Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
-                                           "Pflanze", "Geist", "Stahl", "Unbekannt", "Wasser",
-                                           "Feuer", "Pflanze", "Elektro", "Psycho", "Eis", "Drache",
-                                           "Unlicht", "Fee"}[ p_type ] );
+              + ( std::vector<std::string>{ "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
+                                            "Pflanze", "Geist", "Stahl", "Unbekannt", "Wasser",
+                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
+                                            "Drache", "Unlicht", "Fee" }[ p_type ] );
 
         return loadIcon( TM_PATH, itemname.c_str( ), p_posX, p_posY, p_oamIndex, p_palCnt,
                          p_tileCnt, p_bottom );
@@ -1145,10 +1253,10 @@ namespace IO {
                      u16 p_tileCnt, bool p_bottom ) {
         std::string itemname
             = ( p_hm ? "VM" : "TM" )
-              + ( std::vector<std::string>{"Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
-                                           "Pflanze", "Geist", "Stahl", "Unbekannt", "Wasser",
-                                           "Feuer", "Pflanze", "Elektro", "Psycho", "Eis", "Drache",
-                                           "Unlicht", "Fee"}[ p_type ] );
+              + ( std::vector<std::string>{ "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
+                                            "Pflanze", "Geist", "Stahl", "Unbekannt", "Wasser",
+                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
+                                            "Drache", "Unlicht", "Fee" }[ p_type ] );
 
         return loadIconB( TM_PATH, itemname.c_str( ), p_posX, p_posY, p_oamIndex, p_tileCnt,
                           p_bottom );

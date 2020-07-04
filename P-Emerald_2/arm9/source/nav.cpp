@@ -31,7 +31,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs.h"
 #include "keyboard.h"
-#include "messageBox.h"
 #include "nav.h"
 #include "screenFade.h"
 #include "sound.h"
@@ -66,11 +65,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Border.h"
 
-#include "bg00.h"
-
-#include "Back.h"
-#include "BagSpr.h"
-
 #include "icon_bag.h"
 #include "icon_dex.h"
 #include "icon_id.h"
@@ -78,364 +72,361 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "icon_save.h"
 #include "icon_select.h"
 #include "icon_settings.h"
+#include "mbox1.h"
+#include "mbox2.h"
+#include "mbox3_1.h"
+#include "mbox3_2.h"
+#include "mbox3_3.h"
+#include "mbox3_4.h"
+#include "noselection_96_32_1.h"
+#include "noselection_96_32_2.h"
+#include "noselection_96_32_4.h"
 
 namespace NAV {
-    state STATE        = HOME;
-    bool  ALLOW_INIT   = true;
-    u8    CURRENT_BANK = 0;
-    u16   CURRENT_MAP  = 0;
+#define SPR_MSGTEXT_OAM 108
+#define SPR_MSGBOX_OAM 112
+#define SPR_MSGCONT_OAM 127
 
-    void drawMapMug( );
-    void drawBorder( );
+#define SPR_MSGBOX_GFX 239
+#define SPR_MSG_GFX 287
+#define SPR_MSGCONT_GFX 511
 
-    u8 mainSpritePos[ 12 ][ 2 ]
-        = {{0, 0},     {12, 42},   {244, 26}, {244, 56}, {244, 86}, {12, 162},
-           {244, 116}, {244, 146}, {0, 0},    {12, 72},  {12, 102}, {12, 132}};
-    unsigned int   NAV_DATA[ 12288 ]   = {0};
-    unsigned short NAV_DATA_PAL[ 256 ] = {0};
-    backgroundSet  BGs[ MAXBG ] = {{"Magnetizing Magnemite", bg00Bitmap, bg00Pal, false, true},
-                                  {"Executing Exeggcute", NAV_DATA, NAV_DATA_PAL, true, true},
-                                  {"Fighting Torchic", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Reborn Ho-Oh", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Raging Gyarados", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Mystic Guardevoir", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Sleeping Eevee", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Waiting Suicune", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Awakening Xerneas", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Awakening Yveltal", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Fighting Groudon", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Fighting Kyogre", NAV_DATA, NAV_DATA_PAL, true, false},
-                                  {"Working Klink", NAV_DATA, NAV_DATA_PAL, true, true}};
+#define SPR_MENU_OAM_SUB( p_idx ) ( 0 + ( p_idx ) )
+#define SPR_MENU_SEL_OAM_SUB 6
+#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 6 * ( p_pos ) )
 
-#define POS mainSpritePos
+#define SPR_MENU_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
+#define SPR_MENU_SEL_PAL_SUB 6
+#define SPR_BOX_PAL_SUB 7
+#define SPR_BOX_SEL_PAL_SUB 8
+#define SPR_X_PAL_SUB 9
+#define SPR_WINDOW_PAL_SUB 10
 
-    std::map<state, state> backTransition = {{MAP_MUG, HOME},
-                                             {MAP_BIG, MAP},
-                                             {MAP, HOME},
+    u16         TEXT_BUF[ 32 * 256 ] = { 0 };
+    u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE };
+    std::string TEXT_CACHE           = "";
 
-                                             {HOME, HOME}};
-
-    void home( ) {
-        STATE = HOME;
+    void hideMessageBox( ) {
+        for( u8 i = 0; i < 14; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_MSGBOX_OAM + i ].isHidden = true;
+        }
+        for( u8 i = 0; i < 4; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + i ].isHidden = true;
+        }
+        std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+        TEXT_CACHE = "";
+        IO::updateOAM( false );
     }
 
-    void drawBorder( ) {
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
-        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+    void init( bool p_bottom ) {
+        IO::clearScreen( p_bottom, false, true );
+        IO::initOAMTable( p_bottom );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::smallFont->setColor( 0, 0 );
+        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        auto ptr  = !p_bottom ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
+        auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
+        auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
+
+        FS::readPictureData( ptr3, "nitro:/PICS/NAV/",
+                             std::to_string( SAVE::SAV.getActiveFile( ).m_currentNavBG ).c_str( ),
+                             192 * 2, 192 * 256, p_bottom );
 
         dmaCopy( BorderBitmap, ptr, 256 * 192 );
         dmaCopy( BorderPal + 192, pal + 192, 64 );
 
-        if( ANIMATE_MAP ) {
-            /*  pal[ IO::WHITE_IDX ] = IO::WHITE;
-              pal[ IO::GRAY_IDX ]  = IO::GRAY;
-              pal[ IO::BLACK_IDX ] = IO::BLACK;
-              regularFont->setColor( IO::WHITE_IDX, 1 );
-              regularFont->setColor( IO::GRAY_IDX, 2 );
-              regularFont->setColor( 0, 0 ); */
-            IO::boldFont->setColor( 0, 1 );
-            IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-
-            IO::boldFont->printString( ( FS::getLocation( CURRENT_MAP ) ).c_str( ), 7, 4,
-                                       !SCREENS_SWAPPED );
-        }
-
-        DRAW_TIME = true;
-    }
-    void updateItems( ) {
-        bool b = false;
-        for( u8 i = 0; i < 3; ++i ) {
-            u16 curitm
-                = SAVE::SAV.getActiveFile( )
-                      .m_lstUsedItems[ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 4 - i )
-                                       % 5 ];
-            if( !b && SAVE::SAV.getActiveFile( ).m_registeredItem
-                && ( !curitm || i == 2
-                     || curitm == SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                curitm = SAVE::SAV.getActiveFile( ).m_registeredItem;
-                b      = true;
-            }
-            if( curitm )
-                IO::loadItemIcon( curitm, POS[ ITM( i ) ][ 0 ] - 16, POS[ ITM( i ) ][ 1 ] - 16,
-                                  ITM( i ), ITM( i ),
-                                  IO::Oam->oamBuffer[ ITM_BACK + 2 ].gfxIndex + 32 * ( i + 1 ) );
-        }
-        IO::updateOAM( true );
-    }
-
-    void initMainSprites( bool p_showBack = false ) {
-        IO::initOAMTable( true );
         u16 tileCnt = 0;
 
-        tileCnt = IO::loadSprite( BACK_ID, BACK_ID, tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28,
-                                  32, 32, BackPal, BackTiles, BackTilesLen, false, false,
-                                  !p_showBack, OBJPRIORITY_0, true );
+        // Main menu icons
+        tileCnt = IO::loadSprite(
+            SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt, 256 - 29, 192 - 6 * 29, 32, 32,
+            icon_partyPal, icon_partyTiles, icon_partyTilesLen, false, false,
+            !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt, 256 - 29,
+                                  192 - 5 * 29, 32, 32, icon_dexPal, icon_dexTiles,
+                                  icon_dexTilesLen, false, false,
+                                  !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ),
+                                  OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 2 ), SPR_MENU_PAL_SUB( 2 ), tileCnt, 256 - 29,
+                                  192 - 4 * 29, 32, 32, icon_bagPal, icon_bagTiles,
+                                  icon_bagTilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 3 ), SPR_MENU_PAL_SUB( 3 ), tileCnt, 256 - 29,
+                                  192 - 3 * 29, 32, 32, icon_idPal, icon_idTiles, icon_idTilesLen,
+                                  false, false, false, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( SPR_MENU_OAM_SUB( 4 ), SPR_MENU_PAL_SUB( 4 ), tileCnt, 256 - 29,
+                                  192 - 2 * 29, 32, 32, icon_savePal, icon_saveTiles,
+                                  icon_saveTilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
+        tileCnt
+            = IO::loadSprite( SPR_MENU_OAM_SUB( 5 ), SPR_MENU_PAL_SUB( 5 ), tileCnt, 256 - 29,
+                              192 - 1 * 29, 32, 32, icon_settingsPal, icon_settingsTiles,
+                              icon_settingsTilesLen, false, false, false, OBJPRIORITY_2, p_bottom );
 
-        //// Main menu sprites
-        // tileCnt
-        //    = IO::loadSprite( A_ID, A_ID, tileCnt, POS[ SAVE_ID ][ 0 ] - 16,
-        //                      POS[ SAVE_ID ][ 1 ] - 16, 32, 32, icon_save_1Pal, icon_save_1Tiles,
-        //                      icon_save_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        // tileCnt = IO::loadSprite( FWD_ID, FWD_ID, tileCnt, POS[ BAG_ID ][ 0 ] - 16,
-        //                          POS[ BAG_ID ][ 1 ] - 16, 32, 32, icon_bag_1Pal, icon_bag_1Tiles,
-        //                          icon_bag_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        // tileCnt
-        //    = IO::loadSprite( BWD_ID, BWD_ID, tileCnt, POS[ PKMN_ID ][ 0 ] - 16,
-        //                      POS[ PKMN_ID ][ 1 ] - 16, 32, 32, icon_party_1Pal,
-        //                      icon_party_1Tiles, icon_party_1TilesLen, false, false, false,
-        //                      OBJPRIORITY_0, true );
-        // tileCnt = IO::loadSprite( NAV_ID, NAV_ID, tileCnt, POS[ NAV_ID ][ 0 ] - 16,
-        //                          POS[ NAV_ID ][ 1 ] - 16, 32, 32, icon_settings_1Pal,
-        //                          icon_settings_1Tiles, icon_settings_1TilesLen, false, false,
-        //                          false, OBJPRIORITY_0, true );
-        // tileCnt = IO::loadSprite( ID_ID, ID_ID, tileCnt, POS[ ID_ID ][ 0 ] - 16,
-        //                          POS[ ID_ID ][ 1 ] - 16, 32, 32, icon_id_1Pal, icon_id_1Tiles,
-        //                          icon_id_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        // tileCnt = IO::loadSprite( DEX_ID, DEX_ID, tileCnt, POS[ DEX_ID ][ 0 ] - 16,
-        //                          POS[ DEX_ID ][ 1 ] - 16, 32, 32, icon_dex_1Pal, icon_dex_1Tiles,
-        //                          icon_dex_1TilesLen, false, false, false, OBJPRIORITY_0, true );
-        // tileCnt = IO::loadItemIcon( "----", POS[ OPTS_ID ][ 0 ] - 16, POS[ OPTS_ID ][ 1 ] - 16,
-        // 67,
-        //                            OPTS_ID, tileCnt );
+        tileCnt
+            = IO::loadSprite( SPR_MENU_SEL_OAM_SUB, SPR_MENU_SEL_PAL_SUB, tileCnt, 256 - 31,
+                              192 - 1 * 31, 32, 32, icon_selectPal, icon_selectTiles,
+                              icon_selectTilesLen, false, false, true, OBJPRIORITY_2, p_bottom );
 
-        IO::loadSprite( PKMN_ID, ITM_BACK, tileCnt, POS[ PKMN_ID ][ 0 ] - 16,
-                        POS[ PKMN_ID ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles, BagSprTilesLen,
-                        false, false, false, OBJPRIORITY_2, true );
-        IO::loadSprite( OPTS_ID, ITM_BACK, tileCnt, POS[ OPTS_ID ][ 0 ] - 16,
-                        POS[ OPTS_ID ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles, BagSprTilesLen,
-                        false, false, false, OBJPRIORITY_2, true );
-        IO::loadSprite( DEX_ID, ITM_BACK, tileCnt, POS[ DEX_ID ][ 0 ] - 16, POS[ DEX_ID ][ 1 ] - 16,
-                        32, 32, BagSprPal, BagSprTiles, BagSprTilesLen, false, false, false,
-                        OBJPRIORITY_2, true );
-        IO::loadSprite( NAV_ID, ITM_BACK, tileCnt, POS[ NAV_ID ][ 0 ] - 16, POS[ NAV_ID ][ 1 ] - 16,
-                        32, 32, BagSprPal, BagSprTiles, BagSprTilesLen, false, false, false,
-                        OBJPRIORITY_2, true );
-        IO::loadSprite( ID_ID, ITM_BACK, tileCnt, POS[ ID_ID ][ 0 ] - 16, POS[ ID_ID ][ 1 ] - 16,
-                        32, 32, BagSprPal, BagSprTiles, BagSprTilesLen, false, false, false,
-                        OBJPRIORITY_2, true );
-        IO::loadSprite( SAVE_ID, ITM_BACK, tileCnt, POS[ SAVE_ID ][ 0 ] - 16,
-                        POS[ SAVE_ID ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles, BagSprTilesLen,
-                        false, false, false, OBJPRIORITY_2, true );
-        IO::loadSprite( BAG_ID, ITM_BACK, tileCnt, POS[ BAG_ID ][ 0 ] - 16, POS[ BAG_ID ][ 1 ] - 16,
-                        32, 32, BagSprPal, BagSprTiles, BagSprTilesLen, false, false, false,
-                        OBJPRIORITY_2, true );
+        // Choice boxes
 
-        IO::loadSprite( ITM_BACK, ITM_BACK, tileCnt, POS[ ITM( 0 ) ][ 0 ] - 16,
-                        POS[ ITM( 0 ) ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles, BagSprTilesLen,
-                        false, false, false, OBJPRIORITY_2, true );
-        IO::loadSprite( ITM_BACK + 1, ITM_BACK, tileCnt, POS[ ITM( 1 ) ][ 0 ] - 16,
-                        POS[ ITM( 1 ) ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles, BagSprTilesLen,
-                        false, false, false, OBJPRIORITY_2, true );
-        tileCnt = IO::loadSprite( ITM_BACK + 2, ITM_BACK, tileCnt, POS[ ITM( 2 ) ][ 0 ] - 16,
-                                  POS[ ITM( 2 ) ][ 1 ] - 16, 32, 32, BagSprPal, BagSprTiles,
-                                  BagSprTilesLen, false, false, false, OBJPRIORITY_2, true );
-        updateItems( );
-        IO::updateOAM( true );
-    }
+        for( u8 i = 0; i < 3; i++ ) {
+            u8 pos = 2 * i;
 
-    void drawMapMug( ) {
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
-        char buffer[ 100 ];
-        snprintf( buffer, 99, "%03hu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR, CURRENT_BANK,
-                  getCurrentDaytime( ) % 4 );
-        FS::readPictureData( ptr, "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED );
-        drawBorder( );
-    }
-
-    void draw( bool p_initMainSrites, u8 p_newIdx ) {
-        if( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx == p_newIdx )
-            return;
-        else if( p_newIdx == u8( 255 ) )
-            p_newIdx = SAVE::SAV.getActiveFile( ).m_options.m_bgIdx;
-
-        auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
-        auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
-
-        if( STATE != MAP_MUG ) {
-            if( !BGs[ p_newIdx ].m_loadFromRom ) {
-                dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
-                dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 192 * 2 );
-                SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = p_newIdx;
-            } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ), p_newIdx ) ) {
-                dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 192 );
-                dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 192 * 2 );
-                SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = 0;
-            } else
-                SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = p_newIdx;
-            drawBorder( );
-        } else if( STATE == MAP_MUG ) {
-            drawMapMug( );
-        }
-        if( p_initMainSrites && ALLOW_INIT ) initMainSprites( STATE != HOME );
-    }
-
-    void showNewMap( u8 p_newMap ) {
-        if( p_newMap == CURRENT_BANK ) return;
-        CURRENT_BANK = p_newMap;
-        CURRENT_MAP  = MAP::curMap->getCurrentLocationId( );
-        char buffer[ 100 ];
-        snprintf( buffer, 99, "%03hhu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR, CURRENT_BANK,
-                  getCurrentDaytime( ) % 4 );
-        if( FS::exists( "nitro:/PICS/MAP_MUG/", buffer ) )
-            STATE = MAP_MUG;
-        else if( STATE == MAP_MUG )
-            STATE = HOME;
-
-        IO::Oam->oamBuffer[ BACK_ID ].isHidden = ( STATE == HOME );
-        IO::updateOAM( true );
-
-        draw( false );
-    }
-
-    void updateMap( u16 p_newMap ) {
-        if( p_newMap != CURRENT_MAP ) {
-            CURRENT_MAP = p_newMap;
-            draw( false );
-        }
-    }
-
-    void handleInput( touchPosition p_touch, const char* p_path ) {
-        touchPosition& touch = p_touch;
-
-        if( held & KEY_Y ) {
-            IO::waitForKeysUp( KEY_Y );
-            if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
-                if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem, []( const char* ) {} );
-                    updateItems( );
-                } else {
-                    IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
-                    draw( true );
-                }
+            if( !i ) {
+                tileCnt
+                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt, 29,
+                                      42 + i * 36, 16, 32, noselection_96_32_1Pal,
+                                      noselection_96_32_1Tiles, noselection_96_32_1TilesLen, false,
+                                      false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                tileCnt
+                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
+                                      29 + 16, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                      noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
+                                      false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             } else {
-                IO::messageBox( GET_STRING( 98 ), GET_STRING( 91 ) );
-                draw( true );
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29, 42 + i * 36, 16,
+                                32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                                noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
+                                p_bottom, OBJMODE_BLENDED );
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 16,
+                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
+                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             }
-            swiWaitForVBlank( );
-            scanKeys( );
-            return;
+            for( u8 j = 2; j < 5; j++ ) {
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 16,
+                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
+                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+            }
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 42 + i * 36,
+                            16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
+                            OBJMODE_BLENDED );
         }
 
-        bool itmsn = false;
-        for( u8 i = 0; i < 3; ++i ) {
-            u16 curitm
-                = SAVE::SAV.getActiveFile( )
-                      .m_lstUsedItems[ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 4 - i )
-                                       % 5 ];
-            if( !itmsn && SAVE::SAV.getActiveFile( ).m_registeredItem
-                && ( !curitm || i == 2
-                     || curitm == SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                curitm = SAVE::SAV.getActiveFile( ).m_registeredItem;
-                itmsn  = true;
+        for( u8 i = 0; i < 3; i++ ) {
+            u8 pos = 2 * i + 1;
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131, 42 + i * 36, 16, 32,
+                            noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                            noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
+                            p_bottom, OBJMODE_BLENDED );
+            for( u8 j = 1; j < 5; j++ ) {
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 16,
+                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
+                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             }
-            /*
-            if( GET_AND_WAIT_C( POS[ ITM( i ) ][ 0 ], POS[ ITM( i ) ][ 1 ], 14 ) ) {
-                if( curitm ) {
-                    if( u16( -1 )
-                        == SAVE::SAV.getActiveFile( ).m_bag.count(
-                               BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm ) ) {
-                        IO::yesNoBox yn( GET_STRING( 91 ) );
-                        char         buffer[ 100 ];
-                        snprintf( buffer, 99, GET_STRING( 96 ),
-                                  ItemList[ curitm ]->getDisplayName( true ).c_str( ) );
-                        if( yn.getResult( buffer ) ) {
-                            for( u8 j = i; j < 4; ++j ) {
-                                SAVE::SAV.getActiveFile( )
-                                    .m_lstUsedItems[ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx
-                                                       + 4 - j )
-                                                     % 5 ]
-                                    = SAVE::SAV.getActiveFile( ).m_lstUsedItems
-                                          [ ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 3
-                                              - j )
-                                            % 5 ];
-                            }
-                            SAVE::SAV.getActiveFile( )
-                                .m_lstUsedItems[ SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx ]
-                                = 0;
-                        }
-                        draw( true );
-                    } else if( ItemList[ curitm ]->useable( ) ) {
-                        if( ItemList[ curitm ]->use( true ) ) IO::messageBox( "", 0, false );
-                        ItemList[ curitm ]->use( );
-                        if( ItemList[ curitm ]->m_itemType != item::KEY_ITEM )
-                            SAVE::SAV.getActiveFile( ).m_bag.erase(
-                                BAG::toBagType( ItemList[ curitm ]->m_itemType ), curitm, 1 );
-                        draw( true );
-                    } else {
-                        IO::messageBox( GET_STRING( 58 ), GET_STRING( 91 ) );
-                        draw( true );
-                    }
-                } else {
-                    IO::messageBox( GET_STRING( 97 ), GET_STRING( 91 ) );
-                    draw( true );
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16,
+                            42 + i * 36, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
+                            OBJMODE_BLENDED );
+        }
+
+        IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
+        IO::updateOAM( p_bottom );
+        hideMessageBox( );
+    }
+
+    void _printMessage( const char* p_message ) {
+        printMessage( p_message );
+    }
+
+    void doPrintMessage( const char* p_message, style p_style ) {
+        u16 x = 10, y = 192 - 38;
+        if( p_message ) {
+            if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE ) {
+                IO::loadSpriteB( SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64, mbox1Pal,
+                                 mbox1Tiles, mbox1TilesLen, false, false, false, OBJPRIORITY_0,
+                                 false );
+
+                for( u8 i = 0; i < 13; ++i ) {
+                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46,
+                                     32, 64, mbox1Pal, mbox1Tiles, mbox1TilesLen, false, true,
+                                     false, OBJPRIORITY_0, false );
                 }
-                return;
+                x = 12, y = 192 - 40;
+                IO::regularFont->setColor( 1, 1 );
+                IO::regularFont->setColor( 2, 2 );
+            } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE ) {
+                IO::loadSpriteB( SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 44, 32, 64, mbox2Pal,
+                                 mbox2Tiles, mbox2TilesLen, false, false, false, OBJPRIORITY_0,
+                                 false );
+
+                for( u8 i = 0; i < 13; ++i ) {
+                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 44,
+                                     32, 64, mbox2Pal, mbox2Tiles, mbox2TilesLen, false, true,
+                                     false, OBJPRIORITY_0, false );
+                }
+                IO::regularFont->setColor( 3, 1 );
+                IO::regularFont->setColor( 2, 2 );
             }
-            */
         }
 
-        /*        if( STATE != HOME && GET_AND_WAIT_R( 224, 164, 300, 300 ) ) {
-                    STATE = backTransition[ STATE ];
-                    draw( false );
-                    if( STATE == HOME ) {
-                        IO::Oam->oamBuffer[ BACK_ID ].isHidden = true;
-                        IO::updateOAM( true );
-                    }
-                } else {*/
-
-        if( pressed & KEY_SELECT ) {
-            IO::yesNoBox Save( GET_STRING( 91 ) );
-            if( Save.getResult( GET_STRING( 92 ) ) ) {
-                draw( );
-                if( FS::writeSave( p_path ) )
-                    IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
-                else
-                    IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
-            }
-            draw( true );
+        if( !p_message ) {
+            std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+            TEXT_CACHE = "";
+        } else {
+            TEXT_CACHE = TEXT_CACHE + p_message;
+            auto ln = IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF, 256,
+                                                      IO::font::LEFT, 17 );
+            u16  tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, SPR_MSG_GFX, x, y, 64, 32, TEXT_BUF,
+                                           64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
+            tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32,
+                                       TEXT_BUF + 64 * 32, 64 * 32 / 2, false, false, false,
+                                       OBJPRIORITY_0, false );
+            tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, 32,
+                                       TEXT_BUF + 2 * 64 * 32, 64 * 32 / 2, false, false, false,
+                                       OBJPRIORITY_0, false );
+            tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64, 32,
+                                       TEXT_BUF + 3 * 64 * 32, 64 * 32 / 2, false, false, false,
+                                       OBJPRIORITY_0, false );
         }
 
-        // StartBag
-        if( ( pressed & KEY_X ) /*||
-                    GET_AND_WAIT_C( POS[ BAG_ID ][ 0 ], POS[ BAG_ID ][ 1 ], 16 ) */) {
-            BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
-            ANIMATE_MAP       = false;
-            UPDATE_TIME       = false;
-            SOUND::dimVolume( );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::updateOAM( false );
+    }
 
-            IO::clearScreen( false );
-            videoSetMode( MODE_5_2D );
-            bgUpdate( );
+    void animateMB( u8 p_frame ) {
+    }
 
-            u16 res = bv.run( );
+    void waitForInteract( ) {
+        cooldown = COOLDOWN_COUNT;
+        u8 frame = 0;
+        loop( ) {
+            animateMB( ++frame );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
 
-            FADE_TOP_DARK( );
-            IO::clearScreen( false );
-            videoSetMode( MODE_5_2D );
-            bgUpdate( );
+            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
+                while( touch.px || touch.py ) {
+                    animateMB( ++frame );
+                    swiWaitForVBlank( );
+                    scanKeys( );
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
 
-            IO::clearScreenConsole( true, true );
-            STATE       = HOME;
-            UPDATE_TIME = true;
-            MAP::curMap->draw( );
-            ANIMATE_MAP = true;
-            SOUND::restoreVolume( );
-            draw( true );
-            updateItems( );
-            if( res ) {
-                ITEM::use( res, []( const char* ) {} );
-                updateItems( );
-                draw( true );
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                cooldown = COOLDOWN_COUNT;
+                break;
             }
-        } else if( ( pressed & KEY_START )
-                   && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_speciesId // StartPkmn
-                   /* && ( GET_AND_WAIT_C( POS[ PKMN_ID ][ 0 ], POS[ PKMN_ID ][ 1 ], 16 ) ) */ ) {
+        }
+    }
+
+    void printMessage( const char* p_message, style p_style ) {
+        doPrintMessage( p_message, p_style );
+
+        if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
+            waitForInteract( );
+            hideMessageBox( );
+        }
+    }
+
+    std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+    printYNMessage( const char* p_message, style p_style, u8 p_selection ) {
+        doPrintMessage( p_message, p_style );
+
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
+            = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+
+        if( p_message || p_selection >= 254 ) {
+
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
+                                 true );
+            for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
+
+            for( u8 i = 2; i < 4; i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                }
+            }
+
+            IO::regularFont->printString(
+                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y + 8, true, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y + 32 ),
+                           IO::yesNoBox::YES ) );
+
+            IO::regularFont->printString(
+                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y + 8, true, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y + 32 ),
+                           IO::yesNoBox::NO ) );
+        }
+
+        IO::updateOAM( true );
+        return res;
+    }
+
+    std::vector<std::pair<IO::inputTarget, u8>>
+    printChoiceMessage( const char* p_message, style p_style, const std::vector<u16>& p_choices,
+                        u8 p_selection ) {
+        doPrintMessage( p_message, p_style );
+
+        // TODO
+        return { };
+    }
+
+    std::vector<std::pair<IO::inputTarget, menuOption>> getTouchPositions( bool p_bottom = true ) {
+        auto         res = std::vector<std::pair<IO::inputTarget, menuOption>>( );
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !oam[ SPR_MENU_OAM_SUB( i ) ].isHidden ) {
+                res.push_back( std::pair( IO::inputTarget( oam[ SPR_MENU_OAM_SUB( i ) ].x,
+                                                           oam[ SPR_MENU_OAM_SUB( i ) ].y,
+                                                           oam[ SPR_MENU_OAM_SUB( i ) ].x + 27,
+                                                           oam[ SPR_MENU_OAM_SUB( i ) ].y + 27 ),
+                                          menuOption( i ) ) );
+            }
+        }
+
+        return res;
+    }
+
+    void handleMenuSelection( menuOption p_selection, const char* p_path ) {
+        switch( p_selection ) {
+        case VIEW_PARTY: {
             ANIMATE_MAP = false;
-            UPDATE_TIME = false;
             SOUND::dimVolume( );
-            STATE = HOME;
-            IO::initOAMTable( true );
-            videoSetMode( MODE_5_2D );
+
             u8 teamSize = 0;
             for( ; teamSize < 6; ++teamSize ) {
                 if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamSize ].m_boxdata.m_speciesId ) {
@@ -457,13 +448,11 @@ namespace NAV {
             IO::resetScale( true, false );
             bgUpdate( );
 
-            IO::clearScreenConsole( true, true );
             ANIMATE_MAP = true;
-            UPDATE_TIME = true;
             SOUND::restoreVolume( );
-            draw( true );
-            MAP::curMap->draw( );
 
+            init( );
+            MAP::curMap->draw( );
             if( res.m_selectedMove ) {
                 for( u8 j = 0; j < 2; ++j ) {
                     if( MOVE::possible( res.m_selectedMove, j ) ) {
@@ -472,17 +461,17 @@ namespace NAV {
                     }
                 }
             }
-        } /*else if( GET_AND_WAIT_C( POS[ DEX_ID ][ 0 ], POS[ DEX_ID ][ 1 ], 16 ) ) {
+            return;
+        }
+        case VIEW_DEX: {
             ANIMATE_MAP = false;
             SOUND::dimVolume( );
-            STATE = HOME;
 
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
 
-            DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN )
-                .run( SAVE::SAV.getActiveFile( ).m_lstDex );
+            DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV.getActiveFile( ).m_lstDex );
 
             FADE_TOP_DARK( );
             IO::clearScreen( false );
@@ -492,27 +481,153 @@ namespace NAV {
             IO::clearScreenConsole( true, true );
             ANIMATE_MAP = true;
             SOUND::restoreVolume( );
-            draw( true );
             MAP::curMap->draw( );
-        } else if( GET_AND_WAIT_C( POS[ OPTS_ID ][ 0 ], POS[ OPTS_ID ][ 1 ], 16 ) ) {
+            init( );
+            return;
+        }
+        case VIEW_BAG: {
+            BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
+            ANIMATE_MAP       = false;
+            SOUND::dimVolume( );
 
-        } else if( GET_AND_WAIT_C( POS[ ID_ID ][ 0 ], POS[ ID_ID ][ 1 ], 16 ) ) {
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
 
-            STATE = HOME;
+            u16 res = bv.run( );
 
-            const char* someText[ 12 ]
-                = {"PKMN Spawn",   "Item Spawn",   "1 Item Test",  "Dbl Battle",
-                   "Sgl Battle",   "Chg NavScrn",  "---", "View Boxes",
-                   "Hoenn Badges", "Kanto Badges", "Keyboard",     "Plate Spawn"};
-            IO::choiceBox test( 12, &someText[ 0 ], 0, false );
-            int           res = test.getResult( "Tokens of god-being..." );
-            draw( );
-            switch( res ) {
+            FADE_TOP_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            MAP::curMap->draw( );
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+            init( );
+
+            if( res ) { ITEM::use( res, _printMessage ); }
+            return;
+        }
+        case VIEW_ID: {
+            // TODO
+
+            return;
+        }
+        case SAVE: {
+            IO::yesNoBox yn;
+            if( yn.getResult( GET_STRING( 92 ), MSG_INFO ) == IO::yesNoBox::YES ) {
+                init( );
+                if( FS::writeSave( p_path, [ & ]( u16 p_perc, u16 p_total ) {
+                        printMessage( 0, MSG_INFO_NOCLOSE );
+                        u16         stat = p_perc * 18 / p_total;
+                        char        buffer[ 100 ];
+                        std::string buf2 = "";
+                        for( u8 i = 0; i < stat; ++i ) {
+                            buf2 += "\x03";
+                            if( i % 3 == 2 ) { buf2 += " "; }
+                        }
+                        for( u8 i = stat; i < 18; ++i ) {
+                            buf2 += "\x04";
+                            if( i % 3 == 2 ) { buf2 += " "; }
+                        }
+                        snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
+                        printMessage( buffer, MSG_INFO_NOCLOSE );
+                    } ) ) {
+                    printMessage( 0, MSG_INFO_NOCLOSE );
+                    printMessage( GET_STRING( 94 ), MSG_INFO );
+                } else {
+                    printMessage( 0, MSG_INFO_NOCLOSE );
+                    printMessage( GET_STRING( 95 ), MSG_INFO );
+                }
+            } else {
+                init( );
+            }
+
+            return;
+        }
+        case SETTINGS: {
+            // TODO
+
+            return;
+        }
+        default:
+            return;
+        }
+    }
+
+    void focusMenu( const char* p_path ) {
+        // TODO
+    }
+
+    void handleInput( const char* p_path ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        if( pressed & KEY_Y ) {
+            // registered item
+            IO::waitForKeysUp( KEY_Y );
+            if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
+                if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem, []( const char* ) {} );
+                    //  updateItems( );
+                } else {
+                    printMessage( GET_STRING( 58 ) );
+                }
+            } else {
+                printMessage( GET_STRING( 98 ) );
+            }
+            return;
+        }
+
+        if( ( pressed & KEY_X ) || ( pressed & KEY_START ) ) {
+            // Open menu
+            focusMenu( p_path );
+            return;
+        }
+
+        for( auto c : getTouchPositions( ) ) {
+            if( c.first.inRange( touch ) ) {
+                oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = false;
+                oam[ SPR_MENU_SEL_OAM_SUB ].x = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].x - 2;
+                oam[ SPR_MENU_SEL_OAM_SUB ].y = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].y - 2;
+
+                IO::updateOAM( true );
+
+                bool change = true;
+                while( touch.px || touch.py ) {
+                    swiWaitForVBlank( );
+                    scanKeys( );
+
+                    if( !c.first.inRange( touch ) ) {
+                        change                               = 0;
+                        oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = true;
+                        IO::updateOAM( true );
+                        break;
+                    }
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
+
+                if( change ) {
+                    handleMenuSelection( c.second, p_path );
+                    oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = true;
+                    IO::updateOAM( true );
+                }
+            }
+        }
+
+#ifdef DESQUID
+        if( pressed & KEY_SELECT ) {
+            std::vector<u16> choices
+                = { DESQUID_STRING + 46, DESQUID_STRING + 47, DESQUID_STRING + 48 };
+
+            IO::choiceBox test = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            switch( test.getResult( GET_STRING( DESQUID_STRING + 49 ), MSG_NOCLOSE, choices ) ) {
             case 0: {
                 memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
                         sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
                 std::vector<u16> tmp
-                    = {201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN};
+                    = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN };
                 for( int i = 0; i < 6; ++i ) {
                     pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
@@ -542,36 +657,18 @@ namespace NAV {
                     for( u16 j = 1; j <= MAX_PKMN; ++j )
                         SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
                 }
-                /*
-                                    for( u16 j : {493, 649, 648, 647, 487, 492, 641, 642,
-                   646,
-                   645, 643, 644} ) {
-                                        auto a       = pokemon( j, 50, 0, j ).m_boxdata;
-                                        a.m_gotPlace = j;
-                                        SAVE::SAV.storePkmn( a );
-                                        if( a.isShiny( ) ) {
-                                          IO::messageBox( "YAAAY" );
-                                          s8 idx = SAVE::SAV.getCurrentBox(
-                   )->getFirstFreeSpot( );
-                                          if( idx == -1 && !( *SAVE::SAV.getCurrentBox( )
-                   )[ 17
-                   ].isShiny( ) )
-                                          IO::messageBox( "Lost :(" );
-                                          else if( !( *SAVE::SAV.getCurrentBox( ) )[ idx -
-                   1
-                   ].isShiny( ) )
-                                          IO::messageBox( "Lost :(" );
-                                          break;
-                                          }
-                                    }
+                for( u16 j : { 493, 649, 648, 647, 487, 492, 641, 642, 646, 645, 643, 644 } ) {
+                    auto a       = pokemon( j, 50, 0, 0, j ).m_boxdata;
+                    a.m_gotPlace = j;
+                    SAVE::SAV.getActiveFile( ).storePkmn( a );
+                }
 
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ]
-                    = M_ROCK_CLIMB;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ]
-                    = M_SWEET_SCENT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
 
+                init( );
                 swiWaitForVBlank( );
                 break;
             }
@@ -579,84 +676,14 @@ namespace NAV {
                 for( u16 j = 1; j < MAX_ITEMS; ++j ) {
                     auto c = ITEM::getItemData( j );
                     if( c.m_itemType )
-                        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( c.m_itemType ),
-                                                                 j, 1 );
+                        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( c.m_itemType ), j,
+                                                                 1 );
                 }
+                init( );
                 break;
             case 2: {
-                // item* curr = ItemList[ rand( ) % 638 ];
-                // while( curr->m_itemName == "Null" ) curr = ItemList[ rand( ) % 638 ];
-                // IO::messageBox( curr, 31 );
-                break;
-            }
-            case 3: {
-                /*
-        std::vector<pokemon> cpy;
-
-        for( u8 i = 0; i < 3; ++i ) {
-            pokemon a( 0, i + 456, 0, 30, SAVE::SAV.getActiveFile( ).m_id + 1,
-                       SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
-            // a.stats.acHP = i*a.stats.maxHP/5;
-            cpy.push_back( a );
-        }
-        BATTLE::battleTrainer opp(
-                {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
-                {"Hmpf\x85 You're not too bad\x85",
-                "Hm\x85 Du bist gar nicht so schlecht\x85"},
-                {"Yay, I won!", "Yay gewonnen!"},
-                {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
-                cpy, 0, 0 );
-        auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
-        BATTLE::battle test_battle( bt, &opp, 100, BATTLE::weather( rand( ) % 9 ), 10,
-                                    0, 5, BATTLE::battle::DOUBLE );
-        ANIMATE_MAP = false;
-        test_battle.start( );
-        SAVE::SAV.getActiveFile( ).updateTeam( bt );
-        delete bt;
-
-                break;
-            }
-            case 4: {
-
-        std::vector<pokemon> cpy;
-
-        for( u8 i = 0; i < 6; ++i ) {
-            pokemon a( 0, 435 + i, 0, 15, SAVE::SAV.getActiveFile( ).m_id + 1,
-                       SAVE::SAV.getActiveFile( ).m_sid, "Heiko", false );
-            // a.stats.acHP = i*a.stats.maxHP/5;
-            cpy.push_back( a );
-        }
-        BATTLE::battleTrainer opp(
-                {"Wally", "Heiko"}, {"Let's battle!", "Auf in den Kampf!"},
-                {"Hmpf\x85 You're not too bad\x85",
-                "Hm\x85 Du bist gar nicht so schlecht\x85"},
-                {"Yay, I won!", "Yay gewonnen!"},
-                {"Well, I lost\x85", "Das war wohl eine Niederlage\x85"},
-                cpy, 0, 0 );
-        auto           bt = SAVE::SAV.getActiveFile( ).getBattleTrainer( );
-        BATTLE::battle test_battle( bt, &opp, 100,
-                                    BATTLE::HAIL weather( rand( ) % 9 ), 10, 0, 5,
-                                    BATTLE::battle::SINGLE );
-        ANIMATE_MAP = false;
-        test_battle.start( );
-        SAVE::SAV.getActiveFile( ).updateTeam( bt );
-        delete bt;
-
-                break;
-            }
-            case 5: {
-                const char* bgNames[ MAXBG ];
-                for( u8 o = 0; o < MAXBG; ++o ) bgNames[ o ] = NAV::BGs[ o ].m_name.c_str( );
-
-                IO::choiceBox scrnChoice( MAXBG, bgNames, 0, true );
-                draw( true,
-                      scrnChoice.getResult( "Welcher Hintergrund\nsoll dargestellt werden?" ) );
-                break;
-            }
-            case 7: {
                 BOX::boxViewer bxv;
                 ANIMATE_MAP = false;
-                UPDATE_TIME = false;
                 videoSetMode( MODE_5_2D );
                 bgUpdate( );
                 SOUND::dimVolume( );
@@ -671,50 +698,77 @@ namespace NAV {
                 IO::initVideoSub( );
                 IO::resetScale( true, false );
                 ANIMATE_MAP = true;
-                UPDATE_TIME = true;
                 SOUND::restoreVolume( );
-                draw( true );
+                init( );
                 MAP::curMap->draw( );
                 break;
             }
-            case 8:
-                SAVE::SAV.getActiveFile( ).m_HOENN_Badges <<= 1;
-                SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= 1;
-                break;
-            case 9:
-                SAVE::SAV.getActiveFile( ).m_KANTO_Badges <<= 1;
-                SAVE::SAV.getActiveFile( ).m_KANTO_Badges |= 1;
-                break;
-            case 10: {
-                IO::keyboard kbd;
-                IO::messageBox( kbd.getText( 10, "Type some text!" ).c_str( ) );
-                break;
             }
-            case 11: {
-                for( u16 j = I_FLAME_PLATE; j <= I_FLAME_PLATE + 17; ++j ) {
-                    SAVE::SAV.getActiveFile( ).m_bag.insert(
-                        BAG::toBagType( ITEM::ITEMTYPE_COLLECTIBLE ), j, 1 );
-                }
-            }
-            }
-            if( res != 10 ) draw( true );
-            swiWaitForVBlank( );
-            if( res == 3 || res == 4 ) {
-                FADE_TOP_DARK( );
-                ANIMATE_MAP = true;
-                MAP::curMap->draw( );
-            }
-        } else if( GET_AND_WAIT_C( POS[ NAV_ID ][ 0 ], POS[ NAV_ID ][ 1 ], 16 ) ) { // Save
-            IO::yesNoBox Save( GET_STRING( 91 ) );
-            if( Save.getResult( GET_STRING( 92 ) ) ) {
-                draw( );
-                if( FS::writeSave( p_path ) )
-                    IO::messageBox Succ( GET_STRING( 94 ), GET_STRING( 91 ) );
-                else
-                    IO::messageBox Succ( GET_STRING( 95 ), GET_STRING( 91 ) );
-            }
-            draw( true );
         }
-    }*/
+#endif
     }
 } // namespace NAV
+
+/*
+                void drawMapMug( ) {
+                    auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr(
+IO::bg3sub ); char buffer[ 100 ]; snprintf( buffer, 99, "%03hu/%hu_%hhu", CURRENT_BANK /
+FS::ITEMS_PER_DIR, CURRENT_BANK, getCurrentDaytime( ) % 4 ); FS::readPictureData( ptr,
+"nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED ); drawBorder( );
+                }
+
+                void draw( bool p_initMainSrites, u8 p_newIdx ) {
+                    if( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx == p_newIdx )
+                        return;
+                    else if( p_newIdx == u8( 255 ) )
+                        p_newIdx = SAVE::SAV.getActiveFile( ).m_options.m_bgIdx;
+
+                    auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr(
+IO::bg3sub ); auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
+
+                    if( STATE != MAP_MUG ) {
+                        if( !BGs[ p_newIdx ].m_loadFromRom ) {
+                            dmaCopy( BGs[ p_newIdx ].m_mainMenu, ptr, 256 * 192 );
+                            dmaCopy( BGs[ p_newIdx ].m_mainMenuPal, pal, 192 * 2 );
+                            SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = p_newIdx;
+                        } else if( !FS::readNavScreenData( ptr, BGs[ p_newIdx ].m_name.c_str( ),
+                                                           p_newIdx ) ) {
+                            dmaCopy( BGs[ 0 ].m_mainMenu, ptr, 256 * 192 );
+                            dmaCopy( BGs[ 0 ].m_mainMenuPal, pal, 192 * 2 );
+                            SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = 0;
+                        } else
+                            SAVE::SAV.getActiveFile( ).m_options.m_bgIdx = p_newIdx;
+                        drawBorder( );
+                    } else if( STATE == MAP_MUG ) {
+                        drawMapMug( );
+                    }
+                    if( p_initMainSrites && ALLOW_INIT ) initMainSprites( STATE != HOME );
+                }
+
+                void showNewMap( u8 p_newMap ) {
+                    if( p_newMap == CURRENT_BANK ) return;
+                    CURRENT_BANK = p_newMap;
+                    CURRENT_MAP  = MAP::curMap->getCurrentLocationId( );
+                    char buffer[ 100 ];
+                    snprintf( buffer, 99, "%03hhu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR,
+                              CURRENT_BANK, getCurrentDaytime( ) % 4 );
+                    if( FS::exists( "nitro:/PICS/MAP_MUG/", buffer ) )
+                        STATE = MAP_MUG;
+                    else if( STATE == MAP_MUG )
+                        STATE = HOME;
+
+                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = ( STATE == HOME );
+                    IO::updateOAM( true );
+
+                    draw( false );
+                }
+
+                void updateMap( u16 p_newMap ) {
+                    if( p_newMap != CURRENT_MAP ) {
+                        CURRENT_MAP = p_newMap;
+                        draw( false );
+                    }
+                }
+
+            } // namespace NAV
+*/

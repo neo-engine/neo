@@ -40,7 +40,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 namespace BAG {
-#define TRESHOLD 20
+// #define THRESHOLD 20
     bagViewer::bagViewer( pokemon* p_playerTeam, context p_context ) {
         _context    = p_context;
         _playerTeam = p_playerTeam;

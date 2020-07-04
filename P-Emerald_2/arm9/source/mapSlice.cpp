@@ -31,8 +31,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "mapSlice.h"
 #include "defines.h"
 #include "fs.h"
+#include "nav.h"
+
 #ifdef DESQUID
-#include "messageBox.h"
 #include "uio.h"
 #endif
 
@@ -54,8 +55,7 @@ namespace MAP {
 #ifdef DESQUID
             char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
-            IO::messageBox m( buffer );
-            NAV::draw( true );
+            NAV::printMessage( buffer, MSG_INFO );
             swiWaitForVBlank( );
 #endif
             mapF = FS::open( MAP_PATH, "empty", ".map" );
@@ -69,8 +69,7 @@ namespace MAP {
         }
 #ifdef DESQUID
         if( !p_result ) {
-            IO::messageBox( "Not enough memory :(" );
-            NAV::draw( true );
+            NAV::printMessage( "Not enough memory :(", MSG_INFO );
         }
 #endif
 

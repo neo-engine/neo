@@ -87,6 +87,14 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define LANGUAGES 2
 #define MAX_STRINGS 500
 #define MAX_ACHIEVEMENTS 50
+#define INITIAL_NAVBG 11
+
+enum style {
+    MSG_NORMAL  = 0,
+    MSG_INFO    = 1,
+    MSG_NOCLOSE = 2, // Msgbox stays open, future calls to print append text
+    MSG_INFO_NOCLOSE = 3,
+};
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ];
@@ -115,19 +123,3 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 
 #define IN_DEX( pidx ) ( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
 
-// Main sprite's OAM indices
-#define BACK_ID 0
-#define SAVE_ID 1
-#define PKMN_ID 2
-#define ID_ID 3
-#define DEX_ID 4
-#define BAG_ID 5
-#define OPTS_ID 6
-#define NAV_ID 7
-#define A_ID 8
-#define ITM( a ) ( 9 + ( a ) )
-#define FWD_ID 13
-#define BWD_ID 14
-#define ITM_BACK 15
-
-#define SQCH_ID 80

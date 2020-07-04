@@ -49,7 +49,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "choiceBox.h"
 #include "keyboard.h"
-#include "messageBox.h"
 #include "screenFade.h"
 #include "sprite.h"
 #include "uio.h"
@@ -254,19 +253,21 @@ int main( int, char** p_argv ) {
     MAP::loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     ANIMATE_MAP = true;
-    NAV::draw( true );
-    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
-    MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
-    NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
+    NAV::init( );
+//    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
+//    MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
+//    NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
     IN_GAME = true;
     bool stopped = true;
     u8   bmp     = false;
+    cooldown = COOLDOWN_COUNT;
     loop( ) {
-        swiWaitForVBlank( );
+        scanKeys( );
         touchRead( &touch );
+        swiWaitForVBlank( );
         pressed = keysUp( );
         last    = held;
         held    = keysHeld( );
@@ -277,7 +278,7 @@ int main( int, char** p_argv ) {
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
             snprintf( buffer, 99,
-                      "Currently at %hhu-(%hx,%hx,%hhx).\nMap: %i:%i,"
+                      "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
                       "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx | %hhu %hhu %hhu",
                       SAVE::SAV.getActiveFile( ).m_currentMap,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
@@ -301,11 +302,11 @@ int main( int, char** p_argv ) {
                           .m_topbehave,
                       SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
                       SAVE::CURRENT_TIME.m_secs );
-            IO::messageBox m( buffer );
-            NAV::draw( true );
+            NAV::printMessage( buffer );
         }
 #endif
 
+        /*
         if( held & KEY_A ) {
             for( u8 i = 0; i < 6; ++i ) {
                 if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
@@ -346,6 +347,8 @@ int main( int, char** p_argv ) {
             scanKeys( );
             continue;
         }
+        */
+
         // Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::direction curDir = MAP::getDir( held );
@@ -377,9 +380,8 @@ int main( int, char** p_argv ) {
             bmp     = false;
         }
 
-        NAV::handleInput( touch, p_argv[ 0 ] );
+        NAV::handleInput( p_argv[ 0 ] );
         // End
-        scanKeys( );
     }
     delete MAP::curMap;
     return 0;

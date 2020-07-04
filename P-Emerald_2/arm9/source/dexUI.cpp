@@ -36,18 +36,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#include "Back.h"
-#include "BagSpr.h"
 #include "BigCirc1.h"
-#include "PKMN.h"
-#include "memo.h"
 #include "star.h"
-#include "time_icon.h"
-
-#include "DexTop.h"
-
-#include "DexSub.h"
-#include "DexSub2.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -137,7 +127,6 @@ namespace DEX {
         IO::updateOAM( false );
 
         // Init sub
-        NAV::draw( );
         IO::initOAMTable( true );
 
         tileCnt = 0;
@@ -257,8 +246,6 @@ namespace DEX {
 
         if( _useInDex && !IN_DEX( p_pkmnIdx ) ) {
             for( u8 i = 0; i < 128; ++i ) IO::OamTop->oamBuffer[ i ].isHidden = true;
-            dmaCopy( DexTopBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-            dmaCopy( DexTopPal, BG_PALETTE, 512 );
             IO::loadPKMNSprite( "nitro:/PICS/SPRITES/PKMN/", 0, 80, 35, PKMN_SPRITE_START( 0 ), 0,
                                 0, false );
 
@@ -525,7 +512,6 @@ namespace DEX {
         switch( (dex::mode) p_mode ) {
         case dex::SHOW_SINGLE:
         case dex::SHOW_CAUGHT:
-            NAV::draw( );
             IO::regularFont->setColor( 0, 0 );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );

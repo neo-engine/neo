@@ -33,10 +33,10 @@
 #include "fs.h"
 #include "item.h"
 #include "itemNames.h"
-#include "messageBox.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "uio.h"
+#include "nav.h"
 
 #include "main1.h"
 #include "main2.h"
@@ -206,6 +206,7 @@ namespace SAVE {
         m_good2 = GOOD_MAGIC2;
 
         m_startDate = CURRENT_DATE;
+        m_currentNavBG = INITIAL_NAVBG;
 
         m_bag = BAG::bag( );
         for( u8 i = 0; i < MAX_BOXES; ++i ) {
@@ -292,8 +293,7 @@ namespace SAVE {
         if( m_repelSteps > 0 ) {
             m_repelSteps--;
             if( !m_repelSteps ) {
-                IO::messageBox( GET_STRING( 4 ), true );
-                NAV::draw( true );
+                NAV::printMessage( GET_STRING( 4 ) );
             }
         }
         if( !m_stepCount ) {

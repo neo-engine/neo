@@ -412,7 +412,7 @@ namespace IO {
     }
 
     std::string formatDate( SAVE::date p_date, u8 p_language ) {
-        u8 tmp[ 3 ] = { p_date.m_day, p_date.m_month, p_date.m_year };
+        u8 tmp[ 3 ] = { p_date.m_day, p_date.m_month, u8( p_date.m_year % 100 ) };
         return formatDate( tmp, p_language );
     }
 

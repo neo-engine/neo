@@ -32,7 +32,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs.h"
 #include "gameStart.h"
 #include "mapDrawer.h"
-#include "messageBox.h"
 #include "nav.h"
 #include "screenFade.h"
 #include "sound.h"
@@ -593,7 +592,7 @@ namespace SAVE {
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
+                STRINGS[ 80 ][ _currentLanguage ], oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8, true, IO::font::CENTER );
 
             res.push_back(
@@ -608,7 +607,7 @@ namespace SAVE {
                                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
+                STRINGS[ 81 ][ _currentLanguage ], oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, true, IO::font::CENTER );
 
             res.push_back(

@@ -25,12 +25,21 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "yesNoBox.h"
 #include "defines.h"
+#include "yesNoBox.h"
 #include "sound.h"
 #include "uio.h"
+#include "nav.h"
 
 namespace IO {
+    yesNoBox::selection yesNoBox::getResult( const char* p_message, style p_style ) {
+        return getResult( [&]( ){
+                return NAV::printYNMessage( p_message, p_style );
+                }, [&]( yesNoBox::selection p_selection ){
+                NAV::printYNMessage( 0, p_style, p_selection == IO::yesNoBox::NO );
+                } );
+    }
+
     yesNoBox::selection yesNoBox::getResult(
         std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
         std::function<void( selection )> p_selectFunction, selection p_initialSelection,
@@ -109,103 +118,5 @@ namespace IO {
             swiWaitForVBlank( );
         }
         return sel;
-    }
-
-    void yesNoBox::draw( u8 p_pressedIdx, u8 p_selectedIdx ) {
-        if( p_selectedIdx == 1 )
-            BG_PALETTE_SUB[ COLOR_IDX ] = BLUE2;
-        else if( p_selectedIdx == 0 )
-            BG_PALETTE_SUB[ COLOR_IDX ] = RED2;
-
-        printChoiceBox( 28, 102, 122, 134, 6, ( p_selectedIdx == 1 ) ? COLOR_IDX : BLUE_IDX,
-                        p_pressedIdx == 0 );
-        regularFont->printString( STRINGS[ 80 ][ _language ], 28 + 47 + 2 * ( p_pressedIdx == 0 ),
-                                  110 + ( p_pressedIdx == 0 ), true, IO::font::CENTER );
-        printChoiceBox( 134, 102, 228, 134, 6, ( p_selectedIdx == 0 ) ? COLOR_IDX : RED_IDX,
-                        p_pressedIdx == 1 );
-        regularFont->printString( STRINGS[ 81 ][ _language ], 134 + 47 + 2 * ( p_pressedIdx == 1 ),
-                                  110 + ( p_pressedIdx == 1 ), true, IO::font::CENTER );
-    }
-
-    yesNoBox::yesNoBox( bool p_initSprites ) {
-        initTextField( );
-        if( p_initSprites ) initOAMTable( true );
-        _isNamed  = false;
-        _language = SAVE::SAV.getActiveFile( ).m_options.m_language;
-    }
-    yesNoBox::yesNoBox( SAVE::language p_language, bool p_initSprites ) {
-        initTextField( );
-        if( p_initSprites ) initOAMTable( true );
-        _isNamed  = false;
-        _language = p_language;
-    }
-    yesNoBox::yesNoBox( const char* p_name, bool p_initSprites ) {
-        initTextField( );
-        if( p_initSprites ) initOAMTable( true );
-        regularFont->printString( p_name, 8, 8, true );
-
-        swiWaitForVBlank( );
-        _isNamed  = true;
-        _language = SAVE::SAV.getActiveFile( ).m_options.m_language;
-    }
-    yesNoBox::yesNoBox( messageBox p_box, bool p_initSprites ) {
-        initTextField( );
-        if( p_initSprites ) initOAMTable( true );
-        _isNamed  = p_box.m_isNamed;
-        _language = SAVE::SAV.getActiveFile( ).m_options.m_language;
-    }
-
-    bool yesNoBox::getResult( const char* p_text, bool p_textAtOnce ) {
-        s16 x = 8 + 64 * !!_isNamed;
-        s16 y = 8;
-        if( p_text && !p_textAtOnce )
-            regularFont->printStringD( p_text, x, y, true );
-        else if( p_text )
-            regularFont->printString( p_text, x, y, true );
-
-        u8 selIdx = (u8) -1;
-        draw( 2, selIdx );
-        bool result;
-        loop( ) {
-            swiWaitForVBlank( );
-            touchPosition t;
-            touchRead( &t );
-            scanKeys( );
-            int pressed = keysCurrent( );
-
-            if( GET_AND_WAIT( KEY_LEFT ) ) {
-                selIdx = 0;
-                draw( 2, selIdx );
-            } else if( GET_AND_WAIT( KEY_RIGHT ) ) {
-                selIdx = 1;
-                draw( 2, selIdx );
-            } else if( selIdx != (u8) -1 && GET_AND_WAIT( KEY_A ) ) {
-                result = !selIdx;
-                break;
-            }
-
-            if( t.px >= 28 && t.py >= 102 && t.px <= 122 && t.py <= 134 ) {
-                draw( 0, selIdx );
-                if( !waitForTouchUp( 28, 102, 122, 134 ) ) {
-                    draw( 2, selIdx );
-                    continue;
-                }
-                draw( 2, selIdx );
-                swiWaitForVBlank( );
-                result = true;
-                break;
-            } else if( t.px >= 134 && t.py >= 102 && t.px <= 228 && t.py <= 134 ) {
-                draw( 1, selIdx );
-                if( !waitForTouchUp( 134, 102, 228, 134 ) ) {
-                    draw( 2, selIdx );
-                    continue;
-                }
-                draw( 2, selIdx );
-                swiWaitForVBlank( );
-                result = false;
-                break;
-            }
-        }
-        return result;
     }
 } // namespace IO

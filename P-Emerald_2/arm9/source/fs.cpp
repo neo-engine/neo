@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <fat.h>
 #include <sys/stat.h>
 
+#include "nav.h"
 #include "ability.h"
 #include "battleTrainer.h"
 #include "defines.h"
@@ -45,8 +46,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 #include "uio.h"
 #include "mapDrawer.h"
-
-#include "messageBox.h"
 
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
@@ -204,6 +203,7 @@ namespace FS {
         return true;
     }
 
+    /*
     bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
         if( p_no == SAVE::SAV.getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
             dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
@@ -220,6 +220,7 @@ namespace FS {
 
         return true;
     }
+    */
 
     bool readNop( FILE* p_file, u32 p_cnt ) {
         u8 tmp;

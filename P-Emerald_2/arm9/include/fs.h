@@ -82,7 +82,7 @@ namespace FS {
     FILE* openScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_id );
     FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id );
 
-    bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
+    // bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name,
                           u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256,
                           bool p_bottom = false );

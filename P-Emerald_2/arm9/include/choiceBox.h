@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include "uio.h"
 #include "pokemon.h"
+#include "defines.h"
 
 namespace IO {
     /*
@@ -68,28 +69,7 @@ namespace IO {
                              std::function<void( )> p_tick = DEFAULT_TICK,
                              u8 p_initialPage = 0 );
 
-        [[deprecated]]
-        choiceBox( int p_num, const char** p_choices, const char* p_name, bool p_big );
-
-        [[deprecated]]
-        void draw( u8 p_pressedIdx );
-        [[deprecated]]
-        int  getResult( const char* p_text = 0, bool p_backButton = false, bool p_drawSub = true,
-                        u8 p_initialSelection = 0 );
-        [[deprecated]]
-        void kill( );
-
-      private:
-        const char** _choices;
-        bool         _big;
-        u8           _num;
-        const char*  _name;
-        const char*  _text;
-        u8           _acPage;
-        u8           _selectedIdx;
-
-        bool _drawSub;
-
-        void updateButtons( bool p_backButton );
+        selection getResult( const char* p_message, style p_style,
+                             const std::vector<u16>& p_choices );
     };
 }

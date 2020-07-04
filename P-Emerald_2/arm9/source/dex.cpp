@@ -65,7 +65,6 @@ namespace DEX {
     }
 
     void dex::changeMode( mode p_newMode, u16 p_startPkmn ) {
-        NAV::draw( );
         if( p_newMode == SHOW_CAUGHT && !IN_DEX( p_startPkmn ) ) {
             p_startPkmn = nextEntry( p_startPkmn );
             if( p_startPkmn > MAX_PKMN ) p_startPkmn = previousEntry( p_startPkmn );

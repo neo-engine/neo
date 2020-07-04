@@ -35,11 +35,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "nav.h"
 #include "uio.h"
 
-#include "A.h"
-#include "Back.h"
-#include "Backward.h"
-#include "Forward.h"
-
 namespace IO {
     const u8 height = 16, width = 16;
     const u8 textHeight = 14, textWidth = 12;
@@ -118,19 +113,9 @@ namespace IO {
     }
 
     void init( ) {
+        // TODO
         initOAMTable( true );
-        u16 tileCnt = 0;
-
-        tileCnt = loadSprite( A_ID, 0, tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 28, 32, 32, APal,
-                              ATiles, ATilesLen, false, false, false, OBJPRIORITY_0, true );
-        tileCnt = loadSprite( FWD_ID, 1, tileCnt, SCREEN_WIDTH - 24, SCREEN_HEIGHT - 28 - 24, 32,
-                              32, ForwardPal, ForwardTiles, ForwardTilesLen, false, false, false,
-                              OBJPRIORITY_1, true );
-        tileCnt = loadSprite( BWD_ID, 2, tileCnt, SCREEN_WIDTH - 28 - 24, SCREEN_HEIGHT - 24, 32,
-                              32, BackwardPal, BackwardTiles, BackwardTilesLen, false, false, false,
-                              OBJPRIORITY_1, true );
         updateOAM( true );
-        NAV::draw( );
         initTextField( );
     }
 

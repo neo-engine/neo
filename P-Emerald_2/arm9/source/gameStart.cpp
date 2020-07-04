@@ -25,21 +25,21 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "sound.h"
 #include "gameStart.h"
 #include "bag.h"
 #include "defines.h"
 #include "gen3Parser.h"
+#include "itemNames.h"
 #include "saveGame.h"
 #include "screenFade.h"
+#include "sound.h"
 #include "startScreen.h"
 #include "uio.h"
 #include "yesNoBox.h"
-#include "itemNames.h"
 
 namespace SAVE {
-    constexpr u16 EP_INTRO_TEXT_START[] = {111};
-    constexpr u8  EP_INTRO_TEXT_LEN[]   = {3};
+    constexpr u16 EP_INTRO_TEXT_START[] = { 111 };
+    constexpr u8  EP_INTRO_TEXT_LEN[]   = { 3 };
 
     void printTextAndWait( const char* p_text ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK );
@@ -47,7 +47,7 @@ namespace SAVE {
         BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
         BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
         BG_PALETTE[ IO::COLOR_IDX ] = IO::GRAY;
-        u8 nw                   = 0;
+        u8 nw                       = 0;
         for( u8 i = 0; i < strlen( p_text ); ++i )
             if( p_text[ i ] == '\n' ) ++nw;
         IO::regularFont->printString( p_text, 128, 89 - 10 * nw, false, IO::font::CENTER );
@@ -61,9 +61,9 @@ namespace SAVE {
             swiWaitForVBlank( );
 
             int pressed = keysCurrent( );
-            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START ) ||
-                ( IO::inputTarget( 1, 1, 256, 192 ).inRange( touch )
-                  && IO::waitForInput( IO::inputTarget( 1, 1, 256, 192 ) ) ) ) {
+            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
+                || ( IO::inputTarget( 1, 1, 256, 192 ).inRange( touch )
+                     && IO::waitForInput( IO::inputTarget( 1, 1, 256, 192 ) ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 break;
             }
@@ -89,10 +89,14 @@ namespace SAVE {
         switch( p_episode ) {
         case 0:
             strcpy( SAV.getActiveFile( ).m_playername, "Test" );
-            SAV.getActiveFile( ).m_player
-                = {MAP::mapObject::PLYR, {299, 53, 4}, 0, MAP::moveMode::WALK, 0, 0,
-                   MAP::direction::RIGHT};
             SAV.getActiveFile( ).m_appearance = rand( ) % 2;
+            SAV.getActiveFile( ).m_player     = { MAP::mapObject::PLYR,
+                                              { 299, 53, 4 },
+                                              u16( 10 * SAV.getActiveFile( ).m_appearance ),
+                                              MAP::moveMode::WALK,
+                                              0,
+                                              0,
+                                              MAP::direction::RIGHT };
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
             SAV.getActiveFile( ).m_currentMap     = 10;
             SAV.getActiveFile( ).m_registeredItem = I_BIKE;

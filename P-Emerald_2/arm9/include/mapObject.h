@@ -54,6 +54,6 @@ namespace MAP {
         direction m_direction;
 
         void      interact( );
-        mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u8 p_palIdx, u16 p_tileIdx );
+        mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u16 p_tileIdx );
     };
 } // namespace MAP

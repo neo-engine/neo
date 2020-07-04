@@ -57,9 +57,9 @@ namespace IO {
         void ( *_shiftchar )( u16 &val );
         color _color[ 5 ];
 
-
         void _runMB( bool p_bottom, u8 p_layer = 1 ) const;
         void _charDelay( ) const;
+
       public:
         enum alignment { LEFT, RIGHT, CENTER };
 
@@ -115,8 +115,8 @@ namespace IO {
          * @brief: Prints the given character (as bitmap) in the given buffer.
          * @returns: the width (in px) of the printed char.
          */
-        u16 printCharB( u16 p_ch, u16* p_palette, u16* p_buffer, u16 p_bufferWidth, s16 p_x = 0,
-                         s16 p_y = 0 ) const;
+        u16 printCharB( u16 p_ch, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x = 0,
+                        s16 p_y = 0 ) const;
 
         /*
          * @brief: Draws the continue triangle for message boxes.
@@ -144,9 +144,9 @@ namespace IO {
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
         u16 printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                          alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
-                          u8 p_charShift = 0, bool p_delay = false, bool p_mb = false,
-                          u8 p_layer = 1 ) const;
+                         alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
+                         u8 p_charShift = 0, bool p_delay = false, bool p_mb = false,
+                         u8 p_layer = 1 ) const;
 
         /*
          * @brief: Prints a string with less horizontal space between characters
@@ -154,7 +154,7 @@ namespace IO {
          */
         u16 printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                           alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
-                          bool p_delay = false, bool p_mb = false,u8 p_layer = 1 ) const;
+                          bool p_delay = false, bool p_mb = false, u8 p_layer = 1 ) const;
 
         /*
          * @brief: Prints the given string with some delay after every character.
@@ -179,22 +179,20 @@ namespace IO {
         u16 printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             u8 p_charShift = 0, u8 p_layer = 1 ) const;
 
-
         /*
          * @brief: Prints the given string to the given buffer.
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
-        u16 printStringB( const char *p_string, u16* p_palette, u16* p_buffer, u16 p_bufferWidth,
+        u16 printStringB( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
                           alignment p_alignment = LEFT, u8 p_yDistance = 15,
-                          u8 p_charShift = 0 ) const;
+                          u8 p_charShift = 0, u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
         /*
          * @brief: Prints a string in the given buffer with less horizontal space between characters
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
-        u16 printStringBC( const char *p_string, u16* p_palette, u16* p_buffer, u16 p_bufferWidth,
-                            alignment p_alignment = LEFT, u8 p_yDistance = 15 ) const;
-
-
+        u16 printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
+                           alignment p_alignment = LEFT, u8 p_yDistance = 15,
+                           u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
 
         /*
          * @brief: Prints the given string, where newlines are inserted whenever the
@@ -202,9 +200,9 @@ namespace IO {
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
         u16 printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
-                                  bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
-                                  char p_breakChar = ' ', s8 p_adjustX = 0, u8 p_charShift = 0,
-                                  bool p_delay = false, bool p_mb = false, u8 p_layer = 1 ) const;
+                                 bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
+                                 char p_breakChar = ' ', s8 p_adjustX = 0, u8 p_charShift = 0,
+                                 bool p_delay = false, bool p_mb = false, u8 p_layer = 1 ) const;
         /*
          * @brief: Prints the given string, where newlines are inserted whenever the
          * current line exceeds the given p_maxWidth. Uses less horizontal space for each
@@ -212,9 +210,9 @@ namespace IO {
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
         u16 printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
-                                   bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
-                                   char p_breakChar = ' ', s8 p_adjustX = 0,
-                                   bool p_delay = false, bool p_mb = false, u8 p_layer = 1 ) const;
+                                  bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
+                                  char p_breakChar = ' ', s8 p_adjustX = 0, bool p_delay = false,
+                                  bool p_mb = false, u8 p_layer = 1 ) const;
 
         /*
          * @brief: Prints a string until p_maxX is reached, writes p_breakChar if the
@@ -228,8 +226,7 @@ namespace IO {
          * prints p_breakChar once p_maxX is reached.
          */
         void printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
-                              s16 p_maxX = 256, u16 p_breakChar = L'.',
-                              bool p_delay = false, u8 p_layer = 1 ) const;
-
+                              s16 p_maxX = 256, u16 p_breakChar = L'.', bool p_delay = false,
+                              u8 p_layer = 1 ) const;
     };
 } // namespace IO

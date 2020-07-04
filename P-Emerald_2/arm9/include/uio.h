@@ -29,7 +29,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "font.h"
-#include "nav.h"
 #include "sprite.h"
 #include "saveGame.h"
 

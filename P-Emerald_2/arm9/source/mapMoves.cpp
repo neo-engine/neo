@@ -28,10 +28,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "mapDrawer.h"
 #include "mapSlice.h"
-#include "messageBox.h"
 #include "saveGame.h"
 #include "uio.h"
 #include "moveNames.h"
+#include "nav.h"
 
 namespace MOVE {
     bool possible( u16 p_moveId, u8 p_param ) {
@@ -184,8 +184,7 @@ namespace MOVE {
                 return;
             case M_SWEET_SCENT:
                 if( !possible( M_SWEET_SCENT, 0 ) || !MAP::curMap->requestWildPkmn( true ) ) {
-                    IO::messageBox( GET_STRING( 90 ), true );
-                    NAV::draw( );
+                    NAV::printMessage( GET_STRING( 90 ) );
                 }
                 return;
             case M_DIG:

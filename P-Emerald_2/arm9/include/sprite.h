@@ -85,19 +85,17 @@ namespace IO {
      * @brief: Loads the given tiles and pals to the OAM(Sub); assumes bitmap mode.
      * @param p_tiled: Specifies whether the given p_spriteData is tiled (default: true)
      */
-    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX,
-                     const u16 p_posY, const u8 p_width, const u8 p_height,
-                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
-                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                     ObjPriority p_priority, bool p_bottom, bool p_outline = false,
-                     u16 p_outlineColor = 0xFFFF, bool p_tiled = true );
+    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
+                     const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
+                     const unsigned int* p_spriteData, const u32 p_spriteDataLen, bool p_flipX,
+                     bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
+                     bool p_outline = false, u16 p_outlineColor = 0xFFFF, bool p_tiled = true );
     /*
      * @brief: Loads the sprite data to the OAM(Sub); assumes bitmap mode.
      */
-    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX,
-                     const u16 p_posY, const u8 p_width, const u8 p_height,
-                     const unsigned short* p_spriteData, const u32 p_spriteDataLen,
-                     bool p_flipX, bool p_flipY, bool p_hidden,
+    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileIdx, const u16 p_posX, const u16 p_posY,
+                     const u8 p_width, const u8 p_height, const unsigned short* p_spriteData,
+                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom );
 
     /*
@@ -115,14 +113,22 @@ namespace IO {
                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
                         u8 p_forme = 0 );
 
+    u16 loadPKMNSpriteB( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
+                         u8 p_oamIndex, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
+                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
+                         u8 p_forme = 0 );
+
+    u16 loadPKMNSpriteB( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                         u16 p_tileCnt, bool p_bottom, bool p_shiny = false, bool p_female = false,
+                         bool p_flipX = false, bool p_topOnly = false, u8 p_forme = 0 );
+
     /*
      * @brief: Loads the back sprite for the given pkmn.
      */
     u16 loadPKMNSpriteBack( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
-                        u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
-                        bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
-                        u8 p_forme = 0 );
-
+                            u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
+                            bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
+                            u8 p_forme = 0 );
 
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom = false, bool p_manaphy = false );
@@ -146,9 +152,11 @@ namespace IO {
     u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                       u8 p_palCnt, u16 p_tileCnt );
     u16 loadOWSpriteB( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
-                       u16 p_tileCnt );
+                       u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_data[ 32 * 4 * 9 ] );
 
-    void setOWSpriteFrame( u8 p_frame, u8 p_oamIndex, u16 p_tileCnt );
+    void setOWSpriteFrame( u8 p_frame, bool p_flip, u8 p_oamIndex, u16 p_palData[ 16 ],
+                           u32 p_data[ 32 * 4 * 9 ] );
+
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
 
     /*
@@ -182,9 +190,8 @@ namespace IO {
      * @brief: Loads the specified pokemon icon from the nitro FAT. (1D bitmap)
      */
     u16 loadPKMNIconB( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
-                       u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0,
-                       bool p_shiny = false, bool p_female = false, bool p_outline = false,
-                       u16 p_outlineColor = 0xFFFF );
+                       u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0, bool p_shiny = false,
+                       bool p_female = false, bool p_outline = false, u16 p_outlineColor = 0xFFFF );
 
     /*
      * @brief: Loads an egg icon from the nitro FAT. (1D tiled)
@@ -195,21 +202,21 @@ namespace IO {
      * @brief: Loads an egg icon from the nitro FAT. (1D bitmap)
      */
     u16 loadEggIconB( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
-                     bool p_bottom = true, bool p_manaphy = false, bool p_outline = false,
-                     u16 p_outlineColor = 0xFFFF );
+                      bool p_bottom = true, bool p_manaphy = false, bool p_outline = false,
+                      u16 p_outlineColor = 0xFFFF );
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom, SAVE::language p_language );
-    u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
-                      u16 p_tileCnt, bool p_bottom, SAVE::language p_language );
+    u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
+                      bool p_bottom, SAVE::language p_language );
 
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u16 p_tileCnt, bool p_bottom );
 
-    u16 loadPlatform( u8 p_platformIdx, const u16 p_posX, const u16 p_posY,
-                      u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
+    u16 loadPlatform( u8 p_platformIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                      u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
     u16 loadRibbonIcon( u8 p_ribbonIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                         u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
     u16 loadShapeIcon( u8 p_shapeIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,

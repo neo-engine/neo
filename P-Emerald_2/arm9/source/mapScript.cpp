@@ -33,7 +33,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"
-#include "messageBox.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sprite.h"
@@ -179,28 +178,36 @@ namespace MAP {
                 break;
 
             case MSG_I:
+                /*
                 if( !PARAMB( SCRIPT_INS[ pc ] ) )
                     IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ), true );
                 else
                     IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ),
                                     GET_STRING( PARAMB( SCRIPT_INS[ pc ] ) ) );
+                                    */
                 break;
             case MSG:
+                /*
                 if( !PARAMB( SCRIPT_INS[ pc ] ) )
                     IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ), true );
                 else
                     IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ),
                                     GET_STRING( FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) ) );
+                                    */
                 break;
             case ITEM_I: {
+                             /*
                 ITEM::itemData itm = ITEM::getItemData( PARAMA( SCRIPT_INS[ pc ] ) );
                 IO::messageBox( PARAMA( SCRIPT_INS[ pc ] ), itm, PARAMB( SCRIPT_INS[ pc ] ) );
+                */
                 break;
             }
             case ITEM: {
+                           /*
                 ITEM::itemData itm = ITEM::getItemData( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) );
                 IO::messageBox( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), itm,
                                 FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
+                                */
                 break;
             }
             case GIVE_PKMN_I: {
@@ -251,7 +258,6 @@ namespace MAP {
                 // TODO
                 break;
             case CLEAR:
-                NAV::draw( true );
                 break;
             default:
                 break;

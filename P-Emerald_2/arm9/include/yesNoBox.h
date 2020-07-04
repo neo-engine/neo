@@ -31,8 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "uio.h"
-#include "messageBox.h"
-#include "saveGame.h"
+#include "defines.h"
 
 namespace IO {
     /*
@@ -58,25 +57,7 @@ namespace IO {
                              selection p_initialSelection = YES,
                              std::function<void( )> p_tick = DEFAULT_TICK );
 
-        [[deprecated]]
-        yesNoBox( bool p_initSprites );
-
-        [[deprecated]]
-        yesNoBox( SAVE::language p_language, bool p_initSprites = true );
-
-        [[deprecated]]
-        yesNoBox( const char* p_name, bool p_initSprites = true );
-
-        [[deprecated]]
-        yesNoBox( messageBox p_box, bool p_initSprites = true );
-
-        [[deprecated]]
-        bool getResult( const char* p_text = 0, bool p_textAtOnce = true );
-
-      private:
-        bool           _isNamed;
-        SAVE::language _language;
-        void           draw( u8 p_pressedIdx, u8 p_selectedIdx );
+        selection getResult( const char* p_message, style p_style );
     };
 
 } // namespace IO

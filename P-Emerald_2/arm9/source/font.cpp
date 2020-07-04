@@ -34,6 +34,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace IO {
+    u16 TMPBUF[ 256 * 32 ] = { 0 };
+
     font::font( u8 *p_data, u8 *p_widths, void ( *p_shiftchar )( u16 &val ) ) {
         _data       = p_data;
         _widths     = p_widths;
@@ -263,7 +265,8 @@ namespace IO {
     }
 
     u16 font::printStringB( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
-                            alignment p_alignment, u8 p_yDistance, u8 p_charShift ) const {
+                            alignment p_alignment, u8 p_yDistance, u8 p_charShift, u8 p_chunkSize,
+                            u16 p_bufferHeight ) const {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
         u16 lines = 1;
@@ -283,6 +286,7 @@ namespace IO {
                              - stringWidth( p_string + current_char + 1, p_charShift ) )
                            / 2;
                 }
+                if( p_alignment == LEFT ) { putX = 0; }
 
                 current_char++;
                 lines++;
@@ -293,13 +297,32 @@ namespace IO {
                     - p_charShift;
             current_char++;
         }
+
+        if( p_chunkSize < p_bufferWidth ) {
+            u16 pos                = 0;
+
+            for( u8 i = 0; i < p_bufferWidth / p_chunkSize; ++i ) {
+                for( u8 y = 0; y < p_bufferHeight; ++y ) {
+                    for( u8 x = 0; x < std::min( int( p_chunkSize ),
+                                                 p_bufferWidth - i * p_bufferWidth / p_chunkSize );
+                         ++x ) {
+                        TMPBUF[ pos++ ]
+                            = p_buffer[ y * p_bufferWidth + x + i * p_chunkSize ];
+                    }
+                }
+            }
+
+            std::memcpy( p_buffer, TMPBUF, p_bufferHeight * p_bufferWidth * sizeof( u16 ) );
+        }
+
         return lines;
     }
 
     u16 font::printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
-                             alignment p_alignment, u8 p_yDistance ) const {
+                             alignment p_alignment, u8 p_yDistance, u8 p_chunkSize,
+                             u16 p_bufferHeight ) const {
         return printStringB( p_string, p_palette, p_buffer, p_bufferWidth, p_alignment, p_yDistance,
-                             1 );
+                             1, p_chunkSize, p_bufferHeight );
     }
 
     u16 font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,

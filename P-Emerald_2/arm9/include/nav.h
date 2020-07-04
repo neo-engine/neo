@@ -30,27 +30,53 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include <nds/ndstypes.h>
 
+#include "uio.h"
+#include "defines.h"
+#include "yesNoBox.h"
+
 namespace NAV {
 #define MAXBG 13
 #define START_BG 0
-    extern unsigned int   NAV_DATA[ 12288 ];
-    extern unsigned short NAV_DATA_PAL[ 256 ];
+
+    enum menuOption {
+        VIEW_PARTY = 0,
+        VIEW_DEX   = 1,
+        VIEW_BAG   = 2,
+        VIEW_ID    = 3,
+        SAVE       = 4,
+        SETTINGS   = 5,
+    };
 
     struct backgroundSet {
         std::string           m_name;
-        const unsigned int *  m_mainMenu;
-        const unsigned short *m_mainMenuPal;
+        const unsigned int*   m_mainMenu;
+        const unsigned short* m_mainMenuPal;
         bool                  m_loadFromRom;
         bool                  m_allowsOverlay;
     };
-    enum state { HOME, MAP, MAP_BIG, MAP_MUG };
 
+    /*
+     * @brief: Prints the given message. An empty message clears the message box.
+     */
+    void printMessage( const char* p_message, style p_style = MSG_NORMAL );
 
-    void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8) 255 );
-    void showNewMap( u8 p_bank );
-    void updateMap( u16 p_map );
-    void handleInput( touchPosition p_touch, const char *p_path );
-    void home( );
+    std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+    printYNMessage( const char* p_message, style p_style, u8 p_selection = 255 );
 
-    extern backgroundSet BGs[ MAXBG ];
-}
+    std::vector<std::pair<IO::inputTarget, u8>>
+    printChoiceMessage( const char* p_message, style p_style, const std::vector<u16>& p_choices,
+                        u8 p_selection = 255 );
+
+    /*
+     * @brief: Initializes the bottom screen with the main menu
+     */
+    void init( bool p_bottom = true );
+
+    //    void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8) 255 );
+    //    void showNewMap( u8 p_bank );
+    //    void updateMap( u16 p_map );
+    void handleInput( const char* p_path );
+    //    void home( );
+
+    //    extern backgroundSet BGs[ MAXBG ];
+} // namespace NAV

@@ -30,7 +30,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "boxUI.h"
 #include "defines.h"
 #include "keyboard.h"
-#include "messageBox.h"
 #include "uio.h"
 
 #include "sound.h"

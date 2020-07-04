@@ -27,21 +27,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "mapSprite.h"
 #include "fs.h"
+#include "nav.h"
 #include "uio.h"
-
-#include "messageBox.h"
 
 namespace MAP {
     mapSprite::mapSprite( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame, u8 p_oamIdx,
-                          u8 p_palIdx, u16 p_tileIdx )
-        : _oamIndex( p_oamIdx ), _palette( p_palIdx ), _tileIdx( p_tileIdx ), _picNum( p_imageId ),
-          _curFrame( p_startFrame ) {
-        if( !IO::loadOWSprite( _picNum, p_currX, p_currY, _oamIndex, _palette, _tileIdx ) ) {
-            IO::messageBox m( "Sprite failed" );
-            NAV::draw( true );
+                          u16 p_tileIdx )
+        : _oamIndex( p_oamIdx ), _picNum( p_imageId ), _curFrame( p_startFrame ) {
+        if( !IO::loadOWSpriteB( _picNum, p_currX, p_currY, _oamIndex, p_tileIdx, _palData,
+                                _frameData ) ) {
+#ifdef DESQUID
+            NAV::printMessage( "Sprite failed" );
+#endif
         }
-        IO::setOWSpriteFrame( _curFrame, _oamIndex, _tileIdx );
-        IO::updateOAM( false );
+        drawFrame( p_startFrame );
     }
 
     ObjPriority mapSprite::getPriority( ) {
@@ -57,11 +56,16 @@ namespace MAP {
         IO::updateOAM( false );
     }
     void mapSprite::drawFrame( u8 p_value ) {
-        IO::setOWSpriteFrame( p_value, _oamIndex, _tileIdx );
-        IO::updateOAM( false );
+        u8 frame = p_value;
+        if( frame % PLAYER_FAST >= 9 ) frame -= 3;
+        if( p_value % PLAYER_FAST == 15 ) frame--;
+
+        drawFrame( frame / PLAYER_FAST * 9 + frame % PLAYER_FAST,
+                   ( frame != p_value )
+                       && ( p_value % PLAYER_FAST < 12 || p_value % PLAYER_FAST == 15 ) );
     }
     void mapSprite::drawFrame( u8 p_value, bool p_hFlip ) {
-        IO::setAnimatedSpriteFrame( p_value, p_hFlip, _oamIndex, _tileIdx );
+        IO::setOWSpriteFrame( p_value, p_hFlip, _oamIndex, _palData, _frameData );
         IO::updateOAM( false );
     }
 
@@ -74,8 +78,7 @@ namespace MAP {
         drawFrame( _curFrame );
     }
     void mapSprite::nextFrame( ) {
-        _curFrame++;
-        if( ( _curFrame % 20 ) % 3 == 0 ) _curFrame -= 2;
+        if( ( ( ++_curFrame ) % PLAYER_FAST ) % 3 == 0 ) _curFrame -= 2;
         drawFrame( _curFrame );
     }
 

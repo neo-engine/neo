@@ -112,6 +112,10 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     { "PP(%s)" },
 
     { "Fateful Enc." },
+    { "PKMN Spawn" },
+    { "Item Spawn" },
+    { "View Boxes" },
+    { "Tokens of god being|" },
 };
 
 #endif
@@ -290,10 +294,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "The scent vanished", "Der Duft verstrich wirkungslos" },
     { "Pok\xe9Nav", "Pok\xe9Nav" },
-    { " Would you like to\n save your progress?\n", " M\xf6"
-                                                    "chtest du deinen\n Fortschritt sichern?\n" },
-    { "Save?\nFrom an emulator?!", "Speichern?\nIn einem Emulator?!" },
-    { "Saved successfully!", "Speichern erfolgreich!" },
+    { " Would you like to save your progress?", " M\xf6"
+                                                    "chtest du deinen Fortschritt sichern?" },
+    { "Saving a lot of data. Don't turn off the power.\n%s", "Speichere eine Menge Daten.\n%s" },
+    { "Saving complete!", "Speichern erfolgreich!" },
 
     { "An error occured.\nProgress not saved.", "Es trat ein Fehler auf\nSpiel nicht gesichert." },
     { "No %s available.\nRemove the icon?",

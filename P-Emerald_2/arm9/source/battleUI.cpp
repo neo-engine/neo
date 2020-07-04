@@ -1781,6 +1781,8 @@ namespace BATTLE {
         IO::updateOAM( false );
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
 
+        // TODO
+        /*
         IO::yesNoBox yn;
         snprintf( buffer, 99, GET_STRING( 141 ), p_pokemon->m_boxdata.m_name );
         if( yn.getResult( buffer ) ) {
@@ -1792,6 +1794,7 @@ namespace BATTLE {
                 p_pokemon->m_boxdata.setIsNicknamed( true );
             }
         }
+        */
     }
 
 } // namespace BATTLE

@@ -30,21 +30,23 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 
 namespace MAP {
+    constexpr u8 PLAYER_FAST = 20;
 
     class mapSprite {
       private:
         u8  _oamIndex;
-        u8  _palette;
         u16 _tileIdx;
 
         u16 _picNum;
         u8  _curFrame;
 
+        u16 _palData[ 16 ];
+        u32 _frameData[ 32 * 32 * 12 / 8 ]; // Down stop, down f1, down f2, up, up, up, left, l, l
       public:
         mapSprite( ) {
         }
         mapSprite( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame, u8 p_oamIdx,
-                   u8 p_palIdx, u16 p_tileIdx );
+                   u16 p_tileIdx );
 
         ObjPriority getPriority( );
 
