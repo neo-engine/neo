@@ -804,5 +804,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Last save created in/at %s\non %s, %02hhu:%02hhu",
       "Zuletzt gesp. in/bei %s\nam %s um %02hhu:%02hhu." },
     { "No save data in this slot.", "Kein Spielstand in diesem Slot."},
+    { "Pok\xe9mon", "Pok\xe9mon" },
+    { "Pok\xe9dex", "Pok\xe9dex" },
 
+    { "Bag", "Beutel" },
+    { "Trainer ID", "Trainerpass" },
+    { "Save", "Speichern" },
+    { "Settings", "Optionen" },
 };

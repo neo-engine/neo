@@ -27,10 +27,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "choiceBox.h"
 #include "defines.h"
+#include "nav.h"
 #include "saveGame.h"
 #include "sound.h"
 #include "uio.h"
-#include "nav.h"
 
 #include <algorithm>
 #include <cmath>
@@ -40,7 +40,7 @@ namespace IO {
 #define UPDATE_PAGE_STATS                                                               \
     do {                                                                                \
         back = ext = prvpg = nxtpg = false;                                             \
-        mxchoice = 0;                                                                   \
+        mxchoice                   = 0;                                                 \
         for( auto g : choices ) {                                                       \
             if( g.second == BACK_CHOICE ) { back = true; }                              \
             if( g.second == EXIT_CHOICE ) { ext = true; }                               \
@@ -51,12 +51,12 @@ namespace IO {
     } while( false )
 
     choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
-            const std::vector<u16>& p_choices ) {
-        return getResult( [&]( u8 ){
-                return NAV::printChoiceMessage( p_message, p_style, p_choices );
-                }, [&]( u8 p_selection ){
+                                               const std::vector<u16>& p_choices ) {
+        return getResult(
+            [ & ]( u8 ) { return NAV::printChoiceMessage( p_message, p_style, p_choices ); },
+            [ & ]( u8 p_selection ) {
                 NAV::printChoiceMessage( 0, p_style, p_choices, p_selection );
-                } );
+            } );
     }
 
     choiceBox::selection choiceBox::getResult(
@@ -87,12 +87,21 @@ namespace IO {
 
             if( pressed & KEY_A ) {
                 if( sel < choices.size( ) ) {
-                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    if( choices[ sel ] == choiceBox::BACK_CHOICE
+                        || choices[ sel ] == choiceBox::EXIT_CHOICE ) {
+                        SOUND::playSoundEffect( SFX_CANCEL );
+                        break;
+                    } else if( choices[ sel ] == choiceBox::DISABLED_CHOICE ) {
+                        // Choice is disabled, nothing happens
+                    } else {
+                        SOUND::playSoundEffect( SFX_CHOOSE );
+                        break;
+                    }
                 } else {
                     SOUND::playSoundEffect( SFX_CANCEL );
+                    break;
                 }
                 cooldown = COOLDOWN_COUNT;
-                break;
             }
             if( back && ( pressed & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );

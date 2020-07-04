@@ -584,10 +584,71 @@ namespace NAV {
         }
     }
 
+    std::vector<std::pair<IO::inputTarget, u8>> drawMenu( ) {
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+            }
+
+            if( !oam[ SPR_MENU_OAM_SUB( i ) ].isHidden ) {
+                if( i != 3 ) {
+                    IO::regularFont->printString(
+                        GET_STRING( 413 + i ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                        oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
+                } else {
+                    IO::regularFont->printString( SAVE::SAV.getActiveFile( ).m_playerName,
+                                                  oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                                                  oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true,
+                                                  IO::font::CENTER );
+                }
+
+                res.push_back(
+                    std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                               i ) );
+            }
+        }
+        oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = true;
+
+        IO::updateOAM( true );
+
+        return res;
+    } // namespace NAV
+
+    void selectMenuItem( u8 p_selection ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+
+        IO::updateOAM( true );
+    }
+
     void focusMenu( const char* p_path ) {
         SOUND::playSoundEffect( SFX_MENU );
 
-        // TODO
+        IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        auto          res  = menu.getResult( [ & ]( u8 ) { return drawMenu( ); }, selectMenuItem );
+
+        if( res != IO::choiceBox::BACK_CHOICE ) { handleMenuSelection( c.second, p_path ); }
+
+        init( );
     }
 
     void handleInput( const char* p_path ) {
