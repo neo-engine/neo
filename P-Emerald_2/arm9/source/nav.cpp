@@ -92,6 +92,7 @@ namespace NAV {
 #define SPR_WINDOW_PAL_SUB 10
 
     u16         TEXT_BUF[ 32 * 256 ] = { 0 };
+    u16         CONT_BUF[ 16 * 16 ]  = { 0 };
     u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE };
     std::string TEXT_CACHE           = "";
 
@@ -273,19 +274,26 @@ namespace NAV {
             TEXT_CACHE = "";
         } else {
             TEXT_CACHE = TEXT_CACHE + p_message;
-            auto ln = IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF, 256,
-                                                      IO::font::LEFT, 16 );
-            u16  tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, SPR_MSG_GFX, x, y, 64, 32, TEXT_BUF,
+            // TODO: Auto rotate msgbox text.
+            /* auto ln = */ IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF,
+                                                            256, IO::font::LEFT, 16 );
+            u16 tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, SPR_MSG_GFX, x, y, 64, 32, TEXT_BUF,
                                            64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
-            tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32,
+            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32,
                                        TEXT_BUF + 64 * 32, 64 * 32 / 2, false, false, false,
                                        OBJPRIORITY_0, false );
-            tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, 32,
+            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, 32,
                                        TEXT_BUF + 2 * 64 * 32, 64 * 32 / 2, false, false, false,
                                        OBJPRIORITY_0, false );
-            tileCnt      = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64, 32,
+            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64, 32,
                                        TEXT_BUF + 3 * 64 * 32, 64 * 32 / 2, false, false, false,
                                        OBJPRIORITY_0, false );
+
+            // "Continue" char
+            IO::regularFont->printStringBC( "@", TEXT_PAL, CONT_BUF, 16, IO::font::LEFT, 16 );
+            tileCnt
+                = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 256 - x, y + 32, 8, 8,
+                                   CONT_BUF, 8 * 8 / 2, false, false, false, OBJPRIORITY_0, false );
         }
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -294,6 +302,11 @@ namespace NAV {
     }
 
     void animateMB( u8 p_frame ) {
+        if( p_frame & 7 == 0 ) {
+            SpriteEntry* oam                = IO::OamTop->oamBuffer;
+            oam[ SPR_MSGCONT_OAM ].isHidden = !oam[ SPR_MSGCONT_OAM ].isHidden;
+            IO::updateOAM( false );
+        }
     }
 
     void waitForInteract( ) {
