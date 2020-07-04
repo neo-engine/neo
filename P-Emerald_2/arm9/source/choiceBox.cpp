@@ -87,11 +87,11 @@ namespace IO {
 
             if( pressed & KEY_A ) {
                 if( sel < choices.size( ) ) {
-                    if( choices[ sel ] == choiceBox::BACK_CHOICE
-                        || choices[ sel ] == choiceBox::EXIT_CHOICE ) {
+                    if( choices[ sel ].second == choiceBox::BACK_CHOICE
+                        || choices[ sel ].second == choiceBox::EXIT_CHOICE ) {
                         SOUND::playSoundEffect( SFX_CANCEL );
                         break;
-                    } else if( choices[ sel ] == choiceBox::DISABLED_CHOICE ) {
+                    } else if( choices[ sel ].second == choiceBox::DISABLED_CHOICE ) {
                         // Choice is disabled, nothing happens
                     } else {
                         SOUND::playSoundEffect( SFX_CHOOSE );
@@ -212,7 +212,7 @@ namespace IO {
                         touchRead( &touch );
                         swiWaitForVBlank( );
                     }
-                    if( !bad ) {
+                    if( !bad && sel != DISABLED_CHOICE ) {
                         if( sel == EXIT_CHOICE || sel == BACK_CHOICE ) {
                             SOUND::playSoundEffect( SFX_CANCEL );
                         } else {

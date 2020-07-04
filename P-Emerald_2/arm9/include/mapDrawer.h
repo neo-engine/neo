@@ -129,7 +129,7 @@ namespace MAP {
             bool canFish( position p_start, direction p_direction );
             void fishPlayer( direction p_direction, u8 p_rodType = 0 );
 
-            void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny );
+            void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme );
 
             void disablePkmn( s16 p_steps = -1 );
             void enablePkmn( );

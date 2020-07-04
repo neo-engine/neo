@@ -11326,6 +11326,15 @@ namespace IO {
                 p_val = 134;
                 return;
             }
+            if( p_val == '<' ) {
+                p_val = 133;
+                return;
+            }
+            if( p_val == '>' ) {
+                p_val = 134;
+                return;
+            }
+
             if( p_val == '(' ) {
                 p_val = 135;
                 return;

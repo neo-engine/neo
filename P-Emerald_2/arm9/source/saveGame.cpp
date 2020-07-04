@@ -103,9 +103,8 @@ namespace SAVE {
         pal[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
 
         // player sprite
-        tileCnt
-            = IO::loadSprite( std::to_string( m_appearance ).c_str( ), 0, 0, tileCnt,
-                              33, 45, 64, 64, false, false, false, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite( std::to_string( m_appearance ).c_str( ), 0, 0, tileCnt, 33, 45,
+                                  64, 64, false, false, false, OBJPRIORITY_2, p_bottom );
 
         // stars
         IO::loadSprite( 1, 1, tileCnt, 100, 37, 16, 16, starPal, starTiles, starTilesLen, false,
@@ -197,8 +196,8 @@ namespace SAVE {
         m_good1 = GOOD_MAGIC1;
         m_good2 = GOOD_MAGIC2;
 
-        m_startDate    = CURRENT_DATE;
-        m_currentNavBG = INITIAL_NAVBG;
+        m_startDate       = CURRENT_DATE;
+        m_options.m_bgIdx = INITIAL_NAVBG;
 
         m_bag = BAG::bag( );
         for( u8 i = 0; i < MAX_BOXES; ++i ) {
@@ -316,18 +315,18 @@ namespace SAVE {
     }
 
     u8 saveGame::playerInfo::getEncounterLevel( u8 p_tier ) {
-        u8 mxlv = 0;
+        s16 mxlv = 0;
         for( u8 i = 0; i < 6; ++i ) {
             if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
-            mxlv = std::max( mxlv, m_pkmnTeam[ i ].m_level );
+            mxlv = std::max( mxlv, s16( m_pkmnTeam[ i ].m_level ) );
         }
         if( !mxlv || m_repelSteps ) return 0;
-        mxlv = std::min( 93, mxlv + 6 );
-        mxlv = std::min( 5 * getBadgeCount( ) + 8, mxlv + 0 );
+        mxlv = std::min( s16( 93 ), s16( mxlv + 6 ) );
+        mxlv = std::min( s16( 5 * getBadgeCount( ) + 8 ), s16( mxlv + 0 ) );
 
         mxlv += m_options.m_levelModifier + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
 
-        return std::max( (u8) 1, std::min( (u8) 100, mxlv ) );
+        return u8( std::max( (s16) 1, std::min( (s16) 100, mxlv ) ) );
     }
 
     bool saveGame::playerInfo::checkFlag( u8 p_idx ) {

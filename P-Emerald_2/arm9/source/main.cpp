@@ -241,7 +241,6 @@ int main( int, char** p_argv ) {
     // TODO remove
     SAVE::SAV.getActiveFile( ).m_options.m_enableBGM = true;
     SAVE::SAV.getActiveFile( ).m_options.m_enableSFX = true;
-    SAVE::SAV.m_version                              = VERSION;
 
     MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
@@ -304,7 +303,7 @@ int main( int, char** p_argv ) {
         }
 #endif
 
-        if( held & KEY_A ) {
+        if( GET_AND_WAIT( KEY_A ) ) {
             for( u8 i = 0; i < 6; ++i ) {
                 if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
                 auto a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
@@ -315,22 +314,23 @@ int main( int, char** p_argv ) {
                             || !MOVE::possible( a.m_boxdata.m_moves[ j ], param )
                             || !MOVE::text( a.m_boxdata.m_moves[ j ], param ) )
                             continue;
-                        char buffer[ 50 ];
+                        char buffer[ 100 ];
                         auto mname = MOVE::getMoveName( a.m_boxdata.m_moves[ j ] );
-                        snprintf( buffer, 49, GET_STRING( 3 ),
+                        snprintf( buffer, 99, GET_STRING( 3 ),
                                   GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                   mname.c_str( ) );
                         SOUND::playSoundEffect( SFX_CHOOSE );
                         IO::yesNoBox yn;
                         if( yn.getResult( buffer, MSG_NOCLOSE ) == IO::yesNoBox::YES ) {
+                            NAV::init( );
                             NAV::printMessage( 0, MSG_NOCLOSE );
                             swiWaitForVBlank( );
-                            snprintf( buffer, 49, GET_STRING( 99 ), a.m_boxdata.m_name,
+                            snprintf( buffer, 99, GET_STRING( 99 ), a.m_boxdata.m_name,
                                       mname.c_str( ) );
-                            NAV::printMessage( buffer, MSG_NOCLOSE );
-                            MAP::curMap->usePkmn( a.m_boxdata.m_speciesId, a.m_boxdata.m_isFemale,
-                                                  a.m_boxdata.isShiny( ) );
+                            NAV::printMessage( buffer, MSG_NORMAL );
                             NAV::printMessage( 0, MSG_NOCLOSE );
+                            MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ),
+                                                  a.isShiny( ), a.getForme( ) );
                             NAV::init( );
                             swiWaitForVBlank( );
 

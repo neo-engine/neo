@@ -68,6 +68,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
+#include "x_16_16.h"
 
 namespace NAV {
 #define SPR_MSGTEXT_OAM 108
@@ -81,6 +82,7 @@ namespace NAV {
 #define SPR_MENU_OAM_SUB( p_idx ) ( 0 + ( p_idx ) )
 #define SPR_MENU_SEL_OAM_SUB 6
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 6 * ( p_pos ) )
+#define SPR_X_OAM_SUB 44
 
 #define SPR_MENU_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
 #define SPR_MENU_SEL_PAL_SUB 6
@@ -106,6 +108,9 @@ namespace NAV {
     }
 
     void init( bool p_bottom ) {
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
         IO::clearScreen( p_bottom, false, true );
         IO::initOAMTable( p_bottom );
         IO::regularFont->setColor( 0, 0 );
@@ -120,9 +125,10 @@ namespace NAV {
         auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
 
-        FS::readPictureData( ptr3, "nitro:/PICS/NAV/",
-                             std::to_string( SAVE::SAV.getActiveFile( ).m_currentNavBG ).c_str( ),
-                             192 * 2, 192 * 256, p_bottom );
+        FS::readPictureData(
+            ptr3, "nitro:/PICS/NAV/",
+            std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
+            192 * 256, p_bottom );
 
         dmaCopy( BorderBitmap, ptr, 256 * 192 );
         dmaCopy( BorderPal + 192, pal + 192, 64 );
@@ -154,6 +160,11 @@ namespace NAV {
         tileCnt = IO::loadSprite( "MM/select", SPR_MENU_SEL_OAM_SUB, SPR_MENU_SEL_PAL_SUB, tileCnt,
                                   256 - 31, 192 - 1 * 31, 32, 32, false, false, true, OBJPRIORITY_2,
                                   p_bottom );
+
+        // x
+        tileCnt = IO::loadSprite( SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16, 16,
+                                  x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, true,
+                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // Choice boxes
 
@@ -325,6 +336,10 @@ namespace NAV {
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
     printYNMessage( const char* p_message, style p_style, u8 p_selection ) {
         doPrintMessage( p_message, p_style );
+
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -336,8 +351,14 @@ namespace NAV {
 
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+        for( u8 i = 2; i < 4; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
             }
         }
 
@@ -347,12 +368,6 @@ namespace NAV {
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
                                  true );
             for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
-
-            for( u8 i = 2; i < 4; i++ ) {
-                for( u8 j = 0; j < 6; j++ ) {
-                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
-                }
-            }
 
             IO::regularFont->printString(
                 GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 48,
@@ -385,6 +400,10 @@ namespace NAV {
     printChoiceMessage( const char* p_message, style p_style, const std::vector<u16>& p_choices,
                         u8 p_selection ) {
         doPrintMessage( p_message, p_style );
+
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -575,7 +594,24 @@ namespace NAV {
             return;
         }
         case SETTINGS: {
-            // TODO
+            ANIMATE_MAP = false;
+            SOUND::dimVolume( );
+
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            SAVE::runSettings( );
+
+            FADE_TOP_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            MAP::curMap->draw( );
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+            init( );
 
             return;
         }
@@ -585,6 +621,10 @@ namespace NAV {
     }
 
     std::vector<std::pair<IO::inputTarget, u8>> drawMenu( ) {
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -595,6 +635,17 @@ namespace NAV {
         SpriteEntry* oam = IO::Oam->oamBuffer;
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
+
+        oam[ SPR_X_OAM_SUB ].isHidden = false;
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::EXIT_CHOICE ) );
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::BACK_CHOICE ) );
+
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 6; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
@@ -603,11 +654,11 @@ namespace NAV {
             if( !oam[ SPR_MENU_OAM_SUB( i ) ].isHidden ) {
                 if( i != 3 ) {
                     IO::regularFont->printString(
-                        GET_STRING( 413 + i ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                        GET_STRING( 413 + i ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48 + 13,
                         oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
                 } else {
-                    IO::regularFont->printString( SAVE::SAV.getActiveFile( ).m_playerName,
-                                                  oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    IO::regularFont->printString( SAVE::SAV.getActiveFile( ).m_playername,
+                                                  oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48 + 13,
                                                   oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true,
                                                   IO::font::CENTER );
                 }
@@ -618,6 +669,15 @@ namespace NAV {
                                                 oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
                                                 oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
                                i ) );
+                oam[ SPR_MENU_OAM_SUB( i ) ].y = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y;
+                oam[ SPR_MENU_OAM_SUB( i ) ].x = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x;
+            } else {
+                res.push_back(
+                    std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                               IO::choiceBox::DISABLED_CHOICE ) );
             }
         }
         oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = true;
@@ -646,9 +706,10 @@ namespace NAV {
         IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
         auto          res  = menu.getResult( [ & ]( u8 ) { return drawMenu( ); }, selectMenuItem );
 
-        if( res != IO::choiceBox::BACK_CHOICE ) { handleMenuSelection( c.second, p_path ); }
-
         init( );
+        if( res != IO::choiceBox::BACK_CHOICE ) {
+            handleMenuSelection( NAV::menuOption( res ), p_path );
+        }
     }
 
     void handleInput( const char* p_path ) {

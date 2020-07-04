@@ -87,7 +87,8 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define LANGUAGES 2
 #define MAX_STRINGS 500
 #define MAX_ACHIEVEMENTS 50
-#define INITIAL_NAVBG 11
+#define NUM_BGS 12
+#define INITIAL_NAVBG ( NUM_BGS - 1 )
 
 #define TRANSPARENCY_COEFF 0x0671
 enum style {

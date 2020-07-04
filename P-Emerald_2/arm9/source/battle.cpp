@@ -92,8 +92,14 @@ namespace BATTLE {
 
         char buffer[ 100 ];
 
+        swiWaitForVBlank( );
+        scanKeys( );
+
         battleEndReason battleEnd = BATTLE_NONE;
         initBattle( );
+
+        swiWaitForVBlank( );
+        scanKeys( );
 
         _round = 0;
         // Main battle loop

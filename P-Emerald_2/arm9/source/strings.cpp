@@ -304,7 +304,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
       "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?" },
     { "Recently used items\nwill appear here.", "Hier erscheinen zuletzt\neingesetzte Items." },
     { "You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren." },
-    { "%s used %s!", "%s setzt %s\nein!" },
+    { "%s used %s!", "%s setzt %s ein!" },
 
     // 100
 
@@ -805,10 +805,31 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
       "Zuletzt gesp. in/bei %s\nam %s um %02hhu:%02hhu." },
     { "No save data in this slot.", "Kein Spielstand in diesem Slot."},
     { "Pok\xe9mon", "Pok\xe9mon" },
-    { "Pok\xe9dex", "Pok\xe9dex" },
+    { "Pok\xe9""dex", "Pok\xe9""dex" },
 
     { "Bag", "Beutel" },
     { "Trainer ID", "Trainerpass" },
     { "Save", "Speichern" },
-    { "Settings", "Optionen" },
+    { "Options", "Optionen" },
+    { "Text Speed", "Textgeschw."},
+
+    // 420
+
+    { "Language", "Sprache" },
+    { "BGM", "Musik" },
+    { "SFX", "Soundeffekte" },
+    { "Difficulty", "Schwierigkeit" },
+    { "Wallpaper", "Hintergrund" },
+
+    { "Slow", "Langs." },
+    { "Medium", "Mittel" },
+    { "Fast", "Schnell" },
+    { "On", "An" },
+    { "Off", "Aus" },
+
+    // 430
+    { "Wynaut", "Isso" },
+    { "Skitty", "Eneco" },
+    { "Absol", "Absol" },
+    { "Sound disabled", "Musik deaktiviert"},
 };

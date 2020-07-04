@@ -28,9 +28,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <maxmod9.h>
 
-#include "sound.h"
 #include "defines.h"
 #include "saveGame.h"
+#include "sound.h"
 
 const char SOUND_PATH[] = "nitro:/SOUND/";
 
@@ -195,6 +195,18 @@ namespace SOUND {
             mmStart( p_id, MM_PLAY_LOOP );
             BGMLoaded  = true;
             currentBGM = p_id;
+        } else if( BGMLoaded ) {
+            setVolume( 0x50 );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            setVolume( 0x25 );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            mmStop( );
+            mmUnload( currentBGM );
+            BGMLoaded = false;
         }
 #else
         (void) p_id;

@@ -32,13 +32,42 @@ namespace SAVE {
 
     struct saveOptions {
         u8 m_EXPShareEnabled;
-        u8 m_enableBGM : 1 = true;
-        u8 m_enableSFX : 7 = true;
+        u8 m_enableBGM : 1  = true;
+        u8 m_enableSFX : 1  = true;
+        u8 m_difficulty : 6 = 3;
         u8 m_bgIdx;
 
         language m_language;
         s8       m_levelModifier;
         s8       m_encounterRateModifier;
         s8       m_textSpeedModifier;
+
+        constexpr u8 getTextSpeed( ) const {
+            if( m_textSpeedModifier == -20 ) { return 0; }
+            if( m_textSpeedModifier == 0 ) { return 1; }
+            return 2;
+        }
+
+        constexpr void setTextSpeed( u8 p_value ) {
+            if( p_value == 0 ) {
+                m_textSpeedModifier = -20;
+            } else if( p_value == 1 ) {
+                m_textSpeedModifier = 0;
+            } else {
+                m_textSpeedModifier = 20;
+            }
+        }
+
+        constexpr void setDifficulty( u8 p_value ) {
+            m_difficulty            = p_value;
+            m_encounterRateModifier = ( s8( p_value ) - 3 ) * -40;
+            m_levelModifier         = ( s8( p_value ) - 3 ) * 5;
+        }
+
+        constexpr u8 getDifficulty( ) const {
+            return m_difficulty;
+        }
     };
+
+    void runSettings( );
 } // namespace SAVE

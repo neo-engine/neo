@@ -146,10 +146,7 @@ namespace SAVE {
             date m_berryPlantedDate[ BERRY_SLOTS ]; // Date when the berry was planted
             time m_berryPlantedTime[ BERRY_SLOTS ]; // Time when the berry was planted
 
-            u8   m_currentNavBG;
-            u32  m_ : 24;
-
-            u32 m_reserved[ 49 ]; // reserved for future things that need to be stored
+            u32 m_reserved[ 50 ]; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 

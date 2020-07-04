@@ -55,7 +55,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "partyScreen.h"
 #include "pokemonNames.h"
 #include "statusScreen.h"
-
 #include "battle.h"
 // END TEST
 
@@ -115,6 +114,7 @@ namespace SAVE {
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
         // BEGIN TEST
+        //
         /*
                 pokemon testTeam[ 6 ];
                 for( u16 i = 0; i < 6; i++ ) {

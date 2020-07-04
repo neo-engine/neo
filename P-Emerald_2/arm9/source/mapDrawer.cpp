@@ -51,8 +51,12 @@ namespace MAP {
 
 #define SPR_MAIN_PLAYER_OAM 0
 #define SPR_MAIN_PLAYER_PLAT_OAM 1
+#define SPR_PKMN_OAM 100
+#define SPR_CIRC_OAM 104
 
 #define SPR_MAIN_PLAYER_GFX 0
+#define SPR_PKMN_GFX 304
+#define SPR_CIRC_GFX 447
 #define SPR_MAIN_PLAYER_PLAT_GFX 335
 
     mapDrawer* curMap = nullptr;
@@ -387,7 +391,8 @@ namespace MAP {
     pokemon wildPkmn;
     bool    mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
 
-        u16 rn = rand( ) % ( 512 + SAVE::SAV.getActiveFile( ).m_options.m_encounterRateModifier );
+        u16 rn
+            = rand( ) % ( 512 + 3 * SAVE::SAV.getActiveFile( ).m_options.m_encounterRateModifier );
         if( p_type == FISHING_ROD ) rn /= 8;
         if( p_forceEncounter ) rn %= 40;
 
@@ -1570,7 +1575,7 @@ namespace MAP {
         PLAYER_IS_FISHING = false;
     }
 
-    void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny ) {
+    void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme ) {
         u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
         bool surfing = ( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF );
@@ -1584,23 +1589,25 @@ namespace MAP {
                                                                                           false );
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
         }
-        u16 tl = IO::loadSpriteB( "UI/cc", 124, 0, 64, 32, 64, 64, false, false, false,
-                                  OBJPRIORITY_1, false );
-        IO::loadSpriteB( 125, 0, 128, 32, 64, 64, 0, 0, 0, false, true, false, OBJPRIORITY_1,
-                         false );
-        IO::loadSpriteB( 126, 0, 64, 96, 64, 64, 0, 0, 0, true, false, false, OBJPRIORITY_1,
-                         false );
-        IO::loadSpriteB( 127, 0, 128, 96, 64, 64, 0, 0, 0, true, true, false, OBJPRIORITY_1,
-                         false );
+        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
+                         OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
+                         false, OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 64, 96, 64, 64, 0, 0, 0, true, false,
+                         false, OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
+                         false, OBJPRIORITY_1, false );
 
-        if( !IO::loadPKMNSpriteB( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, tl, false,
-                                  p_shiny, p_female ) )
-            IO::loadPKMNSpriteB( "nitro:/PICS/SPRITES/PKMN/", p_pkmIdx, 80, 48, 120, tl, false,
-                                 p_shiny, !p_female );
+        SOUND::playCry( p_pkmIdx, p_forme );
+        IO::loadPKMNSpriteB( p_pkmIdx, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false, p_shiny, p_female,
+                             false, false, p_forme );
         IO::updateOAM( false );
         for( u8 i = 0; i < 75; ++i ) swiWaitForVBlank( );
 
-        for( u8 i = 120; i < 128; ++i ) IO::OamTop->oamBuffer[ i ].isHidden = true;
+        for( u8 i = 0; i < 4; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true;
+            IO::OamTop->oamBuffer[ SPR_PKMN_OAM + i ].isHidden = true;
+        }
         IO::updateOAM( false );
         changeMoveMode( surfing ? SURF : WALK );
         if( surfing ) {
