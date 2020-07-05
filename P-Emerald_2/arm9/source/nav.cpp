@@ -936,7 +936,8 @@ namespace NAV {
 #ifdef DESQUID
         if( pressed & KEY_SELECT ) {
             std::vector<u16> choices
-                = { DESQUID_STRING + 46, DESQUID_STRING + 47, DESQUID_STRING + 48 };
+                = { DESQUID_STRING + 46, DESQUID_STRING + 47, DESQUID_STRING + 48,
+                DESQUID_STRING + 50, DESQUID_STRING + 51 };
 
             IO::choiceBox test = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
             switch( test.getResult( GET_STRING( DESQUID_STRING + 49 ), MSG_NOCLOSE, choices ) ) {
@@ -1018,6 +1019,16 @@ namespace NAV {
                 SOUND::restoreVolume( );
                 init( );
                 MAP::curMap->draw( );
+                break;
+            }
+            case 3: {
+                init( );
+                MAP::curMap->awardBadge( 0, 1 + rand( ) % 8 );
+                break;
+            }
+            case 4: {
+                init( );
+                MAP::curMap->awardBadge( 1, ( 1 + rand( ) % 7 ) * 10 + 1 + ( rand( ) % 2 ) );
                 break;
             }
             }

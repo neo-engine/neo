@@ -87,25 +87,34 @@ extern unsigned short TEMP_PAL[ 256 ];
 #define LANGUAGES 2
 #define MAX_STRINGS 500
 #define MAX_ACHIEVEMENTS 50
+#define MAX_BADGENAMES 25
 #define NUM_BGS 12
 #define INITIAL_NAVBG ( NUM_BGS - 1 )
 
 #define TRANSPARENCY_COEFF 0x0671
 enum style {
-    MSG_NORMAL  = 0,
-    MSG_INFO    = 1,
-    MSG_NOCLOSE = 2, // Msgbox stays open, future calls to print append text
+    MSG_NORMAL       = 0,
+    MSG_INFO         = 1,
+    MSG_NOCLOSE      = 2, // Msgbox stays open, future calls to print append text
     MSG_INFO_NOCLOSE = 3,
 };
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ];
+extern const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 extern const char* const MONTHS[ 12 ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 
+#define getBadgeName( p_type, p_badge )                                                            \
+    ( ( ( p_type ) == 0 )                                                                          \
+          ? BADGENAME[ (p_badge) -1 ][ CURRENT_LANGUAGE ]                                          \
+          : ( ( p_type ) == 1 ? BADGENAME[ 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) \
+                                           - 1 ][ CURRENT_LANGUAGE ]                               \
+                              : 0 ) )
+
 #ifdef DESQUID
-#define MAX_DESQUID_STRINGS 50
+#define MAX_DESQUID_STRINGS 100
 extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define GET_STRING( p_stringId )                                                                 \
     ( ( ( p_stringId ) >= DESQUID_STRING ) ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ] \
@@ -123,5 +132,5 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )
 #define sq( a ) ( ( a ) * ( a ) )
 
-#define IN_DEX( pidx ) ( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )
-
+#define IN_DEX( pidx ) \
+    ( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )

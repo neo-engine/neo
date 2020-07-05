@@ -129,6 +129,12 @@ namespace MAP {
             bool canFish( position p_start, direction p_direction );
             void fishPlayer( direction p_direction, u8 p_rodType = 0 );
 
+            /*
+             * @brief: Plays the badge award animation.
+             * @param p_type: Type of badge to award (0: HOENN badge, 1: Frontier symbol)
+             * :param p_badge: Badge to award (1-8 or 11/12 - 71/72)
+             */
+            void awardBadge( u8 p_type, u8 p_badge );
             void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme );
 
             void disablePkmn( s16 p_steps = -1 );

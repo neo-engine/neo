@@ -116,6 +116,11 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     { "Item Spawn" },
     { "View Boxes" },
     { "Tokens of god being|" },
+
+    // 50
+
+    { "RND Badge" },
+    { "RND Symbol" },
 };
 
 #endif
@@ -152,6 +157,32 @@ const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ] = {
     { "Won the S. Ability Symbol on %s", "S-Anlagesymbol erhalten am %s" },
     { "Won the G. Ability Symbol on %s", "G-Anlagesymbol erhalten am %s" },
     { "Battle Frontier cleared on %s", "Kampfzone bezwungen am %s" },
+};
+
+const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ] = {
+    { "Stone Badge", "den Steinorden" },
+    { "Knuckle Badge", "den Kn\f6"
+                       "chelorden" },
+    { "Dynamo Badge", "den Dynamo-Orden" },
+    { "Heat Badge", "den Hitzeorden" },
+    { "Balance Badge", "den Balanceorden" },
+    { "Feather Badge", "den Federorden" },
+    { "Mind Badge", "den Mentalrden" },
+    { "Rain Badge", "den Schauerorden" },
+    { "Silver Knowledge Symbol", "das Silber-Kenntnissymbol" },
+    { "Gold Knowledge Symbol", "das Gold-Kenntnissymbol" },
+    { "Silver Guts Symbol", "das Silber-Grobsymbol" },
+    { "Gold Guts Symbol", "das Gold-Grobsymbol" },
+    { "Silver Tactics Symbol", "das Silber-Taktiksymbol" },
+    { "Gold Tactics Symbol", "das Gold-Taktiksymbol" },
+    { "Silver Luck Symbol", "das Silber-Lossymbol" },
+    { "Gold Luck Symbol", "das Gold-Lossymbol" },
+    { "Silver Spirits Symbol", "das Silber-Seelensymbol" },
+    { "Gold Spirits Symbol", "das Gold-Seelensymbol" },
+    { "Silver Brave Symbol", "das Silber-Bravursymbol" },
+    { "Gold Brave Symbol", "das Gold-Bravursymbol" },
+    { "Silver Ability Symbol", "das Silber-Anlagesymbol" },
+    { "Gold Ability Symbol", "das Gold-Anlagesymbol" },
 };
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
@@ -260,7 +291,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 70
 
     { "TOUCH TO START", "BER\x9A"
-                                 "HRE, UM ZU STARTEN" },
+                        "HRE, UM ZU STARTEN" },
     { "Continue", "Weiter" },
     { "New Game", "Neues Spiel" },
     { "Special Episodes", "Spezialepisoden" },
@@ -295,7 +326,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "The scent vanished", "Der Duft verstrich wirkungslos" },
     { "Pok\xe9Nav", "Pok\xe9Nav" },
     { " Would you like to save your progress?", " M\xf6"
-                                                    "chtest du deinen Fortschritt sichern?" },
+                                                "chtest du deinen Fortschritt sichern?" },
     { "Saving a lot of data. Don't turn off the power.\n%s", "Speichere eine Menge Daten.\n%s" },
     { "Saving complete!", "Speichern erfolgreich!" },
 
@@ -803,15 +834,18 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Adventure started on %s", "Abenteuer gest. am %s" },
     { "Last save created in/at %s\non %s, %02hhu:%02hhu",
       "Zuletzt gesp. in/bei %s\nam %s um %02hhu:%02hhu." },
-    { "No save data in this slot.", "Kein Spielstand in diesem Slot."},
+    { "No save data in this slot.", "Kein Spielstand in diesem Slot." },
     { "Pok\xe9mon", "Pok\xe9mon" },
-    { "Pok\xe9""dex", "Pok\xe9""dex" },
+    { "Pok\xe9"
+      "dex",
+      "Pok\xe9"
+      "dex" },
 
     { "Bag", "Beutel" },
     { "Trainer ID", "Trainerpass" },
     { "Save", "Speichern" },
     { "Options", "Optionen" },
-    { "Text Speed", "Textgeschw."},
+    { "Text Speed", "Textgeschw." },
 
     // 420
 
@@ -831,8 +865,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Wynaut", "Isso" },
     { "Skitty", "Eneco" },
     { "Absol", "Absol" },
-    { "Sound disabled", "Musik deaktiviert"},
+    { "Sound disabled", "Musik deaktiviert" },
     { "Hoenn Pok\xe9mon League Badges", "Hoenn Pok\xe9mon-Liga Orden" },
 
     { "Battle Frontier Symbols", "Kampfzonensymbole" },
+    { "%s obtained\nthe %s!", "%s erhielt\n%s!" },
 };

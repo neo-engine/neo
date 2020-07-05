@@ -360,7 +360,7 @@ namespace ITEM {
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE ) {
-                if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::BIKE );
+                if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::MACH_BIKE );
                 return false;
             } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE ) {
                 if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::WALK );
@@ -424,10 +424,14 @@ namespace ITEM {
             return MOVE::possible( M_SWEET_SCENT, 0 );
         case I_BIKE2:
         case I_BIKE:
-        case I_MACH_BIKE:
-        case I_ACRO_BIKE:
             return SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                    || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE;
+        case I_MACH_BIKE:
+            return SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
+                   || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE;
+        case I_ACRO_BIKE:
+            return SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
+                   || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE;
         case I_OLD_ROD:
         case I_GOOD_ROD:
         case I_SUPER_ROD:

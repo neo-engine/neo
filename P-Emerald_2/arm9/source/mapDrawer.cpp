@@ -1476,7 +1476,9 @@ namespace MAP {
             newIsBig                                     = true;
             break;
         case ACRO_BIKE:
-            SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 2;
+            //    SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 2;
+            //    TODO
+            SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1;
             newIsBig                                     = true;
             break;
         case SIT:
@@ -1624,6 +1626,64 @@ namespace MAP {
                 getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
         }
         swiWaitForVBlank( );
+    }
+
+    void mapDrawer::awardBadge( u8 p_type, u8 p_badge ) {
+
+        if( p_type == 0
+            && ( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << ( p_badge - 1 ) ) ) ) {
+            // player already has this badge/symbol.
+            return;
+        } else if( p_type == 1 ) {
+            auto sym = ( p_badge / 10 ) - 1;
+            auto tp  = ( p_badge % 10 ) - 1;
+
+            if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << ( 7 * tp + sym ) ) ) {
+                return;
+            }
+        }
+
+        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
+                         OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
+                         false, OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 64, 96, 64, 64, 0, 0, 0, true, false,
+                         false, OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
+                         false, OBJPRIORITY_1, false );
+
+        if( p_type == 0 ) { // Hoenn badge
+            IO::loadSpriteB( ( "ba/b" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
+                            SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
+                            false );
+            SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = p_badge;
+            SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= ( 1 << ( p_badge - 1 ) );
+        } else if( p_type == 1 ) { // Frontier symbol
+            IO::loadSpriteB( ( "ba/s" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
+                            SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
+                            false );
+
+            auto sym = ( p_badge / 10 ) - 1;
+            auto tp  = ( p_badge % 10 ) - 1;
+
+            SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = 10 + 2 * sym + tp;
+            SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges |= ( 1 << ( 7 * tp + sym ) );
+        }
+
+        SAVE::SAV.getActiveFile( ).m_lastAchievementDate = SAVE::CURRENT_DATE;
+
+        IO::updateOAM( false );
+        // TODO: play sound
+        for( u8 i = 0; i < 150; ++i ) swiWaitForVBlank( );
+
+        for( u8 i = 0; i < 4; ++i ) { IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true; }
+        IO::OamTop->oamBuffer[ SPR_PKMN_OAM ].isHidden = true;
+        IO::updateOAM( false );
+
+        char buffer[ 140 ];
+        snprintf( buffer, 139, GET_STRING( 436 ), SAVE::SAV.getActiveFile( ).m_playername,
+                  getBadgeName( p_type, p_badge ) );
+        NAV::printMessage( buffer, MSG_INFO );
     }
 
     u16 mapDrawer::getCurrentLocationId( ) const {
