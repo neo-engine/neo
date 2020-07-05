@@ -8,8 +8,8 @@ addons:
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq gcc-4.9 git curl wget
-    - curl -L https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.2/devkitpro-pacman.deb -o pacman.deb
-    - sudo dpkg -i pacman.deb
+    - sudo apt-get install -qq gdebi-core
+    - sudo gdebi devkitpro-pacman.amd64.deb
     - sudo dkp-pacman -Syu
     - sudo dkp-pacman -S nds-dev --noconfirm
 
@@ -32,8 +32,8 @@ deploy:
     file:
     - "P-Emerald_2_NOSOUND.nds"
     - "P-Emerald_2_NOSOUND_DESQUID.nds"
-      #    - "P-Emerald_2.nds"
-      #    - "P-Emerald_2_DESQUID.nds"
+    - "P-Emerald_2.nds"
+    - "P-Emerald_2_DESQUID.nds"
     draft: true
     on:
         tags: true
