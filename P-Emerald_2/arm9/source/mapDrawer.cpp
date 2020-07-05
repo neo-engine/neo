@@ -57,7 +57,7 @@ namespace MAP {
 #define SPR_MAIN_PLAYER_GFX 0
 #define SPR_PKMN_GFX 304
 #define SPR_CIRC_GFX 447
-#define SPR_MAIN_PLAYER_PLAT_GFX 335
+#define SPR_MAIN_PLAYER_PLAT_GFX 332
 
     mapDrawer* curMap = nullptr;
 #define CUR_SLICE _slices[ _curX ][ _curY ]
@@ -686,22 +686,22 @@ namespace MAP {
             return false;
         case 0xd3: // Bike stuff
             if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+            if( p_direction % 2 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
         case 0xd4:
             if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+            if( p_direction % 2 == 0 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
         case 0xd5:
             if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+            if( p_direction % 2 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
         case 0xd6:
             if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 == 0 && ( p_moveMode & BIKE_JUMP ) && curBehave == lstBehave )
+            if( p_direction % 2 == 0 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
         case 0xd7:
@@ -1345,17 +1345,23 @@ namespace MAP {
             moveCamera( p_direction, true );
             if( i == 8 )
                 _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame( );
-            if( ( !p_fast || i % 3 ) && SAVE::SAV.getActiveFile( ).m_player.m_movement != BIKE )
+            if( ( !p_fast || i % 3 ) && !( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE ) )
                 swiWaitForVBlank( );
             if( i % ( fastBike / 3 + 2 ) == 0
-                && SAVE::SAV.getActiveFile( ).m_player.m_movement == BIKE )
+                && ( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE ) )
                 swiWaitForVBlank( );
         }
         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
             ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
-        if( SAVE::SAV.getActiveFile( ).m_player.m_movement == BIKE )
-            fastBike = std::min( fastBike + 1, 12 );
-        else
+        if( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE ) {
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == ACRO_BIKE ) {
+                fastBike = std::min( fastBike + 1, 4 );
+            } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MACH_BIKE ) {
+                fastBike = std::min( fastBike + 1, 12 );
+            } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == BIKE ) {
+                fastBike = std::min( fastBike + 1, 8 );
+            }
+        } else
             fastBike = false;
 
         if( atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
@@ -1465,6 +1471,7 @@ namespace MAP {
             ydif                                         = 2;
             break;
         case BIKE:
+        case MACH_BIKE:
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1;
             newIsBig                                     = true;
             break;

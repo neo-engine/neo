@@ -832,4 +832,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Skitty", "Eneco" },
     { "Absol", "Absol" },
     { "Sound disabled", "Musik deaktiviert"},
+    { "Hoenn Pok\xe9mon League Badges", "Hoenn Pok\xe9mon-Liga Orden" },
+
+    { "Battle Frontier Symbols", "Kampfzonensymbole" },
 };

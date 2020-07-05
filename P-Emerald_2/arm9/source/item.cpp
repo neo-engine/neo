@@ -177,7 +177,9 @@ namespace ITEM {
                 p_pokemon.m_status.m_isParalyzed = false;
                 break;
             }
-            default: { break; }
+            default: {
+                break;
+            }
             }
             return change;
         }
@@ -288,18 +290,8 @@ namespace ITEM {
     bool use( const u16 p_itemId, std::function<void( const char* )> p_message, bool p_dryRun ) {
         char buffer[ 50 ];
         if( !p_dryRun ) {
-            bool ex = false;
-            for( u8 i = 0; i < 5; ++i )
-                if( SAVE::SAV.getActiveFile( ).m_lstUsedItems[ i ] == p_itemId ) {
-                    ex = true;
-                    break;
-                }
-            if( !ex ) {
-                SAVE::SAV.getActiveFile( )
-                    .m_lstUsedItems[ SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx ]
-                    = p_itemId;
-                SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx
-                    = ( SAVE::SAV.getActiveFile( ).m_lstUsedItemsIdx + 1 ) % 5;
+            if( SAVE::SAV.getActiveFile( ).m_lstUsedItem != p_itemId ) {
+                SAVE::SAV.getActiveFile( ).m_lstUsedItem = p_itemId;
             }
         }
         switch( p_itemId ) {
@@ -354,9 +346,9 @@ namespace ITEM {
             return false;
         case I_BIKE2:
         case I_BIKE:
-        case I_MACH_BIKE:
-        case I_ACRO_BIKE:
-            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK ) {
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
+                || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
+                || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE ) {
                 if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::BIKE );
                 return false;
             } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE ) {
@@ -364,6 +356,29 @@ namespace ITEM {
                 return false;
             } else
                 return true;
+        case I_MACH_BIKE:
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
+                || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
+                || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE ) {
+                if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::BIKE );
+                return false;
+            } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE ) {
+                if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::WALK );
+                return false;
+            } else
+                return true;
+        case I_ACRO_BIKE:
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
+                || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
+                || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE ) {
+                if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::ACRO_BIKE );
+                return false;
+            } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE ) {
+                if( !p_dryRun ) MAP::curMap->changeMoveMode( MAP::WALK );
+                return false;
+            } else
+                return true;
+
         case I_OLD_ROD:
             if( MAP::curMap->canFish( SAVE::SAV.getActiveFile( ).m_player.m_pos,
                                       SAVE::SAV.getActiveFile( ).m_player.m_direction ) ) {

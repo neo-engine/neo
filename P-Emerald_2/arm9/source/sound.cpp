@@ -55,7 +55,15 @@ void initSFX( ) {
     mmLoadEffect( SFX_BATTLE_THROW );
     mmLoadEffect( SFX_SHINY );
 
-    mmLoadEffect( SFX_CRY_123 );
+    mmLoadEffect( SFX_CRY_041 );
+    mmLoadEffect( SFX_CRY_252 );
+    mmLoadEffect( SFX_CRY_255 );
+    mmLoadEffect( SFX_CRY_258 );
+    mmLoadEffect( SFX_CRY_261 );
+    mmLoadEffect( SFX_CRY_263 );
+    mmLoadEffect( SFX_CRY_265 );
+    mmLoadEffect( SFX_CRY_278 );
+    mmLoadEffect( SFX_CRY_280 );
 
     mmLoadEffect( SFX_BUMP );
     mmLoadEffect( SFX_CAVE_WARP );

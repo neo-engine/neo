@@ -70,14 +70,15 @@ namespace MAP {
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
     enum moveMode {
         // Player modes
-        WALK      = 0,
-        SURF      = 1,
-        BIKE      = 2,
-        ACRO_BIKE = 3,
-        BIKE_JUMP = 4,
-        SIT       = 5,
-        DIVE      = 6,
-        ROCK_CLIMB= 7,
+        WALK       = 0,
+        SURF       = ( 1 << 0 ),
+        BIKE       = ( 1 << 2 ),
+        ACRO_BIKE  = ( 1 << 2 ) | ( 1 << 0 ),
+        MACH_BIKE  = ( 1 << 2 ) | ( 1 << 1 ),
+        BIKE_JUMP  = ( 1 << 2 ) | ( 1 << 0 ) | ( 1 << 1 ),
+        SIT        = ( 1 << 3 ),
+        DIVE       = ( 1 << 4 ),
+        ROCK_CLIMB = ( 1 << 5 ),
         // NPC modes
         NO_MOVEMENT = 0,
     };
@@ -142,6 +143,5 @@ namespace MAP {
         if( p_dir & KEY_RIGHT ) { return MAP::direction::RIGHT; }
         return MAP::direction::RIGHT;
     }
-
 
 } // namespace MAP

@@ -72,12 +72,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace NAV {
 #define SPR_MSGTEXT_OAM 108
-#define SPR_MSGBOX_OAM 112
-#define SPR_MSGCONT_OAM 127
+#define SPR_MSGCONT_OAM 112
+#define SPR_MSGBOX_OAM 113
 
-#define SPR_MSGBOX_GFX 351
-#define SPR_MSG_GFX 383
-#define SPR_MSGCONT_GFX 511
+#define SPR_MSGBOX_GFX 348
+#define SPR_MSG_GFX 380
+#define SPR_MSGCONT_GFX 508
 
 #define SPR_MENU_OAM_SUB( p_idx ) ( 0 + ( p_idx ) )
 #define SPR_MENU_SEL_OAM_SUB 6
@@ -89,7 +89,6 @@ namespace NAV {
 #define SPR_BOX_PAL_SUB 7
 #define SPR_BOX_SEL_PAL_SUB 8
 #define SPR_X_PAL_SUB 9
-#define SPR_WINDOW_PAL_SUB 10
 
     u16         TEXT_BUF[ 32 * 256 ] = { 0 };
     u16         CONT_BUF[ 16 * 16 ]  = { 0 };
@@ -100,6 +99,8 @@ namespace NAV {
         for( u8 i = 0; i < 14; ++i ) {
             IO::OamTop->oamBuffer[ SPR_MSGBOX_OAM + i ].isHidden = true;
         }
+        IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
+
         for( u8 i = 0; i < 4; ++i ) {
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + i ].isHidden = true;
         }
@@ -125,6 +126,10 @@ namespace NAV {
         auto ptr  = !p_bottom ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
         auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
+
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
+        bgUpdate( );
 
         FS::readPictureData(
             ptr3, "nitro:/PICS/NAV/",
@@ -233,9 +238,6 @@ namespace NAV {
         IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( p_bottom );
         hideMessageBox( );
-        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-        REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
-        bgUpdate( );
     }
 
     void _printMessage( const char* p_message ) {
@@ -289,11 +291,15 @@ namespace NAV {
                                        TEXT_BUF + 3 * 64 * 32, 64 * 32 / 2, false, false, false,
                                        OBJPRIORITY_0, false );
 
-            // "Continue" char
-            IO::regularFont->printStringBC( "@", TEXT_PAL, CONT_BUF, 16, IO::font::LEFT, 16 );
-            tileCnt
-                = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 256 - x, y + 32, 8, 8,
-                                   CONT_BUF, 8 * 8 / 2, false, false, false, OBJPRIORITY_0, false );
+            if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
+                // "Continue" char
+                IO::regularFont->printCharB( 172, TEXT_PAL, CONT_BUF, 16, 0, 0 );
+                tileCnt = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 254 - x, y + 24, 16,
+                                           16, CONT_BUF, 16 * 16 / 2, false, false, false,
+                                           OBJPRIORITY_0, false );
+            } else {
+                IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
+            }
         }
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -302,7 +308,7 @@ namespace NAV {
     }
 
     void animateMB( u8 p_frame ) {
-        if( p_frame & 7 == 0 ) {
+        if( ( p_frame & 15 ) == 0 ) {
             SpriteEntry* oam                = IO::OamTop->oamBuffer;
             oam[ SPR_MSGCONT_OAM ].isHidden = !oam[ SPR_MSGCONT_OAM ].isHidden;
             IO::updateOAM( false );
@@ -480,6 +486,131 @@ namespace NAV {
         return res;
     }
 
+    void drawBadges( u8 p_page ) {
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 20 );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+        IO::regularFont->setColor( 0, 2 );
+        u16 tileCnt = 0;
+        // x
+        tileCnt = IO::loadSprite( 9, 15, tileCnt, 236, 172, 16, 16, x_16_16Pal, x_16_16Tiles,
+                                  x_16_16TilesLen, false, false, false, OBJPRIORITY_1, true,
+                                  OBJMODE_NORMAL );
+
+        for( u8 i = 0; i < 8; ++i ) { IO::Oam->oamBuffer[ i ].isHidden = true; }
+
+        switch( p_page ) {
+        case 0: { // Hoenn badges
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "bc1", 480, 49152,
+                                 true );
+            BG_PALETTE_SUB[ IO::GRAY_IDX ] = RGB15( 24, 24, 24 );
+            IO::regularFont->printStringC( GET_STRING( 434 ), 2, 0, true );
+
+            constexpr u16 spos[ 9 ][ 2 ] = { { 8, 19 }, { 67, 19 }, { 128, 19 }, { 182, 19 },
+                                             { 9, 89 }, { 68, 90 }, { 128, 90 }, { 182, 90 } };
+
+            for( u8 i = 0; i < 8; ++i ) {
+                if( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << i ) ) {
+                    tileCnt = IO::loadSprite( ( "ba/b" + std::to_string( i + 1 ) ).c_str( ), i, i,
+                                              tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
+                                              false, false, false, OBJPRIORITY_0, true );
+                }
+            }
+
+            break;
+        }
+        case 1: { // battle frontier
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "bc2", 480, 49152,
+                                 true );
+            BG_PALETTE_SUB[ IO::GRAY_IDX ] = RGB15( 24, 24, 24 );
+            IO::regularFont->printStringC( GET_STRING( 435 ), 2, 0, true );
+
+            constexpr u16 spos[ 7 ][ 2 ] = { { 6, 18 },  { 66, 18 }, { 126, 18 }, { 186, 18 },
+                                             { 36, 88 }, { 96, 88 }, { 156, 88 } };
+
+            for( u8 i = 0; i < 7; ++i ) {
+                if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << ( 7 + i ) ) ) {
+                    tileCnt = IO::loadSprite( ( "ba/s" + std::to_string( i + 1 ) + "2" ).c_str( ),
+                                              i, i, tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
+                                              false, false, false, OBJPRIORITY_0, true );
+
+                } else if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << i ) ) {
+                    tileCnt = IO::loadSprite( ( "ba/s" + std::to_string( i + 1 ) + "1" ).c_str( ),
+                                              i, i, tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
+                                              false, false, false, OBJPRIORITY_0, true );
+                }
+            }
+
+            break;
+        }
+        default:
+            return;
+        }
+
+        IO::updateOAM( true );
+    }
+
+    void runIDViewer( ) {
+        IO::vramSetup( );
+        IO::clearScreen( true, true, true );
+        IO::initOAMTable( true );
+        IO::initOAMTable( false );
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::smallFont->setColor( 0, 0 );
+        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
+
+        SAVE::SAV.getActiveFile( ).drawTrainersCard( false );
+
+        u8 currentPage = 0;
+
+        drawBadges( currentPage );
+
+        cooldown = COOLDOWN_COUNT;
+        loop( ) {
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
+                while( touch.px || touch.py ) {
+                    swiWaitForVBlank( );
+                    scanKeys( );
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
+
+                SOUND::playSoundEffect( SFX_CANCEL );
+                cooldown = COOLDOWN_COUNT;
+                return;
+            }
+
+            if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_R ) ) { // next badge case
+                if( SAVE::SAV.getActiveFile( ).hasBadgeCase( currentPage + 1 ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    drawBadges( ++currentPage );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( currentPage
+                       && ( GET_KEY_COOLDOWN( KEY_LEFT )
+                            || GET_KEY_COOLDOWN( KEY_L ) ) ) { // next badge case
+                if( SAVE::SAV.getActiveFile( ).hasBadgeCase( currentPage - 1 ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    drawBadges( --currentPage );
+                }
+                cooldown = COOLDOWN_COUNT;
+            }
+        }
+    }
+
     void handleMenuSelection( menuOption p_selection, const char* p_path ) {
         switch( p_selection ) {
         case VIEW_PARTY: {
@@ -502,6 +633,7 @@ namespace NAV {
             auto res = sts.run( );
 
             FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             IO::resetScale( true, false );
@@ -533,6 +665,7 @@ namespace NAV {
             DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV.getActiveFile( ).m_lstDex );
 
             FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
@@ -556,6 +689,7 @@ namespace NAV {
             u16 res = bv.run( );
 
             FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
@@ -569,13 +703,30 @@ namespace NAV {
             return;
         }
         case VIEW_ID: {
-            // TODO
+            ANIMATE_MAP = false;
+            SOUND::dimVolume( );
 
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            runIDViewer( );
+
+            FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            MAP::curMap->draw( );
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+            init( );
             return;
         }
         case SAVE: {
             IO::yesNoBox yn;
-            if( yn.getResult( GET_STRING( 92 ), MSG_INFO ) == IO::yesNoBox::YES ) {
+            if( yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE ) == IO::yesNoBox::YES ) {
                 init( );
                 if( FS::writeSave( p_path, [ & ]( u16 p_perc, u16 p_total ) {
                         printMessage( 0, MSG_INFO_NOCLOSE );
@@ -617,6 +768,7 @@ namespace NAV {
             SAVE::runSettings( );
 
             FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
@@ -650,15 +802,6 @@ namespace NAV {
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
 
         oam[ SPR_X_OAM_SUB ].isHidden = false;
-        res.push_back(
-            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
-                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
-                       IO::choiceBox::EXIT_CHOICE ) );
-        res.push_back(
-            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
-                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
-                       IO::choiceBox::BACK_CHOICE ) );
-
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 6; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
@@ -696,6 +839,15 @@ namespace NAV {
         oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = true;
 
         IO::updateOAM( true );
+
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::EXIT_CHOICE ) );
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::BACK_CHOICE ) );
 
         return res;
     } // namespace NAV

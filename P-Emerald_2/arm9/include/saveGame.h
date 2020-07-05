@@ -127,14 +127,14 @@ namespace SAVE {
             MAP::warpPos   m_lastWarp;
             u8             m_curBox;
             u16            m_lstDex;
-            u16            m_lstUsedItems[ 5 ];
-            u8             m_lstUsedItemsIdx;
+            u16            m_lstViewedItem[ 5 ]; // Last viewed item in the bag
+            u8             m_unused;
 
             u32 m_good2 = 0;
 
             u16         m_registeredItem; // Item registered for fast-use
             u8          m_lstBag;         // Last sub-bag used by the player
-            u16         m_lstBagItem;     // Most recently viewed bag item
+            u16         m_lstUsedItem;    // Most recently used bag item
             s16         m_repelSteps;     // Steps remaining of the currently active repel
             saveOptions m_options;        // Various options and settings
             pokemon     m_pkmnTeam[ 6 ];
@@ -154,6 +154,14 @@ namespace SAVE {
 
             u8 m_caughtPkmn[ 125 ]; // The pkmn the player has caught
             u8 m_seenPkmn[ 125 ];   // The pkmn the player has seen
+
+            constexpr bool hasBadgeCase( u8 p_case ) const {
+                if( p_case == 0 ) { return true; }
+
+                if( p_case == 1 ) { return !!m_FRONTIER_Badges; }
+
+                return false;
+            }
 
             /*
              * @brief: returns the number of stars on the trainer's card

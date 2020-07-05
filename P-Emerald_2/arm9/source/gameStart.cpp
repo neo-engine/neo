@@ -98,6 +98,8 @@ namespace SAVE {
                                               0,
                                               MAP::direction::RIGHT };
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
+            SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
+            SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
             SAV.getActiveFile( ).m_currentMap     = 10;
             SAV.getActiveFile( ).m_registeredItem = I_BIKE;
             return true;

@@ -424,7 +424,10 @@ namespace BAG {
             const u8 SECOND_LINE = 39 + 26 * i;
             const u8 SINGLE_LINE = 32 + 26 * i;
 
-            if( !_playerTeam[ i ].m_boxdata.m_speciesId ) break;
+            if( !_playerTeam[ i ].m_boxdata.m_speciesId ) {
+                IO::printRectangle( 0, 28 + 26 * i, 133, 28 + 26 * i + 26, true, 0 );
+                continue;
+            }
 
             if( _playerTeam[ i ].getItem( ) != _teamItemCache[ i ].first ) {
                 // Cache miss, check whether the item can be found somewhere else
