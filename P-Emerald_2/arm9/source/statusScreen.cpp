@@ -120,26 +120,26 @@ namespace STS {
             if( pressed & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
-            } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice = ( _currentDetailChoice + 2 )
                                        % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
-            } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_UP ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice = ( _currentDetailChoice
                                          + _ui->getDetailsPageCount( _pokemon, _currentPage ) - 2 )
                                        % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
-            } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice = ( _currentDetailChoice + 1 )
                                        % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
-            } else if( _allowKeyUp && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice = ( _currentDetailChoice
                                          + _ui->getDetailsPageCount( _pokemon, _currentPage ) - 1 )

@@ -177,7 +177,9 @@ namespace BOX {
                     // Change box name / wall paper etc.
                     runBoxSettings( );
                 } else if( _selectedIdx == PARTY_BUTTON ) {
-                    runParty( );
+                    if( runParty( ) ) {
+                        return;
+                    }
                 }
                 cooldown = COOLDOWN_COUNT;
             }
@@ -290,10 +292,10 @@ namespace BOX {
         } else {
             // put down pkmn
             setPkmn( p_index, &_heldPkmn );
+            u8 st = SAVE::SAV.getActiveFile( ).consolidatePkmn( );
             if( p_index < MAX_PKMN_PER_BOX ) {
                 _boxUI.updatePkmn( getPkmn( p_index ), p_index );
             } else {
-                u8 st = SAVE::SAV.getActiveFile( ).consolidatePkmn( );
                 if( st == u8( -1 ) ) {
                     _boxUI.updatePkmn( getPkmn( p_index ), p_index );
                 } else {

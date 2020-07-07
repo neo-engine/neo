@@ -30,9 +30,9 @@
 #include "pokemon.h"
 #include "pokemonNames.h"
 #include "screenFade.h"
+#include "sound.h"
 #include "sprite.h"
 #include "uio.h"
-#include "sound.h"
 
 namespace IO::ANIM {
 #define PKMN_X 80
@@ -107,14 +107,17 @@ namespace IO::ANIM {
         setFrameVis( 1, true );
         updateOAM( false );
 
-        // Main Animation
-        waitForInteract( );
         SOUND::playBGM( MOD_EVOLVING );
+        // Main Animation
+        for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
+
+        SOUND::playCry( p_startSpecies );
+        for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
 
         u8   slowfactor = 7;
         bool abort      = false;
         for( u8 i = 4; i < 7; ++i ) {
-            for( u8 k = 0; k < 2; ++k ) {
+            for( u8 k = 0; k < 3; ++k ) {
                 setFrameVis( 0, true );
                 setFrameVis( 1, false );
                 updateOAM( false );
@@ -132,22 +135,30 @@ namespace IO::ANIM {
             }
         }
         if( abort ) {
-            clearScreen( true, true, true );
-            regularFont->printStringC( GET_STRING( 388 ), 127, 136, false, font::CENTER );
+            SOUND::stopBGM( );
             setFrameVis( 0, false );
             setFrameVis( 1, true );
             updateOAM( false );
+            SOUND::playCry( p_startSpecies );
+            for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
+            clearScreen( true, true, true );
+            regularFont->printStringC( GET_STRING( 388 ), 127, 136, false, font::CENTER );
             waitForInteract( );
+            SOUND::restartBGM( );
             return false;
         } else {
-            clearScreen( true, true, true );
-            snprintf( buffer, 200, GET_STRING( 52 ), getDisplayName( p_startSpecies ).c_str( ),
-                      getDisplayName( p_endSpecies ).c_str( ) );
-            regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
+            SOUND::stopBGM( );
             setFrameVis( 0, true );
             setFrameVis( 1, false );
             updateOAM( false );
+            SOUND::playCry( p_endSpecies );
+            clearScreen( true, true, true );
+            for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
+            snprintf( buffer, 200, GET_STRING( 52 ), getDisplayName( p_startSpecies ).c_str( ),
+                      getDisplayName( p_endSpecies ).c_str( ) );
+            regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
             waitForInteract( );
+            SOUND::restartBGM( );
             return true;
         }
     }

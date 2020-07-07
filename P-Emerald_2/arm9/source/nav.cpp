@@ -821,7 +821,7 @@ namespace NAV {
                 memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
                         sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
                 std::vector<u16> tmp
-                    = { 201, 493, 521, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN };
+                    = { 201, 493, PKMN_EEVEE, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN };
                 for( int i = 0; i < 6; ++i ) {
                     pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 

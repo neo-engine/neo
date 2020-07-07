@@ -133,7 +133,8 @@ namespace SOUND {
             case L_JAGGED_PASS:
                 return MOD_CAVE_FORESTS;
             default:
-                return MOD_ABANDONED_SHIP;
+//                return MOD_ABANDONED_SHIP;
+                return MOD_SHOAL_CAVE;
         }
     }
 
