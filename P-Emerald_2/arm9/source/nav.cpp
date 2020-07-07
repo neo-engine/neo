@@ -43,6 +43,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "itemNames.h"
 #include "moveNames.h"
 #include "pokemon.h"
+#include "specials.h"
 
 #include "bagUI.h"
 #include "bagViewer.h"
@@ -486,131 +487,6 @@ namespace NAV {
         return res;
     }
 
-    void drawBadges( u8 p_page ) {
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 20 );
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
-        IO::regularFont->setColor( 0, 2 );
-        u16 tileCnt = 0;
-        // x
-        tileCnt = IO::loadSprite( 9, 15, tileCnt, 236, 172, 16, 16, x_16_16Pal, x_16_16Tiles,
-                                  x_16_16TilesLen, false, false, false, OBJPRIORITY_1, true,
-                                  OBJMODE_NORMAL );
-
-        for( u8 i = 0; i < 8; ++i ) { IO::Oam->oamBuffer[ i ].isHidden = true; }
-
-        switch( p_page ) {
-        case 0: { // Hoenn badges
-            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "bc1", 480, 49152,
-                                 true );
-            BG_PALETTE_SUB[ IO::GRAY_IDX ] = RGB15( 24, 24, 24 );
-            IO::regularFont->printStringC( GET_STRING( 434 ), 2, 0, true );
-
-            constexpr u16 spos[ 9 ][ 2 ] = { { 8, 19 }, { 67, 19 }, { 128, 19 }, { 182, 19 },
-                                             { 9, 89 }, { 68, 90 }, { 128, 90 }, { 182, 90 } };
-
-            for( u8 i = 0; i < 8; ++i ) {
-                if( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << i ) ) {
-                    tileCnt = IO::loadSprite( ( "ba/b" + std::to_string( i + 1 ) ).c_str( ), i, i,
-                                              tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
-                                              false, false, false, OBJPRIORITY_0, true );
-                }
-            }
-
-            break;
-        }
-        case 1: { // battle frontier
-            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "bc2", 480, 49152,
-                                 true );
-            BG_PALETTE_SUB[ IO::GRAY_IDX ] = RGB15( 24, 24, 24 );
-            IO::regularFont->printStringC( GET_STRING( 435 ), 2, 0, true );
-
-            constexpr u16 spos[ 7 ][ 2 ] = { { 6, 18 },  { 66, 18 }, { 126, 18 }, { 186, 18 },
-                                             { 36, 88 }, { 96, 88 }, { 156, 88 } };
-
-            for( u8 i = 0; i < 7; ++i ) {
-                if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << ( 7 + i ) ) ) {
-                    tileCnt = IO::loadSprite( ( "ba/s" + std::to_string( i + 1 ) + "2" ).c_str( ),
-                                              i, i, tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
-                                              false, false, false, OBJPRIORITY_0, true );
-
-                } else if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << i ) ) {
-                    tileCnt = IO::loadSprite( ( "ba/s" + std::to_string( i + 1 ) + "1" ).c_str( ),
-                                              i, i, tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
-                                              false, false, false, OBJPRIORITY_0, true );
-                }
-            }
-
-            break;
-        }
-        default:
-            return;
-        }
-
-        IO::updateOAM( true );
-    }
-
-    void runIDViewer( ) {
-        IO::vramSetup( );
-        IO::clearScreen( true, true, true );
-        IO::initOAMTable( true );
-        IO::initOAMTable( false );
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
-        IO::smallFont->setColor( 0, 0 );
-        IO::smallFont->setColor( IO::WHITE_IDX, 1 );
-        IO::smallFont->setColor( IO::GRAY_IDX, 2 );
-
-        SAVE::SAV.getActiveFile( ).drawTrainersCard( false );
-
-        u8 currentPage = 0;
-
-        drawBadges( currentPage );
-
-        cooldown = COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
-
-            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    touchRead( &touch );
-                    swiWaitForVBlank( );
-                }
-
-                SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
-                return;
-            }
-
-            if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_R ) ) { // next badge case
-                if( SAVE::SAV.getActiveFile( ).hasBadgeCase( currentPage + 1 ) ) {
-                    SOUND::playSoundEffect( SFX_SELECT );
-                    drawBadges( ++currentPage );
-                }
-                cooldown = COOLDOWN_COUNT;
-            } else if( currentPage
-                       && ( GET_KEY_COOLDOWN( KEY_LEFT )
-                            || GET_KEY_COOLDOWN( KEY_L ) ) ) { // next badge case
-                if( SAVE::SAV.getActiveFile( ).hasBadgeCase( currentPage - 1 ) ) {
-                    SOUND::playSoundEffect( SFX_SELECT );
-                    drawBadges( --currentPage );
-                }
-                cooldown = COOLDOWN_COUNT;
-            }
-        }
-    }
-
     void handleMenuSelection( menuOption p_selection, const char* p_path ) {
         switch( p_selection ) {
         case VIEW_PARTY: {
@@ -710,7 +586,7 @@ namespace NAV {
             videoSetMode( MODE_5_2D );
             bgUpdate( );
 
-            runIDViewer( );
+            SPX::runIDViewer( );
 
             FADE_TOP_DARK( );
             FADE_SUB_DARK( );
@@ -937,7 +813,7 @@ namespace NAV {
         if( pressed & KEY_SELECT ) {
             std::vector<u16> choices
                 = { DESQUID_STRING + 46, DESQUID_STRING + 47, DESQUID_STRING + 48,
-                DESQUID_STRING + 50, DESQUID_STRING + 51 };
+                    DESQUID_STRING + 50, DESQUID_STRING + 51 };
 
             IO::choiceBox test = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
             switch( test.getResult( GET_STRING( DESQUID_STRING + 49 ), MSG_NOCLOSE, choices ) ) {
@@ -1009,6 +885,7 @@ namespace NAV {
                 bxv.run( );
 
                 FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
                 IO::clearScreen( false );
                 videoSetMode( MODE_5_2D );
                 bgUpdate( );
@@ -1027,8 +904,7 @@ namespace NAV {
                 break;
             }
             case 4: {
-                init( );
-                MAP::curMap->awardBadge( 1, ( 1 + rand( ) % 7 ) * 10 + 1 + ( rand( ) % 2 ) );
+                SPX::runInitialPkmnSelection( );
                 break;
             }
             }

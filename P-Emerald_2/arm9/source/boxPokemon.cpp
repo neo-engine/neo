@@ -119,6 +119,16 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     }
 
     for( u8 i = 0; i < 6; ++i ) IVset( i, rand( ) & 31 );
+
+    if( p_fatefulEncounter ) {
+        IVset( rand( ) % 6, 31 );
+        IVset( rand( ) % 6, 31 );
+        IVset( rand( ) % 6, 31 );
+        IVset( rand( ) % 6, 31 );
+        IVset( rand( ) % 6, 31 );
+        IVset( rand( ) % 6, 31 );
+    }
+
     setIsNicknamed( !!p_name );
     setIsEgg( p_isEgg );
     m_fateful = p_fatefulEncounter;

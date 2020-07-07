@@ -49,13 +49,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // BEGIN TEST
 #include "animations.h"
 #include "bagViewer.h"
+#include "battle.h"
 #include "boxViewer.h"
 #include "itemNames.h"
 #include "moveNames.h"
 #include "partyScreen.h"
 #include "pokemonNames.h"
+#include "specials.h"
 #include "statusScreen.h"
-#include "battle.h"
 // END TEST
 
 namespace SAVE {

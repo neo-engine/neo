@@ -118,29 +118,35 @@ namespace IO {
                 break;
             }
 
-            if( _mode != MODE_UP_DOWN_SINGLE && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+            if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
+                if( _mode == MODE_LEFT_RIGHT ) {
+                    sel = ( sel + mxchoice - 1 ) % mxchoice;
+                } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     if( !( sel & 1 ) && prvpg ) {
                         // Switch to previous page
                         choices = p_drawFunction( --page );
                         UPDATE_PAGE_STATS;
                     }
                     sel ^= 1;
-                }
-                if( _mode == MODE_UP_DOWN && prvpg ) {
+                } else if( _mode == MODE_UP_DOWN && prvpg ) {
                     choices = p_drawFunction( --page );
                     UPDATE_PAGE_STATS;
+                } else {
+                    cooldown = COOLDOWN_COUNT;
+                    continue;
                 }
                 p_selectFunction( sel );
 
                 cooldown = COOLDOWN_COUNT;
             }
-            if( _mode != MODE_UP_DOWN_SINGLE && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+            if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
+                if( _mode == MODE_LEFT_RIGHT ) {
+                    sel = ( sel + 1 ) % mxchoice;
+                } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     if( ( sel & 1 ) && nxtpg ) {
                         // Switch to previous page
                         choices = p_drawFunction( ++page );
@@ -151,11 +157,13 @@ namespace IO {
                     } else if( sel > 0 ) {
                         sel--;
                     }
-                }
-                if( _mode == MODE_UP_DOWN && nxtpg ) {
+                } else if( _mode == MODE_UP_DOWN && nxtpg ) {
                     choices = p_drawFunction( ++page );
                     UPDATE_PAGE_STATS;
                     sel = std::min( sel, mxchoice );
+                } else {
+                    continue;
+                    cooldown = COOLDOWN_COUNT;
                 }
                 p_selectFunction( sel );
 
