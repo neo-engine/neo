@@ -36,33 +36,35 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <fat.h>
 #include <sys/stat.h>
 
-#include "nav.h"
 #include "ability.h"
 #include "battleTrainer.h"
 #include "defines.h"
 #include "fs.h"
 #include "item.h"
+#include "mapDrawer.h"
 #include "move.h"
+#include "nav.h"
 #include "pokemon.h"
 #include "uio.h"
-#include "mapDrawer.h"
 
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
 
-const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/";
-const char ITEM_NAME_PATH[]     = "nitro:/DATA/ITEM_NAME/";
-const char ITEM_DSCR_PATH[]     = "nitro:/DATA/ITEM_DSCR/";
-const char ITEM_DATA_PATH[]     = "nitro:/DATA/ITEM_DATA/";
-const char ABILITY_NAME_PATH[]  = "nitro:/DATA/ABTY_NAME/";
-const char ABILITY_DSCR_PATH[]  = "nitro:/DATA/ABTY_DSCR/";
-const char MOVE_NAME_PATH[]     = "nitro:/DATA/MOVE_NAME/";
-const char MOVE_DSCR_PATH[]     = "nitro:/DATA/MOVE_DSCR/";
-const char MOVE_DATA_PATH[]     = "nitro:/DATA/MOVE_DATA/";
-const char POKEMON_NAME_PATH[]  = "nitro:/DATA/PKMN_NAME/";
-const char POKEMON_DATA_PATH[]  = "nitro:/DATA/PKMN_DATA/";
-const char POKEMON_EVOS_PATH[]  = "nitro:/DATA/PKMN_EVOS/";
-const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/PKMN_LEARN/";
+const char LOCATION_NAME_PATH[]    = "nitro:/DATA/LOC_NAME/";
+const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/";
+const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/";
+const char ITEM_DATA_PATH[]        = "nitro:/DATA/ITEM_DATA/";
+const char ABILITY_NAME_PATH[]     = "nitro:/DATA/ABTY_NAME/";
+const char ABILITY_DSCR_PATH[]     = "nitro:/DATA/ABTY_DSCR/";
+const char MOVE_NAME_PATH[]        = "nitro:/DATA/MOVE_NAME/";
+const char MOVE_DSCR_PATH[]        = "nitro:/DATA/MOVE_DSCR/";
+const char MOVE_DATA_PATH[]        = "nitro:/DATA/MOVE_DATA/";
+const char POKEMON_NAME_PATH[]     = "nitro:/DATA/PKMN_NAME/";
+const char POKEMON_SPECIES_PATH[]  = "nitro:/DATA/PKMN_SPCS/";
+const char POKEMON_DATA_PATH[]     = "nitro:/DATA/PKMN_DATA/";
+const char POKEMON_EVOS_PATH[]     = "nitro:/DATA/PKMN_EVOS/";
+const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/";
+const char PKMN_LEARNSET_PATH[]    = "nitro:/DATA/PKMN_LEARN/";
 
 const char BATTLE_TRAINER_PATH[] = "n/a";
 
@@ -335,8 +337,8 @@ namespace FS {
         auto oldt = SAVE::SAV.getActiveFile( ).m_lastSaveTime;
 
         SAVE::SAV.getActiveFile( ).m_lastSaveLocation = MAP::curMap->getCurrentLocationId( );
-        SAVE::SAV.getActiveFile( ).m_lastSaveDate = SAVE::CURRENT_DATE;
-        SAVE::SAV.getActiveFile( ).m_lastSaveTime = SAVE::CURRENT_TIME;
+        SAVE::SAV.getActiveFile( ).m_lastSaveDate     = SAVE::CURRENT_DATE;
+        SAVE::SAV.getActiveFile( ).m_lastSaveTime     = SAVE::CURRENT_TIME;
 
         if( CARD::checkCard( ) ) {
             if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
@@ -348,8 +350,8 @@ namespace FS {
         FILE* f = FS::open( "", p_path, ".sav", "w" );
         if( !f ) {
             SAVE::SAV.getActiveFile( ).m_lastSaveLocation = oldl;
-            SAVE::SAV.getActiveFile( ).m_lastSaveDate = oldd;
-            SAVE::SAV.getActiveFile( ).m_lastSaveTime = oldt;
+            SAVE::SAV.getActiveFile( ).m_lastSaveDate     = oldd;
+            SAVE::SAV.getActiveFile( ).m_lastSaveTime     = oldt;
 
             return false;
         }
@@ -534,6 +536,33 @@ std::string getAbilityDescr( u16 p_abilityId ) {
     return getAbilityDescr( p_abilityId, CURRENT_LANGUAGE );
 }
 
+std::string getSpeciesName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
+    char tmpbuf[ 40 ];
+    if( !getSpeciesName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
+    return std::string( tmpbuf );
+}
+
+std::string getSpeciesName( u16 p_pkmnId, u8 p_forme ) {
+    return getSpeciesName( p_pkmnId, CURRENT_LANGUAGE, p_forme );
+}
+
+bool getSpeciesName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
+    FILE* f;
+    if( p_forme ) {
+        char tmpbuf[ 20 ];
+        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
+        f = FS::openSplit( POKEMON_SPECIES_PATH, p_pkmnId, tmpbuf );
+    }
+    if( !p_forme || !f ) { f = FS::openSplit( POKEMON_SPECIES_PATH, p_pkmnId, ".str" ); }
+    if( !f ) return false;
+
+    for( int i = 0; i <= p_language; ++i ) {
+        assert( SPECIES_NAMELENGTH == fread( p_out, 1, SPECIES_NAMELENGTH, f ) );
+    }
+    fclose( f );
+    return true;
+}
+
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 20 ];
     if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
@@ -555,8 +584,8 @@ bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
     if( !f ) return false;
 
     for( int i = 0; i <= p_language; ++i ) {
-        assert( PKMN_NAMELENGTH + ( 5 * !!p_forme )
-                == fread( p_out, 1, PKMN_NAMELENGTH + ( 5 * !!p_forme ), f ) );
+        assert( PKMN_NAMELENGTH + ( 15 * !!p_forme )
+                == fread( p_out, 1, PKMN_NAMELENGTH + ( 15 * !!p_forme ), f ) );
     }
     fclose( f );
     return true;
@@ -613,7 +642,6 @@ bool getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_
     }
     return true;
 }
-
 
 u16  LEARNSET_BUFFER[ 700 ];
 void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, u16* p_result ) {

@@ -812,6 +812,11 @@ namespace BATTLE {
     }
 
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
+        if( _isWildBattle ) {
+            SOUND::playBGM( MOD_VICTORY_WILD );
+            for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
+        }
+
         switch( p_battleEndReason ) {
         case BATTLE_CAPTURE:
             handleCapture( );

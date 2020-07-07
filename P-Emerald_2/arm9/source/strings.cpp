@@ -870,7 +870,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Battle Frontier Symbols", "Kampfzonensymbole" },
     { "%s obtained\nthe %s!", "%s erhielt\n%s!" },
-    { "Choose the %s Pok\xe9mon %s?", "Das %s Pok\xe9mon %s w\xe4hlen?" },
+    { "Choose the %s Pok\xe9mon %s?", "Das %s-Pok\xe9mon %s w\xe4hlen?" },
     { "Prof. Birch is in trouble!\nRelease a Pok\xe9mon and rescue him!",
         "Prof. Birk ist in Schwierigkeiten!\nSchnapp' dir ein Pok\xe9mon und hilf ihm!" },
 };

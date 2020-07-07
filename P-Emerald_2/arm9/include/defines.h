@@ -45,6 +45,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_MOVE MAX_ATTACK
 #define MAX_PKMN 893
 #define OTLENGTH 8
+#define SPECIES_NAMELENGTH 30
 #define PKMN_NAMELENGTH 15
 #define ITEM_NAMELENGTH 20
 #define ITEM_DSCRLENGTH 200

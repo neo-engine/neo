@@ -34,6 +34,7 @@
 #include "mapDrawer.h"
 #include "nav.h"
 #include "pokemon.h"
+#include "pokemonData.h"
 #include "pokemonNames.h"
 #include "screenFade.h"
 #include "sound.h"
@@ -290,7 +291,9 @@ namespace SPX {
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
 
             char buffer[ 100 ];
-            snprintf( buffer, 99, GET_STRING( 437 ), "TEST", pkmn[ res ].m_boxdata.m_name );
+            snprintf( buffer, 99, GET_STRING( 437 ),
+                      getSpeciesName( pkmn[ res ].getSpecies( ), pkmn[ res ].getForme( ) ).c_str( ),
+                      pkmn[ res ].m_boxdata.m_name );
 
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
             IO::regularFont->printStringC( buffer, 12, 192 - 40, false );

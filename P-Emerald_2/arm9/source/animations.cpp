@@ -32,6 +32,7 @@
 #include "screenFade.h"
 #include "sprite.h"
 #include "uio.h"
+#include "sound.h"
 
 namespace IO::ANIM {
 #define PKMN_X 80
@@ -108,6 +109,7 @@ namespace IO::ANIM {
 
         // Main Animation
         waitForInteract( );
+        SOUND::playBGM( MOD_EVOLVING );
 
         u8   slowfactor = 7;
         bool abort      = false;
