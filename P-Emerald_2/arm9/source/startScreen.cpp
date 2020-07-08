@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gameStart.h"
 #include "mapDrawer.h"
 #include "nav.h"
+#include "pokemonNames.h"
 #include "screenFade.h"
 #include "sound.h"
 #include "startScreen.h"
@@ -54,7 +55,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "itemNames.h"
 #include "moveNames.h"
 #include "partyScreen.h"
-#include "pokemonNames.h"
 #include "specials.h"
 #include "statusScreen.h"
 // END TEST
@@ -190,7 +190,8 @@ namespace SAVE {
             int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
                 || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
-                SOUND::playSoundEffect( SFX_CHOOSE );
+                SOUND::playCry( PKMN_RAYQUAZA );
+                for( u8 i = 0; i < 70; ++i ) { swiWaitForVBlank( ); };
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true, false, true );
                 IO::fadeScreen( IO::CLEAR_DARK, true, true );

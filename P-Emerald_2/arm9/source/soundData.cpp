@@ -25,6 +25,9 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <nds.h>
+
+#include "fs.h"
 #include "locationNames.h"
 #include "pokemonNames.h"
 #include "sound.h"
@@ -33,28 +36,21 @@ namespace SOUND {
     u16           currentLocation = 0;
     MAP::moveMode currentMoveMode = MAP::WALK;
 
-    void playCry( u16 p_pokemonId, u8 p_formeId, bool p_female ) {
-        if( p_pokemonId == 41 || p_pokemonId == 42 || p_pokemonId == 169 ) {
-            playSoundEffect( SFX_CRY_041 );
-        } else if( p_pokemonId >= 252 && p_pokemonId <= 254 ) {
-            playSoundEffect( SFX_CRY_252 );
-        } else if( p_pokemonId >= 255 && p_pokemonId <= 257 ) {
-            playSoundEffect( SFX_CRY_255 );
-        } else if( p_pokemonId >= 258 && p_pokemonId <= 260 ) {
-            playSoundEffect( SFX_CRY_258 );
-        } else if( p_pokemonId == 261 || p_pokemonId == 262 ) {
-            playSoundEffect( SFX_CRY_261 );
-        } else if( p_pokemonId == 263 || p_pokemonId == 264 ) {
-            playSoundEffect( SFX_CRY_263 );
-        } else if( p_pokemonId >= 265 && p_pokemonId <= 269 ) {
-            playSoundEffect( SFX_CRY_265 );
-        } else if( p_pokemonId == 278 || p_pokemonId == 279 ) {
-            playSoundEffect( SFX_CRY_278 );
-        } else if( p_pokemonId >= 280 && p_pokemonId <= 282 ) {
-            playSoundEffect( SFX_CRY_280 );
-        } else {
-           playSoundEffect( SFX_CRY_261 );
+    u16 LAST_CRY = -1;
+
+    void playCry( u16 p_pokemonId, u8 p_formeId, bool ) {
+#ifndef NO_SOUND
+        u16 len;
+        u8* cry = FS::readCry( p_pokemonId, p_formeId, len );
+        if( cry == nullptr ) {
+            playSoundEffect( SFX_CANCEL );
+            return;
         }
+
+        if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
+
+        LAST_CRY = soundPlaySample( cry, SoundFormat_8Bit, len, 22050, 0x0f, 64, false, 0 );
+#endif
     }
 
     void onLocationChange( u16 p_newLocation ) {
@@ -83,6 +79,7 @@ namespace SOUND {
             return MOD_SURFING;
         case MAP::BIKE:
         case MAP::ACRO_BIKE:
+        case MAP::MACH_BIKE:
         case MAP::BIKE_JUMP:
             return MOD_CYCLING;
         case MAP::WALK:

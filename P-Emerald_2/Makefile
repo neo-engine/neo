@@ -64,7 +64,7 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 		"$(GAME_TITLE_IT);$(GAME_SUBTITLE1_IT);$(GAME_SUBTITLE2_IT)" $(_ADDFILES) \
 		"$(GAME_TITLE_ES);$(GAME_SUBTITLE1_ES);$(GAME_SUBTITLE2_ES)" $(_ADDFILES) \
 		-g $(GAME_CODE) $(DEV_CODE) "$(GAME_TITLE)" $(VERSION)
-	padbin 0x4000000 $(TARGET).nds
+	padbin 0x8000000 $(TARGET).nds
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 arm7/$(TARGET).elf: FORCE

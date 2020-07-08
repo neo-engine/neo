@@ -276,7 +276,7 @@ int main( int, char** p_argv ) {
             char buffer[ 100 ];
             snprintf( buffer, 99,
                       "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %lx %hx %hx | %hhu %hhu %hhu",
+                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | %hhu %hhu %hhu | %hhu",
                       SAVE::SAV.getActiveFile( ).m_currentMap,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
@@ -288,7 +288,6 @@ int main( int, char** p_argv ) {
                       MAP::CURRENT_BANK.m_bank,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
-                      ( reinterpret_cast<u32*>( ( (u8*) &MAP::CURRENT_BANK ) + 1 ) )[ 0 ],
                       MAP::curMap
                           ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
@@ -298,7 +297,7 @@ int main( int, char** p_argv ) {
                                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                           .m_topbehave,
                       SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
-                      SAVE::CURRENT_TIME.m_secs );
+                      SAVE::CURRENT_TIME.m_secs, 0 );
             NAV::printMessage( buffer );
         }
 #endif

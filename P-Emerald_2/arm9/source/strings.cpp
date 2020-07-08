@@ -327,7 +327,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Pok\xe9Nav", "Pok\xe9Nav" },
     { " Would you like to save your progress?", " M\xf6"
                                                 "chtest du deinen Fortschritt sichern?" },
-    { "Saving a lot of data. Don't turn off the power.\n%s", "Speichere eine Menge Daten.\n%s" },
+    { "Saving a lot of data| Don't turn off the power.\n%s",
+      "Speichere eine Menge Daten| Nicht ausschalten.\n%s" },
     { "Saving complete!", "Speichern erfolgreich!" },
 
     { "An error occured.\nProgress not saved.", "Es trat ein Fehler auf\nSpiel nicht gesichert." },
@@ -872,5 +873,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s obtained\nthe %s!", "%s erhielt\n%s!" },
     { "Choose the %s Pok\xe9mon %s?", "Das %s-Pok\xe9mon %s w\xe4hlen?" },
     { "Prof. Birch is in trouble!\nRelease a Pok\xe9mon and rescue him!",
-        "Prof. Birk ist in Schwierigkeiten!\nSchnapp' dir ein Pok\xe9mon und hilf ihm!" },
+      "Prof. Birk ist in Schwierigkeiten!\nSchnapp' dir ein Pok\xe9mon und hilf ihm!" },
 };

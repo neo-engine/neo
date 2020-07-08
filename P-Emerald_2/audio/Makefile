@@ -19,7 +19,7 @@ MODFILES	+=	$(foreach dir,$(notdir $(wildcard $(MUSIC)/*.xm)),$(MUSIC)/$(dir))
 soundbank:	$(WAVFILES) $(MODFILES)
 #---------------------------------------------------------------------------------
 	@mkdir -p $(OUT)/$(@D)
-	@mmutil $^ -d -o$(OUT)/sound.msl -h$(HEADER_OUT)/soundbank.h
+	mmutil $^ -d -o$(OUT)/sound.msl -h$(HEADER_OUT)/soundbank.h
 	@touch soundbank
 
 clean	:

@@ -50,6 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
 
+const char CRY_PATH[]              = "nitro:/SOUND/";
 const char LOCATION_NAME_PATH[]    = "nitro:/DATA/LOC_NAME/";
 const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/";
@@ -71,6 +72,7 @@ const char BATTLE_TRAINER_PATH[] = "n/a";
 namespace FS {
     char TMP_BUFFER[ 100 ];
     char TMP_BUFFER_SHORT[ 50 ];
+    u8   CRY_DATA[ 41000 ];
 
     bool SD_ACCESSED = false, SD_READ = false;
     bool SDFound( ) {
@@ -203,6 +205,21 @@ namespace FS {
         else
             dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE + p_palStart, p_palSize );
         return true;
+    }
+
+    u8* readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len ) {
+        FILE* f;
+
+        if( p_forme ) {
+            snprintf( TMP_BUFFER_SHORT, 49, "_%hhu.raw", p_forme );
+            f = FS::openSplit( CRY_PATH, p_pkmnIdx, ".raw", MAX_PKMN );
+        }
+        if( !p_forme || !f ) { f = FS::openSplit( CRY_PATH, p_pkmnIdx, ".raw", MAX_PKMN ); }
+        if( !f ) { return nullptr; }
+
+        std::memset( CRY_DATA, 0, sizeof( CRY_DATA ) );
+        if( !( p_len = read( f, CRY_DATA, sizeof( u8 ), sizeof( CRY_DATA ) ) ) ) { return nullptr; }
+        return CRY_DATA;
     }
 
     /*

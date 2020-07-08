@@ -812,7 +812,7 @@ namespace BATTLE {
     }
 
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
-        if( _isWildBattle ) {
+        if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
             SOUND::playBGM( MOD_VICTORY_WILD );
             for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
         }

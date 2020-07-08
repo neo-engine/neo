@@ -55,16 +55,6 @@ void initSFX( ) {
     mmLoadEffect( SFX_BATTLE_THROW );
     mmLoadEffect( SFX_SHINY );
 
-    mmLoadEffect( SFX_CRY_041 );
-    mmLoadEffect( SFX_CRY_252 );
-    mmLoadEffect( SFX_CRY_255 );
-    mmLoadEffect( SFX_CRY_258 );
-    mmLoadEffect( SFX_CRY_261 );
-    mmLoadEffect( SFX_CRY_263 );
-    mmLoadEffect( SFX_CRY_265 );
-    mmLoadEffect( SFX_CRY_278 );
-    mmLoadEffect( SFX_CRY_280 );
-
     mmLoadEffect( SFX_BUMP );
     mmLoadEffect( SFX_CAVE_WARP );
     mmLoadEffect( SFX_ENTER_DOOR );
@@ -144,6 +134,7 @@ void initSound( ) {
 #ifndef NO_SOUND
     std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
     mmInitDefault( const_cast<char*>( path.c_str( ) ) );
+    mmLockChannels( BIT( 0 ) );
     initSFX( );
 #endif
 }
