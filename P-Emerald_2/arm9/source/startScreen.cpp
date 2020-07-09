@@ -47,6 +47,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
 
+#ifdef DESQUID
 // BEGIN TEST
 #include "animations.h"
 #include "bagViewer.h"
@@ -57,7 +58,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "partyScreen.h"
 #include "specials.h"
 #include "statusScreen.h"
+#include "keyboard.h"
 // END TEST
+#endif
 
 namespace SAVE {
 
@@ -114,8 +117,13 @@ namespace SAVE {
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
+#ifdef DESQUID
         // BEGIN TEST
-        //
+
+        auto kb = IO::keyboard( );
+
+        kb.getText( 12 );
+
         /*
                 pokemon testTeam[ 6 ];
                 for( u16 i = 0; i < 6; i++ ) {
@@ -159,6 +167,7 @@ namespace SAVE {
         //        bt.start( );
 
         // END TEST
+#endif
 
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );

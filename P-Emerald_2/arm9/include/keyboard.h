@@ -25,30 +25,31 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
+#include <functional>
+#include <vector>
 #include <string>
 #include <nds.h>
 
 namespace IO {
 #define MAX_KEYBOARD_PAGES 4
     class keyboard {
-      public:
-        std::string getText( u8 p_length, const char* p_msg );
-
-        keyboard( ) : _page( 0 ) {
-        }
-
       private:
-        u8 _page = 0;
+        u8               _page = 0;
+        std::vector<u16> _curRes;
 
-        std::string getText( u8 p_length );
+        u8 maxPages( ) const;
 
-        void drawPage( );
-        void drawPage( const char* p_msg );
+        void drawPage( ) const;
+
+        void init( ) const;
 
         void drawChar( u8 p_pos, u16 p_char );
         void clearChar( u8 p_pos );
 
         u16 getNextChar( );
+      public:
+        keyboard( ) { }
+
+        std::string getText( u8 p_length );
     };
-}
+} // namespace IO
