@@ -195,6 +195,7 @@ namespace SAVE {
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true, false, true );
                 IO::fadeScreen( IO::CLEAR_DARK, true, true );
+
                 break;
             }
             ++frame;
@@ -209,6 +210,9 @@ namespace SAVE {
 
         IO::clearScreenConsole( true, true );
         consoleSelect( &IO::Top );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+        bgUpdate( );
     }
 
     std::vector<startScreen::choice> startScreen::getMainChoicesForSlot( u8 p_slot ) {
@@ -233,7 +237,13 @@ namespace SAVE {
         std::vector<std::pair<IO::inputTarget, startScreen::choice>> res
             = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
         IO::initOAMTable( true );
-        IO::clearScreen( true, false, true );
+
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+        bgUpdate( );
 
         // Sprites
         SpriteEntry* oam = IO::Oam->oamBuffer;
@@ -243,15 +253,15 @@ namespace SAVE {
         tileCnt = IO::loadSprite( SPR_LARGE_CHOICE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32,
                                   noselection_96_32_1Pal, noselection_96_32_1Tiles,
                                   noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_NORMAL );
+                                  true, OBJMODE_BLENDED );
         tileCnt = IO::loadSprite( SPR_LARGE_CHOICE_OAM_SUB + 1, SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16,
                                   32, noselection_96_32_2Pal, noselection_96_32_2Tiles,
                                   noselection_96_32_2TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_NORMAL );
+                                  true, OBJMODE_BLENDED );
         tileCnt = IO::loadSprite( SPR_SMALL_CHOICE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32,
                                   noselection_64_20Pal, noselection_64_20Tiles,
                                   noselection_64_20TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_NORMAL );
+                                  true, OBJMODE_BLENDED );
 
         // Arrows
         tileCnt = IO::loadSprite( SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4, 76, 16,
@@ -277,6 +287,10 @@ namespace SAVE {
         IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
 
         if( _currentSlot != p_slot ) { SAV.m_saveFile[ p_slot ].drawTrainersCard( false ); }
+
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
+        bgUpdate( );
 
         _currentSlot = p_slot;
         if( SAV.m_saveFile[ p_slot ].m_gameType ) {
@@ -332,16 +346,16 @@ namespace SAVE {
 
                 IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ), SPR_BOX_PAL_SUB,
                                 oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 48, cury, 16, 32, 0, 0, 0,
-                                false, false, false, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                                false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 for( u8 i = 1; i <= 8; ++i ) {
                     IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + i, SPR_BOX_PAL_SUB,
                                     oam[ SPR_LARGE_CHOICE_OAM_SUB + 1 ].gfxIndex, 48 + 16 * i, cury,
                                     16, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, true,
-                                    OBJMODE_NORMAL );
+                                    OBJMODE_BLENDED );
                 }
                 IO::loadSprite( SPR_CHOICE_OAM_SUB( ln ) + 9, SPR_BOX_PAL_SUB,
                                 oam[ SPR_LARGE_CHOICE_OAM_SUB ].gfxIndex, 48 + 16 * 9, cury, 16, 32,
-                                0, 0, 0, true, true, false, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                                0, 0, 0, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
                 cury += 34;
             } else {
@@ -733,8 +747,13 @@ namespace SAVE {
             _currentSlot = 255;
 
             loop( ) {
-                IO::choiceBox cb  = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
-                auto          res = cb.getResult(
+                IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+
+                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
+                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 480,
+                                     256 * 192, true );
+
+                auto res = cb.getResult(
                     [ & ]( u8 p_slot ) {
                         return drawMainChoice( getMainChoicesForSlot( p_slot ), p_slot );
                     },

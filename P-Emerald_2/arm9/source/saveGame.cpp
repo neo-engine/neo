@@ -62,7 +62,7 @@ namespace SAVE {
         IO::initOAMTable( p_bottom );
         u16 tileCnt = 0;
 
-        IO::clearScreen( p_bottom, false, true );
+        dmaFillWords( 0, bgGetGfxPtr( p_bottom ? IO::bg2sub : IO::bg2 ), 256 * 192 );
         u16* pal = IO::BG_PAL( p_bottom );
 
         pal[ 0 ]             = 0;
@@ -91,7 +91,7 @@ namespace SAVE {
         }
 
         FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/id",
-                             std::to_string( achvs + 1 ).c_str( ) );
+                             std::to_string( achvs + 1 ).c_str( ), 440 );
 
         pal[ 0 ]             = 0;
         pal[ IO::WHITE_IDX ] = IO::WHITE;
