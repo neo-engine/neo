@@ -26,18 +26,22 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <functional>
-#include <vector>
 #include <string>
+#include <vector>
 #include <nds.h>
+#include "uio.h"
 
 namespace IO {
-#define MAX_KEYBOARD_PAGES 4
+#define MAX_KEYBOARD_PAGES 5
     class keyboard {
       private:
-        u8               _page = 0;
-        std::vector<u16> _curRes;
+        u8 _page   = 0;
+        u8 _frame  = 0;
+        u8 _curSel = 0;
 
         u8 maxPages( ) const;
+
+        std::vector<std::pair<inputTarget, u8>> getTouchPositions( ) const;
 
         void drawPage( ) const;
 
@@ -46,9 +50,13 @@ namespace IO {
         void drawChar( u8 p_pos, u16 p_char );
         void clearChar( u8 p_pos );
 
+        void select( u8 p_idx, u8 p_frame );
+
         u16 getNextChar( );
+
       public:
-        keyboard( ) { }
+        keyboard( ) {
+        }
 
         std::string getText( u8 p_length );
     };

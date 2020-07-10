@@ -874,7 +874,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Choose the %s Pok\xe9mon %s?", "Das %s-Pok\xe9mon %s w\xe4hlen?" },
     { "Prof. Birch is in trouble!\nRelease a Pok\xe9mon and rescue him!",
       "Prof. Birk ist in Schwierigkeiten!\nSchnapp' dir ein Pok\xe9mon und hilf ihm!" },
-    { "SPACE", "LEER" },
+    { "BACKSPACE", "ENTFERNEN" },
 
     // 440
 

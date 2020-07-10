@@ -120,9 +120,8 @@ namespace SAVE {
 #ifdef DESQUID
         // BEGIN TEST
 
-        auto kb = IO::keyboard( );
-
-        kb.getText( 12 );
+        // auto kb = IO::keyboard( );
+        // kb.getText( 12 );
 
         /*
                 pokemon testTeam[ 6 ];
