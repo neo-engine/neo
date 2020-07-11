@@ -28,8 +28,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <string>
 #include <functional>
+#include <string>
 
 #include <nds.h>
 
@@ -42,8 +42,8 @@ namespace FS {
 #define MAXITEMSPERPAGE 12
     const u16 ITEMS_PER_DIR = 30;
 
-    bool   SDFound( );
-    bool   FCFound( );
+    bool SDFound( );
+    bool FCFound( );
 
     bool   exists( const char* p_path );
     bool   exists( const char* p_path, const char* p_name );
@@ -82,7 +82,8 @@ namespace FS {
     FILE* openScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_id );
     FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id );
 
-    u8* readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
+    u8*  readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
+    u8* readSFX( u16 p_sfxID, u16& p_len );
 
     // bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name,
@@ -95,22 +96,22 @@ namespace FS {
 
     std::string getLocation( u16 p_locationId );
     std::string getLocation( u16 p_locationId, u8 p_language );
-    bool getLocation( u16 p_locationId, u8 p_language, char* p_out );
+    bool        getLocation( u16 p_locationId, u8 p_language, char* p_out );
 
     bool readSave( const char* p_path );
     bool writeSave( const char* p_path );
-    bool writeSave( const char* p_path, std::function<void(u16,u16)> p_progress );
+    bool writeSave( const char* p_path, std::function<void( u16, u16 )> p_progress );
 
     namespace CARD {
         bool checkCard( );
 
         void waitBusy( );
         void waitWriteInProgress( );
-        u8 transfer( u8 p_data );
+        u8   transfer( u8 p_data );
         void write( u8 p_data );
 
         void readData( u32 p_address, u8* p_out, u32 p_cnt );
-        bool writeData( u8* p_data, u32 p_cnt, std::function<void(u16,u16)> p_progress );
-        bool writeData( u32 p_addressr, u8 *p_data, u32 p_cnt );
-    }
-}
+        bool writeData( u8* p_data, u32 p_cnt, std::function<void( u16, u16 )> p_progress );
+        bool writeData( u32 p_addressr, u8* p_data, u32 p_cnt );
+    } // namespace CARD
+} // namespace FS

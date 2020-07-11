@@ -117,7 +117,6 @@ namespace SAVE {
     bool initNewGame( ) {
         SAV.getActiveFile( ).initialize( );
         SAV.getActiveFile( ).m_gameType = NORMAL;
-        SOUND::restoreVolume( );
         IO::initOAMTable( true );
 
         // Initial text
@@ -469,7 +468,7 @@ namespace SAVE {
         // TODO: Proper location
         SAV.getActiveFile( ).m_currentMap = 10;
         SAV.getActiveFile( ).m_player     = { MAP::mapObject::PLYR,
-                                          { 299, 53, 4 },
+                                          { 0x93, 0x4a, 3 },
                                           u16( 10 * SAV.getActiveFile( ).m_appearance ),
                                           MAP::moveMode::WALK,
                                           0,
@@ -477,7 +476,10 @@ namespace SAVE {
                                           MAP::direction::RIGHT };
         IO::clearScreen( true, true, true );
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
-        SOUND::stopBGM( );
+        for( u8 i = 10; i; --i ) {
+            SOUND::setVolume( 0x10 * i );
+            swiWaitForVBlank( );
+        }
         return true;
     }
 
@@ -486,6 +488,7 @@ namespace SAVE {
             return initNewGame( );
         }
 
+        SOUND::playBGM( MOD_ROUTE_123 );
         printEpisodeInfo( p_episode );
 
         switch( p_episode ) {
@@ -504,6 +507,10 @@ namespace SAVE {
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
             SAV.getActiveFile( ).m_currentMap     = 10;
             SAV.getActiveFile( ).m_registeredItem = I_BIKE;
+            for( u8 i = 10; i; --i ) {
+                SOUND::setVolume( 0x10 * i );
+                swiWaitForVBlank( );
+            }
             return true;
         default:
             SAV.getActiveFile( ).m_gameType = UNUSED;

@@ -50,7 +50,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
 
-const char CRY_PATH[]              = "nitro:/SOUND/";
+const char CRY_PATH[]              = "nitro:/SOUND/CRIES/";
+const char SFX_PATH[]              = "nitro:/SOUND/SFX/";
 const char LOCATION_NAME_PATH[]    = "nitro:/DATA/LOC_NAME/";
 const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/";
@@ -219,6 +220,15 @@ namespace FS {
 
         std::memset( CRY_DATA, 0, sizeof( CRY_DATA ) );
         if( !( p_len = read( f, CRY_DATA, sizeof( u8 ), sizeof( CRY_DATA ) ) ) ) { return nullptr; }
+        return CRY_DATA;
+    }
+
+    u8* readSFX( u16 p_sfxIdx, u16& p_len ) {
+        FILE* f = FS::openSplit( SFX_PATH, p_sfxIdx, ".raw", 400 );
+        if( !f ) { return nullptr; }
+
+        std::memset( CRY_DATA, 0, sizeof( CRY_DATA ) );
+        if( !( p_len = read( f, CRY_DATA, 1, sizeof( CRY_DATA ) ) ) ) { return nullptr; }
         return CRY_DATA;
     }
 

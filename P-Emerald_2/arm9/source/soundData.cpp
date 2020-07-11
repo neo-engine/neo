@@ -43,15 +43,32 @@ namespace SOUND {
         u16 len;
         u8* cry = FS::readCry( p_pokemonId, p_formeId, len );
         if( cry == nullptr ) {
-            playSoundEffect( SFX_CANCEL );
+            if( p_pokemonId != 1 ) { playCry( 1 ); }
             return;
         }
 
         if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
 
-        LAST_CRY = soundPlaySample( cry, SoundFormat_8Bit, len, 22050, 0x0f, 64, false, 0 );
+        LAST_CRY = soundPlaySample( cry, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
 #endif
     }
+
+    void playSoundEffect( u16 p_id ) {
+#ifndef NO_SOUND
+        if( SAVE::SAV.getActiveFile( ).m_options.m_enableSFX ) {
+            u16 len;
+            u8* sfx = FS::readSFX( p_id, len );
+            if( sfx == nullptr ) { return; }
+
+            if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
+
+            LAST_CRY = soundPlaySample( sfx, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
+        }
+#else
+        (void) p_id;
+#endif
+    }
+
 
     void onLocationChange( u16 p_newLocation ) {
         if( currentLocation == p_newLocation ) { return; }

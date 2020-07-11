@@ -232,17 +232,14 @@ int main( int, char** p_argv ) {
         SAVE::SAV.clear( );
     }
 
+    MAP::curMap = new MAP::mapDrawer( );
+
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
 
     FADE_TOP( );
 
-    // TODO remove
-    SAVE::SAV.getActiveFile( ).m_options.m_enableBGM = true;
-    SAVE::SAV.getActiveFile( ).m_options.m_enableSFX = true;
-
-    MAP::curMap = new MAP::mapDrawer( );
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
 

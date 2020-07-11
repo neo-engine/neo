@@ -29,114 +29,26 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <maxmod9.h>
 
 #include "defines.h"
+#include "fs.h"
 #include "saveGame.h"
 #include "sound.h"
 
 const char SOUND_PATH[] = "nitro:/SOUND/";
 
 void initSFX( ) {
-    mmLoadEffect( SFX_CANCEL );
-    mmLoadEffect( SFX_CHOOSE );
-    mmLoadEffect( SFX_SELECT );
-    mmLoadEffect( SFX_USE_ITEM );
-
-    mmLoadEffect( SFX_BATTLE_BALLDROP );
-    mmLoadEffect( SFX_BATTLE_BALLSHAKE );
-    mmLoadEffect( SFX_BATTLE_DAMAGE_NORMAL );
-    mmLoadEffect( SFX_BATTLE_DAMAGE_SUPER );
-    mmLoadEffect( SFX_BATTLE_DAMAGE_WEAK );
-    mmLoadEffect( SFX_BATTLE_DECREASE );
-    mmLoadEffect( SFX_BATTLE_ESCAPE );
-    mmLoadEffect( SFX_BATTLE_EXPFULL );
-    mmLoadEffect( SFX_BATTLE_FAINT );
-    mmLoadEffect( SFX_BATTLE_INCREASE );
-    mmLoadEffect( SFX_BATTLE_JUMPTOBALL );
-    mmLoadEffect( SFX_BATTLE_RECALL );
-    mmLoadEffect( SFX_BATTLE_THROW );
-    mmLoadEffect( SFX_BATTLE_ABILITY );
-    mmLoadEffect( SFX_SHINY );
-
-    mmLoadEffect( SFX_BUMP );
-    mmLoadEffect( SFX_NAV );
-    mmLoadEffect( SFX_CAVE_WARP );
-    mmLoadEffect( SFX_ENTER_DOOR );
-    mmLoadEffect( SFX_EXMARK );
-    mmLoadEffect( SFX_JUMP );
-    mmLoadEffect( SFX_MENU );
-    mmLoadEffect( SFX_OBTAIN_EGG );
-    mmLoadEffect( SFX_OBTAIN_ITEM );
-    mmLoadEffect( SFX_OBTAIN_KEY_ITEM );
-    mmLoadEffect( SFX_SAVE );
-    mmLoadEffect( SFX_WARP );
 }
 
 void initBattleSFX( ) {
-    /*
-    mmLoadEffect( SFX_BATTLE_BALLDROP );
-    mmLoadEffect( SFX_BATTLE_BALLSHAKE );
-    mmLoadEffect( SFX_BATTLE_DAMAGE_NORMAL );
-    mmLoadEffect( SFX_BATTLE_DAMAGE_SUPER );
-    mmLoadEffect( SFX_BATTLE_DAMAGE_WEAK );
-    mmLoadEffect( SFX_BATTLE_DECREASE );
-    mmLoadEffect( SFX_BATTLE_ESCAPE );
-    mmLoadEffect( SFX_BATTLE_EXPFULL );
-    mmLoadEffect( SFX_BATTLE_FAINT );
-    mmLoadEffect( SFX_BATTLE_INCREASE );
-    mmLoadEffect( SFX_BATTLE_JUMPTOBALL );
-    mmLoadEffect( SFX_BATTLE_RECALL );
-    mmLoadEffect( SFX_BATTLE_THROW );
-    mmLoadEffect( SFX_SHINY );
-
-    mmUnloadEffect( SFX_BUMP );
-    mmUnloadEffect( SFX_CAVE_WARP );
-    mmUnloadEffect( SFX_ENTER_DOOR );
-    mmUnloadEffect( SFX_EXMARK );
-    mmUnloadEffect( SFX_JUMP );
-    mmUnloadEffect( SFX_MENU );
-    mmUnloadEffect( SFX_OBTAIN_EGG );
-    mmUnloadEffect( SFX_OBTAIN_ITEM );
-    mmUnloadEffect( SFX_OBTAIN_KEY_ITEM );
-    mmUnloadEffect( SFX_SAVE );
-    mmUnloadEffect( SFX_WARP );
-    */
 }
 
 void deinitBattleSFX( ) {
-    /*
-    mmUnloadEffect( SFX_BATTLE_BALLDROP );
-    mmUnloadEffect( SFX_BATTLE_BALLSHAKE );
-    mmUnloadEffect( SFX_BATTLE_DAMAGE_NORMAL );
-    mmUnloadEffect( SFX_BATTLE_DAMAGE_SUPER );
-    mmUnloadEffect( SFX_BATTLE_DAMAGE_WEAK );
-    mmUnloadEffect( SFX_BATTLE_DECREASE );
-    mmUnloadEffect( SFX_BATTLE_ESCAPE );
-    mmUnloadEffect( SFX_BATTLE_EXPFULL );
-    mmUnloadEffect( SFX_BATTLE_FAINT );
-    mmUnloadEffect( SFX_BATTLE_INCREASE );
-    mmUnloadEffect( SFX_BATTLE_JUMPTOBALL );
-    mmUnloadEffect( SFX_BATTLE_RECALL );
-    mmUnloadEffect( SFX_BATTLE_THROW );
-    mmUnloadEffect( SFX_SHINY );
-
-    mmLoadEffect( SFX_BUMP );
-    mmLoadEffect( SFX_CAVE_WARP );
-    mmLoadEffect( SFX_ENTER_DOOR );
-    mmLoadEffect( SFX_EXMARK );
-    mmLoadEffect( SFX_JUMP );
-    mmLoadEffect( SFX_MENU );
-    mmLoadEffect( SFX_OBTAIN_EGG );
-    mmLoadEffect( SFX_OBTAIN_ITEM );
-    mmLoadEffect( SFX_OBTAIN_KEY_ITEM );
-    mmLoadEffect( SFX_SAVE );
-    mmLoadEffect( SFX_WARP );
-    */
 }
 
 void initSound( ) {
 #ifndef NO_SOUND
     std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
     mmInitDefault( const_cast<char*>( path.c_str( ) ) );
-    mmLockChannels( BIT( 0 ) );
+    mmLockChannels( BIT( 0 ) | BIT( 1 ) );
     initSFX( );
 #endif
 }
@@ -164,6 +76,7 @@ namespace SOUND {
         (void) p_newValue;
 #endif
     }
+
     void dimVolume( ) {
 #ifndef NO_SOUND
         setVolume( 0x50 );
@@ -224,15 +137,4 @@ namespace SOUND {
 #endif
     }
 
-    void playSoundEffect( u16 p_id ) {
-#ifndef NO_SOUND
-        if( SAVE::SAV.getActiveFile( ).m_options.m_enableSFX ) {
-            auto handle = mmEffect( p_id );
-            mmEffectVolume( handle, 0xFF );
-            mmEffectRelease( handle );
-        }
-#else
-        (void) p_id;
-#endif
-    }
 } // namespace SOUND
