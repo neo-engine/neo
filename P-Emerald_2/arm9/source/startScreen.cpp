@@ -766,7 +766,7 @@ namespace SAVE {
             loop( ) {
                 IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
 
-                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 480,
+                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 500,
                                      256 * 192, true );
 
                 auto res = cb.getResult(
