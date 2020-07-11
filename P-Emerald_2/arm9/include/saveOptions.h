@@ -42,6 +42,15 @@ namespace SAVE {
         s8       m_encounterRateModifier;
         s8       m_textSpeedModifier;
 
+        constexpr void clear( ) {
+            m_EXPShareEnabled = false;
+            m_enableBGM = true;
+            m_enableSFX = true;
+            m_bgIdx  = 0;
+            setDifficulty( 3 );
+            setTextSpeed( 1 );
+        }
+
         constexpr u8 getTextSpeed( ) const {
             if( m_textSpeedModifier == -20 ) { return 0; }
             if( m_textSpeedModifier == 0 ) { return 1; }

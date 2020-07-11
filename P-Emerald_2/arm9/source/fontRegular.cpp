@@ -253,19 +253,19 @@ namespace IO {
                 return;
             }
             if( p_val == '\x01' ) { // Heart
-                p_val = 445;
+                p_val = 444;
                 return;
             }
             if( p_val == '\x02' ) { // Battle
-                p_val = 475;
+                p_val = 474;
                 return;
             }
             if( p_val == '\x03' ) { // Full Circle
-                p_val = 448;
+                p_val = 447;
                 return;
             }
             if( p_val == '\x04' ) { // Empty Circle
-                p_val = 449;
+                p_val = 448;
                 return;
             }
 
@@ -322,6 +322,10 @@ namespace IO {
                 p_val = 128;
                 return;
             }
+            if( p_val == '\x5d' ) {
+                p_val = 129;
+                return;
+            }
             if( p_val == '' ) {
                 p_val = 129;
                 return;
@@ -334,7 +338,7 @@ namespace IO {
                 p_val = 130;
                 return;
             }
-            if( p_val == '' ) {
+            if( p_val == '\x5e' ) {
                 p_val = 131;
                 return;
             }

@@ -355,7 +355,7 @@ namespace NAV {
 
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
     printYNMessage( const char* p_message, style p_style, u8 p_selection ) {
-        doPrintMessage( p_message, p_style );
+        if( p_selection != 253 ) { doPrintMessage( p_message, p_style ); }
 
         BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
         BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
@@ -382,11 +382,13 @@ namespace NAV {
             }
         }
 
-        if( p_message || p_selection >= 254 ) {
+        if( p_message || p_selection >= 253 ) {
 
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
-                                 true );
+            if( p_selection != 253 ) {
+                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
+                                     true );
+            }
             for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
 
             IO::regularFont->printString(

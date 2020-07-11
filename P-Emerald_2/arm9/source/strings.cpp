@@ -335,7 +335,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "No %s available.\nRemove the icon?",
       "Kein Exemplar des Items\n%s vorhanden.\nIcon entfernen?" },
     { "Recently used items\nwill appear here.", "Hier erscheinen zuletzt\neingesetzte Items." },
-    { "You may register an\nitem to the button Y.", "Du kannst ein Item\nauf Y registrieren." },
+    { "You can register an item to the Y button.", "Du kannst ein Item auf Y registrieren." },
     { "%s used %s!", "%s setzt %s ein!" },
 
     // 100
@@ -879,4 +879,59 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 440
 
     { "ENTER", "ENTER" },
+    { "Hello..?\nCan you hear me?", "Hallo..?\nKannst du mich h\xf6ren?" },
+    { "Nice! Your Pok\xe9Nav seems to be working just fine.",
+      "Gut! Dein Pok\xe9Nav funktioniert schonmal." },
+    { "My name is Birch, but everyone calls me Pok\xe9mon Professor.",
+      "Mein Name ist Birk, aber jeder nennt mich Pok\xe9mon Professor." },
+    { "But first of all, welcome to the world of Pok\xe9mon!",
+      "Aber zun\xe4"
+      "chst, willkommen in der Welt der Pok\xe9mon!" },
+
+    { "This is what we call a \x5dPok\xe9mon.\"", "Dies ist ein sogenanntes \x5ePok\xe9mon\x5d." },
+    { "This world is widely inhabited by creatures known as Pok\xe9mon.",
+      "Auf dieser Welt leben Wesen, die als Pok\xe9mon bekannt sind." },
+    { "We humans live alongside Pok\xe9mon, at times as friendly playmates,",
+      "Wir Menschen leben Seite an Seite mit ihnen, manchmal als Freunde," },
+    { "at times as cooperative workmates.", "manchmal auch als Arbeitskollegen." },
+    { "And sometimes, we band together and battle others like us.",
+      "Und manchmal schlie\xdf"
+      "en wir uns zusammen und tragen K\xe4mpfe aus." },
+
+    // 450
+
+    { "But despite our closeness, there is much to learn about Pok\xe9mon.",
+      "Und dennoch gibt es noch viel \xfc"
+      "ber die Pok\xe9mon zu lernen." },
+    { "In fact, there are many, many secrets surrounding Pok\xe9mon.",
+      "Es gibt noch viele, viele Geheimnisse um die Pok\xe9mon." },
+    { "To unravel Pok\xe9mon mysteries, I've been undertaking research.",
+      "Um ihre Mysterien aufzudecken, widme ich der Forschung." },
+    { "That's what I do.", "Ja, genau das tue ich." },
+    { "Ah sorry, I got carried away|", "Ah, ich schweife ab|" },
+
+    { "I am calling because I need some information from you.",
+      "Ich rufe an, weil ich noch ein paar Informationen von dir ben\xfctige." },
+    { "For now, just complete your profile in your Pok\xe9Nav.",
+      "Kannst du bitte dein Pok\xe9Nav-Profil ausf\xfcllen?" },
+    { "Choose a picture!", "W\xe4hle ein Bild!" },
+    { "Your name?", "Dein Name?" },
+    { "Are you fine with your profile?", "Ist dieses Profil so in Ordnung?" },
+
+    // 460
+
+    { "Brendan", "Brix" },
+    { "May", "Maike" },
+    { "Alright ", "Also gut " },
+    { ", are you ready?", ", bist du bereit?" },
+    { "Your very own adventure is about to unfold.",
+      "Dein ganz eigenes Abenteuer wird nun beginnen." },
+
+    { "Take courage, and leap into the world of Pok\xe9mon,",
+      "Hab nur Mut, und st\xfcrze dich in die Welt der Pok\xe9mon," },
+    { "where dreams, adventure, and friendships await!",
+      "wo Abenteuer, Tr\xe4ume und Freundschaften warten." },
+    { "Well, I'll be expecting you later.\nCome see me in my Pok\xe9mon Lab.",
+      "Ah, komm sp\xe4ter in mein Pok\xe9mon-\nLabor, ich erwarte dich dort." },
+
 };

@@ -52,6 +52,8 @@ namespace SAVE {
     constexpr u8 F_DEX_OBTAINED     = 3;
     constexpr u8 F_NAT_DEX_OBTAINED = 4;
 
+    constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
+
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 
     enum gameType {
@@ -240,6 +242,16 @@ namespace SAVE {
             void setFlag( u8 p_idx, bool p_value );
 
             /*
+             * @brief: Returns the value of the specified variable
+             */
+            u16 getVar( u8 p_idx );
+
+            /*
+             * @brief: Sets the specified var to the specified value.
+             */
+            void setVar( u8 p_idx, u16 p_value );
+
+            /*
              * @brief: Increases the number of steps the player has walked by 1.
              * Needs to be called whenever the player makes a step in the ow.
              */
@@ -308,8 +320,9 @@ namespace SAVE {
 
             /*
              * @brief: Draws the trainer's id card to the specified screen.
+             * @param p_dummy: Show an empty trainer's card
              */
-            void drawTrainersCard( bool p_bottom = false );
+            void drawTrainersCard( bool p_bottom = false, bool p_dummy = false );
 
             /*
              * @brief: Increases the time by 1 second.
@@ -357,16 +370,14 @@ namespace SAVE {
             void plantBerry( u8 p_berrySlot, u16 p_berry );
         } m_saveFile[ MAX_SAVE_FILES ];
 
-        u8  m_activeFile; // The save file the player is currently using.
-        u32 m_version;    // The game version the save was created with.
+        u8  m_activeFile;      // The save file the player is currently using.
+        u32 m_version;         // The game version the save was created with.
         u16 m_specialEpisodes; // Unlocked special episodes
 
         inline std::vector<u8> getSpecialEpisodes( ) const {
             auto res = std::vector<u8>( );
             for( u8 i = 0; i < MAX_SPECIAL_EPISODES; ++i ) {
-                if( m_specialEpisodes & ( 1 << i ) ) {
-                    res.push_back( i + 1 );
-                }
+                if( m_specialEpisodes & ( 1 << i ) ) { res.push_back( i + 1 ); }
             }
 #ifdef DESQUID
             res.push_back( 0 );
@@ -387,8 +398,9 @@ namespace SAVE {
         inline playerInfo& getActiveFile( ) {
             return m_saveFile[ m_activeFile ];
         }
-
     };
+
+    bool initNewGame( );
 
     extern saveGame SAV;
 } // namespace SAVE

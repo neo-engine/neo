@@ -53,9 +53,11 @@ void initSFX( ) {
     mmLoadEffect( SFX_BATTLE_JUMPTOBALL );
     mmLoadEffect( SFX_BATTLE_RECALL );
     mmLoadEffect( SFX_BATTLE_THROW );
+    mmLoadEffect( SFX_BATTLE_ABILITY );
     mmLoadEffect( SFX_SHINY );
 
     mmLoadEffect( SFX_BUMP );
+    mmLoadEffect( SFX_NAV );
     mmLoadEffect( SFX_CAVE_WARP );
     mmLoadEffect( SFX_ENTER_DOOR );
     mmLoadEffect( SFX_EXMARK );

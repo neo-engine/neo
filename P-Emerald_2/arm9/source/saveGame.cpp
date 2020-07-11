@@ -54,7 +54,7 @@ namespace SAVE {
             32, 32, 32, 32, 96, 96, 96, 96,  96,  96,  96,  96,  96, 96, 96, 96, 96,
             96, 56, 56, 56, 56, 56, 56, 108, 108, 108, 108, 108, 108 };
 
-    void saveGame::playerInfo::drawTrainersCard( bool p_bottom ) {
+    void saveGame::playerInfo::drawTrainersCard( bool p_bottom, bool p_dummy ) {
         IO::initVideo( true );
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         u8           achvs = getAchievementCount( );
@@ -103,8 +103,10 @@ namespace SAVE {
         pal[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
 
         // player sprite
-        tileCnt = IO::loadSprite( std::to_string( m_appearance ).c_str( ), 0, 0, tileCnt, 33, 45,
-                                  64, 64, false, false, false, OBJPRIORITY_2, p_bottom );
+        if( !p_dummy ) {
+            tileCnt = IO::loadSprite( std::to_string( m_appearance ).c_str( ), 0, 0, tileCnt, 33,
+                                      45, 64, 64, false, false, false, OBJPRIORITY_2, p_bottom );
+        }
 
         // stars
         IO::loadSprite( 1, 1, tileCnt, 100, 37, 16, 16, starPal, starTiles, starTilesLen, false,
@@ -145,54 +147,92 @@ namespace SAVE {
         IO::regularFont->printString( m_playername, 234, 52, p_bottom, IO::font::RIGHT );
 
         // play time
-        IO::regularFont->printString( STRINGS[ 407 ][ m_options.m_language ], 108, 68, p_bottom );
-        snprintf( buffer, 99, "%hu:%02hhu", m_playTime.m_hours, m_playTime.m_mins );
-        IO::regularFont->printString( buffer, 234, 68, p_bottom, IO::font::RIGHT );
-
-        // Money
-        IO::regularFont->printString( STRINGS[ 408 ][ m_options.m_language ], 108, 84, p_bottom );
-        snprintf( buffer, 99, "$%lu", m_money );
-        IO::regularFont->printString( buffer, 234, 84, p_bottom, IO::font::RIGHT );
-
-        if( checkFlag( F_DEX_OBTAINED ) ) {
-            // PokeDex
-            IO::regularFont->printString( STRINGS[ 409 ][ m_options.m_language ], 108, 100,
+        if( !p_dummy ) {
+            IO::regularFont->printString( STRINGS[ 407 ][ m_options.m_language ], 108, 68,
                                           p_bottom );
-            snprintf( buffer, 99, "%hhu/%hhu", getSeenCount( ), getCaughtCount( ) );
-            IO::regularFont->printString( buffer, 234, 100, p_bottom, IO::font::RIGHT );
+            snprintf( buffer, 99, "%hu:%02hhu", m_playTime.m_hours, m_playTime.m_mins );
+            IO::regularFont->printString( buffer, 234, 68, p_bottom, IO::font::RIGHT );
+
+            // Money
+            IO::regularFont->printString( STRINGS[ 408 ][ m_options.m_language ], 108, 84,
+                                          p_bottom );
+            snprintf( buffer, 99, "$%lu", m_money );
+            IO::regularFont->printString( buffer, 234, 84, p_bottom, IO::font::RIGHT );
+
+            if( checkFlag( F_DEX_OBTAINED ) ) {
+                // PokeDex
+                IO::regularFont->printString( STRINGS[ 409 ][ m_options.m_language ], 108, 100,
+                                              p_bottom );
+                snprintf( buffer, 99, "%hhu/%hhu", getSeenCount( ), getCaughtCount( ) );
+                IO::regularFont->printString( buffer, 234, 100, p_bottom, IO::font::RIGHT );
+            }
+
+            // Last Badge / Hall of Fame.
+            if( m_lastAchievementEvent ) {
+                snprintf( buffer, 99,
+                          ACHIEVEMENTS[ m_lastAchievementEvent ][ m_options.m_language ],
+                          IO::formatDate( m_lastAchievementDate, m_options.m_language ).c_str( ) );
+                IO::regularFont->printStringC( buffer, 242, 116, p_bottom, IO::font::RIGHT );
+            }
+
+            // Last save
+            if( m_lastSaveLocation ) {
+                snprintf( buffer, 99, STRINGS[ 411 ][ m_options.m_language ],
+                          FS::getLocation( m_lastSaveLocation, m_options.m_language ).c_str( ),
+                          IO::formatDate( m_lastSaveDate, m_options.m_language ).c_str( ),
+                          m_lastSaveTime.m_hours, m_lastSaveTime.m_mins );
+                IO::regularFont->printBreakingStringC( buffer, 242, 132, 230, p_bottom,
+                                                       IO::font::RIGHT );
+            }
+
+            // Adventure started
+            snprintf( buffer, 99, STRINGS[ 410 ][ m_options.m_language ],
+                      IO::formatDate( m_startDate, m_options.m_language ).c_str( ) );
+            IO::regularFont->printStringC( buffer, 242, 164, p_bottom, IO::font::RIGHT );
         }
-
-        // Last Badge / Hall of Fame.
-        if( m_lastAchievementEvent ) {
-            snprintf( buffer, 99, ACHIEVEMENTS[ m_lastAchievementEvent ][ m_options.m_language ],
-                      IO::formatDate( m_lastAchievementDate, m_options.m_language ).c_str( ) );
-            IO::regularFont->printStringC( buffer, 242, 116, p_bottom, IO::font::RIGHT );
-        }
-
-        // Last save
-        if( m_lastSaveLocation ) {
-            snprintf( buffer, 99, STRINGS[ 411 ][ m_options.m_language ],
-                      FS::getLocation( m_lastSaveLocation, m_options.m_language ).c_str( ),
-                      IO::formatDate( m_lastSaveDate, m_options.m_language ).c_str( ),
-                      m_lastSaveTime.m_hours, m_lastSaveTime.m_mins );
-            IO::regularFont->printBreakingStringC( buffer, 242, 132, 230, p_bottom,
-                                                   IO::font::RIGHT );
-        }
-
-        // Adventure started
-        snprintf( buffer, 99, STRINGS[ 410 ][ m_options.m_language ],
-                  IO::formatDate( m_startDate, m_options.m_language ).c_str( ) );
-        IO::regularFont->printStringC( buffer, 242, 164, p_bottom, IO::font::RIGHT );
-
         IO::updateOAM( p_bottom );
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
     }
 
     void saveGame::playerInfo::clear( ) {
-        std::memset( this, 0, sizeof( saveGame::playerInfo ) );
+        m_good1 = 0;
+        std::memset( m_playername, 0, sizeof( m_playername ) );
+        m_id = m_appearance = m_sid = 0;
+        m_startDate = m_lastSaveDate = m_lastAchievementDate = { 0, 0, 0 };
+        m_lastSaveTime = m_playTime = { 0, 0, 0 };
+        m_lastSaveLocation          = 0;
+        m_HOENN_Badges = m_FRONTIER_Badges = m_KANTO_Badges = m_JOHTO_Badges = m_RESERVED_Badges
+            = m_lastAchievementEvent                                         = 0;
+
+        m_money = m_coins = m_battlePoints = m_currentMap = m_stepCount = m_curBox = m_lstDex = 0;
+        std::memset( m_lstViewedItem, 0, sizeof( m_lstViewedItem ) );
+
+        m_unused = 0;
+
+        m_options.clear( );
+
+        m_registeredItem = m_lstBag = m_lstUsedItem = m_repelSteps = 0;
+        std::memset( m_pkmnTeam, 0, sizeof( m_pkmnTeam ) );
+        std::memset( m_vars, 0, sizeof( m_vars ) );
+        std::memset( m_flags, 0, sizeof( m_flags ) );
+
+        std::memset( m_berryTrees, 0, sizeof( m_berryTrees ) );
+        std::memset( m_berryHealth, 0, sizeof( m_berryHealth ) );
+        std::memset( m_berryPlantedDate, 0, sizeof( m_berryPlantedDate ) );
+        std::memset( m_berryPlantedTime, 0, sizeof( m_berryPlantedTime ) );
+
+        std::memset( m_reserved, 0, sizeof( m_reserved ) );
+
+        std::memset( &m_bag, 0, sizeof( BAG::bag ) );
+
+        std::memset( m_storedPokemon, 0, sizeof( m_storedPokemon ) );
+
+        std::memset( m_caughtPkmn, 0, sizeof( m_caughtPkmn ) );
+        std::memset( m_seenPkmn, 0, sizeof( m_seenPkmn ) );
     }
     void saveGame::playerInfo::initialize( ) {
         clear( );
+
         m_good1 = GOOD_MAGIC1;
         m_good2 = GOOD_MAGIC2;
 
@@ -336,6 +376,14 @@ namespace SAVE {
         if( p_value != checkFlag( p_idx ) ) m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
         return;
     }
+
+    u16 saveGame::playerInfo::getVar( u8 p_idx ) {
+        return m_vars[ p_idx ];
+    }
+    void saveGame::playerInfo::setVar( u8 p_idx, u16 p_value ) {
+        m_vars[ p_idx ] = p_value;
+    }
+
     u8 saveGame::playerInfo::getBadgeCount( ) {
         u8 cnt = 0;
         for( u8 i = 0; i < 8; ++i ) {
@@ -429,7 +477,7 @@ namespace SAVE {
         return false;
     }
     void saveGame::clear( ) {
-        std::memset( this, 0, sizeof( saveGame ) );
+        for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) { SAV.m_saveFile[ i ].clear( ); }
         m_version = VERSION;
     }
 } // namespace SAVE

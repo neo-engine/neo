@@ -120,6 +120,8 @@ namespace SAVE {
 #ifdef DESQUID
         // BEGIN TEST
 
+//        SAVE::initNewGame( );
+
         // auto kb = IO::keyboard( );
         // kb.getText( 12 );
 
@@ -199,7 +201,7 @@ namespace SAVE {
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
                 || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playCry( PKMN_RAYQUAZA );
-                for( u8 i = 0; i < 70; ++i ) { swiWaitForVBlank( ); };
+                for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); };
                 IO::clearScreenConsole( true, true );
                 IO::clearScreen( true, false, true );
                 IO::fadeScreen( IO::CLEAR_DARK, true, true );
@@ -246,7 +248,6 @@ namespace SAVE {
             = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
         IO::initOAMTable( true );
 
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
 
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -294,7 +295,10 @@ namespace SAVE {
         IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, true );
         IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
 
-        if( _currentSlot != p_slot ) { SAV.m_saveFile[ p_slot ].drawTrainersCard( false ); }
+        if( _currentSlot != p_slot ) {
+            FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
+            SAV.m_saveFile[ p_slot ].drawTrainersCard( false );
+        }
 
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
@@ -399,9 +403,9 @@ namespace SAVE {
     }
 
     std::vector<std::pair<IO::inputTarget, startScreen::choice>> startScreen::drawEpisodeChoice( ) {
-
         SpriteEntry* oam = IO::Oam->oamBuffer;
-        IO::clearScreen( true, false, true );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+
         std::vector<std::pair<IO::inputTarget, startScreen::choice>> res
             = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
 
@@ -703,13 +707,16 @@ namespace SAVE {
         IO::clearScreen( true, true, true );
     }
 
-    bool startScreen::initNewGame( gameType p_type, language p_lang, u8 p_episode ) {
+    bool startScreen::initNewGame( gameType p_type, language, u8 p_episode ) {
         // Check if this is the first save file
         bool hasSave = false;
 
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) hasSave |= SAV.m_saveFile[ i ].isGood( );
 
-        if( !hasSave ) { SAV.clear( ); }
+        if( !hasSave ) {
+            std::memset( &SAVE::SAV, 0, sizeof( SAVE::saveGame ) );
+            SAVE::SAV.m_version = VERSION;
+        }
 
         if( SAV.m_saveFile[ _currentSlot ].m_gameType != UNUSED ) {
             // Ask the player if they want to override their save
@@ -734,7 +741,9 @@ namespace SAVE {
         SAV.getActiveFile( ).m_gameType           = p_type;
         SAV.getActiveFile( ).m_options.m_bgIdx    = START_BG;
 
+
         if( p_type == SPECIAL ) { return initSpecialEpisode( p_episode ); }
+        if( p_type == NORMAL ) { return initSpecialEpisode( -1 ); }
         return true;
     }
 
@@ -757,7 +766,6 @@ namespace SAVE {
             loop( ) {
                 IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
 
-                FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
                 FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 480,
                                      256 * 192, true );
 

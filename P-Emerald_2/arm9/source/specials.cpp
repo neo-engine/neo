@@ -334,6 +334,7 @@ namespace SPX {
                 == IO::yesNoBox::YES ) {
 
                 SAVE::SAV.getActiveFile( ).setTeamPkmn( 0, &pkmn[ res ] );
+                SAVE::SAV.getActiveFile( ).setVar( SAVE::V_INITIAL_PKMN_CHOICE, res + 1 );
                 break;
             }
         }

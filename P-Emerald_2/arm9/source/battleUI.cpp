@@ -874,6 +874,7 @@ namespace BATTLE {
 
     void battleUI::logAbility( pokemon* p_pokemon, bool p_opponent ) {
         for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+        SOUND::playSoundEffect( SFX_BATTLE_ABILITY );
 
         SpriteEntry* oam = IO::OamTop->oamBuffer;
 

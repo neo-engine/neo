@@ -42,10 +42,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "Border.h"
 
 namespace SAVE {
-#define SPR_MSGTEXT_OAM 108
-#define SPR_MSGBOX_OAM 112
-#define SPR_MSGCONT_OAM 127
-
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 0 + 10 * ( p_pos ) )
 #define SPR_X_OAM_SUB 60
 
