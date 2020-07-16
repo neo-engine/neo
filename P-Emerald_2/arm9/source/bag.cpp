@@ -82,7 +82,7 @@ namespace BAG {
     u16 bag::count( bagType p_bagType, u16 p_itemId ) {
         for( u16 i = _startIdx[ p_bagType ]; i < _nextFree[ p_bagType ]; ++i )
             if( _items[ i ].first == p_itemId ) return _items[ i ].second;
-        return -1;
+        return 0;
     }
 
     bool bag::empty( bagType p_bagType ) {

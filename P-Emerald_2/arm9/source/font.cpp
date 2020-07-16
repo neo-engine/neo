@@ -269,45 +269,40 @@ namespace IO {
                             u16 p_bufferHeight ) const {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
-        u16 lines = 1;
-        if( p_alignment == RIGHT ) { putX = p_bufferWidth - stringWidth( p_string, p_charShift ); }
-        if( p_alignment == CENTER ) {
-            putX = ( p_bufferWidth - stringWidth( p_string, p_charShift ) ) / 2;
-        }
+        u16 lines  = 1;
+        s16 lineWd = stringMaxWidth( p_string, p_bufferWidth, ' ', p_charShift );
+        if( p_alignment == RIGHT ) putX = p_bufferWidth - lineWd;
+        if( p_alignment == CENTER ) putX = ( p_bufferWidth - lineWd ) / 2;
 
         while( p_string[ current_char ] && putX < p_bufferWidth ) {
-            if( p_string[ current_char ] == '\n' ) {
+            if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
-                if( p_alignment == RIGHT ) {
-                    putX = p_bufferWidth - stringWidth( p_string + current_char + 1, p_charShift );
-                }
-                if( p_alignment == CENTER ) {
-                    putX = ( p_bufferWidth
-                             - stringWidth( p_string + current_char + 1, p_charShift ) )
-                           / 2;
-                }
+                lineWd = stringMaxWidth( p_string + current_char + 1, p_bufferWidth, ' ',
+                                         p_charShift );
                 if( p_alignment == LEFT ) { putX = 0; }
+                if( p_alignment == RIGHT ) putX = p_bufferWidth - lineWd;
+                if( p_alignment == CENTER ) putX = ( p_bufferWidth - lineWd ) / 2;
 
                 current_char++;
                 lines++;
                 continue;
             }
-            putX += printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX,
-                                putY )
-                    - p_charShift;
+            u16 wd = printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX,
+                                 putY );
+            putX += wd - p_charShift;
+            lineWd -= wd - p_charShift;
             current_char++;
         }
 
         if( p_chunkSize < p_bufferWidth ) {
-            u16 pos                = 0;
+            u16 pos = 0;
 
             for( u8 i = 0; i < p_bufferWidth / p_chunkSize; ++i ) {
                 for( u8 y = 0; y < p_bufferHeight; ++y ) {
                     for( u8 x = 0; x < std::min( int( p_chunkSize ),
                                                  p_bufferWidth - i * p_bufferWidth / p_chunkSize );
                          ++x ) {
-                        TMPBUF[ pos++ ]
-                            = p_buffer[ y * p_bufferWidth + x + i * p_chunkSize ];
+                        TMPBUF[ pos++ ] = p_buffer[ y * p_bufferWidth + x + i * p_chunkSize ];
                     }
                 }
             }

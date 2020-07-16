@@ -148,22 +148,22 @@ namespace IO {
                     sel = ( sel + 1 ) % mxchoice;
                 } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     if( ( sel & 1 ) && nxtpg ) {
-                        // Switch to previous page
+                        // Switch to next page
                         choices = p_drawFunction( ++page );
                         UPDATE_PAGE_STATS;
                     }
                     if( ( sel ^ 1 ) < mxchoice ) {
                         sel ^= 1;
                     } else if( sel > 0 ) {
-                        sel--;
+                        sel = ( ( mxchoice - 1 ) >> 1 ) << 1;
                     }
                 } else if( _mode == MODE_UP_DOWN && nxtpg ) {
                     choices = p_drawFunction( ++page );
                     UPDATE_PAGE_STATS;
                     sel = std::min( sel, mxchoice );
                 } else {
-                    continue;
                     cooldown = COOLDOWN_COUNT;
+                    continue;
                 }
                 p_selectFunction( sel );
 

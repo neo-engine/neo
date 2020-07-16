@@ -98,6 +98,8 @@ enum style {
     MSG_INFO         = 1,
     MSG_NOCLOSE      = 2, // Msgbox stays open, future calls to print append text
     MSG_INFO_NOCLOSE = 3,
+    MSG_MART_ITEM    = 4, // Message used for items / pokemart
+    MSG_ITEM         = 5, // Message used when player obtains an item
 };
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];

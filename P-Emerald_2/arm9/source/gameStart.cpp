@@ -287,6 +287,10 @@ namespace SAVE {
                                       OBJPRIORITY_3, true );
             tileCnt = IO::loadSprite( "1", 15, 1, tileCnt, 128 + 32, 88, 64, 64, false, false,
                                       false, OBJPRIORITY_3, true );
+
+            IO::loadSprite( "UI/sel_64_64", 50, 4, tileCnt, 32, 88, 64, 64, false, false, false,
+                            OBJPRIORITY_3, true );
+
             IO::updateOAM( true );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -312,7 +316,11 @@ namespace SAVE {
                                               1 ) );
                     return res;
                 },
-                [ & ]( u8 p_selection ) {} );
+                [ & ]( u8 p_selection ) {
+                    IO::Oam->oamBuffer[ 50 ].x = IO::Oam->oamBuffer[ 14 + p_selection ].x;
+                    IO::Oam->oamBuffer[ 50 ].y = IO::Oam->oamBuffer[ 14 + p_selection ].y;
+                    IO::updateOAM( true );
+                } );
 
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_s" );
             SAV.getActiveFile( ).drawTrainersCard( false, true );

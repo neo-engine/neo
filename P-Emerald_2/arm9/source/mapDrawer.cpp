@@ -28,9 +28,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 #include "abilityNames.h"
+#include "bagViewer.h"
 #include "battle.h"
 #include "battleDefines.h"
 #include "battleTrainer.h"
+#include "choiceBox.h"
 #include "defines.h"
 #include "mapDrawer.h"
 #include "nav.h"
@@ -216,6 +218,7 @@ namespace MAP {
     }
 
     void mapDrawer::drawObjects( ) {
+        // TODO
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
@@ -544,6 +547,7 @@ namespace MAP {
     }
 
     void mapDrawer::handleTrainer( ) {
+        // TODO
     }
 
     bool mapDrawer::requestWildPkmn( bool p_forceHighGrass ) {
@@ -1654,14 +1658,14 @@ namespace MAP {
 
         if( p_type == 0 ) { // Hoenn badge
             IO::loadSpriteB( ( "ba/b" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
-                            SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
-                            false );
+                             SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
+                             false );
             SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = p_badge;
             SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= ( 1 << ( p_badge - 1 ) );
         } else if( p_type == 1 ) { // Frontier symbol
             IO::loadSpriteB( ( "ba/s" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
-                            SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
-                            false );
+                             SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
+                             false );
 
             auto sym = ( p_badge / 10 ) - 1;
             auto tp  = ( p_badge % 10 ) - 1;
@@ -1684,6 +1688,53 @@ namespace MAP {
         snprintf( buffer, 139, GET_STRING( 436 ), SAVE::SAV.getActiveFile( ).m_playername,
                   getBadgeName( p_type, p_badge ) );
         NAV::printMessage( buffer, MSG_INFO );
+    }
+
+    void mapDrawer::runPokeMart( const std::vector<std::pair<u16, u32>>& p_offeredItems,
+                                 const char* p_message, bool p_allowItemSell, u8 p_paymentMethod ) {
+
+        // Select mode (buy/sell/cancel)
+
+        u8 curMode = 0;
+
+        loop( ) {
+            if( p_allowItemSell ) {
+                curMode = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
+                              .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
+                                          { 468, 469, 387 } );
+            } else {
+                curMode = 0;
+            }
+
+            if( curMode == 0 ) {
+                NAV::buyItem( p_offeredItems, p_paymentMethod );
+            } else if( curMode == 1 ) {
+                BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                    BAG::bagViewer::SELL_ITEM );
+                ANIMATE_MAP       = false;
+                SOUND::dimVolume( );
+
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
+                bv.run( );
+
+                FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
+                draw( );
+                ANIMATE_MAP = true;
+                SOUND::restoreVolume( );
+                NAV::init( );
+            }
+            if( !p_allowItemSell || curMode == 2 ) { break; }
+        }
+
+        NAV::init( );
     }
 
     u16 mapDrawer::getCurrentLocationId( ) const {

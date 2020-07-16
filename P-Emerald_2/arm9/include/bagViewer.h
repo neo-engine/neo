@@ -44,6 +44,7 @@ namespace BAG {
             WILD_BATTLE,  // Allow only items usable in-battle and pokeballs
             GIVE_TO_PKMN, // Allow only items, medicine and berries
             // TODO: USE_ON_PKMN,  // Allow only evo items, medicine, berries, and forme change
+            SELL_ITEM,    // Sell items
         };
 
       private:

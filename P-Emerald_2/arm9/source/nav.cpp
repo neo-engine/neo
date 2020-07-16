@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 
 #include "choiceBox.h"
+#include "counter.h"
 #include "defines.h"
 #include "fs.h"
 #include "keyboard.h"
@@ -66,6 +67,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Border.h"
 
+#include "arrow_up.h"
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
@@ -76,22 +78,29 @@ namespace NAV {
 #define SPR_MSGCONT_OAM 112
 #define SPR_MSGBOX_OAM 113
 
-#define SPR_MSGBOX_GFX 348
-#define SPR_MSG_GFX 380
+#define SPR_MSG_GFX 348
+#define SPR_MSG_EXT_GFX 220
+#define SPR_MSGBOX_GFX 476
 #define SPR_MSGCONT_GFX 508
 
 #define SPR_MENU_OAM_SUB( p_idx ) ( 0 + ( p_idx ) )
+#define SPR_ITEM_OAM_SUB( p_i ) ( 0 + ( p_i ) )
 #define SPR_MENU_SEL_OAM_SUB 6
-#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 6 * ( p_pos ) )
-#define SPR_X_OAM_SUB 44
+#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 8 * ( p_pos ) )
+#define SPR_X_OAM_SUB 56
+#define SPR_ARROW_UP_OAM_SUB( p_i ) ( 57 + ( p_i ) )
+#define SPR_ARROW_DOWN_OAM_SUB( p_i ) ( 63 + ( p_i ) )
+#define SPR_MSGBOX_OAM_SUB 70
 
 #define SPR_MENU_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
+#define SPR_ITEM_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
 #define SPR_MENU_SEL_PAL_SUB 6
 #define SPR_BOX_PAL_SUB 7
 #define SPR_BOX_SEL_PAL_SUB 8
 #define SPR_X_PAL_SUB 9
+#define SPR_MSGBOX_PAL_SUB 10
 
-    u16         TEXT_BUF[ 32 * 256 ] = { 0 };
+    u16         TEXT_BUF[ 64 * 256 ] = { 0 };
     u16         CONT_BUF[ 16 * 16 ]  = { 0 };
     u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE };
     std::string TEXT_CACHE           = "";
@@ -110,11 +119,11 @@ namespace NAV {
         IO::updateOAM( false );
     }
 
-    void init( bool p_bottom ) {
+    void init( bool p_noPic, bool p_bottom ) {
         BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
         BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
         BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
-        IO::clearScreen( p_bottom, false, true );
+        if( !p_noPic ) { IO::clearScreen( p_bottom, false, true ); }
         IO::initOAMTable( p_bottom );
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -132,36 +141,38 @@ namespace NAV {
         REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
         bgUpdate( );
 
-        FS::readPictureData(
-            ptr3, "nitro:/PICS/NAV/",
-            std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
-            192 * 256, p_bottom );
-
-        dmaCopy( BorderBitmap, ptr, 256 * 192 );
-        dmaCopy( BorderPal + 192, pal + 192, 64 );
+        if( !p_noPic ) {
+            FS::readPictureData(
+                ptr3, "nitro:/PICS/NAV/",
+                std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
+                192 * 256, p_bottom );
+            dmaCopy( BorderBitmap, ptr, 256 * 192 );
+            dmaCopy( BorderPal + 192, pal + 192, 64 );
+        }
 
         u16 tileCnt = 0;
 
         // Main menu icons
         tileCnt = IO::loadSprite( "MM/party", SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt,
                                   256 - 29, 192 - 6 * 29, 32, 32, false, false,
-                                  !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), OBJPRIORITY_2,
-                                  p_bottom );
-        tileCnt = IO::loadSprite( "MM/dex", SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt,
-                                  256 - 29, 192 - 5 * 29, 32, 32, false, false,
-                                  !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ),
+                                  p_noPic || !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
                                   OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadSprite(
+            "MM/dex", SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt, 256 - 29, 192 - 5 * 29,
+            32, 32, false, false,
+            p_noPic || !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ), OBJPRIORITY_2,
+            p_bottom );
         tileCnt = IO::loadSprite( "MM/bag", SPR_MENU_OAM_SUB( 2 ), SPR_MENU_PAL_SUB( 2 ), tileCnt,
-                                  256 - 29, 192 - 4 * 29, 32, 32, false, false, false,
+                                  256 - 29, 192 - 4 * 29, 32, 32, false, false, p_noPic,
                                   OBJPRIORITY_2, p_bottom );
         tileCnt = IO::loadSprite( "MM/id", SPR_MENU_OAM_SUB( 3 ), SPR_MENU_PAL_SUB( 3 ), tileCnt,
-                                  256 - 29, 192 - 3 * 29, 32, 32, false, false, false,
+                                  256 - 29, 192 - 3 * 29, 32, 32, false, false, p_noPic,
                                   OBJPRIORITY_2, p_bottom );
         tileCnt = IO::loadSprite( "MM/save", SPR_MENU_OAM_SUB( 4 ), SPR_MENU_PAL_SUB( 4 ), tileCnt,
-                                  256 - 29, 192 - 2 * 29, 32, 32, false, false, false,
+                                  256 - 29, 192 - 2 * 29, 32, 32, false, false, p_noPic,
                                   OBJPRIORITY_2, p_bottom );
         tileCnt = IO::loadSprite( "MM/settings", SPR_MENU_OAM_SUB( 5 ), SPR_MENU_PAL_SUB( 5 ),
-                                  tileCnt, 256 - 29, 192 - 1 * 29, 32, 32, false, false, false,
+                                  tileCnt, 256 - 29, 192 - 1 * 29, 32, 32, false, false, p_noPic,
                                   OBJPRIORITY_2, p_bottom );
 
         tileCnt = IO::loadSprite( "MM/select", SPR_MENU_SEL_OAM_SUB, SPR_MENU_SEL_PAL_SUB, tileCnt,
@@ -172,6 +183,25 @@ namespace NAV {
         tileCnt = IO::loadSprite( SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16, 16,
                                   x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, true,
                                   OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+
+        // arrows
+        for( u8 i = 0; i < 6; ++i ) {
+            IO::loadSprite( SPR_ARROW_UP_OAM_SUB( i ), SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16, 0, 0,
+                            0, false, false, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+            IO::loadSprite( SPR_ARROW_DOWN_OAM_SUB( i ), SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16, 0, 0,
+                            0, true, true, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        }
+        tileCnt = IO::loadSprite( SPR_ARROW_UP_OAM_SUB( 0 ), SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16,
+                                  arrow_upPal, arrow_upTiles, arrow_upTilesLen, false, false, true,
+                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+
+        // mbox
+        for( u8 i = 0; i < 9; ++i ) {
+            IO::loadSprite( SPR_MSGBOX_OAM_SUB + 10 - i, SPR_MSGBOX_PAL_SUB, tileCnt, 64 + 16 * i,
+                            32, 32, 64, 0, 0, 0, false, true, true, OBJPRIORITY_3, true );
+        }
+        tileCnt = IO::loadSprite( "UI/mbox1", SPR_MSGBOX_OAM_SUB, SPR_MSGBOX_PAL_SUB, tileCnt, 32,
+                                  32, 32, 64, false, false, true, OBJPRIORITY_3, true );
 
         // Choice boxes
 
@@ -186,7 +216,7 @@ namespace NAV {
                                       false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
                 tileCnt
                     = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
-                                      29 + 16, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                      29 + 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
                                       noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
                                       false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             } else {
@@ -196,19 +226,19 @@ namespace NAV {
                                 noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
                                 p_bottom, OBJMODE_BLENDED );
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
-                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 16,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 11,
                                 42 + i * 36, 16, 32, noselection_96_32_2Pal,
                                 noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
                                 true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             }
-            for( u8 j = 2; j < 5; j++ ) {
+            for( u8 j = 2; j < 7; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
-                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 16,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 11,
                                 42 + i * 36, 16, 32, noselection_96_32_2Pal,
                                 noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
                                 true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             }
-            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 42 + i * 36,
                             16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
                             noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
@@ -222,31 +252,35 @@ namespace NAV {
                             noselection_96_32_1Pal, noselection_96_32_1Tiles,
                             noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
                             p_bottom, OBJMODE_BLENDED );
-            for( u8 j = 1; j < 5; j++ ) {
+            for( u8 j = 1; j < 7; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
-                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 16,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 11,
                                 42 + i * 36, 16, 32, noselection_96_32_2Pal,
                                 noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
                                 true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             }
-            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16,
                             42 + i * 36, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
                             noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
                             OBJMODE_BLENDED );
         }
 
+        IO::copySpritePal( arrow_upPal, SPR_X_PAL_SUB, 0, 2 * 4, p_bottom );
+        IO::copySpritePal( x_16_16Pal + 4, SPR_X_PAL_SUB, 4, 2 * 3, p_bottom );
+
         IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( p_bottom );
-        hideMessageBox( );
+        if( !p_noPic ) { hideMessageBox( ); }
     }
 
     void _printMessage( const char* p_message ) {
         printMessage( p_message );
     }
 
-    void doPrintMessage( const char* p_message, style p_style ) {
-        u16 x = 12, y = 192 - 40;
+    void doPrintMessage( const char* p_message, style p_style, u16 p_item = 0,
+                         const ITEM::itemData* p_data = 0 ) {
+        u16 x = 12, y = 192 - 40, hg = 32;
         if( p_message ) {
             if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE ) {
                 IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
@@ -258,7 +292,7 @@ namespace NAV {
                 }
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 2, 2 );
-            } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE ) {
+            } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE || p_style == MSG_ITEM ) {
                 IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
 
@@ -269,6 +303,24 @@ namespace NAV {
 
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
+            } else if( p_style == MSG_MART_ITEM ) {
+                std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+                TEXT_CACHE = "";
+                IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 51, 32, 64,
+                                 false, false, false, OBJPRIORITY_0, false );
+                for( u8 i = 0; i < 13; ++i ) {
+                    IO::loadSpriteB( SPR_MSGBOX_OAM + i + 1, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 51,
+                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
+                }
+
+                IO::regularFont->setColor( 3, 1 );
+                IO::regularFont->setColor( 0, 2 );
+                x = 54, y = 192 - 50, hg = 64;
+
+                u16 lns = IO::regularFont->printBreakingStringC(
+                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, false, -1 );
+                if( lns == 3 ) { y = 192 - 44; }
+                if( lns <= 2 ) { y = 192 - 38; }
             }
         }
 
@@ -279,18 +331,29 @@ namespace NAV {
             TEXT_CACHE = TEXT_CACHE + p_message;
             // TODO: Auto rotate msgbox text.
             /* auto ln = */ IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF,
-                                                            256, IO::font::LEFT, 16 );
-            u16 tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, SPR_MSG_GFX, x, y, 64, 32, TEXT_BUF,
-                                           64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
-            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32,
-                                       TEXT_BUF + 64 * 32, 64 * 32 / 2, false, false, false,
+                                                            256 - ( 64 * !!p_item ), IO::font::LEFT,
+                                                            16 - ( 4 * !!p_item ), 64, hg );
+            u16 tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
+            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, hg, TEXT_BUF,
+                                       64 * hg / 2, false, false, false, OBJPRIORITY_0, false );
+            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, hg,
+                                       TEXT_BUF + 64 * hg, 64 * hg / 2, false, false, false,
                                        OBJPRIORITY_0, false );
-            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, 32,
-                                       TEXT_BUF + 2 * 64 * 32, 64 * 32 / 2, false, false, false,
+            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, hg,
+                                       TEXT_BUF + 2 * 64 * hg, 64 * hg / 2, false, false, false,
                                        OBJPRIORITY_0, false );
-            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64, 32,
-                                       TEXT_BUF + 3 * 64 * 32, 64 * 32 / 2, false, false, false,
-                                       OBJPRIORITY_0, false );
+            if( !p_item ) {
+                tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64, hg,
+                                           TEXT_BUF + 3 * 64 * hg, 64 * hg / 2, false, false, false,
+                                           OBJPRIORITY_0, false );
+            } else if( !p_data || p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
+                tileCnt = IO::loadItemIconB( p_item, 16, 192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt,
+                                             false );
+            } else if( p_data && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
+                MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
+                tileCnt = IO::loadTMIconB( move.m_type, MOVE::isFieldMove( p_data->m_param2 ), 16,
+                                           192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt, false );
+            }
 
             if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
                 // "Continue" char
@@ -370,14 +433,14 @@ namespace NAV {
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 6; j++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
             }
         }
         for( u8 i = 2; i < 4; i++ ) {
-            for( u8 j = 0; j < 6; j++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
             }
         }
@@ -436,7 +499,7 @@ namespace NAV {
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 6; j++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
             }
@@ -450,7 +513,7 @@ namespace NAV {
             for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
 
             for( u8 i = 0; i < p_choices.size( ); i++ ) {
-                for( u8 j = 0; j < 6; j++ ) {
+                for( u8 j = 0; j < 8; j++ ) {
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
                 }
 
@@ -681,7 +744,7 @@ namespace NAV {
 
         oam[ SPR_X_OAM_SUB ].isHidden = false;
         for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 6; j++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
             }
 
@@ -728,13 +791,13 @@ namespace NAV {
                        IO::choiceBox::BACK_CHOICE ) );
 
         return res;
-    } // namespace NAV
+    }
 
     void selectMenuItem( u8 p_selection ) {
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 6; j++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
             }
@@ -752,6 +815,446 @@ namespace NAV {
         init( );
         if( res != IO::choiceBox::BACK_CHOICE ) {
             handleMenuSelection( NAV::menuOption( res ), p_path );
+        }
+    }
+
+    std::vector<std::pair<IO::inputTarget, u8>>
+    drawItemChoice( const std::vector<std::pair<u16, u32>>& p_offeredItems,
+                    const std::vector<std::string>&         p_itemNames,
+                    const std::vector<ITEM::itemData>& p_data, u8 p_paymentMethod,
+                    u8 p_firstItem ) {
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        FADE_SUB_DARK( );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
+
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 471 + p_paymentMethod ),
+                  p_paymentMethod == 0
+                      ? SAVE::SAV.getActiveFile( ).m_money
+                      : ( p_paymentMethod == 1 ? SAVE::SAV.getActiveFile( ).m_battlePoints
+                                               : SAVE::SAV.getActiveFile( ).m_coins ) );
+        IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        oam[ SPR_X_OAM_SUB ].isHidden = false;
+
+        // next page (TODO)
+        // prev page (TODO)
+
+        for( u8 i = 0; i < 6; ++i ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
+            }
+            oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
+        }
+
+        for( u8 i = 0; i < std::min( u32( 6 ), u32( p_offeredItems.size( ) - p_firstItem ) );
+             i++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+
+                if( i & 1 ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].x = 130 + 15 * j;
+                } else {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].x = 6 + 15 * j;
+                }
+            }
+
+            if( p_data[ p_firstItem + i ].m_itemType != ITEM::ITEMTYPE_TM ) {
+                IO::loadItemIcon(
+                    p_offeredItems[ p_firstItem + i ].first, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y, SPR_ITEM_OAM_SUB( i ),
+                    SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
+            } else {
+                MOVE::moveData move = MOVE::getMoveData( p_data[ p_firstItem + i ].m_param2 );
+                IO::loadTMIcon(
+                    move.m_type, MOVE::isFieldMove( p_data[ p_firstItem + i ].m_param2 ),
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                    SPR_ITEM_OAM_SUB( i ), SPR_ITEM_PAL_SUB( i ),
+                    oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
+            }
+
+            if( IO::regularFont->stringWidthC( p_itemNames[ p_firstItem + i ].c_str( ) ) <= 85 ) {
+                IO::regularFont->printStringC( p_itemNames[ p_firstItem + i ].c_str( ),
+                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
+                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true,
+                                               IO::font::CENTER );
+            } else {
+                IO::regularFont->printStringC( p_itemNames[ p_firstItem + i ].c_str( ),
+                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 112,
+                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true,
+                                               IO::font::RIGHT );
+            }
+            snprintf( buffer, 90, "$%lu", p_offeredItems[ p_firstItem + i ].second );
+            IO::regularFont->setColor( 0, 2 );
+            IO::regularFont->printStringC( buffer, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 114,
+                                           oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 16, true,
+                                           IO::font::RIGHT );
+
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 120,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                           i ) );
+        }
+
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::EXIT_CHOICE ) );
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::BACK_CHOICE ) );
+
+        if( p_firstItem ) { // allow prev page
+            res.push_back( std::pair(
+                IO::inputTarget( 0, 0, 0 ) /* oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y -
+                                 8, oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 )*/
+                ,
+                IO::choiceBox::PREV_PAGE_CHOICE ) );
+        }
+
+        if( size_t( p_firstItem + 6 ) < p_offeredItems.size( ) ) { // allow next page
+            res.push_back( std::pair(
+                IO::inputTarget( 0, 0, 0 ) /* oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y -
+                                 8, oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 )*/
+                ,
+                IO::choiceBox::NEXT_PAGE_CHOICE ) );
+        }
+
+        IO::updateOAM( true );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
+        IO::fadeScreen( IO::fadeType::UNFADE, true, false );
+        bgUpdate( );
+        return res;
+    }
+
+    void selectItem( std::pair<u16, u32> p_item, const ITEM::itemData& p_itemData,
+                     const std::string& p_descr, u8 p_selection ) {
+
+        IO::printRectangle( 128, 0, 255, 40, true, 0 );
+
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 474 ),
+                  SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( p_itemData.m_itemType ),
+                                                          p_item.first ) );
+        IO::regularFont->printStringC( buffer, 254, 2, true, IO::font::RIGHT );
+
+        selectMenuItem( p_selection % 6 );
+        doPrintMessage( p_descr.c_str( ), MSG_MART_ITEM, p_item.first, &p_itemData );
+    }
+
+    std::vector<std::pair<IO::inputTarget, s32>> drawCounter( s32 p_min, s32 p_max ) {
+        std::vector<std::pair<IO::inputTarget, s32>> res
+            = std::vector<std::pair<IO::inputTarget, s32>>( );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        for( u8 i = 0; i < 6; ++i ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
+            }
+            oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
+        }
+
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       p_min - 1 ) );
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       0 ) );
+
+        s32 mx = p_max, dd = 1;
+        if( -p_min > p_max ) { mx = p_max; }
+
+        u8 digs = 0;
+        for( auto i = mx; i > 0; i /= 10, ++digs, dd *= 10 ) {}
+        dd /= 10;
+
+        // counter box
+        for( u8 j = 0; j < 8; j++ ) {
+            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + j ].isHidden = false;
+            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + j ].x        = 78 + 12 * j;
+            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + j ].y        = 88;
+        }
+
+        // confirm
+        for( u8 j = 0; j < 8; j++ ) {
+            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].isHidden = false;
+            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].x        = 92 + 8 * j;
+            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].y        = 140;
+        }
+
+        // up / down
+
+        for( u8 i = 0; i < digs; ++i, dd /= 10 ) {
+            oam[ SPR_ARROW_UP_OAM_SUB( i ) ].isHidden = false;
+            oam[ SPR_ARROW_UP_OAM_SUB( i ) ].x        = 128 - ( digs * 10 ) + i * 20;
+            oam[ SPR_ARROW_UP_OAM_SUB( i ) ].y        = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y - 4;
+
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_ARROW_UP_OAM_SUB( i ) ].x,
+                                                       oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y - 4,
+                                                       oam[ SPR_ARROW_UP_OAM_SUB( i ) ].x + 16,
+                                                       oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8 ),
+                                      dd ) );
+
+            oam[ SPR_ARROW_DOWN_OAM_SUB( i ) ].isHidden = false;
+            oam[ SPR_ARROW_DOWN_OAM_SUB( i ) ].x        = 128 - ( digs * 10 ) + i * 20;
+            oam[ SPR_ARROW_DOWN_OAM_SUB( i ) ].y = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 20;
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_ARROW_DOWN_OAM_SUB( i ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 24,
+                                            oam[ SPR_ARROW_DOWN_OAM_SUB( i ) ].x + 16,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 36 ),
+                           -dd ) );
+        }
+
+        IO::regularFont->printString(
+            GET_STRING( 323 ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 36,
+            oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, true, IO::font::CENTER );
+
+        res.push_back( std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x,
+                                                   oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y,
+                                                   oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 64,
+                                                   oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 32 ),
+                                  p_min - 2 ) );
+
+        IO::updateOAM( true );
+        return res;
+    }
+
+    void updateCounterValue( s32 p_newValue, u8 p_selectedDigit, u8 p_numDigs ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        IO::printRectangle( oam[ SPR_ARROW_UP_OAM_SUB( 0 ) ].x,
+                            oam[ SPR_ARROW_UP_OAM_SUB( 0 ) ].y + 12,
+                            oam[ SPR_ARROW_UP_OAM_SUB( p_numDigs - 1 ) ].x + 16,
+                            oam[ SPR_ARROW_UP_OAM_SUB( 0 ) ].y + 32, true, 0 );
+        BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
+        BG_PALETTE_SUB[ IO::BLUE2_IDX ] = IO::BLUE2;
+        for( u8 dg = p_numDigs; dg > 0; dg--, p_newValue /= 10 ) {
+            if( dg - 1 == p_selectedDigit ) {
+                IO::regularFont->setColor( 0, 0 );
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
+            } else {
+                IO::regularFont->setColor( 0, 0 );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            }
+
+            IO::regularFont->printString( std::to_string( p_newValue % 10 ).c_str( ),
+                                          oam[ SPR_ARROW_UP_OAM_SUB( dg - 1 ) ].x + 7,
+                                          oam[ SPR_ARROW_UP_OAM_SUB( dg - 1 ) ].y + 13, true,
+                                          IO::font::CENTER );
+        }
+    }
+
+    void hoverCounterButton( s32 p_min, s32 p_max, s32 p_button ) {
+        (void) p_max;
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        if( p_button == p_min - 2 ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].palette = SPR_BOX_SEL_PAL_SUB;
+            }
+        } else {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].palette = SPR_BOX_PAL_SUB;
+            }
+        }
+        IO::updateOAM( true );
+    }
+
+    s32 getItemCount( std::pair<u16, u32> p_item, const ITEM::itemData& p_itemData,
+                      const std::string& p_name, u8 p_paymentMethod ) {
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        IO::printRectangle( 0, 40, 255, 192, true, 0 );
+
+        // Compute max amount of the selected item the player can buy
+
+        s32 mx = 0;
+        if( p_paymentMethod == 0 ) {
+            mx = SAVE::SAV.getActiveFile( ).m_money / p_item.second;
+        } else if( p_paymentMethod == 1 ) {
+            mx = SAVE::SAV.getActiveFile( ).m_battlePoints / p_item.second;
+        } else if( p_paymentMethod == 2 ) {
+            mx = SAVE::SAV.getActiveFile( ).m_coins / p_item.second;
+        }
+
+        mx = std::max( s32( 0 ),
+                       (s32) std::min( mx, s32( 999
+                                                - SAVE::SAV.getActiveFile( ).m_bag.count(
+                                                    BAG::toBagType( p_itemData.m_itemType ),
+                                                    p_item.first ) ) ) );
+
+        char buffer[ 100 ];
+        s32  res = 0;
+        if( mx == 0 ) {
+            IO::printRectangle( 0, 40, 255, 192, true, 0 );
+            init( true );
+            for( u8 i = 0; i < 6; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
+            for( u8 i = 0; i < 11; ++i ) {
+                oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false;
+                oam[ SPR_MSGBOX_OAM_SUB + i ].y        = 32;
+            }
+
+            IO::updateOAM( true );
+
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->printBreakingStringC( GET_STRING( 479 + p_paymentMethod ), 40, 38,
+                                                   256 - 80, true );
+
+            waitForInteract( );
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            return res;
+        } else if( mx > 0 ) {
+            snprintf( buffer, 100, GET_STRING( 475 ), p_name.c_str( ) );
+
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+
+            for( u8 i = 0; i < 11; ++i ) { oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false; }
+
+            IO::regularFont->printBreakingStringC( buffer, 40, 38, 256 - 80, true );
+
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+
+            IO::counter c   = IO::counter( 0, mx );
+            u8          mdg = 0;
+            for( auto tmp = mx; tmp > 0; tmp /= 10, ++mdg ) {}
+
+            res = c.getResult(
+                [ & ]( ) { return drawCounter( 0, mx ); },
+                [ & ]( u32 p_newValue, u8 p_selDig ) {
+                    updateCounterValue( p_newValue, p_selDig, mdg );
+                },
+                [ & ]( s32 p_hoveredButton ) { hoverCounterButton( 0, mx, p_hoveredButton ); }, 1 );
+            if( !res || res == -1 ) { return res; }
+        } else {
+            res = 1;
+        }
+
+        // make the player confirm the choice
+        IO::printRectangle( 0, 40, 255, 192, true, 0 );
+        init( true );
+        for( u8 i = 0; i < 6; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
+        for( u8 i = 0; i < 11; ++i ) {
+            oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false;
+            oam[ SPR_MSGBOX_OAM_SUB + i ].y        = 16;
+        }
+
+        u32 cost = res * p_item.second;
+
+        snprintf( buffer, 99, GET_STRING( 476 + p_paymentMethod ), p_name.c_str( ), res, cost );
+        IO::yesNoBox yn;
+        auto         conf = yn.getResult(
+            [ & ]( ) {
+                auto tmpres = printYNMessage( 0, MSG_NORMAL, 253 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::regularFont->printBreakingStringC( buffer, 40, 22, 256 - 80, true );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                return tmpres;
+            },
+            [ & ]( IO::yesNoBox::selection p_selection ) {
+                printYNMessage( 0, MSG_NORMAL, p_selection == IO::yesNoBox::NO );
+            } );
+        if( conf == IO::yesNoBox::NO ) { return 0; }
+        return res;
+    }
+
+    void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod ) {
+        std::vector<std::string>    names = std::vector<std::string>( );
+        std::vector<std::string>    descr = std::vector<std::string>( );
+        std::vector<ITEM::itemData> data  = std::vector<ITEM::itemData>( );
+
+        for( auto i : p_offeredItems ) {
+            data.push_back( ITEM::getItemData( i.first ) );
+            auto nm = ITEM::getItemName( i.first );
+            if( data.back( ).m_itemType == ITEM::ITEMTYPE_TM ) {
+                nm += ": " + MOVE::getMoveName( data.back( ).m_param2 );
+                descr.push_back( MOVE::getMoveDescr( data.back( ).m_param2 ) );
+            } else {
+                descr.push_back( ITEM::getItemDescr( i.first ) );
+            }
+            names.push_back( nm );
+        }
+
+        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        hideMessageBox( );
+
+        u8 curPg = 0, oldsel = 0;
+        loop( ) {
+            // Make player select an item
+            auto curItm = cb.getResult(
+                [ & ]( u8 p_page ) {
+                    curPg = p_page;
+                    return drawItemChoice( p_offeredItems, names, data, p_paymentMethod,
+                                           6 * p_page );
+                },
+                [ & ]( u8 p_selection ) {
+                    selectItem( p_offeredItems[ 6 * curPg + p_selection ],
+                                data[ 6 * curPg + p_selection ], descr[ 6 * curPg + p_selection ],
+                                6 * curPg + p_selection );
+                },
+                oldsel, IO::choiceBox::DEFAULT_TICK, curPg );
+
+            oldsel = curItm;
+
+            if( curItm == IO::choiceBox::BACK_CHOICE || curItm == IO::choiceBox::EXIT_CHOICE ) {
+                dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+                init( true );
+                hideMessageBox( );
+                break;
+            }
+
+            curItm += 6 * curPg;
+
+            // Make player choose how many of the chosen item they want to buy
+
+            s32 cnt = getItemCount( p_offeredItems[ curItm ], data[ curItm ], names[ curItm ],
+                                    p_paymentMethod );
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            init( true );
+
+            if( cnt == -1 ) {
+                hideMessageBox( );
+                break;
+            }
+
+            if( cnt > 0 ) {
+                if( p_paymentMethod == 0 ) {
+                    SAVE::SAV.getActiveFile( ).m_money -= p_offeredItems[ curItm ].second * cnt;
+                } else if( p_paymentMethod == 1 ) {
+                    SAVE::SAV.getActiveFile( ).m_battlePoints
+                        -= p_offeredItems[ curItm ].second * cnt;
+                } else if( p_paymentMethod == 2 ) {
+                    SAVE::SAV.getActiveFile( ).m_coins -= p_offeredItems[ curItm ].second * cnt;
+                }
+                SAVE::SAV.getActiveFile( ).m_bag.insert(
+                    BAG::toBagType( data[ curItm ].m_itemType ), p_offeredItems[ curItm ].first,
+                    cnt );
+            }
         }
     }
 
@@ -815,7 +1318,7 @@ namespace NAV {
         if( pressed & KEY_SELECT ) {
             std::vector<u16> choices
                 = { DESQUID_STRING + 46, DESQUID_STRING + 47, DESQUID_STRING + 48,
-                    DESQUID_STRING + 50, DESQUID_STRING + 51 };
+                    DESQUID_STRING + 50, DESQUID_STRING + 51, DESQUID_STRING + 52 };
 
             IO::choiceBox test = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
             switch( test.getResult( GET_STRING( DESQUID_STRING + 49 ), MSG_NOCLOSE, choices ) ) {
@@ -907,6 +1410,15 @@ namespace NAV {
             }
             case 4: {
                 SPX::runInitialPkmnSelection( );
+                break;
+            }
+            case 5: {
+                init( );
+                std::vector<std::pair<u16, u32>> items
+                    = { { I_POKE_BALL, 200 },        { I_POTION, 300 },   { I_REVIVE, 1500 },
+                        { I_ANTIDOTE, 100 },         { I_TM04, 100000 },  { I_TR90, 5000 },
+                        { I_TOPO_BERRY, 100000000 }, { I_ORAN_BERRY, 20 } };
+                MAP::curMap->runPokeMart( items );
                 break;
             }
             }

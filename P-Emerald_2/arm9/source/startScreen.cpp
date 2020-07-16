@@ -202,9 +202,9 @@ namespace SAVE {
                 || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playCry( PKMN_RAYQUAZA );
                 for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); };
-                IO::clearScreenConsole( true, true );
-                IO::clearScreen( true, false, true );
                 IO::fadeScreen( IO::CLEAR_DARK, true, true );
+                IO::clearScreenConsole( true, true );
+                IO::clearScreen( true, true, true );
 
                 break;
             }
@@ -767,7 +767,7 @@ namespace SAVE {
                 IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
 
                 FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 500,
-                                     256 * 192, true );
+                                     1, 256 * 192, true );
 
                 auto res = cb.getResult(
                     [ & ]( u8 p_slot ) {

@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace IO {
     /*
-     * @brief: Runs a message box with a YES and a NO choice.
+     * @brief: Makes the player select one out of a set of different choices.
      */
     class choiceBox {
       public:

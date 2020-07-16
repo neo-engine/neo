@@ -70,13 +70,9 @@ namespace NAV {
     /*
      * @brief: Initializes the bottom screen with the main menu
      */
-    void init( bool p_bottom = true );
+    void init( bool p_noPic = false, bool p_bottom = true );
 
-    //    void draw( bool p_initMainSprites = false, u8 p_newIdx = (u8) 255 );
-    //    void showNewMap( u8 p_bank );
-    //    void updateMap( u16 p_map );
     void handleInput( const char* p_path );
-    //    void home( );
 
-    //    extern backgroundSet BGs[ MAXBG ];
+    void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod );
 } // namespace NAV

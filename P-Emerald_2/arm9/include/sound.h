@@ -131,7 +131,7 @@ namespace SOUND {
         case L_ROUTE_105:
         case L_ROUTE_106:
         case L_ROUTE_107:
-            //            return MOD_ROUTE_104;
+            return MOD_ROUTE_104;
         case L_ROUTE_110:
         case L_ROUTE_111:
         case L_ROUTE_112:
@@ -143,11 +143,19 @@ namespace SOUND {
             //            return MOD_ROUTE_118;
         case L_ROUTE_120:
         case L_ROUTE_121:
-            //            return MOD_ROUTE_120;
+            return MOD_ROUTE_120;
         case L_ROUTE_123:
             return MOD_ROUTE_123;
         case L_CLIFFELTA_CITY:
             return MOD_CLIFFELTA_CITY;
+        case L_LITTLEROOT_TOWN:
+            return MOD_LITTLEROOT_TOWN;
+        case L_OLDALE_TOWN:
+            return MOD_OLDALE_TOWN;
+        case L_PETALBURG_CITY:
+            return MOD_PETALBURG_CITY;
+        case L_RUSTBORO_CITY:
+            return MOD_RUSTBORO_CITY;
         case L_FALLARBOR_TOWN:
             return MOD_FALLARBOR_TOWN;
         case L_METEOR_FALLS:
@@ -169,7 +177,7 @@ namespace SOUND {
             return MOD_CAVE_FORESTS;
         default:
             //                return MOD_ABANDONED_SHIP;
-            return MOD_SHOAL_CAVE;
+            return rand( ) % MSL_NSONGS;
         }
     }
 

@@ -115,12 +115,13 @@ const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     { "PKMN Spawn" },
     { "Item Spawn" },
     { "View Boxes" },
-    { "Tokens of god being|" },
+    { "Tokens of god-being|" },
 
     // 50
 
     { "RND Badge" },
     { "Init PKMN" },
+    { "Pok\xe9Mart" },
 };
 
 #endif
@@ -933,5 +934,30 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
       "wo Abenteuer, Tr\xe4ume und Freundschaften warten." },
     { "Well, I'll be expecting you later.\nCome see me in my Pok\xe9mon Lab.",
       "Ah, komm sp\xe4ter in mein Pok\xe9mon-\nLabor, ich erwarte dich dort." },
+    { "Buy", "Kaufen" },
+    { "Sell", "Verkaufen" },
+
+    // 470
+
+    { "Welcome!\nHow may I help you today?", "Willkommen!\nWie kann ich helfen?" },
+    { "Money: $%lu", "Geld: $%lu" },
+    { "BP: %lu", "GP: %lu" },
+    { "Coins: %lu", "M\xfcnzen: %lu" },
+    { "In Bag: %lu", "Beutel: %lu" },
+
+    { "%s, sure!\nHow many do you need?", "%s, gerne!\nWie viele Exemplare ben\xf6tigst du?" },
+    { "%s, and you want %ld?\nThis will be $%lu then.", "%s und du m\xf6"
+                                                        "chtest %ld?\nDas macht dann $%lu." },
+    { "%s, and you want %ld?\nThis will be %lu BP then.", "%s und du m\xf6"
+                                                          "chtest %ld?\nDas macht dann %lu GP." },
+    { "%s, and you want %ld?\nThis will be %lu coins then.",
+      "%s und du m\xf6"
+      "chtest %ld?\nDas macht dann %lu M\xfcnzen." },
+    { "You don't have enough money.", "Du hast nicht genug Geld." },
+
+    // 480
+
+    { "You don't have enough BP.", "Du hast nicht genug GP." },
+    { "You don't have enough coins.", "Du hast nicht genug M\xfcnzen." },
 
 };
