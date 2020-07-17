@@ -181,7 +181,7 @@ namespace BATTLE {
         IO::initOAMTable( false );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
-        u16 tileCnt = SPR_PKMN_GFX( 4 );
+        u16 tileCnt = SPR_PKMN_GFX( 4 ) + 16;
 
         // platforms
         tileCnt = IO::loadPlatform( _platform2, 144, OPP_PLAT_Y, SPR_PLATFORM_OAM, SPR_PLATFORM_PAL,
@@ -204,9 +204,9 @@ namespace BATTLE {
         // Preload other sprites
         // HP "bars"
         // opponent
-        tileCnt = IO::loadSprite( "BT/nmbg", SPR_STATUSBG_OAM( 0 ), SPR_STATUSBG_PAL, tileCnt, OPP_1_HP_X - 96,
-                                  OPP_1_HP_Y, 64, 32, false, false, true, OBJPRIORITY_3, false,
-                                  OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "BT/nmbg", SPR_STATUSBG_OAM( 0 ), SPR_STATUSBG_PAL, tileCnt,
+                                  OPP_1_HP_X - 96, OPP_1_HP_Y, 64, 32, false, false, true,
+                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_STATUSBG_OAM( 0 ) + 1, SPR_STATUSBG_PAL,
                         IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OPP_1_HP_X - 32,
                         OPP_1_HP_Y, 64, 32, 0, 0, 0, false, true, true, OBJPRIORITY_3, false,
@@ -515,18 +515,195 @@ namespace BATTLE {
         IO::updateOAM( true );
     }
 
-    void battleUI::animateBallRelease( bool p_opponent, u8 p_slot, u8 p_ballId ) const {
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+    void battleUI::animateBallRelease( bool p_opponent, u8 p_pos, u8 p_ballId ) const {
+        u16 x = ( _mode == SINGLE ) ? ( p_opponent ? PKMN_OPP_1_X_SINGLE : PKMN_OWN_1_X_SINGLE )
+                                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_X : PKMN_OPP_1_X )
+                                                     : ( p_pos ? PKMN_OWN_2_X : PKMN_OWN_1_X ) ) );
+        u16 y = ( _mode == SINGLE ) ? ( p_opponent ? PKMN_OPP_1_Y_SINGLE : PKMN_OWN_1_Y_SINGLE )
+                                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
+                                                     : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
+
+        if( !p_opponent ) {
+            x += 24;
+            y += 48;
+        } else {
+            x += 48;
+            y += 48;
+        }
+
+        IO::OamTop->matrixBuffer[ 7 ].hdx = 1 << 9;
+        IO::OamTop->matrixBuffer[ 7 ].vdx = 0;
+        IO::OamTop->matrixBuffer[ 7 ].hdy = 0;
+        IO::OamTop->matrixBuffer[ 7 ].vdy = 1 << 9;
+
+        char buffer[ 50 ];
+        snprintf( buffer, 49, "PB/%hhu/%hhu_", p_ballId, p_ballId );
+
+        IO::loadSprite( ( std::string( buffer ) + "0" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x, y, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        IO::loadSprite( ( std::string( buffer ) + "1" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x - 1, y - 2, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadSprite( ( std::string( buffer ) + "2" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x - 2, y - 1, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        IO::loadSprite( ( std::string( buffer ) + "3" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x - 3, y, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadSprite( ( std::string( buffer ) + "4" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x - 3, y + 1, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        IO::loadSprite( ( std::string( buffer ) + "5" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x - 2, y + 2, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadSprite( ( std::string( buffer ) + "6" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x - 1, y + 4, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        IO::loadSprite( ( std::string( buffer ) + "7" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x, y + 7, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
         SOUND::playSoundEffect( SFX_BATTLE_RECALL );
 
-        // TODO
+        IO::loadSprite( ( std::string( buffer ) + "8" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+        IO::loadSprite( ( std::string( buffer ) + "9" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+        IO::loadSprite( ( std::string( buffer ) + "10" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
+                        false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = false;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 0;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isHidden      = true;
+        IO::updateOAM( false );
     }
 
     void battleUI::animateBallThrow( u8 p_slot, u8 p_ballId ) const {
-        SOUND::playSoundEffect( SFX_BATTLE_THROW );
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+        (void) p_slot;
 
-        // TODO
+        SOUND::playSoundEffect( SFX_BATTLE_THROW );
+
+        u16 x = 0, y = 0;
+
+        char buffer[ 50 ];
+        snprintf( buffer, 49, "PB/%hhu/%hhu_", p_ballId, p_ballId );
+        IO::OamTop->matrixBuffer[ 7 ].hdx = 1 << 8;
+        IO::OamTop->matrixBuffer[ 7 ].vdy = 1 << 8;
+        IO::OamTop->matrixBuffer[ 7 ].vdx = 0;
+        IO::OamTop->matrixBuffer[ 7 ].hdy = 0;
+
+        for( x = 92; x < 184; x++ ) {
+            y    = x * x / 100 - 3 * x + 236;
+            u8 f = x - 92;
+
+            if( x % 2 == 0 ) {
+                IO::OamTop->matrixBuffer[ 7 ].hdx += 5;
+                IO::OamTop->matrixBuffer[ 7 ].vdy += 5;
+            }
+
+            if( ( f % 6 ) == 0 ) {
+                IO::loadSprite(
+                    ( std::string( buffer ) + std::to_string( ( f / 3 + 6 ) % 9 ) ).c_str( ),
+                    SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false, false,
+                    false, OBJPRIORITY_0, false );
+                IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+                IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+                IO::updateOAM( false );
+            }
+
+            if( x % 4 == 2 ) {
+                IO::OamTop->matrixBuffer[ 7 ].hdx++;
+                IO::OamTop->matrixBuffer[ 7 ].vdy++;
+            }
+            if( x % 8 == 4 ) { swiWaitForVBlank( ); }
+        }
+        IO::OamTop->matrixBuffer[ 7 ].hdx = 1 << 9;
+        IO::OamTop->matrixBuffer[ 7 ].vdy = 1 << 9;
+
+        SOUND::playSoundEffect( SFX_BATTLE_JUMPTOBALL );
+        IO::loadSprite( ( std::string( buffer ) + std::to_string( 9 ) ).c_str( ),
+                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
+                        false, false, OBJPRIORITY_0, false );
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadSprite( ( std::string( buffer ) + std::to_string( 10 ) ).c_str( ),
+                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
+                        false, false, OBJPRIORITY_0, false );
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
     }
 
     void battleUI::animateShiny( bool p_opponent, u8 p_slot, u8 p_shinyType ) const {
@@ -1471,13 +1648,11 @@ namespace BATTLE {
             if( !_isWildBattle && !p_slot ) {
                 IO::loadSprite( "BT/in", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32,
-                                32, true, true, false, OBJPRIORITY_3,
-                                true, OBJMODE_BLENDED );
+                                32, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
                 IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32,
-                                32, true, true, false, OBJPRIORITY_3, true,
-                                OBJMODE_BLENDED );
+                                32, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
 
             IO::loadPKMNIcon( p_pokemon->getSpecies( ), oam[ SPR_BATTLE_ICON_OAM_SUB ].x,
@@ -1520,77 +1695,176 @@ namespace BATTLE {
             IO::loadSprite( "BT/ft2", SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
             IO::loadSprite( "BT/ft", SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
         if( p_highlightedButton == 1 ) {
             IO::loadSprite( "BT/pk2", SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
             IO::loadSprite( "BT/pk", SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
         if( p_highlightedButton == 2 ) {
             if( !p_slot && !_isWildBattle ) {
                 IO::loadSprite( "BT/in2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32,
-                                true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
                 IO::loadSprite( "BT/rn2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32,
-                                true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         } else {
             if( !p_slot && !_isWildBattle ) {
                 IO::loadSprite( "BT/in", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32,
-                                true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
                 IO::loadSprite( "bt/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32,
-                                true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         }
         if( p_highlightedButton == 3 ) {
             IO::loadSprite( "BT/bg2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
                             oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
             IO::loadSprite( "BT/bg", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
                             oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true,
-                            true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
     }
 
     void battleUI::animateCapturePkmn( u16 p_pokeball, u8 p_ticks ) {
-        // TODO
+        animateBallThrow( 0, ITEM::itemToBall( p_pokeball ) );
+        char buffer[ 50 ];
+        snprintf( buffer, 49, "PB/%hhu/%hhu_", ITEM::itemToBall( p_pokeball ),
+                  ITEM::itemToBall( p_pokeball ) );
 
-        (void) p_pokeball;
-        (void) p_ticks;
+        u16 x = IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].x;
+        u16 y = IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y;
+
+        hidePkmn( true, 0 );
+
+        x += 3;
+        IO::loadSprite( ( std::string( buffer ) + std::to_string( 9 ) ).c_str( ),
+                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
+                        false, false, OBJPRIORITY_0, false );
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
+
+        x += 3;
+        IO::loadSprite( ( std::string( buffer ) + std::to_string( 0 ) ).c_str( ),
+                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
+                        false, false, OBJPRIORITY_0, false );
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
+        swiWaitForVBlank( );
+
+        SOUND::playSoundEffect( SFX_BATTLE_BALLDROP );
+        for( ; y < OPP_PLAT_Y + 14; ++y ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y = y;
+            IO::updateOAM( false );
+            if( y & 1 ) { swiWaitForVBlank( ); }
+        }
+        for( ; y >= OPP_PLAT_Y; --y ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y = y;
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+        SOUND::playSoundEffect( SFX_BATTLE_BALLDROP );
+        for( ; y < OPP_PLAT_Y + 14; ++y ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y = y;
+            IO::updateOAM( false );
+            if( y & 1 ) { swiWaitForVBlank( ); }
+        }
+
+        // "ticks"
+
+        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        if( !p_ticks ) { goto BREAK; }
+
+        SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
+        for( auto i : { 11, 12, 13, 12, 11, 0 } ) {
+            IO::loadSprite( ( std::string( buffer ) + std::to_string( i ) ).c_str( ),
+                            SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32,
+                            false, false, false, OBJPRIORITY_0, false );
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+            IO::updateOAM( false );
+            for( u8 j = 0; j < 4; ++j ) { swiWaitForVBlank( ); }
+        }
+        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        if( p_ticks == 1 ) { goto BREAK; }
+
+        SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
+        for( auto i : { 14, 15, 16, 15, 14, 0 } ) {
+            IO::loadSprite( ( std::string( buffer ) + std::to_string( i ) ).c_str( ),
+                            SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32,
+                            false, false, false, OBJPRIORITY_0, false );
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+            IO::updateOAM( false );
+            for( u8 j = 0; j < 4; ++j ) { swiWaitForVBlank( ); }
+        }
+        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        if( p_ticks == 2 ) { goto BREAK; }
+
+        SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
+        for( auto i : { 11, 12, 13, 12, 11, 0 } ) {
+            IO::loadSprite( ( std::string( buffer ) + std::to_string( i ) ).c_str( ),
+                            SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32,
+                            false, false, false, OBJPRIORITY_0, false );
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+            IO::updateOAM( false );
+            for( u8 j = 0; j < 4; ++j ) { swiWaitForVBlank( ); }
+        }
+        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        if( p_ticks == 3 ) { goto BREAK; }
+
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].palette = SPR_PKMN_SHADOW_PAL;
+        IO::updateOAM( false );
+        return;
+
+    BREAK:
+
+        SOUND::playSoundEffect( SFX_BATTLE_RECALL );
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = false;
+        IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isHidden      = true;
+        IO::updateOAM( false );
+        showPkmn( true, 0 );
+        return;
     }
 
     void battleUI::animateVolatileStatusCondition( bool p_opponent, u8 p_slot,
@@ -1649,8 +1923,7 @@ namespace BATTLE {
 
             IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true,
-                            OBJMODE_BLENDED );
+                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
             // Moves
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
@@ -1737,14 +2010,14 @@ namespace BATTLE {
             IO::loadSprite( "BT/rn2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
             IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true,
-                            true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
 
         IO::updateOAM( true );

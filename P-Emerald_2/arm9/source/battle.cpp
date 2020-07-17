@@ -854,7 +854,8 @@ namespace BATTLE {
     bool battle::playerCaptures( u16 p_pokeball ) {
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::bag::ITEMS, p_pokeball, 1 );
 
-        u16 ballCatchRate = 2;
+        char buffer[ 100 ];
+        u16  ballCatchRate = 2;
 
         auto plpk   = _field.getPkmn( false, 0 );
         auto wild   = _field.getPkmn( true, 0 );
@@ -944,7 +945,27 @@ namespace BATTLE {
             succ++;
         }
         _battleUI.animateCapturePkmn( p_pokeball, succ );
-        return ( succ == 4 );
+
+        switch( succ ) {
+        default:
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            _battleUI.log( GET_STRING( 487 + succ ) );
+            break;
+        case 4:
+            snprintf( buffer, 99, GET_STRING( 486 ), wild->m_boxdata.m_name );
+            _battleUI.log( buffer );
+            break;
+        }
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        if( succ == 4 ) {
+            wild->m_boxdata.m_ball = ITEM::itemToBall( p_pokeball );
+            return true;
+        }
+        return false;
     }
 
     void battle::handleCapture( ) {
@@ -957,7 +978,8 @@ namespace BATTLE {
             snprintf( buffer, 99, GET_STRING( 174 ), getDisplayName( spid ).c_str( ) );
             _battleUI.log( buffer );
 
-            DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( spid );
+            // TODO
+            // DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( spid );
         }
         _battleUI.handleCapture( _field.getPkmn( true, 0 ) );
 
@@ -989,7 +1011,7 @@ namespace BATTLE {
                 snprintf( buffer, 99, GET_STRING( 179 ), pkmn->m_boxdata.m_name );
                 _battleUI.log( buffer );
             }
-            for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
+            for( u8 i = 0; i < 120; ++i ) { swiWaitForVBlank( ); }
         }
     }
 

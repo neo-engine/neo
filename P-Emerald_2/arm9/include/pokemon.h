@@ -349,12 +349,12 @@ struct pokemon {
     pokemon( boxPokemon& p_boxPokemon );
     pokemon( trainerPokemon& p_trainerPokemon );
     pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme = 0, const char* p_name = 0, u8 p_shiny = 0,
-             bool p_hiddenAbility = false, bool p_isEgg = false, u8 p_ball = 0, u8 p_pokerus = 0,
+             bool p_hiddenAbility = false, bool p_isEgg = false, u8 p_ball = 3, u8 p_pokerus = 0,
              bool p_fatefulEncounter = false );
     pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
              const char* p_ot, u8 p_shiny = 0, bool p_hiddenAbility = false,
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
-             u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0 );
+             u8 p_ball = 3, u8 p_pokerus = 0, u8 p_forme = 0 );
 
     /*
      * @brief: Returns whether the given pkmn can still evolve.

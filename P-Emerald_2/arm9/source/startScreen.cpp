@@ -54,11 +54,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle.h"
 #include "boxViewer.h"
 #include "itemNames.h"
+#include "keyboard.h"
 #include "moveNames.h"
 #include "partyScreen.h"
 #include "specials.h"
 #include "statusScreen.h"
-#include "keyboard.h"
 // END TEST
 #endif
 
@@ -120,25 +120,18 @@ namespace SAVE {
 #ifdef DESQUID
         // BEGIN TEST
 
-//        SAVE::initNewGame( );
+        pokemon testTeam[ 6 ];
+        for( u16 i = 0; i < 6; i++ ) {
+            testTeam[ i ]                 = pokemon( PKMN_GYARADOS, 100, 0, 0, 255, false, i == 3 );
+            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+            SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
+                                                           1 + rand( ) % 100, 0, 0, i, rand( ) % 2,
+                                                           3 * i == 490, rand( ) % 20 ) );
 
-        // auto kb = IO::keyboard( );
-        // kb.getText( 12 );
-
-        /*
-                pokemon testTeam[ 6 ];
-                for( u16 i = 0; i < 6; i++ ) {
-                    testTeam[ i ]                 = pokemon( PKMN_GYARADOS, 100, 0, 0, 255, false, i
-           == 3 ); testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
-                    SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
-                                                                   1 + rand( ) % 100, 0, 0, i, rand(
-           ) % 2, 3 * i == 490, rand( ) % 20 ) );
-
-                    testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
-                    testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
-                    testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
-                }
-        */
+            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
+            testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
+            testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
+        }
         //        BAG::bagViewer
         //        btv = BAG::bagViewer( testTeam );
         //        btv.run( );
@@ -160,12 +153,11 @@ namespace SAVE {
 
         //       SOUND::playBGM( MOD_SURFING );
 
-        //        BATTLE::battle bt
-        //            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2
-        //            ),
-        //                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
+        BATTLE::battle bt
+            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
+                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
 
-        //        bt.start( );
+        bt.start( );
 
         // END TEST
 #endif
@@ -741,7 +733,6 @@ namespace SAVE {
         SAV.getActiveFile( ).m_gameType           = p_type;
         SAV.getActiveFile( ).m_options.m_bgIdx    = START_BG;
 
-
         if( p_type == SPECIAL ) { return initSpecialEpisode( p_episode ); }
         if( p_type == NORMAL ) { return initSpecialEpisode( -1 ); }
         return true;
@@ -766,8 +757,8 @@ namespace SAVE {
             loop( ) {
                 IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
 
-                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 500,
-                                     1, 256 * 192, true );
+                FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 500, 1,
+                                     256 * 192, true );
 
                 auto res = cb.getResult(
                     [ & ]( u8 p_slot ) {

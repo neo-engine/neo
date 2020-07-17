@@ -464,10 +464,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "%s was sent to\nthe Pok\xe9mon Storage System.",
       "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt." },
-    { "Box %s is full.", "Box %s ist voll." },
-    { "%s was deposited\nto Box %s.", "%s wurde in\nBox %s abgelegt." },
-    { "There is no space left\nfor additional Pok\xe9mon.",
-      "Du hast keinen Platz\nf\xfcr weitere Pok\xe9mon." },
+    { "Box \x5d%s\" is full.", "Box \x5e%s\x5d ist voll." },
+    { "%s was deposited to Box \x5d%s\".", "%s wurde in Box \x5e%s\x5d abgelegt." },
+    { "There is no space left for additional Pok\xe9mon.",
+      "Du hast keinen Platz f\xfcr weitere Pok\xe9mon." },
     { "%s was released.", "%s wurde wieder\nfreigelassen." },
 
     // 180
@@ -964,4 +964,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "I can pay you $%lu. Is this fine?", "Ich kann $%lu zahlen. Ist das ok?" },
 
     { "Do you really want to toss this item?", "Willst du dieses Item wirklich wegwerfen?" },
+    { "Gotcha! %s was caught!", "Toll! %s wurde gefangen!" },
+    { "Oh, no! It broke free!", "Mist! Es hat sich befreit!" },
+    { "Aww! It appeared to be caught!", "Oh. Fast h\xe4tte es geklappt!" },
+    { "Aargh! Almost had it!", "Mist! Das war knapp!" },
+
+    // 490
+
+    { "Shoot! It was so close, too!", "Verflixt! Es war doch fast gefangen." },
 };
