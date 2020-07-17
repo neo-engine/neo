@@ -329,7 +329,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { " Would you like to save your progress?", " M\xf6"
                                                 "chtest du deinen Fortschritt sichern?" },
     { "Saving a lot of data| Don't turn off the power.\n%s",
-      "Speichere eine Menge Daten| Nicht ausschalten.\n%s" },
+      "Speichere eine Menge Daten| Nicht abschalten.\n%s" },
     { "Saving complete!", "Speichern erfolgreich!" },
 
     { "An error occured.\nProgress not saved.", "Es trat ein Fehler auf\nSpiel nicht gesichert." },

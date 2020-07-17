@@ -141,6 +141,8 @@ namespace MAP {
             FADE_TOP_DARK( );
             bgUpdate( );
 
+            _curX = _curY = 0;
+
             u16 mx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 my = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
@@ -256,12 +258,12 @@ namespace MAP {
         }
 
         // Check if a new slice should be loaded
-        if( ( dir[ p_direction ][ 0 ] == 1 && cx % 32 == 15 )
-            || ( dir[ p_direction ][ 0 ] == -1 && cx % 32 == 14 )
+        if( ( dir[ p_direction ][ 0 ] == 1 && cx % 32 == 16 )
+            || ( dir[ p_direction ][ 0 ] == -1 && cx % 32 == 15 )
             || ( dir[ p_direction ][ 1 ] == 1 && cy % 32 == 16 )
             || ( dir[ p_direction ][ 1 ] == -1 && cy % 32 == 15 ) ) {
             loadSlice( p_direction );
-#ifdef __DESQUID
+#ifdef DESQUID_MORE
             NAV::printMessage( "Load Slice" );
 #endif
         }
@@ -280,8 +282,9 @@ namespace MAP {
             dmaCopy( CUR_SLICE->m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
 
-#ifdef __DESQUID
-            sprintf( buffer, "Switch Slice to (%d, %d)", _curX, _curY );
+#ifdef DESQUID_MORE
+            char buffer[ 100 ];
+            snprintf( buffer, 99, "Switch Slice to (%d, %d)", _curX, _curY );
             NAV::printMessage( buffer );
 #endif
         }
