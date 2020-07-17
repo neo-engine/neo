@@ -291,7 +291,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 70
 
-    { "TOUCH TO START", "BER\x9A"
+    { "TOUCH TO START", "BER\xdc"
                         "HRE, UM ZU STARTEN" },
     { "Continue", "Weiter" },
     { "New Game", "Neues Spiel" },
@@ -946,13 +946,13 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "In Bag: %lu", "Beutel: %lu" },
 
     { "%s, sure!\nHow many do you need?", "%s, gerne!\nWie viele Exemplare ben\xf6tigst du?" },
-    { "%s, and you want %ld?\nThis will be $%lu then.", "%s und du m\xf6"
-                                                        "chtest %ld?\nDas macht dann $%lu." },
-    { "%s, and you want %ld?\nThis will be %lu BP then.", "%s und du m\xf6"
-                                                          "chtest %ld?\nDas macht dann %lu GP." },
-    { "%s, and you want %ld?\nThis will be %lu coins then.",
+    { "%s, and you want %ld? This will be $%lu then.", "%s und du m\xf6"
+                                                       "chtest %ld? Das macht dann $%lu." },
+    { "%s, and you want %ld? This will be %lu BP then.", "%s und du m\xf6"
+                                                         "chtest %ld? Das macht dann %lu GP." },
+    { "%s, and you want %ld? This will be %lu coins then.",
       "%s und du m\xf6"
-      "chtest %ld?\nDas macht dann %lu M\xfcnzen." },
+      "chtest %ld? Das macht dann %lu M\xfcnzen." },
     { "You don't have enough money.", "Du hast nicht genug Geld." },
 
     // 480

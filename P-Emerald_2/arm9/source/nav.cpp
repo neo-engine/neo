@@ -197,7 +197,7 @@ namespace NAV {
 
         // mbox
         for( u8 i = 0; i < 9; ++i ) {
-            IO::loadSprite( SPR_MSGBOX_OAM_SUB + 10 - i, SPR_MSGBOX_PAL_SUB, tileCnt, 64 + 16 * i,
+            IO::loadSprite( SPR_MSGBOX_OAM_SUB + 9 - i, SPR_MSGBOX_PAL_SUB, tileCnt, 64 + 16 * i,
                             32, 32, 64, 0, 0, 0, false, true, true, OBJPRIORITY_3, true );
         }
         tileCnt = IO::loadSprite( "UI/mbox1", SPR_MSGBOX_OAM_SUB, SPR_MSGBOX_PAL_SUB, tileCnt, 32,
@@ -1114,8 +1114,8 @@ namespace NAV {
         if( mx == 0 ) {
             IO::printRectangle( 0, 40, 255, 192, true, 0 );
             init( true );
-            for( u8 i = 0; i < 6; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
-            for( u8 i = 0; i < 11; ++i ) {
+            for( u8 i = 0; i < 128; ++i ) { oam[ i ].isHidden = true; }
+            for( u8 i = 0; i < 10; ++i ) {
                 oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false;
                 oam[ SPR_MSGBOX_OAM_SUB + i ].y        = 32;
             }
@@ -1134,7 +1134,7 @@ namespace NAV {
 
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
-            for( u8 i = 0; i < 11; ++i ) { oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false; }
+            for( u8 i = 0; i < 10; ++i ) { oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false; }
 
             IO::regularFont->printBreakingStringC( buffer, 40, 38, 256 - 80, true );
 
@@ -1158,8 +1158,8 @@ namespace NAV {
         // make the player confirm the choice
         IO::printRectangle( 0, 40, 255, 192, true, 0 );
         init( true );
-        for( u8 i = 0; i < 6; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
-        for( u8 i = 0; i < 11; ++i ) {
+        for( u8 i = 0; i < 128; ++i ) { oam[ i ].isHidden = true; }
+        for( u8 i = 0; i < 10; ++i ) {
             oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false;
             oam[ SPR_MSGBOX_OAM_SUB + i ].y        = 16;
         }
@@ -1415,8 +1415,8 @@ namespace NAV {
             case 5: {
                 init( );
                 std::vector<std::pair<u16, u32>> items
-                    = { { I_POKE_BALL, 200 },        { I_POTION, 300 },   { I_REVIVE, 1500 },
-                        { I_ANTIDOTE, 100 },         { I_TM04, 100000 },  { I_TR90, 5000 },
+                    = { { I_POKE_BALL, 200 },        { I_MASTER_BALL, 10 },  { I_REVIVE, 1500 },
+                        { I_FULL_RESTORE, 100 },     { I_EXP_CANDY_XL, 10 }, { I_TM00, 5000 },
                         { I_TOPO_BERRY, 100000000 }, { I_ORAN_BERRY, 20 } };
                 MAP::curMap->runPokeMart( items );
                 break;
