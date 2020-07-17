@@ -56,7 +56,9 @@ namespace BAG {
         _view = std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>( );
 
         if( (bag::bagType) curBg == bag::TM_HM || (bag::bagType) curBg == bag::KEY_ITEMS ) {
-            if( _context != context::NO_SPECIAL_CONTEXT ) { return; }
+            if( _context != context::NO_SPECIAL_CONTEXT && _context != context::SELL_ITEM ) {
+                return;
+            }
         }
 
         auto sz = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBg );
@@ -113,7 +115,7 @@ namespace BAG {
     }
 
     bool bagViewer::isAllowed( u16 p_itemId ) {
-        if( _context == NO_SPECIAL_CONTEXT ) {
+        if( _context == NO_SPECIAL_CONTEXT || _context == SELL_ITEM ) {
             return true;
         } else if( _context == BATTLE || _context == WILD_BATTLE ) {
             constexpr u16 BATTLE_ITEMS[ 75 ] = {
@@ -393,8 +395,8 @@ namespace BAG {
                                                                     _currentViewStart );
                         done              = isAllowed( ci.first );
                         SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ]
-                            = ( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ]
-                                    + curBgsz - 1 ) % curBgsz;
+                            = ( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] + curBgsz - 1 )
+                              % curBgsz;
                         if( done ) {
                             auto idata                = ITEM::getItemData( ci.first );
                             _view[ _currSelectedIdx ] = std::pair( ci, idata );
@@ -644,9 +646,8 @@ namespace BAG {
             curBg   = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
             curBgsz = SAVE::SAV.getActiveFile( ).m_bag.size( curBg );
 
-
             if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] >= curBgsz ) {
-                SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] = curBgsz;
+                SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] = 0;
             }
 
             initView( );
@@ -661,7 +662,7 @@ namespace BAG {
             curBgsz = SAVE::SAV.getActiveFile( ).m_bag.size( curBg );
 
             if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] >= curBgsz ) {
-                SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] = curBgsz;
+                SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] = 0;
             }
 
             initView( );
@@ -693,33 +694,37 @@ namespace BAG {
                                                               ITEM::itemData* p_data ) {
         auto res = std::vector<bagViewer::choice>( );
 
-        if( canGive( p_itemId ) ) { res.push_back( GIVE_ITEM ); }
+        if( _context != SELL_ITEM ) {
+            if( canGive( p_itemId ) ) { res.push_back( GIVE_ITEM ); }
 
-        if( p_data->m_itemType & ITEM::ITEMTYPE_BERRY ) { res.push_back( VIEW_DETAILS ); }
+            if( p_data->m_itemType & ITEM::ITEMTYPE_BERRY ) { res.push_back( VIEW_DETAILS ); }
 
-        if( ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE
-            || p_data->m_itemType == ITEM::ITEMTYPE_FORMECHANGE
-            || p_data->m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
-            res.push_back( APPLY_ITEM );
-        }
-
-        if( ITEM::isUsable( p_itemId ) ) { res.push_back( USE_ITEM ); }
-
-        if( p_data->m_itemType == ITEM::ITEMTYPE_KEYITEM ) {
-            if( ITEM::isUsable( p_itemId ) ) {
-                if( SAVE::SAV.getActiveFile( ).m_registeredItem != p_itemId ) {
-                    res.push_back( REGISTER_ITEM );
-                } else {
-                    res.push_back( DEREGISTER_ITEM );
-                }
+            if( ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE
+                || p_data->m_itemType == ITEM::ITEMTYPE_FORMECHANGE
+                || p_data->m_itemType == ITEM::ITEMTYPE_EVOLUTION ) {
+                res.push_back( APPLY_ITEM );
             }
-        } else if( p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
-            res.push_back( USE_TM );
-            if( p_data->m_effect == 2 ) { // TR
+
+            if( ITEM::isUsable( p_itemId ) ) { res.push_back( USE_ITEM ); }
+
+            if( p_data->m_itemType == ITEM::ITEMTYPE_KEYITEM ) {
+                if( ITEM::isUsable( p_itemId ) ) {
+                    if( SAVE::SAV.getActiveFile( ).m_registeredItem != p_itemId ) {
+                        res.push_back( REGISTER_ITEM );
+                    } else {
+                        res.push_back( DEREGISTER_ITEM );
+                    }
+                }
+            } else if( p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
+                res.push_back( USE_TM );
+                if( p_data->m_effect == 2 ) { // TR
+                    res.push_back( TOSS_ITEM );
+                }
+            } else {
                 res.push_back( TOSS_ITEM );
             }
         } else {
-            res.push_back( TOSS_ITEM );
+            res.push_back( SELL );
         }
 
         res.push_back( BACK );
@@ -758,15 +763,41 @@ namespace BAG {
         auto curBag     = SAVE::SAV.getActiveFile( ).m_lstBag;
         auto curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
 
+        char buffer[ 100 ];
+
         switch( p_choice ) {
-        case DEREGISTER_ITEM:
-            SAVE::SAV.getActiveFile( ).m_registeredItem = 0;
-            return 0;
-        case REGISTER_ITEM:
-            SAVE::SAV.getActiveFile( ).m_registeredItem = targetItem;
-            return 0;
-        case TOSS_ITEM:
-            SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem );
+        case SELL: {
+            _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
+                                 _currSelectedIdx );
+            if( !idata.m_sellPrice ) { // item cannot be sold
+                _bagUI->printMessage( GET_STRING( 482 ) );
+                waitForInteract( );
+                return 0;
+            }
+
+            auto cnt = SAVE::SAV.getActiveFile( ).m_bag.count( (bag::bagType) curBag, targetItem );
+
+            if( cnt > 1 ) {
+                // make player choose how many items they want to sell
+
+                // TODO
+            }
+
+            u32 sellprice = cnt * idata.m_sellPrice;
+            snprintf( buffer, 99, GET_STRING( 484 ), sellprice );
+
+            IO::yesNoBox yn;
+            if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer, 254 ); },
+                              [ & ]( IO::yesNoBox::selection p_sel ) {
+                                  _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
+                              } )
+                == IO::yesNoBox::NO ) {
+                return 0;
+            }
+
+            SAVE::SAV.getActiveFile( ).m_money += sellprice;
+            SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem, cnt );
+            curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
             if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] == curBagSize ) {
                 if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] > 0 ) {
                     SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ]--;
@@ -774,6 +805,33 @@ namespace BAG {
             }
             initView( );
             return 0;
+        }
+        case DEREGISTER_ITEM:
+            SAVE::SAV.getActiveFile( ).m_registeredItem = 0;
+            return 0;
+        case REGISTER_ITEM:
+            SAVE::SAV.getActiveFile( ).m_registeredItem = targetItem;
+            return 0;
+        case TOSS_ITEM: {
+            IO::yesNoBox yn;
+            if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( GET_STRING( 485 ), 254 ); },
+                              [ & ]( IO::yesNoBox::selection p_sel ) {
+                                  _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
+                              } )
+                == IO::yesNoBox::NO ) {
+                return 0;
+            }
+
+            SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem );
+            curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
+            if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] == curBagSize ) {
+                if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] > 0 ) {
+                    SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ]--;
+                }
+            }
+            initView( );
+            return 0;
+        }
         case USE_ITEM: {
             SAVE::SAV.getActiveFile( ).m_lstUsedItem = targetItem;
 
@@ -793,6 +851,7 @@ namespace BAG {
                         (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, targetItem, 1 );
                 }
 
+                curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
                 if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] == curBagSize ) {
                     if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] > 0 ) {
                         SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ]--;
@@ -836,6 +895,7 @@ namespace BAG {
             // remove item from bag
             if( removeItem ) {
                 SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem, 1 );
+                curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
                 if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] == curBagSize ) {
                     if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] > 0 ) {
                         SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ]--;

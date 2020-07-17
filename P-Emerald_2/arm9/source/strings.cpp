@@ -256,7 +256,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Apply", "Anwenden" },
     { "Register", "Registrieren" },
     { "Use", "Einsetzen" },
-    { "Toss", "Wegwerfen" },
+    { "Toss All", "Alle Wegwerfen" },
     { "Select a move!", "Welche Attacke?" },
 
     // 50
@@ -959,5 +959,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "You don't have enough BP.", "Du hast nicht genug GP." },
     { "You don't have enough coins.", "Du hast nicht genug M\xfcnzen." },
+    { "I cannot buy this item.", "Ich kann dieses Item nicht kaufen." },
+    { "Sell All", "Alle Verkaufen" },
+    { "I can pay you $%lu. Is this fine?", "Ich kann $%lu zahlen. Ist das ok?" },
 
+    { "Do you really want to toss this item?", "Willst du dieses Item wirklich wegwerfen?" },
 };

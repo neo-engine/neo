@@ -614,10 +614,10 @@ namespace BAG {
         } else if( p_data->m_itemType == ITEM::ITEMTYPE_TM
                    && MOVE::isFieldMove( p_data->m_param2 ) ) {
             IO::boldFont->setColor( IO::BLUE_IDX, 2 );
-            IO::boldFont->printChar( 468 + 2, 236, y + 2, true );
+            IO::boldFont->printChar( ITEM::getItemChar( ITEM::ITEMTYPE_TM ), 236, y + 2, true );
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
         } else if( p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
-            IO::boldFont->printChar( 468 + 2, 236, y + 2, true );
+            IO::boldFont->printChar( ITEM::getItemChar( ITEM::ITEMTYPE_TM ), 236, y + 2, true );
         }
 
         IO::regularFont->printStringC( _itemCache[ p_idx ].second.c_str( ), x + 6, y + 2, true );

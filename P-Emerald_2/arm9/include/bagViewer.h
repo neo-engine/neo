@@ -57,6 +57,7 @@ namespace BAG {
             APPLY_ITEM,
             GIVE_ITEM,
             VIEW_DETAILS,
+            SELL,
             BACK,
         };
 
@@ -99,6 +100,8 @@ namespace BAG {
                 return 401;
             case BACK:
                 return 330;
+            case SELL:
+                return 483;
             }
             return 0;
         }
