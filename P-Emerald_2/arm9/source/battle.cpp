@@ -963,6 +963,8 @@ namespace BATTLE {
 
         if( succ == 4 ) {
             wild->m_boxdata.m_ball = ITEM::itemToBall( p_pokeball );
+            if( p_pokeball == I_FRIEND_BALL ) { wild->m_boxdata.m_steps = 200; }
+            if( p_pokeball == I_HEAL_BALL ) { wild->heal( ); }
             return true;
         }
         return false;
@@ -977,6 +979,8 @@ namespace BATTLE {
             SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] |= ( 1 << ( spid % 8 ) );
             snprintf( buffer, 99, GET_STRING( 174 ), getDisplayName( spid ).c_str( ) );
             _battleUI.log( buffer );
+
+            for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
             // TODO
             // DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( spid );
@@ -1088,8 +1092,6 @@ namespace BATTLE {
 
     void battle::useItem( fieldPosition p_target, u16 p_item ) {
         // TODO
-        (void) p_target;
-        (void) p_item;
     }
 
     void battle::sortPkmn( bool p_opponent ) {

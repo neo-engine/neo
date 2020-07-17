@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "battleDefines.h"
 #include "saveGame.h"
+#include "yesNoBox.h"
 
 namespace BATTLE {
     class battleUI {
@@ -44,7 +45,7 @@ namespace BATTLE {
 
         u8 _currentLogLine = 0;
 
-        u8 _curHP[ 2 ][ 2 ] = {{0}};
+        u8 _curHP[ 2 ][ 2 ] = { { 0 } };
 
         void initTop( );
         void initSub( );
@@ -80,6 +81,12 @@ namespace BATTLE {
          * @brief: Plays the boosts animation for the given stat change.
          */
         void animateStatChange( bool p_opponent, u8 p_slot, bool p_down ) const;
+
+        /*
+         * @brief: Shows choice boxes for a yesNoBox.
+         */
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+        printYNMessage( u8 p_selection );
 
       public:
         battleUI( ) {

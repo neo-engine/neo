@@ -55,6 +55,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "BattleBall3.h" //Fainted
 #include "BattleBall4.h" //NA
 
+#include "noselection_96_32_1.h"
+#include "noselection_96_32_2.h"
+#include "noselection_96_32_4.h"
+
 #include "hpbar_battle.h"
 #include "hpbar_battle_opp.h"
 
@@ -99,6 +103,7 @@ namespace BATTLE {
 #define SPR_SHINY_ICON_OAM( p_idx ) ( 62 + ( p_idx ) )
 #define SPR_SHINY_PARTICLE_START_OAM 70
 #define SPR_STAT_CHANGE_PARTICLE_START_OAM 86
+#define SPR_MBOX_START_OAM 86
 #define SPR_BALL_START_OAM 101
 #define SPR_STATUS_BALL_OAM( p_idx ) ( 106 + ( p_idx ) )
 
@@ -127,6 +132,7 @@ namespace BATTLE {
 #define SPR_TYPE_OAM_SUB( p_idx ) ( 40 + ( p_idx ) )
 #define SPR_MOVE_OAM_SUB( p_move ) ( 44 + 6 * ( p_move ) )
 #define SPR_DMG_CAT_OAM_SUB( p_idx ) ( 80 + ( p_idx ) )
+#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 84 + 8 * ( p_pos ) )
 
 #define SPR_BATTLE_FITE_PAL_SUB 0
 #define SPR_BATTLE_BAG_PAL_SUB 1
@@ -134,6 +140,7 @@ namespace BATTLE {
 #define SPR_BATTLE_RUN_PAL_SUB 3
 #define SPR_BATTLE_ICON_PAL_SUB 4
 #define SPR_BOX_PAL_SUB 5
+#define SPR_BOX_SEL_PAL_SUB 6
 #define SPR_TYPE_PAL_SUB( p_idx ) ( 6 + ( p_idx ) )
 #define SPR_DMG_CAT_PAL_SUB( p_idx ) ( 10 + ( p_idx ) )
 
@@ -511,6 +518,69 @@ namespace BATTLE {
                                     SPR_DMG_CAT_PAL_SUB( i ), tileCnt, true, CURRENT_LANGUAGE );
             oam[ SPR_DMG_CAT_OAM_SUB( i ) ].isHidden = true;
         }
+
+        // choice boxes
+
+        for( u8 i = 0; i < 2; i++ ) {
+            u8 pos = 2 * i;
+            if( !i ) {
+                tileCnt
+                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt, 29,
+                                      42 + i * 36, 16, 32, noselection_96_32_1Pal,
+                                      noselection_96_32_1Tiles, noselection_96_32_1TilesLen, false,
+                                      false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                tileCnt
+                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
+                                      29 + 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                      noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
+                                      false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            } else {
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29, 42 + i * 36, 16,
+                                32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                                noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_BLENDED );
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 11,
+                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
+                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
+            for( u8 j = 2; j < 7; j++ ) {
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 11,
+                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
+                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 42 + i * 36,
+                            16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
+        }
+
+        for( u8 i = 0; i < 2; i++ ) {
+            u8 pos = 2 * i + 1;
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131, 42 + i * 36, 16, 32,
+                            noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                            noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
+            for( u8 j = 1; j < 7; j++ ) {
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
+                                oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 11,
+                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
+                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
+                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16,
+                            42 + i * 36, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
+                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
+        }
+        IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
 
         IO::updateOAM( true );
     }
@@ -1095,10 +1165,11 @@ namespace BATTLE {
         char buffer[ 100 ];
         if( p_itms.size( ) == 1 ) {
             snprintf( buffer, 99, GET_STRING( 398 ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
-                      ITEM::getItemName( p_itms[ 0 ] ) );
+                      ITEM::getItemName( p_itms[ 0 ] ).c_str( ) );
         } else if( p_itms.size( ) == 2 ) {
             snprintf( buffer, 99, GET_STRING( 399 ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
-                      ITEM::getItemName( p_itms[ 0 ] ), ITEM::getItemName( p_itms[ 1 ] ) );
+                      ITEM::getItemName( p_itms[ 0 ] ).c_str( ),
+                      ITEM::getItemName( p_itms[ 1 ] ).c_str( ) );
         } else {
             return;
         }
@@ -2023,6 +2094,57 @@ namespace BATTLE {
         IO::updateOAM( true );
     }
 
+    std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+    battleUI::printYNMessage( u8 p_selection ) {
+
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
+            = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        for( u8 i = 0; i < 4; i++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+        for( u8 i = 2; i < 4; i++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+            }
+        }
+
+        if( p_selection >= 254 ) {
+            for( u8 i = 0; i < 12; ++i ) { oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = true; }
+
+            IO::regularFont->printString(
+                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y + 8, true, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y + 32 ),
+                           IO::yesNoBox::YES ) );
+
+            IO::regularFont->printString(
+                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y + 8, true, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y + 32 ),
+                           IO::yesNoBox::NO ) );
+        }
+
+        IO::updateOAM( true );
+        return res;
+    }
+
     void battleUI::handleCapture( pokemon* p_pokemon ) {
         init( );
         IO::initOAMTable( false );
@@ -2036,23 +2158,58 @@ namespace BATTLE {
                             SPR_PKMN_PAL( 0 ), SPR_PKMN_GFX( 0 ), false, p_pokemon->isShiny( ),
                             p_pokemon->isFemale( ), false, false, p_pokemon->getForme( ) );
 
+        IO::loadSprite( "UI/mbox1", SPR_MBOX_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 1 ), 0,
+                        192 - 46, 32, 64, false, false, false, OBJPRIORITY_3, false );
+        for( u8 i = 0; i < 13; ++i ) {
+            IO::loadSprite( SPR_MBOX_START_OAM + 13 - i, SPR_BALL_PAL, SPR_PKMN_GFX( 1 ),
+                            32 + 16 * i, 192 - 46, 32, 64, 0, 0, 0, false, true, false,
+                            OBJPRIORITY_3, false );
+        }
+
         IO::updateOAM( false );
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
 
-        // TODO
-        /*
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
         IO::yesNoBox yn;
         snprintf( buffer, 99, GET_STRING( 141 ), p_pokemon->m_boxdata.m_name );
-        if( yn.getResult( buffer ) ) {
+        IO::regularFont->printBreakingStringC( buffer, 12, 192 - 40, 192, false );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        if( yn.getResult( [ & ]( ) { return printYNMessage( 254 ); },
+                          [ & ]( IO::yesNoBox::selection p_selection ) {
+                              printYNMessage( p_selection == IO::yesNoBox::NO );
+                          } )
+            == IO::yesNoBox::YES ) {
             IO::keyboard kbd;
-            auto         nick = kbd.getText( 10, GET_STRING( 142 ) );
+            IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->printBreakingStringC( GET_STRING( 142 ), 12, 192 - 40, 192, false );
+            auto nick = kbd.getText( 10 );
             if( strcmp( nick.c_str( ), p_pokemon->m_boxdata.m_name )
                 && strcmp( "", nick.c_str( ) ) ) {
                 strcpy( p_pokemon->m_boxdata.m_name, nick.c_str( ) );
                 p_pokemon->m_boxdata.setIsNicknamed( true );
             }
         }
-        */
+        IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
+        for( u8 i = 0; i < 14; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_MBOX_START_OAM + i ].isHidden = true;
+        }
+        IO::updateOAM( false );
+
+        initSub( );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "battlesub2", 512, 49152,
+                             true );
+        u16* pal   = IO::BG_PAL( true );
+        pal[ 0 ]   = 0;
+        pal[ 250 ] = IO::WHITE;
+        pal[ 251 ] = IO::GRAY;
+        pal[ 252 ] = IO::RGB( 18, 22, 31 );
+        pal[ 254 ] = IO::RGB( 31, 18, 18 );
+        pal[ 253 ] = IO::RGB( 0, 0, 25 );
+        pal[ 255 ] = IO::RGB( 23, 0, 0 );
+        resetLog( );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
     }
 
 } // namespace BATTLE
