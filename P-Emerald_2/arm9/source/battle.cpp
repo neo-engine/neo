@@ -55,6 +55,7 @@ namespace BATTLE {
         _opponent = getBattleTrainer( p_opponentId, CURRENT_LANGUAGE );
         for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
+            _yieldEXP[ i ]     = std::set<u8>( );
         }
 
         _policy       = p_policy;
@@ -74,6 +75,7 @@ namespace BATTLE {
 
         _opponent          = battleTrainer( );
         _opponentTeam[ 0 ] = p_opponent;
+        _yieldEXP[ 0 ]     = std::set<u8>( );
         _opponentTeamSize  = 1;
 
         _policy       = p_policy;
@@ -104,6 +106,16 @@ namespace BATTLE {
         _round = 0;
         // Main battle loop
         while( !_maxRounds || ++_round < _maxRounds ) {
+            // register pkmn for exp
+
+            for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++i ) {
+                for( u8 j = 0; j < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++j ) {
+                    if( _field.getPkmn( false, j )->canBattle( ) ) {
+                        _yieldEXP[ i ].insert( _playerPkmnPerm[ j ] );
+                    }
+                }
+            }
+
             battleMoveSelection moves[ 2 ][ 2 ] = { {} }; // fieldPosition -> selected move
 
             // Compute player's moves
@@ -166,7 +178,7 @@ namespace BATTLE {
 
             _battleUI.resetLog( );
 
-            for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 0 ); ++i ) {
+            for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++i ) {
                 moves[ field::OPPONENT_SIDE ][ i ] = getAIMove( i );
             }
 
@@ -327,6 +339,7 @@ namespace BATTLE {
                         _field.executeBattleMove( &_battleUI, sortedMoves[ i ], targets,
                                                   targetedBy );
 
+                        distributeEXP( );
                         checkAndRefillBattleSpots( slot::status::RECALLED );
                     }
 
@@ -345,6 +358,7 @@ namespace BATTLE {
             }
             _field.age( &_battleUI );
 
+            distributeEXP( );
             if( endConditionHit( battleEnd ) ) {
                 endBattle( battleEnd );
                 return battleEnd;
@@ -362,8 +376,9 @@ namespace BATTLE {
         _battleUI.init( );
 
         for( u8 i = 0; i < 6; ++i ) {
-            _opponentPkmnPerm[ i ] = i;
-            _playerPkmnPerm[ i ]   = i;
+            _opponentPkmnPerm[ i ]    = i;
+            _playerPkmnPerm[ i ]      = i;
+            _playerPkmnOrigLevel[ i ] = ( i < _playerTeamSize ) * _playerTeam[ i ].m_level;
         }
 
         sortPkmn( true );
@@ -771,8 +786,7 @@ namespace BATTLE {
 
     bool battle::endConditionHit( battle::battleEndReason& p_out ) {
         if( _isWildBattle && _field.getSlotStatus( true, 0 ) == slot::FAINTED ) {
-            // distribute exp
-            // TODO
+            distributeEXP( );
             p_out = battleEndReason::BATTLE_PLAYER_WON;
             return true;
         }
@@ -827,6 +841,10 @@ namespace BATTLE {
 
         restoreInitialOrder( false );
         resetBattleTransformations( false );
+
+        // Check for evolutions / attack learn
+
+        // TODO
 
         _battleUI.deinit( );
         SOUND::deinitBattleSound( );
@@ -976,7 +994,7 @@ namespace BATTLE {
 
         char buffer[ 100 ];
         if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1 << ( spid % 8 ) ) ) ) {
-            SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] |= ( 1 << ( spid % 8 ) );
+            SAVE::SAV.getActiveFile( ).registerCaughtPkmn( spid );
             snprintf( buffer, 99, GET_STRING( 174 ), getDisplayName( spid ).c_str( ) );
             _battleUI.log( buffer );
 
@@ -1025,7 +1043,6 @@ namespace BATTLE {
     }
 
     void battle::checkAndRefillBattleSpots( slot::status p_checkType ) {
-
         for( u8 i = 0; i < 2; ++i )
             for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
                 if( _field.getSlotStatus( i, j ) == p_checkType ) {
@@ -1078,6 +1095,7 @@ namespace BATTLE {
         if( p_toSwitch.first ) {
             // opponent
             std::swap( _opponentTeam[ p_toSwitch.second ], _opponentTeam[ p_newIndex ] );
+            std::swap( _yieldEXP[ p_toSwitch.second ], _yieldEXP[ p_newIndex ] );
             std::swap( _opponentPkmnPerm[ p_toSwitch.second ], _opponentPkmnPerm[ p_newIndex ] );
             _field.sendPokemon( &_battleUI, p_toSwitch.first, p_toSwitch.second,
                                 &_opponentTeam[ p_toSwitch.second ] );
@@ -1104,6 +1122,7 @@ namespace BATTLE {
                 // pkmn cannot battle, move it to the end of the list.
                 for( u8 j = i + 1; j < len; ++j ) {
                     std::swap( pkmn[ j - 1 ], pkmn[ j ] );
+                    if( p_opponent ) { std::swap( _yieldEXP[ j - 1 ], _yieldEXP[ j ] ); }
                     std::swap( perm[ j - 1 ], perm[ j ] );
                 }
             }
@@ -1119,6 +1138,7 @@ namespace BATTLE {
             // In each step, move the i-th pkmn to the correct place.
             while( perm[ i ] != i ) {
                 std::swap( pkmn[ i ], pkmn[ perm[ i ] ] );
+                if( p_opponent ) { std::swap( _yieldEXP[ i ], _yieldEXP[ perm[ i ] ] ); }
                 std::swap( perm[ i ], perm[ perm[ i ] ] );
             }
         }
@@ -1130,6 +1150,71 @@ namespace BATTLE {
         for( u8 i = 0; i < len; ++i ) {
             pkmn[ i ].revertBattleTransform( );
             pkmn[ i ].setBattleTimeAbility( 0 );
+        }
+    }
+
+    void battle::distributeEXP( ) {
+        if( !_policy.m_distributeEXP ) { return; }
+
+        char buffer[ 100 ];
+        for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+            if( _field.getSlotStatus( true, j ) == slot::status::FAINTED ) {
+                // distribute EXP
+#ifdef DESQUID_MORE
+                std::string lmsg = "Distributing EXP to ";
+#endif
+                std::vector<u8> reg, share;
+                for( u8 q2 = 0; q2 < _playerTeamSize; ++q2 ) {
+                    if( _yieldEXP[ j ].count( _playerPkmnPerm[ q2 ] )
+                        && _playerTeam[ q2 ].canBattle( ) ) {
+#ifdef DESQUID_MORE
+                        lmsg += std::string( _playerTeam[ q2 ].m_boxdata.m_name ) + " ";
+#endif
+                        // pkmn that get regular exp
+                        reg.push_back( q2 );
+                    } else if( _playerTeam[ q2 ].canBattle( )
+                               && SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled ) {
+                        // pkmn that get exp via exp share
+                        share.push_back( q2 );
+                    }
+                }
+#ifdef DESQUID_MORE
+                _battleUI.log( lmsg );
+#endif
+                _yieldEXP[ j ].clear( );
+                // base exp (before distribution to pkmn)
+                u32 baseexp = _field.getPkmnData( true, j ).m_baseForme.m_expYield
+                                  * _opponentTeam[ j ].m_level
+                              >> 3;
+                if( !_isWildBattle ) { baseexp = baseexp * 3 / 2; }
+                if( reg.size( ) && share.size( ) ) { baseexp /= 2; }
+
+                if( reg.size( ) ) {
+                    for( auto i : reg ) {
+                        u32 curexp = baseexp / reg.size( );
+                        if( _playerTeam[ i ].getItem( ) == I_LUCKY_EGG ) { curexp <<= 1; }
+                        if( _playerTeam[ i ].isForeign( ) ) { curexp <<= 1; }
+
+                        u8 oldlv = _playerTeam[ i ].m_level;
+
+                        _playerTeam[ i ].gainExperience( curexp );
+                        snprintf( buffer, 99, GET_STRING( 167 ), _playerTeam[ i ].m_boxdata.m_name,
+                                  curexp );
+                        _battleUI.log( buffer );
+                        for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
+                        if( _playerTeam[ i ].m_level != oldlv ) {
+                            snprintf( buffer, 99, GET_STRING( 168 ),
+                                      _playerTeam[ i ].m_boxdata.m_name, _playerTeam[ i ].m_level );
+                            _battleUI.log( buffer );
+                            for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
+                        }
+                        if( i <= u8( _policy.m_mode ) ) {
+                            // update battleUI
+                            _battleUI.updatePkmnStats( false, i, _field.getPkmn( false, i ), true );
+                        }
+                    }
+                }
+            }
         }
     }
 } // namespace BATTLE

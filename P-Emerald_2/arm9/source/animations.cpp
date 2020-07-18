@@ -29,6 +29,7 @@
 #include "fs.h"
 #include "pokemon.h"
 #include "pokemonNames.h"
+#include "saveGame.h"
 #include "screenFade.h"
 #include "sound.h"
 #include "sprite.h"
@@ -159,6 +160,7 @@ namespace IO::ANIM {
             regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
             waitForInteract( );
             SOUND::restartBGM( );
+            SAVE::SAV.getActiveFile( ).registerCaughtPkmn( p_endSpecies );
             return true;
         }
     }

@@ -200,6 +200,14 @@ namespace SAVE {
                 return res;
             }
 
+            constexpr void registerSeenPkmn( u16 p_pokemon ) {
+                m_seenPkmn[ p_pokemon / 8 ] |= 1 << ( p_pokemon % 8 );
+            }
+
+            constexpr void registerCaughtPkmn( u16 p_pokemon ) {
+                m_caughtPkmn[ p_pokemon / 8 ] |= 1 << ( p_pokemon % 8 );
+            }
+
             /*
              * @brief: Stores the given pkmn in the storage system at the next available
              * spot in the box the player used most recently (or any subsequent box until

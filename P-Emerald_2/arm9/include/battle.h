@@ -66,15 +66,16 @@ namespace BATTLE {
 
         battleTrainer _opponent;
         pokemon       _opponentTeam[ 6 ];
-        u8            _opponentTeamSize;
-        u8            _opponentPkmnPerm[ 6 ];
+        std::set<u8>
+            _yieldEXP[ 6 ]; // idx's of the player's pkmn that will receive EXP when the pkmn faints
+        u8  _opponentTeamSize;
+        u8  _opponentPkmnPerm[ 6 ];
 
         pokemon* _playerTeam;
         u8       _playerTeamSize;
         u8       _playerPkmnPerm[ 6 ];
 
-        u8 _curPkmnPosition[ 6 ][ 2 ]; // me; opp; maps the Pkmn's positions in the
-                                       //  teams to their real in-battle positions
+        u8       _playerPkmnOrigLevel[ 6 ]; // unaffected by permutation
 
         battlePolicy _policy;
         bool         _isWildBattle;
@@ -177,6 +178,12 @@ namespace BATTLE {
          * @brief: Resets any battle-time only transformations of pkmn.
          */
         void resetBattleTransformations( bool p_opponent );
+
+        /*
+         * @brief: Checks if any of the opponent's pkmn fainted and distributes EXP
+         * correspondingly.
+         */
+        void distributeEXP( );
 
       public:
         /*

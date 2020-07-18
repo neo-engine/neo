@@ -50,11 +50,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "screenFade.h"
 
 // Sprites
-#include "BattleBall1.h" //Normal
-#include "BattleBall2.h" //Statused
-#include "BattleBall3.h" //Fainted
-#include "BattleBall4.h" //NA
-
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
@@ -120,6 +115,7 @@ namespace BATTLE {
 #define SPR_STATUS_BALL_PAL 15
 
 #define SPR_PKMN_GFX( p_idx ) ( 144 * ( p_idx ) )
+#define SPR_STSBALL_GFX( p_idx ) ( SPR_PKMN_GFX( 4 ) + 16 + 4 * ( p_idx ) )
 
 // Sub screen
 #define SPR_BATTLE_FITE_OAM_SUB 0
@@ -190,6 +186,34 @@ namespace BATTLE {
 
         u16 tileCnt = SPR_PKMN_GFX( 4 ) + 16;
 
+        // status ball
+        tileCnt = IO::loadSprite( "BT/bb1", SPR_STATUS_BALL_OAM( 0 ), SPR_STATUS_BALL_PAL, tileCnt,
+                                  OPP_1_HP_X + 8, OPP_1_HP_Y + 8, 16, 16, false, false, true,
+                                  OBJPRIORITY_0, false );
+        tileCnt = IO::loadSprite( "BT/bb2", SPR_STATUS_BALL_OAM( 1 ), SPR_STATUS_BALL_PAL, tileCnt,
+                                  OPP_2_HP_X + 8, OPP_2_HP_Y + 8, 16, 16, false, false, true,
+                                  OBJPRIORITY_0, false );
+        tileCnt = IO::loadSprite( "BT/bb3", SPR_STATUS_BALL_OAM( 6 ), SPR_STATUS_BALL_PAL, tileCnt,
+                                  OWN_1_HP_X + 8, OWN_1_HP_Y + 8, 16, 16, false, false, true,
+                                  OBJPRIORITY_0, false );
+        tileCnt = IO::loadSprite( "BT/bb4", SPR_STATUS_BALL_OAM( 7 ), SPR_STATUS_BALL_PAL, tileCnt,
+                                  OWN_2_HP_X + 8, OWN_2_HP_Y + 8, 16, 16, false, false, true,
+                                  OBJPRIORITY_0, false );
+
+        for( u8 i = 1 + ( _mode == DOUBLE ); i < 6; ++i ) {
+            IO::loadSprite( SPR_STATUS_BALL_OAM( i ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
+                            4 + 16 * ( i - 1 - ( _mode == DOUBLE ) ), -2, 16, 16, 0, 0, 0, false,
+                            false, true, OBJPRIORITY_0, false );
+            IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + i ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
+                            156 + 16 * i, 181, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_0,
+                            false );
+        }
+        if( _mode == SINGLE ) {
+            IO::loadSprite( SPR_STATUS_BALL_OAM( 6 ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
+                            OWN_2_HP_X + 8, OWN_2_HP_Y + 8, 16, 16, 0, 0, 0, false, false, true,
+                            OBJPRIORITY_0, false );
+        }
+
         // platforms
         tileCnt = IO::loadPlatform( _platform2, 144, OPP_PLAT_Y, SPR_PLATFORM_OAM, SPR_PLATFORM_PAL,
                                     tileCnt, false );
@@ -240,8 +264,8 @@ namespace BATTLE {
                             32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
             tileCnt = IO::loadSprite( SPR_HPBAR_OAM + 3, SPR_HPBAR_PAL + 1, tileCnt, OWN_2_HP_X,
-                                      OWN_2_HP_Y, 32, 32, hpbar_battlePal, hpbar_battleTiles,
-                                      hpbar_battleTilesLen, false, false, true, OBJPRIORITY_3,
+                                      OWN_2_HP_Y, 32, 32, hpbar_battlePal, hpbar_battle_oppTiles,
+                                      hpbar_battle_oppTilesLen, false, false, true, OBJPRIORITY_3,
                                       false, OBJMODE_BLENDED );
 
             IO::loadSprite( SPR_STATUSBG_OAM( 2 ), SPR_STATUSBG_PAL,
@@ -275,8 +299,8 @@ namespace BATTLE {
                             32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
             tileCnt = IO::loadSprite( SPR_HPBAR_OAM + 2, SPR_HPBAR_PAL + 1, tileCnt, OWN_2_HP_X,
-                                      OWN_2_HP_Y, 32, 32, hpbar_battlePal, hpbar_battleTiles,
-                                      hpbar_battleTilesLen, false, false, true, OBJPRIORITY_3,
+                                      OWN_2_HP_Y, 32, 32, hpbar_battlePal, hpbar_battle_oppTiles,
+                                      hpbar_battle_oppTilesLen, false, false, true, OBJPRIORITY_3,
                                       false, OBJMODE_BLENDED );
 
             IO::loadSprite( SPR_STATUSBG_OAM( 2 ), SPR_STATUSBG_PAL,
@@ -1199,6 +1223,66 @@ namespace BATTLE {
                           32 * 256 );
         }
 
+        if( !p_pos || _mode == DOUBLE ) {
+            if( !p_opponent ) {
+                if( p_pokemon == nullptr ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 3 ), oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].y, 16, 16, 0, 0, 0,
+                                    false, false, false, OBJPRIORITY_0, false );
+                } else if( !p_pokemon->canBattle( ) ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 2 ), oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].y, 16, 16, 0, 0, 0,
+                                    false, false, false, OBJPRIORITY_0, false );
+                } else if( p_pokemon->m_statusint ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 1 ), oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].y, 16, 16, 0, 0, 0,
+                                    false, false, false, OBJPRIORITY_0, false );
+                } else {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 0 ), oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].y, 16, 16, 0, 0, 0,
+                                    false, false, false, OBJPRIORITY_0, false );
+                }
+            } else if( !_isWildBattle ) {
+                if( p_pokemon == nullptr ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 3 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
+                                    false, false, OBJPRIORITY_0, false );
+                } else if( !p_pokemon->canBattle( ) ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 2 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
+                                    false, false, OBJPRIORITY_0, false );
+                } else if( p_pokemon->m_statusint ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 1 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
+                                    false, false, OBJPRIORITY_0, false );
+                } else {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 0 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
+                                    false, false, OBJPRIORITY_0, false );
+                }
+            } else {
+                if( p_pokemon != nullptr && IN_DEX( p_pokemon->getSpecies( ) ) ) {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 0 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
+                                    false, false, OBJPRIORITY_0, false );
+                } else {
+                    IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
+                                    SPR_STSBALL_GFX( 3 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
+                                    oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
+                                    false, false, OBJPRIORITY_0, false );
+                }
+            }
+        }
+
         if( p_pokemon != nullptr && ( !p_pos || _mode == DOUBLE ) ) {
             // pkmn name
             u16 namewd = IO::regularFont->stringWidth( p_pokemon->m_boxdata.m_name );
@@ -1348,7 +1432,8 @@ namespace BATTLE {
     void battleUI::hidePkmnStats( bool p_opponent, u8 p_pos ) {
         SpriteEntry* oam = IO::OamTop->oamBuffer;
 
-        oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].isHidden = true;
+        oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].isHidden    = true;
+        oam[ SPR_STATUS_BALL_OAM( 6 * !p_opponent + p_pos ) ].isHidden = true;
 
         // clear relevant part of the screen
         dmaFillWords( 0,
@@ -1615,6 +1700,9 @@ namespace BATTLE {
     }
 
     void battleUI::sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
+        if( p_pokemon != nullptr ) {
+            SAVE::SAV.getActiveFile( ).registerSeenPkmn( p_pokemon->getSpecies( ) );
+        }
         IO::fadeScreen( IO::UNFADE, true, true );
         REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA     = 0xff | ( 0x06 << 8 );
@@ -1674,6 +1762,9 @@ namespace BATTLE {
 
     void battleUI::prepareMove( bool p_opponent, u8 p_pos, battleMove p_move ) {
         // TODO
+        (void) p_opponent;
+        (void) p_pos;
+        (void) p_move;
     }
 
     void battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton ) {

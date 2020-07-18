@@ -269,10 +269,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s already has an item.\nSwap the items?",
       "%s tr\xe4gt bereits ein Item.\nSollen die Items getauscht werden?" },
 
-    { "You can't choose\nthis item.", "Dieses Item kann nicht\nausgew\xe4hlt werden." },
+    { "You can't choose this item.", "Dieses Item kann nicht ausgew\xe4hlt werden." },
     { "Choose %s?", "%s ausw\xe4hlen?" },
     { "Do what with %s?", "Was tun mit %s?" },
-    { "You can't use\nthat right now.", "Das kann jetzt nicht\neingesetzt werden." },
+    { "You can't use that right now.", "Das kann jetzt nicht eingesetzt werden." },
     { "Pok\xe9mon team", "Pok\xe9mon-Team" },
 
     // 60
@@ -411,10 +411,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 140
 
     { "Go [OWN%d]![A]", "Los [OWN%d]![A]" },
-    { "Do you want to give\na nick name to %s?", "M\xf6"
-                                                 "chtest du dem %s\neinen Spitznamen geben?" },
+    { "Do you want to give a nick name to %s?", "M\xf6"
+                                                 "chtest du dem %s einen Spitznamen geben?" },
     { "Choose a nick name!", "W\xe4hle einen Spitznamen!" },
-    { "You are challenged by\n%s %s![END]", "Eine Herausforderung von\n%s %s![END]" },
+    { "You are challenged by %s %s!", "Eine Herausforderung von %s %s!" },
     { "Frzn", "Eingfr" },
 
     { "Prlz", "Prlyse" },
@@ -447,8 +447,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Choose a target!", "Welches Pok\xe9mon angreifen?" },
     { "Choose a Pok\xe9mon.", "Welches Pok\xe9mon?" },
-    { "%s gained %lu EXP.[A]", "%s gewinnt %lu E.-Punkte.[A]" },
-    { "%s advanced\nto level %d.[A]", "%s erreicht Level %d.[A]" },
+    { "%s gained %lu EXP.", "%s gewinnt %lu E.-Punkte." },
+    { "%s advanced to level %d.", "%s erreicht Level %d." },
     { "The %s enabled\n%s to go first!", "%.0s%s agiert dank\neiner %s zuerst!" },
 
     // 170
