@@ -122,14 +122,14 @@ namespace SAVE {
 
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
-            testTeam[ i ] = pokemon( i != 1 ? rand( ) % MAX_PKMN + 1 : PKMN_GYARADOS, 50, 0, 0,
+            testTeam[ i ] = pokemon( i != 1 ? rand( ) % MAX_PKMN + 1 : PKMN_COMBUSKEN, 35, 0, 0,
                                      255, false, i == 3 );
             testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //     SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
             //                                                    1 + rand( ) % 100, 0, 0, i, rand(
             //                                                    ) % 2, 3 * i == 490, rand( ) % 20
             //                                                    ) );
-
+            testTeam[ i ].m_boxdata.m_experienceGained += 3500;
             testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
             testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
             testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
@@ -155,9 +155,8 @@ namespace SAVE {
 
         //       SOUND::playBGM( MOD_SURFING );
 
-        BATTLE::battle bt
-            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 5, 0, 0, 2 ),
-                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
+        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_CASCOON, 100, 0, 0, 2 ),
+                                            rand( ) % 46, rand( ) % 46, rand( ) % 58 );
 
         bt.start( );
 

@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
 
+#include "animations.h"
 #include "battle.h"
 #include "battleField.h"
 #include "battleSide.h"
@@ -825,6 +826,7 @@ namespace BATTLE {
         return false;
     }
 
+    u16  MOVE_BUFFER[ 20 ];
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
         if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
             SOUND::playBGM( MOD_VICTORY_WILD );
@@ -844,10 +846,56 @@ namespace BATTLE {
 
         // Check for evolutions / attack learn
 
-        // TODO
+        for( u8 i = 0; i < _playerTeamSize; ++i ) {
+            if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
+                // pkmn was elevated to a new level, check for new moves
 
+                getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerPkmnOrigLevel[ i ] + 1,
+                               _playerTeam[ i ].m_level, 20, MOVE_BUFFER );
+
+                for( u8 j = 0; j < 20; ++j ) {
+                    if( !MOVE_BUFFER[ j ] ) { break; }
+                    bool gd = false;
+                    for( u8 mv = 0; mv < 4; ++mv ) {
+                        if( _playerTeam[ i ].getMove( i ) == MOVE_BUFFER[ j ] ) { gd = false; }
+                    }
+                    if( gd ) {
+                        _playerTeam[ i ].learnMove(
+                            MOVE_BUFFER[ j ],
+                            [ & ]( const char* p_message ) { _battleUI.log( p_message ); },
+                            [ & ]( boxPokemon* p_bp, u16 p_nmove ) { return 0; },
+                            [ & ]( const char* p_message ) { return true; } );
+                    }
+                }
+            }
+        }
         _battleUI.deinit( );
         SOUND::deinitBattleSound( );
+
+        for( u8 i = 0; i < _playerTeamSize; ++i ) {
+            if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
+                // Check for evolution
+
+                auto edata = getPkmnEvolveData( _playerTeam[ i ].getSpecies( ),
+                                                _playerTeam[ i ].getForme( ) );
+
+                u8 ev = 0;
+                if( ( ev = _playerTeam[ i ].getItem( ) != I_EVERSTONE
+                           && _playerTeam[ i ].canEvolve( 0, EVOMETHOD_LEVEL_UP, &edata ) ) ) {
+
+                    u16 oldsp = _playerTeam[ i ].getSpecies( );
+                    u8  oldfm = _playerTeam[ i ].getForme( );
+                    u16 newsp = edata.m_evolutions[ ev - 1 ].m_target;
+                    u8  newfm = edata.m_evolutions[ ev - 1 ].m_targetForme;
+
+                    if( IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm,
+                                              _playerTeam[ i ].isShiny( ),
+                                              _playerTeam[ i ].isFemale( ), true ) ) {
+                        _playerTeam[ i ].evolve( );
+                    }
+                }
+            }
+        }
     }
 
     bool battle::playerRuns( ) {
@@ -1189,28 +1237,53 @@ namespace BATTLE {
                 if( !_isWildBattle ) { baseexp = baseexp * 3 / 2; }
                 if( reg.size( ) && share.size( ) ) { baseexp /= 2; }
 
-                if( reg.size( ) ) {
-                    for( auto i : reg ) {
-                        u32 curexp = baseexp / reg.size( );
-                        if( _playerTeam[ i ].getItem( ) == I_LUCKY_EGG ) { curexp <<= 1; }
-                        if( _playerTeam[ i ].isForeign( ) ) { curexp <<= 1; }
+                for( auto lst : { reg, share } ) {
+                    if( lst.size( ) ) {
+                        for( auto i : lst ) {
+                            // distribute ev
+                            for( u8 ev = 0; ev < 6; ++ev ) {
+                                u8 m1 = ( _playerTeam[ i ].getItem( ) == I_MACHO_BRACE );
+                                if( _playerTeam[ i ].m_boxdata.m_pokerus ) { m1++; }
 
-                        u8 oldlv = _playerTeam[ i ].m_level;
+                                u8 m2 = 0;
+                                if( ev + I_POWER_BRACER - 1 == _playerTeam[ i ].getItem( ) ) {
+                                    m2 = 8;
+                                }
+                                if( !ev && _playerTeam[ i ].getItem( ) == I_POWER_WEIGHT ) {
+                                    m2 = 8;
+                                }
 
-                        _playerTeam[ i ].gainExperience( curexp );
-                        snprintf( buffer, 99, GET_STRING( 167 ), _playerTeam[ i ].m_boxdata.m_name,
-                                  curexp );
-                        _battleUI.log( buffer );
-                        for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
-                        if( _playerTeam[ i ].m_level != oldlv ) {
-                            snprintf( buffer, 99, GET_STRING( 168 ),
-                                      _playerTeam[ i ].m_boxdata.m_name, _playerTeam[ i ].m_level );
+                                _playerTeam[ i ].EVset( ev,
+                                                        _playerTeam[ i ].EVget( ev )
+                                                            + ( ( _field.getPkmnData( true, j )
+                                                                      .m_baseForme.m_evYield[ ev ]
+                                                                  + m2 )
+                                                                << m1 ) );
+                            }
+
+                            u32 curexp = baseexp / reg.size( );
+                            if( _playerTeam[ i ].getItem( ) == I_LUCKY_EGG ) { curexp <<= 1; }
+                            if( _playerTeam[ i ].isForeign( ) ) { curexp <<= 1; }
+
+                            u8 oldlv = _playerTeam[ i ].m_level;
+
+                            _playerTeam[ i ].gainExperience( curexp );
+                            snprintf( buffer, 99, GET_STRING( 167 ),
+                                      _playerTeam[ i ].m_boxdata.m_name, curexp );
                             _battleUI.log( buffer );
                             for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
-                        }
-                        if( i <= u8( _policy.m_mode ) ) {
-                            // update battleUI
-                            _battleUI.updatePkmnStats( false, i, _field.getPkmn( false, i ), true );
+                            if( _playerTeam[ i ].m_level != oldlv ) {
+                                snprintf( buffer, 99, GET_STRING( 168 ),
+                                          _playerTeam[ i ].m_boxdata.m_name,
+                                          _playerTeam[ i ].m_level );
+                                _battleUI.log( buffer );
+                                for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
+                            }
+                            if( i <= u8( _policy.m_mode ) ) {
+                                // update battleUI
+                                _battleUI.updatePkmnStats( false, i, _field.getPkmn( false, i ),
+                                                           true );
+                            }
                         }
                     }
                 }

@@ -1061,21 +1061,21 @@ namespace STS {
                 }
             } else if( p_pokemon->isForeign( ) ) {
                 if( p_pokemon->m_boxdata.m_fateful ) {
-                    snprintf( buffer, 49, GET_STRING( 373 ), p_pokemon->m_level );
+                    snprintf( buffer, 49, GET_STRING( 373 ), p_pokemon->m_boxdata.m_gotLevel );
                     IO::regularFont->printStringC( buffer, INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 } else {
-                    snprintf( buffer, 49, GET_STRING( 371 ), p_pokemon->m_level );
+                    snprintf( buffer, 49, GET_STRING( 371 ), p_pokemon->m_boxdata.m_gotLevel );
                     IO::regularFont->printStringC( buffer, INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 }
             } else {
                 if( p_pokemon->m_boxdata.m_fateful ) {
-                    snprintf( buffer, 49, GET_STRING( 372 ), p_pokemon->m_level );
+                    snprintf( buffer, 49, GET_STRING( 372 ), p_pokemon->m_boxdata.m_gotLevel );
                     IO::regularFont->printStringC( buffer, INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 } else {
-                    snprintf( buffer, 49, GET_STRING( 370 ), p_pokemon->m_level );
+                    snprintf( buffer, 49, GET_STRING( 370 ), p_pokemon->m_boxdata.m_gotLevel );
                     IO::regularFont->printStringC( buffer, INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 }

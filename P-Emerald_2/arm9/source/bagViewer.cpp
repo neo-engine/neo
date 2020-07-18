@@ -230,8 +230,7 @@ namespace BAG {
                     }
                     return 0;
                 } ) ) {
-                snprintf( buffer, 99, GET_STRING( 50 ),
-                          ITEM::getItemName( p_itemId, CURRENT_LANGUAGE ).c_str( ) );
+                snprintf( buffer, 99, GET_STRING( 50 ), ITEM::getItemName( p_itemId ).c_str( ) );
                 _bagUI->printMessage( buffer );
                 waitForInteract( );
 
@@ -515,7 +514,7 @@ namespace BAG {
                         char          buffer[ 100 ];
                         snprintf( buffer, 99, GET_STRING( 57 ),
                                   ITEM::getItemName( _ranges[ start ].second.m_item,
-                                                     CURRENT_LANGUAGE )
+                                                     )
                                       .c_str( ) );
                         _bagUI->drawPkmnIcons( );
                         int res = cb.getResult( buffer, true, false );
@@ -813,6 +812,8 @@ namespace BAG {
             SAVE::SAV.getActiveFile( ).m_registeredItem = targetItem;
             return 0;
         case TOSS_ITEM: {
+            _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
+                                 _currSelectedIdx );
             IO::yesNoBox yn;
             if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( GET_STRING( 485 ), 254 ); },
                               [ & ]( IO::yesNoBox::selection p_sel ) {

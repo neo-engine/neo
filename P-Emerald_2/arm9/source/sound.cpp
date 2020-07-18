@@ -127,6 +127,45 @@ namespace SOUND {
 #endif
     }
 
+    void playBGMOneshot( u16 p_id ) {
+#ifndef NO_SOUND
+        if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
+            if( BGMLoaded && p_id == currentBGM ) { return; }
+            if( BGMLoaded ) {
+                setVolume( 0x50 );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                setVolume( 0x25 );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+                mmStop( );
+                mmUnload( currentBGM );
+            }
+            restoreVolume( );
+            mmLoad( p_id );
+            mmStart( p_id, MM_PLAY_ONCE );
+            BGMLoaded  = true;
+            currentBGM = p_id;
+        } else if( BGMLoaded ) {
+            setVolume( 0x50 );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            setVolume( 0x25 );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            mmStop( );
+            mmUnload( currentBGM );
+            BGMLoaded = false;
+        }
+#else
+        (void) p_id;
+#endif
+    }
+
     void stopBGM( ) {
 #ifndef NO_SOUND
         if( BGMLoaded ) {

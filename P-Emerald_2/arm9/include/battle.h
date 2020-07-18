@@ -185,6 +185,12 @@ namespace BATTLE {
          */
         void distributeEXP( );
 
+        /*
+         * @brief: Teaches the specified move to the given pkmn. If the pkmn already knows
+         * the specified move, nothing happens. If the pkmn knows 4 other moves already,
+         * the player is asked which move should be forgotten.
+         */
+        void learnMove( pokemon* p_pokemon, u16 p_move );
       public:
         /*
          * @brief: Creates a new trainer battle.

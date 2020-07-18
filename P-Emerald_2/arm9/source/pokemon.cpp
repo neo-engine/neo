@@ -54,13 +54,12 @@ pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 
     m_statusint         = 0;
 }
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
-                  const char* p_oT, u8 p_shiny, bool p_hiddenAbility,
-                  bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus,
-                  u8 p_forme ) {
+                  const char* p_oT, u8 p_shiny, bool p_hiddenAbility, bool p_fatefulEncounter,
+                  bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus, u8 p_forme ) {
     pkmnData data = getPkmnData( p_pkmnId, p_forme );
-    m_boxdata     = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT,
-                            p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace,
-                            p_ball, p_pokerus, p_forme, &data );
+    m_boxdata     = boxPokemon( p_moves, p_pkmnId, p_name, p_level, p_id, p_sid, p_oT, p_shiny,
+                            p_hiddenAbility, p_fatefulEncounter, p_isEgg, p_gotPlace, p_ball,
+                            p_pokerus, p_forme, &data );
     m_level       = p_level;
     m_stats       = calcStats( m_boxdata, p_level, &data );
     m_battleForme = 0;
@@ -492,8 +491,8 @@ void pokemon::evolve( u16 p_item, evolutionMethod p_method ) {
     setSpecies( edata.m_evolutions[ tg ].m_target );
 
     if( !m_boxdata.isNicknamed( ) ) {
-        strcpy( m_boxdata.m_name,
-                getDisplayName( m_boxdata.m_speciesId, CURRENT_LANGUAGE ).c_str( ) );
+        strncpy( m_boxdata.m_name, getDisplayName( edata.m_evolutions[ tg ].m_target ).c_str( ),
+                 12 );
     }
 
     // check for shedinja

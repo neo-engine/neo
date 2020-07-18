@@ -35,7 +35,7 @@ namespace IO::ANIM {
      * @brief: Plays the pkmn evolution animation. Destroys everything that was on the
      * screen.
      */
-    void evolvePkmn( u16 p_startSpecies, u8 p_startForme, u16 p_endSpecies, u8 p_endForme,
+    bool evolvePkmn( u16 p_startSpecies, u8 p_startForme, u16 p_endSpecies, u8 p_endForme,
                      bool p_shiny, bool p_female, bool p_allowAbort = true );
 
     /*

@@ -82,12 +82,6 @@ namespace BATTLE {
          */
         void animateStatChange( bool p_opponent, u8 p_slot, bool p_down ) const;
 
-        /*
-         * @brief: Shows choice boxes for a yesNoBox.
-         */
-        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
-        printYNMessage( u8 p_selection );
-
       public:
         battleUI( ) {
         }
@@ -249,5 +243,11 @@ namespace BATTLE {
          * @brief: Displays the pkmn capture screen.
          */
         void handleCapture( pokemon* p_pokemon );
+
+        /*
+         * @brief: Shows choice boxes for a yesNoBox.
+         */
+        std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+        printYNMessage( u8 p_selection );
     };
 } // namespace BATTLE

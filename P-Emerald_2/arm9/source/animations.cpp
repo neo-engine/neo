@@ -148,7 +148,7 @@ namespace IO::ANIM {
             SOUND::restartBGM( );
             return false;
         } else {
-            SOUND::stopBGM( );
+            SOUND::playBGMOneshot( MOD_OS_EVOLVED );
             setFrameVis( 0, true );
             setFrameVis( 1, false );
             updateOAM( false );

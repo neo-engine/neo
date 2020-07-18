@@ -82,6 +82,7 @@ namespace SOUND {
     void deinitBattleSound( );
 
     void playBGM( u16 p_id );
+    void playBGMOneshot( u16 p_id );
     void playSoundEffect( u16 p_id );
 
     void playCry( u16 p_pokemonId, u8 p_formeId = 0, bool p_female = false );
