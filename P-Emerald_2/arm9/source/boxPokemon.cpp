@@ -307,18 +307,23 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
             p_message( buffer );
             snprintf( buffer, 49, GET_STRING( 104 ), m_name );
             if( p_yesNoMessage( buffer ) ) {
-                u8 res = p_getMove( this, p_move );
-                if( res < 4 ) {
-                    if( MOVE::isFieldMove( m_moves[ res ] ) ) {
-                        snprintf( buffer, 49, GET_STRING( 106 ), m_name,
-                                  MOVE::getMoveName( m_moves[ res ] ).c_str( ) );
-                        p_message( buffer );
-                        return false;
-                    } else {
-                        m_moves[ res ] = p_move;
-                        m_curPP[ res ] = std::min( m_curPP[ res ], mdata.m_pp );
+                loop( ) {
+                    u8 res = p_getMove( this, p_move );
+                    if( res < 4 ) {
+                        if( MOVE::isFieldMove( m_moves[ res ] ) ) {
+                            snprintf( buffer, 49, GET_STRING( 106 ), m_name,
+                                      MOVE::getMoveName( m_moves[ res ] ).c_str( ) );
+                            p_message( buffer );
+                            snprintf( buffer, 49, GET_STRING( 104 ), m_name );
+                            p_message( buffer );
+                            continue;
+                        } else {
+                            m_moves[ res ] = p_move;
+                            m_curPP[ res ] = std::min( m_curPP[ res ], mdata.m_pp );
+                        }
+                        return true;
                     }
-                    return true;
+                    break;
                 }
             }
             snprintf( buffer, 49, GET_STRING( 403 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );

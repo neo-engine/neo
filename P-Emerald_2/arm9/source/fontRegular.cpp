@@ -269,7 +269,6 @@ namespace IO {
                 return;
             }
 
-
             if( p_val == '$' ) {
                 p_val = 117;
                 return;
@@ -467,6 +466,7 @@ namespace IO {
 
             return;
         }
+        /* clang-format off */
         // NUM_CHARS = 490
         // FONT_WIDTH = 16
         // FONT_HEIGHT = 16

@@ -96,6 +96,8 @@ namespace BATTLE {
         inline void invert( ) {
             for( u8 i = 0; i < 8; ++i ) { setBoost( i, -getBoost( i ) ); }
         }
+
+        constexpr auto operator<=>( const boosts& ) const = default;
     };
 
     typedef std::pair<u8, u8> fieldPosition; // (side, slot)
@@ -130,10 +132,10 @@ namespace BATTLE {
         SUBSTITUTE       = ( 1 << 24 ), // TODO
         BIDE             = ( 1 << 25 ), // TODO
         FOCUSENERGY      = ( 1 << 26 ),
-        DEFENSECURL      = ( 1 << 27 ),    // TODO
-        MINIMIZE         = ( 1 << 28 ),    // TODO
-        LEECHSEED        = ( 1 << 29 ),    // TODO
-        DISABLE          = ( 1 << 30 ),    // TODO
+        DEFENSECURL      = ( 1 << 27 ), // TODO
+        MINIMIZE         = ( 1 << 28 ), // TODO
+        LEECHSEED        = ( 1 << 29 ), // TODO
+        DISABLE          = ( 1 << 30 ), // TODO
         FORESIGHT        = ( 1LLU << 31 ),
         SNATCH           = ( 1LLU << 32 ), // TODO
         GRUDGE           = ( 1LLU << 33 ), // TODO
@@ -220,16 +222,19 @@ namespace BATTLE {
     };
 
     const u8 defaultSideConditionDurations[ MAX_SIDE_CONDITIONS ]
-        = {1, 0, 1, 1, 1, 0, 0, 5, 5, 5, 0, 5, 5, 5, 5};
+        = { 1, 0, 1, 1, 1, 0, 0, 5, 5, 5, 0, 5, 5, 5, 5 };
     const u8 maxSideConditionAmount[ MAX_SIDE_CONDITIONS ]
-        = {1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 3, 1, 1, 1, 1};
+        = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 3, 1, 1, 1, 1 };
 
+    constexpr u8 MAX_SLOT_CONDITIONS = 3;
     enum slotCondition : u8 {
         NO_SLOT_CONDITION = 0,
         WISH              = 1,
         HEALINGWISH       = 2,
         LUNARDANCE        = 3,
     };
+
+    const u8 defaultSlotConditionDurations[ MAX_SLOT_CONDITIONS ] = { 3, 1, 1 };
 
     enum battleMode { SINGLE = 0, DOUBLE = 1 };
 
@@ -245,8 +250,9 @@ namespace BATTLE {
     };
 
     constexpr battlePolicy DEFAULT_TRAINER_POLICY
-        = {SINGLE, true, true, true, false, NO_WEATHER, 5, 0};
-    constexpr battlePolicy DEFAULT_WILD_POLICY = {SINGLE, true, true, true, true, NO_WEATHER, 0, 0};
+        = { SINGLE, true, true, true, false, NO_WEATHER, 5, 0 };
+    constexpr battlePolicy DEFAULT_WILD_POLICY
+        = { SINGLE, true, true, true, true, NO_WEATHER, 0, 0 };
 
 } // namespace BATTLE
 
@@ -460,7 +466,7 @@ namespace BATTLE {
     };
 
     constexpr battleMoveSelection NO_OP_SELECTION
-        = {NO_OP, 0, {255, 255}, {255, 255}, false, MOVE::moveData( )};
+        = { NO_OP, 0, { 255, 255 }, { 255, 255 }, false, MOVE::moveData( ) };
 
     struct battleMove {
         battleMoveType             m_type;

@@ -59,6 +59,7 @@ namespace BATTLE {
       private:
         status        _status;
         slotCondition _slotCondition;
+        u8            _slotConditionCounter[ MAX_SLOT_CONDITIONS ];
         pokemon*      _pokemon;
         pokemon       _transformedPkmn; // pkmn the pkmn is transformed into
         bool          _isTransformed;
@@ -119,6 +120,7 @@ namespace BATTLE {
             _altTypes.clear( );
             std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
             std::memset( _volatileStatusCounter, 0, sizeof( _volatileStatusCounter ) );
+            std::memset( _slotConditionCounter, 0, sizeof( _slotConditionCounter ) );
             std::memset( _volatileStatusAmount, 0, sizeof( _volatileStatusAmount ) );
         }
 
@@ -330,8 +332,7 @@ namespace BATTLE {
                 getPkmn( )->m_status.m_isBadlyPoisoned = true;
                 if( _isTransformed ) { _pokemon->m_status.m_isBadlyPoisoned = true; }
                 break;
-            default:
-                return false;
+            default: return false;
             }
             return true;
         }
@@ -365,20 +366,13 @@ namespace BATTLE {
                 }
 
             switch( p_status ) {
-            case SLEEP:
-                return pkmn.m_status.m_isAsleep;
-            case BURN:
-                return pkmn.m_status.m_isBurned;
-            case FROZEN:
-                return pkmn.m_status.m_isFrozen;
-            case PARALYSIS:
-                return pkmn.m_status.m_isParalyzed;
-            case POISON:
-                return pkmn.m_status.m_isPoisoned;
-            case TOXIC:
-                return pkmn.m_status.m_isBadlyPoisoned;
-            default:
-                return false;
+            case SLEEP: return pkmn.m_status.m_isAsleep;
+            case BURN: return pkmn.m_status.m_isBurned;
+            case FROZEN: return pkmn.m_status.m_isFrozen;
+            case PARALYSIS: return pkmn.m_status.m_isParalyzed;
+            case POISON: return pkmn.m_status.m_isPoisoned;
+            case TOXIC: return pkmn.m_status.m_isBadlyPoisoned;
+            default: return false;
             }
         }
 
@@ -455,7 +449,46 @@ namespace BATTLE {
             return 0;
         }
 
-        bool addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition, u8 p_duration );
+        inline bool addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition,
+                                      u8 p_duration = 0 ) {
+
+            if( ( _slotCondition & p_slotCondition ) == p_slotCondition ) {
+                p_ui->log( GET_STRING( 304 ) );
+                return false;
+            }
+
+#ifdef DESQUID
+            p_ui->log( std::string( "Add slot condition " ) + std::to_string( p_slotCondition ) );
+            for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+#endif
+
+            for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
+                if( ( 1 << i ) & p_slotCondition ) {
+                    if( !( ( 1 << i ) & _slotCondition ) ) {
+                        _slotConditionCounter[ i ]
+                            = p_duration ? p_duration : defaultSlotConditionDurations[ i ];
+                    }
+                }
+            }
+            _slotCondition = slotCondition( _slotCondition | p_slotCondition );
+            return true;
+        }
+        inline bool removeSlotCondition( battleUI* p_ui, slotCondition p_slotCondition ) {
+            if( !( _slotCondition & p_slotCondition ) ) { return false; }
+
+            for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
+                if( ( 1 << i ) & p_slotCondition ) { _slotConditionCounter[ i ] = 0; }
+            }
+            _slotCondition = slotCondition( _slotCondition & ~p_slotCondition );
+#ifdef DESQUID
+            p_ui->log( std::string( "Remove slot condition " )
+                       + std::to_string( p_slotCondition ) );
+            for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+#else
+            (void) p_ui;
+#endif
+            return true;
+        }
         constexpr slotCondition getSlotCondition( ) const {
             return _slotCondition;
         }
@@ -936,9 +969,7 @@ namespace BATTLE {
                 }
             switch( getPkmn( )->getAbility( ) ) {
             case A_AIR_LOCK:
-            case A_CLOUD_NINE:
-                return true;
-                [[likely]] default : return false;
+            case A_CLOUD_NINE: return true; [[likely]] default : return false;
             }
         }
     };

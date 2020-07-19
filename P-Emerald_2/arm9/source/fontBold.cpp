@@ -164,7 +164,6 @@ namespace IO {
                 return;
             }
 
-
             if( p_val == '\xe4' ) { // ä
                 p_val = 89;
                 return;
@@ -453,6 +452,7 @@ namespace IO {
 
             return;
         }
+        /* clang-format off */
         u8 fontWidths[ NUM_CHARS ] = {
 
             8,  7,  8,  8,  8,  8,  8,  8,  8,  8,

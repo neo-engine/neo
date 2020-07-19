@@ -88,61 +88,61 @@ namespace BATTLE {
 
 // Top screen
 // (opp 1, opp 2, own 1, own 2)
-#define SPR_ABILITY_OAM( p_opponent ) ( 3 * ( p_opponent ) )
-#define SPR_HPBAR_OAM 6
-#define SPR_STATUSBG_OAM( p_idx ) ( 10 + 3 * ( p_idx ) )
-#define SPR_PKMN_START_OAM( p_idx ) ( 22 + 4 * ( p_idx ) )
+#define SPR_ABILITY_OAM( p_opponent )      ( 3 * ( p_opponent ) )
+#define SPR_HPBAR_OAM                      6
+#define SPR_STATUSBG_OAM( p_idx )          ( 10 + 3 * ( p_idx ) )
+#define SPR_PKMN_START_OAM( p_idx )        ( 22 + 4 * ( p_idx ) )
 #define SPR_PKMN_SHADOW_START_OAM( p_idx ) ( 38 + 4 * ( p_idx ) )
-#define SPR_PLATFORM_OAM 54
-#define SPR_STATUS_ICON_OAM( p_idx ) ( 58 + ( p_idx ) )
-#define SPR_SHINY_ICON_OAM( p_idx ) ( 62 + ( p_idx ) )
-#define SPR_SHINY_PARTICLE_START_OAM 70
+#define SPR_PLATFORM_OAM                   54
+#define SPR_STATUS_ICON_OAM( p_idx )       ( 58 + ( p_idx ) )
+#define SPR_SHINY_ICON_OAM( p_idx )        ( 62 + ( p_idx ) )
+#define SPR_SHINY_PARTICLE_START_OAM       70
 #define SPR_STAT_CHANGE_PARTICLE_START_OAM 86
-#define SPR_MBOX_START_OAM 86
-#define SPR_BALL_START_OAM 101
-#define SPR_STATUS_BALL_OAM( p_idx ) ( 106 + ( p_idx ) )
+#define SPR_MBOX_START_OAM                 86
+#define SPR_BALL_START_OAM                 101
+#define SPR_STATUS_BALL_OAM( p_idx )       ( 106 + ( p_idx ) )
 
 #define SPR_PKMN_PAL( p_idx ) ( p_idx )
-#define SPR_PKMN_SHADOW_PAL 4
-#define SPR_PLATFORM_PAL 5
-#define SPR_HPBAR_PAL 7
-#define SPR_STATUS_ICON_PAL 9
-#define SPR_SHINY_ICON_PAL 10
-#define SPR_STATUSBG_PAL 11
-#define SPR_BOX_PAL 12
-#define SPR_STAT_CHANGE_PAL 13
-#define SPR_BALL_PAL 14
-#define SPR_STATUS_BALL_PAL 15
+#define SPR_PKMN_SHADOW_PAL   4
+#define SPR_PLATFORM_PAL      5
+#define SPR_HPBAR_PAL         7
+#define SPR_STATUS_ICON_PAL   9
+#define SPR_SHINY_ICON_PAL    10
+#define SPR_STATUSBG_PAL      11
+#define SPR_BOX_PAL           12
+#define SPR_STAT_CHANGE_PAL   13
+#define SPR_BALL_PAL          14
+#define SPR_STATUS_BALL_PAL   15
 
-#define SPR_PKMN_GFX( p_idx ) ( 144 * ( p_idx ) )
+#define SPR_PKMN_GFX( p_idx )    ( 144 * ( p_idx ) )
 #define SPR_STSBALL_GFX( p_idx ) ( SPR_PKMN_GFX( 4 ) + 16 + 4 * ( p_idx ) )
 
 // Sub screen
-#define SPR_BATTLE_FITE_OAM_SUB 0
-#define SPR_BATTLE_BAG_OAM_SUB 2
-#define SPR_BATTLE_PKMN_OAM_SUB 4
-#define SPR_BATTLE_RUN_OAM_SUB 6
-#define SPR_BATTLE_ICON_OAM_SUB 8
-#define SPR_SMALL_MESSAGE_OAM_SUB 9
-#define SPR_LARGE_MESSAGE_OAM_SUB 20
-#define SPR_TYPE_OAM_SUB( p_idx ) ( 40 + ( p_idx ) )
-#define SPR_MOVE_OAM_SUB( p_move ) ( 44 + 6 * ( p_move ) )
-#define SPR_DMG_CAT_OAM_SUB( p_idx ) ( 80 + ( p_idx ) )
+#define SPR_BATTLE_FITE_OAM_SUB           0
+#define SPR_BATTLE_BAG_OAM_SUB            2
+#define SPR_BATTLE_PKMN_OAM_SUB           4
+#define SPR_BATTLE_RUN_OAM_SUB            6
+#define SPR_BATTLE_ICON_OAM_SUB           8
+#define SPR_SMALL_MESSAGE_OAM_SUB         9
+#define SPR_LARGE_MESSAGE_OAM_SUB         20
+#define SPR_TYPE_OAM_SUB( p_idx )         ( 40 + ( p_idx ) )
+#define SPR_MOVE_OAM_SUB( p_move )        ( 44 + 6 * ( p_move ) )
+#define SPR_DMG_CAT_OAM_SUB( p_idx )      ( 80 + ( p_idx ) )
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 84 + 8 * ( p_pos ) )
 
-#define SPR_BATTLE_FITE_PAL_SUB 0
-#define SPR_BATTLE_BAG_PAL_SUB 1
-#define SPR_BATTLE_PKMN_PAL_SUB 2
-#define SPR_BATTLE_RUN_PAL_SUB 3
-#define SPR_BATTLE_ICON_PAL_SUB 4
-#define SPR_BOX_PAL_SUB 5
-#define SPR_BOX_SEL_PAL_SUB 6
-#define SPR_TYPE_PAL_SUB( p_idx ) ( 6 + ( p_idx ) )
+#define SPR_BATTLE_FITE_PAL_SUB      0
+#define SPR_BATTLE_BAG_PAL_SUB       1
+#define SPR_BATTLE_PKMN_PAL_SUB      2
+#define SPR_BATTLE_RUN_PAL_SUB       3
+#define SPR_BATTLE_ICON_PAL_SUB      4
+#define SPR_BOX_PAL_SUB              5
+#define SPR_BOX_SEL_PAL_SUB          6
+#define SPR_TYPE_PAL_SUB( p_idx )    ( 6 + ( p_idx ) )
 #define SPR_DMG_CAT_PAL_SUB( p_idx ) ( 10 + ( p_idx ) )
 
 // other macros
 #define WILD_BATTLE_SPRITE_X_START 144
-#define WILD_BATTLE_SPRITE_X 160
+#define WILD_BATTLE_SPRITE_X       160
 
 #define OPP_PLAT_Y 72
 #define PLY_PLAT_Y 120
@@ -155,23 +155,23 @@ namespace BATTLE {
 #define OWN_1_HP_X 124
 #define OWN_1_HP_Y 120
 
-#define PKMN_OPP_1_X 192
-#define PKMN_OPP_1_Y ( OPP_PLAT_Y + 32 - 96 )
+#define PKMN_OPP_1_X        192
+#define PKMN_OPP_1_Y        ( OPP_PLAT_Y + 32 - 96 )
 #define PKMN_OPP_1_X_SINGLE 160
 #define PKMN_OPP_1_Y_SINGLE ( OPP_PLAT_Y + 35 - 96 )
-#define PKMN_OPP_2_X 128
-#define PKMN_OPP_2_Y ( OPP_PLAT_Y + 38 - 96 )
+#define PKMN_OPP_2_X        128
+#define PKMN_OPP_2_Y        ( OPP_PLAT_Y + 38 - 96 )
 
-#define PKMN_OWN_1_X -40
-#define PKMN_OWN_1_Y 84
+#define PKMN_OWN_1_X        -40
+#define PKMN_OWN_1_Y        84
 #define PKMN_OWN_1_X_SINGLE 4
 #define PKMN_OWN_1_Y_SINGLE 92
-#define PKMN_OWN_2_X 40
-#define PKMN_OWN_2_Y 100
+#define PKMN_OWN_2_X        40
+#define PKMN_OWN_2_Y        100
 
 #define HP_OUTLINE_COL 240
-#define OWN_HP_COL 241
-#define OPP_HP_COL 245
+#define OWN_HP_COL     241
+#define OPP_HP_COL     245
 #define HP_COL( a, b ) ( ( a ) ? ( OPP_HP_COL + (b) *2 ) : ( OWN_HP_COL + (b) *2 ) )
 
     void battleUI::initTop( ) {
@@ -1091,27 +1091,53 @@ namespace BATTLE {
             if( p_intended.getBoost( i ) > 0 ) {
                 auto bt = p_actual.getBoost( i );
                 if( bt == 0 ) {
+                } else if( bt == 1 ) {
+                    up = true;
+                } else if( bt == 2 ) {
+                    up = true;
+                } else if( bt >= 3 ) {
+                    up = true;
+                }
+            }
+        }
+        if( up ) { animateStatChange( p_opponent, p_slot, false ); }
+
+        for( u8 i = 0; i < 8; ++i ) {
+            if( p_intended.getBoost( i ) > 0 ) {
+                auto bt = p_actual.getBoost( i );
+                if( bt == 0 ) {
                     snprintf( buffer, 99, GET_STRING( 256 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
                 } else if( bt == 1 ) {
                     snprintf( buffer, 99, GET_STRING( 257 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
-                    up = true;
                 } else if( bt == 2 ) {
                     snprintf( buffer, 99, GET_STRING( 258 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
-                    up = true;
                 } else if( bt >= 3 ) {
                     snprintf( buffer, 99, GET_STRING( 259 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
-                    up = true;
                 }
                 log( std::string( buffer ) );
             }
         }
-        if( up ) { animateStatChange( p_opponent, p_slot, false ); }
 
         up = false;
+        for( u8 i = 0; i < 8; ++i ) {
+            if( p_intended.getBoost( i ) < 0 ) {
+                auto bt = p_actual.getBoost( i );
+                if( bt == 0 ) {
+                } else if( bt == -1 ) {
+                    up = true;
+                } else if( bt == -2 ) {
+                    up = true;
+                } else if( bt <= -3 ) {
+                    up = true;
+                }
+            }
+        }
+        if( up ) { animateStatChange( p_opponent, p_slot, true ); }
+
         for( u8 i = 0; i < 8; ++i ) {
             if( p_intended.getBoost( i ) < 0 ) {
                 auto bt = p_actual.getBoost( i );
@@ -1121,20 +1147,16 @@ namespace BATTLE {
                 } else if( bt == -1 ) {
                     snprintf( buffer, 99, GET_STRING( 260 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
-                    up = true;
                 } else if( bt == -2 ) {
                     snprintf( buffer, 99, GET_STRING( 261 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
-                    up = true;
                 } else if( bt <= -3 ) {
                     snprintf( buffer, 99, GET_STRING( 262 ), pkmnstr.c_str( ),
                               GET_STRING( 248 + i ), pkmnstr.c_str( ) );
-                    up = true;
                 }
                 log( std::string( buffer ) );
             }
         }
-        if( up ) { animateStatChange( p_opponent, p_slot, true ); }
         for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
     }
 
@@ -2287,7 +2309,9 @@ namespace BATTLE {
         if( p_message ) {
             IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+            BG_PALETTE[ IO::GRAY_IDX ] = IO::GRAY;
             IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 192, false );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         }

@@ -234,7 +234,6 @@ namespace BATTLE {
                     selection.push_back( moves[ i ][ j ] );
                 }
 #ifdef DESQUID_MORE
-
             for( u8 i = 0; i < selection.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
                                + " tp: " + std::to_string( u16( selection[ i ].m_type ) )
@@ -253,15 +252,17 @@ namespace BATTLE {
             _battleUI.log( "Sorting done" );
             for( u8 i = 0; i < sortedMoves.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
-                        + " tp: " + std::to_string( u16( sortedMoves[ i ].m_type ) )
-                        + " param: " + std::to_string( sortedMoves[ i ].m_param )
-                        + " user: " + std::to_string( sortedMoves[ i ].m_user.first )
-                        + ", " + std::to_string( sortedMoves[ i ].m_user.second )
-                        + " spd: " + std::to_string( sortedMoves[ i ].m_userSpeed )
-                        + " prio: " + std::to_string( sortedMoves[ i ].m_priority )
-//                        + " tg: " + std::to_string( sortedMoves[ i ].m_target.first )
-//                        + ", " + std::to_string( sortedMoves[ i ].m_target.second )
-                        );
+                               + " tp: " + std::to_string( u16( sortedMoves[ i ].m_type ) )
+                               + " param: " + std::to_string( sortedMoves[ i ].m_param )
+                               + " user: " + std::to_string( sortedMoves[ i ].m_user.first ) + ", "
+                               + std::to_string( sortedMoves[ i ].m_user.second )
+                               + " spd: " + std::to_string( sortedMoves[ i ].m_userSpeed )
+                               + " prio: " + std::to_string( sortedMoves[ i ].m_priority )
+                               //                        + " tg: " + std::to_string( sortedMoves[ i
+                               //                        ].m_target.first )
+                               //                        + ", " + std::to_string( sortedMoves[ i
+                               //                        ].m_target.second )
+                );
             }
             for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 #endif
@@ -321,8 +322,7 @@ namespace BATTLE {
                                     .c_str( ) );
                             _battleUI.log( buffer );
                             break;
-                        default:
-                            break;
+                        default: break;
                         }
                     }
 
@@ -416,17 +416,11 @@ namespace BATTLE {
             case MOVE::ANY_FOE:
             case MOVE::ALL_FOES_AND_ALLY:
             case MOVE::ALL_FOES:
-            case MOVE::RANDOM:
-                res.m_target = { true, 0 };
-                return res;
+            case MOVE::RANDOM: res.m_target = { true, 0 }; return res;
             case MOVE::SELF:
             case MOVE::ALLY_OR_SELF:
-            case MOVE::ALL_ALLIES:
-                res.m_target = { false, 0 };
-                return res;
-            default:
-                res.m_target = { 255, 255 };
-                return res;
+            case MOVE::ALL_ALLIES: res.m_target = { false, 0 }; return res;
+            default: res.m_target = { 255, 255 }; return res;
             }
         }
 
@@ -605,8 +599,7 @@ namespace BATTLE {
                     }
                     break;
                 }
-                default:
-                    break;
+                default: break;
                 }
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
@@ -767,11 +760,8 @@ namespace BATTLE {
         }
 
         switch( p_battleEndReason ) {
-        case BATTLE_CAPTURE:
-            handleCapture( );
-            break;
-        default:
-            break;
+        case BATTLE_CAPTURE: handleCapture( ); break;
+        default: break;
         }
 
         restoreInitialOrder( false );
@@ -904,15 +894,9 @@ namespace BATTLE {
         switch( p_pokeball ) {
         case I_SAFARI_BALL:
         case I_SPORT_BALL:
-        case I_GREAT_BALL:
-            ballCatchRate = 3;
-            break;
-        case I_ULTRA_BALL:
-            ballCatchRate = 4;
-            break;
-        case I_MASTER_BALL:
-            ballCatchRate = 512;
-            break;
+        case I_GREAT_BALL: ballCatchRate = 3; break;
+        case I_ULTRA_BALL: ballCatchRate = 4; break;
+        case I_MASTER_BALL: ballCatchRate = 512; break;
 
         case I_LEVEL_BALL:
             if( plpk->m_level > wild->m_level ) ballCatchRate = 4;
@@ -928,9 +912,7 @@ namespace BATTLE {
         case I_LOVE_BALL:
             if( wild->isFemale( ) * plpk->isFemale( ) < 0 ) ballCatchRate = 16;
             break;
-        case I_HEAVY_BALL:
-            ballCatchRate = std::min( 128, p.m_baseForme.m_weight >> 2 );
-            break;
+        case I_HEAVY_BALL: ballCatchRate = std::min( 128, p.m_baseForme.m_weight >> 2 ); break;
         case I_FAST_BALL:
             if( p.m_baseForme.m_bases[ 5 ] >= 100 ) ballCatchRate = 16;
             break;
@@ -939,12 +921,8 @@ namespace BATTLE {
             if( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ specId / 8 ] & ( 1 << ( specId % 8 ) ) )
                 ballCatchRate = 6;
             break;
-        case I_TIMER_BALL:
-            ballCatchRate = std::min( _round + 10 / 5, 8 );
-            break;
-        case I_NEST_BALL:
-            ballCatchRate = std::max( ( 40 - wild->m_level ) / 5, 2 );
-            break;
+        case I_TIMER_BALL: ballCatchRate = std::min( _round + 10 / 5, 8 ); break;
+        case I_NEST_BALL: ballCatchRate = std::max( ( 40 - wild->m_level ) / 5, 2 ); break;
         case I_NET_BALL:
             if( p.m_baseForme.m_types[ 0 ] == type::BUG || p.m_baseForme.m_types[ 1 ] == type::BUG
                 || p.m_baseForme.m_types[ 0 ] == type::WATER
@@ -963,8 +941,7 @@ namespace BATTLE {
             if( MOVE::possible( M_DIG, 0 ) || getCurrentDaytime( ) == 4 ) ballCatchRate = 7;
             break;
 
-        default:
-            break;
+        default: break;
         }
 
         u8 status = 2;
@@ -989,9 +966,7 @@ namespace BATTLE {
         case 0:
         case 1:
         case 2:
-        case 3:
-            _battleUI.log( GET_STRING( 487 + succ ) );
-            break;
+        case 3: _battleUI.log( GET_STRING( 487 + succ ) ); break;
         case 4:
             snprintf( buffer, 99, GET_STRING( 486 ), wild->m_boxdata.m_name );
             _battleUI.log( buffer );

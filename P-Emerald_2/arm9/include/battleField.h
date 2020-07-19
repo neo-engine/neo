@@ -136,8 +136,16 @@ namespace BATTLE {
         /*
          * @brief: Adds the given side conditions to the specified side
          */
-        constexpr bool addSideCondition( bool p_opponent, sideCondition p_sideCondition,
-                                         u8 p_duration = 0 ) {
+        inline bool addSideCondition( battleUI* p_ui, bool p_opponent,
+                                      sideCondition p_sideCondition, u8 p_duration = 0 ) {
+#ifdef DESQUID
+            // TODO: proper log
+            p_ui->log( "Set side condition " + std::to_string( u8( p_sideCondition ) ) );
+            for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+#else
+            (void) p_ui;
+#endif
+
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addSideCondition(
                 p_sideCondition, p_duration );
         }
@@ -145,9 +153,42 @@ namespace BATTLE {
         /*
          * @brief: Removes the given side conditions from the specified side
          */
-        constexpr bool removeSideCondition( bool p_opponent, sideCondition p_sideCondition ) {
+        inline bool removeSideCondition( battleUI* p_ui, bool p_opponent,
+                                         sideCondition p_sideCondition ) {
+#ifdef DESQUID
+            // TODO: proper log
+            p_ui->log( "Remove side condition " + std::to_string( u8( p_sideCondition ) ) );
+            for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+#else
+            (void) p_ui;
+#endif
+
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeSideCondition(
                 p_sideCondition );
+        }
+
+        /*
+         * @brief: Adds the given slot conditions to the specified slot
+         */
+        inline bool addSlotCondition( battleUI* p_ui, bool p_opponent, u8 p_pos,
+                                      slotCondition p_slotCondition, u8 p_duration = 0 ) {
+            // TODO: proper log
+            p_ui->log( "Set slot condition " + std::to_string( u8( p_slotCondition ) ) );
+
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addSlotCondition(
+                p_ui, p_pos, p_slotCondition, p_duration );
+        }
+
+        /*
+         * @brief: Removes the given slot conditions from the specified slot
+         */
+        inline bool removeSideCondition( battleUI* p_ui, bool p_opponent, u8 p_pos,
+                                         slotCondition p_slotCondition ) {
+            // TODO: proper log
+            p_ui->log( "Remove slot condition " + std::to_string( u8( p_slotCondition ) ) );
+
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeSlotCondition(
+                p_ui, p_pos, p_slotCondition );
         }
 
         /*

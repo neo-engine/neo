@@ -53,7 +53,7 @@ namespace IO {
                 return;
             }
         }
-
+        /* clang-format off */
         u8 fontWidths[ NUM_CHARS ] = {8, 8, 8, 8, 8,
             8, 8, 8, 8, 8,
             9, 8, 8, 13, 13,

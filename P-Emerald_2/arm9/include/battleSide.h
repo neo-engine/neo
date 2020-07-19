@@ -114,7 +114,8 @@ namespace BATTLE {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
                 if( p_sideCondition & ( 1 << i ) ) {
                     _sideConditionAmount[ i ]++;
-                    _sideConditionCounter[ i ] = p_duration;
+                    _sideConditionCounter[ i ]
+                        = p_duration ? p_duration : defaultSideConditionDurations[ i ];
                 }
             }
             return true;
@@ -128,6 +129,20 @@ namespace BATTLE {
                 }
             }
             return true;
+        }
+
+        /*
+         * @brief: Tries to add the specified slot condition(s).
+         * @param p_duration: The duration of the condition in turns. (0 for the
+         * defauls amount)
+         */
+        inline bool addSlotCondition( battleUI* p_ui, u8 p_pos, slotCondition p_slotCondition,
+                                      u8 p_duration = 0 ) {
+            return _slots[ p_pos ].addSlotCondition( p_ui, p_slotCondition, p_duration );
+        }
+
+        inline bool removeSlotCondition( battleUI* p_ui, u8 p_pos, slotCondition p_slotCondition ) {
+            return _slots[ p_pos ].removeSlotCondition( p_ui, p_slotCondition );
         }
 
         constexpr sideCondition getSideCondition( ) const {

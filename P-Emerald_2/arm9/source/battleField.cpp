@@ -84,9 +84,7 @@ namespace BATTLE {
         switch( pkmn->getAbility( ) ) {
         // abilities that cannot be suppressed
         case A_COMATOSE:
-        case A_NEUTRALIZING_GAS:
-            p_ui->logAbility( pkmn, p_opponent );
-            break;
+        case A_NEUTRALIZING_GAS: p_ui->logAbility( pkmn, p_opponent ); break;
         case A_ZEN_MODE:
             if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
                 if( pkmn->getSpecies( ) == PKMN_DARMANITAN ) {
@@ -117,9 +115,7 @@ namespace BATTLE {
                 case A_TERAVOLT:
                 case A_TURBOBLAZE:
                 case A_PRESSURE:
-                case A_UNNERVE:
-                    p_ui->logAbility( pkmn, p_opponent );
-                    break;
+                case A_UNNERVE: p_ui->logAbility( pkmn, p_opponent ); break;
 
                 // Stat changing abilities
                 case A_DAUNTLESS_SHIELD: {
@@ -310,8 +306,7 @@ namespace BATTLE {
                     break;
                 }
 
-                default:
-                    break;
+                default: break;
                 }
                 break;
             }
@@ -604,8 +599,7 @@ namespace BATTLE {
                 case MOVE::ALLY:
                     bm.m_target.push_back( fieldPosition( m.m_user.first, !m.m_user.second ) );
                     break;
-                default:
-                    break;
+                default: break;
                 }
                 break;
             }
@@ -641,21 +635,128 @@ namespace BATTLE {
     }
 
     void field::confusionSelfDamage( battleUI* p_ui, bool p_opponent, u8 p_slot ) {
-        // TODO
+        auto pkmn = getPkmn( p_opponent, p_slot );
+        if( pkmn == nullptr ) { return; }
+
+        p_ui->animateHitPkmn( p_opponent, p_slot, 100 );
+        // TODO: proper calculation(?)
+        damagePokemon( p_ui, p_opponent, p_slot, pkmn->m_stats.m_maxHP / 16 );
     }
 
     void field::executeStatusEffects( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
-        // TODO
+        auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        auto target = getPkmn( p_target.first, p_target.second );
+        if( p_move.m_moveData.m_target == MOVE::SELF ) {
+            target   = user;
+            p_target = p_move.m_user;
+        }
+        if( user == nullptr || target == nullptr ) [[unlikely]] {
+                return;
+            }
+
+        // Check for status conditions
+        if( p_move.m_moveData.m_status ) {
+            if( setStatusCondition( p_target.first, p_target.second, p_move.m_moveData.m_status,
+                                    p_move.m_moveData.m_status == SLEEP ? rand( ) & 7 : 255 ) ) {
+                p_ui->animateStatusCondition( p_target.first, p_target.second,
+                                              p_move.m_moveData.m_status );
+                p_ui->updatePkmnStats( p_target.first, p_target.second, target, true );
+            }
+        }
+
+        if( p_move.m_moveData.m_sideCondition ) {
+            addSideCondition( p_ui, p_target.first, p_move.m_moveData.m_sideCondition );
+        }
+
+        if( p_move.m_moveData.m_weather ) { setWeather( p_ui, p_move.m_moveData.m_weather ); }
+        if( p_move.m_moveData.m_pseudoWeather ) {
+            setPseudoWeather( p_ui, p_move.m_moveData.m_pseudoWeather );
+        }
+        if( p_move.m_moveData.m_terrain ) { setTerrain( p_ui, p_move.m_moveData.m_terrain ); }
+
+        if( p_move.m_moveData.m_slotCondition ) {
+            addSlotCondition( p_ui, p_target.first, p_target.second,
+                              p_move.m_moveData.m_slotCondition );
+        }
+
+        if( p_move.m_moveData.m_volatileStatus ) {
+            p_ui->animateVolatileStatusCondition( p_target.first, p_target.second,
+                                                  p_move.m_moveData.m_volatileStatus );
+            addVolatileStatus( p_target.first, p_target.second, p_move.m_moveData.m_volatileStatus,
+                               255 );
+        }
+
+        // Boosts
+        if( p_move.m_moveData.m_boosts != boosts( ) ) {
+            auto res = addBoosts( p_target.first, p_target.second, p_move.m_moveData.m_boosts );
+            p_ui->logBoosts( user, p_target.first, p_target.second, p_move.m_moveData.m_boosts,
+                             res );
+        }
+
+        if( p_move.m_moveData.m_selfBoosts != boosts( ) ) {
+            auto res = addBoosts( p_move.m_user.first, p_move.m_user.second,
+                                  p_move.m_moveData.m_selfBoosts );
+            p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second,
+                             p_move.m_moveData.m_selfBoosts, res );
+        }
     }
 
     void field::executeSecondaryStatus( battleUI* p_ui, battleMove p_move,
                                         fieldPosition p_target ) {
-        // TODO
+        auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        auto target = getPkmn( p_target.first, p_target.second );
+        if( p_move.m_moveData.m_target == MOVE::SELF ) {
+            target   = user;
+            p_target = p_move.m_user;
+        }
+        if( user == nullptr || target == nullptr ) [[unlikely]] {
+                return;
+            }
+        // Check for status conditions
+        if( p_move.m_moveData.m_secondaryStatus ) {
+            if( setStatusCondition(
+                    p_target.first, p_target.second, p_move.m_moveData.m_secondaryStatus,
+                    p_move.m_moveData.m_secondaryStatus == SLEEP ? rand( ) & 7 : 255 ) ) {
+                p_ui->animateStatusCondition( p_target.first, p_target.second,
+                                              p_move.m_moveData.m_secondaryStatus );
+                p_ui->updatePkmnStats( p_target.first, p_target.second, target, true );
+            }
+        }
+
+        if( p_move.m_moveData.m_secondaryVolatileStatus ) {
+            p_ui->animateVolatileStatusCondition( p_target.first, p_target.second,
+                                                  p_move.m_moveData.m_secondaryVolatileStatus );
+            addVolatileStatus( p_target.first, p_target.second,
+                               p_move.m_moveData.m_secondaryVolatileStatus, 255 );
+        }
     }
 
     void field::executeSecondaryEffects( battleUI* p_ui, battleMove p_move,
                                          fieldPosition p_target ) {
-        // TODO
+        auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        auto target = getPkmn( p_target.first, p_target.second );
+        if( p_move.m_moveData.m_target == MOVE::SELF ) {
+            target   = user;
+            p_target = p_move.m_user;
+        }
+        if( user == nullptr || target == nullptr ) [[unlikely]] {
+                return;
+            }
+
+        // Boosts
+        if( p_move.m_moveData.m_secondaryBoosts != boosts( ) ) {
+            auto res
+                = addBoosts( p_target.first, p_target.second, p_move.m_moveData.m_secondaryBoosts );
+            p_ui->logBoosts( user, p_target.first, p_target.second,
+                             p_move.m_moveData.m_secondaryBoosts, res );
+        }
+
+        if( p_move.m_moveData.m_secondarySelfBoosts != boosts( ) ) {
+            auto res = addBoosts( p_move.m_user.first, p_move.m_user.second,
+                                  p_move.m_moveData.m_secondarySelfBoosts );
+            p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second,
+                             p_move.m_moveData.m_secondarySelfBoosts, res );
+        }
     }
 
     void field::executeContact( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
@@ -829,9 +930,7 @@ namespace BATTLE {
             }
 
             // Compound Eyes
-            if( user->getAbility( ) == A_COMPOUND_EYES ) {
-                acc = ( acc * 13 ) / 10;
-            }
+            if( user->getAbility( ) == A_COMPOUND_EYES ) { acc = ( acc * 13 ) / 10; }
 
             // Hustle
             if( user->getAbility( ) == A_HUSTLE
@@ -1005,23 +1104,15 @@ namespace BATTLE {
 
         if( p_move.m_param == M_WEATHER_BALL ) {
             switch( getWeather( ) ) {
-            case NO_WEATHER:
-                basepower = 50;
-                break;
-            default:
-                basepower = 100;
-                break;
+            case NO_WEATHER: basepower = 50; break;
+            default: basepower = 100; break;
             }
         }
 
         if( p_move.m_param == M_TERRAIN_PULSE ) {
             switch( getTerrain( ) ) {
-            case NO_TERRAIN:
-                basepower = 50;
-                break;
-            default:
-                basepower = 100;
-                break;
+            case NO_TERRAIN: basepower = 50; break;
+            default: basepower = 100; break;
             }
         }
 
@@ -1053,9 +1144,7 @@ namespace BATTLE {
 
         if( !suppressesAbilities( ) ) {
             switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getAbility( ) ) {
-            case A_NORMALIZE:
-                moveType = NORMAL;
-                break;
+            case A_NORMALIZE: moveType = NORMAL; break;
             case A_PIXILATE:
                 if( moveType == NORMAL ) { return FAIRY; }
                 break;
@@ -1079,63 +1168,25 @@ namespace BATTLE {
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) )
             [[unlikely]] {
                 switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getItem( ) ) {
-                case I_FLAME_PLATE:
-                    moveType = FIRE;
-                    break;
-                case I_SPLASH_PLATE:
-                    moveType = WATER;
-                    break;
-                case I_ZAP_PLATE:
-                    moveType = ELECTRIC;
-                    break;
-                case I_MEADOW_PLATE:
-                    moveType = GRASS;
-                    break;
-                case I_ICICLE_PLATE:
-                    moveType = ICE;
-                    break;
-                case I_FIST_PLATE:
-                    moveType = FIGHT;
-                    break;
-                case I_TOXIC_PLATE:
-                    moveType = type::POISON;
-                    break;
-                case I_EARTH_PLATE:
-                    moveType = GROUND;
-                    break;
-                case I_SKY_PLATE:
-                    moveType = FLYING;
-                    break;
-                case I_MIND_PLATE:
-                    moveType = PSYCHIC;
-                    break;
-                case I_INSECT_PLATE:
-                    moveType = BUG;
-                    break;
-                case I_STONE_PLATE:
-                    moveType = ROCK;
-                    break;
-                case I_SPOOKY_PLATE:
-                    moveType = GHOST;
-                    break;
-                case I_DRACO_PLATE:
-                    moveType = DRAGON;
-                    break;
-                case I_DREAD_PLATE:
-                    moveType = DARK;
-                    break;
-                case I_IRON_PLATE:
-                    moveType = STEEL;
-                    break;
-                case I_PIXIE_PLATE:
-                    moveType = FAIRY;
-                    break;
-                case I_NULL_PLATE:
-                    moveType = UNKNOWN;
-                    break;
-                default:
-                    moveType = NORMAL;
-                    break;
+                case I_FLAME_PLATE: moveType = FIRE; break;
+                case I_SPLASH_PLATE: moveType = WATER; break;
+                case I_ZAP_PLATE: moveType = ELECTRIC; break;
+                case I_MEADOW_PLATE: moveType = GRASS; break;
+                case I_ICICLE_PLATE: moveType = ICE; break;
+                case I_FIST_PLATE: moveType = FIGHT; break;
+                case I_TOXIC_PLATE: moveType = type::POISON; break;
+                case I_EARTH_PLATE: moveType = GROUND; break;
+                case I_SKY_PLATE: moveType = FLYING; break;
+                case I_MIND_PLATE: moveType = PSYCHIC; break;
+                case I_INSECT_PLATE: moveType = BUG; break;
+                case I_STONE_PLATE: moveType = ROCK; break;
+                case I_SPOOKY_PLATE: moveType = GHOST; break;
+                case I_DRACO_PLATE: moveType = DRAGON; break;
+                case I_DREAD_PLATE: moveType = DARK; break;
+                case I_IRON_PLATE: moveType = STEEL; break;
+                case I_PIXIE_PLATE: moveType = FAIRY; break;
+                case I_NULL_PLATE: moveType = UNKNOWN; break;
+                default: moveType = NORMAL; break;
                 }
             }
 
@@ -1143,60 +1194,24 @@ namespace BATTLE {
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) )
             [[unlikely]] {
                 switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getItem( ) ) {
-                case I_FIGHTING_MEMORY:
-                    moveType = FIGHT;
-                    break;
-                case I_FLYING_MEMORY:
-                    moveType = FLYING;
-                    break;
-                case I_POISON_MEMORY:
-                    moveType = type::POISON;
-                    break;
-                case I_GROUND_MEMORY:
-                    moveType = GROUND;
-                    break;
-                case I_ROCK_MEMORY:
-                    moveType = ROCK;
-                    break;
-                case I_BUG_MEMORY:
-                    moveType = BUG;
-                    break;
-                case I_GHOST_MEMORY:
-                    moveType = GHOST;
-                    break;
-                case I_STEEL_MEMORY:
-                    moveType = STEEL;
-                    break;
-                case I_FIRE_MEMORY:
-                    moveType = FIRE;
-                    break;
-                case I_WATER_MEMORY:
-                    moveType = WATER;
-                    break;
-                case I_GRASS_MEMORY:
-                    moveType = GRASS;
-                    break;
-                case I_ELECTRIC_MEMORY:
-                    moveType = ELECTRIC;
-                    break;
-                case I_PSYCHIC_MEMORY:
-                    moveType = PSYCHIC;
-                    break;
-                case I_ICE_MEMORY:
-                    moveType = ICE;
-                    break;
-                case I_DRAGON_MEMORY:
-                    moveType = DRAGON;
-                    break;
-                case I_DARK_MEMORY:
-                    moveType = DARK;
-                    break;
-                case I_FAIRY_MEMORY:
-                    moveType = FAIRY;
-                    break;
-                default:
-                    moveType = NORMAL;
-                    break;
+                case I_FIGHTING_MEMORY: moveType = FIGHT; break;
+                case I_FLYING_MEMORY: moveType = FLYING; break;
+                case I_POISON_MEMORY: moveType = type::POISON; break;
+                case I_GROUND_MEMORY: moveType = GROUND; break;
+                case I_ROCK_MEMORY: moveType = ROCK; break;
+                case I_BUG_MEMORY: moveType = BUG; break;
+                case I_GHOST_MEMORY: moveType = GHOST; break;
+                case I_STEEL_MEMORY: moveType = STEEL; break;
+                case I_FIRE_MEMORY: moveType = FIRE; break;
+                case I_WATER_MEMORY: moveType = WATER; break;
+                case I_GRASS_MEMORY: moveType = GRASS; break;
+                case I_ELECTRIC_MEMORY: moveType = ELECTRIC; break;
+                case I_PSYCHIC_MEMORY: moveType = PSYCHIC; break;
+                case I_ICE_MEMORY: moveType = ICE; break;
+                case I_DRAGON_MEMORY: moveType = DRAGON; break;
+                case I_DARK_MEMORY: moveType = DARK; break;
+                case I_FAIRY_MEMORY: moveType = FAIRY; break;
+                default: moveType = NORMAL; break;
                 }
             }
 
@@ -1204,21 +1219,11 @@ namespace BATTLE {
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) )
             [[unlikely]] {
                 switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getItem( ) ) {
-                case I_BURN_DRIVE:
-                    moveType = FIRE;
-                    break;
-                case I_DOUSE_DRIVE:
-                    moveType = WATER;
-                    break;
-                case I_CHILL_DRIVE:
-                    moveType = ICE;
-                    break;
-                case I_SHOCK_DRIVE:
-                    moveType = ELECTRIC;
-                    break;
-                default:
-                    moveType = NORMAL;
-                    break;
+                case I_BURN_DRIVE: moveType = FIRE; break;
+                case I_DOUSE_DRIVE: moveType = WATER; break;
+                case I_CHILL_DRIVE: moveType = ICE; break;
+                case I_SHOCK_DRIVE: moveType = ELECTRIC; break;
+                default: moveType = NORMAL; break;
                 }
             }
 
@@ -1234,45 +1239,23 @@ namespace BATTLE {
         if( p_move.m_param == M_WEATHER_BALL ) {
             switch( getWeather( ) ) {
             case RAIN:
-            case HEAVY_RAIN:
-                moveType = WATER;
-                break;
+            case HEAVY_RAIN: moveType = WATER; break;
             case SUN:
-            case HEAVY_SUNSHINE:
-                moveType = FIRE;
-                break;
-            case HAIL:
-                moveType = ICE;
-                break;
-            case SANDSTORM:
-                moveType = ROCK;
-                break;
-            case FOG:
-                moveType = FLYING;
-                break;
-            default:
-                moveType = NORMAL;
-                break;
+            case HEAVY_SUNSHINE: moveType = FIRE; break;
+            case HAIL: moveType = ICE; break;
+            case SANDSTORM: moveType = ROCK; break;
+            case FOG: moveType = FLYING; break;
+            default: moveType = NORMAL; break;
             }
         }
 
         if( p_move.m_param == M_TERRAIN_PULSE ) {
             switch( getTerrain( ) ) {
-            case PSYCHICTERRAIN:
-                moveType = PSYCHIC;
-                break;
-            case ELECTRICTERRAIN:
-                moveType = ELECTRIC;
-                break;
-            case MISTYTERRAIN:
-                moveType = FAIRY;
-                break;
-            case GRASSYTERRAIN:
-                moveType = GRASS;
-                break;
-            default:
-                moveType = NORMAL;
-                break;
+            case PSYCHICTERRAIN: moveType = PSYCHIC; break;
+            case ELECTRICTERRAIN: moveType = ELECTRIC; break;
+            case MISTYTERRAIN: moveType = FAIRY; break;
+            case GRASSYTERRAIN: moveType = GRASS; break;
+            default: moveType = NORMAL; break;
             }
         }
 
@@ -1436,21 +1419,11 @@ namespace BATTLE {
                         movePower = 150;
                     } else {
                         switch( atkspd / defspd ) {
-                        case 0:
-                            movePower = 40;
-                            break;
-                        case 1:
-                            movePower = 60;
-                            break;
-                        case 2:
-                            movePower = 80;
-                            break;
-                        case 3:
-                            movePower = 120;
-                            break;
-                        default:
-                            movePower = 150;
-                            break;
+                        case 0: movePower = 40; break;
+                        case 1: movePower = 60; break;
+                        case 2: movePower = 80; break;
+                        case 3: movePower = 120; break;
+                        default: movePower = 150; break;
                         }
                     }
                 }
@@ -1809,8 +1782,7 @@ namespace BATTLE {
                     damage = ( damage * cons / 100 );
                     break;
                 }
-                default:
-                    break;
+                default: break;
                 }
             }
 
@@ -1874,8 +1846,7 @@ namespace BATTLE {
                 case I_YACHE_BERRY:
                     if( moveType == type::ICE && effectiveness > 100 ) { eatitem = true; }
                     break;
-                default:
-                    break;
+                default: break;
                 }
                 if( eatitem ) {
                     damage >>= 1;
@@ -2016,24 +1987,15 @@ namespace BATTLE {
                     addVolatileStatus( opponent, slot, MOVECHARGE, 1 );
 
                     switch( p_move.m_param ) {
-                    case M_DIVE:
-                        addVolatileStatus( opponent, slot, DIVING, 1 );
-                        break;
-                    case M_DIG:
-                        addVolatileStatus( opponent, slot, DIGGING, 1 );
-                        break;
+                    case M_DIVE: addVolatileStatus( opponent, slot, DIVING, 1 ); break;
+                    case M_DIG: addVolatileStatus( opponent, slot, DIGGING, 1 ); break;
                     case M_FLY:
                     case M_BOUNCE:
-                    case M_SKY_DROP:
-                        addVolatileStatus( opponent, slot, INAIR, 1 );
-                        break;
+                    case M_SKY_DROP: addVolatileStatus( opponent, slot, INAIR, 1 ); break;
                     case M_PHANTOM_FORCE:
-                    case M_SHADOW_FORCE:
-                        addVolatileStatus( opponent, slot, INVISIBLE, 1 );
-                        break;
+                    case M_SHADOW_FORCE: addVolatileStatus( opponent, slot, INVISIBLE, 1 ); break;
 
-                    default:
-                        break;
+                    default: break;
                     }
 
                     battleMoveSelection bms = NO_OP_SELECTION;
