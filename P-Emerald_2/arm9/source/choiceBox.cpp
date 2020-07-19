@@ -107,7 +107,7 @@ namespace IO {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 cooldown = COOLDOWN_COUNT;
                 sel      = choiceBox::BACK_CHOICE;
-                p_selectFunction( sel );
+                if( _mode != MODE_UP_DOWN_LEFT_RIGHT_CANCEL ) { p_selectFunction( sel ); }
                 break;
             }
             if( ext && ( pressed & KEY_X ) ) {
@@ -123,13 +123,15 @@ namespace IO {
 
                 if( _mode == MODE_LEFT_RIGHT ) {
                     sel = ( sel + mxchoice - 1 ) % mxchoice;
+                } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT_CANCEL ) {
+                    if( ( sel ^ 1 ) < mxchoice ) { sel ^= 1; }
                 } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     if( !( sel & 1 ) && prvpg ) {
                         // Switch to previous page
                         choices = p_drawFunction( --page );
                         UPDATE_PAGE_STATS;
                     }
-                    sel ^= 1;
+                    if( ( sel ^ 1 ) < mxchoice ) { sel ^= 1; }
                 } else if( _mode == MODE_UP_DOWN && prvpg ) {
                     choices = p_drawFunction( --page );
                     UPDATE_PAGE_STATS;
@@ -146,6 +148,12 @@ namespace IO {
 
                 if( _mode == MODE_LEFT_RIGHT ) {
                     sel = ( sel + 1 ) % mxchoice;
+                } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT_CANCEL ) {
+                    if( ( sel ^ 1 ) < mxchoice ) {
+                        sel ^= 1;
+                    } else if( sel > 0 ) {
+                        sel = ( ( mxchoice - 1 ) >> 1 ) << 1;
+                    }
                 } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     if( ( sel & 1 ) && nxtpg ) {
                         // Switch to next page
@@ -174,6 +182,12 @@ namespace IO {
 
                 if( _mode == MODE_UP_DOWN ) {
                     sel = ( sel + mxchoice - 1 ) % mxchoice;
+                } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT_CANCEL ) {
+                    if( sel < 2 ) {
+                        sel = 4;
+                    } else if( sel < 5 ) {
+                        sel -= 2;
+                    }
                 } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     // move to the pre option in the current column
                     if( sel < 2 ) {
@@ -191,6 +205,14 @@ namespace IO {
 
                 if( _mode == MODE_UP_DOWN ) {
                     sel = ( sel + 1 ) % mxchoice;
+                } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT_CANCEL ) {
+                    if( sel < 3 ) {
+                        sel += 2;
+                    } else if( sel < 4 ) {
+                        sel = 4;
+                    } else if( sel == 4 ) {
+                        sel = 0;
+                    }
                 } else if( _mode == MODE_UP_DOWN_LEFT_RIGHT ) {
                     // Move to the next option in the current column
                     if( sel + 2 >= mxchoice ) {

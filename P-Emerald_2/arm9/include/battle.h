@@ -75,11 +75,13 @@ namespace BATTLE {
         u8       _playerTeamSize;
         u8       _playerPkmnPerm[ 6 ];
 
-        u8       _playerPkmnOrigLevel[ 6 ]; // unaffected by permutation
+        u8 _playerPkmnOrigLevel[ 6 ]; // unaffected by permutation
 
         battlePolicy _policy;
         bool         _isWildBattle;
         bool         _opponentRuns; // wild pkmn tries to run whenever possible
+
+        u8 _lastMoveChoice = 0;
 
         /*
          * @brief: Initializes the battle.
@@ -191,6 +193,7 @@ namespace BATTLE {
          * the player is asked which move should be forgotten.
          */
         void learnMove( pokemon* p_pokemon, u16 p_move );
+
       public:
         /*
          * @brief: Creates a new trainer battle.

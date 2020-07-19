@@ -36,10 +36,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleSlot.h"
 #include "battleTrainer.h"
 #include "battleUI.h"
+#include "choiceBox.h"
 #include "dex.h"
 #include "partyScreen.h"
 #include "saveGame.h"
 #include "uio.h"
+#include "yesNoBox.h"
 
 #include "bagViewer.h"
 #include "pokemon.h"
@@ -455,111 +457,44 @@ namespace BATTLE {
             return chooseTarget( res );
         }
 
-        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega );
-        u8 curSel = 0;
-        _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega, curSel,
-                                       res.m_megaEvolve );
+        IO::choiceBox cb     = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
+        u8            curSel = _lastMoveChoice;
 
-        cooldown = COOLDOWN_COUNT;
         loop( ) {
-            scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            u8 rs = cb.getResult(
+                [ & ]( u8 ) {
+                    return _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse,
+                                                          mega );
+                },
+                [ & ]( u8 p_selection ) {
+                    curSel = p_selection;
+                    _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
+                                                   curSel, res.m_megaEvolve );
+                },
+                curSel );
 
-            if( pressed & KEY_B ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
+            if( rs == IO::choiceBox::BACK_CHOICE || rs == 4 ) {
                 res.m_type = CANCEL;
                 return res;
             }
-            if( pressed & KEY_A ) {
-                if( curSel < 4 ) { // Choos attack curSel
-                    if( canUse[ curSel ] ) {
-                        SOUND::playSoundEffect( SFX_CHOOSE );
-                        res.m_param = _field.getPkmn( false, p_slot )->getMove( curSel );
-                        auto tmp    = chooseTarget( res );
+            if( rs < 4 ) {
+                // player selects an attack
+                if( canUse[ rs ] ) {
+                    res.m_param = _field.getPkmn( false, p_slot )->getMove( curSel );
+                    auto tmp    = chooseTarget( res );
 
-                        if( tmp.m_type != CANCEL ) {
-                            return tmp;
-                        } else {
-                            res.m_param = 0;
-                        }
-                    }
-                } else if( curSel == 4 ) { // Cancel
-                    SOUND::playSoundEffect( SFX_CANCEL );
-                    res.m_type = CANCEL;
-                    return res;
-                } else if( mega && curSel == 5 ) { // Toggle Mega Evolution
-                    res.m_megaEvolve = !res.m_megaEvolve;
-                    _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
-                                                   curSel, res.m_megaEvolve );
-                }
-
-                cooldown = COOLDOWN_COUNT;
-            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_LEFT ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-
-                if( curSel < 4 && _field.getPkmn( false, p_slot )->getMove( curSel ^ 1 ) ) {
-                    curSel ^= 1;
-                } else if( curSel == 5 ) {
-                    curSel = 4;
-                } else if( curSel == 4 && mega ) {
-                    curSel = 5;
-                } else {
-                    cooldown = COOLDOWN_COUNT;
-                    continue;
-                }
-
-                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
-                                               curSel, res.m_megaEvolve );
-
-                cooldown = COOLDOWN_COUNT;
-            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-
-                if( curSel + 2 < 4 && _field.getPkmn( false, p_slot )->getMove( curSel + 2 ) ) {
-                    curSel += 2;
-                } else if( curSel < 4 ) {
-                    curSel = 4;
-                } else if( curSel == 4 ) {
-                    curSel = 0;
-                } else {
-                    cooldown = COOLDOWN_COUNT;
-                    continue;
-                }
-
-                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
-                                               curSel, res.m_megaEvolve );
-
-                cooldown = COOLDOWN_COUNT;
-            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
-
-                if( curSel >= 2 && curSel < 4 ) {
-                    curSel -= 2;
-                } else if( curSel == 4 ) {
-                    if( _field.getPkmn( false, p_slot )->getMove( 2 ) ) {
-                        curSel = 2;
+                    if( tmp.m_type != CANCEL ) {
+                        _lastMoveChoice = curSel;
+                        return tmp;
                     } else {
-                        curSel = 0;
+                        res.m_param = 0;
                     }
-                } else if( curSel < 2 ) {
-                    curSel = 4;
-                } else {
-                    cooldown = COOLDOWN_COUNT;
-                    continue;
                 }
-
-                _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
-                                               curSel, res.m_megaEvolve );
-
-                cooldown = COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
+            if( mega && rs == 5 ) { // Toggle Mega Evolution
+                res.m_megaEvolve = !res.m_megaEvolve;
+            }
         }
-
-        return res;
     }
 
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
@@ -855,16 +790,55 @@ namespace BATTLE {
 
                 for( u8 j = 0; j < 20; ++j ) {
                     if( !MOVE_BUFFER[ j ] ) { break; }
-                    bool gd = false;
+                    bool gd = true;
                     for( u8 mv = 0; mv < 4; ++mv ) {
                         if( _playerTeam[ i ].getMove( i ) == MOVE_BUFFER[ j ] ) { gd = false; }
                     }
                     if( gd ) {
+                        _battleUI.showTopMessagePkmn( &_playerTeam[ i ] );
+                        _battleUI.printTopMessage( 0, true );
                         _playerTeam[ i ].learnMove(
                             MOVE_BUFFER[ j ],
-                            [ & ]( const char* p_message ) { _battleUI.log( p_message ); },
-                            [ & ]( boxPokemon* p_bp, u16 p_nmove ) { return 0; },
-                            [ & ]( const char* p_message ) { return true; } );
+                            [ & ]( const char* p_message ) {
+                                _battleUI.printTopMessage( p_message, true );
+                                for( u8 g = 0; g < 100; ++g ) swiWaitForVBlank( );
+                            },
+                            [ & ]( boxPokemon*, u16 ) -> u8 {
+                                IO::choiceBox cb = IO::choiceBox(
+                                    IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
+                                u8 curSel = 0;
+
+                                bool canUse[ 4 ] = { 1, 1, 1, 1 };
+                                u8   rs          = cb.getResult(
+                                    [ & ]( u8 ) {
+                                        return _battleUI.showAttackSelection( &_playerTeam[ i ],
+                                                                              canUse, false );
+                                    },
+                                    [ & ]( u8 p_selection ) {
+                                        curSel = p_selection;
+                                        _battleUI.showAttackSelection( &_playerTeam[ i ], canUse,
+                                                                       false, curSel, false );
+                                    },
+                                    curSel );
+
+                                if( rs < 4 ) {
+                                    return rs;
+                                } else {
+                                    return 4;
+                                }
+                            },
+                            [ & ]( const char* p_message ) {
+                                IO::yesNoBox yn;
+                                _battleUI.printTopMessage( p_message, true );
+                                return yn.getResult(
+                                           [ & ]( ) { return _battleUI.printYNMessage( 254 ); },
+                                           [ & ]( IO::yesNoBox::selection p_selection ) {
+                                               _battleUI.printYNMessage( p_selection
+                                                                         == IO::yesNoBox::NO );
+                                           } )
+                                       == IO::yesNoBox::YES;
+                            } );
+                        _battleUI.hideTopMessage( );
                     }
                 }
             }

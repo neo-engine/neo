@@ -176,11 +176,11 @@ namespace SPX {
 
         std::vector<pokemon> pkmn = {
             pokemon( PKMN_TREECKO, 5, 0, 0, 255 * ( ( rand( ) & 3 ) == 3 ), ( rand( ) & 7 ) == 7,
-                     false, 0, 0, true ),
+                     false, 3, 0, true ),
             pokemon( PKMN_TORCHIC, 5, 0, 0, 255 * ( ( rand( ) & 3 ) == 3 ), ( rand( ) & 7 ) == 7,
-                     false, 0, 0, true ),
+                     false, 3, 0, true ),
             pokemon( PKMN_MUDKIP, 5, 0, 0, 255 * ( ( rand( ) & 3 ) == 3 ), ( rand( ) & 7 ) == 7,
-                     false, 0, 0, true ),
+                     false, 3, 0, true ),
         };
 
         u8 curSel = 1;

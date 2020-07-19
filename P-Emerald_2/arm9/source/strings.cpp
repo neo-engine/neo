@@ -405,14 +405,13 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Fainted", "Besiegt" },
     { "Statistics", "Statuswerte" },
     { "Lv.%3i", "Lv.%3i" },
-    { "[TRAINER] ([TCLASS]) sent\nout %s![A]",
-      "[TRAINER] ([TCLASS]) schickt\n%s in den Kampf![A]" },
+    { "%s tries to learn %s.", "%s versucht %s zu lernen." },
 
     // 140
 
     { "Go [OWN%d]![A]", "Los [OWN%d]![A]" },
     { "Do you want to give a nick name to %s?", "M\xf6"
-                                                 "chtest du dem %s einen Spitznamen geben?" },
+                                                "chtest du dem %s einen Spitznamen geben?" },
     { "Choose a nick name!", "W\xe4hle einen Spitznamen!" },
     { "You are challenged by %s %s!", "Eine Herausforderung von %s %s!" },
     { "Frzn", "Eingfr" },

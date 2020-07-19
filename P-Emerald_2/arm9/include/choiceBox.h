@@ -51,6 +51,8 @@ namespace IO {
             MODE_UP_DOWN            = 0, // A single column of choices (per page)
             MODE_UP_DOWN_LEFT_RIGHT = 1, // Two columns of choices (per page) in total
             MODE_LEFT_RIGHT         = 2, // A single row of choices (no page switch)
+            MODE_UP_DOWN_LEFT_RIGHT_CANCEL
+            = 3, // Two columns of 2 choices and an extra option centered below
         };
 
       private:

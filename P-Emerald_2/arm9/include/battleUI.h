@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "battleDefines.h"
 #include "saveGame.h"
+#include "uio.h"
 #include "yesNoBox.h"
 
 namespace BATTLE {
@@ -229,9 +230,9 @@ namespace BATTLE {
         /*
          * @brief: Shows the attack selection for the given pkmn.
          */
-        void showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ],
-                                  bool p_showMegaEvolution, u8 p_highlightedButton = -1,
-                                  bool p_megaButtonActive = false );
+        std::vector<std::pair<IO::inputTarget, u8>>
+        showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ], bool p_showMegaEvolution,
+                             u8 p_highlightedButton = -1, bool p_megaButtonActive = false );
 
         /*
          * @brief: Animates an attempt at capturing the wild pkmn with the given ball and
@@ -249,5 +250,22 @@ namespace BATTLE {
          */
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
         printYNMessage( u8 p_selection );
+
+        /*
+         * @brief: Shows the specified pkmn centered on the top screen, destroys
+         * any sprites that were previously on the top screen.
+         */
+        void showTopMessagePkmn( pokemon* p_pokemon );
+
+        /*
+         * @brief: Prints a message to a mbox on the top screen. To be used only when no
+         * battlers are on the screen.
+         */
+        void printTopMessage( const char* p_message, bool p_init );
+
+        /*
+         * @brief: Hides the mbox on the top screen.
+         */
+        void hideTopMessage( );
     };
 } // namespace BATTLE

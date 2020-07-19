@@ -37,17 +37,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
                         bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
                         bool p_fatefulEncounter, pkmnData* p_data )
-    : boxPokemon::boxPokemon(
-          nullptr, p_pkmnId, p_name, p_level, SAVE::SAV.getActiveFile( ).m_id,
-          SAVE::SAV.getActiveFile( ).m_sid, SAVE::SAV.getActiveFile( ).m_playername,
-          p_shiny, p_hiddenAbility, p_fatefulEncounter,
-          p_isEgg, MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) {
+    : boxPokemon::boxPokemon( nullptr, p_pkmnId, p_name, p_level, SAVE::SAV.getActiveFile( ).m_id,
+                              SAVE::SAV.getActiveFile( ).m_sid,
+                              SAVE::SAV.getActiveFile( ).m_playername, p_shiny, p_hiddenAbility,
+                              p_fatefulEncounter, p_isEgg, MAP::curMap->getCurrentLocationId( ),
+                              p_ball, p_pokerus, p_forme, p_data ) {
 }
 
 boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id,
-                        u16 p_sid, const char* p_oT, u8 p_shiny,
-                        bool p_hiddenAbility, bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace,
-                        u8 p_ball, u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
+                        u16 p_sid, const char* p_oT, u8 p_shiny, bool p_hiddenAbility,
+                        bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_ball,
+                        u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
     pkmnData data;
     if( p_data == nullptr ) {
         data = getPkmnData( p_pkmnId, p_forme );
@@ -143,9 +143,9 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     }
     m_hometown = 4;
     strcpy( m_oT, p_oT );
-    m_pokerus    = p_pokerus;
-    m_ball       = p_ball;
-    m_gotLevel   = p_level;
+    m_pokerus  = p_pokerus;
+    m_ball     = p_ball;
+    m_gotLevel = p_level;
 
     m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
     setSpecies( p_pkmnId, &data );
@@ -294,7 +294,7 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
         for( u8 i = 0; i < 4; ++i )
             if( !m_moves[ i ] ) {
                 m_moves[ i ] = p_move;
-                m_curPP[ i ] = std::min( m_curPP[ i ], mdata.m_pp );
+                m_curPP[ i ] = mdata.m_pp;
 
                 snprintf( buffer, 49, GET_STRING( 103 ), m_name,
                           MOVE::getMoveName( p_move ).c_str( ) );
@@ -303,6 +303,8 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                 break;
             }
         if( !freeSpot ) {
+            snprintf( buffer, 49, GET_STRING( 139 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+            p_message( buffer );
             snprintf( buffer, 49, GET_STRING( 104 ), m_name );
             if( p_yesNoMessage( buffer ) ) {
                 u8 res = p_getMove( this, p_move );
