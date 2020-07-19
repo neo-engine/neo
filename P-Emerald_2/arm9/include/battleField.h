@@ -475,6 +475,20 @@ namespace BATTLE {
         }
 
         /*
+         * @brief: Checks whether the specified pkmn has any of the abilities
+         * A_MOLD_BREAKER, A_TERAVOLT, or A_TURBOBLAZE
+         */
+        inline bool breaksAbilities( bool p_opponent, u8 p_pos ) {
+            auto p = getPkmn( p_opponent, p_pos );
+            if( p == nullptr ) [[unlikely]] {
+                    return false;
+                }
+
+            return p->getAbility( ) == A_MOLD_BREAKER || p->getAbility( ) == A_TERAVOLT
+                   || p->getAbility( ) == A_TURBOBLAZE;
+        }
+
+        /*
          * @brief: Checks whether weather effects are currently suppressed by something on the
          * field
          */
@@ -594,7 +608,7 @@ namespace BATTLE {
         bool useMove( battleUI* p_ui, battleMove p_move );
 
         /*
-         * @brief: Checks whether the pokemon can use an item (from the bag).
+         * @brief: Checks whether the pokemon can use an item (from the bag or hold).
          */
         constexpr bool canUseItem( bool p_opponent, u8 p_slot, bool p_allowAbilities = true ) {
             if( getPseudoWeather( ) & MAGICROOM ) { return false; }

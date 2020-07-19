@@ -126,7 +126,7 @@ namespace BATTLE {
         POWERTRICK       = ( 1 << 20 ), // TODO
         HEALBLOCK        = ( 1 << 21 ),
         EMBARGO          = ( 1 << 22 ),
-        MIRACLEEYE       = ( 1 << 23 ), // TODO
+        MIRACLEEYE       = ( 1 << 23 ),
         SUBSTITUTE       = ( 1 << 24 ), // TODO
         BIDE             = ( 1 << 25 ), // TODO
         FOCUSENERGY      = ( 1 << 26 ),
@@ -134,7 +134,7 @@ namespace BATTLE {
         MINIMIZE         = ( 1 << 28 ),    // TODO
         LEECHSEED        = ( 1 << 29 ),    // TODO
         DISABLE          = ( 1 << 30 ),    // TODO
-        FORESIGHT        = ( 1LLU << 31 ), // TODO
+        FORESIGHT        = ( 1LLU << 31 ),
         SNATCH           = ( 1LLU << 32 ), // TODO
         GRUDGE           = ( 1LLU << 33 ), // TODO
         IMPRISON         = ( 1LLU << 34 ), // TODO
@@ -337,13 +337,13 @@ namespace MOVE {
         /** ignores defense boosts */
         IGNOREDEFS = ( 1LLU << 39 ), // TODO
         /** ignores evasion boosts */
-        IGNOREEVASION = ( 1LLU << 40 ), // TODO
+        IGNOREEVASION = ( 1LLU << 40 ),
         /** Defrosts the target */
         DEFROSTTARGET = ( 1LLU << 41 ),
         /** Forces the target to switch out */
         FORCESWITCH = ( 1LLU << 42 ),
         /** Will always land a critical hit */
-        WILLCRIT = ( 1LLU << 43 ), // TODO
+        WILLCRIT = ( 1LLU << 43 ),
         /** Move uses atk/satk of the target */
         TARGETOFFENSIVES = ( 1LLU << 44 ), // TODO
         /** Move hits at a later time */

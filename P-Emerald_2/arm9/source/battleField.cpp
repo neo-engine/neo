@@ -642,43 +642,24 @@ namespace BATTLE {
 
     void field::confusionSelfDamage( battleUI* p_ui, bool p_opponent, u8 p_slot ) {
         // TODO
-        (void) p_ui;
-        (void) p_opponent;
-        (void) p_slot;
     }
 
     void field::executeStatusEffects( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
         // TODO
-
-        (void) p_ui;
-        (void) p_move;
-        (void) p_target;
     }
 
     void field::executeSecondaryStatus( battleUI* p_ui, battleMove p_move,
                                         fieldPosition p_target ) {
         // TODO
-
-        (void) p_ui;
-        (void) p_move;
-        (void) p_target;
     }
 
     void field::executeSecondaryEffects( battleUI* p_ui, battleMove p_move,
                                          fieldPosition p_target ) {
         // TODO
-
-        (void) p_ui;
-        (void) p_move;
-        (void) p_target;
     }
 
     void field::executeContact( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
         // TODO
-
-        (void) p_ui;
-        (void) p_move;
-        (void) p_target;
     }
 
     bool field::useMove( battleUI* p_ui, battleMove p_move ) {
@@ -810,14 +791,94 @@ namespace BATTLE {
 
     bool field::moveMisses( battleUI* p_ui, battleMove p_move, fieldPosition p_target,
                             bool p_critical ) {
-        // TODO
+        auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        auto target = getPkmn( p_target.first, p_target.second );
+        if( user == nullptr || target == nullptr ) [[unlikely]] {
+                return false;
+            }
 
+        auto tgvol = getVolatileStatus( p_target.first, p_target.second );
+        auto usvol = getVolatileStatus( p_move.m_user.first, p_move.m_user.second );
+
+        if( usvol & FORESIGHT ) { return false; }
+        if( usvol & MIRACLEEYE ) { return false; }
+
+        bool supprAbs = suppressesAbilities( );
+
+        u16 acc = p_move.m_moveData.m_accuracy;
+        if( !acc || acc > 100 ) { return false; }
+
+        bool ignoreEvasion = !!( p_move.m_moveData.m_flags & MOVE::IGNOREEVASION ) || p_critical;
+
+        s8 ev = s8( getStat( p_move.m_user.first, p_move.m_user.second, ACCURACY ) )
+                - ( ignoreEvasion * s8( getStat( p_target.first, p_target.second, EVASION ) ) );
+
+        if( ev < -6 ) { ev = -6; }
+        if( ev > 6 ) { ev = 6; }
+
+        if( ev < 0 ) {
+            acc = ( acc * 3 ) / ( -ev + 3 );
+        } else if( ev > 0 ) {
+            acc = ( acc * ( ev + 3 ) ) / 3;
+        }
+
+        if( !supprAbs && !breaksAbilities( p_move.m_user.first, p_move.m_user.second ) ) {
+            // Victory Star
+            if( _sides[ p_move.m_user.first ].anyHasAbility( A_VICTORY_STAR ) ) {
+                acc = ( acc * 11 ) / 10;
+            }
+
+            // Compound Eyes
+            if( user->getAbility( ) == A_COMPOUND_EYES ) {
+                acc = ( acc * 13 ) / 10;
+            }
+
+            // Hustle
+            if( user->getAbility( ) == A_HUSTLE
+                && p_move.m_moveData.m_category == MOVE::PHYSICAL ) {
+                acc = ( acc * 8 ) / 10;
+            }
+
+            // Wonder Skin
+            if( target->getAbility( ) == A_WONDER_SKIN
+                && p_move.m_moveData.m_category == MOVE::SPECIAL ) {
+                acc = 50;
+            }
+            // Sand Veil
+            if( target->getAbility( ) == A_SAND_VEIL && getWeather( ) == SANDSTORM ) {
+                acc = ( 4 * acc ) / 5;
+            }
+            // Snow Cloak
+            if( target->getAbility( ) == A_SNOW_CLOAK && getWeather( ) == HAIL ) {
+                acc = ( 4 * acc ) / 5;
+            }
+            // Tangled Feet
+            if( target->getAbility( ) == A_TANGLED_FEET && ( tgvol & CONFUSION ) ) { acc >>= 1; }
+        }
+
+        if( canUseItem( p_target.first, p_target.second ) ) {
+            if( target->getItem( ) == I_BRIGHT_POWDER || target->getItem( ) == I_LAX_INCENSE ) {
+                acc = ( 9 * acc ) / 10;
+            }
+        }
+        if( canUseItem( p_move.m_user.first, p_move.m_user.second ) ) {
+            if( user->getItem( ) == I_WIDE_LENS ) { acc = ( 11 * acc ) / 10; }
+            if( user->getItem( ) == I_ZOOM_LENS ) {
+                // TODO proper check
+                if( getStat( p_move.m_user.first, p_move.m_user.second, SPEED )
+                    < getStat( p_target.first, p_target.second, SPEED ) ) {
+                    acc = ( 12 * acc ) / 10;
+                }
+            }
+        }
+
+#ifdef DESQUID_MORE
+        p_ui->log( std::string( "Accuracy computed " ) + std::to_string( acc ) );
+#else
         (void) p_ui;
-        (void) p_move;
-        (void) p_target;
-        (void) p_critical;
+#endif
 
-        return false;
+        return rand( ) % 100 >= acc;
     }
 
     bool field::executeCriticalCheck( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
@@ -845,6 +906,7 @@ namespace BATTLE {
         if( getSideCondition( !p_target.first ) & LUCKYCHANT ) { return false; }
 
         if( userVolStat & LASERFOCUS ) { return true; }
+        if( p_move.m_moveData.m_flags & MOVE::WILLCRIT ) { return true; }
 
         // Calculate critical hit
 

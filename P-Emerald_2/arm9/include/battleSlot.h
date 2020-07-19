@@ -524,6 +524,7 @@ namespace BATTLE {
                 auto res = _boosts.getShiftedBoost( p_stat );
                 if( res < 7 && p_ignoreNegative ) { return 7; }
                 if( res > 7 && p_ignorePositive ) { return 7; }
+
                 return res;
             }
 

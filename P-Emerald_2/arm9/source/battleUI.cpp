@@ -649,8 +649,6 @@ namespace BATTLE {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-
         IO::loadSprite( ( std::string( buffer ) + "2" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
                         SPR_PKMN_GFX( 4 ), x - 2, y - 1, 32, 32, false, false, false, OBJPRIORITY_0,
                         false );
@@ -685,8 +683,6 @@ namespace BATTLE {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-
         IO::loadSprite( ( std::string( buffer ) + "6" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
                         SPR_PKMN_GFX( 4 ), x - 1, y + 4, 32, 32, false, false, false, OBJPRIORITY_0,
                         false );
@@ -714,7 +710,6 @@ namespace BATTLE {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
         IO::loadSprite( ( std::string( buffer ) + "9" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
                         SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
                         false );
@@ -723,7 +718,6 @@ namespace BATTLE {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
         IO::loadSprite( ( std::string( buffer ) + "10" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
                         SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
                         false );
@@ -1063,7 +1057,8 @@ namespace BATTLE {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ) + ( 10 + 14 * _currentLogLine ) * 128,
                       ( 14 * ( height + 2 ) ) * 256 );
         _currentLogLine += IO::regularFont->printBreakingStringC(
-            p_message.c_str( ), 16, 10 + 14 * _currentLogLine, 256 - 32, true, IO::font::LEFT, 14 );
+            p_message.c_str( ), 16, 10 + 14 * _currentLogLine, 256 - 32, true, IO::font::LEFT, 14,
+            ' ', 0, true );
     }
 
     std::string battleUI::getPkmnName( pokemon* p_pokemon, bool p_opponent,
@@ -1671,10 +1666,6 @@ namespace BATTLE {
 
         IO::updateOAM( false );
 
-        char buffer[ 50 ];
-        snprintf( buffer, 49, GET_STRING( 394 ), p_pokemon->m_boxdata.m_name );
-        log( std::string( buffer ) );
-
         for( u16 i = WILD_BATTLE_SPRITE_X_START; i < WILD_BATTLE_SPRITE_X; ++i ) {
             for( u8 j = 0; j < 4; ++j ) {
                 oam[ SPR_PKMN_START_OAM( 0 ) + j ].x++;
@@ -1691,6 +1682,10 @@ namespace BATTLE {
         if( p_pokemon->isShiny( ) ) { animateShiny( true, 0, p_pokemon->m_boxdata.m_shinyType ); }
         _curHP[ 0 ][ 0 ] = 0;
         updatePkmnStats( true, 0, p_pokemon );
+
+        char buffer[ 50 ];
+        snprintf( buffer, 49, GET_STRING( 394 ), p_pokemon->m_boxdata.m_name );
+        log( std::string( buffer ) );
     }
 
     void battleUI::startTrainerBattle( battleTrainer* p_trainer ) {

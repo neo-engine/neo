@@ -104,16 +104,14 @@ namespace BAG {
     }
 
     void bagUI::init( ) {
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        IO::initOAMTable( false );
+        // Don't init anything else for the top screen here
+        IO::initOAMTable( true );
         IO::vramSetup( );
         swiWaitForVBlank( );
         IO::clearScreen( true, true );
         IO::resetScale( true, true );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152,
-                             true );
-
-        bgUpdate( );
-        initColors( );
 
         for( u8 i = 0; i < 6; ++i ) {
             if( !_playerTeam[ i ].getSpecies( ) ) { break; }
@@ -122,10 +120,6 @@ namespace BAG {
                                              ITEM::getItemName( _playerTeam[ i ].getItem( ) ) );
         }
 
-        IO::initOAMTable( false );
-        // Don't init anything else for the top screen here
-
-        IO::initOAMTable( true );
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         u16 tileCnt = drawPkmnIcons( );
@@ -281,6 +275,12 @@ namespace BAG {
 
         IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( true );
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152,
+                             true );
+
+        initColors( );
     }
 
     u16 bagUI::drawPkmnIcons( ) {
@@ -416,6 +416,7 @@ namespace BAG {
         IO::regularFont->printBreakingStringC( descr.c_str( ), 33, 83, 196, false, IO::font::LEFT,
                                                11 );
         IO::updateOAM( false );
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
     }
 
     void bagUI::drawPkmn( u16 p_itemId, const ITEM::itemData* p_data ) {

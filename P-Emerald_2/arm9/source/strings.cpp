@@ -635,7 +635,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 280
 
-    { "%s remains unaffected.", "%s blieb unber\xfchrt." },
+    { "%s evaded the attack.", "%s wich aus." },
     { "%s passes its %s. The %s found its purpose.",
       "%s gibt seine %s weiter. Die %s fand ihre Bestimmung." },
     { "The %s protects %s.", "Die %s sch\xfctzt %s." },

@@ -208,7 +208,7 @@ namespace BAG {
         }
 
         char buffer[ 100 ];
-        if( p_data->m_itemType == ITEM::ITEMTYPE_MEDICINE
+        if( ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE
             || p_data->m_itemType == ITEM::ITEMTYPE_FORMECHANGE ) {
 
             u8 oldLv = p_pokemon.m_level;
@@ -256,7 +256,7 @@ namespace BAG {
                                           p_pokemon.isFemale( ), false );
                     initUI( );
                 }
-                return false;
+                return true;
             }
             _bagUI->printMessage( GET_STRING( 53 ) );
             waitForInteract( );
@@ -340,18 +340,7 @@ namespace BAG {
 
                 if( tgpkmn == IO::choiceBox::BACK_CHOICE ) { return false; }
 
-                if( useItemOnPkmn( _playerTeam[ tgpkmn ], p_targetItem, p_data ) ) {
-
-                    auto lstBg = SAVE::SAV.getActiveFile( ).m_lstBag;
-                    SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) lstBg, p_targetItem, 1 );
-                    if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ lstBg ]
-                        == SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) lstBg ) ) {
-                        if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ lstBg ] > 0 ) {
-                            SAVE::SAV.getActiveFile( ).m_lstViewedItem[ lstBg ]--;
-                        }
-                    }
-                    initView( );
-                } else {
+                if( !useItemOnPkmn( _playerTeam[ tgpkmn ], p_targetItem, p_data ) ) {
                     _bagUI->selectPkmn( -1 );
                     return false;
                 }

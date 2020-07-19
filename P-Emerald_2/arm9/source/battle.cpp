@@ -233,7 +233,7 @@ namespace BATTLE {
                     }
                     selection.push_back( moves[ i ][ j ] );
                 }
-#ifdef DESQUID
+#ifdef DESQUID_MORE
 
             for( u8 i = 0; i < selection.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
@@ -249,8 +249,7 @@ namespace BATTLE {
 
             auto sortedMoves = _field.computeSortedBattleMoves( &_battleUI, selection );
 
-#ifdef DESQUID
-            /*
+#ifdef DESQUID_MORE
             _battleUI.log( "Sorting done" );
             for( u8 i = 0; i < sortedMoves.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
@@ -265,7 +264,6 @@ namespace BATTLE {
                         );
             }
             for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
-            */
 #endif
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
