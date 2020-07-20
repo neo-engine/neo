@@ -60,6 +60,14 @@ namespace BATTLE {
             std::memset( _sideConditionCounter, 0, sizeof( _sideConditionCounter ) );
         }
 
+        constexpr u16 getAndIncreaseToxicCount( u8 p_slot ) {
+            return _slots[ p_slot ].getAndIncreaseToxicCount( );
+        }
+
+        constexpr u16 getTurnsInPlay( u8 p_slot ) {
+            return _slots[ p_slot ].getTurnsInPlay( );
+        }
+
         constexpr pkmnData getPkmnData( u8 p_slot ) const {
             return _slots[ p_slot ].getPokemonData( );
         }

@@ -112,6 +112,11 @@ void pokemon::battleTransform( ) {
         return;
     }
 
+    if( getSpecies( ) == PKMN_ZYGARDE && getAbility( ) == A_POWER_CONSTRUCT ) {
+        setBattleForme( 2 );
+        return;
+    }
+
     if( canBattleTransform( ) ) {
         if( getSpecies( ) == PKMN_CHARIZARD ) {
             if( getItem( ) == I_CHARIZARDITE_X ) {

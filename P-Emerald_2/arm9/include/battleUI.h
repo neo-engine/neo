@@ -119,13 +119,14 @@ namespace BATTLE {
          * @brief: Plays an animation that the pkmn at the specified slot currently has
          * the specified status condition.
          */
-        void animateVolatileStatusCondition( bool p_opponent, u8 p_slot, volatileStatus p_status );
+        void animateVolatileStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
+                                             volatileStatus p_status );
 
         /*
          * @brief: Plays an animation that the pkmn at the specified slot currently has
          * the specified status condition.
          */
-        void animateStatusCondition( bool p_opponent, u8 p_slot, u8 p_status );
+        void animateStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot, u8 p_status );
 
         /*
          * @brief: Runs the animation when the given move is prepared and prints

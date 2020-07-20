@@ -66,6 +66,7 @@ namespace BATTLE {
         u8            _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
         u8            _volatileStatusAmount[ MAX_VOLATILE_STATUS ]; // Multiple stockpiles
         boosts        _boosts;
+        u16           _toxicCount;
         u16 _turnsInPlay; // Number of turns the pkmn in the slot in participating in the battle
 
         battleMoveSelection _lockedMove; // move that a pkmn is forced to execute (no op if hib)
@@ -83,6 +84,16 @@ namespace BATTLE {
         slot( ) {
             reset( );
             _pokemon = nullptr;
+        }
+
+        constexpr u16 getAndIncreaseToxicCount( ) {
+            auto res = _toxicCount;
+            if( ++_toxicCount >= 15 ) { _toxicCount = 15; }
+            return res;
+        }
+
+        constexpr u16 getTurnsInPlay( ) {
+            return _turnsInPlay;
         }
 
         /*
@@ -108,6 +119,7 @@ namespace BATTLE {
         inline void reset( ) {
             _usedItem             = 0;
             _turnsInPlay          = 0;
+            _toxicCount           = 0;
             _lockedMove           = NO_OP_SELECTION;
             _lockedMoveTurns      = 0;
             _consecutiveMoveCount = 0;
@@ -227,6 +239,7 @@ namespace BATTLE {
             } else {
                 _usedItem             = 0;
                 _turnsInPlay          = 0;
+                _toxicCount           = 0;
                 _lockedMove           = NO_OP_SELECTION;
                 _lockedMoveTurns      = 0;
                 _slotCondition        = slotCondition( 0 );
@@ -309,26 +322,37 @@ namespace BATTLE {
 
             switch( p_status ) {
             case SLEEP:
+                if( getPkmn( )->getAbility( ) == A_COMATOSE ) { return false; }
                 getPkmn( )->m_status.m_isAsleep = p_duration;
                 if( _isTransformed ) { _pokemon->m_status.m_isAsleep = p_duration; }
                 break;
             case BURN:
+                if( hasType( FIRE ) ) { return false; }
                 getPkmn( )->m_status.m_isBurned = true;
                 if( _isTransformed ) { _pokemon->m_status.m_isBurned = true; }
                 break;
             case FROZEN:
+                if( hasType( ICE ) ) { return false; }
                 getPkmn( )->m_status.m_isFrozen = true;
                 if( _isTransformed ) { _pokemon->m_status.m_isFrozen = true; }
                 break;
             case PARALYSIS:
+                if( hasType( ELECTRIC ) ) { return false; }
                 getPkmn( )->m_status.m_isParalyzed = true;
                 if( _isTransformed ) { _pokemon->m_status.m_isParalyzed = true; }
                 break;
             case POISON:
+                // p_duration == 254 iff pkmn causing poison has corrosion ability
+                if( hasType( type::POISON ) && p_duration != 254 ) { return false; }
+                if( hasType( STEEL ) && p_duration != 254 ) { return false; }
                 getPkmn( )->m_status.m_isPoisoned = true;
                 if( _isTransformed ) { _pokemon->m_status.m_isPoisoned = true; }
                 break;
             case TOXIC:
+                // p_duration == 254 iff pkmn causing poison has corrosion ability
+                if( hasType( type::POISON ) && p_duration != 254 ) { return false; }
+                if( hasType( STEEL ) && p_duration != 254 ) { return false; }
+                _toxicCount                            = 1;
                 getPkmn( )->m_status.m_isBadlyPoisoned = true;
                 if( _isTransformed ) { _pokemon->m_status.m_isBadlyPoisoned = true; }
                 break;

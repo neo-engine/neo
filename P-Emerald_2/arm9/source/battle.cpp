@@ -1213,18 +1213,19 @@ namespace BATTLE {
                             if( _playerTeam[ i ].isForeign( ) ) { curexp <<= 1; }
 
                             u8 oldlv = _playerTeam[ i ].m_level;
-
-                            _playerTeam[ i ].gainExperience( curexp );
-                            snprintf( buffer, 99, GET_STRING( 167 ),
-                                      _playerTeam[ i ].m_boxdata.m_name, curexp );
-                            _battleUI.log( buffer );
-                            for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
-                            if( _playerTeam[ i ].m_level != oldlv ) {
-                                snprintf( buffer, 99, GET_STRING( 168 ),
-                                          _playerTeam[ i ].m_boxdata.m_name,
-                                          _playerTeam[ i ].m_level );
+                            if( _playerTeam[ i ].m_level < 100 ) {
+                                _playerTeam[ i ].gainExperience( curexp );
+                                snprintf( buffer, 99, GET_STRING( 167 ),
+                                          _playerTeam[ i ].m_boxdata.m_name, curexp );
                                 _battleUI.log( buffer );
                                 for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
+                                if( _playerTeam[ i ].m_level != oldlv ) {
+                                    snprintf( buffer, 99, GET_STRING( 168 ),
+                                              _playerTeam[ i ].m_boxdata.m_name,
+                                              _playerTeam[ i ].m_level );
+                                    _battleUI.log( buffer );
+                                    for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
+                                }
                             }
                             if( i <= u8( _policy.m_mode ) ) {
                                 // update battleUI

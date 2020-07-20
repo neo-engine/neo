@@ -2081,21 +2081,46 @@ namespace BATTLE {
         return;
     }
 
-    void battleUI::animateVolatileStatusCondition( bool p_opponent, u8 p_slot,
+    void battleUI::animateVolatileStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
                                                    volatileStatus p_status ) {
         // TODO
-
+        (void) p_pokemon;
         (void) p_opponent;
         (void) p_slot;
         (void) p_status;
     }
 
-    void battleUI::animateStatusCondition( bool p_opponent, u8 p_slot, u8 p_status ) {
-        // TODO
-
-        (void) p_opponent;
+    void battleUI::animateStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
+                                           u8 p_status ) {
         (void) p_slot;
-        (void) p_status;
+
+        auto pkmnstr = getPkmnName( p_pokemon, p_opponent );
+        char buffer[ 100 ];
+
+        if( p_status == POISON ) {
+            snprintf( buffer, 99, GET_STRING( 529 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == TOXIC ) {
+            snprintf( buffer, 99, GET_STRING( 530 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == BURN ) {
+            snprintf( buffer, 99, GET_STRING( 531 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == SLEEP ) {
+            snprintf( buffer, 99, GET_STRING( 299 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == FROZEN ) {
+            snprintf( buffer, 99, GET_STRING( 297 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == PARALYSIS ) {
+            snprintf( buffer, 99, GET_STRING( 302 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
     }
 
     std::vector<std::pair<IO::inputTarget, u8>>
@@ -2417,7 +2442,7 @@ namespace BATTLE {
     }
 
     void battleUI::setNewWeather( weather p_newWeather ) {
-        log( GET_STRING( 490 + u8( p_newWeather ) ) );
+        log( GET_STRING( 491 + u8( p_newWeather ) ) );
         _currentWeather = p_newWeather;
     }
 

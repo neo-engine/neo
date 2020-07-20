@@ -79,6 +79,15 @@ namespace BATTLE {
          */
         void age( battleUI* p_ui );
 
+        constexpr u16 getTurnsInPlay( bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getTurnsInPlay( p_slot );
+        }
+
+        constexpr u16 getAndIncreaseToxicCount( bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getAndIncreaseToxicCount(
+                p_slot );
+        }
+
         constexpr pkmnData getPkmnData( bool p_opponent, u8 p_slot ) const {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getPkmnData( p_slot );
         }
@@ -209,6 +218,18 @@ namespace BATTLE {
 
         constexpr bool setStatusCondition( bool p_opponent, u8 p_slot, u8 p_status,
                                            u8 p_duration = 255 ) {
+
+            auto pkmn = getPkmn( p_opponent, p_slot );
+            if( pkmn == nullptr ) [[unlikely]] {
+                    return false;
+                }
+
+            if( !suppressesAbilities( ) && !suppressesWeather( )
+                && pkmn->getAbility( ) == A_LEAF_GUARD
+                && ( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) ) {
+                return false;
+            }
+
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setStatusCondition(
                 p_slot, p_status, p_duration );
         }
@@ -318,7 +339,9 @@ namespace BATTLE {
         constexpr void deducePP( bool p_opponent, u8 p_slot, u16 p_moveId, u8 p_amount = 255 ) {
             if( p_amount == 255 ) {
                 p_amount = 1;
-                if( !suppressesAbilities( ) && anyHasAbility( A_PRESSURE ) ) { p_amount = 2; }
+                if( !suppressesAbilities( ) && _sides[ !p_opponent ].anyHasAbility( A_PRESSURE ) ) {
+                    p_amount = 2;
+                }
             }
 
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].deducePP( p_slot, p_moveId,
@@ -348,6 +371,11 @@ namespace BATTLE {
          */
         bool executeDamagingMove( battleUI* p_ui, battleMove p_move, fieldPosition p_target,
                                   bool p_critical, u8 p_damageModifier = 100 );
+
+        /*
+         * @brief: Executes all self boosts.
+         */
+        void executeSelfStatusEffects( battleUI* p_ui, battleMove p_move, fieldPosition p_target );
 
         /*
          * @brief: Executes all status effects of the specified move.

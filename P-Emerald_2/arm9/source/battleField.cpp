@@ -305,7 +305,45 @@ namespace BATTLE {
                     }
                     break;
                 }
+                case A_FLOWER_GIFT: {
+                    if( pkmn->getSpecies( ) == PKMN_CHERRIM ) {
+                        if( !suppressesWeather( ) ) {
+                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                                pkmn->setBattleForme( 1 );
+                                p_ui->updatePkmn( p_opponent, p_slot, pkmn );
+                                break;
+                            }
+                        }
+                        pkmn->setBattleForme( 0 );
+                        p_ui->updatePkmn( p_opponent, p_slot, pkmn );
+                    }
 
+                    break;
+                }
+                case A_FORECAST: {
+                    if( pkmn->getSpecies( ) == PKMN_CASTFORM ) {
+                        if( !suppressesWeather( ) ) {
+                            if( getWeather( ) == RAIN || getWeather( ) == HEAVY_RAIN ) {
+                                pkmn->setBattleForme( 2 );
+                                p_ui->updatePkmn( p_opponent, p_slot, pkmn );
+                                break;
+                            }
+                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                                pkmn->setBattleForme( 1 );
+                                p_ui->updatePkmn( p_opponent, p_slot, pkmn );
+                                break;
+                            }
+                            if( getWeather( ) == HAIL ) {
+                                pkmn->setBattleForme( 3 );
+                                p_ui->updatePkmn( p_opponent, p_slot, pkmn );
+                                break;
+                            }
+                        }
+                        pkmn->setBattleForme( 0 );
+                        p_ui->updatePkmn( p_opponent, p_slot, pkmn );
+                    }
+                    break;
+                }
                 default: break;
                 }
                 break;
@@ -342,6 +380,294 @@ namespace BATTLE {
                 }
             }
         }
+
+        // abilities
+        bool supprA = suppressesAbilities( );
+        if( !supprA ) {
+            for( u8 i = 0; i < 2; ++i ) {
+                for( u8 j = 0; j < 2; ++j ) {
+                    auto pkmn = getPkmn( i, j );
+                    if( pkmn == nullptr || supprA ) { continue; }
+
+                    auto adj = getPkmn( i, !j );
+
+                    if( adj != nullptr && adj->getAbility( ) == A_HEALER ) {
+                        if( pkmn->m_statusint && !( rand( ) % 3 ) ) {
+                            if( removeStatusCondition( i, j ) ) {
+                                p_ui->logAbility( adj, i );
+                                p_ui->updatePkmnStats( i, j, pkmn, true );
+                            }
+                        }
+                    }
+
+                    switch( pkmn->getAbility( ) ) {
+                    case A_SHED_SKIN:
+                        if( pkmn->m_statusint && !( rand( ) % 3 ) ) {
+                            if( removeStatusCondition( i, j ) ) {
+                                p_ui->logAbility( pkmn, i );
+                                p_ui->updatePkmnStats( i, j, pkmn, true );
+                            }
+                        }
+                        break;
+                    case A_SPEED_BOOST: {
+                        boosts bs  = getBoosts( i, j );
+                        boosts res = boosts( );
+                        if( bs.getBoost( SPEED ) < 6 ) {
+                            res.setBoost( SPEED, 1 );
+                            p_ui->logAbility( pkmn, i );
+                            auto res2 = addBoosts( i, j, res );
+                            p_ui->logBoosts( pkmn, i, j, res, res2 );
+                        }
+                        break;
+                    }
+                    case A_MOODY: {
+                        boosts bs  = getBoosts( i, j );
+                        boosts res = boosts( );
+                        u8     rs = 1 + rand( ) % 5, lw = 1 + rand( ) % 5;
+
+                        bool gd = false;
+                        for( u8 i2 = 1; i2 < 6; ++i2 ) {
+                            if( bs.getBoost( i2 ) < 6 ) { gd = true; }
+                        }
+                        while( gd && bs.getBoost( rs ) >= 6 ) { rs = 1 + rand( ) % 5; }
+                        res.setBoost( rs, 2 );
+                        gd = false;
+                        for( u8 i2 = 1; i2 < 6; ++i2 ) {
+                            if( bs.getBoost( i2 ) > -6 ) { gd = true; }
+                        }
+                        while( gd && ( bs.getBoost( lw ) <= -6 || rs == lw ) ) {
+                            lw = 1 + rand( ) % 5;
+                        }
+                        res.setBoost( lw, -1 );
+
+                        if( res != boosts( ) ) {
+                            p_ui->logAbility( pkmn, i );
+                            auto res2 = addBoosts( i, j, res );
+                            p_ui->logBoosts( pkmn, i, j, res, res2 );
+                        }
+                        break;
+                    }
+                    case A_ZEN_MODE:
+                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+                            if( pkmn->getSpecies( ) == PKMN_DARMANITAN ) {
+                                p_ui->logAbility( pkmn, i );
+                                pkmn->battleTransform( );
+                                p_ui->updatePkmn( i, j, pkmn );
+                            }
+                        }
+                        break;
+                    case A_POWER_CONSTRUCT:
+                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+                            if( pkmn->getSpecies( ) == PKMN_ZYGARDE ) {
+                                p_ui->logAbility( pkmn, i );
+                                pkmn->battleTransform( );
+                                p_ui->updatePkmn( i, j, pkmn );
+                            }
+                        }
+                        break;
+                    case A_SHIELDS_DOWN:
+                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+                            if( pkmn->getSpecies( ) == PKMN_MINIOR ) {
+                                p_ui->logAbility( pkmn, i );
+                                // TODO: implement minior battle transform
+                                pkmn->battleTransform( );
+                                p_ui->updatePkmn( i, j, pkmn );
+                            }
+                        }
+                        break;
+
+                    case A_SCHOOLING: {
+                        if( pkmn->m_level >= 20
+                            && pkmn->m_stats.m_curHP * 4 > pkmn->m_stats.m_maxHP ) {
+                            p_ui->logAbility( pkmn, i );
+                            pkmn->battleTransform( );
+                            p_ui->updatePkmn( i, j, pkmn );
+                        }
+                        break;
+                    }
+
+                    default: break;
+                    }
+                }
+            }
+        }
+
+        char buffer[ 100 ];
+
+        // volatile status
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                auto pkmn = getPkmn( i, j );
+                if( pkmn == nullptr || supprA ) { continue; }
+
+                auto volst = getVolatileStatus( i, j );
+
+                if( volst & NIGHTMARE ) {
+                    if( hasStatusCondition( i, j, SLEEP ) ) {
+                        snprintf( buffer, 99, GET_STRING( 536 ),
+                                  p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                        p_ui->log( buffer );
+                        u16 amount = pkmn->m_stats.m_maxHP / 4;
+                        if( !amount ) { amount = 1; }
+                        damagePokemon( p_ui, i, j, amount );
+                    } else {
+                        _sides[ i ].removeVolatileStatus( j, NIGHTMARE );
+                    }
+                }
+
+                if( volst & YAWN ) {
+                    if( getVolatileStatusCounter( i, j, YAWN ) == 1 ) {
+                        if( setStatusCondition( i, j, SLEEP, 4 + ( rand( ) & 3 ) ) ) {
+                            p_ui->animateStatusCondition( pkmn, i, j, SLEEP );
+                            p_ui->updatePkmnStats( i, j, pkmn, true );
+                        }
+
+                        _sides[ i ].removeVolatileStatus( j, YAWN );
+                    }
+                }
+                if( volst & AQUARING ) {
+                    if( !( volst & HEALBLOCK ) ) {
+                        snprintf( buffer, 99, GET_STRING( 535 ),
+                                  p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                        p_ui->log( buffer );
+                        u16 amount = pkmn->m_stats.m_maxHP / 16;
+                        if( !amount ) { amount = 1; }
+                        if( canUseItem( i, j ) && pkmn->getItem( ) == I_BIG_ROOT ) {
+                            amount = ( amount * 13 ) / 10;
+                        }
+                        healPokemon( p_ui, i, j, amount );
+                    }
+                }
+                if( volst & INGRAIN ) {
+                    if( !( volst & HEALBLOCK ) ) {
+                        snprintf( buffer, 99, GET_STRING( 534 ),
+                                  p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                        p_ui->log( buffer );
+                        u16 amount = pkmn->m_stats.m_maxHP / 16;
+                        if( !amount ) { amount = 1; }
+                        if( canUseItem( i, j ) && pkmn->getItem( ) == I_BIG_ROOT ) {
+                            amount = ( amount * 13 ) / 10;
+                        }
+                        healPokemon( p_ui, i, j, amount );
+                    }
+                }
+                if( volst & CURSE ) {
+                    snprintf( buffer, 99, GET_STRING( 533 ),
+                              p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                    p_ui->log( buffer );
+                    u16 amount = pkmn->m_stats.m_maxHP / 4;
+                    if( !amount ) { amount = 1; }
+                    damagePokemon( p_ui, i, j, amount );
+                }
+
+                if( !getPkmn( i, j )->canBattle( ) ) {
+                    // pkmn fainted
+                    faintPokemon( p_ui, i, j );
+                }
+            }
+        }
+
+        // status conditions
+
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                auto pkmn = getPkmn( i, j );
+                if( pkmn == nullptr ) { continue; }
+
+                auto volst = getVolatileStatus( i, j );
+
+                if( hasStatusCondition( i, j, SLEEP ) && !supprA ) {
+                    for( u8 i2 = 0; i2 < 2; ++i2 ) {
+                        for( u8 j2 = 0; j2 < 2; ++j2 ) {
+                            if( i2 == i && j2 == j ) { continue; }
+                            auto p2 = getPkmn( i2, j2 );
+                            if( p2 == nullptr ) { continue; }
+
+                            if( p2->getAbility( ) == A_BAD_DREAMS ) {
+                                p_ui->logAbility( p2, i2 );
+                                damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                            }
+                        }
+                    }
+                }
+
+                if( hasStatusCondition( i, j, POISON ) ) {
+                    p_ui->animateStatusCondition( pkmn, i, j, POISON );
+                    if( supprA || pkmn->getAbility( ) != A_POISON_HEAL ) {
+                        damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                    } else if( !( volst & HEALBLOCK ) ) {
+                        p_ui->logAbility( pkmn, i );
+                        healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                    }
+                }
+                if( hasStatusCondition( i, j, TOXIC ) ) {
+                    p_ui->animateStatusCondition( pkmn, i, j, TOXIC );
+                    u8 turns = getAndIncreaseToxicCount( i, j );
+                    if( turns > 15 ) { turns = 15; }
+                    if( supprA || pkmn->getAbility( ) != A_POISON_HEAL ) {
+                        damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP * turns / 16 );
+                    } else if( !( volst & HEALBLOCK ) ) {
+                        p_ui->logAbility( pkmn, i );
+                        healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                    }
+                }
+                if( hasStatusCondition( i, j, BURN ) ) {
+                    p_ui->animateStatusCondition( pkmn, i, j, BURN );
+                    damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                }
+
+                if( !getPkmn( i, j )->canBattle( ) ) {
+                    // pkmn fainted
+                    faintPokemon( p_ui, i, j );
+                }
+            }
+        }
+
+        // items TODO: add messages
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                auto pkmn = getPkmn( i, j );
+                if( pkmn == nullptr ) { continue; }
+                if( !canUseItem( i, j ) ) { continue; }
+                auto volst = getVolatileStatus( i, j );
+
+                if( pkmn->getItem( ) == I_LEFTOVERS && !( volst & HEALBLOCK ) ) {
+                    healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
+                }
+                if( pkmn->getItem( ) == I_BLACK_SLUDGE ) {
+                    if( hasType( i, j, type::POISON ) ) {
+                        if( !( volst & HEALBLOCK ) ) {
+                            healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
+                        }
+                    } else {
+                        if( suppressesAbilities( ) || pkmn->getAbility( ) != A_MAGIC_GUARD ) {
+                            damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                        }
+                    }
+                }
+                if( pkmn->getItem( ) == I_STICKY_BARB ) {
+                    if( suppressesAbilities( ) || pkmn->getAbility( ) != A_MAGIC_GUARD ) {
+                        damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                    }
+                }
+                if( pkmn->getItem( ) == I_FLAME_ORB ) {
+                    if( setStatusCondition( i, j, BURN ) ) {
+                        p_ui->animateStatusCondition( pkmn, i, j, BURN );
+                        p_ui->updatePkmnStats( i, j, pkmn, true );
+                    }
+                }
+                if( pkmn->getItem( ) == I_TOXIC_ORB ) {
+                    if( setStatusCondition( i, j, TOXIC ) ) {
+                        p_ui->animateStatusCondition( pkmn, i, j, TOXIC );
+                        p_ui->updatePkmnStats( i, j, pkmn, true );
+                    }
+                }
+                if( !getPkmn( i, j )->canBattle( ) ) {
+                    // pkmn fainted
+                    faintPokemon( p_ui, i, j );
+                }
+            }
+        }
     }
 
     bool field::setWeather( battleUI* p_ui, weather p_newWeather, bool p_extended ) {
@@ -364,11 +690,138 @@ namespace BATTLE {
         _weatherTimer = p_extended ? EXTENDED_DURATION : NORMAL_DURATION;
 
         p_ui->setNewWeather( p_newWeather );
+
+        // Check for castform
+
+        if( !suppressesAbilities( ) ) {
+            for( u8 i = 0; i < 2; ++i ) {
+                for( u8 j = 0; j < 2; ++j ) {
+                    auto pkmn = getPkmn( i, j );
+                    if( pkmn == nullptr ) { continue; }
+
+                    if( pkmn->getSpecies( ) == PKMN_CASTFORM
+                        && pkmn->getAbility( ) == A_FORECAST ) {
+                        if( !suppressesWeather( ) ) {
+                            if( getWeather( ) == RAIN || getWeather( ) == HEAVY_RAIN ) {
+                                pkmn->setBattleForme( 2 );
+                                p_ui->updatePkmn( i, j, pkmn );
+                                continue;
+                            }
+                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                                pkmn->setBattleForme( 1 );
+                                p_ui->updatePkmn( i, j, pkmn );
+                                continue;
+                            }
+                            if( getWeather( ) == HAIL ) {
+                                pkmn->setBattleForme( 3 );
+                                p_ui->updatePkmn( i, j, pkmn );
+                                continue;
+                            }
+                        }
+                        pkmn->setBattleForme( 0 );
+                        p_ui->updatePkmn( i, j, pkmn );
+                    }
+
+                    if( pkmn->getSpecies( ) == PKMN_CHERRIM
+                        && pkmn->getAbility( ) == A_FLOWER_GIFT ) {
+                        if( !suppressesWeather( ) ) {
+                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                                pkmn->setBattleForme( 1 );
+                                p_ui->updatePkmn( i, j, pkmn );
+                                continue;
+                            }
+                        }
+                        pkmn->setBattleForme( 0 );
+                        p_ui->updatePkmn( i, j, pkmn );
+                    }
+                }
+            }
+        }
+
         return true;
     }
 
     void field::continueWeather( battleUI* p_ui ) {
         p_ui->continueWeather( );
+
+        auto weather = getWeather( );
+        if( weather == NO_WEATHER || suppressesWeather( ) ) {
+            // nothing to do
+            return;
+        }
+
+        bool supprA = suppressesAbilities( );
+
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                auto pkmn = getPkmn( i, j );
+                if( pkmn == nullptr ) { continue; }
+                auto volst = getVolatileStatus( i, j );
+
+                if( weather == RAIN || weather == HEAVY_RAIN ) {
+                    if( !supprA && pkmn->getAbility( ) == A_HYDRATION ) {
+                        if( pkmn->m_statusint ) {
+                            if( removeStatusCondition( i, j ) ) {
+                                p_ui->logAbility( pkmn, i );
+                                p_ui->updatePkmnStats( i, j, pkmn, true );
+                            }
+                        }
+                    }
+                    if( !supprA && pkmn->getAbility( ) == A_DRY_SKIN && !( volst & HEALBLOCK ) ) {
+                        p_ui->logAbility( pkmn, i );
+                        healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                    }
+                    if( !supprA && pkmn->getAbility( ) == A_RAIN_DISH && !( volst & HEALBLOCK ) ) {
+                        p_ui->logAbility( pkmn, i );
+                        healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
+                    }
+                }
+                if( weather == SUN || weather == HEAVY_SUNSHINE ) {
+                    if( !supprA
+                        && ( pkmn->getAbility( ) == A_DRY_SKIN
+                             || pkmn->getAbility( ) == A_SOLAR_POWER ) ) {
+                        p_ui->logAbility( pkmn, i );
+                        damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
+                    }
+                }
+                if( weather == HAIL ) {
+                    if( !supprA && pkmn->getAbility( ) == A_ICE_BODY ) {
+                        if( !( volst & HEALBLOCK ) ) {
+                            p_ui->logAbility( pkmn, i );
+                            healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
+                        }
+                    } else if( !supprA
+                               && ( pkmn->getAbility( ) == A_SNOW_CLOAK
+                                    || pkmn->getAbility( ) == A_MAGIC_GUARD
+                                    || pkmn->getAbility( ) == A_OVERCOAT ) ) {
+                    } else if( canUseItem( i, j ) && pkmn->getItem( ) == I_SAFETY_GOGGLES ) {
+                    } else if( hasType( i, j, ICE ) ) {
+                    } else {
+                        damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
+                    }
+                }
+
+                if( weather == SANDSTORM ) {
+                    if( hasType( i, j, GROUND ) || hasType( i, j, ROCK )
+                        || hasType( i, j, STEEL ) ) {
+                    } else if( !supprA
+                               && ( pkmn->getAbility( ) == A_SAND_FORCE
+                                    || pkmn->getAbility( ) == A_SAND_RUSH
+                                    || pkmn->getAbility( ) == A_SAND_VEIL
+                                    || pkmn->getAbility( ) == A_MAGIC_GUARD
+                                    || pkmn->getAbility( ) == A_OVERCOAT ) ) {
+                    } else if( canUseItem( i, j ) && pkmn->getItem( ) == I_SAFETY_GOGGLES ) {
+                    } else {
+                        damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
+                    }
+                }
+
+                if( !getPkmn( i, j )->canBattle( ) ) {
+                    // pkmn fainted
+                    faintPokemon( p_ui, i, j );
+                }
+            }
+        }
     }
 
     bool field::removeWeather( battleUI* p_ui ) {
@@ -672,6 +1125,35 @@ namespace BATTLE {
         damagePokemon( p_ui, p_opponent, p_slot, pkmn->m_stats.m_maxHP / 16 );
     }
 
+    void field::executeSelfStatusEffects( battleUI* p_ui, battleMove p_move,
+                                          fieldPosition p_target ) {
+        (void) p_target;
+        auto user = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        if( user == nullptr ) [[unlikely]] {
+                return;
+            }
+
+        if( p_move.m_param == M_CURSE ) {
+            if( !hasType( p_move.m_user.first, p_move.m_user.second, GHOST ) ) {
+                boosts bs = boosts( );
+                bs.setBoost( SPEED, -1 );
+                bs.setBoost( ATK, 1 );
+                bs.setBoost( DEF, 1 );
+                auto res = addBoosts( p_move.m_user.first, p_move.m_user.second, bs );
+                p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second, bs, res );
+                return;
+            }
+        }
+
+        // Boosts
+        if( p_move.m_moveData.m_selfBoosts != boosts( ) ) {
+            auto res = addBoosts( p_move.m_user.first, p_move.m_user.second,
+                                  p_move.m_moveData.m_selfBoosts );
+            p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second,
+                             p_move.m_moveData.m_selfBoosts, res );
+        }
+    }
+
     void field::executeStatusEffects( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
         auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
         auto target = getPkmn( p_target.first, p_target.second );
@@ -685,13 +1167,68 @@ namespace BATTLE {
                 return;
             }
 
+        if( p_move.m_param == M_CURSE ) {
+            if( hasType( p_move.m_user.first, p_move.m_user.second, GHOST ) ) {
+                damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
+                               user->m_stats.m_maxHP / 2 );
+            }
+        }
+
+        if( p_move.m_param == M_TRANSFORM ) {
+            if( transformPkmn( p_move.m_user.first, p_move.m_user.second,
+                               getSlot( p_target.first, p_target.second ) ) ) {
+                p_ui->updatePkmn( p_move.m_user.first, p_move.m_user.second,
+                                  getPkmn( p_move.m_user.first, p_move.m_user.second ) );
+                if( getPkmn( p_move.m_user.first, p_move.m_user.second )->getAbility( )
+                    != A_IMPOSTER ) {
+                    checkOnSendOut( p_ui, p_move.m_user.first, p_move.m_user.second );
+                }
+            } else {
+                p_ui->log( GET_STRING( 304 ) );
+            }
+            return;
+        }
+
+        if( p_move.m_param == M_REST ) {
+            if( getVolatileStatus( p_target.first, p_target.second ) & HEALBLOCK ) {
+                p_ui->log( GET_STRING( 304 ) );
+            } else {
+                user->m_status.m_isAsleep = 3;
+                p_ui->animateStatusCondition( target, p_target.first, p_target.second,
+                                              p_move.m_moveData.m_status );
+                p_ui->updatePkmnStats( p_target.first, p_target.second, target );
+                healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
+                             user->m_stats.m_maxHP );
+            }
+            return;
+        }
+
+        // Heal
+        if( p_move.m_moveData.m_heal ) {
+            if( getVolatileStatus( p_target.first, p_target.second ) & HEALBLOCK ) {
+                p_ui->log( GET_STRING( 304 ) );
+            } else {
+                u16 amount = target->m_stats.m_maxHP * p_move.m_moveData.m_heal / 240;
+                if( !amount ) { amount = 1; }
+                healPokemon( p_ui, p_target.first, p_target.second, amount );
+            }
+        }
+
         // Check for status conditions
         if( p_move.m_moveData.m_status ) {
+            bool corr = false;
+            if( !suppressesAbilities( ) && user->getAbility( ) == A_CORROSION ) {
+                corr = ( p_move.m_moveData.m_secondaryStatus == POISON );
+            }
+
             if( setStatusCondition( p_target.first, p_target.second, p_move.m_moveData.m_status,
-                                    p_move.m_moveData.m_status == SLEEP ? rand( ) & 7 : 255 ) ) {
-                p_ui->animateStatusCondition( p_target.first, p_target.second,
+                                    p_move.m_moveData.m_status == SLEEP ? ( 4 + ( rand( ) & 3 ) )
+                                                                        : ( corr ? 254 : 255 ) ) ) {
+                p_ui->animateStatusCondition( target, p_target.first, p_target.second,
                                               p_move.m_moveData.m_status );
                 p_ui->updatePkmnStats( p_target.first, p_target.second, target, true );
+            } else {
+                p_ui->log( GET_STRING( 304 ) );
             }
         }
 
@@ -745,10 +1282,14 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_volatileStatus ) {
-            p_ui->animateVolatileStatusCondition( p_target.first, p_target.second,
+            p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
                                                   p_move.m_moveData.m_volatileStatus );
-            addVolatileStatus( p_target.first, p_target.second, p_move.m_moveData.m_volatileStatus,
-                               255 );
+            if( addVolatileStatus( p_target.first, p_target.second,
+                                   p_move.m_moveData.m_volatileStatus, 255 ) ) {
+
+            } else {
+                p_ui->log( GET_STRING( 304 ) );
+            }
         }
 
         // Boosts
@@ -756,13 +1297,6 @@ namespace BATTLE {
             auto res = addBoosts( p_target.first, p_target.second, p_move.m_moveData.m_boosts );
             p_ui->logBoosts( user, p_target.first, p_target.second, p_move.m_moveData.m_boosts,
                              res );
-        }
-
-        if( p_move.m_moveData.m_selfBoosts != boosts( ) ) {
-            auto res = addBoosts( p_move.m_user.first, p_move.m_user.second,
-                                  p_move.m_moveData.m_selfBoosts );
-            p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second,
-                             p_move.m_moveData.m_selfBoosts, res );
         }
     }
 
@@ -779,20 +1313,30 @@ namespace BATTLE {
             }
         // Check for status conditions
         if( p_move.m_moveData.m_secondaryStatus ) {
+            bool corr = false;
+            if( !suppressesAbilities( ) && user->getAbility( ) == A_CORROSION ) {
+                corr = ( p_move.m_moveData.m_secondaryStatus == POISON );
+            }
             if( setStatusCondition(
                     p_target.first, p_target.second, p_move.m_moveData.m_secondaryStatus,
-                    p_move.m_moveData.m_secondaryStatus == SLEEP ? rand( ) & 7 : 255 ) ) {
-                p_ui->animateStatusCondition( p_target.first, p_target.second,
+                    p_move.m_moveData.m_secondaryStatus == SLEEP ? ( 4 + ( rand( ) & 3 ) )
+                                                                 : ( corr ? 254 : 255 ) ) ) {
+                p_ui->animateStatusCondition( target, p_target.first, p_target.second,
                                               p_move.m_moveData.m_secondaryStatus );
                 p_ui->updatePkmnStats( p_target.first, p_target.second, target, true );
+            } else {
+                p_ui->log( GET_STRING( 304 ) );
             }
         }
 
         if( p_move.m_moveData.m_secondaryVolatileStatus ) {
-            p_ui->animateVolatileStatusCondition( p_target.first, p_target.second,
+            p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
                                                   p_move.m_moveData.m_secondaryVolatileStatus );
-            addVolatileStatus( p_target.first, p_target.second,
-                               p_move.m_moveData.m_secondaryVolatileStatus, 255 );
+            if( addVolatileStatus( p_target.first, p_target.second,
+                                   p_move.m_moveData.m_secondaryVolatileStatus, 255 ) ) {
+            } else {
+                p_ui->log( GET_STRING( 304 ) );
+            }
         }
     }
 
@@ -862,10 +1406,8 @@ namespace BATTLE {
                     removeStatusCondition( opponent, slot );
                     p_ui->updatePkmnStats( opponent, slot, getPkmn( opponent, slot ) );
                 } else {
-                    p_ui->animateStatusCondition( opponent, slot, FROZEN );
-                    snprintf( buffer, 99, GET_STRING( 297 ),
-                              p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
-                    p_ui->log( buffer );
+                    p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot,
+                                                  FROZEN );
                     return false;
                 }
             }
@@ -873,10 +1415,7 @@ namespace BATTLE {
         if( u8 slp = hasStatusCondition( opponent, slot, SLEEP ); slp ) {
             if( --slp ) {
                 // pkmn continues to sleep
-                p_ui->animateStatusCondition( opponent, slot, SLEEP );
-                snprintf( buffer, 99, GET_STRING( 299 ),
-                          p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
-                p_ui->log( buffer );
+                p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot, SLEEP );
                 setStatusCondition( opponent, slot, SLEEP, slp );
 
                 if( !( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) ) { return false; }
@@ -900,10 +1439,8 @@ namespace BATTLE {
 
         if( hasStatusCondition( opponent, slot, PARALYSIS ) ) {
             if( rand( ) % 100 < 25 ) {
-                p_ui->animateStatusCondition( opponent, slot, PARALYSIS );
-                snprintf( buffer, 99, GET_STRING( 301 ),
-                          p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
-                p_ui->log( buffer );
+                p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot,
+                                              PARALYSIS );
                 return false;
             }
         }
@@ -912,7 +1449,8 @@ namespace BATTLE {
                 u8 curVal = getVolatileStatusCounter( opponent, slot, CONFUSION );
                 if( curVal > 0 ) {
                     --curVal;
-                    p_ui->animateVolatileStatusCondition( opponent, slot, CONFUSION );
+                    p_ui->animateVolatileStatusCondition( getPkmn( opponent, slot ), opponent, slot,
+                                                          CONFUSION );
                     snprintf( buffer, 99, GET_STRING( 293 ),
                               p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                     p_ui->log( buffer );
@@ -971,6 +1509,8 @@ namespace BATTLE {
         u16 acc = p_move.m_moveData.m_accuracy;
         if( !acc || acc > 100 ) { return false; }
 
+        if( !suppressesWeather( ) && getWeather( ) == FOG ) { acc = ( 3 * acc ) / 5; }
+
         bool ignoreEvasion = !!( p_move.m_moveData.m_flags & MOVE::IGNOREEVASION ) || p_critical;
 
         s8 ev = s8( getStat( p_move.m_user.first, p_move.m_user.second, ACCURACY ) )
@@ -1006,11 +1546,13 @@ namespace BATTLE {
                 acc = 50;
             }
             // Sand Veil
-            if( target->getAbility( ) == A_SAND_VEIL && getWeather( ) == SANDSTORM ) {
+            if( target->getAbility( ) == A_SAND_VEIL && getWeather( ) == SANDSTORM
+                && !suppressesWeather( ) ) {
                 acc = ( 4 * acc ) / 5;
             }
             // Snow Cloak
-            if( target->getAbility( ) == A_SNOW_CLOAK && getWeather( ) == HAIL ) {
+            if( target->getAbility( ) == A_SNOW_CLOAK && getWeather( ) == HAIL
+                && !suppressesWeather( ) ) {
                 acc = ( 4 * acc ) / 5;
             }
             // Tangled Feet
@@ -1164,7 +1706,7 @@ namespace BATTLE {
             }
         }
 
-        if( p_move.m_param == M_WEATHER_BALL ) {
+        if( p_move.m_param == M_WEATHER_BALL && !suppressesWeather( ) ) {
             switch( getWeather( ) ) {
             case NO_WEATHER: basepower = 50; break;
             default: basepower = 100; break;
@@ -1298,7 +1840,7 @@ namespace BATTLE {
             }
         }
 
-        if( p_move.m_param == M_WEATHER_BALL ) {
+        if( p_move.m_param == M_WEATHER_BALL && !suppressesWeather( ) ) {
             switch( getWeather( ) ) {
             case RAIN:
             case HEAVY_RAIN: moveType = WATER; break;
@@ -1344,8 +1886,10 @@ namespace BATTLE {
 
         // Heavy weather
 
-        if( getWeather( ) == HEAVY_SUNSHINE && moveType == WATER ) { return 0; }
-        if( getWeather( ) == HEAVY_RAIN && moveType == FIRE ) { return 0; }
+        if( getWeather( ) == HEAVY_SUNSHINE && moveType == WATER && !suppressesWeather( ) ) {
+            return 0;
+        }
+        if( getWeather( ) == HEAVY_RAIN && moveType == FIRE && !suppressesWeather( ) ) { return 0; }
 
         if( ( p_move.m_moveData.m_flags & MOVE::SOUND )
             && ( getPkmn( p_target.first, p_target.second )->getAbility( ) == A_SOUNDPROOF
@@ -1427,8 +1971,8 @@ namespace BATTLE {
                 return false;
             }
 
-        bool supprAbs = suppressesAbilities( );
-        // auto userVolStat = getVolatileStatus( p_move.m_user.first, p_move.m_user.second );
+        bool supprAbs    = suppressesAbilities( );
+        auto userVolStat = getVolatileStatus( p_move.m_user.first, p_move.m_user.second );
 
         u16 effectiveness = getEffectiveness( p_move, p_target );
 
@@ -1949,9 +2493,15 @@ namespace BATTLE {
 
         // Calculate recoil / drain
 
-        if( p_move.m_moveData.m_drain ) {
-            healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
-                         damage * p_move.m_moveData.m_drain / 240 );
+        if( p_move.m_moveData.m_drain && !( userVolStat & HEALBLOCK ) ) {
+            u32 amount = damage * p_move.m_moveData.m_drain / 240;
+            if( canUseItem( p_move.m_user.first, p_move.m_user.second )
+                && user->getItem( ) == I_BIG_ROOT ) {
+                amount = 13 * amount / 10;
+            }
+            if( !amount ) { amount = 1; }
+
+            healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
             snprintf( buffer, 99, GET_STRING( 288 ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
@@ -1959,12 +2509,29 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_recoil ) {
-            damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
-                           damage * p_move.m_moveData.m_recoil / 240 );
+            u32 amount = damage * p_move.m_moveData.m_recoil / 240;
+            if( !amount ) { amount = 1; }
+
+            damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
             snprintf( buffer, 99, GET_STRING( 287 ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
             p_ui->log( buffer );
+        }
+
+        // Shell bell
+        if( user->canBattle( ) && canUseItem( p_move.m_user.first, p_move.m_user.second )
+            && user->getItem( ) == I_SHELL_BELL ) {
+            if( !( userVolStat & HEALBLOCK ) ) {
+                u32 amount = damage / 8;
+                if( !amount ) { amount = 1; }
+
+                healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
+
+                snprintf( buffer, 99, GET_STRING( 533 ),
+                          p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
+                p_ui->log( buffer );
+            }
         }
 
         // Life orb recoil
@@ -2142,6 +2709,9 @@ namespace BATTLE {
 
                 // Pkmn fainted
                 if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { break; }
+
+                executeSelfStatusEffects( p_ui, p_move, p_move.m_target[ i ] );
+
                 // Target fainted
                 if( getSlotStatus( p_move.m_target[ i ].first, p_move.m_target[ i ].second )
                     == slot::status::FAINTED ) {

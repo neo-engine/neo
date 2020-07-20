@@ -45,9 +45,6 @@ namespace BATTLE {
                 }
             }
         }
-
-        u8 sts = 0;
-        if( ( sts = hasStatusCondition( SLEEP ) ) ) { setStatusCondition( SLEEP, sts - 1 ); }
         _turnsInPlay++;
     }
 } // namespace BATTLE

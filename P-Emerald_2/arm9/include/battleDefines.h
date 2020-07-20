@@ -123,7 +123,7 @@ namespace BATTLE {
         RAGEPOWDER       = ( 1 << 15 ), // TODO
         TELEKINESIS      = ( 1 << 16 ),
         MAGNETRISE       = ( 1 << 17 ),
-        AQUARING         = ( 1 << 18 ), // TODO
+        AQUARING         = ( 1 << 18 ),
         GASTROACID       = ( 1 << 19 ), // TODO
         POWERTRICK       = ( 1 << 20 ), // TODO
         HEALBLOCK        = ( 1 << 21 ),
@@ -140,9 +140,9 @@ namespace BATTLE {
         SNATCH           = ( 1LLU << 32 ), // TODO
         GRUDGE           = ( 1LLU << 33 ), // TODO
         IMPRISON         = ( 1LLU << 34 ), // TODO
-        YAWN             = ( 1LLU << 35 ), // TODO
+        YAWN             = ( 1LLU << 35 ),
         MAGICCOAT        = ( 1LLU << 36 ), // TODO
-        INGRAIN          = ( 1LLU << 37 ), // TODO
+        INGRAIN          = ( 1LLU << 37 ),
         HELPINGHAND      = ( 1LLU << 38 ), // TODO
         TAUNT            = ( 1LLU << 39 ), // TODO
         CHARGE           = ( 1LLU << 40 ), // TODO
@@ -152,8 +152,8 @@ namespace BATTLE {
         ENDURE           = ( 1LLU << 44 ), // TODO
         PROTECT          = ( 1LLU << 45 ),
         DESTINYBOND      = ( 1LLU << 46 ), // TODO
-        CURSE            = ( 1LLU << 47 ), // TODO
-        NIGHTMARE        = ( 1LLU << 48 ), // TODO
+        CURSE            = ( 1LLU << 47 ),
+        NIGHTMARE        = ( 1LLU << 48 ),
         STOCKPILE        = ( 1LLU << 49 ), // TODO
         ENCORE           = ( 1LLU << 50 ), // TODO
         EXTRATYPE        = ( 1LLU << 51 ),

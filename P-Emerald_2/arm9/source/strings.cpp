@@ -654,7 +654,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "It missed %s.", "%s wich aus." },
     { "A critical hit!", "Ein Volltreffer!" },
     { "%s prepares a move.", "%s bereitet einen Angriff vor." },
-    { "%s is confused.", "%s ist verwirrst." },
+    { "%s is confused.", "%s ist verwirrt." },
     { "%s snapped out of its confusion.", "%s ist nicht mehr verwirrt." },
 
     { "It hurt itself in its confusion.", "Es hat sich in seiner Verwirrung selbst verletzt." },
@@ -1026,13 +1026,24 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "The Wonder Room disappeared.", "Der Wunderraum verschwand." },
     { "The twisted dimensions returned to normal.", "Die Dimensionen wurden wieder normal." },
+
     { "The gravity became normal again.", "Die Schwerkraft wurde wieder normal." },
     { "Fire's power returned to normal", "Die St\xe4rke des Feuers wurde wieder normal" },
     { "Electricity's power returned to normal.",
       "Die St\xe4rke der Elektrizit\xe4t wurde wieder normal." },
-
-    // 520
-
     { "The Fairy Lock stopped.", "Feenschloss l\xe4sst nach." },
+    { "%s is poisoned.", "%s ist vergiftet." },
+
+    // 530
+
+    { "%s is badly poisoned.", "%s ist schwer vergiftet." },
+    { "%s is burned.", "%s ist verbrannt." },
+    { "%s restores some HP by listening to the soothing sound of its Shell Bell.",
+        "%s lauscht dem beruhigenden Klang seines Seegesangs und heilt ein paar KP." },
+    { "%s is harmed by its curse.", "Der Fluch schadet %s." },
+    { "%s restores some HP using its roots.", "Die Wurzeln von %s heilen ein paar KP." },
+
+    { "%s's Aqua Ring restores some HP.", "Der Wasserring von %s heilt ein paar KP." },
+    { "%s is harmed by its nightmare.", "Der Alptraum schadet %s." },
 
 };
