@@ -39,20 +39,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // Assumes that the Backup is a 512k flash memory
 #define BACKUP_SIZE ( 512 * 1024 )
 
-#define MAX_ITEMS 1280
-#define MAX_ITEMS_IN_BAG MAX_ITEMS
-#define MAX_ATTACK 820
-#define MAX_MOVE MAX_ATTACK
-#define MAX_PKMN 893
-#define OTLENGTH 8
-#define SPECIES_NAMELENGTH 30
-#define PKMN_NAMELENGTH 15
-#define ITEM_NAMELENGTH 20
-#define ITEM_DSCRLENGTH 200
-#define MOVE_NAMELENGTH 20
-#define MOVE_DSCRLENGTH 200
-#define ABILITY_NAMELENGTH 20
-#define ABILITY_DSCRLENGTH 200
+#define MAX_ITEMS           1280
+#define MAX_ITEMS_IN_BAG    MAX_ITEMS
+#define MAX_ATTACK          820
+#define MAX_MOVE            MAX_ATTACK
+#define MAX_PKMN            893
+#define OTLENGTH            8
+#define SPECIES_NAMELENGTH  30
+#define PKMN_NAMELENGTH     15
+#define ITEM_NAMELENGTH     20
+#define ITEM_DSCRLENGTH     200
+#define MOVE_NAMELENGTH     20
+#define MOVE_DSCRLENGTH     200
+#define ABILITY_NAMELENGTH  20
+#define ABILITY_DSCRLENGTH  200
 #define LOCATION_NAMELENGTH 25
 
 #undef RAND_MAX
@@ -85,14 +85,20 @@ extern bool TWL_CONFIG;
 extern unsigned int   TEMP[ 12288 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
-#define LANGUAGES 2
-#define MAX_STRINGS 500
-#define MAX_ACHIEVEMENTS 50
-#define MAX_BADGENAMES 25
-#define NUM_BGS 12
-#define INITIAL_NAVBG ( NUM_BGS - 1 )
+constexpr u8  LANGUAGES        = 2;
+constexpr u16 MAX_STRINGS      = 800;
+constexpr u8  MAX_ACHIEVEMENTS = 50;
+constexpr u8  MAX_BADGENAMES   = 25;
+constexpr u8  NUM_BGS          = 12;
+constexpr u8  INITIAL_NAVBG    = NUM_BGS - 1;
 
-#define TRANSPARENCY_COEFF 0x0671
+constexpr u8 DAYTIME_NIGHT   = 0;
+constexpr u8 DAYTIME_MORNING = 1;
+constexpr u8 DAYTIME_DAY     = 2;
+constexpr u8 DAYTIME_DUSK    = 3;
+constexpr u8 DAYTIME_EVENING = 4;
+
+constexpr u32 TRANSPARENCY_COEFF = 0x0671;
 enum style {
     MSG_NORMAL       = 0,
     MSG_INFO         = 1,
@@ -117,7 +123,7 @@ extern const char* const MONTHS[ 12 ][ LANGUAGES ];
                               : 0 ) )
 
 #ifdef DESQUID
-#define MAX_DESQUID_STRINGS 100
+constexpr u16            MAX_DESQUID_STRINGS = 100;
 extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define GET_STRING( p_stringId )                                                                 \
     ( ( ( p_stringId ) >= DESQUID_STRING ) ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ] \
@@ -126,14 +132,14 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define GET_STRING( p_stringId ) STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
 #endif
 
-#define NO_DATA GET_STRING( 0 )
-#define FARAWAY_PLACE GET_STRING( 1 )
+#define NO_DATA         GET_STRING( 0 )
+#define FARAWAY_PLACE   GET_STRING( 1 )
 #define UNKNOWN_SPECIES GET_STRING( 2 )
-#define POKE_NAV GET_STRING( 8 )
+#define POKE_NAV        GET_STRING( 8 )
 
-#define loop( ) while( 1 )
+#define loop( )     while( 1 )
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )
-#define sq( a ) ( ( a ) * ( a ) )
+#define sq( a )     ( ( a ) * ( a ) )
 
 #define IN_DEX( pidx ) \
     ( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )

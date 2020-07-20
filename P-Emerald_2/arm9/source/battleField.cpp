@@ -301,7 +301,7 @@ namespace BATTLE {
                     p_ui->logAbility( pkmn, p_opponent );
                     for( u8 i = 0; i < 2; ++i ) {
                         _sides[ i ].removeSideCondition(
-                            sideCondition( LIGHTSCREEN | REFLECT | AURORAVEIL ) );
+                            p_ui, sideCondition( LIGHTSCREEN | REFLECT | AURORAVEIL ) );
                     }
                     break;
                 }
@@ -315,19 +315,36 @@ namespace BATTLE {
 
     void field::init( battleUI* p_ui ) {
         (void) p_ui;
-        // TODO
     }
 
     void field::age( battleUI* p_ui ) {
-        (void) p_ui;
-        // TODO
+        for( u8 i = 0; i < 2; ++i ) { _sides[ i ].age( p_ui ); }
+        if( _weatherTimer > 0 ) {
+            if( _weatherTimer < 240 && !--_weatherTimer ) {
+                // Weather ended
+                removeWeather( p_ui );
+            } else {
+                continueWeather( p_ui );
+            }
+        }
+        if( _terrainTimer > 0 && _terrainTimer < 240 ) {
+            if( !--_terrainTimer ) {
+                // terrain ended
+                removeTerrain( p_ui );
+            }
+        }
+
+        for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
+            if( _pseudoWeatherTimer[ i ] > 0 && _pseudoWeatherTimer[ i ] < 240 ) {
+                if( !--_pseudoWeatherTimer[ i ] ) {
+                    // pseudo weather ended
+                    p_ui->removePseudoWeather( i );
+                }
+            }
+        }
     }
 
     bool field::setWeather( battleUI* p_ui, weather p_newWeather, bool p_extended ) {
-        // TODO: add proper log
-
-        p_ui->log( "[setWeather]: " + std::to_string( u8( p_newWeather ) ) );
-
         if( p_newWeather == _weather ) {
             p_ui->log( GET_STRING( 304 ) );
             return false;
@@ -346,14 +363,20 @@ namespace BATTLE {
         _weather      = p_newWeather;
         _weatherTimer = p_extended ? EXTENDED_DURATION : NORMAL_DURATION;
 
+        p_ui->setNewWeather( p_newWeather );
         return true;
     }
 
+    void field::continueWeather( battleUI* p_ui ) {
+        p_ui->continueWeather( );
+    }
+
     bool field::removeWeather( battleUI* p_ui ) {
-        // TODO: proper log
-
-        p_ui->log( "Weather removed" );
-
+        if( _weather != NO_WEATHER ) {
+            p_ui->setNewWeather( NO_WEATHER );
+        } else {
+            return false;
+        }
         _weather      = NO_WEATHER;
         _weatherTimer = 0;
         return true;
@@ -361,42 +384,52 @@ namespace BATTLE {
 
     bool field::setPseudoWeather( battleUI* p_ui, pseudoWeather p_newPseudoWeather,
                                   bool p_extended ) {
-
-        // TODO proper log
-        // TODO can this return false?
-
-        p_ui->log( "Set pseudoWeather " + std::to_string( u8( p_newPseudoWeather ) ) );
-
+        bool change = false;
         for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
-            if( p_newPseudoWeather & ( 1 << i ) ) {
+            if( ( p_newPseudoWeather & ( 1 << i ) ) && _pseudoWeatherTimer[ i ]
+                && ( ( 1 << i ) == MAGICROOM || ( 1 << i ) == WONDERROOM
+                     || ( 1 << i ) == TRICKROOM ) ) {
+                removePseudoWeather( p_ui, pseudoWeather( 1 << i ) );
+                change = true;
+                continue;
+            }
+            if( ( p_newPseudoWeather & ( 1 << i ) ) && !_pseudoWeatherTimer[ i ] ) {
+                change                   = true;
                 _pseudoWeatherTimer[ i ] = p_extended ? EXTENDED_DURATION : NORMAL_DURATION;
+                if( ( 1 << i ) == FAIRYLOCK ) { _pseudoWeatherTimer[ i ] = 2; }
+                p_ui->addPseudoWeather( i );
             }
         }
-        return true;
+        if( !change ) { p_ui->log( GET_STRING( 304 ) ); }
+        return change;
     }
 
     bool field::removePseudoWeather( battleUI* p_ui, pseudoWeather p_pseudoWeather ) {
-        // TODO proper log
-        p_ui->log( "Pseudo Weather removed" );
+        bool change = false;
         for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
-            if( p_pseudoWeather & ( 1 << i ) ) { _pseudoWeatherTimer[ i ] = 0; }
+            if( ( p_pseudoWeather & ( 1 << i ) ) && _pseudoWeatherTimer[ i ] ) {
+                change                   = true;
+                _pseudoWeatherTimer[ i ] = 0;
+                p_ui->removePseudoWeather( i );
+            }
         }
-        return false;
+        return change;
     }
 
     bool field::setTerrain( battleUI* p_ui, terrain p_newTerrain, bool p_extended ) {
-        // TODO: proper log
-        p_ui->log( "Set terrain " + std::to_string( u8( p_newTerrain ) ) );
-
+        if( _terrain == p_newTerrain ) {
+            p_ui->log( GET_STRING( 140 ) );
+            return false;
+        }
+        p_ui->setNewTerrain( p_newTerrain );
         _terrain      = p_newTerrain;
         _terrainTimer = p_extended ? EXTENDED_DURATION : NORMAL_DURATION;
         return true;
     }
 
     bool field::removeTerrain( battleUI* p_ui ) {
-        // TODO proper log
-        p_ui->log( "terrain removed" );
-        _terrain      = NO_TERRAIN;
+        if( _terrain == NO_TERRAIN ) { return false; }
+        p_ui->setNewTerrain( _terrain = NO_TERRAIN );
         _terrainTimer = 0;
         return true;
     }
@@ -409,8 +442,6 @@ namespace BATTLE {
                   ITEM::getItemName( getPkmn( p_opponent, p_slot )->getItem( ) ).c_str( ) );
         p_ui->log( std::string( buffer ) );
 
-        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
-
         getPkmn( p_opponent, p_slot )->battleTransform( );
         p_ui->updatePkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ) );
 
@@ -418,8 +449,6 @@ namespace BATTLE {
                   p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
                   getPkmn( p_opponent, p_slot )->getItem( ) );
         p_ui->log( std::string( buffer ) );
-
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
         checkOnSendOut( p_ui, p_opponent, p_slot );
     }
@@ -646,7 +675,9 @@ namespace BATTLE {
     void field::executeStatusEffects( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
         auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
         auto target = getPkmn( p_target.first, p_target.second );
-        if( p_move.m_moveData.m_target == MOVE::SELF ) {
+        if( p_move.m_moveData.m_target == MOVE::SELF || p_move.m_moveData.m_target == MOVE::FIELD
+            || p_move.m_moveData.m_target == MOVE::FOE_SIDE
+            || p_move.m_moveData.m_target == MOVE::ALLY_SIDE ) {
             target   = user;
             p_target = p_move.m_user;
         }
@@ -665,14 +696,48 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_sideCondition ) {
-            addSideCondition( p_ui, p_target.first, p_move.m_moveData.m_sideCondition );
+            if( p_move.m_moveData.m_target == MOVE::FOE_SIDE ) {
+                addSideCondition( p_ui, !p_move.m_user.first, p_move.m_moveData.m_sideCondition );
+            } else {
+                addSideCondition( p_ui, p_move.m_user.first, p_move.m_moveData.m_sideCondition );
+            }
         }
 
-        if( p_move.m_moveData.m_weather ) { setWeather( p_ui, p_move.m_moveData.m_weather ); }
-        if( p_move.m_moveData.m_pseudoWeather ) {
-            setPseudoWeather( p_ui, p_move.m_moveData.m_pseudoWeather );
+        if( p_move.m_moveData.m_weather ) {
+            bool extended = false;
+            if( canUseItem( p_move.m_user.first, p_move.m_user.second ) ) {
+                if( p_move.m_moveData.m_weather == RAIN && user->getItem( ) == I_DAMP_ROCK ) {
+                    extended = true;
+                }
+                if( p_move.m_moveData.m_weather == SUN && user->getItem( ) == I_HEAT_ROCK ) {
+                    extended = true;
+                }
+                if( p_move.m_moveData.m_weather == SANDSTORM
+                    && user->getItem( ) == I_SMOOTH_ROCK ) {
+                    extended = true;
+                }
+                if( p_move.m_moveData.m_weather == HAIL && user->getItem( ) == I_ICY_ROCK ) {
+                    extended = true;
+                }
+            }
+            setWeather( p_ui, p_move.m_moveData.m_weather, extended );
         }
-        if( p_move.m_moveData.m_terrain ) { setTerrain( p_ui, p_move.m_moveData.m_terrain ); }
+        if( p_move.m_moveData.m_pseudoWeather ) {
+            bool extended = false;
+            if( p_move.m_moveData.m_pseudoWeather == MAGICROOM
+                || p_move.m_moveData.m_pseudoWeather == WONDERROOM
+                || p_move.m_moveData.m_pseudoWeather == TRICKROOM ) {
+                extended = canUseItem( p_move.m_user.first, p_move.m_user.second )
+                           && user->getItem( ) == I_ROOM_SERVICE;
+            }
+
+            setPseudoWeather( p_ui, p_move.m_moveData.m_pseudoWeather, extended );
+        }
+        if( p_move.m_moveData.m_terrain ) {
+            bool extended = canUseItem( p_move.m_user.first, p_move.m_user.second )
+                            && user->getItem( ) == I_TERRAIN_EXTENDER;
+            setTerrain( p_ui, p_move.m_moveData.m_terrain, extended );
+        }
 
         if( p_move.m_moveData.m_slotCondition ) {
             addSlotCondition( p_ui, p_target.first, p_target.second,
@@ -828,9 +893,6 @@ namespace BATTLE {
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
                           MOVE::getMoveName( p_move.m_param ).c_str( ) );
                 p_ui->log( buffer );
-
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-
                 p_ui->log( GET_STRING( 304 ) );
                 return false;
             }
@@ -1872,18 +1934,13 @@ namespace BATTLE {
             snprintf( buffer, 99, GET_STRING( 285 ),
                       p_ui->getPkmnName( target, p_target.first, false ).c_str( ) );
             p_ui->log( buffer );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         } else if( effectiveness < 100 ) {
             snprintf( buffer, 99, GET_STRING( 286 ),
                       p_ui->getPkmnName( target, p_target.first, false ).c_str( ) );
             p_ui->log( buffer );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         }
 
-        if( p_critical ) {
-            p_ui->log( GET_STRING( 291 ) );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-        }
+        if( p_critical ) { p_ui->log( GET_STRING( 291 ) ); }
 
         if( !getPkmn( p_target.first, p_target.second )->canBattle( ) ) {
             // pkmn fainted
@@ -1899,7 +1956,6 @@ namespace BATTLE {
             snprintf( buffer, 99, GET_STRING( 288 ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
             p_ui->log( buffer );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         }
 
         if( p_move.m_moveData.m_recoil ) {
@@ -1909,7 +1965,6 @@ namespace BATTLE {
             snprintf( buffer, 99, GET_STRING( 287 ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
             p_ui->log( buffer );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         }
 
         // Life orb recoil
@@ -1922,7 +1977,6 @@ namespace BATTLE {
             snprintf( buffer, 99, GET_STRING( 306 ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
             p_ui->log( buffer );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         }
 
         // Check if user fainted
@@ -1979,7 +2033,6 @@ namespace BATTLE {
                             buffer, 99, GET_STRING( 305 ),
                             p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                         p_ui->log( buffer );
-                        for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
 
                         removeItem( p_ui, opponent, slot );
                     }
@@ -2024,8 +2077,6 @@ namespace BATTLE {
                   p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
                   MOVE::getMoveName( p_move.m_param ).c_str( ) );
         p_ui->log( buffer );
-
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
         for( u8 i = 0; i < p_move.m_target.size( ); ++i ) {
             // Check for multi-hit moves
@@ -2078,7 +2129,6 @@ namespace BATTLE {
                                                          p_move.m_target[ i ].first )
                                           .c_str( ) );
                             p_ui->log( buffer );
-                            for( u8 k = 0; k < 30; ++k ) { swiWaitForVBlank( ); }
                             continue;
                         }
 
@@ -2162,7 +2212,6 @@ namespace BATTLE {
             if( hits > 1 ) {
                 snprintf( buffer, 99, GET_STRING( 400 ), hits );
                 p_ui->log( buffer );
-                for( u8 k = 0; k < 30; ++k ) { swiWaitForVBlank( ); }
             }
 
             if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { return; }

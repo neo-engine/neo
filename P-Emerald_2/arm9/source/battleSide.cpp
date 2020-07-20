@@ -34,6 +34,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BATTLE {
     void side::age( battleUI* p_ui ) {
-        // TODO
+        for( u8 i = 0; i < 2; ++i ) { _slots[ i ].age( p_ui ); }
+
+        for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
+            if( _sideConditionCounter[ i ] && _sideConditionCounter[ i ] < 250 ) {
+                if( !--_sideConditionCounter[ i ] ) {
+                    removeSideCondition( p_ui, sideCondition( 1 << i ) );
+                }
+            }
+        }
     }
 } // namespace BATTLE

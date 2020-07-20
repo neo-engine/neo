@@ -374,7 +374,7 @@ namespace BATTLE {
     void battle::initBattle( ) {
         SOUND::initBattleSound( );
 
-        _battleUI.init( );
+        _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
         for( u8 i = 0; i < 6; ++i ) {
             _opponentPkmnPerm[ i ]    = i;
@@ -531,7 +531,7 @@ namespace BATTLE {
 
                     auto r = pt.run( p_slot );
 
-                    _battleUI.init( );
+                    _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
                     for( u8 i2 = 0; i2 < 2; ++i2 )
                         for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
@@ -583,7 +583,7 @@ namespace BATTLE {
                         }
                     }
 
-                    _battleUI.init( );
+                    _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
                     for( u8 i2 = 0; i2 < 2; ++i2 )
                         for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
@@ -1067,7 +1067,7 @@ namespace BATTLE {
 #endif
                             }
 
-                        _battleUI.init( );
+                        _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
                         for( u8 i2 = 0; i2 < 2; ++i2 )
                             for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {

@@ -110,20 +110,38 @@ namespace BATTLE {
          * @param p_duration: The duration of the condition in turns. (0 for the
          * defauls amount)
          */
-        constexpr bool addSideCondition( sideCondition p_sideCondition, u8 p_duration = 0 ) {
+        inline bool addSideCondition( battleUI* p_ui, sideCondition p_sideCondition,
+                                      u8 p_duration = 0 ) {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
                 if( p_sideCondition & ( 1 << i ) ) {
-                    _sideConditionAmount[ i ]++;
-                    _sideConditionCounter[ i ]
-                        = p_duration ? p_duration : defaultSideConditionDurations[ i ];
+                    if( !_sideConditionAmount[ i ] ) {
+#ifdef DESQUID
+                        // TODO: proper log
+                        p_ui->log( "Set side condition " + std::to_string( 1 << i ) );
+                        for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
+#else
+                        (void) p_ui;
+#endif
+
+                        _sideConditionAmount[ i ]++;
+                        _sideConditionCounter[ i ]
+                            = p_duration ? p_duration : defaultSideConditionDurations[ i ];
+                    }
                 }
             }
             return true;
         }
 
-        constexpr bool removeSideCondition( sideCondition p_sideCondition ) {
+        inline bool removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition ) {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
                 if( p_sideCondition & ( 1 << i ) ) {
+#ifdef DESQUID
+                    // TODO: proper log
+                    p_ui->log( "Remove side condition " + std::to_string( 1 << i ) );
+                    for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
+#else
+                    (void) p_ui;
+#endif
                     _sideConditionAmount[ i ]  = 0;
                     _sideConditionCounter[ i ] = 0;
                 }

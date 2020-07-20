@@ -409,7 +409,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 140
 
-    { "Go [OWN%d]![A]", "Los [OWN%d]![A]" },
+    { "The terrain didn't change.", "Das Terrain blieb unver\xe4ndert." },
     { "Do you want to give a nick name to %s?", "M\xf6"
                                                 "chtest du dem %s einen Spitznamen geben?" },
     { "Choose a nick name!", "W\xe4hle einen Spitznamen!" },
@@ -454,7 +454,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "The wild %s fled!", "%s (wild) floh." },
     { "[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]" },
-    { "It got wasted|", "Es hat keine Wirkung|" },
+    { "It got wasted|", "Es hatte keine Wirkung|" },
     { "Used %s.", "%s eingesetzt." },
     { "%s's data was\nregistred to the Pok\xe9"
       "dex.",
@@ -684,21 +684,21 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "the foe's %s", "%s (Gegner)" },
     { "The wild %s", "%s (wild)" },
     { "The foe's %s", "%s (Gegner)" },
-    { "This tree looks like it can be\ncut down. ", "Ein kleiner Baum.\n" },
-    { "This rock appears to be breakable.\n", "Ein kleiner Felsen.\n" },
+    { "This tree looks like it can be cut down. ", "Ein kleiner Baum." },
+    { "This rock appears to be breakable.", "Ein kleiner Felsen." },
 
-    { "A huge whirlpool.\n", "Ein riesiger Strudel.\n" },
-    { "The water is a deep blue...\n", "Das Wasser ist tiefblau...\n" },
-    { "The sea is deep here.\n", "Das Wasser ist sehr tief.\n" },
-    { "It's a big boulder.\n", "Ein großer Felsen.\n" },
-    { "The wall is very rocky...\n", "Eine steile Felswand.\n" },
+    { "A huge whirlpool.", "Ein riesiger Strudel." },
+    { "The water is a deep blue|", "Das Wasser ist tiefblau|" },
+    { "The sea is deep here.", "Das Wasser ist sehr tief." },
+    { "It's a big boulder.", "Ein großer Felsen." },
+    { "The wall is very rocky|", "Eine steile Felswand|" },
 
     // 320
 
-    { "It's a large Waterfall.\n", "Ein großer Wasserfall.\n" },
-    { "Something moved!\n", "Da hat sich etwas bewegt!\n" },
-    { "Light is shining from the\nsurface. ", "Licht scheint von der\nOberfl\xe4"
-                                              "che. " },
+    { "It's a large Waterfall.", "Ein großer Wasserfall." },
+    { "Something moved!", "Da hat sich etwas bewegt!" },
+    { "Light is shining from the surface. ", "Licht scheint von der Oberfl\xe4"
+                                             "che. " },
     { "Select", "Ausw\xe4hlen" },
     { "Status", "Status" },
 
@@ -971,4 +971,68 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 490
 
     { "Shoot! It was so close, too!", "Verflixt! Es war doch fast gefangen." },
+    { "The weather became normal again.", "Das Wetter wurde wieder normal." },
+    { "It started to rain.", "Es begann zu regnen." },
+    { "It started to hail.", "Es begann zu hageln." },
+    { "The air became foggy.", "Dichter Nebel zog auf." },
+
+    { "A sandstorm formed.", "Ein Sandsturm zog auf." },
+    { "The sunlight turned harsh.", "Das Sonnenlicht wurde st\xe4rker." },
+    { "A heavy rain began to fall.", "Es begann enornm zu regnen." },
+    { "The sunlight turned extremely harsh.", "Das Sonnenlicht wurde enorm kr\xe4rker." },
+    { "Mysterious strong winds are protecting Flying-type Pok\xe9mon.",
+      "Starke Winde sch\xfctzen Flug-Pok\xe9mon." },
+
+    // 500
+    { "Rain continues to fall.", "Es regnet weiter." },
+    { "Hail continues to fall.", "Es hagelt." },
+    { "The air is foggy.", "Dichter Nebel." },
+    { "The sandstorm rages.", "Der Sandsturm w\xfctet" },
+    { "The sunlight is harsh.", "Das Sonnenlicht ist stark." },
+
+    { "Heavy rain continues to fall.", "Enormer Regen." },
+    { "The extremely harsh sunlight continues.", "Extremes Sonnenlicht." },
+    { "Strong winds continue to blow.", "Starke Winde." },
+    { "The battlefield became normal.", "Das Feld wurde normal." },
+    { "The battlefield became weird.", "Das Feld wurde komisch." },
+
+    // 510
+
+    { "An electric current runs across the battlefield.",
+      "Eine elektrische Str\xf6mung flie\xdft durch das Feld." },
+    { "Mist swrils around the battlefield.", "Das Feld wurde in Nebel geh\xfcllt." },
+    { "Grass grew to cover the battlefield.", "Gras wuchs \xfc"
+                                              "ber das Feld." },
+    { "A deluge of ions showers the battlefield.",
+      "Ein elektrisch geladener Niederschlag regnet auf das Feld herab." },
+    { "It created a strange room in which items no longer work.",
+      "Es entsteht ein Raum, in dem keine Items mehr funktionieren." },
+
+    { "It created a bizarre area in which the Defense and Sp. Defense stats are swapped.",
+      "Es entsteht ein Raum, in dem Vert. und Sp.Vert. vertauscht sind." },
+    { "It twisted the dimensions.", "Es hat die Dimensionen verdreht." },
+    { "The gravity intensifies.", "Die Schwerkraft wurde st\xe4rker." },
+    { "Fire's power was weakened.", "Die St\xe4rke des Feuers wurde geschw\xe4"
+                                    "cht." },
+    { "Electricity's power was weakened.", "Die St\xe4rke der Elektrizit\xe4t wurde geschw\xe4"
+                                           "cht." },
+
+    // 520
+
+    { "All Pok\xe9mon become locked to the field for the next turn.",
+      "Alle Pok\xe9mon sind f\xfcr eine Runde an das Feld gebunden." },
+    { "The ion shower disappeared.", "Der elektrisch geladene Niederschlag verschwand." },
+    { "The Magic Room disappeared.", "Der Magieraum verschwand." },
+
+    { "The Wonder Room disappeared.", "Der Wunderraum verschwand." },
+    { "The twisted dimensions returned to normal.", "Die Dimensionen wurden wieder normal." },
+    { "The gravity became normal again.", "Die Schwerkraft wurde wieder normal." },
+    { "Fire's power returned to normal", "Die St\xe4rke des Feuers wurde wieder normal" },
+    { "Electricity's power returned to normal.",
+      "Die St\xe4rke der Elektrizit\xe4t wurde wieder normal." },
+
+    // 520
+
+    { "The Fairy Lock stopped.", "Feenschloss l\xe4sst nach." },
+
 };

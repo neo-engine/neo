@@ -995,14 +995,48 @@ namespace BATTLE {
         }
     }
 
-    void battleUI::init( ) {
+    u16 getTODBattleBG( u16 p_base ) {
+        u8 curDT = getCurrentDaytime( );
+
+        switch( p_base ) {
+        case 1:
+            if( curDT == DAYTIME_EVENING || curDT == DAYTIME_NIGHT ) { return 200 + p_base; }
+            [[fallthrough]];
+        case 2:
+        case 3:
+            if( curDT == DAYTIME_MORNING || curDT == DAYTIME_DUSK ) { return 100 + p_base; }
+            [[fallthrough]];
+        default: return p_base;
+        }
+    }
+
+    void battleUI::redrawBattleBG( ) {
+        u16 bg = getTODBattleBG( _background );
+        if( _currentTerrain != NO_TERRAIN ) { bg = 1000 + u8( _currentTerrain ); }
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/",
+                             std::to_string( bg ).c_str( ), 480, 49152 );
+        u16* pal   = BG_PALETTE;
+        pal[ 0 ]   = 0;
+        pal[ 250 ] = IO::WHITE;
+        pal[ 251 ] = IO::GRAY;
+        pal[ 252 ] = IO::RGB( 18, 22, 31 );
+        pal[ 254 ] = IO::RGB( 31, 18, 18 );
+        pal[ 253 ] = IO::RGB( 0, 0, 25 );
+        pal[ 255 ] = IO::RGB( 23, 0, 0 );
+    }
+
+    void battleUI::init( weather p_initialWeather, terrain p_initialTerrain ) {
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         IO::vramSetup( true );
+
+        _currentWeather = p_initialWeather;
+        _currentTerrain = p_initialTerrain;
+
         initTop( );
         initSub( );
 
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/",
-                             std::to_string( _background ).c_str( ), 512, 49152 );
+        redrawBattleBG( );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "battlesub2", 512, 49152,
                              true );
         for( u8 i = 0; i < 2; ++i ) {
@@ -1059,6 +1093,8 @@ namespace BATTLE {
         _currentLogLine += IO::regularFont->printBreakingStringC(
             p_message.c_str( ), 16, 10 + 14 * _currentLogLine, 256 - 32, true, IO::font::LEFT, 14,
             ' ', 0, true );
+
+        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
     }
 
     std::string battleUI::getPkmnName( pokemon* p_pokemon, bool p_opponent,
@@ -1540,7 +1576,6 @@ namespace BATTLE {
 #endif
         }
         log( std::string( buffer ) );
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
     }
 
     void battleUI::loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
@@ -2311,7 +2346,7 @@ namespace BATTLE {
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
-            BG_PALETTE[ IO::GRAY_IDX ] = IO::GRAY;
+            BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
             IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 192, false );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         }
@@ -2330,7 +2365,7 @@ namespace BATTLE {
     }
 
     void battleUI::showTopMessagePkmn( pokemon* p_pokemon ) {
-        init( );
+        init( _currentWeather, _currentTerrain );
         IO::initOAMTable( false );
 
         u16 x = 80;
@@ -2381,4 +2416,28 @@ namespace BATTLE {
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
     }
 
+    void battleUI::setNewWeather( weather p_newWeather ) {
+        log( GET_STRING( 490 + u8( p_newWeather ) ) );
+        _currentWeather = p_newWeather;
+    }
+
+    void battleUI::continueWeather( ) {
+        if( _currentWeather == NO_WEATHER ) { return; }
+
+        log( GET_STRING( 500 + u8( _currentWeather ) - 1 ) );
+    }
+
+    void battleUI::addPseudoWeather( u8 p_pwIdx ) {
+        log( GET_STRING( 513 + u8( p_pwIdx ) ) );
+    }
+
+    void battleUI::removePseudoWeather( u8 p_pwIdx ) {
+        log( GET_STRING( 521 + u8( p_pwIdx ) ) );
+    }
+
+    void battleUI::setNewTerrain( terrain p_newTerrain ) {
+        _currentTerrain = p_newTerrain;
+        redrawBattleBG( );
+        log( GET_STRING( 508 + u8( p_newTerrain ) ) );
+    }
 } // namespace BATTLE

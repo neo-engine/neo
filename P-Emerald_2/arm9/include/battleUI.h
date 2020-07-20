@@ -48,6 +48,9 @@ namespace BATTLE {
 
         u8 _curHP[ 2 ][ 2 ] = { { 0 } };
 
+        weather _currentWeather;
+        terrain _currentTerrain;
+
         void initTop( );
         void initSub( );
 
@@ -83,6 +86,11 @@ namespace BATTLE {
          */
         void animateStatChange( bool p_opponent, u8 p_slot, bool p_down ) const;
 
+        /*
+         * @brief: Redraws the battle bg picture.
+         */
+        void redrawBattleBG( );
+
       public:
         battleUI( ) {
         }
@@ -97,7 +105,7 @@ namespace BATTLE {
          * @brief: Initializes the battleUI. Destroys anything that was previously on the
          * screen.
          */
-        void init( );
+        void init( weather p_initialWeather, terrain p_initialTerrain );
 
         void deinit( );
 
@@ -267,5 +275,30 @@ namespace BATTLE {
          * @brief: Hides the mbox on the top screen.
          */
         void hideTopMessage( );
+
+        /*
+         * @brief: Sets the current weather to the specified weather.
+         */
+        void setNewWeather( weather p_newWeather );
+
+        /*
+         * @brief: Continues the current weather (e.g. between turns)
+         */
+        void continueWeather( );
+
+        /*
+         * @brief: adds the specified pseudo weather to the current pseudo weather.
+         */
+        void addPseudoWeather( u8 p_newPseudoWeatherIdx );
+
+        /*
+         * @brief: Removes the specified pseudo weather.
+         */
+        void removePseudoWeather( u8 p_pseudoWeatherIdx );
+
+        /*
+         * @brief: Sets the current terrain to the specified value.
+         */
+        void setNewTerrain( terrain p_newTerrain );
     };
 } // namespace BATTLE
