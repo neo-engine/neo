@@ -41,7 +41,14 @@ namespace BATTLE {
         for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
             if( _slotConditionCounter[ i ] && _slotConditionCounter[ i ] < 250 ) {
                 if( !--_slotConditionCounter[ i ] ) {
-                    removeSlotCondition( p_ui, slotCondition( 1 << i ) );
+                    removeSlotCondition( p_ui, slotCondition( 1LLU << i ) );
+                }
+            }
+        }
+        for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
+            if( _volatileStatusCounter[ i ] && _volatileStatusCounter[ i ] < 250 ) {
+                if( !--_volatileStatusCounter[ i ] ) {
+                    removeVolatileStatus( p_ui, volatileStatus( 1LLU << i ) );
                 }
             }
         }

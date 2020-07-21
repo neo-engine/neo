@@ -918,7 +918,7 @@ namespace BATTLE {
             break;
 
         case I_REPEAT_BALL:
-            if( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ specId / 8 ] & ( 1 << ( specId % 8 ) ) )
+            if( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ specId / 8 ] & ( 1LLU << ( specId % 8 ) ) )
                 ballCatchRate = 6;
             break;
         case I_TIMER_BALL: ballCatchRate = std::min( _round + 10 / 5, 8 ); break;
@@ -988,7 +988,7 @@ namespace BATTLE {
         u16 spid = _field.getPkmn( true, 0 )->getSpecies( );
 
         char buffer[ 100 ];
-        if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1 << ( spid % 8 ) ) ) ) {
+        if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1LLU << ( spid % 8 ) ) ) ) {
             SAVE::SAV.getActiveFile( ).registerCaughtPkmn( spid );
             snprintf( buffer, 99, GET_STRING( 174 ), getDisplayName( spid ).c_str( ) );
             _battleUI.log( buffer );
@@ -1104,7 +1104,176 @@ namespace BATTLE {
     }
 
     void battle::useItem( fieldPosition p_target, u16 p_item ) {
-        // TODO
+        auto idata = ITEM::getItemData( p_item );
+        char buffer[ 100 ];
+        auto pkmn = _field.getPkmn( p_target.first, p_target.second );
+
+        if( p_target.first ) {
+            // opponent item
+            bool itemfound = false;
+            for( u8 i = 0; i < 5; ++i ) {
+                if( _opponent.m_data.m_items[ i ] == p_item ) {
+                    _opponent.m_data.m_items[ i ] = 0;
+                    itemfound                     = true;
+                    break;
+                }
+            }
+            if( !itemfound ) {
+                // cannot use non-existing item . . .
+                return;
+            }
+
+#ifdef DESQUID
+            _battleUI.log( "Triener used item" );
+#endif
+        } else {
+            // player item
+            snprintf( buffer, 99, GET_STRING( 50 ), ITEM::getItemName( p_item ) );
+            _battleUI.log( buffer );
+        }
+
+        auto   volst   = _field.getVolatileStatus( p_target.first, p_target.second );
+        bool   remitem = true;
+        bool   boost   = false;
+        boosts bs      = boosts( );
+        switch( p_item ) {
+        // Due to animations, slightly different effects; need to handle medicine here
+        // again
+        case I_POTION: _field.healPokemon( &_battleUI, p_target.first, p_target.second, 30 ); break;
+        case I_FRESH_WATER:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 40 );
+            break;
+        case I_ENERGY_POWDER:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 50 );
+            break;
+        case I_SUPER_POTION:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 60 );
+            break;
+        case I_SODA_POP:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 70 );
+            break;
+        case I_LEMONADE:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 90 );
+            break;
+        case I_MOOMOO_MILK:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 100 );
+            break;
+        case I_HYPER_POTION:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 120 );
+            break;
+        case I_ENERGY_ROOT:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second, 200 );
+            break;
+        case I_MAX_POTION:
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second,
+                                pkmn->m_stats.m_maxHP );
+            break;
+        case I_FULL_RESTORE:
+            _field.removeStatusCondition( p_target.first, p_target.second );
+            _field.healPokemon( &_battleUI, p_target.first, p_target.second,
+                                pkmn->m_stats.m_maxHP );
+            break;
+        case I_HEAL_POWDER:
+        case I_FULL_HEAL:
+            _field.removeStatusCondition( p_target.first, p_target.second );
+            _battleUI.updatePkmnStats( p_target.first, p_target.second, pkmn );
+            break;
+
+        case I_X_ATTACK:
+            bs.setBoost( ATK, 2 );
+            boost = true;
+            break;
+        case I_X_DEFENSE:
+            bs.setBoost( DEF, 2 );
+            boost = true;
+
+            break;
+        case I_X_SPEED:
+            bs.setBoost( SPEED, 2 );
+            boost = true;
+            break;
+        case I_X_ACCURACY:
+            bs.setBoost( ACCURACY, 2 );
+            boost = true;
+
+            break;
+        case I_X_SP_ATK:
+            bs.setBoost( SATK, 2 );
+            boost = true;
+            break;
+        case I_X_SP_DEF:
+            bs.setBoost( SDEF, 2 );
+            boost = true;
+            break;
+        case I_NION_BERRY: {
+            bs = _field.getBoosts( p_target.first, p_target.second );
+            if( bs.negative( ) != boosts( ) ) {
+                bs    = bs.negative( ).invert( );
+                boost = true;
+            } else {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+            break;
+        }
+
+        case I_BLUE_FLUTE:
+            remitem = false;
+            if( _field.hasStatusCondition( p_target.first, p_target.second, SLEEP ) ) {
+                _field.removeStatusCondition( p_target.first, p_target.second );
+                _battleUI.updatePkmnStats( p_target.first, p_target.second, pkmn );
+            } else {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+            break;
+
+        case I_GUARD_SPEC:
+            if( !_field.addSideCondition( &_battleUI, p_target.first, MIST, 5 ) ) {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+            break;
+        case I_DIRE_HIT:
+            if( !_field.addVolatileStatus( &_battleUI, p_target.first, p_target.second, FOCUSENERGY,
+                                           255 ) ) {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+            break;
+        case I_YELLOW_FLUTE: remitem = false; [[fallthrough]];
+        case I_RIE_BERRY:
+        case I_PERSIM_BERRY:
+            if( volst & CONFUSION ) {
+                _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
+                                             CONFUSION );
+                snprintf( buffer, 99, GET_STRING( 294 ),
+                          _battleUI.getPkmnName( pkmn, p_target.first ).c_str( ) );
+                _battleUI.log( buffer );
+            } else {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+            break;
+
+        case I_RED_FLUTE: remitem = false; [[fallthrough]];
+        case I_GARC_BERRY:
+            if( volst & ATTRACT ) {
+                _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second, ATTRACT );
+            } else {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+            break;
+
+        default: break;
+        }
+
+        if( boost ) {
+            auto res = _field.addBoosts( p_target.first, p_target.second, bs );
+            if( res != boosts( ) ) {
+                _battleUI.logBoosts( pkmn, p_target.first, p_target.second, bs, res );
+            } else {
+                _battleUI.log( GET_STRING( 171 ) );
+            }
+        }
+        if( remitem && !p_target.first ) {
+            SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( idata.m_itemType ), p_item, 1 );
+        }
     }
 
     void battle::sortPkmn( bool p_opponent ) {

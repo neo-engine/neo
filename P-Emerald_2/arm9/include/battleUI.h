@@ -132,7 +132,7 @@ namespace BATTLE {
          * @brief: Runs the animation when the given move is prepared and prints
          * corresponding log commands.
          */
-        void prepareMove( bool p_opponent, u8 p_slot, battleMove p_move );
+        void prepareMove( pokemon* p_pokemon, bool p_opponent, u8 p_slot, battleMove p_move );
 
         /*
          * @brief: Initializes and shows the log screen.

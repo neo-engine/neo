@@ -93,8 +93,20 @@ namespace BATTLE {
         /*
          * @brief: Inverts all boosts.
          */
-        inline void invert( ) {
+        inline boosts invert( ) {
             for( u8 i = 0; i < 8; ++i ) { setBoost( i, -getBoost( i ) ); }
+            return *this;
+        }
+
+        /*
+         * @brief: Returns all negative boosts.
+         */
+        constexpr boosts negative( ) {
+            boosts res = boosts( );
+            for( u8 i = 0; i < 8; ++i ) {
+                if( getBoost( i ) < 0 ) { res.setBoost( i, -getBoost( i ) ); }
+            }
+            return res;
         }
 
         constexpr auto operator<=>( const boosts& ) const = default;
@@ -106,19 +118,19 @@ namespace BATTLE {
     enum volatileStatus : u64 {
         NONE             = 0,
         CONFUSION        = ( 1 << 0 ),
-        OBSTRUCT         = ( 1 << 1 ), // TODO
+        OBSTRUCT         = ( 1 << 1 ),
         PARTIALLYTRAPPED = ( 1 << 2 ), // TODO
         FLINCH           = ( 1 << 3 ),
         OCTOLOCK         = ( 1 << 4 ), // TODO
         TARSHOT          = ( 1 << 5 ), // TODO
         NORETREAT        = ( 1 << 6 ),
         LASERFOCUS       = ( 1 << 7 ),
-        SPOTLIGHT        = ( 1 << 8 ),  // TODO
-        BANEFULBUNKER    = ( 1 << 9 ),  // TODO
+        SPOTLIGHT        = ( 1 << 8 ), // TODO
+        BANEFULBUNKER    = ( 1 << 9 ),
         SMACKDOWN        = ( 1 << 10 ), // TODO
         POWDERED         = ( 1 << 11 ), // TODO
-        SPIKYSHIELD      = ( 1 << 12 ), // TODO
-        KINGSSHIELD      = ( 1 << 13 ), // TODO
+        SPIKYSHIELD      = ( 1 << 12 ),
+        KINGSSHIELD      = ( 1 << 13 ),
         ELECTRIFY        = ( 1 << 14 ),
         RAGEPOWDER       = ( 1 << 15 ), // TODO
         TELEKINESIS      = ( 1 << 16 ),
@@ -136,36 +148,37 @@ namespace BATTLE {
         MINIMIZE         = ( 1 << 28 ), // TODO
         LEECHSEED        = ( 1 << 29 ), // TODO
         DISABLE          = ( 1 << 30 ), // TODO
-        FORESIGHT        = ( 1LLU << 31 ),
-        SNATCH           = ( 1LLU << 32 ), // TODO
-        GRUDGE           = ( 1LLU << 33 ), // TODO
-        IMPRISON         = ( 1LLU << 34 ), // TODO
-        YAWN             = ( 1LLU << 35 ),
-        MAGICCOAT        = ( 1LLU << 36 ), // TODO
-        INGRAIN          = ( 1LLU << 37 ),
-        HELPINGHAND      = ( 1LLU << 38 ), // TODO
-        TAUNT            = ( 1LLU << 39 ), // TODO
-        CHARGE           = ( 1LLU << 40 ), // TODO
-        FOLLOWME         = ( 1LLU << 41 ), // TODO
-        TORMENT          = ( 1LLU << 42 ), // TODO
-        ATTRACT          = ( 1LLU << 43 ),
-        ENDURE           = ( 1LLU << 44 ), // TODO
-        PROTECT          = ( 1LLU << 45 ),
-        DESTINYBOND      = ( 1LLU << 46 ), // TODO
-        CURSE            = ( 1LLU << 47 ),
-        NIGHTMARE        = ( 1LLU << 48 ),
-        STOCKPILE        = ( 1LLU << 49 ), // TODO
-        ENCORE           = ( 1LLU << 50 ), // TODO
-        EXTRATYPE        = ( 1LLU << 51 ),
-        MOVECHARGE       = ( 1LLU << 52 ),
-        RECHARGE         = ( 1LLU << 53 ),
-        ROOST            = ( 1LLU << 54 ),
-        BURNUP           = ( 1LLU << 55 ),
-        REPLACETYPE      = ( 1LLU << 56 ),
-        DIVING           = ( 1LLU << 57 ),
-        INAIR            = ( 1LLU << 58 ),
-        DIGGING          = ( 1LLU << 59 ),
-        INVISIBLE        = ( 1LLU << 60 ),
+        FORESIGHT        = ( 1ULL << 31 ),
+        SNATCH           = ( 1ULL << 32 ), // TODO
+        GRUDGE           = ( 1ULL << 33 ), // TODO
+        IMPRISON         = ( 1ULL << 34 ), // TODO
+        YAWN             = ( 1ULL << 35 ),
+        MAGICCOAT        = ( 1ULL << 36 ), // TODO
+        INGRAIN          = ( 1ULL << 37 ),
+        HELPINGHAND      = ( 1ULL << 38 ), // TODO
+        TAUNT            = ( 1ULL << 39 ), // TODO
+        CHARGE           = ( 1ULL << 40 ), // TODO
+        FOLLOWME         = ( 1ULL << 41 ), // TODO
+        TORMENT          = ( 1ULL << 42 ), // TODO
+        ATTRACT          = ( 1ULL << 43 ),
+        ENDURE           = ( 1ULL << 44 ), // TODO
+        PROTECT          = ( 1ULL << 45 ),
+        DESTINYBOND      = ( 1ULL << 46 ), // TODO
+        CURSE            = ( 1ULL << 47 ),
+        NIGHTMARE        = ( 1ULL << 48 ),
+        STOCKPILE        = ( 1ULL << 49 ), // TODO
+        ENCORE           = ( 1ULL << 50 ), // TODO
+        EXTRATYPE        = ( 1ULL << 51 ),
+        MOVECHARGE       = ( 1ULL << 52 ),
+        RECHARGE         = ( 1ULL << 53 ),
+        ROOST            = ( 1ULL << 54 ),
+        BURNUP           = ( 1ULL << 55 ),
+        REPLACETYPE      = ( 1ULL << 56 ),
+        DIVING           = ( 1ULL << 57 ),
+        INAIR            = ( 1ULL << 58 ),
+        DIGGING          = ( 1ULL << 59 ),
+        INVISIBLE        = ( 1ULL << 60 ),
+        BEAKBLAST        = ( 1ULL << 61 ),
     };
 
     enum weather : u8 {
@@ -317,47 +330,47 @@ namespace MOVE {
         /** Use source defensive stats as offensive stats */
         DEFASOFF = ( 1 << 26 ),
         /** User is damaged if the attack misses */
-        CRASHDAMAGE = ( 1 << 27 ), // TODO
+        CRASHDAMAGE = ( 1 << 27 ),
         /** OHKO move */
-        OHKO = ( 1 << 28 ), // TODO
+        OHKO = ( 1 << 28 ),
         /** PKMN self-destructs */
         SELFDESTRUCT = ( 1 << 29 ),
         /** PKMN self-destructs */
         SELFDESTRUCTHIT = ( 1 << 30 ),
         /** move cannot be sketched */
-        NOSKETCH = ( 1LLU << 31 ), // TODO
+        NOSKETCH = ( 1ULL << 31 ), // TODO
         /** move pp cannot be increased */
-        NOPPBOOST = ( 1LLU << 32 ),
+        NOPPBOOST = ( 1ULL << 32 ),
         /** move can be used while asleep */
-        SLEEPUSABLE = ( 1LLU << 33 ),
+        SLEEPUSABLE = ( 1ULL << 33 ),
         /** target cannot faint due to move */
-        NOFAINT = ( 1LLU << 34 ), // TODO
+        NOFAINT = ( 1ULL << 34 ), // TODO
         /** breaks protect */
-        BREAKSPROTECT = ( 1LLU << 35 ), // TODO
+        BREAKSPROTECT = ( 1ULL << 35 ), // TODO
         /** ignores type immunities */
-        IGNOREIMMUNITY = ( 1LLU << 36 ), // TODO
+        IGNOREIMMUNITY = ( 1ULL << 36 ), // TODO
         /** ignores ground type immunity */
-        IGNOREIMMUNITYGROUND = ( 1LLU << 37 ), // TODO
+        IGNOREIMMUNITYGROUND = ( 1ULL << 37 ), // TODO
         /** ignores abilities */
-        IGNOREABILITY = ( 1LLU << 38 ), // TODO
+        IGNOREABILITY = ( 1ULL << 38 ), // TODO
         /** ignores defense boosts */
-        IGNOREDEFS = ( 1LLU << 39 ), // TODO
+        IGNOREDEFS = ( 1ULL << 39 ), // TODO
         /** ignores evasion boosts */
-        IGNOREEVASION = ( 1LLU << 40 ),
+        IGNOREEVASION = ( 1ULL << 40 ),
         /** Defrosts the target */
-        DEFROSTTARGET = ( 1LLU << 41 ),
+        DEFROSTTARGET = ( 1ULL << 41 ),
         /** Forces the target to switch out */
-        FORCESWITCH = ( 1LLU << 42 ),
+        FORCESWITCH = ( 1ULL << 42 ),
         /** Will always land a critical hit */
-        WILLCRIT = ( 1LLU << 43 ),
+        WILLCRIT = ( 1ULL << 43 ),
         /** Move uses atk/satk of the target */
-        TARGETOFFENSIVES = ( 1LLU << 44 ), // TODO
+        TARGETOFFENSIVES = ( 1ULL << 44 ), // TODO
         /** Move hits at a later time */
-        FUTUREMOVE = ( 1LLU << 45 ), // TODO
+        FUTUREMOVE = ( 1ULL << 45 ), // TODO
         /** Beton pass */
-        BATONPASS = ( 1LLU << 46 ),
+        BATONPASS = ( 1ULL << 46 ),
         /** OHKO move (useless on ice-type pkmn) */
-        OHKOICE = ( 1LLU << 47 ), // TODO
+        OHKOICE = ( 1ULL << 47 ),
     };
 
     enum moveHitTypes : u8 { NOOP = 0, PHYSICAL = 1, SPECIAL = 2, STATUS = 3 };

@@ -88,15 +88,15 @@ namespace BATTLE {
         /*
          * @brief: Sets the type of the specified pkmn.
          */
-        inline void setType( u8 p_slot, type p_type ) {
-            return _slots[ p_slot ].setType( p_type );
+        inline void setType( battleUI* p_ui, u8 p_slot, type p_type ) {
+            return _slots[ p_slot ].setType( p_ui, p_type );
         }
 
         /*
          * @brief: Sets the extra type of the specified pkmn.
          */
-        inline void setExtraType( u8 p_slot, type p_type ) {
-            return _slots[ p_slot ].setExtraType( p_type );
+        inline void setExtraType( battleUI* p_ui, u8 p_slot, type p_type ) {
+            return _slots[ p_slot ].setExtraType( p_ui, p_type );
         }
 
         /*
@@ -121,11 +121,11 @@ namespace BATTLE {
         inline bool addSideCondition( battleUI* p_ui, sideCondition p_sideCondition,
                                       u8 p_duration = 0 ) {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
-                if( p_sideCondition & ( 1 << i ) ) {
+                if( p_sideCondition & ( 1LLU << i ) ) {
                     if( !_sideConditionAmount[ i ] ) {
 #ifdef DESQUID
                         // TODO: proper log
-                        p_ui->log( "Set side condition " + std::to_string( 1 << i ) );
+                        p_ui->log( "Set side condition " + std::to_string( 1LLU << i ) );
                         for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
 #else
                         (void) p_ui;
@@ -142,10 +142,10 @@ namespace BATTLE {
 
         inline bool removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition ) {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
-                if( p_sideCondition & ( 1 << i ) ) {
+                if( p_sideCondition & ( 1LLU << i ) ) {
 #ifdef DESQUID
                     // TODO: proper log
-                    p_ui->log( "Remove side condition " + std::to_string( 1 << i ) );
+                    p_ui->log( "Remove side condition " + std::to_string( 1LLU << i ) );
                     for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
 #else
                     (void) p_ui;
@@ -174,7 +174,7 @@ namespace BATTLE {
         constexpr sideCondition getSideCondition( ) const {
             sideCondition res = sideCondition( 0 );
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
-                if( _sideConditionAmount[ i ] ) { res = sideCondition( res | ( 1 << i ) ); }
+                if( _sideConditionAmount[ i ] ) { res = sideCondition( res | ( 1LLU << i ) ); }
             }
             return res;
         }
@@ -193,16 +193,17 @@ namespace BATTLE {
             return _slots[ p_slot ].getVolatileStatusCounter( p_volatileStatus );
         }
 
-        constexpr bool removeVolatileStatus( u8 p_slot, volatileStatus p_volatileStatus ) {
-            return _slots[ p_slot ].removeVolatileStatus( p_volatileStatus );
+        constexpr bool removeVolatileStatus( battleUI* p_ui, u8 p_slot,
+                                             volatileStatus p_volatileStatus ) {
+            return _slots[ p_slot ].removeVolatileStatus( p_ui, p_volatileStatus );
         }
 
         /*
          * @brief: returns the volatile statuses of the pkmn in the given slot.
          */
-        constexpr bool addVolatileStatus( u8 p_slot, volatileStatus p_volatileStatus,
-                                          u8 p_duration ) {
-            return _slots[ p_slot ].addVolatileStatus( p_volatileStatus, p_duration );
+        constexpr bool addVolatileStatus( battleUI* p_ui, u8 p_slot,
+                                          volatileStatus p_volatileStatus, u8 p_duration ) {
+            return _slots[ p_slot ].addVolatileStatus( p_ui, p_volatileStatus, p_duration );
         }
 
         constexpr bool setStatusCondition( u8 p_slot, u8 p_status, u8 p_duration = 255 ) {

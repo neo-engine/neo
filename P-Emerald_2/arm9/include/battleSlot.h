@@ -139,17 +139,17 @@ namespace BATTLE {
         /*
          * @brief: Sets the type of the specified pkmn.
          */
-        inline void setType( type p_type ) {
+        inline void setType( battleUI* p_ui, type p_type ) {
             _altTypes = { p_type };
-            addVolatileStatus( REPLACETYPE, -1 );
+            addVolatileStatus( p_ui, REPLACETYPE, -1 );
         }
 
         /*
          * @brief: Sets the extra type of the specified pkmn.
          */
-        inline void setExtraType( type p_type ) {
+        inline void setExtraType( battleUI* p_ui, type p_type ) {
             _extraType = p_type;
-            addVolatileStatus( EXTRATYPE, -1 );
+            addVolatileStatus( p_ui, EXTRATYPE, -1 );
         }
 
         /*
@@ -431,44 +431,62 @@ namespace BATTLE {
             }
         }
 
-        constexpr bool addVolatileStatus( volatileStatus p_volatileStatus, u8 p_duration = 255 ) {
+        constexpr bool addVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus,
+                                          u8 p_duration = 255 ) {
+            bool change = false;
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                if( p_volatileStatus & ( 1 << i ) ) {
+                if( ( p_volatileStatus & ( 1LLU << i ) )
+                    && ( _volatileStatusCounter[ i ] == 255 || !_volatileStatusAmount[ i ] ) ) {
+                    change = true;
                     _volatileStatusAmount[ i ]++;
                     _volatileStatusCounter[ i ] = p_duration;
+#ifdef DESQUID
+                    p_ui->log( std::string( "Add volatile status condition " )
+                               + std::to_string( 1LLU << i ) );
+#else
+                    (void) p_ui;
+#endif
                 }
             }
-            return true;
+            return change;
         }
 
-        constexpr bool removeVolatileStatus( volatileStatus p_volatileStatus ) {
+        constexpr bool removeVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus ) {
+            bool change = false;
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                if( p_volatileStatus & ( 1 << i ) ) {
+                if( ( p_volatileStatus & ( 1LLU << i ) ) && _volatileStatusCounter[ i ] ) {
+                    change                      = true;
                     _volatileStatusAmount[ i ]  = 0;
                     _volatileStatusCounter[ i ] = 0;
+#ifdef DESQUID
+                    p_ui->log( std::string( "Remove volatile status condition " )
+                               + std::to_string( 1LLU << i ) );
+#else
+                    (void) p_ui;
+#endif
                 }
             }
-            return true;
+            return change;
         }
 
         constexpr volatileStatus getVolatileStatus( ) const {
             volatileStatus res = volatileStatus( 0 );
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                if( _volatileStatusAmount[ i ] ) { res = volatileStatus( res | ( 1 << i ) ); }
+                if( _volatileStatusAmount[ i ] ) { res = volatileStatus( res | ( 1LLU << i ) ); }
             }
             return res;
         }
 
         constexpr u8 getVolatileStatusAmount( volatileStatus p_volatileStatus ) const {
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                if( p_volatileStatus & ( 1 << i ) ) { return _volatileStatusAmount[ i ]; }
+                if( p_volatileStatus & ( 1LLU << i ) ) { return _volatileStatusAmount[ i ]; }
             }
             return 0;
         }
 
         constexpr u8 getVolatileStatusCounter( volatileStatus p_volatileStatus ) const {
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                if( p_volatileStatus & ( 1 << i ) ) { return _volatileStatusCounter[ i ]; }
+                if( p_volatileStatus & ( 1LLU << i ) ) { return _volatileStatusCounter[ i ]; }
             }
             return 0;
         }
@@ -483,12 +501,11 @@ namespace BATTLE {
 
 #ifdef DESQUID
             p_ui->log( std::string( "Add slot condition " ) + std::to_string( p_slotCondition ) );
-            for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 #endif
 
             for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
-                if( ( 1 << i ) & p_slotCondition ) {
-                    if( !( ( 1 << i ) & _slotCondition ) ) {
+                if( ( 1LLU << i ) & p_slotCondition ) {
+                    if( !( ( 1LLU << i ) & _slotCondition ) ) {
                         _slotConditionCounter[ i ]
                             = p_duration ? p_duration : defaultSlotConditionDurations[ i ];
                     }
@@ -501,13 +518,12 @@ namespace BATTLE {
             if( !( _slotCondition & p_slotCondition ) ) { return false; }
 
             for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
-                if( ( 1 << i ) & p_slotCondition ) { _slotConditionCounter[ i ] = 0; }
+                if( ( 1LLU << i ) & p_slotCondition ) { _slotConditionCounter[ i ] = 0; }
             }
             _slotCondition = slotCondition( _slotCondition & ~p_slotCondition );
 #ifdef DESQUID
             p_ui->log( std::string( "Remove slot condition " )
                        + std::to_string( p_slotCondition ) );
-            for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 #else
             (void) p_ui;
 #endif
@@ -935,11 +951,11 @@ namespace BATTLE {
 
                 auto volstat = p_target->getVolatileStatus( );
                 for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                    if( volstat & ( 1 << i ) ) {
+                    if( volstat & ( 1LLU << i ) ) {
                         _volatileStatusAmount[ i ]
-                            = p_target->getVolatileStatusAmount( volatileStatus( 1 << i ) );
+                            = p_target->getVolatileStatusAmount( volatileStatus( 1LLU << i ) );
                         _volatileStatusCounter[ i ]
-                            = p_target->getVolatileStatusCounter( volatileStatus( 1 << i ) );
+                            = p_target->getVolatileStatusCounter( volatileStatus( 1LLU << i ) );
                     }
                 }
 

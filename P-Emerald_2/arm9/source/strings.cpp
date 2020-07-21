@@ -453,7 +453,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 170
 
     { "The wild %s fled!", "%s (wild) floh." },
-    { "[TRAINER] ([TCLASS])\nused %s.[A]", "[TRAINER] ([TCLASS]) setzt\n%s ein.[A]" },
+    { "But nothing happened|", "Nichts geschah|" },
     { "It got wasted|", "Es hatte keine Wirkung|" },
     { "Used %s.", "%s eingesetzt." },
     { "%s's data was\nregistred to the Pok\xe9"
@@ -1045,5 +1045,19 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "%s's Aqua Ring restores some HP.", "Der Wasserring von %s heilt ein paar KP." },
     { "%s is harmed by its nightmare.", "Der Alptraum schadet %s." },
+    { "%s activated its %s.", "%s nutzt sein Item %s." },
+    { "%s' Air Balloon popped.", "Der Luftballon von %s platzte." },
+    { "%s drank its %s.", "%s trank sein %s." },
 
+    // 540
+
+    { "%s dives.", "%s taucht ab." },
+    { "%s dug a hole.", "%s gr\xe4bt sich ein." },
+    { "%s flies up high.", "%s flog hoch." },
+    { "%s jumps up high.", "%s sprang hoch." },
+    { "%s <SKYDROP>.", "%s <SKYDROP>" },
+
+    { "%s disappeared.", "%s verschwand." },
+    { "%s continues and crashes.", "%s macht weiter und bricht zusammen." },
+    { "It's a one-hit KO!", "Ein K.O.-Treffer!" },
 };

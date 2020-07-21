@@ -64,27 +64,26 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace SAVE {
 
-#define SPR_SMALL_CHOICE_OAM_SUB 0
-#define SPR_LARGE_CHOICE_OAM_SUB 1
-#define SPR_ARROW_LEFT_OAM_SUB 5
-#define SPR_ARROW_RIGHT_OAM_SUB 6
-#define SPR_PAGE_LEFT_OAM_SUB 7
-#define SPR_PAGE_RIGHT_OAM_SUB 8
-#define SPR_MSG_BOX_OAM_SUB 9
-#define SPR_CHOICE_OAM_SUB( p_choice ) ( 30 + 10 * ( p_choice ) )
+#define SPR_SMALL_CHOICE_OAM_SUB          0
+#define SPR_LARGE_CHOICE_OAM_SUB          1
+#define SPR_ARROW_LEFT_OAM_SUB            5
+#define SPR_ARROW_RIGHT_OAM_SUB           6
+#define SPR_PAGE_LEFT_OAM_SUB             7
+#define SPR_PAGE_RIGHT_OAM_SUB            8
+#define SPR_MSG_BOX_OAM_SUB               9
+#define SPR_CHOICE_OAM_SUB( p_choice )    ( 30 + 10 * ( p_choice ) )
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 30 + 6 * ( p_pos ) )
 
-#define SPR_BOX_PAL_SUB 0
+#define SPR_BOX_PAL_SUB      0
 #define SPR_SELECTED_PAL_SUB 1
-#define SPR_ARROW_X_PAL_SUB 2
+#define SPR_ARROW_X_PAL_SUB  2
 
     constexpr language translate( u8 p_dSRegion ) {
         switch( p_dSRegion ) {
         // case 0:
         //    return SAVE::JPN;
         default:
-        case 1:
-            return SAVE::EN;
+        case 1: return SAVE::EN;
         // case 2:
         //    return SAVE::FRE;
         case 3:
@@ -124,16 +123,18 @@ namespace SAVE {
         for( u16 i = 0; i < 6; i++ ) {
             testTeam[ i ] = pokemon( i != 1 ? rand( ) % MAX_PKMN + 1 : PKMN_COMBUSKEN, 100, 0, 0,
                                      255, false, i == 3 );
-  //          testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
+            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //     SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
             //                                                    1 + rand( ) % 100, 0, 0, i, rand(
             //                                                    ) % 2, 3 * i == 490, rand( ) % 20
             //                                                    ) );
-//            testTeam[ i ].m_boxdata.m_experienceGained += 3500;
-//            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
-//            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_TOXIC;
-            testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
-            testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
+            //            testTeam[ i ].m_boxdata.m_experienceGained += 3500;
+            //            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
+            //            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_TOXIC;
+            testTeam[ i ].m_boxdata.m_moves[ 0 ] = M_BOUNCE;
+            //            testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
+            //           testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
+            testTeam[ i ].m_boxdata.m_heldItem = I_SITRUS_BERRY;
         }
         //        BAG::bagViewer
         //        btv = BAG::bagViewer( testTeam );
@@ -156,8 +157,11 @@ namespace SAVE {
 
         //       SOUND::playBGM( MOD_SURFING );
 
-        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
-                                            rand( ) % 46, rand( ) % 46, rand( ) % 58 );
+        //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
+        //        2 ),
+        BATTLE::battle bt
+            = BATTLE::battle( testTeam, 6, pokemon( 1 + rand( ) % MAX_PKMN, 100, 0, 0, 2 ),
+                              rand( ) % 46, rand( ) % 46, rand( ) % 58 );
 
         bt.start( );
 
@@ -790,8 +794,7 @@ namespace SAVE {
                         break;
                     return;
                 }
-                default:
-                    continue;
+                default: continue;
                 }
             }
         }

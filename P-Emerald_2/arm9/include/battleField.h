@@ -123,7 +123,7 @@ namespace BATTLE {
         constexpr pseudoWeather getPseudoWeather( ) const {
             pseudoWeather res = pseudoWeather( 0 );
             for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
-                if( _pseudoWeatherTimer[ i ] ) { res = pseudoWeather( res | ( 1 << i ) ); }
+                if( _pseudoWeatherTimer[ i ] ) { res = pseudoWeather( res | ( 1LLU << i ) ); }
             }
             return res;
         }
@@ -201,19 +201,19 @@ namespace BATTLE {
                 p_slot, p_volatileStatus );
         }
 
-        constexpr bool removeVolatileStatus( bool p_opponent, u8 p_slot,
+        constexpr bool removeVolatileStatus( battleUI* p_ui, bool p_opponent, u8 p_slot,
                                              volatileStatus p_volatileStatus ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].removeVolatileStatus(
-                p_slot, p_volatileStatus );
+                p_ui, p_slot, p_volatileStatus );
         }
 
         /*
          * @brief: returns the volatile statuses of the pkmn in the given slot.
          */
-        constexpr bool addVolatileStatus( bool p_opponent, u8 p_slot,
+        constexpr bool addVolatileStatus( battleUI* p_ui, bool p_opponent, u8 p_slot,
                                           volatileStatus p_volatileStatus, u8 p_duration ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addVolatileStatus(
-                p_slot, p_volatileStatus, p_duration );
+                p_ui, p_slot, p_volatileStatus, p_duration );
         }
 
         constexpr bool setStatusCondition( bool p_opponent, u8 p_slot, u8 p_status,
@@ -434,6 +434,17 @@ namespace BATTLE {
         void checkOnEatBerry( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_berry );
 
         /*
+         * @brief: Checks whether the specified pkmn uses its item after an attack.
+         */
+        void checkItemAfterAttack( battleUI* p_ui, bool p_opponent, u8 p_slot );
+
+        /*
+         * @brief: Checks for effects tha happen when a move damages a pkmn
+         */
+        void checkOnTakeDamage( battleUI* p_ui, battleMove p_move, fieldPosition p_target,
+                                u16 p_damage, u8 p_effectiveness );
+
+        /*
          * @brief: Returns a list of all types the pkmn currently has. May be empty
          */
         inline std::vector<type> getTypes( bool p_opponent, u8 p_slot ) const {
@@ -443,15 +454,16 @@ namespace BATTLE {
         /*
          * @brief: Sets the type of the specified pkmn.
          */
-        inline void setType( bool p_opponent, u8 p_slot, type p_type ) {
-            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setType( p_slot, p_type );
+        inline void setType( battleUI* p_ui, bool p_opponent, u8 p_slot, type p_type ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setType( p_ui, p_slot,
+                                                                               p_type );
         }
 
         /*
          * @brief: Sets the extra type of the specified pkmn.
          */
-        inline void setExtraType( bool p_opponent, u8 p_slot, type p_type ) {
-            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setExtraType( p_slot,
+        inline void setExtraType( battleUI* p_ui, bool p_opponent, u8 p_slot, type p_type ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setExtraType( p_ui, p_slot,
                                                                                     p_type );
         }
 
@@ -804,7 +816,7 @@ namespace BATTLE {
                           itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
-                addVolatileStatus( p_sourceOpp, p_sorceSlot, PROTECT, 1 );
+                addVolatileStatus( p_ui, p_sourceOpp, p_sorceSlot, PROTECT, 1 );
                 snprintf( buffer, 99, GET_STRING( 282 ), itemname.c_str( ),
                           p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ) );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }

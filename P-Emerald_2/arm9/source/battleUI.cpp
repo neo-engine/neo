@@ -625,10 +625,10 @@ namespace BATTLE {
             y += 48;
         }
 
-        IO::OamTop->matrixBuffer[ 7 ].hdx = 1 << 9;
+        IO::OamTop->matrixBuffer[ 7 ].hdx = 1LLU << 9;
         IO::OamTop->matrixBuffer[ 7 ].vdx = 0;
         IO::OamTop->matrixBuffer[ 7 ].hdy = 0;
-        IO::OamTop->matrixBuffer[ 7 ].vdy = 1 << 9;
+        IO::OamTop->matrixBuffer[ 7 ].vdy = 1LLU << 9;
 
         char buffer[ 50 ];
         snprintf( buffer, 49, "PB/%hhu/%hhu_", p_ballId, p_ballId );
@@ -743,8 +743,8 @@ namespace BATTLE {
 
         char buffer[ 50 ];
         snprintf( buffer, 49, "PB/%hhu/%hhu_", p_ballId, p_ballId );
-        IO::OamTop->matrixBuffer[ 7 ].hdx = 1 << 8;
-        IO::OamTop->matrixBuffer[ 7 ].vdy = 1 << 8;
+        IO::OamTop->matrixBuffer[ 7 ].hdx = 1LLU << 8;
+        IO::OamTop->matrixBuffer[ 7 ].vdy = 1LLU << 8;
         IO::OamTop->matrixBuffer[ 7 ].vdx = 0;
         IO::OamTop->matrixBuffer[ 7 ].hdy = 0;
 
@@ -773,8 +773,8 @@ namespace BATTLE {
             }
             if( x % 8 == 4 ) { swiWaitForVBlank( ); }
         }
-        IO::OamTop->matrixBuffer[ 7 ].hdx = 1 << 9;
-        IO::OamTop->matrixBuffer[ 7 ].vdy = 1 << 9;
+        IO::OamTop->matrixBuffer[ 7 ].hdx = 1LLU << 9;
+        IO::OamTop->matrixBuffer[ 7 ].vdy = 1LLU << 9;
 
         SOUND::playSoundEffect( SFX_BATTLE_JUMPTOBALL );
         IO::loadSprite( ( std::string( buffer ) + std::to_string( 9 ) ).c_str( ),
@@ -1614,10 +1614,10 @@ namespace BATTLE {
         }
 
         u16 emptyPal[ 32 ]                = { 0xffff, 0xffff, 0 };
-        IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1 << 8 );
+        IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1LLU << 8 );
         IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
-        IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1 << 9 );
-        IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1 << 10 );
+        IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1LLU << 9 );
+        IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1LLU << 10 );
 
         IO::OamTop->matrixBuffer[ 3 ].hdx = 187;
         IO::OamTop->matrixBuffer[ 3 ].hdy = ( 0 << 8 );
@@ -1691,10 +1691,10 @@ namespace BATTLE {
 
         for( u8 i = 0; i < 4; ++i ) { oam[ SPR_PKMN_START_OAM( 0 ) + i ].priority = OBJPRIORITY_3; }
         u16 emptyPal[ 32 ]                = { 0xffff, 0xffff, 0 };
-        IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1 << 8 );
+        IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1LLU << 8 );
         IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
-        IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1 << 9 );
-        IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1 << 10 );
+        IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1LLU << 9 );
+        IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1LLU << 10 );
 
         u16 sy = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y + 8
                  - ( IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 2 ),
@@ -1812,11 +1812,39 @@ namespace BATTLE {
         for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
     }
 
-    void battleUI::prepareMove( bool p_opponent, u8 p_pos, battleMove p_move ) {
-        // TODO
-        (void) p_opponent;
-        (void) p_pos;
-        (void) p_move;
+    void battleUI::prepareMove( pokemon* p_pokemon, bool p_opponent, u8 p_pos, battleMove p_move ) {
+        auto pkmnstr  = getPkmnName( p_pokemon, p_opponent );
+        bool hidepkmn = true;
+        char buffer[ 100 ];
+        switch( p_move.m_param ) {
+        case M_DIVE:
+            snprintf( buffer, 99, GET_STRING( 540 ), pkmnstr.c_str( ) );
+            log( buffer );
+            break;
+        case M_DIG:
+            snprintf( buffer, 99, GET_STRING( 541 ), pkmnstr.c_str( ) );
+            log( buffer );
+            break;
+        case M_FLY:
+            snprintf( buffer, 99, GET_STRING( 542 ), pkmnstr.c_str( ) );
+            log( buffer );
+            break;
+        case M_BOUNCE:
+            snprintf( buffer, 99, GET_STRING( 543 ), pkmnstr.c_str( ) );
+            log( buffer );
+            break;
+        case M_SKY_DROP:
+            snprintf( buffer, 99, GET_STRING( 544 ), pkmnstr.c_str( ) );
+            log( buffer );
+            break;
+        case M_PHANTOM_FORCE:
+        case M_SHADOW_FORCE:
+            snprintf( buffer, 99, GET_STRING( 545 ), pkmnstr.c_str( ) );
+            log( buffer );
+            break;
+        default: hidepkmn = false; break;
+        }
+        if( hidepkmn ) { hidePkmn( p_opponent, p_pos ); }
     }
 
     void battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton ) {
@@ -2118,7 +2146,7 @@ namespace BATTLE {
             log( buffer );
         }
         if( p_status == PARALYSIS ) {
-            snprintf( buffer, 99, GET_STRING( 302 ), pkmnstr.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 301 ), pkmnstr.c_str( ) );
             log( buffer );
         }
     }
