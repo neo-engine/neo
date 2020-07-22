@@ -1764,11 +1764,10 @@ namespace BATTLE {
 
         char buffer[ 100 ];
         if( p_opponent ) {
-            // TODO
-            //            snprintf( buffer, 99, GET_STRING( 264 ),
-            //                    getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
-            //                    _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
-            //            log( std::string( buffer ) );
+            snprintf( buffer, 99, GET_STRING( 264 ),
+                      getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
+                      _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
+            log( std::string( buffer ) );
         } else {
             snprintf( buffer, 99, GET_STRING( 395 ), p_pokemon->m_boxdata.m_name );
             log( std::string( buffer ) );
