@@ -330,23 +330,20 @@ namespace BATTLE {
                             OBJPRIORITY_3, false, OBJMODE_BLENDED );
         }
 
-        // Shiny / Status icon
-        tileCnt = IO::loadSprite( SPR_STATUS_ICON_OAM( 0 ), SPR_STATUS_ICON_PAL, tileCnt, 0, 0, 8,
-                                  8, status_parPal, status_parTiles, status_parTilesLen / 2, false,
-                                  false, true, OBJPRIORITY_0, false, OBJMODE_NORMAL );
         // Shiny icon
         tileCnt = IO::loadSprite( SPR_SHINY_ICON_OAM( 0 ), SPR_SHINY_ICON_PAL, tileCnt, 0, 0, 8, 8,
                                   status_shinyPal, status_shinyTiles, status_shinyTilesLen, false,
                                   false, true, OBJPRIORITY_0, false, OBJMODE_NORMAL );
 
+        // Shiny / Status icon
         for( u8 i = 0; i < 4; ++i ) {
             u16 anchorx
                 = IO::OamTop->oamBuffer[ SPR_HPBAR_OAM + i ].x + ( ( i < 2 ) ? -8 : 34 + 82 );
             u16 anchory = IO::OamTop->oamBuffer[ SPR_HPBAR_OAM + i ].y + 4;
-            IO::loadSprite( SPR_STATUS_ICON_OAM( i ), SPR_STATUS_ICON_PAL,
-                            IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex, anchorx,
-                            anchory, 8, 8, status_parPal, status_parTiles, status_parTilesLen / 2,
-                            false, false, true, OBJPRIORITY_0, false, OBJMODE_NORMAL );
+            tileCnt     = IO::loadSprite( SPR_STATUS_ICON_OAM( i ), SPR_STATUS_ICON_PAL, tileCnt,
+                                      anchorx, anchory, 8, 8, status_parPal, status_parTiles,
+                                      status_parTilesLen / 2, false, false, true, OBJPRIORITY_0,
+                                      false, OBJMODE_NORMAL );
             IO::loadSprite( SPR_SHINY_ICON_OAM( i ), SPR_SHINY_ICON_PAL,
                             IO::OamTop->oamBuffer[ SPR_SHINY_ICON_OAM( 0 ) ].gfxIndex, anchorx,
                             anchory + 8, 8, 8, status_shinyPal, status_shinyTiles,
@@ -617,13 +614,8 @@ namespace BATTLE {
                                     : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
                                                      : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
 
-        if( !p_opponent ) {
-            x += 24;
-            y += 48;
-        } else {
-            x += 48;
-            y += 48;
-        }
+        x += 24;
+        y += 48;
 
         IO::OamTop->matrixBuffer[ 7 ].hdx = 1LLU << 9;
         IO::OamTop->matrixBuffer[ 7 ].vdx = 0;
@@ -1265,8 +1257,8 @@ namespace BATTLE {
         IO::smallFont->setColor( 250, 1 );
         IO::smallFont->setColor( 251, 2 );
         // show/hide hp bar
-        oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].isHidden
-            = p_pokemon == nullptr || ( p_pos && _mode != DOUBLE );
+        bool disabled = p_pokemon == nullptr || ( p_pos && _mode != DOUBLE );
+        oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].isHidden = disabled;
         if( p_redraw ) {
             // clear relevant part of the screen
             dmaFillWords( 0,
@@ -1281,7 +1273,7 @@ namespace BATTLE {
                     IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
                                     SPR_STSBALL_GFX( 3 ), oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].x,
                                     oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].y, 16, 16, 0, 0, 0,
-                                    false, false, false, OBJPRIORITY_0, false );
+                                    false, false, disabled, OBJPRIORITY_0, false );
                 } else if( !p_pokemon->canBattle( ) ) {
                     IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
                                     SPR_STSBALL_GFX( 2 ), oam[ SPR_STATUS_BALL_OAM( 6 + p_pos ) ].x,
@@ -1303,7 +1295,7 @@ namespace BATTLE {
                     IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
                                     SPR_STSBALL_GFX( 3 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
                                     oam[ SPR_STATUS_BALL_OAM( p_pos ) ].y, 16, 16, 0, 0, 0, false,
-                                    false, false, OBJPRIORITY_0, false );
+                                    false, disabled, OBJPRIORITY_0, false );
                 } else if( !p_pokemon->canBattle( ) ) {
                     IO::loadSprite( SPR_STATUS_BALL_OAM( p_pos ), SPR_STATUS_BALL_PAL,
                                     SPR_STSBALL_GFX( 2 ), oam[ SPR_STATUS_BALL_OAM( p_pos ) ].x,
@@ -1416,7 +1408,8 @@ namespace BATTLE {
         if( !p_pokemon->m_stats.m_curHP ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_fntTiles, status_fntTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1424,7 +1417,8 @@ namespace BATTLE {
         } else if( p_pokemon->m_status.m_isParalyzed ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_parTiles, status_parTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1432,7 +1426,8 @@ namespace BATTLE {
         } else if( p_pokemon->m_status.m_isAsleep ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_slpTiles, status_slpTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1440,7 +1435,8 @@ namespace BATTLE {
         } else if( p_pokemon->m_status.m_isBadlyPoisoned ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_txcTiles, status_txcTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1448,7 +1444,8 @@ namespace BATTLE {
         } else if( p_pokemon->m_status.m_isBurned ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_brnTiles, status_brnTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1456,7 +1453,8 @@ namespace BATTLE {
         } else if( p_pokemon->m_status.m_isFrozen ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_frzTiles, status_frzTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1464,7 +1462,8 @@ namespace BATTLE {
         } else if( p_pokemon->m_status.m_isPoisoned ) {
             IO::loadSprite(
                 SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ), SPR_STATUS_ICON_PAL,
-                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 0 ) ].gfxIndex,
+                IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ]
+                    .gfxIndex,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].x,
                 IO::OamTop->oamBuffer[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].y, 8, 8,
                 0, status_psnTiles, status_psnTilesLen / 2, false, false, false, OBJPRIORITY_0,
@@ -1474,9 +1473,12 @@ namespace BATTLE {
         }
 
         oam[ SPR_SHINY_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].isHidden = !p_pokemon->isShiny( );
-        oam[ SPR_STATUSBG_OAM( 2 * ( !p_opponent ) + p_pos ) ].isHidden   = false;
-        oam[ SPR_STATUSBG_OAM( 2 * ( !p_opponent ) + p_pos ) + 1 ].isHidden = false;
-        oam[ SPR_STATUSBG_OAM( 2 * ( !p_opponent ) + p_pos ) + 2 ].isHidden = false;
+        oam[ SPR_STATUSBG_OAM( 2 * ( !p_opponent ) + p_pos ) ].isHidden   = disabled;
+        oam[ SPR_STATUSBG_OAM( 2 * ( !p_opponent ) + p_pos ) + 1 ].isHidden = disabled;
+        oam[ SPR_STATUSBG_OAM( 2 * ( !p_opponent ) + p_pos ) + 2 ].isHidden = disabled;
+        if( disabled ) {
+            oam[ SPR_STATUS_ICON_OAM( 2 * ( !p_opponent ) + p_pos ) ].isHidden = true;
+        }
 
         IO::updateOAM( false );
     }
@@ -1503,7 +1505,11 @@ namespace BATTLE {
     }
 
     void battleUI::updatePkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
-        loadPkmnSprite( p_opponent, p_pos, p_pokemon );
+        if( p_pokemon == nullptr ) {
+            hidePkmn( p_opponent, p_pos );
+        } else {
+            loadPkmnSprite( p_opponent, p_pos, p_pokemon );
+        }
         _curHP[ !p_opponent ][ p_pos ] = 0;
         updatePkmnStats( p_opponent, p_pos, p_pokemon );
     }
@@ -1763,7 +1769,7 @@ namespace BATTLE {
 
         char buffer[ 100 ];
         if( p_opponent ) {
-            snprintf( buffer, 99, GET_STRING( 264 ),
+            snprintf( buffer, 99, GET_STRING( 263 ),
                       getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
                       _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
             log( std::string( buffer ) );

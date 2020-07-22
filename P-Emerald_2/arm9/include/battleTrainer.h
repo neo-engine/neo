@@ -42,6 +42,8 @@ namespace BATTLE {
 
     struct trainerData {
         u8             m_trainerClass;
+        u8             m_AILevel;
+        u16            m_trainerBG;
         u16            m_battleBG;
         u8             m_battlePlat1;
         u8             m_battlePlat2;

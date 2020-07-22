@@ -1046,7 +1046,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s's Aqua Ring restores some HP.", "Der Wasserring von %s heilt ein paar KP." },
     { "%s is harmed by its nightmare.", "Der Alptraum schadet %s." },
     { "%s activated its %s.", "%s nutzt sein Item %s." },
-    { "%s' Air Balloon popped.", "Der Luftballon von %s platzte." },
+    { "%s's Air Balloon popped.", "Der Luftballon von %s platzte." },
     { "%s drank its %s.", "%s trank sein %s." },
 
     // 540

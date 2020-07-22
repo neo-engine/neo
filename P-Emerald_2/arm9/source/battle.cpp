@@ -65,12 +65,40 @@ namespace BATTLE {
 
         _policy       = p_policy;
         _isWildBattle = false;
+        _AILevel      = _opponent.m_data.m_AILevel;
 
         _field    = field( p_policy.m_weather );
         _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
                               _opponent.m_data.m_battleBG, _policy.m_mode, false );
 
         _opponentRuns = false;
+
+        // adjust difficulty
+
+        switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
+        case 0:
+            if( _AILevel ) { _AILevel--; }
+            for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
+                if( _opponentTeam[ i ].m_level <= 10 ) {
+                    _opponentTeam[ i ].setLevel( 5 );
+                } else {
+                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level - 5 );
+                }
+            }
+            break;
+        case 3:
+        default: break;
+        case 6:
+            if( _AILevel < 9 ) { _AILevel++; }
+            for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
+                if( _opponentTeam[ i ].m_level > 95 ) {
+                    _opponentTeam[ i ].setLevel( 100 );
+                } else {
+                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level + 5 );
+                }
+            }
+            break;
+        }
     }
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform,
                     u8 p_platform2, u8 p_background, battlePolicy p_policy, bool p_wildPkmnRuns ) {
@@ -83,6 +111,7 @@ namespace BATTLE {
         _opponentTeamSize  = 1;
 
         _policy       = p_policy;
+        _AILevel      = _policy.m_aiLevel;
         _isWildBattle = true;
 
         // Initialize the field with the wild pkmn
@@ -234,6 +263,7 @@ namespace BATTLE {
                     }
                     selection.push_back( moves[ i ][ j ] );
                 }
+
 #ifdef DESQUID_MORE
             for( u8 i = 0; i < selection.size( ); ++i ) {
                 _battleUI.log( "Move sel " + std::to_string( i )
@@ -670,25 +700,75 @@ namespace BATTLE {
     battleMoveSelection battle::getAIMove( u8 p_slot ) {
         battleMoveSelection res = NO_OP_SELECTION;
         res.m_user              = { true, p_slot };
-        switch( _policy.m_aiLevel ) {
+        auto pkmn               = _field.getPkmn( true, p_slot );
+        if( pkmn == nullptr ) { return res; }
+
+        // Use item if remotely sensible
+        for( u8 i = 0; i < 5; ++i ) {
+            switch( _opponent.m_data.m_items[ i ] ) {
+            case I_POTION:
+            case I_FRESH_WATER:
+            case I_ENERGY_POWDER:
+            case I_SUPER_POTION:
+            case I_SODA_POP:
+            case I_LEMONADE:
+            case I_MOOMOO_MILK:
+            case I_HYPER_POTION:
+            case I_ENERGY_ROOT:
+            case I_MAX_POTION:
+            case I_FULL_RESTORE:
+                if( pkmn->m_stats.m_curHP * 5 < pkmn->m_stats.m_maxHP ) {
+                    res.m_type  = USE_ITEM;
+                    res.m_param = _opponent.m_data.m_items[ i ];
+                    return res;
+                }
+                break;
+            case I_HEAL_POWDER:
+            case I_FULL_HEAL:
+                if( pkmn->m_statusint ) {
+                    res.m_type  = USE_ITEM;
+                    res.m_param = _opponent.m_data.m_items[ i ];
+                    return res;
+                }
+                break;
+            case I_X_ATTACK:
+            case I_X_DEFENSE:
+            case I_X_SPEED:
+            case I_X_ACCURACY:
+            case I_X_SP_ATK:
+            case I_X_SP_DEF:
+                res.m_type  = USE_ITEM;
+                res.m_param = _opponent.m_data.m_items[ i ];
+                return res;
+            default: break;
+            }
+        }
+
+        // Mega evolve starting with ai level 6
+        if( _AILevel >= 6 ) {
+            if( pkmn->canBattleTransform( ) ) { res.m_megaEvolve = true; }
+        }
+        res.m_type = ATTACK;
+        bool canUse[ 4 ], str = false;
+        for( u8 i = 0; i < 4; ++i ) {
+            canUse[ i ] = _field.canSelectMove( true, p_slot, i );
+            str         = str || canUse[ i ];
+        }
+
+        if( !str ) { // pkmn struggles
+            res.m_param = M_STRUGGLE;
+        }
+
+        switch( _AILevel ) {
         default:
             [[likely]] case 0 : { // Wild pkmn
-                // Pick a random move
-                res.m_type = ATTACK;
-                bool canUse[ 4 ], str = false;
-                for( u8 i = 0; i < 4; ++i ) {
-                    canUse[ i ] = _field.canSelectMove( true, p_slot, i );
-                    str         = str || canUse[ i ];
-                }
-
-                if( !str ) { // pkmn struggles
-                    res.m_param = M_STRUGGLE;
-                } else {
+                if( str ) {
+                    // Pick a random move
                     u8 mv = rand( ) % 4;
                     while( !canUse[ mv ] ) { mv = rand( ) % 4; }
                     res.m_param = _field.getPkmn( true, p_slot )->getMove( mv );
                 }
-
+                // Choose a target
                 // Pick a random target
                 auto mdata     = MOVE::getMoveData( res.m_param );
                 res.m_moveData = mdata;
@@ -715,8 +795,129 @@ namespace BATTLE {
                     break;
                     [[unlikely]] default : break;
                 }
-                break;
+
+                return res;
             }
+        case 1:
+        case 2: // Simple trainer
+        case 3: // Ace trainer
+        case 4: // Rival
+        case 5: // Gym Leader / simple battle frontier
+        case 6: // Elite Four / 7-streak battle frontier
+        case 7: // Champ
+        case 8: // Frontier Brain
+        case 9: {
+            u8         score[ 4 ] = { 100, 100, 100, 100 };
+            battleMove bmove[ 4 ];
+
+            for( u8 i = 0; i < 4; ++i ) {
+                if( !canUse[ i ] ) {
+                    score[ i ] = 0;
+                    continue;
+                }
+                bmove[ i ].m_param    = pkmn->getMove( i );
+                bmove[ i ].m_moveData = MOVE::getMoveData( pkmn->getMove( i ) );
+                // TODO: do this properly for double battles
+                auto tg = bmove[ i ].m_moveData.m_pressureTarget != MOVE::NO_TARGET
+                              ? bmove[ i ].m_moveData.m_pressureTarget
+                              : bmove[ i ].m_moveData.m_target;
+
+                bool canTarget[ 4 ];
+                for( u8 j = 0; j < 4; ++j ) {
+                    if( _field.getPkmn( j < 2, j & 1 ) == nullptr ) {
+                        canTarget[ j ] = false;
+                        continue;
+                    }
+                    if( _AILevel > 3 ) {
+                        canTarget[ j ] = !!_field.getEffectiveness( bmove[ i ], { j / 2, j % 2 } );
+                    } else {
+                        canTarget[ j ] = true;
+                    }
+                }
+                u8 ctg = rand( ) % 2;
+
+                switch( tg ) {
+                case MOVE::RANDOM:
+                case MOVE::ANY_FOE:
+                    [[likely]] case MOVE::ANY : if( !canTarget[ 2 ] && !canTarget[ 3 ] ) {
+                        ctg = 0;
+                    }
+                    else {
+                        while( !canTarget[ 2 + ctg ] ) { ctg = rand( ) & 1; }
+                    }
+                    bmove[ i ].m_target = { fieldPosition( false, ctg ) };
+                    break;
+                case MOVE::ALLY_OR_SELF:
+                    while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
+                    bmove[ i ].m_target = { fieldPosition( true, ctg ) };
+                    break;
+                    [[unlikely]] default : bmove[ i ].m_target = { fieldPosition( false, 0 ) };
+                    break;
+                }
+
+                if( _AILevel < 4 && bmove[ i ].m_moveData.m_category == MOVE::STATUS ) {
+                    // Bad trainers don't want to use status moves
+                    score[ i ] -= 5;
+                } else if( bmove[ i ].m_moveData.m_category == MOVE::STATUS ) {
+                    if( pkmn->m_boxdata.m_curPP[ i ] + ( 18 - _AILevel ) / 2
+                        < bmove[ i ].m_moveData.m_pp ) {
+                        score[ i ] = 1;
+                        continue;
+                    }
+                    score[ i ] = score[ i ] + 5 - ( rand( ) % ( 13 - _AILevel ) );
+                }
+
+                if( _AILevel > 4 && _field.hasType( true, p_slot, bmove[ i ].m_moveData.m_type ) ) {
+                    score[ i ] += _AILevel / 2;
+                }
+                if( bmove[ i ].m_moveData.m_category == MOVE::PHYSICAL ) {
+                    if( _AILevel > 3
+                        && _field.getStat( true, p_slot, ATK )
+                               > _field.getStat( true, p_slot, SATK ) ) {
+                        score[ i ] += _AILevel / 2;
+                    }
+                }
+                if( bmove[ i ].m_moveData.m_category == MOVE::SPECIAL ) {
+                    if( _AILevel > 3
+                        && _field.getStat( true, p_slot, SATK )
+                               > _field.getStat( true, p_slot, ATK ) ) {
+                        score[ i ] += _AILevel / 2;
+                    }
+                }
+
+                if( _AILevel > 5 ) {
+                    u16 eff = _field.getEffectiveness( bmove[ i ], bmove[ i ].m_target[ 0 ] );
+                    score[ i ] += ( eff - 100 ) / 3;
+                }
+                if( _AILevel > 2 ) {
+                    if( bmove[ i ].m_moveData.m_basePower > _AILevel * 9 ) {
+                        score[ i ] += ( bmove[ i ].m_moveData.m_basePower - 50 ) / 10;
+                    }
+                }
+                if( _AILevel > 6 ) {
+                    score[ i ] -= ( 100 - bmove[ i ].m_moveData.m_accuracy ) / 10;
+                }
+                score[ i ] += ( rand( ) % 5 );
+            }
+
+            // pick the move with the highest score
+            u8 mxscr = 0, idx = -1;
+            for( u8 i = 0; i < 4; ++i ) {
+                if( score[ i ] > mxscr ) {
+                    mxscr = score[ i ];
+                    idx   = i;
+                }
+            }
+
+            // TODO: switch pkmn if mx score is too low
+
+            res.m_type     = ATTACK;
+            res.m_target   = bmove[ idx ].m_target[ 0 ];
+            res.m_param    = bmove[ idx ].m_param;
+            res.m_moveData = bmove[ idx ].m_moveData;
+
+            break;
+        }
         }
         return res;
     }

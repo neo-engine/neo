@@ -70,7 +70,7 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     pkmnData data = getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme );
     m_level       = p_trainerPokemon.m_level;
     m_boxdata = boxPokemon( p_trainerPokemon.m_speciesId, m_level, p_trainerPokemon.m_forme & 31, 0,
-                            2 * !!p_trainerPokemon.m_shiny, false, false, 0, 0, false, &data );
+                            2 * !!p_trainerPokemon.m_shiny, false, false, 3, 0, false, &data );
 
     if( p_trainerPokemon.m_shiny ) { m_boxdata.m_shinyType = p_trainerPokemon.m_shiny - 1; }
     m_boxdata.m_isFemale     = p_trainerPokemon.m_forme & ( 1 << 6 );
