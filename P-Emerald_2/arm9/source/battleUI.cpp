@@ -1035,7 +1035,6 @@ namespace BATTLE {
 
         initTop( );
         initSub( );
-
         redrawBattleBG( );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "battlesub2", 512, 49152,
                              true );

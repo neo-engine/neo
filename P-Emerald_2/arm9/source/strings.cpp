@@ -1052,7 +1052,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 540
 
     { "%s dives.", "%s taucht ab." },
-    { "%s dug a hole.", "%s gr\xe4bt sich ein." },
+    { "%s dug a hole.", "%s gr\xe4""bt sich ein." },
     { "%s flies up high.", "%s flog hoch." },
     { "%s jumps up high.", "%s sprang hoch." },
     { "%s <SKYDROP>.", "%s <SKYDROP>" },
@@ -1063,4 +1063,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s lost its focus and cannot attack.",
       "%s hat seinen Fokus verloren und kann nicht angreifen." },
     { "%s's trap failed.", "Die Falle von %s blieb wirkungslos." },
+
+    // 550
+
+    { "Pok\xe9mon Trainer", "Pok\xe9mon-Trainer" },
 };

@@ -42,6 +42,9 @@ namespace BATTLE {
 
     struct trainerData {
         u8             m_trainerClass;
+        u16            m_battleBG;
+        u8             m_battlePlat1;
+        u8             m_battlePlat2;
         u8             m_numPokemon;
         u16            m_items[ 5 ];
         u32            m_moneyEarned;
@@ -57,9 +60,9 @@ namespace BATTLE {
         }
     };
 
-    std::string getTrainerClassName( u8 p_trainerClass );
-    std::string getTrainerClassName( u8 p_trainerClass, u8 p_language );
-    bool        getTrainerClassName( u8 p_trainerClass, u8 p_language, char* p_out );
+    std::string getTrainerClassName( u16 p_trainerClass );
+    std::string getTrainerClassName( u16 p_trainerClass, u8 p_language );
+    bool        getTrainerClassName( u16 p_trainerClass, u8 p_language, char* p_out );
 
     battleTrainer getBattleTrainer( u16 p_battleTrainerId );
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );

@@ -198,8 +198,8 @@ namespace BATTLE {
         /*
          * @brief: Creates a new trainer battle.
          */
-        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId, u8 p_platform = 10,
-                u8 p_platform2 = 10, u8 p_background = 0, battlePolicy = DEFAULT_TRAINER_POLICY );
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
+                battlePolicy = DEFAULT_TRAINER_POLICY );
 
         /*
          * @brief: Creates a new wild pkmn battle.

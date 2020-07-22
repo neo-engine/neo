@@ -68,7 +68,9 @@ const char POKEMON_EVOS_PATH[]     = "nitro:/DATA/PKMN_EVOS/";
 const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/";
 const char PKMN_LEARNSET_PATH[]    = "nitro:/DATA/PKMN_LEARN/";
 
-const char BATTLE_TRAINER_PATH[] = "n/a";
+const char BATTLE_STRINGS_PATH[] = "nitro:/DATA/TRNR_STRS/";
+const char BATTLE_TRAINER_PATH[] = "nitro:/DATA/TRNR_DATA/";
+const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/";
 
 namespace FS {
     char TMP_BUFFER[ 100 ];
@@ -509,17 +511,47 @@ namespace MOVE {
 } // namespace MOVE
 
 namespace BATTLE {
+    bool getTrainerClassName( u16 p_trainerClass, u8 p_language, char* p_out ) {
+        FILE* f = FS::openSplit( TCLASS_NAME_PATH, p_trainerClass, ".str" );
+        if( !f ) return false;
+
+        for( u8 i = 0; i <= p_language; ++i ) { fread( p_out, 1, TCLASS_NAMELENGTH, f ); }
+        fclose( f );
+        return true;
+    }
+
+    std::string getTrainerClassName( u16 p_trainerClass, u8 p_language ) {
+        char tmpbuf[ TCLASS_NAMELENGTH ];
+        if( !getTrainerClassName( p_trainerClass, p_language, tmpbuf ) ) {
+            return std::string( GET_STRING( 550 ) );
+        }
+        return std::string( tmpbuf );
+    }
+
+    std::string getTrainerClassName( u16 p_trainerClass ) {
+        return getTrainerClassName( p_trainerClass, CURRENT_LANGUAGE );
+    }
+
+    battleTrainer getBattleTrainer( u16 p_battleTrainerId ) {
+        return getBattleTrainer( p_battleTrainerId, CURRENT_LANGUAGE );
+    }
+
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language ) {
-        battleTrainer res;
+        battleTrainer res = battleTrainer( );
         if( getBattleTrainer( p_battleTrainerId, p_language, &res ) ) { return res; }
         getBattleTrainer( 0, p_language, &res );
         return res;
     }
+
     bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out ) {
-        FILE* f = FS::openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId,
-                                 ( "-" + std::to_string( p_language ) + ".data" ).c_str( ) );
+        FILE* f = FS::openSplit( BATTLE_STRINGS_PATH, p_battleTrainerId,
+                                 ( "_" + std::to_string( 1 + p_language ) + ".trnr.str" ).c_str( ) );
         if( !f ) return false;
-        fread( p_out, sizeof( battleTrainer ), 1, f );
+        fread( &p_out->m_strings, sizeof( trainerStrings ), 1, f );
+        fclose( f );
+        f = FS::openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId, ".trnr.data" );
+        if( !f ) return false;
+        fread( &p_out->m_data, sizeof( trainerData ), 1, f );
         fclose( f );
         return true;
     }

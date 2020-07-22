@@ -69,8 +69,12 @@ pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u
 pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     pkmnData data = getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme );
     m_level       = p_trainerPokemon.m_level;
-    m_boxdata     = boxPokemon( p_trainerPokemon.m_speciesId, m_level, p_trainerPokemon.m_forme, 0,
-                            p_trainerPokemon.m_shiny, false, false, 0, 0, false, &data );
+    m_boxdata = boxPokemon( p_trainerPokemon.m_speciesId, m_level, p_trainerPokemon.m_forme & 31, 0,
+                            2 * !!p_trainerPokemon.m_shiny, false, false, 0, 0, false, &data );
+
+    if( p_trainerPokemon.m_shiny ) { m_boxdata.m_shinyType = p_trainerPokemon.m_shiny - 1; }
+    m_boxdata.m_isFemale     = p_trainerPokemon.m_forme & ( 1 << 6 );
+    m_boxdata.m_isGenderless = p_trainerPokemon.m_forme & ( 1 << 7 );
 
     m_boxdata.m_ability  = p_trainerPokemon.m_ability;
     m_boxdata.m_heldItem = p_trainerPokemon.m_heldItem;
@@ -209,29 +213,18 @@ bool pokemon::setExperience( u32 p_amount ) {
 
 void pokemon::setStatus( u8 p_status, u8 p_value ) {
     switch( p_status ) {
-    case 0:
-        m_status.m_isAsleep = p_value;
-        break;
-    case 1:
-        m_status.m_isPoisoned = p_value;
-        break;
-    case 2:
-        m_status.m_isBurned = p_value;
-        break;
+    case 0: m_status.m_isAsleep = p_value; break;
+    case 1: m_status.m_isPoisoned = p_value; break;
+    case 2: m_status.m_isBurned = p_value; break;
     case 3:
         m_status.m_isFrozen = p_value;
         if( p_value && m_boxdata.m_speciesId == PKMN_SHAYMIN && getForme( ) == 1 ) {
             setForme( 0 );
         }
         break;
-    case 4:
-        m_status.m_isParalyzed = p_value;
-        break;
-    case 5:
-        m_status.m_isBadlyPoisoned = p_value;
-        break;
-    default:
-        break;
+    case 4: m_status.m_isParalyzed = p_value; break;
+    case 5: m_status.m_isBadlyPoisoned = p_value; break;
+    default: break;
     }
 }
 

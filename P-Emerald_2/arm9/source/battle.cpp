@@ -48,14 +48,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound.h"
 
 namespace BATTLE {
-    std::string trainerClassNames[ 120 ] = { "Pokémon-Trainer" };
-
-    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId, u8 p_platform,
-                    u8 p_platform2, u8 p_background, battlePolicy p_policy ) {
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
+                    battlePolicy p_policy ) {
         _playerTeam     = p_playerTeam;
         _playerTeamSize = p_playerTeamSize;
 
-        _opponent = getBattleTrainer( p_opponentId, CURRENT_LANGUAGE );
+        _opponent = getBattleTrainer( p_opponentId );
+
+        _opponentTeamSize = _opponent.m_data.m_numPokemon
+            = std::min( u8( 6 ), _opponent.m_data.m_numPokemon );
+
         for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
             _yieldEXP[ i ]     = std::set<u8>( );
@@ -65,11 +67,10 @@ namespace BATTLE {
         _isWildBattle = false;
 
         _field    = field( p_policy.m_weather );
-        _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, _policy.m_mode, false );
+        _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
+                              _opponent.m_data.m_battleBG, _policy.m_mode, false );
 
         _opponentRuns = false;
-        ;
     }
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform,
                     u8 p_platform2, u8 p_background, battlePolicy p_policy, bool p_wildPkmnRuns ) {
@@ -1289,6 +1290,10 @@ namespace BATTLE {
         pokemon* pkmn = p_opponent ? _opponentTeam : _playerTeam;
         u8*      perm = p_opponent ? _opponentPkmnPerm : _playerPkmnPerm;
         u8       len  = p_opponent ? _opponentTeamSize : _playerTeamSize;
+
+        if( len > 6 ) [[unlikely]] {
+                len = 6;
+            }
 
         for( u8 i = 0; i < len - 1; ++i ) {
             if( !pkmn[ i ].canBattle( ) ) {
