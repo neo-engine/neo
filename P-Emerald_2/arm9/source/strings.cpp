@@ -1039,7 +1039,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s is badly poisoned.", "%s ist schwer vergiftet." },
     { "%s is burned.", "%s ist verbrannt." },
     { "%s restores some HP by listening to the soothing sound of its Shell Bell.",
-        "%s lauscht dem beruhigenden Klang seines Seegesangs und heilt ein paar KP." },
+      "%s lauscht dem beruhigenden Klang seines Seegesangs und heilt ein paar KP." },
     { "%s is harmed by its curse.", "Der Fluch schadet %s." },
     { "%s restores some HP using its roots.", "Die Wurzeln von %s heilen ein paar KP." },
 
@@ -1060,4 +1060,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s disappeared.", "%s verschwand." },
     { "%s continues and crashes.", "%s macht weiter und bricht zusammen." },
     { "It's a one-hit KO!", "Ein K.O.-Treffer!" },
+    { "%s lost its focus and cannot attack.",
+      "%s hat seinen Fokus verloren und kann nicht angreifen." },
+    { "%s's trap failed.", "Die Falle von %s blieb wirkungslos." },
 };

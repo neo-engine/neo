@@ -506,6 +506,16 @@ namespace BATTLE {
         char buffer[ 100 ];
         bool supprAbs = suppressesAbilities( );
 
+        // Check for M_FOCUS_PUNCH and M_SHELL_TRAP
+
+        auto tgvol = getVolatileStatus( p_target.first, p_target.second );
+        if( p_damage && ( tgvol & FOCUSPUNCH ) ) {
+            removeVolatileStatus( p_ui, p_target.first, p_target.second, FOCUSPUNCH );
+        }
+        if( p_move.m_moveData.m_category == MOVE::PHYSICAL && p_damage && ( tgvol & SHELLTRAP ) ) {
+            removeVolatileStatus( p_ui, p_target.first, p_target.second, SHELLTRAP );
+        }
+
         if( canUseItem( p_target.first, p_target.second ) ) {
             switch( target->getItem( ) ) {
             case I_WEAKNESS_POLICY:
@@ -1698,7 +1708,7 @@ namespace BATTLE {
                                     res.push_back( { MESSAGE_ITEM,
                                                      I_CUSTAP_BERRY,
                                                      { },
-                                                     { 255, 255 },
+                                                     { m.m_user.first, m.m_user.second },
                                                      127,
                                                      0,
                                                      u8( 5 + j ),
@@ -1718,7 +1728,7 @@ namespace BATTLE {
                         res.push_back( { MESSAGE_MOVE,
                                          bm.m_param,
                                          { },
-                                         { 255, 255 },
+                                         { m.m_user.first, m.m_user.second },
                                          125,
                                          0,
                                          u8( 5 + j ),
@@ -1891,7 +1901,7 @@ namespace BATTLE {
         // Boosts
         if( p_move.m_moveData.m_boosts != boosts( ) ) {
             auto res = addBoosts( p_target.first, p_target.second, p_move.m_moveData.m_boosts );
-            p_ui->logBoosts( user, p_target.first, p_target.second, p_move.m_moveData.m_boosts,
+            p_ui->logBoosts( target, p_target.first, p_target.second, p_move.m_moveData.m_boosts,
                              res );
         }
 
@@ -2099,7 +2109,7 @@ namespace BATTLE {
         if( p_move.m_moveData.m_secondaryBoosts != boosts( ) ) {
             auto res
                 = addBoosts( p_target.first, p_target.second, p_move.m_moveData.m_secondaryBoosts );
-            p_ui->logBoosts( user, p_target.first, p_target.second,
+            p_ui->logBoosts( target, p_target.first, p_target.second,
                              p_move.m_moveData.m_secondaryBoosts, res );
         }
 
@@ -2153,7 +2163,6 @@ namespace BATTLE {
             }
         }
         if( tgvol & BEAKBLAST ) {
-            // TODO: Make beak blast user get beak blast volstat on move select
             if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, BURN ) ) {
                 p_ui->animateStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
                                               BURN );
@@ -2345,6 +2354,19 @@ namespace BATTLE {
 
         auto volst = getVolatileStatus( opponent, slot );
 
+        if( p_move.m_param == M_FOCUS_PUNCH && !( volst & FOCUSPUNCH ) ) [[unlikely]] {
+                snprintf( buffer, 99, GET_STRING( 548 ),
+                          p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
+                p_ui->log( buffer );
+                return false;
+            }
+        if( p_move.m_param == M_SHELL_TRAP && ( volst & SHELLTRAP ) ) [[unlikely]] {
+                snprintf( buffer, 99, GET_STRING( 549 ),
+                          p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
+                p_ui->log( buffer );
+                return false;
+            }
+
         if( volst & RECHARGE ) [[unlikely]] {
                 snprintf( buffer, 99, GET_STRING( 276 ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
@@ -2470,6 +2492,12 @@ namespace BATTLE {
         bool supprAbs = suppressesAbilities( );
 
         if( !supprAbs && user->getAbility( ) == A_NO_GUARD ) { return false; }
+
+        if( p_move.m_moveData.m_target == MOVE::SELF || p_move.m_moveData.m_target == MOVE::FIELD
+            || p_move.m_moveData.m_target == MOVE::FOE_SIDE
+            || p_move.m_moveData.m_target == MOVE::ALLY_SIDE ) {
+            return false;
+        }
 
         if( tgvol & DIGGING ) {
             return !( p_move.m_param == M_EARTHQUAKE || p_move.m_param == M_MAGNITUDE
@@ -2969,7 +2997,7 @@ namespace BATTLE {
 
         if( effectiveness == 0 ) {
             snprintf( buffer, 99, GET_STRING( 284 ),
-                      p_ui->getPkmnName( target, p_target.first ).c_str( ) );
+                      p_ui->getPkmnName( target, p_target.first, false ).c_str( ) );
             p_ui->log( buffer );
             return false;
         }
@@ -3467,6 +3495,12 @@ namespace BATTLE {
         }
 
         p_ui->animateHitPkmn( p_target.first, p_target.second, effectiveness );
+
+        if( p_move.m_moveData.m_flags & MOVE::NOFAINT ) {
+            if( damage >= target->m_stats.m_curHP ) {
+                damage = target->m_stats.m_curHP - 1;
+            }
+        }
 
         damagePokemon( p_ui, p_target.first, p_target.second, damage );
 

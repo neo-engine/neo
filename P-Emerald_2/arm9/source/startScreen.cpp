@@ -129,10 +129,10 @@ namespace SAVE {
             //                                                    ) % 2, 3 * i == 490, rand( ) % 20
             //                                                    ) );
             //            testTeam[ i ].m_boxdata.m_experienceGained += 3500;
-            //            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
+            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
             //            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_TOXIC;
-            testTeam[ i ].m_boxdata.m_moves[ 0 ] = M_BOUNCE;
-            //            testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
+            // testTeam[ i ].m_boxdata.m_moves[ 0 ] = M_BOUNCE;
+            testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
             //           testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
             testTeam[ i ].m_boxdata.m_heldItem = I_SITRUS_BERRY;
         }

@@ -436,7 +436,7 @@ namespace BATTLE {
             bool change = false;
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
                 if( ( p_volatileStatus & ( 1LLU << i ) )
-                    && ( _volatileStatusCounter[ i ] == 255 || !_volatileStatusAmount[ i ] ) ) {
+                    && ( _volatileStatusCounter[ i ] >= 250 || !_volatileStatusAmount[ i ] ) ) {
                     change = true;
                     _volatileStatusAmount[ i ]++;
                     _volatileStatusCounter[ i ] = p_duration;

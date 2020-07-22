@@ -179,6 +179,8 @@ namespace BATTLE {
         DIGGING          = ( 1ULL << 59 ),
         INVISIBLE        = ( 1ULL << 60 ),
         BEAKBLAST        = ( 1ULL << 61 ),
+        FOCUSPUNCH       = ( 1ULL << 62 ),
+        SHELLTRAP        = ( 1ULL << 63 ),
     };
 
     enum weather : u8 {
@@ -344,7 +346,7 @@ namespace MOVE {
         /** move can be used while asleep */
         SLEEPUSABLE = ( 1ULL << 33 ),
         /** target cannot faint due to move */
-        NOFAINT = ( 1ULL << 34 ), // TODO
+        NOFAINT = ( 1ULL << 34 ),
         /** breaks protect */
         BREAKSPROTECT = ( 1ULL << 35 ), // TODO
         /** ignores type immunities */

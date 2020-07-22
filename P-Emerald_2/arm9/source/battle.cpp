@@ -301,6 +301,9 @@ namespace BATTLE {
                                                   sortedMoves[ i ].m_user.first, false )
                                     .c_str( ) );
                             _battleUI.log( buffer );
+                            _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
+                                                      sortedMoves[ i ].m_user.second, SHELLTRAP,
+                                                      1 );
                             break;
                         case M_FOCUS_PUNCH:
                             snprintf(
@@ -311,6 +314,9 @@ namespace BATTLE {
                                                   sortedMoves[ i ].m_user.first, false )
                                     .c_str( ) );
                             _battleUI.log( buffer );
+                            _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
+                                                      sortedMoves[ i ].m_user.second, FOCUSPUNCH,
+                                                      1 );
                             break;
                         case M_BEAK_BLAST:
                             snprintf(
@@ -320,6 +326,9 @@ namespace BATTLE {
                                                                   sortedMoves[ i ].m_user.second ),
                                                   sortedMoves[ i ].m_user.first, false )
                                     .c_str( ) );
+                            _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
+                                                      sortedMoves[ i ].m_user.second, BEAKBLAST,
+                                                      1 );
                             _battleUI.log( buffer );
                             break;
                         default: break;

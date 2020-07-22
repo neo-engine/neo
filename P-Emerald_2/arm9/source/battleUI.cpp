@@ -1734,7 +1734,7 @@ namespace BATTLE {
 
         SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ), p_pokemon->isFemale( ) );
 
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+        for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
 
         if( p_pokemon->isShiny( ) ) { animateShiny( true, 0, p_pokemon->m_boxdata.m_shinyType ); }
         _curHP[ 0 ][ 0 ] = 0;
@@ -1781,7 +1781,7 @@ namespace BATTLE {
 
         SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ), p_pokemon->isFemale( ) );
 
-        for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+        for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
 
         if( p_pokemon->isShiny( ) ) {
             animateShiny( p_opponent, p_pos, p_pokemon->m_boxdata.m_shinyType );
