@@ -2200,8 +2200,8 @@ namespace BATTLE {
             case A_WANDERING_SPIRIT: {
                 p_ui->logAbility( target, p_target.first );
                 p_ui->logAbility( user, p_move.m_user.first );
-                user->setBattleTimeAbility( A_WANDERING_SPIRIT );
                 target->setBattleTimeAbility( user->getAbility( ) );
+                user->setBattleTimeAbility( A_WANDERING_SPIRIT );
                 p_ui->logAbility( user, p_move.m_user.first );
                 p_ui->logAbility( target, p_target.first );
                 break;

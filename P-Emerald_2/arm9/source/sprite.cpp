@@ -561,10 +561,8 @@ namespace IO {
             case PKMN_WIGGLYTUFF:
             case PKMN_ZANGOOSE:
             case PKMN_ZYGARDE:
-            case PKMN_VIVILLON:
-                return false;
-            default:
-                return true;
+            case PKMN_VIVILLON: return false;
+            default: return true;
             }
         }
 
@@ -668,10 +666,8 @@ namespace IO {
             case PKMN_JELLICENT:
             case PKMN_PYROAR:
             case PKMN_MEOWSTIC:
-            case PKMN_INDEEDEE:
-                return true;
-            default:
-                return false;
+            case PKMN_INDEEDEE: return true;
+            default: return false;
             }
         }
         return true;
@@ -923,39 +919,20 @@ namespace IO {
                                false, false, false, false, 1 + p_manaphy );
     }
 
-    u16 loadTrainerSprite( const char* p_path, const char* p_name, const s16 p_posX,
-                           const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
-                           bool p_flipx, bool p_topOnly ) {
-        snprintf( BUFFER, 99, "Sprite_%s", p_name );
-
-        memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) );
-        memset( TEMP, 0, sizeof( TEMP ) );
-
-        if( !FS::readData<unsigned short, unsigned int>( p_path, BUFFER, 16, TEMP_PAL, 96 * 96 / 8,
-                                                         TEMP ) ) {
-            return false;
+    u16 loadTrainerSprite( u8 p_trainerId, const u16 p_posX, const u16 p_posY, u8 p_oamIdx,
+                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+        FILE* f = FS::openSplit( "nitro:/PICS/SPRITES/TRAINER/", p_trainerId, ".raw", 255 );
+        if( !f ) {
+            return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
+                               NoItemTiles, NoItemTilesLen, false, false, false, OBJPRIORITY_0,
+                               p_bottom );
         }
 
-        loadSprite( p_oamIdx++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY, 64, 64,
-                    TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
-        loadSprite( p_oamIdx++, p_palCnt, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY,
-                    32, 64, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0, p_bottom );
-        if( !p_topOnly ) {
-            loadSprite( p_oamIdx++, p_palCnt, p_tileCnt + 96, p_flipx ? 32 + p_posX : p_posX,
-                        p_posY + 64, 64, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0,
-                        p_bottom );
-            loadSprite( p_oamIdx++, p_palCnt, p_tileCnt + 128, p_flipx ? p_posX : 64 + p_posX,
-                        p_posY + 64, 32, 32, 0, 0, 0, false, p_flipx, false, OBJPRIORITY_0,
-                        p_bottom );
-        }
-        updateOAM( p_bottom );
-        return p_tileCnt + 144;
-    }
-    u16 loadTrainerSprite( const char* p_name, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipx,
-                           bool p_topOnly ) {
-        return loadTrainerSprite( TRAINER_PATH, p_name, p_posX, p_posY, p_oamIdx, p_palCnt,
-                                  p_tileCnt, p_bottom, p_flipx, p_topOnly );
+        FS::read( f, TEMP, sizeof( u32 ), 512 );
+        FS::read( f, TEMP_PAL, sizeof( u16 ), 16 );
+
+        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL, TEMP,
+                           64 * 64 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,

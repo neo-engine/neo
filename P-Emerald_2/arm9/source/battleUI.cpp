@@ -1753,7 +1753,44 @@ namespace BATTLE {
     void battleUI::startTrainerBattle( battleTrainer* p_trainer ) {
         _battleTrainer = p_trainer;
 
-        // TODO
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+
+        IO::fadeScreen( IO::UNFADE, true, true );
+        REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA     = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x02 << 8 );
+        bgUpdate( );
+        // Load trainer sprite
+
+        IO::loadTrainerSprite( _battleTrainer->m_data.m_trainerBG, WILD_BATTLE_SPRITE_X + 16,
+                               OPP_PLAT_Y - 96 + 35, SPR_PKMN_START_OAM( 0 ), SPR_PKMN_PAL( 0 ),
+                               SPR_PKMN_GFX( 0 ), false );
+
+        IO::OamTop->matrixBuffer[ 5 ].hdx            = 1 << 7 | 1 << 6 | 1 << 5;
+        IO::OamTop->matrixBuffer[ 5 ].vdy            = 1 << 7 | 1 << 6 | 1 << 5;
+        oam[ SPR_PKMN_START_OAM( 0 ) ].isRotateScale = true;
+        oam[ SPR_PKMN_START_OAM( 0 ) ].isSizeDouble  = true;
+        oam[ SPR_PKMN_START_OAM( 0 ) ].rotationIndex = 5;
+
+        IO::updateOAM( false );
+        char buffer[ 50 ];
+        snprintf( buffer, 49, GET_STRING( 143 ),
+                  getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
+                  _battleTrainer->m_strings.m_name );
+        log( std::string( buffer ) );
+
+        // Slide trainer out
+
+        for( u8 i = 40; i > 0; --i ) {
+            oam[ SPR_PKMN_START_OAM( 0 ) ].x += 1;
+            IO::updateOAM( false );
+            swiWaitForVBlank( );
+        }
+        oam[ SPR_PKMN_START_OAM( 0 ) ].isRotateScale = false;
+        oam[ SPR_PKMN_START_OAM( 0 ) ].isSizeDouble  = false;
+        oam[ SPR_PKMN_START_OAM( 0 ) ].isHidden      = true;
+        IO::updateOAM( false );
     }
 
     void battleUI::sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {

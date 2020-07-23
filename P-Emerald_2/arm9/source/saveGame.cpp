@@ -104,8 +104,7 @@ namespace SAVE {
 
         // player sprite
         if( !p_dummy ) {
-            tileCnt = IO::loadSprite( std::to_string( m_appearance ).c_str( ), 0, 0, tileCnt, 33,
-                                      45, 64, 64, false, false, false, OBJPRIORITY_2, p_bottom );
+            tileCnt = IO::loadTrainerSprite( m_appearance, 33, 45, 0, 0, tileCnt, p_bottom );
         }
 
         // stars

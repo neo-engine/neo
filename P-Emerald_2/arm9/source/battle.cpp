@@ -596,6 +596,9 @@ namespace BATTLE {
                     } else if( p_slot ) {
                         SOUND::playSoundEffect( SFX_CANCEL );
                         res.m_type = CANCEL;
+                    } else {
+                        cooldown = COOLDOWN_COUNT;
+                        continue;
                     }
                     return res;
                 case 3: { // Choose item
@@ -674,7 +677,7 @@ namespace BATTLE {
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) || GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
-                if( curSel == 0 && ( p_slot || _isWildBattle ) ) {
+                if( curSel == 0 ) {
                     curSel = 2;
                 } else {
                     curSel = 0;
@@ -965,9 +968,14 @@ namespace BATTLE {
 
     u16  MOVE_BUFFER[ 20 ];
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
-        if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
+        if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
+            SOUND::stopBGM( );
+        } else if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
             SOUND::playBGM( MOD_VICTORY_WILD );
             for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
+        } else if( !_isWildBattle && p_battleEndReason == BATTLE_PLAYER_WON ) {
+            SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerBG ) );
+
         }
 
         switch( p_battleEndReason ) {
@@ -1329,14 +1337,15 @@ namespace BATTLE {
                     break;
                 }
             }
-            if( !itemfound ) {
-                // cannot use non-existing item . . .
-                return;
-            }
+            if( !itemfound ) [[unlikely]] {
+                    // cannot use non-existing item . . .
+                    return;
+                }
 
-#ifdef DESQUID
-            _battleUI.log( "Triener used item" );
-#endif
+            snprintf( buffer, 99, GET_STRING( 551 ),
+                      getTrainerClassName( _opponent.getClass( ) ).c_str( ),
+                      _opponent.m_strings.m_name, ITEM::getItemName( p_item ).c_str( ) );
+            _battleUI.log( buffer );
         } else {
             // player item
             snprintf( buffer, 99, GET_STRING( 50 ), ITEM::getItemName( p_item ) );
@@ -1416,16 +1425,16 @@ namespace BATTLE {
             bs.setBoost( SDEF, 2 );
             boost = true;
             break;
-        case I_NION_BERRY: {
-            bs = _field.getBoosts( p_target.first, p_target.second );
-            if( bs.negative( ) != boosts( ) ) {
-                bs    = bs.negative( ).invert( );
-                boost = true;
-            } else {
-                _battleUI.log( GET_STRING( 171 ) );
+            [[unlikely]] case I_NION_BERRY : {
+                bs = _field.getBoosts( p_target.first, p_target.second );
+                if( bs.negative( ) != boosts( ) ) {
+                    bs    = bs.negative( ).invert( );
+                    boost = true;
+                } else {
+                    _battleUI.log( GET_STRING( 171 ) );
+                }
+                break;
             }
-            break;
-        }
 
         case I_BLUE_FLUTE:
             remitem = false;
@@ -1448,25 +1457,28 @@ namespace BATTLE {
                 _battleUI.log( GET_STRING( 171 ) );
             }
             break;
-        case I_YELLOW_FLUTE: remitem = false; [[fallthrough]];
-        case I_RIE_BERRY:
-        case I_PERSIM_BERRY:
-            if( volst & CONFUSION ) {
+        case I_YELLOW_FLUTE:
+            remitem = false;
+            [[fallthrough]];
+            [[unlikely]] case I_RIE_BERRY : case I_PERSIM_BERRY : if( volst & CONFUSION ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              CONFUSION );
                 snprintf( buffer, 99, GET_STRING( 294 ),
                           _battleUI.getPkmnName( pkmn, p_target.first ).c_str( ) );
                 _battleUI.log( buffer );
-            } else {
+            }
+            else {
                 _battleUI.log( GET_STRING( 171 ) );
             }
             break;
 
-        case I_RED_FLUTE: remitem = false; [[fallthrough]];
-        case I_GARC_BERRY:
-            if( volst & ATTRACT ) {
+        case I_RED_FLUTE:
+            remitem = false;
+            [[fallthrough]];
+            [[unlikely]] case I_GARC_BERRY : if( volst & ATTRACT ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second, ATTRACT );
-            } else {
+            }
+            else {
                 _battleUI.log( GET_STRING( 171 ) );
             }
             break;

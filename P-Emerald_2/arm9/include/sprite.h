@@ -150,13 +150,8 @@ namespace IO {
     u16 loadEggSprite( const u16 p_posX, const u16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom = false, bool p_manaphy = false );
 
-    u16 loadTrainerSprite( const char* p_path, const char* p_name, const u16 p_posX,
-                           const u16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
-                           bool p_bottom, bool p_flipX = false, bool p_topOnly = false );
-
-    u16 loadTrainerSprite( const char* p_name, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
-                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_flipX = false,
-                           bool p_topOnly = false );
+    u16 loadTrainerSprite( u8 p_trainerId, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
 
     u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                             u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority = OBJPRIORITY_2,

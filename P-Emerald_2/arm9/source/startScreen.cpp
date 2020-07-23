@@ -121,7 +121,7 @@ namespace SAVE {
 
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
-            testTeam[ i ] = pokemon( i != 1 ? rand( ) % MAX_PKMN + 1 : PKMN_COMBUSKEN, 100, 0, 0,
+            testTeam[ i ] = pokemon( i != 0 ? rand( ) % MAX_PKMN + 1 : PKMN_BLAZIKEN, 100, 0, 0,
                                      255, false, i == 3 );
             //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //     SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
@@ -159,9 +159,9 @@ namespace SAVE {
 
         //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
         //        2 ),
-        BATTLE::battle bt = BATTLE::battle( testTeam, 6, 0 );
+        BATTLE::battle bt = BATTLE::battle( testTeam, 1, 0 );
 
-        bt.start( );
+//        bt.start( );
 
         // END TEST
 #endif

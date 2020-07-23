@@ -303,7 +303,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Learn your companion's stories", "Erfahre mehr \xfc"
                                         "ber deine Begleiter" },
     { "Revive myths of old", "Setze alte Abenteuer fort" },
-    { "This slot contains a saved game.\nOverride it?",
+    { "This slot contains a saved game.\nOverwrite it?",
       "Es existiert bereits ein Spielstand.\nSoll dieser \xfc"
       "berschrieben werden?" },
 
@@ -1067,4 +1067,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 550
 
     { "Pok\xe9mon Trainer", "Pok\xe9mon-Trainer" },
+    { "%s %s used %s.", "%s %s setzt %s ein." },
 };

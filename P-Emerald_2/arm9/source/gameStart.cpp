@@ -145,8 +145,7 @@ namespace SAVE {
         dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
         u16 tileCnt = 0;
-        tileCnt     = IO::loadSprite( "240", 0, 0, tileCnt, 80, 32, 64, 64, false, false, false,
-                                  OBJPRIORITY_3, true );
+        tileCnt     = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt     = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
 
         // mbox
@@ -283,10 +282,8 @@ namespace SAVE {
                                 false, OBJPRIORITY_3, true );
             }
 
-            tileCnt = IO::loadSprite( "0", 14, 0, tileCnt + 32, 32, 88, 64, 64, false, false, false,
-                                      OBJPRIORITY_3, true );
-            tileCnt = IO::loadSprite( "1", 15, 1, tileCnt, 128 + 32, 88, 64, 64, false, false,
-                                      false, OBJPRIORITY_3, true );
+            tileCnt = IO::loadTrainerSprite( 0, 32, 88, 14, 0, tileCnt + 32, true );
+            tileCnt = IO::loadTrainerSprite( 1, 128 + 32, 88, 15, 1, tileCnt, true );
 
             IO::loadSprite( "UI/sel_64_64", 50, 4, tileCnt, 32, 88, 64, 64, false, false, false,
                             OBJPRIORITY_3, true );
@@ -324,8 +321,7 @@ namespace SAVE {
 
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_s" );
             SAV.getActiveFile( ).drawTrainersCard( false, true );
-            IO::loadSprite( std::to_string( SAV.getActiveFile( ).m_appearance ).c_str( ), 0, 0, 0,
-                            33, 45, 64, 64, false, false, false, OBJPRIORITY_2, false );
+            IO::loadTrainerSprite( SAV.getActiveFile( ).m_appearance, 33, 45, 0, 0, 0, false );
             IO::updateOAM( false );
 
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 50 );
@@ -353,9 +349,9 @@ namespace SAVE {
             }
 
             tileCnt = 32;
-#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 6 * ( p_pos ) )
-#define SPR_BOX_PAL_SUB 7
-#define SPR_BOX_SEL_PAL_SUB 8
+#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 8 * ( p_pos ) )
+#define SPR_BOX_PAL_SUB                   7
+#define SPR_BOX_SEL_PAL_SUB               8
             for( u8 i = 0; i < 3; i++ ) {
                 u8 pos = 2 * i;
 
@@ -383,15 +379,15 @@ namespace SAVE {
                         noselection_96_32_2TilesLen, false, false, true, OBJPRIORITY_3, true,
                         OBJMODE_BLENDED );
                 }
-                for( u8 j = 2; j < 5; j++ ) {
+                for( u8 j = 2; j < 7; j++ ) {
                     IO::loadSprite(
                         SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                         IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
-                        29 + j * 16, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                        29 + j * 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
                         noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false, true,
                         OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 }
-                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
                                 29 + 5 * 16, 42 + i * 36, 16, 32, noselection_96_32_1Pal,
                                 noselection_96_32_1Tiles, noselection_96_32_1TilesLen, true, true,
@@ -405,15 +401,15 @@ namespace SAVE {
                                 42 + i * 36, 16, 32, noselection_96_32_1Pal,
                                 noselection_96_32_1Tiles, noselection_96_32_1TilesLen, false, false,
                                 true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
-                for( u8 j = 1; j < 5; j++ ) {
+                for( u8 j = 1; j < 7; j++ ) {
                     IO::loadSprite(
                         SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                         IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
-                        131 + j * 16, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
+                        131 + j * 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
                         noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false, true,
                         OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 }
-                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
+                IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
                                 131 + 5 * 16, 42 + i * 36, 16, 32, noselection_96_32_1Pal,
                                 noselection_96_32_1Tiles, noselection_96_32_1TilesLen, true, true,
@@ -447,8 +443,7 @@ namespace SAVE {
         dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
         tileCnt = 0;
-        tileCnt = IO::loadSprite( "240", 0, 0, tileCnt, 80, 32, 64, 64, false, false, false,
-                                  OBJPRIORITY_3, true );
+        tileCnt = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
 
         // mbox
@@ -520,9 +515,7 @@ namespace SAVE {
                 swiWaitForVBlank( );
             }
             return true;
-        default:
-            SAV.getActiveFile( ).m_gameType = UNUSED;
-            return false;
+        default: SAV.getActiveFile( ).m_gameType = UNUSED; return false;
         }
     }
 
