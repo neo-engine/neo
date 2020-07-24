@@ -93,13 +93,13 @@ namespace BATTLE {
 #define SPR_STATUSBG_OAM( p_idx )          ( 10 + 3 * ( p_idx ) )
 #define SPR_PKMN_START_OAM( p_idx )        ( 22 + 4 * ( p_idx ) )
 #define SPR_PKMN_SHADOW_START_OAM( p_idx ) ( 38 + 4 * ( p_idx ) )
-#define SPR_PLATFORM_OAM                   54
 #define SPR_STATUS_ICON_OAM( p_idx )       ( 58 + ( p_idx ) )
 #define SPR_SHINY_ICON_OAM( p_idx )        ( 62 + ( p_idx ) )
 #define SPR_SHINY_PARTICLE_START_OAM       70
 #define SPR_STAT_CHANGE_PARTICLE_START_OAM 86
 #define SPR_MBOX_START_OAM                 86
 #define SPR_BALL_START_OAM                 101
+#define SPR_PLATFORM_OAM                   102
 #define SPR_STATUS_BALL_OAM( p_idx )       ( 106 + ( p_idx ) )
 
 #define SPR_PKMN_PAL( p_idx ) ( p_idx )
@@ -2441,7 +2441,8 @@ namespace BATTLE {
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
             BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
-            IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 192, false );
+            IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 192, false,
+                                                   IO::font::LEFT, 16, ' ', 0, true );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         }
     }
@@ -2508,6 +2509,50 @@ namespace BATTLE {
         pal[ 255 ] = IO::RGB( 23, 0, 0 );
         resetLog( );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+    }
+
+    void battleUI::handleBattleEnd( bool p_playerWon ) {
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 2; ++j ) {
+                hidePkmn( i, j );
+                hidePkmnStats( i, j );
+            }
+        }
+        resetLog( );
+        IO::loadTrainerSprite( _battleTrainer->m_data.m_trainerBG, WILD_BATTLE_SPRITE_X + 16,
+                               OPP_PLAT_Y - 96 + 35, SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ),
+                               SPR_PKMN_PAL( 2 * ( !p_playerWon ) ),
+                               SPR_PKMN_GFX( 2 * ( !p_playerWon ) ), false );
+        IO::OamTop->matrixBuffer[ 5 ].hdx                               = 1 << 7 | 1 << 6 | 1 << 5;
+        IO::OamTop->matrixBuffer[ 5 ].vdy                               = 1 << 7 | 1 << 6 | 1 << 5;
+        oam[ SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ) ].isRotateScale = true;
+        oam[ SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ) ].isSizeDouble  = true;
+        oam[ SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ) ].rotationIndex = 5;
+
+        oam[ SPR_PLATFORM_OAM + 2 ].priority = OBJPRIORITY_3;
+        oam[ SPR_PLATFORM_OAM + 3 ].priority = OBJPRIORITY_3;
+
+        IO::loadSprite( "UI/mbox1", SPR_MBOX_START_OAM, SPR_BALL_PAL,
+                        SPR_PKMN_GFX( 2 * ( !p_playerWon ) + 1 ), 0, 192 - 46, 32, 64, false, false,
+                        false, OBJPRIORITY_3, false );
+        for( u8 i = 0; i < 13; ++i ) {
+            IO::loadSprite( SPR_MBOX_START_OAM + 13 - i, SPR_BALL_PAL,
+                            SPR_PKMN_GFX( 2 * ( !p_playerWon ) + 1 ), 32 + 16 * i, 192 - 46, 32, 64,
+                            0, 0, 0, false, true, false, OBJPRIORITY_3, false );
+        }
+        IO::updateOAM( false );
+        printTopMessage( p_playerWon ? _battleTrainer->m_strings.m_message2
+                                     : _battleTrainer->m_strings.m_message3,
+                         false );
+
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
+        for( u8 i = 0; i <= 13; ++i ) {
+            oam[ SPR_MBOX_START_OAM + 13 - i ].isHidden = true;
+        }
+        IO::updateOAM( false );
     }
 
     void battleUI::setNewWeather( weather p_newWeather ) {

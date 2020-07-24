@@ -968,19 +968,37 @@ namespace BATTLE {
 
     u16  MOVE_BUFFER[ 20 ];
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
-        if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
-            SOUND::stopBGM( );
-        } else if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
+        char buffer[ 100 ];
+        if( p_battleEndReason == BATTLE_OPPONENT_WON ) { SOUND::stopBGM( ); }
+        if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
             SOUND::playBGM( MOD_VICTORY_WILD );
-            for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
-        } else if( !_isWildBattle && p_battleEndReason == BATTLE_PLAYER_WON ) {
-            SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerBG ) );
+            if( p_battleEndReason == BATTLE_CAPTURE ) {
+                handleCapture( );
+            } else {
+                for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
+            }
+        } else if( !_isWildBattle ) {
+            if( p_battleEndReason == BATTLE_PLAYER_WON ) {
+                SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerBG ) );
+                _battleUI.handleBattleEnd( true );
 
-        }
+                if( _opponent.m_data.m_moneyEarned ) {
+                    snprintf( buffer, 99, GET_STRING( 552 ), _opponent.m_data.m_moneyEarned );
+                    _battleUI.log( buffer );
+                    for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); }
+                    SAVE::SAV.getActiveFile( ).m_money += _opponent.m_data.m_moneyEarned;
+                }
+            }
+            if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
+                _battleUI.handleBattleEnd( false );
+                if( _opponent.m_data.m_moneyEarned ) {
+                    snprintf( buffer, 99, GET_STRING( 553 ), _opponent.m_data.m_moneyEarned );
+                    _battleUI.log( buffer );
+                    for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); }
 
-        switch( p_battleEndReason ) {
-        case BATTLE_CAPTURE: handleCapture( ); break;
-        default: break;
+                    SAVE::SAV.getActiveFile( ).m_money -= _opponent.m_data.m_moneyEarned;
+                }
+            }
         }
 
         restoreInitialOrder( false );

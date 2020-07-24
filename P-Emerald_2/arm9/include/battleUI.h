@@ -255,6 +255,11 @@ namespace BATTLE {
         void handleCapture( pokemon* p_pokemon );
 
         /*
+         * @brief: Displays the trainer's win/loos message after the battle.
+         */
+        void handleBattleEnd( bool p_playerWon );
+
+        /*
          * @brief: Shows choice boxes for a yesNoBox.
          */
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>

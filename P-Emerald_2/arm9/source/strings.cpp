@@ -1068,4 +1068,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Pok\xe9mon Trainer", "Pok\xe9mon-Trainer" },
     { "%s %s used %s.", "%s %s setzt %s ein." },
+    { "You earned $%lu.", "Du gewinnst $%lu." },
+    { "You payed $%lu to the winner.", "Du zahlst dem Gewinner $%lu." },
 };
