@@ -76,29 +76,29 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace NAV {
 #define SPR_MSGTEXT_OAM 108
 #define SPR_MSGCONT_OAM 112
-#define SPR_MSGBOX_OAM 113
+#define SPR_MSGBOX_OAM  113
 
-#define SPR_MSG_GFX 348
+#define SPR_MSG_GFX     348
 #define SPR_MSG_EXT_GFX 220
-#define SPR_MSGBOX_GFX 476
+#define SPR_MSGBOX_GFX  476
 #define SPR_MSGCONT_GFX 508
 
-#define SPR_MENU_OAM_SUB( p_idx ) ( 0 + ( p_idx ) )
-#define SPR_ITEM_OAM_SUB( p_i ) ( 0 + ( p_i ) )
-#define SPR_MENU_SEL_OAM_SUB 6
+#define SPR_MENU_OAM_SUB( p_idx )         ( 0 + ( p_idx ) )
+#define SPR_ITEM_OAM_SUB( p_i )           ( 0 + ( p_i ) )
+#define SPR_MENU_SEL_OAM_SUB              6
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 8 * ( p_pos ) )
-#define SPR_X_OAM_SUB 56
-#define SPR_ARROW_UP_OAM_SUB( p_i ) ( 57 + ( p_i ) )
-#define SPR_ARROW_DOWN_OAM_SUB( p_i ) ( 63 + ( p_i ) )
-#define SPR_MSGBOX_OAM_SUB 70
+#define SPR_X_OAM_SUB                     56
+#define SPR_ARROW_UP_OAM_SUB( p_i )       ( 57 + ( p_i ) )
+#define SPR_ARROW_DOWN_OAM_SUB( p_i )     ( 63 + ( p_i ) )
+#define SPR_MSGBOX_OAM_SUB                70
 
 #define SPR_MENU_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
 #define SPR_ITEM_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
-#define SPR_MENU_SEL_PAL_SUB 6
-#define SPR_BOX_PAL_SUB 7
-#define SPR_BOX_SEL_PAL_SUB 8
-#define SPR_X_PAL_SUB 9
-#define SPR_MSGBOX_PAL_SUB 10
+#define SPR_MENU_SEL_PAL_SUB      6
+#define SPR_BOX_PAL_SUB           7
+#define SPR_BOX_SEL_PAL_SUB       8
+#define SPR_X_PAL_SUB             9
+#define SPR_MSGBOX_PAL_SUB        10
 
     u16         TEXT_BUF[ 64 * 256 ] = { 0 };
     u16         CONT_BUF[ 16 * 16 ]  = { 0 };
@@ -721,8 +721,7 @@ namespace NAV {
 
             return;
         }
-        default:
-            return;
+        default: return;
         }
     }
 
@@ -838,11 +837,15 @@ namespace NAV {
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         char buffer[ 100 ];
-        snprintf( buffer, 99, GET_STRING( 471 + p_paymentMethod ),
-                  p_paymentMethod == 0
-                      ? SAVE::SAV.getActiveFile( ).m_money
-                      : ( p_paymentMethod == 1 ? SAVE::SAV.getActiveFile( ).m_battlePoints
-                                               : SAVE::SAV.getActiveFile( ).m_coins ) );
+        if( p_paymentMethod < 3 ) {
+            snprintf( buffer, 99, GET_STRING( 471 + p_paymentMethod ),
+                      p_paymentMethod == 0
+                          ? SAVE::SAV.getActiveFile( ).m_money
+                          : ( p_paymentMethod == 1 ? SAVE::SAV.getActiveFile( ).m_battlePoints
+                                                   : SAVE::SAV.getActiveFile( ).m_coins ) );
+        } else if( p_paymentMethod == 3 ) {
+            snprintf( buffer, 99, GET_STRING( 554 ), SAVE::SAV.getActiveFile( ).m_ashCount );
+        }
         IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
@@ -1101,6 +1104,8 @@ namespace NAV {
             mx = SAVE::SAV.getActiveFile( ).m_battlePoints / p_item.second;
         } else if( p_paymentMethod == 2 ) {
             mx = SAVE::SAV.getActiveFile( ).m_coins / p_item.second;
+        } else if( p_paymentMethod == 3 ) {
+            mx = SAVE::SAV.getActiveFile( ).m_ashCount / p_item.second;
         }
 
         mx = std::max( s32( 0 ),
@@ -1108,6 +1113,8 @@ namespace NAV {
                                                 - SAVE::SAV.getActiveFile( ).m_bag.count(
                                                     BAG::toBagType( p_itemData.m_itemType ),
                                                     p_item.first ) ) ) );
+
+        if( p_paymentMethod == 3 ) { mx = 1; }
 
         char buffer[ 100 ];
         s32  res = 0;
@@ -1123,8 +1130,12 @@ namespace NAV {
             IO::updateOAM( true );
 
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-            IO::regularFont->printBreakingStringC( GET_STRING( 479 + p_paymentMethod ), 40, 38,
-                                                   256 - 80, true );
+            if( p_paymentMethod < 3 ) {
+                IO::regularFont->printBreakingStringC( GET_STRING( 479 + p_paymentMethod ), 40, 38,
+                                                       256 - 80, true );
+            } else if( p_paymentMethod == 3 ) {
+                IO::regularFont->printBreakingStringC( GET_STRING( 555 ), 40, 38, 256 - 80, true );
+            }
 
             waitForInteract( );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -1166,7 +1177,11 @@ namespace NAV {
 
         u32 cost = res * p_item.second;
 
-        snprintf( buffer, 99, GET_STRING( 476 + p_paymentMethod ), p_name.c_str( ), res, cost );
+        if( p_paymentMethod < 3 ) {
+            snprintf( buffer, 99, GET_STRING( 476 + p_paymentMethod ), p_name.c_str( ), res, cost );
+        } else if( p_paymentMethod == 3 ) {
+            snprintf( buffer, 99, GET_STRING( 556 ), p_name.c_str( ), cost );
+        }
         IO::yesNoBox yn;
         auto         conf = yn.getResult(
             [ & ]( ) {
@@ -1250,6 +1265,8 @@ namespace NAV {
                         -= p_offeredItems[ curItm ].second * cnt;
                 } else if( p_paymentMethod == 2 ) {
                     SAVE::SAV.getActiveFile( ).m_coins -= p_offeredItems[ curItm ].second * cnt;
+                } else if( p_paymentMethod == 3 ) {
+                    SAVE::SAV.getActiveFile( ).m_ashCount -= p_offeredItems[ curItm ].second * cnt;
                 }
                 SAVE::SAV.getActiveFile( ).m_bag.insert(
                     BAG::toBagType( data[ curItm ].m_itemType ), p_offeredItems[ curItm ].first,

@@ -194,13 +194,13 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
                    "chtest du %s nutzen?" },
     { "The repel wore off.", "Der Schutz ist aufgebraucht." },
 
-    { "Just an old Pok\xe9 Ball", "Doch nur ein alter Pok\xe9"
-                                    "ball" },
+    { "Just an old Pok\xe9 Ball|", "Doch nur ein alter Pok\xe9"
+                                   "ball|" },
     { "You fished a Pok\xe9mon!", "Du hast ein Pok\xe9mon geangelt!" },
     { "Map border.\nReturn, or you\nwill get lost!",
       "Ende der Kartendaten.\nKehr um, sonst\nverirrst du dich!" },
     { "\nSomething's on the hook!", "\nDa ist etwas am Haken!" },
-    { "It disappeared", "Es ist entkommen" },
+    { "It disappeared|", "Es ist entkommen|" },
 
     // 10
 
@@ -324,7 +324,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 90
 
-    { "The scent vanished", "Der Duft verstrich wirkungslos" },
+    { "The scent vanished|", "Der Duft verstrich wirkungslos|" },
     { "Pok\xe9Nav", "Pok\xe9Nav" },
     { " Would you like to save your progress?", " M\xf6"
                                                 "chtest du deinen Fortschritt sichern?" },
@@ -381,7 +381,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 120
 
     { "Proceed?", "Fortfahren?" },
-    { "Importing data", "Lade Spielstand" },
+    { "Importing data|", "Lade Spielstand|" },
     { "An error occured.\nAborting.", "Ein Fehler ist aufgetreten.\nKehre zum Hauptmen\xfc zur\xfc"
                                       "ck." },
     { "Completed.", "Abgeschlossen." },
@@ -684,19 +684,19 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "the foe's %s", "%s (Gegner)" },
     { "The wild %s", "%s (wild)" },
     { "The foe's %s", "%s (Gegner)" },
-    { "This tree looks like it can be cut down. ", "Ein kleiner Baum." },
-    { "This rock appears to be breakable.", "Ein kleiner Felsen." },
+    { "This tree looks like it can be cut down. ", "Ein kleiner Baum. " },
+    { "This rock appears to be breakable. ", "Ein kleiner Felsen. " },
 
-    { "A huge whirlpool.", "Ein riesiger Strudel." },
-    { "The water is a deep blue|", "Das Wasser ist tiefblau|" },
-    { "The sea is deep here.", "Das Wasser ist sehr tief." },
-    { "It's a big boulder.", "Ein großer Felsen." },
-    { "The wall is very rocky|", "Eine steile Felswand|" },
+    { "A huge whirlpool. ", "Ein riesiger Strudel. " },
+    { "The water is a deep blue| ", "Das Wasser ist tiefblau| " },
+    { "The sea is deep here. ", "Das Wasser ist sehr tief. " },
+    { "It's a big boulder. ", "Ein großer Felsen. " },
+    { "The wall is very rocky| ", "Eine steile Felswand| " },
 
     // 320
 
-    { "It's a large Waterfall.", "Ein großer Wasserfall." },
-    { "Something moved!", "Da hat sich etwas bewegt!" },
+    { "It's a large Waterfall. ", "Ein großer Wasserfall. " },
+    { "Something moved! ", "Da hat sich etwas bewegt! " },
     { "Light is shining from the surface. ", "Licht scheint von der Oberfl\xe4"
                                              "che. " },
     { "Select", "Ausw\xe4hlen" },
@@ -1052,7 +1052,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 540
 
     { "%s dives.", "%s taucht ab." },
-    { "%s dug a hole.", "%s gr\xe4""bt sich ein." },
+    { "%s dug a hole.", "%s gr\xe4"
+                        "bt sich ein." },
     { "%s flies up high.", "%s flog hoch." },
     { "%s jumps up high.", "%s sprang hoch." },
     { "%s <SKYDROP>.", "%s <SKYDROP>" },
@@ -1070,4 +1071,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s %s used %s.", "%s %s setzt %s ein." },
     { "You earned $%lu.", "Du gewinnst $%lu." },
     { "You payed $%lu to the winner.", "Du zahlst dem Gewinner $%lu." },
+    { "Ash: $%lu grams", "Asche: $%lu Gramm" },
+
+    { "You don't have enough ash.", "Du hast nicht genug Asche." },
+    { "%s? I can make one for %lu grams ash.", "%s? Alles klar, das macht dann %lu Gramm Asche." },
+    { "Collected ash: %lu grams.", "Gesammelte Asche: %lu Gramm." },
 };

@@ -784,6 +784,9 @@ namespace BAG {
             }
 
             SAVE::SAV.getActiveFile( ).m_money += sellprice;
+            if( SAVE::SAV.getActiveFile( ).m_money > 999'999'999 ) {
+                SAVE::SAV.getActiveFile( ).m_money = 999'999'999;
+            }
             SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem, cnt );
             curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
             if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] == curBagSize ) {

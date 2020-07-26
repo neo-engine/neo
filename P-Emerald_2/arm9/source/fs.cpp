@@ -72,6 +72,8 @@ const char BATTLE_STRINGS_PATH[] = "nitro:/DATA/TRNR_STRS/";
 const char BATTLE_TRAINER_PATH[] = "nitro:/DATA/TRNR_DATA/";
 const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/";
 
+const char MAP_DATA_PATH[] = "nitro:/DATA/MAP_DATA/";
+
 namespace FS {
     char TMP_BUFFER[ 100 ];
     char TMP_BUFFER_SHORT[ 50 ];
@@ -313,13 +315,18 @@ namespace FS {
         FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bnk" );
         if( !f ) return false;
         read( f, &p_result.m_locationId, sizeof( u16 ), 1 );
-        read( f, &p_result.m_battleBg, sizeof( u8 ), 1 );
-        read( f, &p_result.m_mapType, sizeof( u8 ), 1 );
-        for( u8 i = 0; i < MAX_MAP_LOCATIONS; ++i ) {
-            read( f, &p_result.m_data[ i ].m_upperLeftX, sizeof( u16 ), 5 );
-            read( f, &p_result.m_data[ i ].m_battleBg, sizeof( u8 ), 1 );
-            read( f, &p_result.m_data[ i ].m_mapType, sizeof( u8 ), 1 );
-        }
+        close( f );
+        return true;
+    }
+
+    bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result ) {
+        FILE* f = open( MAP_DATA_PATH,
+                        ( std::to_string( p_bank ) + "/" + std::to_string( p_mapY ) + "/"
+                          + std::to_string( p_mapY ) + "_" + std::to_string( p_mapX ) )
+                            .c_str( ),
+                        ".map.data" );
+        if( !f ) { return false; }
+        fread( &p_result, sizeof( MAP::mapData ), 1, f );
         close( f );
         return true;
     }
@@ -544,8 +551,9 @@ namespace BATTLE {
     }
 
     bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out ) {
-        FILE* f = FS::openSplit( BATTLE_STRINGS_PATH, p_battleTrainerId,
-                                 ( "_" + std::to_string( 1 + p_language ) + ".trnr.str" ).c_str( ) );
+        FILE* f
+            = FS::openSplit( BATTLE_STRINGS_PATH, p_battleTrainerId,
+                             ( "_" + std::to_string( 1 + p_language ) + ".trnr.str" ).c_str( ) );
         if( !f ) return false;
         fread( &p_out->m_strings, sizeof( trainerStrings ), 1, f );
         fclose( f );

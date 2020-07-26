@@ -854,16 +854,31 @@ namespace BATTLE {
                     while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
                     bmove[ i ].m_target = { fieldPosition( true, ctg ) };
                     break;
+                case MOVE::SELF:
+                    bmove[ i ].m_target = { fieldPosition( true, p_slot ) };
+                    break;
                     [[unlikely]] default : bmove[ i ].m_target = { fieldPosition( false, 0 ) };
                     break;
                 }
+
+                auto target = _field.getPkmn( bmove[ i ].m_target[ 0 ].first,
+                                              bmove[ i ].m_target[ 0 ].second );
 
                 if( _AILevel < 4 && bmove[ i ].m_moveData.m_category == MOVE::STATUS ) {
                     // Bad trainers don't want to use status moves
                     score[ i ] -= 5;
                 } else if( bmove[ i ].m_moveData.m_category == MOVE::STATUS ) {
-                    if( pkmn->m_boxdata.m_curPP[ i ] + ( 18 - _AILevel ) / 2
-                        < bmove[ i ].m_moveData.m_pp ) {
+                    if( _AILevel > 2 && bmove[ i ].m_moveData.m_weather != _field.getWeather( ) ) {
+                        if( _AILevel > 4 && _field.suppressesWeather( ) ) {
+                            score[ i ] = 1;
+                        } else {
+                            score[ i ] = 200;
+                        }
+                    } else if( _AILevel > 3 && bmove[ i ].m_moveData.m_status && target != nullptr
+                               && !target->m_statusint ) {
+                        score[ i ] += 20;
+                    } else if( pkmn->m_boxdata.m_curPP[ i ] + _AILevel / 2
+                               < bmove[ i ].m_moveData.m_pp ) {
                         score[ i ] = 1;
                         continue;
                     }
@@ -987,6 +1002,9 @@ namespace BATTLE {
                     _battleUI.log( buffer );
                     for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); }
                     SAVE::SAV.getActiveFile( ).m_money += _opponent.m_data.m_moneyEarned;
+                    if( SAVE::SAV.getActiveFile( ).m_money > 999'999'999 ) {
+                        SAVE::SAV.getActiveFile( ).m_money = 999'999'999;
+                    }
                 }
             }
             if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
@@ -996,7 +1014,11 @@ namespace BATTLE {
                     _battleUI.log( buffer );
                     for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); }
 
-                    SAVE::SAV.getActiveFile( ).m_money -= _opponent.m_data.m_moneyEarned;
+                    if( SAVE::SAV.getActiveFile( ).m_money < _opponent.m_data.m_moneyEarned ) {
+                        SAVE::SAV.getActiveFile( ).m_money = 0;
+                    } else {
+                        SAVE::SAV.getActiveFile( ).m_money -= _opponent.m_data.m_moneyEarned;
+                    }
                 }
             }
         }
@@ -1527,9 +1549,9 @@ namespace BATTLE {
             }
 
         for( u8 i = 0; i < len - 1; ++i ) {
-            if( !pkmn[ i ].canBattle( ) ) {
+            if( !pkmn[ 0 ].canBattle( ) ) {
                 // pkmn cannot battle, move it to the end of the list.
-                for( u8 j = i + 1; j < len; ++j ) {
+                for( u8 j = 1; j < len - i; ++j ) {
                     std::swap( pkmn[ j - 1 ], pkmn[ j ] );
                     if( p_opponent ) { std::swap( _yieldEXP[ j - 1 ], _yieldEXP[ j ] ); }
                     std::swap( perm[ j - 1 ], perm[ j ] );

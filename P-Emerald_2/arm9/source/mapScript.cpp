@@ -28,8 +28,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 #include "battle.h"
-#include "battleTrainer.h"
 #include "battleDefines.h"
+#include "battleTrainer.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"
@@ -89,9 +89,10 @@ namespace MAP {
         CLEAR         = 0xFE, // Call IO::drawNav( true )
         EOP           = 0xFF  // Exit the script
     };
-    bool mapDrawer::executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
+#ifdef false
+    bool mapDrawer::executeScript( u8 p_map, u8 p_globX, u8 p_globY, u8 p_z, u8 p_number,
                                    invocationType p_inv ) {
-        FILE* sc = FS::openScript( warpPos{p_map, {p_globX, p_globY, p_z}}, p_number );
+        FILE* sc = FS::openScript( warpPos{ p_map, { p_globX, p_globY, p_z } }, p_number );
         if( !sc ) return false;
 
         u8 header[ 5 ];
@@ -170,12 +171,8 @@ namespace MAP {
             case BRANCH_I:
                 if( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ) pc = ( PARAM2( SCRIPT_INS[ pc ] ) );
                 break;
-            case JUMP:
-                pc = FETCH( PARAM2( SCRIPT_INS[ pc ] ) );
-                break;
-            case JUMP_I:
-                pc = ( PARAM2( SCRIPT_INS[ pc ] ) );
-                break;
+            case JUMP: pc = FETCH( PARAM2( SCRIPT_INS[ pc ] ) ); break;
+            case JUMP_I: pc = ( PARAM2( SCRIPT_INS[ pc ] ) ); break;
 
             case MSG_I:
                 /*
@@ -196,18 +193,18 @@ namespace MAP {
                                     */
                 break;
             case ITEM_I: {
-                             /*
-                ITEM::itemData itm = ITEM::getItemData( PARAMA( SCRIPT_INS[ pc ] ) );
-                IO::messageBox( PARAMA( SCRIPT_INS[ pc ] ), itm, PARAMB( SCRIPT_INS[ pc ] ) );
-                */
+                /*
+   ITEM::itemData itm = ITEM::getItemData( PARAMA( SCRIPT_INS[ pc ] ) );
+   IO::messageBox( PARAMA( SCRIPT_INS[ pc ] ), itm, PARAMB( SCRIPT_INS[ pc ] ) );
+   */
                 break;
             }
             case ITEM: {
-                           /*
-                ITEM::itemData itm = ITEM::getItemData( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) );
-                IO::messageBox( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), itm,
-                                FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
-                                */
+                /*
+     ITEM::itemData itm = ITEM::getItemData( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) );
+     IO::messageBox( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), itm,
+                     FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
+                     */
                 break;
             }
             case GIVE_PKMN_I: {
@@ -257,35 +254,35 @@ namespace MAP {
             case GET_PKMN_STAT:
                 // TODO
                 break;
-            case CLEAR:
-                break;
-            default:
-                break;
+            case CLEAR: break;
+            default: break;
             }
             ++pc;
         }
         return true;
     }
+#endif
 
     // At most one warp is allowed per block.
     // The corresponding script must have id 0.
     warpPos getWarpPos( warpPos p_source ) {
+#ifdef false
         FILE* sc = FS::openScript( p_source, 0 );
-        if( !sc ) return warpPos{0, {0, 0, 0}};
+        if( !sc ) return warpPos{ 0, { 0, 0, 0 } };
 
         u8 header[ 5 ], content[ 7 ];
         FS::read( sc, header, sizeof( u8 ), 4 );
         if( header[ 0 ] != scriptType::WARP_SCRIPT || header[ 2 ] != invocationType::WARP_TILE ) {
             FS::close( sc );
-            return warpPos{0, {0, 0, 0}};
+            return warpPos{ 0, { 0, 0, 0 } };
         }
 
         if( header[ 3 ] == 1 ) { // warp specified as local coordinates
             FS::read( sc, content, sizeof( u8 ), 6 );
             FS::close( sc );
-            return warpPos{content[ 0 ],
-                           {( u16 )( content[ 2 ] * SIZE + content[ 3 ] ),
-                            ( u16 )( content[ 1 ] * SIZE + content[ 4 ] ), content[ 5 ]}};
+            return warpPos{ content[ 0 ],
+                            { ( u16 )( content[ 2 ] * SIZE + content[ 3 ] ),
+                              ( u16 )( content[ 1 ] * SIZE + content[ 4 ] ), content[ 5 ] } };
         } else if( header[ 3 ] == 0 ) { // warp specified as global coordinates
             warpPos res;
             FS::read( sc, &res, sizeof( warpPos ), 1 );
@@ -293,8 +290,9 @@ namespace MAP {
             return res;
         } else {
             FS::close( sc );
-            return warpPos{0, {0, 0, 0}};
+            return warpPos{ 0, { 0, 0, 0 } };
         }
+#endif
     }
 
     void mapDrawer::interact( ) {
@@ -305,27 +303,18 @@ namespace MAP {
         handleEvents( px, py, pz, d );
     }
 
-    void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z ) {
-        u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
-        u8 i   = 0;
-        while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::STEP_ONTO ) ) ++i;
+    void mapDrawer::handleEvents( u8 p_globX, u8 p_globY, u8 p_z ) {
+        //   u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
+        //   u8 i   = 0;
+        //   while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::STEP_ONTO ) ) ++i;
     }
 
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir ) {
-        p_globX += dir[ p_dir ][ 0 ];
-        p_globY += dir[ p_dir ][ 1 ];
-        u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
-        u8 i   = 0;
-        while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::INTERACT ) ) ++i;
+        /*   p_globX += dir[ p_dir ][ 0 ];
+           p_globY += dir[ p_dir ][ 1 ];
+           u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
+           u8 i   = 0;
+           while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::INTERACT ) ) ++i;
+       */
     }
-
-    void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
-        warpPos tg = getWarpPos( p_source );
-
-        if( tg.first == 0xFF ) tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
-        if( !tg.first && !tg.second.m_posY && !tg.second.m_posZ && !tg.second.m_posX ) return;
-
-        SAVE::SAV.getActiveFile( ).m_lastWarp = p_source;
-        warpPlayer( p_type, tg );
-    }
-}
+} // namespace MAP

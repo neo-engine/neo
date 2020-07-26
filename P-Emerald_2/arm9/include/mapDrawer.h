@@ -45,6 +45,9 @@ namespace MAP {
 
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } }; //[x][y]
         u8                        _curX, _curY; // Current main slice from the _slices array
+
+        mapData _data[ 2 ][ 2 ];
+
         std::map<std::pair<u16, u16>, std::vector<mapObject>> _mapObjs;
 
         bool _playerIsFast;
@@ -74,16 +77,13 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        bool executeScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_z, u8 p_number,
-                            invocationType p_inv );
-
-        void handleEvents( u16 p_globX, u16 p_globY, u8 p_z );
-        void handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir );
+        void handleEvents( u8 p_localX, u8 p_localY, u8 p_z );
+        void handleEvents( u16 p_localX, u16 p_localY, u8 p_z, direction p_dir );
         void handleWarp( warpType p_type, warpPos p_source );
         void handleWarp( warpType p_type );
 
         void handleWildPkmn( u16 p_globX, u16 p_globY );
-        bool handleWildPkmn( wildPkmnType p_type, u8 p_rodType = 0, bool p_forceEncounter = false );
+        bool handleWildPkmn( wildPkmnType p_type, bool p_forceEncounter = false );
         void handleTrainer( );
 
         BATTLE::battlePolicy getBattlePolicy( bool               p_isWildBattle,
@@ -93,6 +93,7 @@ namespace MAP {
       public:
         block&        at( u16 p_x, u16 p_y ) const;
         mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
+        const mapData&      currentData( ) const;
 
         mapDrawer( );
 

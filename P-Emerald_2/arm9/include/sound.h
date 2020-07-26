@@ -148,6 +148,7 @@ namespace SOUND {
         case L_ROUTE_101:
         case L_ROUTE_102:
         case L_ROUTE_103: return MOD_ROUTE_101;
+        case L_HIDDEN_LAKE:
         case L_ROUTE_104:
         case L_ROUTE_114:
         case L_ROUTE_115:

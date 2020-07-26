@@ -770,7 +770,7 @@ namespace BATTLE {
         case A_COMATOSE:
         case A_NEUTRALIZING_GAS: p_ui->logAbility( pkmn, p_opponent ); break;
         case A_ZEN_MODE:
-            if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+            if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP && !( pkmn->getForme( ) & 1 ) ) {
                 if( pkmn->getSpecies( ) == PKMN_DARMANITAN ) {
                     p_ui->logAbility( pkmn, p_opponent );
                     pkmn->battleTransform( );
@@ -779,7 +779,8 @@ namespace BATTLE {
             }
             break;
         case A_SCHOOLING: {
-            if( pkmn->m_level >= 20 && pkmn->m_stats.m_curHP * 4 > pkmn->m_stats.m_maxHP ) {
+            if( pkmn->m_level >= 20 && pkmn->m_stats.m_curHP * 4 > pkmn->m_stats.m_maxHP
+                && !pkmn->getForme( ) ) {
                 p_ui->logAbility( pkmn, p_opponent );
                 pkmn->battleTransform( );
                 p_ui->updatePkmn( p_opponent, p_slot, pkmn );
@@ -1132,7 +1133,8 @@ namespace BATTLE {
                         break;
                     }
                     case A_ZEN_MODE:
-                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP
+                            && !( pkmn->getForme( ) & 1 ) ) {
                             if( pkmn->getSpecies( ) == PKMN_DARMANITAN ) {
                                 p_ui->logAbility( pkmn, i );
                                 pkmn->battleTransform( );
@@ -1141,7 +1143,8 @@ namespace BATTLE {
                         }
                         break;
                     case A_POWER_CONSTRUCT:
-                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP
+                            && pkmn->getForme( ) < 2 ) {
                             if( pkmn->getSpecies( ) == PKMN_ZYGARDE ) {
                                 p_ui->logAbility( pkmn, i );
                                 pkmn->battleTransform( );
@@ -1150,7 +1153,8 @@ namespace BATTLE {
                         }
                         break;
                     case A_SHIELDS_DOWN:
-                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) {
+                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP
+                            && pkmn->getForme( ) < 7 ) {
                             if( pkmn->getSpecies( ) == PKMN_MINIOR ) {
                                 p_ui->logAbility( pkmn, i );
                                 // TODO: implement minior battle transform
@@ -1161,8 +1165,8 @@ namespace BATTLE {
                         break;
 
                     case A_SCHOOLING: {
-                        if( pkmn->m_level >= 20
-                            && pkmn->m_stats.m_curHP * 4 > pkmn->m_stats.m_maxHP ) {
+                        if( pkmn->m_level >= 20 && pkmn->m_stats.m_curHP * 4 > pkmn->m_stats.m_maxHP
+                            && !pkmn->getForme( ) ) {
                             p_ui->logAbility( pkmn, i );
                             pkmn->battleTransform( );
                             p_ui->updatePkmn( i, j, pkmn );
@@ -3497,9 +3501,7 @@ namespace BATTLE {
         p_ui->animateHitPkmn( p_target.first, p_target.second, effectiveness );
 
         if( p_move.m_moveData.m_flags & MOVE::NOFAINT ) {
-            if( damage >= target->m_stats.m_curHP ) {
-                damage = target->m_stats.m_curHP - 1;
-            }
+            if( damage >= target->m_stats.m_curHP ) { damage = target->m_stats.m_curHP - 1; }
         }
 
         damagePokemon( p_ui, p_target.first, p_target.second, damage );

@@ -30,36 +30,36 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <nds.h>
 
-#define MAP_HOENN 10
+#define MAP_HOENN        10
 #define MAP_METEOR_FALLS 11
 #define MAP_DESERT_RUINS 12
-#define MAP_ISLAND_CAVE 13
+#define MAP_ISLAND_CAVE  13
 #define MAP_ANCIENT_TOMB 14
 
-#define MAP_KANTO 110
-#define MAP_TOHJO_FALLS 111
+#define MAP_KANTO              110
+#define MAP_TOHJO_FALLS        111
 #define MAP_KANTO_VICTORY_ROAD 112
-#define MAP_VIRIDIAN_FOREST 113
-#define MAP_SEAFOAM_ISLANDS 114
-#define MAP_MT_MOON 115
-#define MAP_DIGLETTS_CAVE 116
-#define MAP_ROCK_TUNNEL 117
-#define MAP_CERULEAN_CAVE 118
+#define MAP_VIRIDIAN_FOREST    113
+#define MAP_SEAFOAM_ISLANDS    114
+#define MAP_MT_MOON            115
+#define MAP_DIGLETTS_CAVE      116
+#define MAP_ROCK_TUNNEL        117
+#define MAP_CERULEAN_CAVE      118
 
-#define MAP_JOHTO 210
-#define MAP_DARK_CAVE 211
-#define MAP_SPROUT_TOWER 212
+#define MAP_JOHTO         210
+#define MAP_DARK_CAVE     211
+#define MAP_SPROUT_TOWER  212
 #define MAP_RUINS_OF_ALPH 213
-#define MAP_UNION_CAVE 214
+#define MAP_UNION_CAVE    214
 #define MAP_SLOWPOKE_WELL 215
-#define MAP_ILEX_FOREST 216
+#define MAP_ILEX_FOREST   216
 #define MAP_NATIONAL_PARK 217
-#define MAP_BURNED_TOWER 218
-#define MAP_BELL_TOWER 219
+#define MAP_BURNED_TOWER  218
+#define MAP_BELL_TOWER    219
 #define MAP_WHIRL_ISLANDS 220
-#define MAP_MT_MORTAR 221
-#define MAP_ICE_PATH 222
-#define MAP_DRAGONS_DEN 223
+#define MAP_MT_MORTAR     221
+#define MAP_ICE_PATH      222
+#define MAP_DRAGONS_DEN   223
 
 namespace MAP {
     struct position {
@@ -68,6 +68,7 @@ namespace MAP {
         u8  m_posZ;
     };
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
+    typedef std::pair<u8, position> warpPos;
     enum moveMode {
         // Player modes
         WALK       = 0,
@@ -82,15 +83,38 @@ namespace MAP {
         // NPC modes
         NO_MOVEMENT = 0,
     };
-    enum wildPkmnType {
-        GRASS,       // 5 tiers
-        HIGH_GRASS,  // 5 tiers
-        WATER,       // 5 tiers
-        FISHING_ROD, // 5 tiers
-        HEADBUTT,    // 3 tiers
-        ROCK_SMASH   // 2 tiers
+    enum eventType : u8 {
+        EVENT_NONE    = 0,
+        EVENT_MESSAGE = 1,
+        EVENT_ITEM    = 2,
+        EVENT_TRAINER = 3,
+        EVENT_OW_PKMN = 4,
+        EVENT_NPC     = 5,
+        EVENT_WARP    = 6,
+        EVENT_GENERIC = 7,
     };
-    enum mapWeather {
+    enum eventTrigger : u8 {
+        TRIGGER_NONE           = 0,
+        TRIGGER_STEP_ON        = ( 1 << 0 ),
+        TRIGGER_INTERACT       = ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ),
+        TRIGGER_INTERACT_UP    = ( 1 << 1 ),
+        TRIGGER_INTERACT_DOWN  = ( 1 << 2 ),
+        TRIGGER_INTERACT_LEFT  = ( 1 << 3 ),
+        TRIGGER_INTERACT_RIGHT = ( 1 << 4 ),
+        TRIGGER_ON_MAP_ENTER   = ( 1 << 5 ),
+    };
+    enum wildPkmnType : u8 {
+        GRASS,
+        HIGH_GRASS,
+        WATER,
+        OLD_ROD,
+        GOOD_ROD,
+        SUPER_ROD,
+        HEADBUTT,
+        ROCK_SMASH,
+        SWEET_SCENT,
+    };
+    enum mapWeather : u8 {
         NOTHING        = 0, // Inside
         SUNNY          = 1,
         REGULAR        = 2,
@@ -107,30 +131,92 @@ namespace MAP {
         HEAVY_RAIN     = 0xd,
         UNDERWATER     = 0xe
     };
-    enum mapType { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
-    enum warpType { NO_SPECIAL, CAVE_ENTRY, DOOR, TELEPORT, EMERGE_WATER, LAST_VISITED };
+    enum mapType : u8 { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
+    enum warpType : u8 { NO_SPECIAL, CAVE_ENTRY, DOOR, TELEPORT, EMERGE_WATER, LAST_VISITED };
 
-    enum scriptType { WARP_SCRIPT = 0, SCRIPT = 1, TRAINER_SCRIPT = 2 };
-    enum invocationType { STEP_ONTO = 0, INTERACT = 1, WARP_TILE = 2 };
+    struct mapData {
+        mapType    m_mapType;
+        mapWeather m_weather;
+        u8         m_battleBG;
+        u8         m_battlePlat1;
+        u8         m_battlePlat2;
+        u8         m_surfBattleBG;
+        u8         m_surfBattlePlat1;
+        u8         m_surfBattlePlat2;
 
-    typedef std::pair<u8, position> warpPos;
+        u16 m_baseLocationId;
+        u8  m_extraLocationCount;
+        struct locationData {
+            u8  m_left;
+            u8  m_top;
+            u8  m_right;
+            u8  m_bottom;
+            u16 m_locationId;
+        } m_extraLocations[ 4 ];
+        u8 m_pokemonDescrCount;
+        struct wildPkmnData {
+            u16          m_speciesId;
+            u8           m_forme;
+            wildPkmnType m_encounterType;
+            u8           m_slot;
+            u8           m_daytime;
+            u8           m_encounterRate;
+        } m_pokemon[ 30 ];
+        u8 m_eventCount;
+        struct event {
+            u8           m_posX;
+            u8           m_posY;
+            u8           m_posZ;
+            u16          m_activateFlag;
+            u16          m_deactivateFlag;
+            eventType    m_type;
+            eventTrigger m_trigger;
+            union data {
+                struct {
+                    u8  m_msgType;
+                    u16 m_msgId;
+                } m_message;
+                struct {
+                    u8  m_itemType;
+                    u16 m_itemId;
+                } m_item;
+                struct {
+                    u8  m_movementType;
+                    u16 m_trainerId;
+                    u8  m_sight;
+                } m_trainer;
+                struct {
+                    u16 m_speciesId;
+                    u8  m_level;
+                    u8  m_forme; // BIT(6) female; BIT(7) genderless
+                    u8  m_shiny; // BIT(6) hidden ability, BIT(7) fateful
+                } m_owPkmn;
+                struct {
+                    u8  m_movementType;
+                    u16 m_spriteId;
+                    u16 m_scriptId;
+                } m_npc;
+                struct {
+                    warpType m_warpType;
+                    u8       m_bank;
+                    u8       m_mapY;
+                    u8       m_mapX;
+                    u8       m_posX;
+                    u8       m_posY;
+                    u8       m_posZ;
+                } m_warp;
+                struct {
+                    u16 m_scriptId;
+                } m_generic;
+            } m_data;
+        } m_events[ 64 ];
+    };
 
-#define MAX_MAP_LOCATIONS 62
     struct bankInfo {
         u8  m_bank;
         u16 m_locationId;
-        u8  m_battleBg;
-        u8  m_mapType; // mapType << 4 | mapWeather
-
-        struct mapInfo {
-            u16 m_upperLeftX;
-            u16 m_upperLeftY;
-            u16 m_lowerRightX;
-            u16 m_lowerRightY;
-            u16 m_locationId;
-            u8  m_battleBg;
-            u8  m_mapType; // mapType << 4 | mapWeather
-        } m_data[ MAX_MAP_LOCATIONS ];
+        u8  m_mapMode; // currently unused, used for different map modes (i.e. 32x32 tiles; large
+                       // maps with connections, etc)
     };
 
     extern bankInfo CURRENT_BANK;

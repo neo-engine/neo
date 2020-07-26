@@ -52,7 +52,7 @@ namespace MAP {
                                  .c_str( ),
                              ".map" );
         if( !mapF ) {
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             NAV::printMessage( buffer, MSG_INFO );
@@ -92,19 +92,6 @@ namespace MAP {
 
         FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
         FS::close( mapF );
-
-        // Read the wild Pokémon data
-        mapF = FS::open(
-            MAP_PATH,
-            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
-                .c_str( ),
-            ".enc" );
-        if( mapF ) {
-            FS::read( mapF, p_result->m_pokemon, sizeof( std::pair<u16, u16> ), 3 * 5 * 5 );
-            FS::close( mapF );
-        } else {
-            memset( p_result->m_pokemon, 0, sizeof( p_result->m_pokemon ) );
-        }
 
         // Read the first tileset
         if( reloadTs || p_result->m_tIdx1 != tsidx1 ) {

@@ -46,6 +46,7 @@ struct trainerPokemon {
     u8  m_ev[ 6 ];
     u8  m_iv[ 6 ];
     u8  m_shiny;
+    u8  m_nature;
 };
 
 struct boxPokemon {

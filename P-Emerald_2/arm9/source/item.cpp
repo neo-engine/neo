@@ -326,6 +326,12 @@ namespace ITEM {
                     = !SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled;
             }
             return true;
+        case I_SOOT_SACK:
+            if( !p_dryRun ) {
+                snprintf( buffer, 50, GET_STRING( 557 ), SAVE::SAV.getActiveFile( ).m_ashCount );
+                p_message( buffer );
+            }
+            return true;
         case I_COIN_CASE:
             if( !p_dryRun ) {
                 snprintf( buffer, 50, GET_STRING( 68 ), SAVE::SAV.getActiveFile( ).m_coins );
@@ -417,6 +423,7 @@ namespace ITEM {
         case I_EXP_SHARE:
         case I_COIN_CASE:
         case I_POINT_CARD:
+        case I_SOOT_SACK:
             return true;
         case I_ESCAPE_ROPE:
             return MOVE::possible( M_DIG, 0 );
@@ -451,8 +458,6 @@ namespace ITEM {
             // TODO
         case I_DNA_SPLICERS:
         case I_DNA_SPLICERS2:
-            // TODO
-        case I_SOOT_SACK:
             // TODO
         case I_ZYGARDE_CUBE:
             // TODO

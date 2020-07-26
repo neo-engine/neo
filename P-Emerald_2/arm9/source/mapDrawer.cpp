@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleTrainer.h"
 #include "choiceBox.h"
 #include "defines.h"
+#include "fs.h"
 #include "mapDrawer.h"
 #include "nav.h"
 #include "saveGame.h"
@@ -42,23 +43,23 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#ifdef DESQUID
+#ifdef DESQUID_MORE
 #include <cassert>
 #endif
 
 namespace MAP {
-#define NUM_ROWS 16
-#define NUM_COLS 32
+#define NUM_ROWS   16
+#define NUM_COLS   32
 #define MAP_BORDER 0x3f
 
-#define SPR_MAIN_PLAYER_OAM 0
+#define SPR_MAIN_PLAYER_OAM      0
 #define SPR_MAIN_PLAYER_PLAT_OAM 1
-#define SPR_PKMN_OAM 100
-#define SPR_CIRC_OAM 104
+#define SPR_PKMN_OAM             100
+#define SPR_CIRC_OAM             104
 
-#define SPR_MAIN_PLAYER_GFX 0
-#define SPR_PKMN_GFX 304
-#define SPR_CIRC_GFX 447
+#define SPR_MAIN_PLAYER_GFX      0
+#define SPR_PKMN_GFX             304
+#define SPR_CIRC_GFX             447
 #define SPR_MAIN_PLAYER_PLAT_GFX 332
 
     mapDrawer* curMap = nullptr;
@@ -80,6 +81,14 @@ namespace MAP {
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ blockidx ];
     }
 
+    const mapData& mapDrawer::currentData( ) const {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+
+        bool x = ( curx / SIZE != CUR_SLICE->m_x ), y = ( cury / SIZE != CUR_SLICE->m_y );
+        return _data[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ];
+    }
+#define CUR_DATA currentData( )
     u16 lastrow,      // Row to be filled when extending the map to the top
         lastcol;      // Column to be filled when extending the map to the left
     u16       cx, cy; // Cameras's pos
@@ -147,13 +156,21 @@ namespace MAP {
                 my = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
                             _slices[ _curX ][ _curY ], _slices );
+            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
+                             _data[ _curX ][ _curY ] );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                             my / SIZE, _slices[ _curX ^ 1 ][ _curY ], _slices );
+            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
+                             my / SIZE, _data[ _curX ^ 1 ][ _curY ] );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                             my / SIZE + currentHalf( my ), _slices[ _curX ][ _curY ^ 1 ], _slices );
+            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
+                             my / SIZE + currentHalf( my ), _data[ _curX ][ _curY ^ 1 ] );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                             my / SIZE + currentHalf( my ), _slices[ _curX ^ 1 ][ _curY ^ 1 ],
                             _slices );
+            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
+                             my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -227,8 +244,7 @@ namespace MAP {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         switch( behave ) {
-        default:
-            break;
+        default: break;
         }
 
         // TODO
@@ -238,18 +254,41 @@ namespace MAP {
         animateField( p_globX, p_globY );
         handleEvents( p_globX, p_globY, p_z );
 
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
         auto curLocId = getCurrentLocationId( );
         for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
-        if( p_allowWildPkmn ) handleWildPkmn( p_globX, p_globY );
+
+        // Check for things that activate upon stepping on a tile
+
+        switch( behave ) {
+        case 0x24: // Add ash to the soot bag
+            if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+                                                        I_SOOT_SACK ) ) {
+                SAVE::SAV.getActiveFile( ).m_ashCount++;
+                if( SAVE::SAV.getActiveFile( ).m_ashCount > 999'999'999 ) {
+                    SAVE::SAV.getActiveFile( ).m_ashCount = 999'999'999;
+                }
+            }
+            break;
+        default: break;
+        }
+
+        if( p_allowWildPkmn ) {
+
+            // Check for trainer
+
+            handleWildPkmn( p_globX, p_globY );
+        }
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
         cx += dir[ p_direction ][ 0 ];
         cy += dir[ p_direction ][ 1 ];
-        //#ifdef DESQUID
-        //        assert( cx != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX || cy !=
-        //        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY );
-        //#endif
+#ifdef DESQUID_MORE
+        assert( cx != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                || cy != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY );
+#endif
         if( p_updatePlayer ) {
             SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = cx;
             SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = cy;
@@ -350,11 +389,20 @@ namespace MAP {
                         _slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                                [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
                         _slices );
+        FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap,
+                         CUR_SLICE->m_x + dir[ p_direction ][ 0 ],
+                         CUR_SLICE->m_y + dir[ p_direction ][ 1 ],
+                         _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
+                              [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
+
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ]
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap,
                         neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ],
                         _slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
+        FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap,
+                         neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ],
+                         _data[ _curX ^ 1 ][ _curY ^ 1 ] );
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
@@ -362,6 +410,51 @@ namespace MAP {
     }
     void mapDrawer::enablePkmn( ) {
         SAVE::SAV.getActiveFile( ).m_repelSteps = 0;
+    }
+
+    void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
+        warpPos tg;
+        u16     curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
+        u16     cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16     curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+
+        for( u8 i = 0; i < CUR_DATA.m_eventCount; ++i ) {
+            if( CUR_DATA.m_events[ i ].m_type == EVENT_WARP && CUR_DATA.m_events[ i ].m_posX == curx
+                && CUR_DATA.m_events[ i ].m_posY == cury
+                && CUR_DATA.m_events[ i ].m_posZ == curz ) {
+                if( CUR_DATA.m_events[ i ].m_activateFlag
+                    && !SAVE::SAV.getActiveFile( ).checkFlag(
+                        CUR_DATA.m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                if( CUR_DATA.m_events[ i ].m_deactivateFlag
+                    && SAVE::SAV.getActiveFile( ).checkFlag(
+                        CUR_DATA.m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+
+                if( CUR_DATA.m_events[ i ].m_data.m_warp.m_warpType != NO_SPECIAL ) {
+                    p_type = CUR_DATA.m_events[ i ].m_data.m_warp.m_warpType;
+                    if( CUR_DATA.m_events[ i ].m_data.m_warp.m_warpType == LAST_VISITED ) {
+                        tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+                    } else {
+                        tg = warpPos( CUR_DATA.m_events[ i ].m_data.m_warp.m_bank,
+                                      position( CUR_DATA.m_events[ i ].m_data.m_warp.m_mapX * SIZE
+                                                    + CUR_DATA.m_events[ i ].m_data.m_warp.m_posX,
+                                                CUR_DATA.m_events[ i ].m_data.m_warp.m_mapY * SIZE
+                                                    + CUR_DATA.m_events[ i ].m_data.m_warp.m_posY,
+                                                +CUR_DATA.m_events[ i ].m_data.m_warp.m_posZ ) );
+                    }
+                }
+                break;
+            }
+        }
+
+        if( tg.first == 0xFF ) tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+        if( !tg.first && !tg.second.m_posY && !tg.second.m_posZ && !tg.second.m_posX ) return;
+
+        SAVE::SAV.getActiveFile( ).m_lastWarp = p_source;
+        warpPlayer( p_type, tg );
     }
 
     void mapDrawer::handleWarp( warpType p_type ) {
@@ -387,19 +480,18 @@ namespace MAP {
         // handle Pkmn stuff
         if( moveData == 0x04 && behave != 0x13 )
             handleWildPkmn( WATER );
-        else if( behave == 0x02 )
+        else if( behave == 0x02 || behave == 0x24 || behave == 0x06 )
             handleWildPkmn( GRASS );
         else if( behave == 0x03 )
             handleWildPkmn( HIGH_GRASS );
-        else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE )
+        else if( CUR_DATA.m_mapType & CAVE )
             handleWildPkmn( GRASS );
     }
     pokemon wildPkmn;
-    bool    mapDrawer::handleWildPkmn( wildPkmnType p_type, u8 p_rodType, bool p_forceEncounter ) {
-
+    bool    mapDrawer::handleWildPkmn( wildPkmnType p_type, bool p_forceEncounter ) {
         u16 rn
             = rand( ) % ( 512 + 3 * SAVE::SAV.getActiveFile( ).m_options.m_encounterRateModifier );
-        if( p_type == FISHING_ROD ) rn /= 8;
+        if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) rn /= 8;
         if( p_forceEncounter ) rn %= 40;
 
         u8 tier;
@@ -416,27 +508,93 @@ namespace MAP {
         u8 level = SAVE::SAV.getActiveFile( ).getEncounterLevel( tier );
 
         if( rn > 40 || !level ) {
-            if( p_type == FISHING_ROD ) {
+            if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
                 _playerIsFast = false;
                 NAV::printMessage( GET_STRING( 5 ) );
             }
             return false;
         }
-        if( p_type == FISHING_ROD ) {
+        if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
             _playerIsFast = false;
             NAV::printMessage( GET_STRING( 6 ) );
-        } else if( SAVE::SAV.getActiveFile( ).m_repelSteps && !p_forceEncounter )
+        } else if( SAVE::SAV.getActiveFile( ).m_repelSteps && !p_forceEncounter ) {
             return false;
-        u8 arridx = u8( p_type ) * 15 + tier * 3;
-        if( p_type != FISHING_ROD )
-            while( level > CUR_SLICE->m_pokemon[ arridx ].second && ( arridx + 1 ) % 3 ) ++arridx;
-        else
-            arridx += p_rodType;
+        }
 
-        if( !CUR_SLICE->m_pokemon[ arridx ].first ) return false;
+        s8 availmod = ( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) - 3 ) / 3;
 
-        u16 pkmnId    = CUR_SLICE->m_pokemon[ arridx ].first & ( ( 1 << 11 ) - 1 );
-        u8  pkmnForme = CUR_SLICE->m_pokemon[ arridx ].first >> 11;
+        u8 total = 0;
+        for( u8 i = 0; i < CUR_DATA.m_pokemonDescrCount; ++i ) {
+            if( CUR_DATA.m_pokemon[ i ].m_encounterType == p_type ) {
+                s8 ownedbadge = SAVE::SAV.getActiveFile( ).getBadgeCount( ) + availmod;
+                if( ownedbadge < 0 ) { ownedbadge = 0; }
+
+                if( ownedbadge >= CUR_DATA.m_pokemon[ i ].m_slot ) {
+
+                    if( CUR_DATA.m_pokemon[ i ].m_daytime
+                        & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) {
+                        total += CUR_DATA.m_pokemon[ i ].m_encounterRate;
+                    } else {
+#ifdef DESQUID_MORE
+                        NAV::printMessage(
+                            ( std::string( "Ignoring pkmn due to wrong time: " )
+                              + std::to_string( i ) + " "
+                              + std::to_string( CUR_DATA.m_pokemon[ i ].m_daytime ) + " vs "
+                              + std::to_string( ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) )
+                                .c_str( ),
+                            MSG_INFO );
+#endif
+                    }
+                } else {
+#ifdef DESQUID_MORE
+                    NAV::printMessage( ( std::string( "Ignoring pkmn due to insufficient badges: " )
+                                         + std::to_string( i ) )
+                                           .c_str( ),
+                                       MSG_INFO );
+#endif
+                }
+            }
+        }
+        if( !total ) {
+#ifdef DESQUID_MORE
+            NAV::printMessage( "No pkmn", MSG_INFO );
+#endif
+            return false;
+        }
+
+#ifdef DESQUID_MORE
+        NAV::printMessage( ( std::to_string( total ) ).c_str( ), MSG_INFO );
+#endif
+        u16 pkmnId    = 0;
+        u8  pkmnForme = 0;
+
+        u8 res = rand( ) % total;
+        total  = 0;
+        for( u8 i = 0; i < CUR_DATA.m_pokemonDescrCount; ++i ) {
+            if( CUR_DATA.m_pokemon[ i ].m_encounterType == p_type ) {
+                s8 ownedbadge = SAVE::SAV.getActiveFile( ).getBadgeCount( ) + availmod;
+                if( ownedbadge < 0 ) { ownedbadge = 0; }
+
+                if( ownedbadge >= CUR_DATA.m_pokemon[ i ].m_slot
+                    && ( CUR_DATA.m_pokemon[ i ].m_daytime
+                         & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) ) {
+                    total += CUR_DATA.m_pokemon[ i ].m_encounterRate;
+
+                    if( total > res ) {
+                        pkmnId    = CUR_DATA.m_pokemon[ i ].m_speciesId;
+                        pkmnForme = CUR_DATA.m_pokemon[ i ].m_forme;
+#ifdef DESQUID_MORE
+                        NAV::printMessage(
+                            ( std::to_string( total ) + " " + std::to_string( res ) ).c_str( ),
+                            MSG_INFO );
+#endif
+                        break;
+                    }
+                }
+            }
+        }
+
+        if( !pkmnId ) { return false; }
 
         bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
                             BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
@@ -461,29 +619,23 @@ namespace MAP {
                             luckyenc, false, 0, 0, luckyenc );
 
         u8 platform = 0, plat2 = 0;
-        u8 battleBack = CURRENT_BANK.m_battleBg;
-        if( p_type == GRASS || p_type == HIGH_GRASS || p_type == FISHING_ROD ) {
-            if( ( CURRENT_BANK.m_mapType >> 4 ) == OUTSIDE
-                && SAVE::SAV.getActiveFile( ).m_player.m_movement != SURF ) {
-                plat2 = platform = 1;
-            } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
-                plat2 = platform = 0;
-            } else if( ( CURRENT_BANK.m_mapType >> 4 ) & DARK ) {
-                plat2 = platform = 6;
-            } else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE ) {
-                plat2 = platform = 4;
-            }
+        u8 battleBack = p_type == WATER ? CUR_DATA.m_surfBattleBG : CUR_DATA.m_battleBG;
+        switch( p_type ) {
+        case WATER:
+            platform = CUR_DATA.m_surfBattlePlat1;
+            plat2    = CUR_DATA.m_surfBattlePlat2;
+            break;
+        case OLD_ROD:
+        case GOOD_ROD:
+        case SUPER_ROD:
+            platform = CUR_DATA.m_battlePlat1;
+            plat2    = CUR_DATA.m_surfBattlePlat2;
+            break;
 
-            if( p_type == FISHING_ROD ) plat2 = 0;
-        }
-
-        if( !battleBack ) {
-            if( p_type == GRASS ) battleBack = 1;
-            if( p_type == HIGH_GRASS ) battleBack = 3;
-            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF )
-                battleBack = 4;
-            else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE )
-                battleBack = 19;
+        default:
+            platform = CUR_DATA.m_battlePlat1;
+            plat2    = CUR_DATA.m_battlePlat2;
+            break;
         }
 
         auto playerPrio
@@ -519,31 +671,16 @@ namespace MAP {
 
         res.m_weather = BATTLE::weather::NO_WEATHER;
         switch( _weather ) {
-        case SUNNY:
-            res.m_weather = BATTLE::weather::SUN;
-            break;
+        case SUNNY: res.m_weather = BATTLE::weather::SUN; break;
         case RAINY:
-        case THUNDERSTORM:
-            res.m_weather = BATTLE::weather::RAIN;
-            break;
+        case THUNDERSTORM: res.m_weather = BATTLE::weather::RAIN; break;
         case SNOW:
-        case BLIZZARD:
-            res.m_weather = BATTLE::weather::HAIL;
-            break;
-        case SANDSTORM:
-            res.m_weather = BATTLE::weather::SANDSTORM;
-            break;
-        case FOG:
-            res.m_weather = BATTLE::weather::FOG;
-            break;
-        case HEAVY_SUNLIGHT:
-            res.m_weather = BATTLE::weather::HEAVY_SUNSHINE;
-            break;
-        case HEAVY_RAIN:
-            res.m_weather = BATTLE::weather::HEAVY_RAIN;
-            break;
-        default:
-            break;
+        case BLIZZARD: res.m_weather = BATTLE::weather::HAIL; break;
+        case SANDSTORM: res.m_weather = BATTLE::weather::SANDSTORM; break;
+        case FOG: res.m_weather = BATTLE::weather::FOG; break;
+        case HEAVY_SUNLIGHT: res.m_weather = BATTLE::weather::HEAVY_SUNSHINE; break;
+        case HEAVY_RAIN: res.m_weather = BATTLE::weather::HEAVY_RAIN; break;
+        default: break;
         }
 
         return res;
@@ -562,13 +699,15 @@ namespace MAP {
                         .m_bottombehave;
 
         if( moveData == 0x04 && behave != 0x13 )
-            return handleWildPkmn( WATER, 0, true );
+            return handleWildPkmn( WATER, true );
         else if( behave == 0x02 && !p_forceHighGrass )
-            return handleWildPkmn( GRASS, 0, true );
+            return handleWildPkmn( GRASS, true );
+        else if( ( behave == 0x24 || behave == 0x06 ) && !p_forceHighGrass )
+            return handleWildPkmn( GRASS, true );
         else if( behave == 0x03 || p_forceHighGrass )
-            return handleWildPkmn( HIGH_GRASS, 0, true );
-        else if( ( CURRENT_BANK.m_mapType >> 4 ) & CAVE )
-            return handleWildPkmn( GRASS, 0, true );
+            return handleWildPkmn( HIGH_GRASS, true );
+        else if( CUR_DATA.m_mapType & CAVE )
+            return handleWildPkmn( GRASS, true );
         return false;
     }
 
@@ -602,6 +741,11 @@ namespace MAP {
     bool mapDrawer::canMove( position p_start, direction p_direction, moveMode p_moveMode ) {
         u16 nx = p_start.m_posX + dir[ p_direction ][ 0 ];
         u16 ny = p_start.m_posY + dir[ p_direction ][ 1 ];
+
+#ifdef DESQUID
+        // Walk through walls for desquid purposes.
+        if( keysHeld( ) & KEY_R ) { return true; }
+#endif
 
         // Gather data about the source block
         u8 lstMoveData, lstBehave;
@@ -664,21 +808,16 @@ namespace MAP {
         case 0x6d:
             if( p_direction == DOWN ) return true;
             break;
-        default:
-            break;
+        default: break;
         }
         switch( curBehave ) {
         // Jumpy stuff
         case 0x38:
-        case 0x35:
-            return p_direction == RIGHT;
+        case 0x35: return p_direction == RIGHT;
         case 0x39:
-        case 0x34:
-            return p_direction == LEFT;
-        case 0x3a:
-            return p_direction == UP;
-        case 0x3b:
-            return p_direction == DOWN;
+        case 0x34: return p_direction == LEFT;
+        case 0x3a: return p_direction == UP;
+        case 0x3b: return p_direction == DOWN;
 
         case 0xa0:
             if( !( p_moveMode & WALK ) ) return false;
@@ -689,8 +828,7 @@ namespace MAP {
         case 0xc1:
             if( p_direction % 2 == 0 ) return false;
             break;
-        case 0x13:
-            return false;
+        case 0x13: return false;
         case 0xd3: // Bike stuff
             if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
             if( p_direction % 2 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
@@ -711,10 +849,8 @@ namespace MAP {
             if( p_direction % 2 == 0 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
                 return true;
             return false;
-        case 0xd7:
-            return false;
-        default:
-            break;
+        case 0xd7: return false;
+        default: break;
         }
 
         // Check for movedata stuff
@@ -894,9 +1030,7 @@ namespace MAP {
                 hadjump = false;
                 switch( lstBehave ) {
                 case 0x20:
-                case 0x48:
-                    slidePlayer( p_direction );
-                    break;
+                case 0x48: slidePlayer( p_direction ); break;
                 // These change the direction of movement
                 case 0x40:
                     if( !canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, RIGHT,
@@ -1031,9 +1165,7 @@ namespace MAP {
                     }
                     switch( newBehave ) {
                     case 0x20:
-                    case 0x48:
-                        walkPlayer( p_direction, p_fast );
-                        break;
+                    case 0x48: walkPlayer( p_direction, p_fast ); break;
 
                     // Check for warpy stuff
                     case 0x60:
@@ -1115,9 +1247,7 @@ namespace MAP {
                         walkPlayer( p_direction, p_fast );
                         p_direction = DOWN;
                         break;
-                    default:
-                        moving = false;
-                        continue;
+                    default: moving = false; continue;
                     }
                 }
             }
@@ -1159,21 +1289,16 @@ namespace MAP {
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-        u8 oldMapType = CURRENT_BANK.m_mapType >> 4;
+        u8 oldMapType = u8( CUR_DATA.m_mapType );
         loadNewBank( p_target.first );
-        u8 newMapType = CURRENT_BANK.m_mapType >> 4;
+        u8 newMapType = u8( CUR_DATA.m_mapType );
 
         bool entryCave = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) );
         bool exitCave  = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
         switch( p_type ) {
-        case DOOR:
-            SOUND::playSoundEffect( SFX_ENTER_DOOR );
-            break;
-        case TELEPORT:
-            SOUND::playSoundEffect( SFX_WARP );
-            break;
-        case EMERGE_WATER:
-            break;
+        case DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break;
+        case TELEPORT: SOUND::playSoundEffect( SFX_WARP ); break;
+        case EMERGE_WATER: break;
         case CAVE_ENTRY:
             SOUND::playSoundEffect( SFX_CAVE_WARP );
             if( entryCave ) {
@@ -1468,9 +1593,7 @@ namespace MAP {
         u8 ydif       = 0;
         SAVE::SAV.getActiveFile( ).m_player.m_movement = p_newMode;
         switch( p_newMode ) {
-        case WALK:
-            SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic;
-            break;
+        case WALK: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic; break;
         case SURF:
         case ROCK_CLIMB:
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
@@ -1493,8 +1616,7 @@ namespace MAP {
             newIsBig                                     = basePic == 0 || basePic == 10;
             ydif                                         = 2;
             break;
-        default:
-            break;
+        default: break;
         }
         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
             = SAVE::SAV.getActiveFile( ).m_player.show( 128 - 8 - 8 * newIsBig, 96 - 24 - ydif,
@@ -1585,7 +1707,12 @@ namespace MAP {
                                 == A_STICKY_HOLD ) );
 
             // Start wild PKMN battle here
-            handleWildPkmn( FISHING_ROD, p_rodType, forceEncounter );
+            switch( p_rodType ) {
+            default:
+            case 0: handleWildPkmn( OLD_ROD, forceEncounter ); break;
+            case 1: handleWildPkmn( GOOD_ROD, forceEncounter ); break;
+            case 2: handleWildPkmn( SUPER_ROD, forceEncounter ); break;
+            }
         }
 
         PLAYER_IS_FISHING = false;
@@ -1650,6 +1777,12 @@ namespace MAP {
             }
         }
 
+        if( p_type == 0 ) {
+            SOUND::playBGMOneshot( MOD_OS_BADGE );
+        } else if( p_type == 1 ) {
+            SOUND::playBGMOneshot( MOD_OS_SYMBOL );
+        }
+
         IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
                          OBJPRIORITY_1, false );
         IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
@@ -1680,8 +1813,7 @@ namespace MAP {
         SAVE::SAV.getActiveFile( ).m_lastAchievementDate = SAVE::CURRENT_DATE;
 
         IO::updateOAM( false );
-        // TODO: play sound
-        for( u8 i = 0; i < 150; ++i ) swiWaitForVBlank( );
+        for( u16 i = 0; i < 330; ++i ) swiWaitForVBlank( );
 
         for( u8 i = 0; i < 4; ++i ) { IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true; }
         IO::OamTop->oamBuffer[ SPR_PKMN_OAM ].isHidden = true;
@@ -1691,6 +1823,7 @@ namespace MAP {
         snprintf( buffer, 139, GET_STRING( 436 ), SAVE::SAV.getActiveFile( ).m_playername,
                   getBadgeName( p_type, p_badge ) );
         NAV::printMessage( buffer, MSG_INFO );
+        SOUND::restartBGM( );
     }
 
     void mapDrawer::runPokeMart( const std::vector<std::pair<u16, u32>>& p_offeredItems,
@@ -1744,24 +1877,25 @@ namespace MAP {
         return getCurrentLocationId( SAVE::SAV.m_activeFile );
     }
     u16 mapDrawer::getCurrentLocationId( u8 p_file ) const {
-        u8 currentBank = CURRENT_BANK.m_bank;
-        if( currentBank != SAVE::SAV.m_saveFile[ p_file ].m_currentMap )
-            loadNewBank( SAVE::SAV.m_saveFile[ p_file ].m_currentMap );
-        u16 res = CURRENT_BANK.m_locationId;
-        for( u8 i = 0; i < MAX_MAP_LOCATIONS; ++i ) {
-            if( SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX
-                    >= CURRENT_BANK.m_data[ i ].m_upperLeftX
-                && SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX
-                       <= CURRENT_BANK.m_data[ i ].m_lowerRightX
-                && SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY
-                       >= CURRENT_BANK.m_data[ i ].m_upperLeftY
-                && SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY
-                       <= CURRENT_BANK.m_data[ i ].m_lowerRightY ) {
-                res = CURRENT_BANK.m_data[ i ].m_locationId;
+        u16 curx = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX % SIZE;
+        u16 cury = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY % SIZE;
+        u16 mapx = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX / SIZE;
+        u16 mapy = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY / SIZE;
+
+        mapData mdata;
+        FS::readMapData( SAVE::SAV.m_saveFile[ p_file ].m_currentMap, mapx, mapy, mdata );
+
+        u16 res = mdata.m_baseLocationId;
+        for( u8 i = 0; i < mdata.m_extraLocationCount; ++i ) {
+            if( mdata.m_extraLocations[ i ].m_left <= curx
+                && mdata.m_extraLocations[ i ].m_right >= curx
+                && mdata.m_extraLocations[ i ].m_top <= cury
+                && mdata.m_extraLocations[ i ].m_bottom >= cury ) {
+
+                res = mdata.m_extraLocations[ i ].m_locationId;
                 break;
             }
         }
-        if( currentBank != SAVE::SAV.m_saveFile[ p_file ].m_currentMap ) loadNewBank( currentBank );
         return res;
     }
 } // namespace MAP

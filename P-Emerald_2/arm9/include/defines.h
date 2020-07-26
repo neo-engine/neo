@@ -107,6 +107,7 @@ enum style {
     MSG_INFO_NOCLOSE = 3,
     MSG_MART_ITEM    = 4, // Message used for items / pokemart
     MSG_ITEM         = 5, // Message used when player obtains an item
+    MSG_SIGN         = 6,
 };
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];

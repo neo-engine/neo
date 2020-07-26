@@ -77,6 +77,7 @@ namespace FS {
     bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
     u8   readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations );
     bool readBankData( u8 p_bank, MAP::bankInfo& p_result );
+    bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result );
 
     FILE* openScript( MAP::warpPos p_pos, u8 p_id );
     FILE* openScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_id );

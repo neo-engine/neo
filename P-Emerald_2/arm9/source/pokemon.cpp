@@ -81,6 +81,7 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     memcpy( m_boxdata.m_moves, p_trainerPokemon.m_moves, sizeof( m_boxdata.m_moves ) );
     memcpy( m_boxdata.m_effortValues, p_trainerPokemon.m_ev, sizeof( m_boxdata.m_effortValues ) );
     for( u8 i = 0; i < 6; ++i ) { m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] ); }
+    m_boxdata.setNature( (pkmnNatures) p_trainerPokemon.m_nature );
     m_stats             = calcStats( m_boxdata, m_level, &data );
     m_battleForme       = 0;
     m_battleTimeAbility = 0;
