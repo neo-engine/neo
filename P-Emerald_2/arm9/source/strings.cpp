@@ -186,6 +186,10 @@ const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ] = {
     { "Gold Ability Symbol", "das Gold-Anlagesymbol" },
 };
 
+const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
+    { "Meteor Falls", "Meteorf\xe4lle" },
+};
+
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "No data.", "Keine Daten." },
     { "Faraway Place", "Entfernter Ort" },

@@ -37,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "screenFade.h"
 #include "sprite.h"
 #include "uio.h"
+#include "nav.h"
 
 namespace MAP {
 #define MAX_SCRIPT_SIZE 64
@@ -263,38 +264,6 @@ namespace MAP {
     }
 #endif
 
-    // At most one warp is allowed per block.
-    // The corresponding script must have id 0.
-    warpPos getWarpPos( warpPos p_source ) {
-#ifdef false
-        FILE* sc = FS::openScript( p_source, 0 );
-        if( !sc ) return warpPos{ 0, { 0, 0, 0 } };
-
-        u8 header[ 5 ], content[ 7 ];
-        FS::read( sc, header, sizeof( u8 ), 4 );
-        if( header[ 0 ] != scriptType::WARP_SCRIPT || header[ 2 ] != invocationType::WARP_TILE ) {
-            FS::close( sc );
-            return warpPos{ 0, { 0, 0, 0 } };
-        }
-
-        if( header[ 3 ] == 1 ) { // warp specified as local coordinates
-            FS::read( sc, content, sizeof( u8 ), 6 );
-            FS::close( sc );
-            return warpPos{ content[ 0 ],
-                            { ( u16 )( content[ 2 ] * SIZE + content[ 3 ] ),
-                              ( u16 )( content[ 1 ] * SIZE + content[ 4 ] ), content[ 5 ] } };
-        } else if( header[ 3 ] == 0 ) { // warp specified as global coordinates
-            warpPos res;
-            FS::read( sc, &res, sizeof( warpPos ), 1 );
-            FS::close( sc );
-            return res;
-        } else {
-            FS::close( sc );
-            return warpPos{ 0, { 0, 0, 0 } };
-        }
-#endif
-    }
-
     void mapDrawer::interact( ) {
         u16  px = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16  py = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
@@ -303,18 +272,69 @@ namespace MAP {
         handleEvents( px, py, pz, d );
     }
 
+    void mapDrawer::runEvent( mapData::event p_event ) {
+        switch( p_event.m_type ) {
+        case EVENT_MESSAGE:
+            NAV::printMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
+                               (style) p_event.m_data.m_message.m_msgType );
+            break;
+
+        default: break;
+        }
+    }
+
     void mapDrawer::handleEvents( u8 p_globX, u8 p_globY, u8 p_z ) {
-        //   u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
-        //   u8 i   = 0;
-        //   while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::STEP_ONTO ) ) ++i;
+        u8 x = p_globX % SIZE;
+        u8 y = p_globY % SIZE;
+        u8 z = p_z;
+
+        auto mdata = currentData( );
+
+        for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
+            if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
+                || mdata.m_events[ i ].m_posZ != z ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_activateFlag
+                && !SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_activateFlag ) ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_deactivateFlag
+                && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_trigger == TRIGGER_STEP_ON ) {
+                runEvent( mdata.m_events[ i ] );
+            }
+        }
     }
 
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir ) {
-        /*   p_globX += dir[ p_dir ][ 0 ];
-           p_globY += dir[ p_dir ][ 1 ];
-           u8 map = SAVE::SAV.getActiveFile( ).m_currentMap;
-           u8 i   = 0;
-           while( executeScript( map, p_globX, p_globY, p_z, i, invocationType::INTERACT ) ) ++i;
-       */
+        p_globX += dir[ p_dir ][ 0 ];
+        p_globY += dir[ p_dir ][ 1 ];
+
+        u8 x = p_globX % SIZE;
+        u8 y = p_globY % SIZE;
+        u8 z = p_z;
+
+        auto mdata = currentData( );
+
+        for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
+            if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
+                || mdata.m_events[ i ].m_posZ != z ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_activateFlag
+                && !SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_activateFlag ) ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_deactivateFlag
+                && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_trigger & dirToEventTrigger( p_dir ) ) {
+                runEvent( mdata.m_events[ i ] );
+            }
+        }
     }
 } // namespace MAP

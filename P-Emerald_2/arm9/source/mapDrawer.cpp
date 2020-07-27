@@ -48,8 +48,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace MAP {
-#define NUM_ROWS   16
-#define NUM_COLS   32
 #define MAP_BORDER 0x3f
 
 #define SPR_MAIN_PLAYER_OAM      0
@@ -608,6 +606,7 @@ namespace MAP {
         } else {
             SOUND::playBGM( SOUND::BGMforWildBattle( pkmnId ) );
         }
+        stopPlayer( );
 
         IO::fadeScreen( IO::BATTLE );
         IO::BG_PAL( true )[ 0 ] = 0;

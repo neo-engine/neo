@@ -77,6 +77,8 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
+        void runEvent( mapData::event p_event );
+
         void handleEvents( u8 p_localX, u8 p_localY, u8 p_z );
         void handleEvents( u16 p_localX, u16 p_localY, u8 p_z, direction p_dir );
         void handleWarp( warpType p_type, warpPos p_source );

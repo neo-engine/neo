@@ -88,6 +88,7 @@ extern unsigned short TEMP_PAL[ 256 ];
 
 constexpr u8  LANGUAGES        = 2;
 constexpr u16 MAX_STRINGS      = 800;
+constexpr u16 MAX_MAP_STRINGS  = 800;
 constexpr u8  MAX_ACHIEVEMENTS = 50;
 constexpr u8  MAX_BADGENAMES   = 25;
 constexpr u8  NUM_BGS          = 12;
@@ -114,6 +115,7 @@ extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ];
 extern const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
+extern const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ];
 extern const char* const MONTHS[ 12 ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 
@@ -134,10 +136,11 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #define GET_STRING( p_stringId ) STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
 #endif
 
-#define NO_DATA         GET_STRING( 0 )
-#define FARAWAY_PLACE   GET_STRING( 1 )
-#define UNKNOWN_SPECIES GET_STRING( 2 )
-#define POKE_NAV        GET_STRING( 8 )
+#define GET_MAP_STRING( p_stringId ) MAP_STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
+#define NO_DATA                      GET_STRING( 0 )
+#define FARAWAY_PLACE                GET_STRING( 1 )
+#define UNKNOWN_SPECIES              GET_STRING( 2 )
+#define POKE_NAV                     GET_STRING( 8 )
 
 #define loop( )     while( 1 )
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )

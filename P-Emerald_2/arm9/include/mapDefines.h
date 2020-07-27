@@ -62,6 +62,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define MAP_DRAGONS_DEN   223
 
 namespace MAP {
+    constexpr u8 NUM_ROWS = 16;
+    constexpr u8 NUM_COLS = 32;
+
     struct position {
         u16 m_posX; // Global
         u16 m_posY; // Global
@@ -97,12 +100,27 @@ namespace MAP {
         TRIGGER_NONE           = 0,
         TRIGGER_STEP_ON        = ( 1 << 0 ),
         TRIGGER_INTERACT       = ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ),
-        TRIGGER_INTERACT_UP    = ( 1 << 1 ),
-        TRIGGER_INTERACT_DOWN  = ( 1 << 2 ),
-        TRIGGER_INTERACT_LEFT  = ( 1 << 3 ),
+        TRIGGER_INTERACT_DOWN  = ( 1 << 1 ),
+        TRIGGER_INTERACT_LEFT  = ( 1 << 2 ),
+        TRIGGER_INTERACT_UP    = ( 1 << 3 ),
         TRIGGER_INTERACT_RIGHT = ( 1 << 4 ),
         TRIGGER_ON_MAP_ENTER   = ( 1 << 5 ),
     };
+
+    constexpr eventTrigger dirToEventTrigger( direction p_dir ) {
+        switch( p_dir ) {
+            case UP:
+                return TRIGGER_INTERACT_DOWN;
+            case LEFT:
+                return TRIGGER_INTERACT_RIGHT;
+            case DOWN:
+                return TRIGGER_INTERACT_UP;
+            case RIGHT:
+                return TRIGGER_INTERACT_LEFT;
+        }
+        return TRIGGER_NONE;
+    }
+
     enum wildPkmnType : u8 {
         GRASS,
         HIGH_GRASS,
