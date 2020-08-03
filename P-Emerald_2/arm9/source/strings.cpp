@@ -188,6 +188,13 @@ const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ] = {
 
 const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Meteor Falls", "Meteorf\xe4lle" },
+    { "\x05 Fallarbor Town\nRoute 113 \x08", "\x05 Laubwechselfeld\nRoute 113 \x08" },
+    { "Fallarbor Town", "Laubwechselfeld" },
+    { "Battle Tent", "Kampfzelt" },
+    { "Move Reminder's House", "Haus des Attackenmaniac" },
+
+    { "Fossil Maniac's House", "Haus des Fossilienmaniac" },
+    { "Lanette's House", "Lanettes Haus" },
 };
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
@@ -695,7 +702,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "The water is a deep blue| ", "Das Wasser ist tiefblau| " },
     { "The sea is deep here. ", "Das Wasser ist sehr tief. " },
     { "It's a big boulder. ", "Ein großer Felsen. " },
-    { "The wall is very rocky| ", "Eine steile Felswand| " },
+    { "The wall is very rocky|\n", "Eine steile Felswand|\n" },
 
     // 320
 

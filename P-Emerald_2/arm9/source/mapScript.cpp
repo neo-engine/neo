@@ -28,16 +28,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 #include "battle.h"
-#include "battleDefines.h"
 #include "battleTrainer.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"
+#include "nav.h"
 #include "saveGame.h"
 #include "screenFade.h"
+#include "sound.h"
 #include "sprite.h"
 #include "uio.h"
-#include "nav.h"
 
 namespace MAP {
 #define MAX_SCRIPT_SIZE 64
@@ -278,7 +278,45 @@ namespace MAP {
             NAV::printMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
                                (style) p_event.m_data.m_message.m_msgType );
             break;
+        case EVENT_TRAINER: {
+            auto tr = BATTLE::getBattleTrainer( p_event.m_data.m_trainer.m_trainerId );
+            if( !SAVE::SAV.getActiveFile( ).checkFlag(
+                    SAVE::F_TRAINER_BATTLED( p_event.m_deactivateFlag ) ) ) {
+                // player did not defeat the trainer yet
 
+                NAV::printMessage( tr.m_strings.m_message1, MSG_NORMAL );
+
+                auto playerPrio = OBJPRIORITY_0;
+                    //_sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
+                    //                  .getPriority( );
+                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
+                FADE_TOP_DARK( );
+                ANIMATE_MAP = false;
+                swiWaitForVBlank( );
+
+                BATTLE::battle bt
+                    = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr );
+                if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+                    // TODO: faint player
+                    // FADE_TOP_DARK( );
+                    // ANIMATE_MAP = true;
+                    // NAV::init( );
+
+                } else {
+                    SAVE::SAV.getActiveFile( ).setFlag(
+                        SAVE::F_TRAINER_BATTLED( p_event.m_deactivateFlag ), true );
+                }
+                FADE_TOP_DARK( );
+                NAV::init( );
+                draw( playerPrio );
+                SOUND::restartBGM( );
+                ANIMATE_MAP = true;
+            }
+
+            NAV::printMessage( tr.m_strings.m_message2, MSG_NORMAL );
+            break;
+        }
         default: break;
         }
     }
@@ -317,7 +355,7 @@ namespace MAP {
         u8 y = p_globY % SIZE;
         u8 z = p_z;
 
-        auto mdata = currentData( );
+        auto mdata = currentData( p_globX, p_globY );
 
         for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
             if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
@@ -328,7 +366,7 @@ namespace MAP {
                 && !SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_activateFlag ) ) {
                 continue;
             }
-            if( mdata.m_events[ i ].m_deactivateFlag
+            if( mdata.m_events[ i ].m_type != EVENT_TRAINER && mdata.m_events[ i ].m_deactivateFlag
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
@@ -337,4 +375,23 @@ namespace MAP {
             }
         }
     }
+
+    bool mapData::hasEvent( eventType p_type, u8 p_x, u8 p_y, u8 p_z ) const {
+        for( u8 i = 0; i < m_eventCount; ++i ) {
+            if( m_events[ i ].m_posX == p_x && m_events[ i ].m_posY == p_y
+                && m_events[ i ].m_posZ == p_z && m_events[ i ].m_type == p_type ) {
+                if( m_events[ i ].m_activateFlag
+                    && !SAVE::SAV.getActiveFile( ).checkFlag( m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                if( m_events[ i ].m_deactivateFlag
+                    && SAVE::SAV.getActiveFile( ).checkFlag( m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
 } // namespace MAP

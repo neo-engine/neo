@@ -35,21 +35,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 const char SOUND_PATH[] = "nitro:/SOUND/";
 
-void initSFX( ) {
-}
-
-void initBattleSFX( ) {
-}
-
-void deinitBattleSFX( ) {
-}
-
 void initSound( ) {
 #ifndef NO_SOUND
     std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
     mmInitDefault( const_cast<char*>( path.c_str( ) ) );
     mmLockChannels( BIT( 0 ) | BIT( 1 ) );
-    initSFX( );
 #endif
 }
 
@@ -58,15 +48,9 @@ namespace SOUND {
     u16  currentBGM = 0;
 
     void initBattleSound( ) {
-#ifndef NO_SOUND
-        initBattleSFX( );
-#endif
     }
 
     void deinitBattleSound( ) {
-#ifndef NO_SOUND
-        deinitBattleSFX( );
-#endif
     }
 
     void setVolume( u16 p_newValue ) {
@@ -102,6 +86,7 @@ namespace SOUND {
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 mmStop( );
+                swiWaitForVBlank( );
                 mmUnload( currentBGM );
             }
             restoreVolume( );
@@ -119,6 +104,7 @@ namespace SOUND {
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             mmStop( );
+            swiWaitForVBlank( );
             mmUnload( currentBGM );
             BGMLoaded = false;
         }
@@ -141,6 +127,7 @@ namespace SOUND {
                 swiWaitForVBlank( );
                 swiWaitForVBlank( );
                 mmStop( );
+                swiWaitForVBlank( );
                 mmUnload( currentBGM );
             }
             restoreVolume( );
@@ -158,6 +145,7 @@ namespace SOUND {
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             mmStop( );
+            swiWaitForVBlank( );
             mmUnload( currentBGM );
             BGMLoaded = false;
         }
@@ -170,6 +158,7 @@ namespace SOUND {
 #ifndef NO_SOUND
         if( BGMLoaded ) {
             mmStop( );
+            swiWaitForVBlank( );
             mmUnload( currentBGM );
             BGMLoaded = false;
         }

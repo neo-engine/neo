@@ -58,6 +58,9 @@ namespace BATTLE {
             BATTLE_OPPONENT_RAN = 5,
         };
 
+        static constexpr u8 BEFORE_BATTLE = 0;
+        static constexpr u8 AFTER_BATTLE = 1;
+
       private:
         u16   _round, _maxRounds, _AILevel;
         field _field;
@@ -198,6 +201,12 @@ namespace BATTLE {
         /*
          * @brief: Creates a new trainer battle.
          */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponent,
+                battlePolicy = DEFAULT_TRAINER_POLICY );
+
+        /*
+         * @brief: Creates a new trainer battle.
+         */
         battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
                 battlePolicy = DEFAULT_TRAINER_POLICY );
 
@@ -214,5 +223,10 @@ namespace BATTLE {
          * player lost.
          */
         battleEndReason start( );
+
+        /*
+         * @brief: Returns messages of the battle trainer.
+         */
+        const char* getString( u8 p_stringId );
     };
 } // namespace BATTLE

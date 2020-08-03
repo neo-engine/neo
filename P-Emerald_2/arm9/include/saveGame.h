@@ -47,10 +47,14 @@ namespace SAVE {
     constexpr u8  MAX_BOXES   = 40;
     constexpr u8  BERRY_SLOTS = 50;
 
-    constexpr u8 F_MEGA_EVOLUTION   = 1;
-    constexpr u8 F_NAV_OBTAINED     = 2;
-    constexpr u8 F_DEX_OBTAINED     = 3;
-    constexpr u8 F_NAT_DEX_OBTAINED = 4;
+    constexpr u16 F_MEGA_EVOLUTION   = 1;
+    constexpr u16 F_NAV_OBTAINED     = 2;
+    constexpr u16 F_DEX_OBTAINED     = 3;
+    constexpr u16 F_NAT_DEX_OBTAINED = 4;
+
+    constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
+        return p_trainer + 2048;
+    }
 
     constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
 
@@ -123,7 +127,7 @@ namespace SAVE {
             u32            m_money;
             u16            m_coins;
             u16            m_battlePoints;
-            MAP::mapObject m_player;
+            MAP::mapPlayer m_player;
             u8             m_currentMap;
             u8             m_stepCount;
             MAP::warpPos   m_lastWarp;
@@ -244,12 +248,12 @@ namespace SAVE {
             /*
              * @brief: Checks whether the given flag is set.
              */
-            bool checkFlag( u8 p_idx );
+            bool checkFlag( u16 p_idx );
 
             /*
              * @brief: Sets the specified flag to the specified value.
              */
-            void setFlag( u8 p_idx, bool p_value );
+            void setFlag( u16 p_idx, bool p_value );
 
             /*
              * @brief: Returns the value of the specified variable

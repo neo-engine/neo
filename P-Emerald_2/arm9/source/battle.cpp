@@ -48,12 +48,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound.h"
 
 namespace BATTLE {
-    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponentId,
                     battlePolicy p_policy ) {
         _playerTeam     = p_playerTeam;
         _playerTeamSize = p_playerTeamSize;
 
-        _opponent = getBattleTrainer( p_opponentId );
+        _opponent = p_opponentId;
 
         _opponentTeamSize = _opponent.m_data.m_numPokemon
             = std::min( u8( 6 ), _opponent.m_data.m_numPokemon );
@@ -100,6 +100,12 @@ namespace BATTLE {
             break;
         }
     }
+
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
+                    battlePolicy p_policy )
+        : battle( p_playerTeam, p_playerTeamSize, getBattleTrainer( p_opponentId ), p_policy ) {
+    }
+
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform,
                     u8 p_platform2, u8 p_background, battlePolicy p_policy, bool p_wildPkmnRuns ) {
         _playerTeam     = p_playerTeam;
@@ -984,7 +990,7 @@ namespace BATTLE {
     u16  MOVE_BUFFER[ 20 ];
     void battle::endBattle( battle::battleEndReason p_battleEndReason ) {
         char buffer[ 100 ];
-        if( p_battleEndReason == BATTLE_OPPONENT_WON ) { SOUND::stopBGM( ); }
+        if( p_battleEndReason == BATTLE_OPPONENT_WON ) { SOUND::setVolume( 0 ); }
         if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
             SOUND::playBGM( MOD_VICTORY_WILD );
             if( p_battleEndReason == BATTLE_CAPTURE ) {
@@ -1009,6 +1015,7 @@ namespace BATTLE {
             }
             if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
                 _battleUI.handleBattleEnd( false );
+
                 if( _opponent.m_data.m_moneyEarned ) {
                     snprintf( buffer, 99, GET_STRING( 553 ), _opponent.m_data.m_moneyEarned );
                     _battleUI.log( buffer );
@@ -1673,5 +1680,16 @@ namespace BATTLE {
                 }
             }
         }
+    }
+
+    const char* battle::getString( u8 p_stringId ) {
+        if( _isWildBattle ) { return 0; }
+
+        switch( p_stringId ) {
+        case battle::BEFORE_BATTLE: return _opponent.m_strings.m_message1;
+        case battle::AFTER_BATTLE: return _opponent.m_strings.m_message2;
+        default: break;
+        }
+        return 0;
     }
 } // namespace BATTLE

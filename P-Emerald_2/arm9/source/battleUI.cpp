@@ -1019,6 +1019,10 @@ namespace BATTLE {
     }
 
     void battleUI::init( weather p_initialWeather, terrain p_initialTerrain ) {
+        for( u8 i = 0; i < 2; ++i ) {
+            u16* pal   = IO::BG_PAL( i );
+            pal[ 0 ]   = 0;
+        }
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         IO::vramSetup( true );
 

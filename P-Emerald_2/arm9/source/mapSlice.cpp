@@ -40,17 +40,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     void constructSlice( u8 p_map, u16 p_x, u16 p_y, std::unique_ptr<mapSlice>& p_result,
                          std::unique_ptr<mapSlice> p_cache[ 2 ][ 2 ] ) {
-        FILE* mapF = FS::open(
-            MAP_PATH,
-            ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
-                .c_str( ),
-            ".map" );
-        if( !mapF )
+        FILE* mapF;
+
+        if( p_map == 10 ) {
             mapF = FS::open( MAP_PATH,
-                             ( std::to_string( p_map ) + "/BORDER/" + std::to_string( p_y ) + "_"
-                               + std::to_string( p_x ) )
+                             ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "/"
+                               + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
                                  .c_str( ),
                              ".map" );
+        } else {
+            mapF = FS::open( MAP_PATH,
+                             ( std::to_string( p_map ) + "/"
+                               + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
+                                 .c_str( ),
+                             ".map" );
+        }
         if( !mapF ) {
 #ifdef DESQUID_MORE
             char buffer[ 50 ];
@@ -68,9 +72,7 @@ namespace MAP {
             reloadTs = true;
         }
 #ifdef DESQUID
-        if( !p_result ) {
-            NAV::printMessage( "Not enough memory :(", MSG_INFO );
-        }
+        if( !p_result ) { NAV::printMessage( "Not enough memory :(", MSG_INFO ); }
 #endif
 
         FS::readNop( mapF, 8 );
@@ -88,7 +90,9 @@ namespace MAP {
         FS::read( mapF, &b2, sizeof( u8 ), 1 );
         FS::readNop( mapF, 2 );
 
-        FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), b1 * b2 ); // Border blocks
+        if( b1 && b2 ) {
+            FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), b1 * b2 ); // Border blocks
+        }
 
         FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
         FS::close( mapF );
@@ -123,11 +127,11 @@ namespace MAP {
                 FS::readTiles( mapF, p_result->m_tileSet.m_tiles );
                 FS::close( mapF );
 
-                mapF = FS::open( TILESET_PATH, tsidx1, ".bvd" );
+                mapF = FS::open( BLOCKSET_PATH, tsidx1, ".bvd" );
                 FS::readBlocks( mapF, p_result->m_blockSet.m_blocks );
                 FS::close( mapF );
 
-                mapF = FS::open( TILESET_PATH, tsidx1, ".p2l" );
+                mapF = FS::open( PALETTE_PATH, tsidx1, ".p2l" );
                 FS::readPal( mapF, p_result->m_pals );
                 FS::close( mapF );
 
@@ -173,12 +177,12 @@ namespace MAP {
                 FS::readTiles( mapF, p_result->m_tileSet.m_tiles, 512 );
                 FS::close( mapF );
 
-                mapF = FS::open( TILESET_PATH, tsidx2, ".bvd" );
+                mapF = FS::open( BLOCKSET_PATH, tsidx2, ".bvd" );
                 FS::readBlocks( mapF, p_result->m_blockSet.m_blocks, 512 );
                 FS::close( mapF );
 
-                mapF = FS::open( TILESET_PATH, tsidx2, ".p2l" );
-                FS::readPal( mapF, p_result->m_pals + 6 );
+                mapF = FS::open( PALETTE_PATH, tsidx2, ".p2l" );
+                FS::readPal( mapF, p_result->m_pals + 6, 8 );
                 FS::close( mapF );
 
                 mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );

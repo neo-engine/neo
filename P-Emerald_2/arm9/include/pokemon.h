@@ -88,7 +88,7 @@ struct boxPokemon {
     u8   m_ball            = 0;     //
     u8   m_gotLevel : 7    = 0;     //
     u8   m_unused : 1      = 0;     // unused
-    u8   m_encounter       = 0;
+    u8   m_nature          = 0;
     u8   m_abilitySlot : 2 = 0;
     u8   m_shinyType : 2   = 0;
     u8   m_rand : 4        = 0;
@@ -129,7 +129,7 @@ struct boxPokemon {
     void setSpecies( u16 p_newSpecies, pkmnData* p_data = 0 );
 
     constexpr pkmnNatures getNature( ) const {
-        return ( pkmnNatures )( m_pid % 25 );
+        return ( pkmnNatures )( m_nature );
     }
     bool setNature( pkmnNatures p_newNature );
 

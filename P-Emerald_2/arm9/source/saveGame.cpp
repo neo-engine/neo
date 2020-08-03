@@ -369,11 +369,11 @@ namespace SAVE {
         return u8( std::max( (s16) 1, std::min( (s16) 100, mxlv ) ) );
     }
 
-    bool saveGame::playerInfo::checkFlag( u8 p_idx ) {
-        return m_flags[ p_idx >> 3 ] & ( 1 << ( p_idx % 8 ) );
+    bool saveGame::playerInfo::checkFlag( u16 p_idx ) {
+        return m_flags[ p_idx >> 4 ] & ( 1 << ( p_idx & 15 ) );
     }
-    void saveGame::playerInfo::setFlag( u8 p_idx, bool p_value ) {
-        if( p_value != checkFlag( p_idx ) ) m_flags[ p_idx >> 3 ] ^= ( 1 << ( p_idx % 8 ) );
+    void saveGame::playerInfo::setFlag( u16 p_idx, bool p_value ) {
+        if( p_value != checkFlag( p_idx ) ) m_flags[ p_idx >> 4 ] ^= ( 1 << ( p_idx & 15 ) );
         return;
     }
 

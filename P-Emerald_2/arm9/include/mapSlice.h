@@ -38,6 +38,8 @@ namespace MAP {
 
     const char* const MAP_PATH      = "nitro:/MAPS/";
     const char* const TILESET_PATH  = "nitro:/MAPS/TILESETS/";
+    const char* const BLOCKSET_PATH  = "nitro:/MAPS/BLOCKSETS/";
+    const char* const PALETTE_PATH  = "nitro:/MAPS/PALETTES/";
     const u16         SIZE          = 32;
     const s16         dir[ 4 ][ 2 ] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
 

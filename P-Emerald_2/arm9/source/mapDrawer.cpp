@@ -52,11 +52,18 @@ namespace MAP {
 
 #define SPR_MAIN_PLAYER_OAM      0
 #define SPR_MAIN_PLAYER_PLAT_OAM 1
+#define SPR_OBJECTS_OAM          10
 #define SPR_PKMN_OAM             100
 #define SPR_CIRC_OAM             104
 
+    // Strength boulder (16x16)
+    // Rock Smash rock  (16x16)
+    // Cut tree         (16x16)
+    // Map animation (rustling grass, etc)
+
 #define SPR_MAIN_PLAYER_GFX      0
-#define SPR_PKMN_GFX             304
+#define SPR_OBJECTS_GFX          64
+#define SPR_PKMN_GFX             303
 #define SPR_CIRC_GFX             447
 #define SPR_MAIN_PLAYER_PLAT_GFX 332
 
@@ -82,16 +89,23 @@ namespace MAP {
     const mapData& mapDrawer::currentData( ) const {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        return currentData( curx, cury );
+    }
+    const mapData& mapDrawer::currentData( u16 p_x, u16 p_y ) const {
+        u16 curx = p_x;
+        u16 cury = p_y;
 
         bool x = ( curx / SIZE != CUR_SLICE->m_x ), y = ( cury / SIZE != CUR_SLICE->m_y );
         return _data[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ];
     }
+
 #define CUR_DATA currentData( )
-    u16 lastrow,      // Row to be filled when extending the map to the top
-        lastcol;      // Column to be filled when extending the map to the left
-    u16       cx, cy; // Cameras's pos
-    u16*      mapMemory[ 4 ];
-    s8        fastBike     = false;
+    u16 lastrow, // Row to be filled when extending the map to the top
+        lastcol; // Column to be filled when extending the map to the left
+    u16  cx, cy; // Cameras's pos
+    u16* mapMemory[ 4 ];
+    s8   fastBike = false;
+    /*
     mapObject surfPlatform = { MAP::mapObject::SURF_PLATFORM,
                                { 0, 0, 0 },
                                240,
@@ -99,7 +113,7 @@ namespace MAP {
                                0,
                                1,
                                MAP::direction::UP };
-
+                               */
     inline void loadBlock( block p_curblock, u32 p_memPos ) {
         u8   toplayer = 1, bottomlayer = 3;
         bool elevateTopLayer = p_curblock.m_topbehave == 0x10;
@@ -146,6 +160,7 @@ namespace MAP {
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
 
             FADE_TOP_DARK( );
+            _mapSprites.init( );
             bgUpdate( );
 
             _curX = _curY = 0;
@@ -170,6 +185,7 @@ namespace MAP {
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
 
+            for( u8 i = 0; i < 4; ++i ) { constructAndAddNewMapObjects( _data[ i % 2 ][ i & 2 ] ); }
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
                 bgSetScroll( i, 120, 40 );
@@ -216,26 +232,53 @@ namespace MAP {
     }
 
     void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
-        _sprites[ 0 ] = SAVE::SAV.getActiveFile( ).m_player.show(
-            128 - 8, 96 - 24, SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX );
-        _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] = 0;
-        _entriesUsed |= ( 1 << 0 );
+        // TODO
+        //        _sprites[ 0 ] = SAVE::SAV.getActiveFile( ).m_player.show(
+        //            128 - 8, 96 - 24, SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX );
+        //        _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] = 0;
+        //        _entriesUsed |= ( 1 << 0 );
         changeMoveMode( SAVE::SAV.getActiveFile( ).m_player.m_movement );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
-            p_playerPrio );
+        //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
+        //            p_playerPrio );
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
-            surfPlatform.m_id                           = 1;
-            _spritePos[ surfPlatform.m_id ]             = 1;
-            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show(
-                128 - 16, 96 - 20, SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX );
-            _entriesUsed |= ( 1 << 1 );
-            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame(
-                getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+            //            surfPlatform.m_id                           = 1;
+            //            _spritePos[ surfPlatform.m_id ]             = 1;
+            //            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show(
+            //                128 - 16, 96 - 20, SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX
+            //                );
+            //            _entriesUsed |= ( 1 << 1 );
+            //            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame(
+            //                getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
         }
     }
 
     void mapDrawer::drawObjects( ) {
-        // TODO
+        //       u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
+        //       u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        //       u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+
+        /*
+        std::vector<mapObject> toDraw = std::vector<mapObject>( );
+        if( dist( curx, cury, i.m_pos.m_x, i.m_pos.m_y ) < 17 ) { toDraw.push_back( i ); }
+        std::sort( toDraw.begin( ), toDraw.end( ),
+                   [ & ]( const mapObject& p_a, const mapObject& p_b ) {
+                       if( dist( curx, cury, p_a.m_pos.m_posX, p_a.m_pos.m_posY )
+                           < dist( curx, cury, p_b.m_pos.m_posX, p_b.m_pos.m_posY ) ) {
+                           return true;
+                       }
+                       return p_a < p_b;
+                   } );
+
+        u8  oam     = SPR_OBJECTS_OAM;
+        u16 tileCnt = SPR_OBJECTS_GFX;
+*/
+        //        _objSprites.clear( );
+
+        // for( auto i : toDraw ) {
+        //            _objSprites.push_back( i.show( currx, curry, oam++, tileCnt ) );
+        //            _objSprites.back( ).currentFrame( );
+        //            tileCnt += 32;
+        // }
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
@@ -260,7 +303,7 @@ namespace MAP {
         // Check for things that activate upon stepping on a tile
 
         switch( behave ) {
-        case 0x24: // Add ash to the soot bag
+        case 0x24: { // Add ash to the soot bag
             if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
                                                         I_SOOT_SACK ) ) {
                 SAVE::SAV.getActiveFile( ).m_ashCount++;
@@ -268,7 +311,15 @@ namespace MAP {
                     SAVE::SAV.getActiveFile( ).m_ashCount = 999'999'999;
                 }
             }
+            // very hacky, I know
+            atom( p_globX, p_globY ).m_blockidx = 0x212;
+
+            loadBlock( at( p_globX, p_globY ), ( lastcol + NUM_COLS / 2 ) % NUM_COLS,
+                       ( lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
+            bgUpdate( );
+
             break;
+        }
         default: break;
         }
 
@@ -368,8 +419,12 @@ namespace MAP {
     }
 
     void mapDrawer::moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
-        for( u8 i = 1; i < 4; ++i ) bgScroll( i, dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
-        bgUpdate( );
+        for( u8 i = 1; i < 4; ++i ) {
+            bgScroll( i, dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
+            //            for( auto spr : _objSprites ) { spr.move( p_direction, 1, false ); }
+            IO::updateOAM( false );
+            bgUpdate( );
+        }
 
         if( p_autoLoadRows
             && ( ( dir[ p_direction ][ 0 ]
@@ -381,6 +436,9 @@ namespace MAP {
     }
 
     void mapDrawer::loadSlice( direction p_direction ) {
+        // Remove map objects that are no longer relevant
+        // purgeMapObjects( );
+
         constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap,
                         CUR_SLICE->m_x + dir[ p_direction ][ 0 ],
                         CUR_SLICE->m_y + dir[ p_direction ][ 1 ],
@@ -393,6 +451,10 @@ namespace MAP {
                          _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
 
+        // Add new map objects
+        constructAndAddNewMapObjects( _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
+                                           [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
+
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ]
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap,
@@ -401,6 +463,9 @@ namespace MAP {
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap,
                          neigh->m_x + dir[ p_direction ][ 0 ], neigh->m_y + dir[ p_direction ][ 1 ],
                          _data[ _curX ^ 1 ][ _curY ^ 1 ] );
+
+        // Add new map objects
+        constructAndAddNewMapObjects( _data[ _curX ^ 1 ][ _curY ^ 1 ] );
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
@@ -637,8 +702,9 @@ namespace MAP {
             break;
         }
 
-        auto playerPrio
-            = _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].getPriority( );
+        auto playerPrio = OBJPRIORITY_0;
+        //            = _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ]
+        //            ].getPriority( );
         ANIMATE_MAP = false;
         DRAW_TIME   = false;
         swiWaitForVBlank( );
@@ -650,10 +716,10 @@ namespace MAP {
             // TODO: faint player
         }
         FADE_TOP_DARK( );
+        draw( playerPrio );
         ANIMATE_MAP = true;
         NAV::init( );
         SOUND::restartBGM( );
-        draw( playerPrio );
 
         return true;
     }
@@ -733,7 +799,7 @@ namespace MAP {
         }
     }
 
-    mapDrawer::mapDrawer( ) : _curX( 0 ), _curY( 0 ), _playerIsFast( false ), _entriesUsed( 0 ) {
+    mapDrawer::mapDrawer( ) : _curX( 0 ), _curY( 0 ), _playerIsFast( false ) {
     }
 
     // Movement stuff
@@ -849,6 +915,16 @@ namespace MAP {
                 return true;
             return false;
         case 0xd7: return false;
+
+        // door-y stuff
+        case 0x69: // Player can move to a door if there is a corresponding warp at the target
+                   // position
+            if( currentData( nx, ny ).hasEvent( EVENT_WARP, nx % SIZE, ny % SIZE,
+                                                p_start.m_posZ ) ) {
+                return true;
+            } else {
+                return false;
+            }
         default: break;
         }
 
@@ -919,8 +995,9 @@ namespace MAP {
                 if( SAVE::SAV.getActiveFile( ).m_player.m_movement != WALK ) return;
                 SAVE::SAV.getActiveFile( ).m_player.m_direction
                     = direction( ( u8( p_direction ) + 2 ) % 4 );
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-                    getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+                //                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ]
+                //                ].setFrame(
+                //                    getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
                 sitDownPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction, SIT );
                 fastBike = false;
                 return;
@@ -1157,8 +1234,9 @@ namespace MAP {
                 NEXT_PASS:
                 default:
                     if( reinit ) {
-                        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-                            getFrame( p_direction ) );
+                        //                        _sprites[ _spritePos[ SAVE::SAV.getActiveFile(
+                        //                        ).m_player.m_id ] ].setFrame(
+                        //                            getFrame( p_direction ) );
                         fastBike = false;
                         return;
                     }
@@ -1173,11 +1251,11 @@ namespace MAP {
                         break;
                     case 0x61:
                     case 0x68:
+                    case 0x6e:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( NO_SPECIAL );
                         break;
                     case 0x66:
-                    case 0x6e:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( LAST_VISITED );
                         break;
@@ -1296,6 +1374,7 @@ namespace MAP {
         bool exitCave  = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
         switch( p_type ) {
         case DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break;
+        case SLIDING_DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break; // TODO
         case TELEPORT: SOUND::playSoundEffect( SFX_WARP ); break;
         case EMERGE_WATER: break;
         case CAVE_ENTRY:
@@ -1329,6 +1408,24 @@ namespace MAP {
         //        }
 
         if( exitCave ) movePlayer( DOWN );
+        u8 behave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                        .m_bottombehave;
+
+        if( ( currentData( ).m_mapType & INSIDE )
+            && ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
+                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE
+                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE ) ) {
+            // Don't bike in buildings
+            changeMoveMode( MAP::WALK );
+        }
+
+        switch( behave ) {
+        case 0x6e: walkPlayer( UP, false ); break;
+        case 0x69: walkPlayer( DOWN, false ); break;
+
+        default: break;
+        }
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
@@ -1343,12 +1440,14 @@ namespace MAP {
 
         // Check if the player's direction changed
         if( p_direction != SAVE::SAV.getActiveFile( ).m_player.m_direction ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-                ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
+            //            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ]
+            //            ].setFrame(
+            //                ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
             SAVE::SAV.getActiveFile( ).m_player.m_direction = p_direction;
 
-            if( _entriesUsed & ( 1 << 1 ) )
-                _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( p_direction ) );
+            //            if( _entriesUsed & ( 1 << 1 ) )
+            //                _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame(
+            //                p_direction ) );
         }
     }
 
@@ -1362,24 +1461,26 @@ namespace MAP {
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 1 );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-            getFrame( p_direction ) / 3 + 12 );
+        //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 1
+        //        ); _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+        //            getFrame( p_direction ) / 3 + 12 );
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         if( remPlat ) {
-            _sprites[ _spritePos[ surfPlatform.m_id ] ].setVisibility( false );
-            _entriesUsed ^= ( 1 << 1 );
+            //            _sprites[ _spritePos[ surfPlatform.m_id ] ].setVisibility( false );
+            //            _entriesUsed ^= ( 1 << 1 );
         }
         moveCamera( p_direction, true );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 2 );
+        //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 2
+        //        );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
         swiWaitForVBlank( );
         moveCamera( p_direction, true );
         moveCamera( p_direction, true );
 
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 1 );
+        //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 1
+        //        );
         for( u8 i = 0; i < 4; ++i ) {
             moveCamera( p_direction, true );
             swiWaitForVBlank( );
@@ -1398,37 +1499,39 @@ namespace MAP {
 
         if( p_newMoveMode == SURF || p_newMoveMode == ROCK_CLIMB ) {
             // Load the Pkmn
-            surfPlatform.m_id                           = 1;
-            _spritePos[ surfPlatform.m_id ]             = 1;
-            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show(
-                128 - 16, 96 - 20, SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX );
-            _entriesUsed |= ( 1 << 1 );
-            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( p_direction ) );
+            // surfPlatform.m_id               = 1;
+            // _spritePos[ surfPlatform.m_id ] = 1;
+            //          _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show(
+            //              128 - 16, 96 - 20, SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX );
+            //          _entriesUsed |= ( 1 << 1 );
+            //          _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame( getFrame( p_direction
+            //          ) );
         }
 
         for( u8 i = 0; i < 7; ++i ) {
-            if( i == 3 )
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
+            //         if( i == 3 )
+            //             _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move(
+            //             UP, 2 );
             moveCamera( di, true );
             swiWaitForVBlank( );
         }
         changeMoveMode( p_newMoveMode );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-            getFrame( p_direction ) / 3 + 12 );
+        //      _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+        //          getFrame( p_direction ) / 3 + 12 );
 
         for( u8 i = 0; i < 4; ++i ) {
             moveCamera( di, true );
             if( i % 2 ) swiWaitForVBlank( );
         }
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
+        //      _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
         swiWaitForVBlank( );
         moveCamera( di, true );
         swiWaitForVBlank( );
         moveCamera( di, true );
         moveCamera( di, true );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-            getFrame( p_direction ) );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP, 1 );
+        //      _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+        //          getFrame( p_direction ) );
+        //      _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP, 1 );
         swiWaitForVBlank( );
         moveCamera( di, true );
         swiWaitForVBlank( );
@@ -1439,14 +1542,16 @@ namespace MAP {
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
             _playerIsFast = false;
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-                getFrame( p_direction ) );
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame( );
+            //         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
+            //             getFrame( p_direction ) );
+            //         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame(
+            //         );
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
-            if( i == 8 )
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].currentFrame( );
+            //        if( i == 8 )
+            //            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ]
+            //            ].currentFrame( );
             swiWaitForVBlank( );
         }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
@@ -1463,34 +1568,36 @@ namespace MAP {
                 == 0x3c
             && SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3
             && SAVE::SAV.getActiveFile( ).m_player.m_movement != SURF ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
-                OBJPRIORITY_1 );
+            //         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ]
+            //         ].setPriority(
+            //             OBJPRIORITY_1 );
         }
 
         if( p_fast != _playerIsFast ) {
             _playerIsFast = p_fast;
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-                ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
+            //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
+            //            ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
         }
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
-            if( i == 8 )
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame( );
-            if( ( !p_fast || i % 3 ) && !( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE ) )
-                swiWaitForVBlank( );
-            if( i % ( fastBike / 3 + 2 ) == 0
-                && ( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE ) )
-                swiWaitForVBlank( );
+            //        if( i == 8 )
+            //            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ]
+            //            ].nextFrame( );
+            if( ( !p_fast || i % 3 ) && !fastBike ) swiWaitForVBlank( );
+            if( i % ( fastBike / 3 + 2 ) == 0 && fastBike ) swiWaitForVBlank( );
         }
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-            ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
-        if( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE ) {
+        //   _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+        //       ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
+        if( ( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE )
+            || SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == ACRO_BIKE ) {
                 fastBike = std::min( fastBike + 1, 4 );
             } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MACH_BIKE ) {
                 fastBike = std::min( fastBike + 1, 12 );
             } else if( SAVE::SAV.getActiveFile( ).m_player.m_movement == BIKE ) {
                 fastBike = std::min( fastBike + 1, 8 );
+            } else {
+                fastBike = std::min( fastBike + 1, 6 );
             }
         } else
             fastBike = false;
@@ -1502,11 +1609,11 @@ namespace MAP {
             && ( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ <= 3
                  || SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
                  || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
-                OBJPRIORITY_3 );
-            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
-                || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB )
-                _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
+            //      _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
+            //          OBJPRIORITY_3 );
+            //      if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
+            //          || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB )
+            //         _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_3 );
         } else if( atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
                              + dir[ p_direction ][ 1 ] )
@@ -1516,11 +1623,11 @@ namespace MAP {
                             SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                               .m_movedata
                           != 0x3c ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
-                OBJPRIORITY_2 );
-            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
-                || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB )
-                _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
+            //    _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setPriority(
+            //        OBJPRIORITY_2 );
+            //     if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
+            //        || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB )
+            //        _sprites[ _spritePos[ surfPlatform.m_id ] ].setPriority( OBJPRIORITY_2 );
         }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
@@ -1532,21 +1639,24 @@ namespace MAP {
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
             _playerIsFast = false;
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-                getFrame( p_direction ) );
+            //  _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
+            //     getFrame( p_direction ) );
         }
         for( u8 i = 0; i < 32; ++i ) {
             moveCamera( p_direction, true );
-            if( i < 6 && i % 2 )
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP, 2 );
-            if( i % 8 == 0 )
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame( );
-            if( i > 28 && i % 2 )
-                _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN, 3 );
+            //     if( i < 6 && i % 2 )
+            //         _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( UP,
+            //         2 );
+            //     if( i % 8 == 0 )
+            //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame(
+            //        );
+            //    if( i > 28 && i % 2 )
+            //        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].move( DOWN,
+            //        3 );
             if( i % 4 ) swiWaitForVBlank( );
         }
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-            getFrame( p_direction ) );
+        // _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+        //     getFrame( p_direction ) );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
@@ -1562,8 +1672,8 @@ namespace MAP {
         }
         _playerIsFast = false;
         fastBike      = false;
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-            getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+        //   _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
+        //       getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
     }
     void mapDrawer::stopPlayer( direction p_direction ) {
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SIT
@@ -1582,7 +1692,7 @@ namespace MAP {
         fastBike = false;
         redirectPlayer( p_direction, false );
         _playerIsFast = false;
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame( );
+        //   _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].nextFrame( );
     }
 
     void mapDrawer::changeMoveMode( moveMode p_newMode ) {
@@ -1617,11 +1727,12 @@ namespace MAP {
             break;
         default: break;
         }
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
-            = SAVE::SAV.getActiveFile( ).m_player.show( 128 - 8 - 8 * newIsBig, 96 - 24 - ydif,
-                                                        SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
-            getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+        //   _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
+        //       = SAVE::SAV.getActiveFile( ).m_player.show( 128 - 8 - 8 * newIsBig, 96 - 24 - ydif,
+        //                                                   SPR_MAIN_PLAYER_OAM,
+        //                                                   SPR_MAIN_PLAYER_GFX );
+        //   _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].setFrame(
+        //       getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
         for( auto fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
     }
 
@@ -1638,18 +1749,19 @@ namespace MAP {
         u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 6;
         bool surfing = ( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF );
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
-            = SAVE::SAV.getActiveFile( ).m_player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
-                                                        96 - 24 + 8 * ( p_direction == DOWN ),
-                                                        SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX );
+        //   _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
+        //       = SAVE::SAV.getActiveFile( ).m_player.show( 128 - 16 + 8 * dir[ p_direction ][ 0 ],
+        //                                                  96 - 24 + 8 * ( p_direction == DOWN ),
+        //                                                 SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX
+        //                                                 );
 
         u8 frame = 0;
         if( p_direction == UP ) frame = 4;
         if( p_direction == DOWN ) frame = 8;
 
         for( u8 i = 0; i < 4; ++i ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-                frame + i, p_direction == RIGHT );
+            //     _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+            //         frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -1689,8 +1801,8 @@ namespace MAP {
             NAV::printMessage( 0 );
         }
         for( s8 i = 2; i >= 0; --i ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
-                frame + i, p_direction == RIGHT );
+            //     _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame(
+            //         frame + i, p_direction == RIGHT );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -1722,13 +1834,14 @@ namespace MAP {
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
         bool surfing = ( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF );
 
-        _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
-            = SAVE::SAV.getActiveFile( ).m_player.show(
-                128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24 - 3 * surfing,
-                SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX );
+        //  _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
+        //      = SAVE::SAV.getActiveFile( ).m_player.show(
+        //          128 - 8 - 8 * ( basePic == 0 || basePic == 10 ), 96 - 24 - 3 * surfing,
+        //          SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX );
         for( u8 i = 0; i < 5; ++i ) {
-            _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame( i,
-                                                                                          false );
+            //      _sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ].drawFrame( i,
+            //                                                                                    false
+            //                                                                                    );
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
         }
         IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
@@ -1753,10 +1866,10 @@ namespace MAP {
         IO::updateOAM( false );
         changeMoveMode( surfing ? SURF : WALK );
         if( surfing ) {
-            _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show(
-                128 - 16, 96 - 20, SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX );
-            _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame(
-                getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+            //    _sprites[ _spritePos[ surfPlatform.m_id ] ] = surfPlatform.show(
+            //        128 - 16, 96 - 20, SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX );
+            //    _sprites[ _spritePos[ surfPlatform.m_id ] ].setFrame(
+            //        getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
         }
         swiWaitForVBlank( );
     }
@@ -1896,5 +2009,9 @@ namespace MAP {
             }
         }
         return res;
+    }
+
+    void mapDrawer::constructAndAddNewMapObjects( MAP::mapData const& ) {
+        // TODO
     }
 } // namespace MAP

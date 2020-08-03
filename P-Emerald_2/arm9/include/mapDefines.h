@@ -69,6 +69,8 @@ namespace MAP {
         u16 m_posX; // Global
         u16 m_posY; // Global
         u8  m_posZ;
+
+        constexpr auto operator<=>( const position& ) const = default;
     };
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
     typedef std::pair<u8, position> warpPos;
@@ -109,14 +111,10 @@ namespace MAP {
 
     constexpr eventTrigger dirToEventTrigger( direction p_dir ) {
         switch( p_dir ) {
-            case UP:
-                return TRIGGER_INTERACT_DOWN;
-            case LEFT:
-                return TRIGGER_INTERACT_RIGHT;
-            case DOWN:
-                return TRIGGER_INTERACT_UP;
-            case RIGHT:
-                return TRIGGER_INTERACT_LEFT;
+        case UP: return TRIGGER_INTERACT_DOWN;
+        case LEFT: return TRIGGER_INTERACT_RIGHT;
+        case DOWN: return TRIGGER_INTERACT_UP;
+        case RIGHT: return TRIGGER_INTERACT_LEFT;
         }
         return TRIGGER_NONE;
     }
@@ -150,8 +148,17 @@ namespace MAP {
         UNDERWATER     = 0xe
     };
     enum mapType : u8 { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
-    enum warpType : u8 { NO_SPECIAL, CAVE_ENTRY, DOOR, TELEPORT, EMERGE_WATER, LAST_VISITED };
+    enum warpType : u8 {
+        NO_SPECIAL,
+        CAVE_ENTRY,
+        DOOR,
+        TELEPORT,
+        EMERGE_WATER,
+        LAST_VISITED,
+        SLIDING_DOOR
+    };
 
+    constexpr u8 MAX_EVENTS_PER_SLICE = 64;
     struct mapData {
         mapType    m_mapType;
         mapWeather m_weather;
@@ -201,6 +208,7 @@ namespace MAP {
                 struct {
                     u8  m_movementType;
                     u16 m_trainerId;
+                    u16 m_spriteId;
                     u8  m_sight;
                 } m_trainer;
                 struct {
@@ -227,7 +235,13 @@ namespace MAP {
                     u16 m_scriptId;
                 } m_generic;
             } m_data;
-        } m_events[ 64 ];
+        } m_events[ MAX_EVENTS_PER_SLICE ];
+
+        /*
+         * @brief: Checks whether there is a active event of the specified type at the
+         * specified position.
+         */
+        bool hasEvent( eventType p_type, u8 p_x, u8 p_y, u8 p_z ) const;
     };
 
     struct bankInfo {

@@ -268,6 +268,23 @@ namespace IO {
                 p_val = 448;
                 return;
             }
+            if( p_val == '\x05' ) { // Left
+                p_val = 475;
+                return;
+            }
+            if( p_val == '\x06' ) { // Up
+                p_val = 476;
+                return;
+            }
+            if( p_val == '\x07' ) { // Down
+                p_val = 477;
+                return;
+            }
+            if( p_val == '\x08' ) { // Right
+                p_val = 478;
+                return;
+            }
+
 
             if( p_val == '$' ) {
                 p_val = 117;

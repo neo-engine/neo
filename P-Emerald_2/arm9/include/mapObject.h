@@ -26,34 +26,66 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 #include "mapDefines.h"
+#include "mapSprite.h"
 
 namespace MAP {
     class mapSprite;
 
     constexpr u8 getFrame( direction p_direction ) {
         switch( p_direction ) {
-        case MAP::UP:
-            return 3;
-        case MAP::RIGHT:
-            return 9;
-        case MAP::DOWN:
-            return 0;
-        case MAP::LEFT:
-            return 6;
+        case MAP::UP: return 3;
+        case MAP::RIGHT: return 9;
+        case MAP::DOWN: return 0;
+        case MAP::LEFT: return 6;
         }
         return 0;
     }
 
-    struct mapObject {
-        enum type { PLYR, SURF_PLATFORM, SIGN, NPC } m_type;
+    struct mapPlayer {
+        u8        m_unused1;
         position  m_pos;
         u16       m_picNum;
         moveMode  m_movement;
-        u16       m_range;
-        u16       m_id;
+        u16       m_unused2;
         direction m_direction;
 
-        void      interact( );
-        mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u16 p_tileIdx );
+        constexpr mapPlayer( position p_pos, u16 p_picNum, moveMode p_movement = moveMode::WALK )
+            : m_pos( p_pos ), m_picNum( p_picNum ), m_movement( p_movement ),
+              m_direction( direction::DOWN ) {
+        }
+
+        constexpr mapPlayer( )
+            : m_pos( { 0, 0, 0 } ), m_picNum( 0 ), m_movement( moveMode::WALK ),
+              m_direction( direction::DOWN ) {
+        }
+    };
+
+    struct mapObject {
+        position       m_pos;
+        u16            m_picNum;
+        moveMode       m_movement;
+        u16            m_range;
+        direction      m_direction;
+        mapData::event m_event;
+
+        inline mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u16 p_tileIdx ) const {
+            u8 frameStart = getFrame( m_direction );
+            return mapSprite( 128 + ( m_pos.m_posX - p_currX ) * 16,
+                              96 + ( m_pos.m_posY - p_currY ) * 16, m_picNum, frameStart, p_oamIdx,
+                              p_tileIdx );
+        }
+
+        void interact( );
+
+        constexpr mapObject( const mapPlayer& p_player )
+            : m_pos( p_player.m_pos ), m_picNum( p_player.m_picNum ),
+              m_movement( p_player.m_movement ), m_range( 0 ), m_direction( p_player.m_direction ),
+              m_event( mapData::event( ) ) {
+        }
+
+        constexpr mapObject( )
+            : m_pos( { 0, 0, 0 } ), m_picNum( 0 ), m_movement( moveMode::WALK ), m_range( 0 ),
+              m_direction( direction::DOWN ), m_event( mapData::event( ) ) {
+        }
     };
 } // namespace MAP

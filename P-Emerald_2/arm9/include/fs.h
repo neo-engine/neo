@@ -72,7 +72,7 @@ namespace FS {
     }
 
     bool readNop( FILE* p_file, u32 p_cnt );
-    bool readPal( FILE* p_file, MAP::palette* p_palette );
+    bool readPal( FILE* p_file, MAP::palette* p_palette, u8 p_count = 6 );
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
     bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
     u8   readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations );

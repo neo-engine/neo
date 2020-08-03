@@ -80,6 +80,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     }
 
     m_experienceGained = EXP[ p_level - 1 ][ data.getExpType( ) ];
+    m_nature           = m_pid % 25;
 
     if( data.m_baseForme.m_items[ 3 ] )
         m_heldItem = data.m_baseForme.m_items[ 3 ];
@@ -255,9 +256,7 @@ void boxPokemon::recalculateForme( ) {
 
 bool boxPokemon::setNature( pkmnNatures p_newNature ) {
     if( getNature( ) == p_newNature ) { return false; }
-    bool shiny = isShiny( );
-    for( ; getNature( ) != p_newNature || isShiny( ) != shiny; m_pid = rand( ) )
-        ;
+    m_nature = u8( p_newNature );
     return true;
 }
 

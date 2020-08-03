@@ -41,20 +41,28 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     class mapDrawer {
       private:
-        mapWeather _weather;
+        mapWeather       _weather;
+        mapSpriteManager _mapSprites;
 
         std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } }; //[x][y]
         u8                        _curX, _curY; // Current main slice from the _slices array
 
         mapData _data[ 2 ][ 2 ];
 
-        std::map<std::pair<u16, u16>, std::vector<mapObject>> _mapObjs;
+        constexpr u16 dist( u16 p_globX1, u16 p_globY1, u16 p_globX2, u16 p_globY2 ) {
+            return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
+        }
+
+        std::vector<std::pair<u8, mapObject>> _objects;
+
+        /*
+         * @brief: Reads the given map data and constructs mapObjects for the relevant
+         * events. Also creates sprites for these events and makes them appear on the
+         * screen.
+         */
+        void constructAndAddNewMapObjects( const mapData& p_data );
 
         bool _playerIsFast;
-
-        mapSprite         _sprites[ 16 ];
-        u16               _entriesUsed;
-        std::map<u16, u8> _spritePos; // mapObject.id -> index in _sprites
 
         std::vector<std::function<void( u16 )>> _newLocationCallbacks
             = std::vector<std::function<void( u16 )>>( ); // Called whenever player makes a step
@@ -93,9 +101,10 @@ namespace MAP {
                                               bool               p_distributeEXP = true );
 
       public:
-        block&        at( u16 p_x, u16 p_y ) const;
-        mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
-        const mapData&      currentData( ) const;
+        block&         at( u16 p_x, u16 p_y ) const;
+        mapBlockAtom&  atom( u16 p_x, u16 p_y ) const;
+        const mapData& currentData( ) const;
+        const mapData& currentData( u16 p_x, u16 p_y ) const;
 
         mapDrawer( );
 

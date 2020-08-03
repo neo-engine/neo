@@ -118,19 +118,18 @@ namespace SOUND {
     }
     constexpr u16 BGMforTrainerWin( u16 p_trainerClassId ) {
         switch( p_trainerClassId ) {
-            case 24: // aqua grunt
-            case 25: // a
-            case 26: // aqua admin
-            case 27:
-            case 28: // archie
-            case 29: // magma grunt
-            case 30:
-            case 31: // magma admin
-            case 32:
-            case 33: // maxie
-                return MOD_VICTORY_TEAM_AM_GRUNT;
-            default:
-                return MOD_VICTORY_TRAINER;
+        case 24: // aqua grunt
+        case 25: // a
+        case 26: // aqua admin
+        case 27:
+        case 28: // archie
+        case 29: // magma grunt
+        case 30:
+        case 31: // magma admin
+        case 32:
+        case 33: // maxie
+            return MOD_VICTORY_TEAM_AM_GRUNT;
+        default: return MOD_VICTORY_TRAINER;
         }
     }
     constexpr u16 BGMforWildBattle( u16 p_pokemonId ) {
@@ -179,14 +178,22 @@ namespace SOUND {
         case L_ISLAND_CAVE:
         case L_DESERT_RUINS: return MOD_SEALED_CHAMBER;
         case L_SHOAL_CAVE: return MOD_SHOAL_CAVE;
-        case L_ROUTE_1112: return MOD_DESERT;
+        case L_ROUTE_111_DESERT: return MOD_DESERT;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
         case L_GRANITE_CAVE:
         case L_PETALBURG_WOODS:
         case L_JAGGED_PASS: return MOD_CAVE_FORESTS;
-        default:
-            //                return MOD_ABANDONED_SHIP;
-            return rand( ) % MSL_NSONGS;
+        case L_POKEMON_MART: return MOD_POKEMON_MART;
+        case L_POKEMON_CENTER: return MOD_POKEMON_CENTER;
+        case L_RUSTBORO_GYM:
+        case L_DEWFORD_GYM:
+        case L_MAUVILLE_GYM:
+        case L_LAVARIDGE_GYM:
+        case L_PETALBURG_GYM:
+        case L_FORTREE_GYM:
+        case L_MOSSDEEP_GYM:
+        case L_SOOTOPOLIS_GYM: return MOD_POKEMON_GYM;
+        default: return MOD_ABANDONED_SHIP;
         }
     }
 

@@ -262,9 +262,9 @@ namespace FS {
         return true;
     }
 
-    bool readPal( FILE* p_file, MAP::palette* p_palette ) {
+    bool readPal( FILE* p_file, MAP::palette* p_palette, u8 p_count ) {
         if( p_file == 0 ) return false;
-        read( p_file, p_palette, sizeof( u16 ) * 16, 6 );
+        read( p_file, p_palette, sizeof( u16 ) * 16, p_count );
         return true;
     }
 

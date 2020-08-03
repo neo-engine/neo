@@ -470,13 +470,9 @@ namespace SAVE {
 
         // TODO: Proper location
         SAV.getActiveFile( ).m_currentMap = 10;
-        SAV.getActiveFile( ).m_player     = { MAP::mapObject::PLYR,
-                                          { 0x93, 0x4a, 3 },
-                                          u16( 10 * SAV.getActiveFile( ).m_appearance ),
-                                          MAP::moveMode::WALK,
-                                          0,
-                                          0,
-                                          MAP::direction::RIGHT };
+        SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
+            { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+            u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
         IO::clearScreen( true, true, true );
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         for( u8 i = 10; i; --i ) {
@@ -498,13 +494,9 @@ namespace SAVE {
         case 0:
             std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
             SAV.getActiveFile( ).m_appearance = rand( ) % 2;
-            SAV.getActiveFile( ).m_player     = { MAP::mapObject::PLYR,
-                                              { 299, 53, 4 },
-                                              u16( 10 * SAV.getActiveFile( ).m_appearance ),
-                                              MAP::moveMode::WALK,
-                                              0,
-                                              0,
-                                              MAP::direction::RIGHT };
+            SAV.getActiveFile( ).m_player
+                = MAP::mapPlayer( { 0x93, 0x4a, 3 }, u16( 10 * SAV.getActiveFile( ).m_appearance ),
+                                  MAP::moveMode::WALK );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
