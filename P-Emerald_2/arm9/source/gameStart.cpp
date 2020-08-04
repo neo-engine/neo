@@ -319,6 +319,9 @@ namespace SAVE {
                     IO::updateOAM( true );
                 } );
 
+            SAV.getActiveFile( ).setVar( V_RIVAL_APPEARANCE,
+                                         1 - SAV.getActiveFile( ).m_appearance );
+
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_s" );
             SAV.getActiveFile( ).drawTrainersCard( false, true );
             IO::loadTrainerSprite( SAV.getActiveFile( ).m_appearance, 33, 45, 0, 0, 0, false );
@@ -494,6 +497,8 @@ namespace SAVE {
         case 0:
             std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
             SAV.getActiveFile( ).m_appearance = rand( ) % 2;
+            SAV.getActiveFile( ).setVar( V_RIVAL_APPEARANCE,
+                                         1 - SAV.getActiveFile( ).m_appearance );
             SAV.getActiveFile( ).m_player
                 = MAP::mapPlayer( { 0x93, 0x4a, 3 }, u16( 10 * SAV.getActiveFile( ).m_appearance ),
                                   MAP::moveMode::WALK );
@@ -501,7 +506,7 @@ namespace SAVE {
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
             SAV.getActiveFile( ).m_currentMap     = 10;
-            SAV.getActiveFile( ).m_registeredItem = I_BIKE;
+            SAV.getActiveFile( ).m_registeredItem = I_MACH_BIKE;
             for( u8 i = 10; i; --i ) {
                 SOUND::setVolume( 0x10 * i );
                 swiWaitForVBlank( );

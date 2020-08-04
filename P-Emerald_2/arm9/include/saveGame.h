@@ -57,6 +57,7 @@ namespace SAVE {
     }
 
     constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
+    constexpr u8 V_RIVAL_APPEARANCE = 1;
 
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 

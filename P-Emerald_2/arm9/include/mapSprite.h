@@ -35,13 +35,44 @@ namespace MAP {
     struct mapSpriteInfo {
         u16 m_picNum;
         u8  m_curFrame;
-        u8  m_width;
-        u8  m_height;
+    };
+
+    struct mapSpritePos {
+        u16 m_curX; // global x coordinate of current position in OW
+        u16 m_curY; // global y coordinate of current position in OW
+        s8  m_dx;   // shift in x dir
+        s8  m_dy;   // shift in x dir
+
+        void moveSprite( s8 p_dx, s8 p_dy ) {
+            m_dx += p_dx;
+            if( m_dx > 16 || m_dx < -16 ) {
+                m_curX += m_dx / 16;
+                m_dx = m_dx % 16;
+            }
+            m_dy += p_dy;
+            if( m_dy > 16 || m_dy < -16 ) {
+                m_curY += m_dy / 16;
+                m_dy = m_dy % 16;
+            }
+        }
     };
 
     struct mapSpriteData {
+        u8  m_width;
+        u8  m_height;
+        u8  m_frameCount;
         u16 m_palData[ 16 ];
         u32 m_frameData[ 32 * 32 * 12 / 8 ]; // Down stop, down f1, down f2, up, up, up, left, l, l
+
+        constexpr mapSpriteData( ) {
+        }
+
+        /*
+         * @brief: reads the sprite data from the FS; if p_imageId < 250, it is
+         * interpreted as a player sprite; if p_imageId == 250, loads the current player
+         * appearance's sprite; p_imageId == 251 loads the rival's sprite.
+         */
+        mapSpriteData( u16 p_imageId );
     };
 
     class mapSprite {
@@ -52,46 +83,120 @@ namespace MAP {
       public:
         mapSprite( ) {
         }
-        mapSprite( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame, u8 p_oamIdx,
-                   u16 p_tileIdx );
+        mapSprite( u16 p_imageId, u8 p_startFrame );
 
-        ObjPriority getPriority( );
+        mapSprite( mapSpriteInfo p_info, const mapSpriteData& p_data )
+            : _info( p_info ), _data( p_data ) {
+        }
 
-        void setVisibility( bool p_value );
-        void setPriority( ObjPriority p_value );
+        const mapSpriteData& getData( ) const {
+            return _data;
+        }
 
-        void drawFrame( u8 p_value );
-        void drawFrame( u8 p_value, bool p_hFlip );
-        void setFrame( u8 p_value );
+        mapSpriteData& getData( ) {
+            return _data;
+        }
 
-        void currentFrame( );
-        void nextFrame( );
-        void move( direction p_direction, s16 p_amount, bool p_update = true );
+        /*
+         * @brief: Normalizes p_value and draws the resulting frame.
+         */
+        void drawFrame( u8 p_oamIdx, u8 p_value );
+
+        /*
+         * @brief: Draws the specified frame, doesn't change the internal frame of the
+         * sprite.
+         */
+        void drawFrame( u8 p_oamIdx, u8 p_value, bool p_hFlip );
+
+        /*
+         * @brief: Sets the sprite to the specified frame and draws that frame.
+         */
+        void setFrame( u8 p_oamIdx, u8 p_value );
+
+        /*
+         * @brief: Draws the current frame of the sprite.
+         */
+        void currentFrame( u8 p_oamIdx );
+
+        /*
+         * @brief: Increments the frame and redraws the sprite.
+         */
+        void nextFrame( u8 p_oamIdx );
     };
 
     class mapSpriteManager {
-        static constexpr u8 MAX_SMALL_NPC = 16;
-        static constexpr u8 MAX_LARGE_NPC = 4;
+      public:
+        static constexpr u8 MAX_SMALL_NPC   = 16;
+        static constexpr u8 MAX_LARGE_NPC   = 4;
         static constexpr u8 MAX_HM_PARTICLE = 32;
+
+        static constexpr u8 SPR_UNUSED     = 0;
+        static constexpr u8 SPR_ITEM       = 1;
+        static constexpr u8 SPR_HMBALL     = 2;
+        static constexpr u8 SPR_STRENGTH   = 3;
+        static constexpr u8 SPR_ROCKSMASH  = 4;
+        static constexpr u8 SPR_ROCKSMASH2 = 5;
+        static constexpr u8 SPR_CUT        = 6;
+        static constexpr u8 SPR_CUT2       = 7;
+        static constexpr u8 SPR_PLATFORM   = 8;
+
+        struct managedSprite {
+            mapSprite    m_sprite;
+            mapSpritePos m_pos;
+
+            void moveSprite( s8 p_dx, s8 p_dy ) {
+                m_pos.moveSprite( p_dx, p_dy );
+            }
+        };
+
       private:
-        mapSprite _player;         // 32x32
-        mapSprite _playerPlatform; // 32x32
+        managedSprite _player;         // 32x32
+        managedSprite _playerPlatform; // 32x32
 
-        std::pair<bool,mapSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32 (
-        std::pair<bool,mapSprite> _bigNpcs[ MAX_LARGE_NPC ];    // 32x32
+        std::pair<bool, managedSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32
+        std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32
 
+        mapSpriteData _itemBallData;   // 16x16
+        mapSpriteData _hmBallData;     // 16x16
         mapSpriteData _strengthData;   // 16x16
         mapSpriteData _rockSmashData;  // 16x16
-        mapSpriteData _rockSmashData2; // crushed rock (16x16)
+        mapSpriteData _rockSmash2Data; // crushed rock (16x16)
         mapSpriteData _cutData;        // 16x16
-        mapSpriteData _cutData2;       // cut tree (16x16)
-        mapSpriteData _rustlingGrass;
-        mapSpriteData _rustlingLargeGrass;
-        mapSpriteData _waterBubbles;
+        mapSpriteData _cut2Data;       // cut tree (16x16)
+        // mapSpriteData _rustlingGrass;
+        // mapSpriteData _rustlingLargeGrass;
+        // mapSpriteData _waterBubbles;
 
-        std::pair<u8,mapSpriteInfo> _hmSpriteInfo[ MAX_HM_PARTICLE ];
+        std::pair<u8, mapSpritePos> _hmSpriteInfo[ MAX_HM_PARTICLE ];
+
+        constexpr u16 screenX( u16 p_camX, u16 p_posX, u8 p_width = 16 ) const {
+            return 128 - p_width / 2 + ( p_posX - p_camX ) * 16;
+        }
+
+        constexpr u16 screenY( u16 p_camY, u16 p_posY, u8 p_height = 32 ) const {
+            return 96 - ( p_height - 8 ) + ( p_posY - p_camY ) * 16;
+        }
+
+        managedSprite& getManagedSprite( u8 p_spriteId );
+
+        const managedSprite& getManagedSprite( u8 p_spriteId ) const;
+
+        /*
+         * @brief: Returns the mapSprite corresponding to a sprite id.
+         */
+        mapSpriteData& getSpriteData( u8 p_spriteId );
+
+        const mapSpriteData& getSpriteData( u8 p_spriteId ) const;
 
       public:
+        enum spriteType {
+            SPTYPE_NONE     = 0,
+            SPTYPE_PLAYER   = 1,
+            SPTYPE_PLATFORM = 2,
+            SPTYPE_NPC      = 3, // Trainer, berry trees
+            SPTYPE_PARTICLE = 4, // item icon, hm particles, etc
+        };
+
         void init( );
 
         /*
@@ -104,31 +209,60 @@ namespace MAP {
          * @brief: Moves the camera in the specified direction. (moves all sprites by the
          * specified amount)
          */
-        void moveCamera( u8 p_spriteId, direction p_direction, s16 p_amount, bool p_movePlayer = false );
+        void moveCamera( direction p_direction, s16 p_amount, bool p_movePlayer = false );
 
         /*
          * @brief: Loads an NPC sprite at the given position, returns an id for the sprite
          * that needs to be passed when the sprite should be accessed.
          */
-        u8 loadNPCSprite( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame );
+        u8 loadNPCSprite( u16 p_camX, u16 p_camY, u16 p_imageId, u8 p_startFrame );
 
-        u8 loadHMParticle( u16 p_currX, u16 p_currY, u16 p_imageId );
+        u8 loadHMParticle( u16 p_camX, u16 p_camY, u16 p_imageId );
 
-        u8 loadPlayerSprite( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame );
+        /*
+         * @brief: Loads the given sprite, returns an id for the sprite
+         * that needs to be passed when the sprite should be accessed.
+         * @param p_camX: x coordinate of the current camera position
+         * @param p_camY: y coordinate of the current camera position
+         */
+        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, spriteType p_type,
+                       const mapSprite& p_sprite );
 
-        u8 loadPlayerPlatform( u16 p_currX, u16 p_currY, u16 p_imageId, u8 p_startFrame );
+        /*
+         * @brief: Loads a (possibly new) instance of the given sprite type, returns an id for the
+         * sprite that needs to be passed when the sprite should be accessed.
+         * @param p_camX: x coordinate of the current camera position
+         * @param p_camY: y coordinate of the current camera position
+         */
+        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_partilcleId );
+
+        /*
+         * @brief: loads a sprite centered on the screen.
+         * @param p_camX: x coordinate of the current camera position
+         * @param p_camY: y coordinate of the current camera position
+         */
+        inline u8 loadSprite( u16 p_camX, u16 p_camY, spriteType p_type,
+                              const mapSprite& p_sprite ) {
+            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_type, p_sprite );
+        }
+
+        inline u8 loadSprite( u16 p_camX, u16 p_camY, u8 p_partilcleId ) {
+            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_partilcleId );
+        }
 
         /*
          * @brief: Hides the specified sprite and marks its corresponding slot as free to
          * use.
          */
-        void destroySprite( u8 p_spriteId );
+        void destroySprite( u8 p_spriteId, bool p_update = true );
 
         /*
          * @brief: Moves the specified sprite by the specified amount in the specified
          * direction.
          */
         void moveSprite( u8 p_spriteId, direction p_direction, s16 p_amount, bool p_update = true );
+
+        void moveSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update = true );
 
         /*
          * @brief: Returns the current priority of the specified sprite.
@@ -138,29 +272,31 @@ namespace MAP {
         /*
          * @brief: Sets the visibility of the specified sprite.
          */
-        void setVisibility( u8 p_spriteId, bool p_value );
+        void setVisibility( u8 p_spriteId, bool p_value, bool p_update = true );
+
+        bool getVisibility( u8 p_spriteId );
 
         /*
          * @brief: Sets the priority of the specified sprite.
          */
-        void setPriority( u8 p_spriteId, ObjPriority p_value );
+        void setPriority( u8 p_spriteId, ObjPriority p_value, bool p_update = true );
 
         /*
          * @brief: Draws the specified frame of the specified sprite.
          */
-        void drawFrame( u8 p_spriteId, u8 p_value );
+        void drawFrame( u8 p_spriteId, u8 p_value, bool p_update = true );
 
         /*
          * @brief: Draws the specified frame of the specified sprite.
          */
-        void drawFrame( u8 p_spriteId, u8 p_value, bool p_hFlip );
+        void drawFrame( u8 p_spriteId, u8 p_value, bool p_hFlip, bool p_update = true );
 
         /*
          * @brief: Sets the specified frame of the specified sprite.
          */
-        void setFrame( u8 p_spriteId, u8 p_value );
+        void setFrame( u8 p_spriteId, u8 p_value, bool p_update = true );
 
-        void currentFrame( );
-        void nextFrame( );
+        void currentFrame( u8 p_spriteId, bool p_update = true );
+        void nextFrame( u8 p_spriteId, bool p_update = true );
     };
 } // namespace MAP

@@ -53,6 +53,9 @@ namespace MAP {
             return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
         }
 
+        u8 _playerSprite;     // id of the player sprite
+        u8 _playerPlatSprite; // id of the player platform sprite
+
         std::vector<std::pair<u8, mapObject>> _objects;
 
         /*

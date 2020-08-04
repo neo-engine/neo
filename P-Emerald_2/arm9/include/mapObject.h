@@ -58,6 +58,14 @@ namespace MAP {
             : m_pos( { 0, 0, 0 } ), m_picNum( 0 ), m_movement( moveMode::WALK ),
               m_direction( direction::DOWN ) {
         }
+
+        /*
+         * @brief: Constructs a map sprite for the player.
+         */
+        inline mapSprite sprite( ) const {
+            u8 frameStart = getFrame( m_direction );
+            return mapSprite( m_picNum, frameStart );
+        }
     };
 
     struct mapObject {
@@ -68,11 +76,9 @@ namespace MAP {
         direction      m_direction;
         mapData::event m_event;
 
-        inline mapSprite show( u16 p_currX, u16 p_currY, u8 p_oamIdx, u16 p_tileIdx ) const {
+        inline mapSprite sprite( ) const {
             u8 frameStart = getFrame( m_direction );
-            return mapSprite( 128 + ( m_pos.m_posX - p_currX ) * 16,
-                              96 + ( m_pos.m_posY - p_currY ) * 16, m_picNum, frameStart, p_oamIdx,
-                              p_tileIdx );
+            return mapSprite( m_picNum | 256, frameStart );
         }
 
         void interact( );

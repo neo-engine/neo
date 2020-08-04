@@ -136,25 +136,32 @@ void initTimeAndRnd( ) {
         SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
     }
 
-    srand( SAVE::CURRENT_TIME.m_hours ^ ( 100 * SAVE::CURRENT_TIME.m_mins ) ^
-            ( 10000 * SAVE::CURRENT_TIME.m_secs ) ^ ( SAVE::CURRENT_DATE.m_day ^
-                ( 100 * SAVE::CURRENT_DATE.m_month ) ^ SAVE::CURRENT_DATE.m_year ) );
+    srand( SAVE::CURRENT_TIME.m_hours ^ ( 100 * SAVE::CURRENT_TIME.m_mins )
+           ^ ( 10000 * SAVE::CURRENT_TIME.m_secs )
+           ^ ( SAVE::CURRENT_DATE.m_day ^ ( 100 * SAVE::CURRENT_DATE.m_month )
+               ^ SAVE::CURRENT_DATE.m_year ) );
 }
 
 constexpr u8 getMonthBound( u8 p_month, u8 p_year ) {
     switch( p_month ) {
-        case 0: case 2: case 4: case 6: case 7: case 9: case 11:
-            return 31;
-        case 3: case 5: case 8: case 10:
-            return 30;
-        case 1:
-            if( p_year % 4 == 0 && p_year ) {
-                return 29;
-            } else {
-                return 28;
-            }
-        default:
-            return 0;
+    case 0:
+    case 2:
+    case 4:
+    case 6:
+    case 7:
+    case 9:
+    case 11: return 31;
+    case 3:
+    case 5:
+    case 8:
+    case 10: return 30;
+    case 1:
+        if( p_year % 4 == 0 && p_year ) {
+            return 29;
+        } else {
+            return 28;
+        }
+    default: return 0;
     }
 }
 
@@ -177,9 +184,8 @@ void vblankIRQ( ) {
                     SAVE::CURRENT_TIME.m_mins = 0;
                     if( ++SAVE::CURRENT_TIME.m_hours >= 24 ) {
                         SAVE::CURRENT_TIME.m_hours = 0;
-                        if( ++SAVE::CURRENT_DATE.m_day
-                                >= getMonthBound( SAVE::CURRENT_DATE.m_month,
-                                    SAVE::CURRENT_DATE.m_year ) ) {
+                        if( ++SAVE::CURRENT_DATE.m_day >= getMonthBound(
+                                SAVE::CURRENT_DATE.m_month, SAVE::CURRENT_DATE.m_year ) ) {
                             SAVE::CURRENT_DATE.m_day = 0;
                             if( ++SAVE::CURRENT_DATE.m_month >= 12 ) {
                                 SAVE::CURRENT_DATE.m_month = 0;
@@ -190,9 +196,7 @@ void vblankIRQ( ) {
                 }
             }
         }
-        if( IN_GAME ) {
-            SAVE::SAV.getActiveFile( ).increaseTime( );
-        }
+        if( IN_GAME ) { SAVE::SAV.getActiveFile( ).increaseTime( ); }
     }
 
     if( !RTC_BAD && tStruct != nullptr ) {
@@ -248,16 +252,16 @@ int main( int, char** p_argv ) {
 
     ANIMATE_MAP = true;
     NAV::init( );
-//    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
-//    MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
-//    NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
+    //    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
+    //    MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
+    //    NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 
-    IN_GAME = true;
+    IN_GAME      = true;
     bool stopped = true;
     u8   bmp     = false;
-    cooldown = COOLDOWN_COUNT;
+    cooldown     = COOLDOWN_COUNT;
     loop( ) {
         scanKeys( );
         touchRead( &touch );
@@ -271,30 +275,33 @@ int main( int, char** p_argv ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
-            snprintf( buffer, 99,
-                      "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | %hhu %hhu %hhu | %hhu",
-                      SAVE::SAV.getActiveFile( ).m_currentMap,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      MAP::CURRENT_BANK.m_bank,
-                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
-                      MAP::curMap->getCurrentLocationId( ),
-                      MAP::curMap
-                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_bottombehave,
-                      MAP::curMap
-                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_topbehave,
-                      SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
-                      SAVE::CURRENT_TIME.m_secs, 0 );
+            snprintf(
+                buffer, 99,
+                "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
+                "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | %hhu %hhu %hhu | %hhx",
+                SAVE::SAV.getActiveFile( ).m_currentMap,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, MAP::CURRENT_BANK.m_bank,
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                MAP::curMap->getCurrentLocationId( ),
+                MAP::curMap
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_bottombehave,
+                MAP::curMap
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_topbehave,
+                SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins, SAVE::CURRENT_TIME.m_secs,
+                MAP::curMap
+                    ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_movedata );
             NAV::printMessage( buffer );
         }
 #endif
@@ -325,8 +332,8 @@ int main( int, char** p_argv ) {
                                       mname.c_str( ) );
                             NAV::printMessage( buffer, MSG_NORMAL );
                             NAV::printMessage( 0, MSG_NOCLOSE );
-                            MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ),
-                                                  a.isShiny( ), a.getForme( ) );
+                            MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ), a.isShiny( ),
+                                                  a.getForme( ) );
                             NAV::init( );
                             swiWaitForVBlank( );
 

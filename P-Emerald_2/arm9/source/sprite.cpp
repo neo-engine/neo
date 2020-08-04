@@ -82,12 +82,12 @@ unsigned short TEMP_PAL[ 256 ] = { 0 };
 
 namespace IO {
     const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
+    const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
     const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/ITEMS/";
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/PKMN/";
     const char* PKMN_BACK_PATH = "nitro:/PICS/SPRITES/PKMNBACK/";
     const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
-    const char* TRAINER_PATH   = "n/a";
 
     const unsigned int* TypeTiles[ 19 ][ LANGUAGES ]
         = { { type_normal_enTiles, type_normal_deTiles },
