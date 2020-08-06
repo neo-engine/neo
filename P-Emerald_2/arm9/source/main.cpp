@@ -233,6 +233,7 @@ int main( int, char** p_argv ) {
     // Read the savegame
     if( gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
         || !FS::readSave( p_argv[ 0 ] ) ) {
+        std::memset( &SAVE::SAV, 0, sizeof( SAVE::saveGame ) );
         SAVE::SAV.clear( );
     }
 

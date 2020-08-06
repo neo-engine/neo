@@ -141,10 +141,11 @@ namespace MAP {
      */
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        const mapSpriteData& p_data ) {
-        IO::loadSpriteB(
-            p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height, p_data.m_palData,
-            reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
-            p_data.m_width * p_data.m_height / 2, false, false, false, OBJPRIORITY_2, false );
+        IO::loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height,
+                         p_data.m_palData,
+                         reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
+                         p_data.m_width * p_data.m_height / 2, false, false,
+                         !( p_posX < 256 && p_posY < 192 ), OBJPRIORITY_2, false );
     }
 
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
@@ -245,7 +246,8 @@ namespace MAP {
                                        { p_sprite,
                                          { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
                                            camShift( p_camY, p_posY ) } } };
-                doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ),
+                doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
+                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                               SPR_LARGE_NPC_OAM( freesp ), SPR_LARGE_NPC_GFX( freesp ), p_sprite );
                 return SPR_LARGE_NPC_OAM( freesp );
             } else {
@@ -261,7 +263,8 @@ namespace MAP {
                                          { p_sprite,
                                            { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
                                              camShift( p_camY, p_posY ) } } };
-                doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ),
+                doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
+                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                               SPR_SMALL_NPC_OAM( freesp ), SPR_SMALL_NPC_GFX( freesp ), p_sprite );
                 return SPR_SMALL_NPC_OAM( freesp );
             }
@@ -292,6 +295,12 @@ namespace MAP {
                 { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ), camShift( p_camY, p_posY ) } };
         }
 
+#ifdef DESQUID_MORE
+        NAV::printMessage( ( std::string( "load hm object " )
+                             + std::to_string( screenX( p_camX, p_posX, 16 ) ) + "."
+                             + std::to_string( screenY( p_camY, p_posY, 16 ) ) + "." )
+                               .c_str( ) );
+#endif
         switch( p_particleId ) {
         case SPR_ITEM:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),

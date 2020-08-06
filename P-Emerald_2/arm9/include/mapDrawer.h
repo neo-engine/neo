@@ -58,12 +58,16 @@ namespace MAP {
 
         std::vector<std::pair<u8, mapObject>> _objects;
 
+        bool _strengthUsed; // Player has used HM Strength and can move boulders
+
         /*
          * @brief: Reads the given map data and constructs mapObjects for the relevant
          * events. Also creates sprites for these events and makes them appear on the
          * screen.
          */
         void constructAndAddNewMapObjects( const mapData& p_data, u8 p_mapX, u8 p_mapY );
+
+        void loadMapObject( std::pair<u8, mapObject>& p_mapObject );
 
         bool _playerIsFast;
 

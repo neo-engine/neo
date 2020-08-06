@@ -207,7 +207,8 @@ namespace SAVE {
             = m_lstDex                                                               = 0;
         std::memset( m_lstViewedItem, 0, sizeof( m_lstViewedItem ) );
 
-        m_unused = 0;
+        m_mapObjectCount = 0;
+        m_playerPriority = OBJPRIORITY_1;
 
         m_options.clear( );
 
@@ -479,5 +480,6 @@ namespace SAVE {
     void saveGame::clear( ) {
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) { SAV.m_saveFile[ i ].clear( ); }
         m_version = VERSION;
+        m_activeFile = 0;
     }
 } // namespace SAVE

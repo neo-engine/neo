@@ -62,6 +62,38 @@ namespace MAP {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }
 
+    void mapDrawer::loadMapObject( std::pair<u8, mapObject>& p_mapObject ) {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        switch( p_mapObject.second.m_event.m_type ) {
+        case EVENT_HMOBJECT: {
+            if( p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
+                p_mapObject.first = _mapSprites.loadSprite(
+                    curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
+                    p_mapObject.second.m_event.m_data.m_hmObject.m_hmType );
+            } else {
+                // HM object got destroyed already
+                p_mapObject.first = 255;
+            }
+            break;
+        }
+        case EVENT_ITEM: {
+            if( p_mapObject.second.m_event.m_data.m_item.m_itemType ) {
+                p_mapObject.first = _mapSprites.loadSprite(
+                    curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
+                    p_mapObject.second.m_event.m_data.m_item.m_itemType == 1
+                        ? mapSpriteManager::SPR_ITEM
+                        : mapSpriteManager::SPR_HMBALL );
+            } else {
+                // No item icon for hidden items (otherwise the "hidden" part would be
+                // pointless, right)
+                p_mapObject.first = 255;
+            }
+        }
+        default: break;
+        }
+    }
+
     mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE->m_x ), y = ( p_y / SIZE != CUR_SLICE->m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
@@ -94,15 +126,7 @@ namespace MAP {
     u16  cx, cy; // Cameras's pos
     u16* mapMemory[ 4 ];
     s8   fastBike = false;
-    /*
-    mapObject surfPlatform = { MAP::mapObject::SURF_PLATFORM,
-                               { 0, 0, 0 },
-                               240,
-                               MAP::moveMode::NO_MOVEMENT,
-                               0,
-                               1,
-                               MAP::direction::UP };
-                               */
+
     inline void loadBlock( block p_curblock, u32 p_memPos ) {
         u8   toplayer = 1, bottomlayer = 3;
         bool elevateTopLayer = p_curblock.m_topbehave == 0x10;
@@ -141,8 +165,8 @@ namespace MAP {
 
     void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
         if( p_init ) {
-            videoSetMode( MODE_0_2D /* | DISPLAY_BG0_ACTIVE*/ | DISPLAY_BG1_ACTIVE
-                          | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
+            videoSetMode( MODE_3_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE
+                          | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                           | ( ( DISPLAY_SPR_1D | DISPLAY_SPR_1D_SIZE_128 | DISPLAY_SPR_1D_BMP
                                 | DISPLAY_SPR_1D_BMP_SIZE_128 | ( 5 << 28 ) | 2 )
                               & 0xffffff0 ) );
@@ -174,8 +198,8 @@ namespace MAP {
                              my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
 
             for( u8 i = 1; i < 4; ++i ) {
-                bgInit( i, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
-                bgSetScroll( i, 120, 40 );
+                bgInit( i - 1, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
+                bgSetScroll( i - 1, 120, 40 );
             }
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
@@ -185,7 +209,7 @@ namespace MAP {
             dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
-                bgSetPriority( i, i );
+                bgSetPriority( i - 1, i );
             }
 
             for( u8 i = 0; i < 4; ++i ) {
@@ -209,14 +233,18 @@ namespace MAP {
         bgUpdate( );
     }
 
-    void mapDrawer::draw( ObjPriority p_playerPrio ) {
-        _objects.clear( );
+    void mapDrawer::draw( ObjPriority ) {
         _mapSprites.reset( );
+
+        // Restore the map objects
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            loadMapObject( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] );
+        }
 
         draw( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true ); // Draw the map
 
-        drawPlayer( p_playerPrio ); // Draw the player
+        drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority ); // Draw the player
         // drawObjects( );             // Draw NPCs / stuff
 
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
@@ -227,26 +255,14 @@ namespace MAP {
     }
 
     void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
-        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
                                                 SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
         changeMoveMode( SAVE::SAV.getActiveFile( ).m_player.m_movement );
-        _mapSprites.setPriority( _playerSprite, p_playerPrio );
-        if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
-            _playerPlatSprite
-                = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPR_PLATFORM );
-            _mapSprites.setPriority( _playerPlatSprite, p_playerPrio );
-            _mapSprites.setFrame( _playerPlatSprite,
-                                  getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
-        } else {
-            if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3 ) {
-                _mapSprites.setPriority( _playerSprite, OBJPRIORITY_1 );
-            } else {
-                _mapSprites.setPriority( _playerSprite, OBJPRIORITY_3 );
-            }
-        }
+        _mapSprites.setPriority( _playerSprite,
+                                 SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio );
     }
 
     void mapDrawer::drawObjects( ) {
@@ -416,19 +432,19 @@ namespace MAP {
     }
 
     void mapDrawer::moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
-        for( u8 i = 1; i < 4; ++i ) {
+        for( u8 i = 0; i < 3; ++i ) {
             bgScroll( i, dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
             bgUpdate( );
         }
         _mapSprites.moveCamera( p_direction, 1, !p_updatePlayer );
-
         if( p_autoLoadRows
             && ( ( dir[ p_direction ][ 0 ]
-                   && ( ( bgState[ 1 ].scrollX >> 8 ) - dir[ p_direction ][ 0 ] + 16 ) % 16 == 0 )
+                   && ( ( bgState[ 1 ].scrollX >> 8 ) - dir[ p_direction ][ 0 ] + 9 ) % 16 == 0 )
                  || ( dir[ p_direction ][ 1 ]
-                      && ( ( bgState[ 1 ].scrollY >> 8 ) - dir[ p_direction ][ 1 ] + 16 ) % 16
-                             == 0 ) ) )
+                      && ( ( bgState[ 1 ].scrollY >> 8 ) - dir[ p_direction ][ 1 ] + 9 ) % 16
+                             == 0 ) ) ) {
             loadNewRow( p_direction, p_updatePlayer );
+        }
     }
 
     void mapDrawer::loadSlice( direction p_direction ) {
@@ -712,7 +728,8 @@ namespace MAP {
         SOUND::restartBGM( );
         FADE_TOP_DARK( );
         draw( playerPrio );
-        _mapSprites.setPriority( _playerSprite, playerPrio );
+        _mapSprites.setPriority( _playerSprite,
+                                 SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
         ANIMATE_MAP = true;
         NAV::init( );
 
@@ -807,6 +824,42 @@ namespace MAP {
         // Walk through walls for desquid purposes.
         if( keysHeld( ) & KEY_R ) { return true; }
 #endif
+
+        // Check if any event is occupying the target block
+
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+            if( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny ) {
+                switch( o.second.m_event.m_type ) {
+                case EVENT_HMOBJECT:
+                    if( o.second.m_event.m_data.m_hmObject.m_hmType
+                        == mapSpriteManager::SPR_STRENGTH ) {
+                        // Check if the boulder could be moved by using strength
+                        if( p_moveMode == STRENGTH
+                            || !canMove( { nx, ny, p_start.m_posZ }, p_direction, STRENGTH ) ) {
+                            return false;
+                        }
+                        // Check if the player has actually used strength
+                        if( !_strengthUsed ) { return false; }
+                        break;
+                    }
+                    if( o.second.m_event.m_data.m_hmObject.m_hmType ) { return false; }
+                    break;
+                case EVENT_ITEM:
+                    if( o.second.m_event.m_data.m_item.m_itemType ) {
+                        return false;
+                    } // item is not hidden
+                    break;
+                case EVENT_NPC:
+                case EVENT_TRAINER:
+                case EVENT_OW_PKMN:
+                case EVENT_BERRYTREE: return false;
+                case EVENT_GENERIC:
+                    if( o.second.m_event.m_trigger & TRIGGER_INTERACT ) { return false; }
+                default: break;
+                }
+            }
+        }
 
         // Gather data about the source block
         u8 lstMoveData, lstBehave;
@@ -1352,7 +1405,11 @@ namespace MAP {
         u8 newMapType = u8( CUR_DATA.m_mapType );
 
         bool entryCave = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) );
-        bool exitCave  = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
+        if( entryCave ) {
+            SAVE::SAV.getActiveFile( ).m_lastCaveEntry = SAVE::SAV.getActiveFile( ).m_lastWarp;
+        }
+        bool exitCave = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
+        if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
         switch( p_type ) {
         case DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break;
         case SLIDING_DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break; // TODO
@@ -1385,6 +1442,13 @@ namespace MAP {
         draw( );
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
+
+        if( curLocId == L_POKEMON_CENTER && oldMapType != newMapType ) {
+            // Register a new faint position (only if the PC was just entered)
+            SAVE::SAV.getActiveFile( ).m_lastPokeCenter = p_target;
+            SAVE::SAV.getActiveFile( ).m_lastPokeCenter.second.m_posY -= 4;
+        }
+
         for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
         //        }
 
@@ -1532,7 +1596,8 @@ namespace MAP {
             && */
             SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3
             && SAVE::SAV.getActiveFile( ).m_player.m_movement != SURF ) {
-            _mapSprites.setPriority( _playerSprite, OBJPRIORITY_1 );
+            _mapSprites.setPriority( _playerSprite,
+                                     SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_1 );
         }
 
         if( p_fast != _playerIsFast ) {
@@ -1568,7 +1633,8 @@ namespace MAP {
             && ( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ <= 3
                  || SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
                  || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) ) {
-            _mapSprites.setPriority( _playerSprite, OBJPRIORITY_3 );
+            _mapSprites.setPriority( _playerSprite,
+                                     SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_3 );
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) {
                 _mapSprites.setPriority( _playerPlatSprite, OBJPRIORITY_3 );
@@ -1584,7 +1650,8 @@ namespace MAP {
                             SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                               .m_movedata
                           != 0x3c */ ) {
-            _mapSprites.setPriority( _playerSprite, OBJPRIORITY_2 );
+            _mapSprites.setPriority( _playerSprite,
+                                     SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_2 );
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) {
                 _mapSprites.setPriority( _playerPlatSprite, OBJPRIORITY_2 );
@@ -1671,8 +1738,8 @@ namespace MAP {
         default: break;
         }
 
-        u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
                                                 SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
         if( ydif ) { _mapSprites.moveSprite( _playerSprite, UP, ydif, true ); }
@@ -1690,8 +1757,8 @@ namespace MAP {
     }
     void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
         PLAYER_IS_FISHING = true;
-        u16 curx          = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16 cury          = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16 curx          = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury          = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 6;
@@ -1778,8 +1845,8 @@ namespace MAP {
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
         bool surfing = ( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF );
 
-        u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
                                                 SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
         if( surfing ) { _mapSprites.moveSprite( _playerSprite, UP, 3 ); }
@@ -1976,14 +2043,17 @@ namespace MAP {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
-        // TODO: Check for events that moved out of their original map
+        std::set<position> eventPositions;
 
         // check old objects and purge them if they are not visible anymore
-        for( auto o : _objects ) {
-            if( dist( o.second.m_pos.m_posX, curx, o.second.m_pos.m_posY, cury ) > 16 ) {
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+            if( dist( o.second.m_pos.m_posX, curx, o.second.m_pos.m_posY, cury ) > 64 ) {
                 _mapSprites.destroySprite( o.first, false );
             } else {
                 res.push_back( o );
+                eventPositions.insert(
+                    { o.second.m_event.m_posX, o.second.m_event.m_posY, o.second.m_event.m_posZ } );
             }
         }
 
@@ -1998,6 +2068,13 @@ namespace MAP {
                 continue;
             }
 
+            // check if there is an event that is already loaded and as the same base
+            // coordinates as thi current event
+            if( eventPositions.count( { p_data.m_events[ i ].m_posX, p_data.m_events[ i ].m_posY,
+                                        p_data.m_events[ i ].m_posZ } ) ) {
+                continue;
+            }
+
             switch( p_data.m_events[ i ].m_type ) {
             case EVENT_HMOBJECT: {
                 mapObject obj   = mapObject( );
@@ -2009,15 +2086,16 @@ namespace MAP {
                 obj.m_range     = 0;
                 obj.m_direction = UP;
                 obj.m_event     = p_data.m_events[ i ];
-#ifdef DESQUID
-//                NAV::printMessage( "HERE 2" );
+#ifdef DESQUID_MORE
+                IO::fadeScreen( IO::UNFADE );
+                NAV::printMessage( ( std::to_string( curx ) + "|" + std::to_string( cury ) + " : "
+                                     + std::to_string( obj.m_pos.m_posX ) + " , "
+                                     + std::to_string( obj.m_pos.m_posY ) )
+                                       .c_str( ) );
 #endif
-
-                // load the sprite and add the object to the list of objects
-                res.push_back(
-                    { _mapSprites.loadSprite( curx, cury, obj.m_pos.m_posX, obj.m_pos.m_posY,
-                                              p_data.m_events[ i ].m_data.m_hmObject.m_hmType ),
-                      obj } );
+                std::pair<u8, mapObject> cur = { 0, obj };
+                loadMapObject( cur );
+                res.push_back( cur );
                 break;
             }
             case EVENT_ITEM: {
@@ -2031,26 +2109,23 @@ namespace MAP {
                 obj.m_direction = UP;
                 obj.m_event     = p_data.m_events[ i ];
 
-                // load the sprite and add the object to the list of objects
-                if( p_data.m_events[ i ].m_data.m_item.m_itemType ) {
-                    res.push_back(
-                        { _mapSprites.loadSprite( curx, cury, obj.m_pos.m_posX, obj.m_pos.m_posY,
-                                                  p_data.m_events[ i ].m_data.m_item.m_itemType == 1
-                                                      ? mapSpriteManager::SPR_ITEM
-                                                      : mapSpriteManager::SPR_HMBALL ),
-                          obj } );
-                } else {
-                    // No item icon for hidden items (otherwise the "hidden" part would be
-                    // pointless, right)
-                    res.push_back( { 255, obj } );
-                }
+                std::pair<u8, mapObject> cur = { 0, obj };
+                loadMapObject( cur );
+                res.push_back( cur );
+                break;
             }
 
             default: break;
             }
         }
 
-        _objects = res;
+        SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( );
+        for( u8 i = 0; i < res.size( ); ++i ) {
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = res[ i ];
+        }
+
+//        NAV::printMessage( std::to_string( SAVE::SAV.getActiveFile( ).m_mapObjectCount ).c_str( ) );
+
         // force an update
         _mapSprites.update( );
     }

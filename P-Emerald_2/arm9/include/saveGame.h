@@ -44,7 +44,7 @@ namespace SAVE {
 
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
-    constexpr u8  MAX_BOXES   = 40;
+    constexpr u8  MAX_BOXES   = 32;
     constexpr u8  BERRY_SLOTS = 50;
 
     constexpr u16 F_MEGA_EVOLUTION   = 1;
@@ -57,7 +57,7 @@ namespace SAVE {
     }
 
     constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
-    constexpr u8 V_RIVAL_APPEARANCE = 1;
+    constexpr u8 V_RIVAL_APPEARANCE    = 1;
 
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 
@@ -135,7 +135,8 @@ namespace SAVE {
             u8             m_curBox;
             u16            m_lstDex;
             u16            m_lstViewedItem[ 5 ]; // Last viewed item in the bag
-            u8             m_unused;
+
+            ObjPriority m_playerPriority;
 
             u32 m_good2 = 0;
 
@@ -155,7 +156,15 @@ namespace SAVE {
 
             u32 m_ashCount = 0; // ash collected on Route 113
 
-            u32 m_reserved[ 49 ]; // reserved for future things that need to be stored
+            MAP::warpPos m_lastPokeCenter; // position where the player is teleported to if all of
+                                           // their pkmn are fainted
+            MAP::warpPos m_lastCaveEntry; // position where a player is teleported to if they use an
+                                          // escape rope in a cave
+
+            std::pair<u8, MAP::mapObject> m_mapObjects[ 256 ];
+            u8                            m_mapObjectCount;
+
+            u32 m_reserved[ 20 ]; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 

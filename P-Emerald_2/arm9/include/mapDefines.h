@@ -85,6 +85,7 @@ namespace MAP {
         SIT        = ( 1 << 3 ),
         DIVE       = ( 1 << 4 ),
         ROCK_CLIMB = ( 1 << 5 ),
+        STRENGTH   = ( 1 << 6 ),
         // NPC modes
         NO_MOVEMENT     = 0,
         LOOK_UP         = 1,

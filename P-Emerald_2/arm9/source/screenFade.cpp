@@ -68,9 +68,7 @@ namespace IO {
             for( s8 i = 3; i >= 0; i -= 2 ) {
                 val &= ~( 3 << u8( i ) );
                 reg = reg2 = val;
-                if( i == 3 ) {
-                    swiWaitForVBlank( );
-                }
+                if( i == 3 ) { swiWaitForVBlank( ); }
             }
             break;
         }
@@ -80,8 +78,8 @@ namespace IO {
             break;
         }
         case IO::CLEAR_DARK_FAST:
-            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 swiWaitForVBlank( );
@@ -90,28 +88,26 @@ namespace IO {
             swiWaitForVBlank( );
             break;
         case IO::CLEAR_DARK_IMMEDIATE_HALF:
-            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 reg = reg2 |= ( 3 << i );
-                if( i == 1 ) {
-                    swiWaitForVBlank( );
-                }
+                if( i == 1 ) { swiWaitForVBlank( ); }
             }
             break;
 
         case IO::CLEAR_DARK_IMMEDIATE:
-            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 0x1F;
             swiWaitForVBlank( );
             break;
 
         case IO::CLEAR_DARK:
         case IO::CAVE_ENTRY:
-            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
@@ -121,8 +117,8 @@ namespace IO {
             if( p_type == CLEAR_DARK ) break;
             break;
         case IO::CLEAR_WHITE_FAST:
-            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
@@ -131,27 +127,25 @@ namespace IO {
             swiWaitForVBlank( );
             break;
         case IO::CLEAR_WHITE_IMMEDIATE_HALF:
-            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; i += 2 ) {
                 reg = reg2 |= ( 3 << i );
-                if( i == 1 ) {
-                    swiWaitForVBlank( );
-                }
+                if( i == 1 ) { swiWaitForVBlank( ); }
             }
             break;
         case IO::CLEAR_WHITE_IMMEDIATE:
-            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 0x1F;
             swiWaitForVBlank( );
             break;
 
         case IO::CLEAR_WHITE:
         case IO::CAVE_EXIT:
-            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
@@ -162,7 +156,8 @@ namespace IO {
             break;
         case IO::BATTLE:
         case IO::BATTLE_STRONG_OPPONENT:
-            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
+            regcnt = regcnt2
+                = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
             for( u8 j = 0; j < p_type - IO::BATTLE + 1; ++j ) {
                 u16 val = 0x1F;
                 for( s8 i = 4; i >= 0; --i ) {
@@ -178,16 +173,15 @@ namespace IO {
                 }
                 for( u8 i = 1; i < 3; ++i ) swiWaitForVBlank( );
             }
-            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3
-                               | BLEND_SRC_SPRITE;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             for( u8 i = 1; i < 5; ++i ) {
                 for( u8 j = 0; j < 4; ++j ) swiWaitForVBlank( );
                 reg = reg2 |= ( 1 << i );
             }
             swiWaitForVBlank( );
             break;
-        default:
-            break;
+        default: break;
         }
     }
 
@@ -207,17 +201,13 @@ namespace IO {
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
             dmaFillHalfWords( 0, BG_PALETTE_SUB, 256 );
-            if( !p_dark ) {
-                BG_PALETTE_SUB[ 0 ] = WHITE;
-            }
+            if( !p_dark ) { BG_PALETTE_SUB[ 0 ] = WHITE; }
         }
         if( p_both || !p_bottom ) {
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
             dmaFillHalfWords( 0, BG_PALETTE, 256 );
-            if( !p_dark ) {
-                BG_PALETTE[ 0 ] = WHITE;
-            }
+            if( !p_dark ) { BG_PALETTE[ 0 ] = WHITE; }
         }
         regularFont->setColor( 0, 0 );
     }
