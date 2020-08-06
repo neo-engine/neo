@@ -60,6 +60,14 @@ namespace MAP {
 
         bool _strengthUsed; // Player has used HM Strength and can move boulders
 
+        u16 _lastrow, // Row to be filled when extending the map to the top
+            _lastcol; // Column to be filled when extending the map to the left
+
+        u16 _cx, _cy; // Cameras's pos
+
+        void loadBlock( block p_curblock, u32 p_memPos );
+        void loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY );
+
         /*
          * @brief: Reads the given map data and constructs mapObjects for the relevant
          * events. Also creates sprites for these events and makes them appear on the
@@ -118,6 +126,12 @@ namespace MAP {
         constexpr mapWeather getWeather( ) const {
             return _weather;
         }
+
+        constexpr void enableStrength( ) {
+            _strengthUsed = true;
+        }
+
+        void destroyHMObject( u16 p_globX, u16 p_globY );
 
         void registerOnBankChangedHandler( std::function<void( u8 )> p_handler );
         void registerOnLocationChangedHandler( std::function<void( u16 )> p_handler );

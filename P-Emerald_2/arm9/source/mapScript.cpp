@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "battle.h"
 #include "battleTrainer.h"
+#include "boxViewer.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"
@@ -269,6 +270,63 @@ namespace MAP {
         u16  py = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         u16  pz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
         auto d  = SAVE::SAV.getActiveFile( ).m_player.m_direction;
+        // Check for special blocks
+
+        u16 tx     = px + dir[ d ][ 0 ];
+        u16 ty     = py + dir[ d ][ 1 ];
+        u8  behave = at( tx, ty ).m_bottombehave;
+
+        switch( behave ) {
+        case 0x83: { // PC
+            SOUND::playSoundEffect( SFX_PC_OPEN );
+            atom( tx, ty ).m_blockidx = 0x5;
+            loadBlock( at( tx, ty ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
+                       ( _lastrow + NUM_ROWS / 2 ) % NUM_ROWS );
+            bgUpdate( );
+            for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+            NAV::printMessage( GET_STRING( 559 ), MSG_INFO );
+
+            BOX::boxViewer bxv;
+            ANIMATE_MAP = false;
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+            SOUND::dimVolume( );
+
+            bxv.run( );
+
+            FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            IO::initVideoSub( );
+            IO::resetScale( true, false );
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+            NAV::init( );
+            draw( );
+
+            SOUND::playSoundEffect( SFX_PC_CLOSE );
+            atom( tx, ty ).m_blockidx = 0x4;
+            loadBlock( at( tx, ty ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
+                       ( _lastrow + NUM_ROWS / 2 ) % NUM_ROWS );
+            bgUpdate( );
+            for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+            return;
+        }
+        case 0x85: { // Map
+            // TODO
+            NAV::printMessage( GET_STRING( 560 ), MSG_NORMAL );
+            break;
+        }
+        case 0x80: { // load script one block behind
+            handleEvents( tx, ty, pz, d );
+            return;
+        }
+            [[likely]] default : break;
+        }
         handleEvents( px, py, pz, d );
     }
 
@@ -287,8 +345,8 @@ namespace MAP {
                 NAV::printMessage( tr.m_strings.m_message1, MSG_NORMAL );
 
                 auto playerPrio = OBJPRIORITY_0;
-                    //_sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
-                    //                  .getPriority( );
+                //_sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
+                //                  .getPriority( );
                 SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
                 FADE_TOP_DARK( );
                 ANIMATE_MAP = false;
@@ -317,6 +375,25 @@ namespace MAP {
             NAV::printMessage( tr.m_strings.m_message2, MSG_NORMAL );
             break;
         }
+        case EVENT_HMOBJECT: {
+            switch( p_event.m_data.m_hmObject.m_hmType ) {
+            case mapSpriteManager::SPR_STRENGTH:
+                if( _strengthUsed ) {
+                    NAV::printMessage( GET_STRING( 558 ), MSG_NORMAL );
+                } else {
+                    NAV::printMessage( GET_STRING( 308 ), MSG_NORMAL );
+                }
+                break;
+            case mapSpriteManager::SPR_ROCKSMASH:
+                NAV::printMessage( GET_STRING( 314 ), MSG_NORMAL );
+                break;
+            case mapSpriteManager::SPR_CUT:
+                NAV::printMessage( GET_STRING( 313 ), MSG_NORMAL );
+                break;
+            default: break;
+            }
+            break;
+        }
         default: break;
         }
     }
@@ -341,6 +418,11 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
+            if( mdata.m_events[ i ].m_type != EVENT_MESSAGE
+                && mdata.m_events[ i ].m_type != EVENT_GENERIC ) {
+                // These events have associated map objects
+                continue;
+            }
             if( mdata.m_events[ i ].m_trigger == TRIGGER_STEP_ON ) {
                 runEvent( mdata.m_events[ i ] );
             }
@@ -356,7 +438,16 @@ namespace MAP {
         u8 z = p_z;
 
         auto mdata = currentData( p_globX, p_globY );
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
+            if( o.second.m_pos.m_posX != p_globX || o.second.m_pos.m_posY != p_globY
+                || o.second.m_pos.m_posZ != z ) {
+                continue;
+            }
+
+            runEvent( o.second.m_event );
+        }
         for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
             if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
                 || mdata.m_events[ i ].m_posZ != z ) {
@@ -370,6 +461,13 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
+
+            if( mdata.m_events[ i ].m_type != EVENT_MESSAGE
+                && mdata.m_events[ i ].m_type != EVENT_GENERIC ) {
+                // These events have associated map objects
+                continue;
+            }
+
             if( mdata.m_events[ i ].m_trigger & dirToEventTrigger( p_dir ) ) {
                 runEvent( mdata.m_events[ i ] );
             }

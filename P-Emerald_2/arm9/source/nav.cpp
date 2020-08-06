@@ -1383,6 +1383,11 @@ namespace NAV {
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 1 ] = M_DIG;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 2 ] = M_TELEPORT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 5 ].m_boxdata.m_moves[ 0 ] = M_ROCK_SMASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 5 ].m_boxdata.m_moves[ 1 ] = M_CUT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 5 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
 
                 init( );
                 swiWaitForVBlank( );

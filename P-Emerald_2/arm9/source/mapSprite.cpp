@@ -305,23 +305,23 @@ namespace MAP {
         case SPR_ITEM:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _itemBallData );
-            break;
+            return SPR_HM_OAM( nextfree );
         case SPR_HMBALL:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _hmBallData );
-            break;
+            return SPR_HM_OAM( nextfree );
         case SPR_STRENGTH:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _strengthData );
-            break;
+            return SPR_HM_OAM( nextfree );
         case SPR_ROCKSMASH:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _rockSmashData );
-            break;
+            return SPR_HM_OAM( nextfree );
         case SPR_CUT:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _cutData );
-            break;
+            return SPR_HM_OAM( nextfree );
         case SPR_PLATFORM:
             _playerPlatform.m_pos = { p_posX, p_posY, 0, 0, 0, 0 };
             doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3,
@@ -335,6 +335,8 @@ namespace MAP {
     }
 
     void mapSpriteManager::destroySprite( u8 p_spriteId, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         IO::OamTop->oamBuffer[ p_spriteId ].isHidden = true;
         if( p_spriteId >= SPR_SMALL_NPC_OAM( 0 )
             && p_spriteId < SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) ) {
@@ -374,11 +376,15 @@ namespace MAP {
 
     void mapSpriteManager::moveSprite( u8 p_spriteId, direction p_direction, s16 p_amount,
                                        bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         moveSprite( p_spriteId, p_amount * dir[ p_direction ][ 0 ],
                     p_amount * dir[ p_direction ][ 1 ], p_update );
     }
 
     void mapSpriteManager::moveSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
         IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
 
@@ -392,6 +398,8 @@ namespace MAP {
     }
 
     void mapSpriteManager::translateSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
         IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
 
@@ -425,24 +433,34 @@ namespace MAP {
     }
 
     ObjPriority mapSpriteManager::getPriority( u8 p_spriteId ) const {
+        if( p_spriteId == 255 ) { return OBJPRIORITY_0; }
+
         return IO::OamTop->oamBuffer[ p_spriteId ].priority;
     }
 
     void mapSpriteManager::setVisibility( u8 p_spriteId, bool p_value, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         IO::OamTop->oamBuffer[ p_spriteId ].isHidden = p_value;
         if( p_update ) { IO::updateOAM( false ); }
     }
 
     bool mapSpriteManager::getVisibility( u8 p_spriteId ) {
+        if( p_spriteId == 255 ) { return true; }
+
         return IO::OamTop->oamBuffer[ p_spriteId ].isHidden;
     }
 
     void mapSpriteManager::setPriority( u8 p_spriteId, ObjPriority p_value, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         IO::OamTop->oamBuffer[ p_spriteId ].priority = p_value;
         if( p_update ) { IO::updateOAM( false ); }
     }
 
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
                 return;
@@ -452,15 +470,37 @@ namespace MAP {
     }
 
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_hflip, bool p_update ) {
-        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
-            [[unlikely]] {
-                return;
+        if( p_spriteId == 255 ) { return; }
+
+        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
+            switch( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first ) {
+            case SPR_ROCKSMASH:
+                doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
+                              IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId, SPR_HM_GFX( 0 ),
+                              _rockSmashData );
+                IO::setOWSpriteFrame( p_value, p_hflip, p_spriteId, _rockSmashData.m_palData,
+                                      _rockSmashData.m_frameData );
+                break;
+            case SPR_CUT:
+                doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
+                              IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId, SPR_HM_GFX( 0 ),
+                              _cutData );
+                IO::setOWSpriteFrame( p_value, p_hflip, p_spriteId, _cutData.m_palData,
+                                      _cutData.m_frameData );
+                break;
+            default: return;
             }
+
+            if( p_update ) { IO::updateOAM( false ); }
+            return;
+        }
         getManagedSprite( p_spriteId ).m_sprite.drawFrame( p_spriteId, p_value, p_hflip );
         if( p_update ) { IO::updateOAM( false ); }
     }
 
     void mapSpriteManager::setFrame( u8 p_spriteId, u8 p_value, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
                 return;
@@ -470,6 +510,8 @@ namespace MAP {
     }
 
     void mapSpriteManager::currentFrame( u8 p_spriteId, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
                 return;
@@ -479,6 +521,8 @@ namespace MAP {
     }
 
     void mapSpriteManager::nextFrame( u8 p_spriteId, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
                 return;

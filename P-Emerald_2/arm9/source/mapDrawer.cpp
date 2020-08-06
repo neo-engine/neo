@@ -121,13 +121,10 @@ namespace MAP {
     }
 
 #define CUR_DATA currentData( )
-    u16 lastrow, // Row to be filled when extending the map to the top
-        lastcol; // Column to be filled when extending the map to the left
-    u16  cx, cy; // Cameras's pos
     u16* mapMemory[ 4 ];
     s8   fastBike = false;
 
-    inline void loadBlock( block p_curblock, u32 p_memPos ) {
+    void mapDrawer::loadBlock( block p_curblock, u32 p_memPos ) {
         u8   toplayer = 1, bottomlayer = 3;
         bool elevateTopLayer = p_curblock.m_topbehave == 0x10;
 
@@ -146,7 +143,7 @@ namespace MAP {
         mapMemory[ bottomlayer ][ p_memPos + 32 ] = p_curblock.m_bottom[ 1 ][ 0 ];
         mapMemory[ bottomlayer ][ p_memPos + 33 ] = p_curblock.m_bottom[ 1 ][ 1 ];
     }
-    inline void loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY ) {
+    void mapDrawer::loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY ) {
         u32 c = 64 * u32( p_scrnY ) + 2 * ( u32( p_scrnX ) % 16 );
         c += ( u32( p_scrnX ) / 16 ) * 1024;
         loadBlock( p_curblock, c );
@@ -219,11 +216,11 @@ namespace MAP {
             }
         }
 
-        lastrow = NUM_ROWS - 1;
-        lastcol = NUM_COLS - 1;
+        _lastrow = NUM_ROWS - 1;
+        _lastcol = NUM_COLS - 1;
 
-        cx = p_globX;
-        cy = p_globY;
+        _cx = p_globX;
+        _cy = p_globY;
 
         u16 mny = p_globY - 8;
         u16 mnx = p_globX - 15;
@@ -327,8 +324,8 @@ namespace MAP {
             // very hacky, I know
             atom( p_globX, p_globY ).m_blockidx = 0x212;
 
-            loadBlock( at( p_globX, p_globY ), ( lastcol + NUM_COLS / 2 ) % NUM_COLS,
-                       ( lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
+            loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
+                       ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
             bgUpdate( );
 
             break;
@@ -345,34 +342,34 @@ namespace MAP {
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
-        cx += dir[ p_direction ][ 0 ];
-        cy += dir[ p_direction ][ 1 ];
+        _cx += dir[ p_direction ][ 0 ];
+        _cy += dir[ p_direction ][ 1 ];
 #ifdef DESQUID_MORE
-        assert( cx != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
-                || cy != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY );
+        assert( _cx != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                || _cy != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY );
 #endif
         if( p_updatePlayer ) {
-            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = cx;
-            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = cy;
+            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = _cx;
+            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = _cy;
 
             SAVE::SAV.getActiveFile( ).stepIncrease( );
         }
 
         // Check if a new slice should be loaded
-        if( ( dir[ p_direction ][ 0 ] == 1 && cx % 32 == 16 )
-            || ( dir[ p_direction ][ 0 ] == -1 && cx % 32 == 15 )
-            || ( dir[ p_direction ][ 1 ] == 1 && cy % 32 == 16 )
-            || ( dir[ p_direction ][ 1 ] == -1 && cy % 32 == 15 ) ) {
+        if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 32 == 16 )
+            || ( dir[ p_direction ][ 0 ] == -1 && _cx % 32 == 15 )
+            || ( dir[ p_direction ][ 1 ] == 1 && _cy % 32 == 16 )
+            || ( dir[ p_direction ][ 1 ] == -1 && _cy % 32 == 15 ) ) {
             loadSlice( p_direction );
 #ifdef DESQUID_MORE
             NAV::printMessage( "Load Slice" );
 #endif
         }
         // Check if a new slice got stepped onto
-        if( ( dir[ p_direction ][ 0 ] == 1 && cx % 32 == 0 )
-            || ( dir[ p_direction ][ 0 ] == -1 && cx % 32 == 31 )
-            || ( dir[ p_direction ][ 1 ] == 1 && cy % 32 == 0 )
-            || ( dir[ p_direction ][ 1 ] == -1 && cy % 32 == 31 ) ) {
+        if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 32 == 0 )
+            || ( dir[ p_direction ][ 0 ] == -1 && _cx % 32 == 31 )
+            || ( dir[ p_direction ][ 1 ] == 1 && _cy % 32 == 0 )
+            || ( dir[ p_direction ][ 1 ] == -1 && _cy % 32 == 31 ) ) {
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             // Update tileset, block and palette data
@@ -392,39 +389,39 @@ namespace MAP {
 
         switch( p_direction ) {
         case UP: {
-            u16 ty  = cy - 8;
-            u16 mnx = cx - 15;
-            for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS;
+            u16 ty  = _cy - 8;
+            u16 mnx = _cx - 15;
+            for( u16 x = ( _lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS;
                  x = ( x + 1 ) % NUM_COLS, ++xp )
-                loadBlock( at( xp, ty ), x, lastrow );
-            lastrow = ( lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
+                loadBlock( at( xp, ty ), x, _lastrow );
+            _lastrow = ( _lastrow + NUM_ROWS - 1 ) % NUM_ROWS;
             break;
         }
         case LEFT: {
-            u16 tx  = cx - 15;
-            u16 mny = cy - 8;
-            for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS;
+            u16 tx  = _cx - 15;
+            u16 mny = _cy - 8;
+            for( u16 y = ( _lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS;
                  y = ( y + 1 ) % NUM_ROWS, ++yp )
-                loadBlock( at( tx, yp ), lastcol, y );
-            lastcol = ( lastcol + NUM_COLS - 1 ) % NUM_COLS;
+                loadBlock( at( tx, yp ), _lastcol, y );
+            _lastcol = ( _lastcol + NUM_COLS - 1 ) % NUM_COLS;
             break;
         }
         case DOWN: {
-            lastrow = ( lastrow + 1 ) % NUM_ROWS;
-            u16 ty  = cy + 7;
-            u16 mnx = cx - 15;
-            for( u16 x = ( lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS;
+            _lastrow = ( _lastrow + 1 ) % NUM_ROWS;
+            u16 ty   = _cy + 7;
+            u16 mnx  = _cx - 15;
+            for( u16 x = ( _lastcol + 1 ) % NUM_COLS, xp = mnx; xp < mnx + NUM_COLS;
                  x = ( x + 1 ) % NUM_COLS, ++xp )
-                loadBlock( at( xp, ty ), x, lastrow );
+                loadBlock( at( xp, ty ), x, _lastrow );
             break;
         }
         case RIGHT: {
-            lastcol = ( lastcol + 1 ) % NUM_COLS;
-            u16 tx  = cx + 16;
-            u16 mny = cy - 8;
-            for( u16 y = ( lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS;
+            _lastcol = ( _lastcol + 1 ) % NUM_COLS;
+            u16 tx   = _cx + 16;
+            u16 mny  = _cy - 8;
+            for( u16 y = ( _lastrow + 1 ) % NUM_ROWS, yp = mny; yp < mny + NUM_ROWS;
                  y = ( y + 1 ) % NUM_ROWS, ++yp )
-                loadBlock( at( tx, yp ), lastcol, y );
+                loadBlock( at( tx, yp ), _lastcol, y );
             break;
         }
         }
@@ -1402,18 +1399,37 @@ namespace MAP {
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
         u8 oldMapType = u8( CUR_DATA.m_mapType );
         loadNewBank( p_target.first );
-        u8 newMapType = u8( CUR_DATA.m_mapType );
+
+        mapData ndata;
+        FS::readMapData( p_target.first, p_target.second.m_posX / SIZE,
+                         p_target.second.m_posY / SIZE, ndata );
+
+        u8 newMapType = u8( ndata.m_mapType );
 
         bool entryCave = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) );
         if( entryCave ) {
-            SAVE::SAV.getActiveFile( ).m_lastCaveEntry = SAVE::SAV.getActiveFile( ).m_lastWarp;
+            SAVE::SAV.getActiveFile( ).m_lastCaveEntry
+                = { SAVE::SAV.getActiveFile( ).m_currentMap,
+                    SAVE::SAV.getActiveFile( ).m_player.m_pos };
         }
         bool exitCave = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
         if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
         switch( p_type ) {
         case DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break;
-        case SLIDING_DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break; // TODO
-        case TELEPORT: SOUND::playSoundEffect( SFX_WARP ); break;
+        case SLIDING_DOOR: SOUND::playSoundEffect( SFX_SLIDING_DOOR ); break;
+        case TELEPORT:
+            SOUND::playSoundEffect( SFX_WARP );
+            for( u8 j = 0; j < 2; ++j ) {
+                redirectPlayer( RIGHT, false );
+                for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
+                redirectPlayer( UP, false );
+                for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
+                redirectPlayer( LEFT, false );
+                for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
+                redirectPlayer( DOWN, false );
+                for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
+            }
+            break;
         case EMERGE_WATER: break;
         case CAVE_ENTRY:
             SOUND::playSoundEffect( SFX_CAVE_WARP );
@@ -1443,7 +1459,7 @@ namespace MAP {
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
 
-        if( curLocId == L_POKEMON_CENTER && oldMapType != newMapType ) {
+        if( curLocId == L_POKEMON_CENTER && oldMapType != newMapType && p_type == SLIDING_DOOR ) {
             // Register a new faint position (only if the PC was just entered)
             SAVE::SAV.getActiveFile( ).m_lastPokeCenter = p_target;
             SAVE::SAV.getActiveFile( ).m_lastPokeCenter.second.m_posY -= 4;
@@ -2124,9 +2140,32 @@ namespace MAP {
             SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = res[ i ];
         }
 
-//        NAV::printMessage( std::to_string( SAVE::SAV.getActiveFile( ).m_mapObjectCount ).c_str( ) );
-
         // force an update
         _mapSprites.update( );
+    }
+
+    void mapDrawer::destroyHMObject( u16 p_globX, u16 p_globY ) {
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+
+            if( o.second.m_pos.m_posX != p_globX || o.second.m_pos.m_posY != p_globY ) { continue; }
+            if( o.second.m_event.m_type == MAP::EVENT_HMOBJECT ) {
+                if( o.second.m_event.m_data.m_hmObject.m_hmType
+                    == mapSpriteManager::SPR_ROCKSMASH ) {
+                    SOUND::playSoundEffect( SFX_HM_ROCKSMASH );
+                    for( u8 g = 1; g <= 4; ++g ) {
+                        for( u8 f = 0; f < 4; ++f ) { swiWaitForVBlank( ); }
+                        _mapSprites.drawFrame( o.first, g, false, true );
+                    }
+                    for( u8 f = 0; f < 4; ++f ) { swiWaitForVBlank( ); }
+                    _mapSprites.destroySprite( o.first );
+
+                    o.first                                     = 255;
+                    o.second.m_event.m_data.m_hmObject.m_hmType = 0;
+                }
+
+                if( o.second.m_event.m_data.m_hmObject.m_hmType == mapSpriteManager::SPR_CUT ) {}
+            }
+        }
     }
 } // namespace MAP

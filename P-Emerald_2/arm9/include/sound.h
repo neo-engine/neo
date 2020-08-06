@@ -67,6 +67,13 @@
 #define SFX_SHINY                31
 #define SFX_USE_ITEM             32
 #define SFX_WARP                 33
+#define SFX_TELEPORT_DOWN        34
+#define SFX_TELEPORT_UP          35
+#define SFX_SLIDING_DOOR         36
+#define SFX_HM_CUT               37
+#define SFX_HM_FLY               38
+#define SFX_HM_ROCKSMASH         39
+#define SFX_HM_STRENGTH          40
 
 void initSound( );
 

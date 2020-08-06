@@ -701,12 +701,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "A huge whirlpool. ", "Ein riesiger Strudel. " },
     { "The water is a deep blue| ", "Das Wasser ist tiefblau| " },
     { "The sea is deep here. ", "Das Wasser ist sehr tief. " },
-    { "It's a big boulder. ", "Ein großer Felsen. " },
+    { "It's a big boulder. ", "Ein gro\xdf""er Felsen. " },
     { "The wall is very rocky|\n", "Eine steile Felswand|\n" },
 
     // 320
 
-    { "It's a large Waterfall. ", "Ein großer Wasserfall. " },
+    { "It's a large Waterfall. ", "Ein gro\xdf""er Wasserfall. " },
     { "Something moved! ", "Da hat sich etwas bewegt! " },
     { "Light is shining from the surface. ", "Licht scheint von der Oberfl\xe4"
                                              "che. " },
@@ -1087,4 +1087,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "You don't have enough ash.", "Du hast nicht genug Asche." },
     { "%s? I can make one for %lu grams ash.", "%s? Alles klar, das macht dann %lu Gramm Asche." },
     { "Collected ash: %lu grams.", "Gesammelte Asche: %lu Gramm." },
+    { "A big boulder that became moveable thanks to your Pok\xe9mon's Strength.",
+        "Ein gro\xdf""er Felsen, der durch die St\xe4rke deiner Pok\xe9mon bewegbar wurde." },
+    { "You booted up the PC.", "Du hast den PC angeschaltet." },
+
+    // 560
+
+    { "It's a map of the Hoenn region.", "Eine Karte der Hoenn-Region." },
 };
