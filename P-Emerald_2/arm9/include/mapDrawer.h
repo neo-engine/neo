@@ -63,7 +63,7 @@ namespace MAP {
          * events. Also creates sprites for these events and makes them appear on the
          * screen.
          */
-        void constructAndAddNewMapObjects( const mapData& p_data );
+        void constructAndAddNewMapObjects( const mapData& p_data, u8 p_mapX, u8 p_mapY );
 
         bool _playerIsFast;
 

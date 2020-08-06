@@ -116,27 +116,41 @@ namespace MAP {
 
     void mapSpriteManager::init( ) {
         // pre load item, hm sprites
-        // _itemBallData   = mapSpriteData( 256 | 249 );
-        // _hmBallData     = mapSpriteData( 256 | 250 );
-        // _strengthData   = mapSpriteData( 256 | 251 );
-        // _rockSmashData  = mapSpriteData( 256 | 252 );
-        // _rockSmash2Data = mapSpriteData( 256 | 253 );
-        // _cutData        = mapSpriteData( 256 | 254 );
-        // _cut2Data       = mapSpriteData( 256 | 255 );
+        _itemBallData  = mapSpriteData( 256 | 249 );
+        _hmBallData    = mapSpriteData( 256 | 250 );
+        _strengthData  = mapSpriteData( 256 | 251 );
+        _rockSmashData = mapSpriteData( 256 | 252 );
+        _cutData       = mapSpriteData( 256 | 253 );
 
         _playerPlatform.m_sprite = mapSprite( { 256 | 248, 0 }, mapSpriteData( 256 | 248 ) );
+    }
+
+    void mapSpriteManager::reset( ) {
+        IO::initOAMTable( false );
+
+        destroySprite( SPR_MAIN_PLAYER_OAM, false );
+        destroySprite( SPR_MAIN_PLAYER_PLAT_OAM, false );
+        for( u8 i = 0; i < MAX_SMALL_NPC; ++i ) { destroySprite( SPR_SMALL_NPC_OAM( i ), false ); }
+        for( u8 i = 0; i < MAX_LARGE_NPC; ++i ) { destroySprite( SPR_LARGE_NPC_OAM( i ), false ); }
+        for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) { destroySprite( SPR_HM_OAM( i ), false ); }
+        update( );
     }
 
     /*
      * @brief: Loads the specified sprite at the specified position on the screen.
      */
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+                       const mapSpriteData& p_data ) {
+        IO::loadSpriteB(
+            p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height, p_data.m_palData,
+            reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
+            p_data.m_width * p_data.m_height / 2, false, false, false, OBJPRIORITY_2, false );
+    }
+
+    void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        const mapSprite& p_sprite ) {
         auto& data = p_sprite.getData( );
-        IO::loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, data.m_width, data.m_height,
-                         data.m_palData, reinterpret_cast<const unsigned int*>( data.m_frameData ),
-                         data.m_width * data.m_height / 2, false, false, false, OBJPRIORITY_2,
-                         false );
+        doLoadSprite( p_posX, p_posY, p_oamIdx, p_tileCnt, data );
     }
 
     const mapSpriteManager::managedSprite&
@@ -185,9 +199,7 @@ namespace MAP {
             case SPR_HMBALL: return _hmBallData;
             case SPR_STRENGTH: return _strengthData;
             case SPR_ROCKSMASH: return _rockSmashData;
-            case SPR_ROCKSMASH2: return _rockSmash2Data;
-            case SPR_CUT: return _cutData;
-            case SPR_CUT2: return _cut2Data; [[unlikely]] default : break;
+            case SPR_CUT: return _cutData; [[unlikely]] default : break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -200,9 +212,7 @@ namespace MAP {
             case SPR_HMBALL: return _hmBallData;
             case SPR_STRENGTH: return _strengthData;
             case SPR_ROCKSMASH: return _rockSmashData;
-            case SPR_ROCKSMASH2: return _rockSmash2Data;
-            case SPR_CUT: return _cutData;
-            case SPR_CUT2: return _cut2Data; [[unlikely]] default : break;
+            case SPR_CUT: return _cutData; [[unlikely]] default : break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -213,11 +223,49 @@ namespace MAP {
 
         switch( p_type ) {
         case SPTYPE_PLAYER:
-            _player = { p_sprite, { p_posX, p_posY, 0, 0 } };
+            _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 } };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                           screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                           SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX, p_sprite );
             return SPR_MAIN_PLAYER_OAM;
+        case SPTYPE_NPC: {
+            bool isBig = p_sprite.getData( ).m_width == 32;
+
+            if( isBig ) {
+                // search for free space
+                u8 freesp = 255;
+                for( u8 i = 0; i < MAX_LARGE_NPC; ++i ) {
+                    if( !_bigNpcs[ i ].first ) {
+                        freesp = i;
+                        break;
+                    }
+                }
+                if( freesp == 255 ) { return 255; }
+                _bigNpcs[ freesp ] = { true,
+                                       { p_sprite,
+                                         { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
+                                           camShift( p_camY, p_posY ) } } };
+                doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ),
+                              SPR_LARGE_NPC_OAM( freesp ), SPR_LARGE_NPC_GFX( freesp ), p_sprite );
+                return SPR_LARGE_NPC_OAM( freesp );
+            } else {
+                u8 freesp = 255;
+                for( u8 i = 0; i < MAX_SMALL_NPC; ++i ) {
+                    if( !_smallNpcs[ i ].first ) {
+                        freesp = i;
+                        break;
+                    }
+                }
+                if( freesp == 255 ) { return 255; }
+                _smallNpcs[ freesp ] = { true,
+                                         { p_sprite,
+                                           { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
+                                             camShift( p_camY, p_posY ) } } };
+                doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ),
+                              SPR_SMALL_NPC_OAM( freesp ), SPR_SMALL_NPC_GFX( freesp ), p_sprite );
+                return SPR_SMALL_NPC_OAM( freesp );
+            }
+        }
         default: break;
         }
 
@@ -225,7 +273,7 @@ namespace MAP {
     }
 
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
-                                     u8 p_partilcleId ) {
+                                     u8 p_particleId ) {
 
         u8 nextfree = 255;
         for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) {
@@ -235,21 +283,38 @@ namespace MAP {
             }
         }
 
-        if( p_partilcleId != SPR_PLATFORM && nextfree == 255 ) {
+        if( p_particleId != SPR_PLATFORM && nextfree == 255 ) {
             // No space for an additional particle
             return 255;
+        } else if( p_particleId != SPR_PLATFORM ) {
+            _hmSpriteInfo[ nextfree ] = {
+                p_particleId,
+                { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ), camShift( p_camY, p_posY ) } };
         }
 
-        switch( p_partilcleId ) {
+        switch( p_particleId ) {
         case SPR_ITEM:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _itemBallData );
+            break;
         case SPR_HMBALL:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _hmBallData );
+            break;
         case SPR_STRENGTH:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _strengthData );
+            break;
         case SPR_ROCKSMASH:
-        case SPR_ROCKSMASH2:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _rockSmashData );
+            break;
         case SPR_CUT:
-        case SPR_CUT2: break;
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _cutData );
+            break;
         case SPR_PLATFORM:
-            _playerPlatform.m_pos = { p_posX, p_posY, 0, 0 };
+            _playerPlatform.m_pos = { p_posX, p_posY, 0, 0, 0, 0 };
             doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3,
                           SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX,
                           _playerPlatform.m_sprite );
@@ -274,6 +339,30 @@ namespace MAP {
         if( p_update ) { IO::updateOAM( false ); }
     }
 
+    void mapSpriteManager::moveCamera( direction p_direction, s16 p_amount, bool p_movePlayer ) {
+
+        s8 dx = -p_amount * dir[ p_direction ][ 0 ];
+        s8 dy = -p_amount * dir[ p_direction ][ 1 ];
+
+        if( p_movePlayer ) {
+            translateSprite( SPR_MAIN_PLAYER_OAM, dx, dy, false );
+            translateSprite( SPR_MAIN_PLAYER_PLAT_OAM, dx, dy, false );
+        }
+        for( u8 i = 0; i < MAX_SMALL_NPC; ++i ) {
+            if( _smallNpcs[ i ].first ) {
+                translateSprite( SPR_SMALL_NPC_OAM( i ), dx, dy, false );
+            }
+        }
+        for( u8 i = 0; i < MAX_LARGE_NPC; ++i ) {
+            if( _bigNpcs[ i ].first ) { translateSprite( SPR_LARGE_NPC_OAM( i ), dx, dy, false ); }
+        }
+        for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) {
+            if( _hmSpriteInfo[ i ].first ) { translateSprite( SPR_HM_OAM( i ), dx, dy, false ); }
+        }
+
+        update( );
+    }
+
     void mapSpriteManager::moveSprite( u8 p_spriteId, direction p_direction, s16 p_amount,
                                        bool p_update ) {
         moveSprite( p_spriteId, p_amount * dir[ p_direction ][ 0 ],
@@ -288,6 +377,39 @@ namespace MAP {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.moveSprite( p_dx, p_dy );
         } else {
             getManagedSprite( p_spriteId ).m_pos.moveSprite( p_dx, p_dy );
+        }
+
+        if( p_update ) { IO::updateOAM( false ); }
+    }
+
+    void mapSpriteManager::translateSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update ) {
+        IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
+        IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
+
+        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
+            _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.translateSprite( p_dx, p_dy );
+            IO::OamTop->oamBuffer[ p_spriteId ].isHidden
+                = !_hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.isVisible( );
+
+#ifdef DESQUID_MORE
+            NAV::printMessage(
+                ( std::to_string( p_spriteId )
+                  + " x: " + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].x )
+                  + " y : " + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].y ) + " cam x : "
+                  + std::to_string( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.m_camDisX )
+                  + " cam y : "
+                  + std::to_string( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.m_camDisY )
+                  + "\npos x : "
+                  + std::to_string( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.m_curX )
+                  + " pos y : "
+                  + std::to_string( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.m_curY ) )
+                    .c_str( ) );
+#endif
+
+        } else {
+            getManagedSprite( p_spriteId ).m_pos.translateSprite( p_dx, p_dy );
+            IO::OamTop->oamBuffer[ p_spriteId ].isHidden
+                = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
         }
 
         if( p_update ) { IO::updateOAM( false ); }
@@ -354,5 +476,9 @@ namespace MAP {
             }
         getManagedSprite( p_spriteId ).m_sprite.nextFrame( p_spriteId );
         if( p_update ) { IO::updateOAM( false ); }
+    }
+
+    void mapSpriteManager::update( ) {
+        IO::updateOAM( false );
     }
 } // namespace MAP

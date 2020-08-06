@@ -86,17 +86,26 @@ namespace MAP {
         DIVE       = ( 1 << 4 ),
         ROCK_CLIMB = ( 1 << 5 ),
         // NPC modes
-        NO_MOVEMENT = 0,
+        NO_MOVEMENT     = 0,
+        LOOK_UP         = 1,
+        LOOK_DOWN       = 2,
+        LOOK_RIGHT      = 4,
+        LOOK_LEFT       = 8,
+        WALK_LEFT_RIGHT = 16,
+        WALK_UP_DOWN    = 17,
+        WALK_CIRCLE     = 18,
     };
     enum eventType : u8 {
-        EVENT_NONE    = 0,
-        EVENT_MESSAGE = 1,
-        EVENT_ITEM    = 2,
-        EVENT_TRAINER = 3,
-        EVENT_OW_PKMN = 4,
-        EVENT_NPC     = 5,
-        EVENT_WARP    = 6,
-        EVENT_GENERIC = 7,
+        EVENT_NONE      = 0,
+        EVENT_MESSAGE   = 1,
+        EVENT_ITEM      = 2,
+        EVENT_TRAINER   = 3,
+        EVENT_OW_PKMN   = 4,
+        EVENT_NPC       = 5,
+        EVENT_WARP      = 6,
+        EVENT_GENERIC   = 7,
+        EVENT_HMOBJECT  = 8, // cut, rock smash, strength
+        EVENT_BERRYTREE = 9,
     };
     enum eventTrigger : u8 {
         TRIGGER_NONE           = 0,
@@ -234,6 +243,12 @@ namespace MAP {
                 struct {
                     u16 m_scriptId;
                 } m_generic;
+                struct {
+                    u8 m_hmType;
+                } m_hmObject;
+                struct {
+                    u8 m_treeIdx; // internal id of this berry tree
+                } m_berryTree;
             } m_data;
         } m_events[ MAX_EVENTS_PER_SLICE ];
 

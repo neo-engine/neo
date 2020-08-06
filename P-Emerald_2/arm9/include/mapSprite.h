@@ -40,10 +40,28 @@ namespace MAP {
     struct mapSpritePos {
         u16 m_curX; // global x coordinate of current position in OW
         u16 m_curY; // global y coordinate of current position in OW
-        s8  m_dx;   // shift in x dir
-        s8  m_dy;   // shift in x dir
+        s8  m_dx;   // shift in x dir (fractional part of the ow position)
+        s8  m_dy;   // shift in x dir (fractional part of the ow position)
 
-        void moveSprite( s8 p_dx, s8 p_dy ) {
+        s16 m_camDisX; // signed x distance to camera position (used to determine when to show/hide
+                       // the sprite)
+        s16 m_camDisY; // signed y distance to camera position
+
+        /*
+         * @brief: Shifts the sprite's position relative to the camera, but does not change
+         * its OW position.
+         */
+        constexpr void translateSprite( s8 p_dx, s8 p_dy ) {
+            m_camDisX += p_dx;
+            m_camDisY += p_dy;
+        }
+
+        /*
+         * @brief: Moves the sprite to a new position in the OW.
+         */
+        constexpr void moveSprite( s8 p_dx, s8 p_dy ) {
+            translateSprite( p_dx, p_dy );
+
             m_dx += p_dx;
             if( m_dx > 16 || m_dx < -16 ) {
                 m_curX += m_dx / 16;
@@ -54,6 +72,15 @@ namespace MAP {
                 m_curY += m_dy / 16;
                 m_dy = m_dy % 16;
             }
+        }
+
+        /*
+         * @brief: Returns whether a sprite is visible if it is located at this position.
+         */
+        constexpr bool isVisible( ) const {
+            if( m_camDisY < -120 || m_camDisY > 120 ) { return false; }
+            if( m_camDisX < -160 || m_camDisX > 160 ) { return false; }
+            return true;
         }
     };
 
@@ -130,22 +157,28 @@ namespace MAP {
         static constexpr u8 MAX_LARGE_NPC   = 4;
         static constexpr u8 MAX_HM_PARTICLE = 32;
 
-        static constexpr u8 SPR_UNUSED     = 0;
-        static constexpr u8 SPR_ITEM       = 1;
-        static constexpr u8 SPR_HMBALL     = 2;
-        static constexpr u8 SPR_STRENGTH   = 3;
-        static constexpr u8 SPR_ROCKSMASH  = 4;
-        static constexpr u8 SPR_ROCKSMASH2 = 5;
-        static constexpr u8 SPR_CUT        = 6;
-        static constexpr u8 SPR_CUT2       = 7;
-        static constexpr u8 SPR_PLATFORM   = 8;
+        static constexpr u8 SPR_UNUSED    = 0;
+        static constexpr u8 SPR_ITEM      = 1;
+        static constexpr u8 SPR_HMBALL    = 2;
+        static constexpr u8 SPR_STRENGTH  = 3;
+        static constexpr u8 SPR_ROCKSMASH = 4;
+        static constexpr u8 SPR_CUT       = 5;
+        static constexpr u8 SPR_PLATFORM  = 8;
 
         struct managedSprite {
             mapSprite    m_sprite;
             mapSpritePos m_pos;
 
-            void moveSprite( s8 p_dx, s8 p_dy ) {
+            constexpr void translateSprite( s8 p_dx, s8 p_dy ) {
+                m_pos.translateSprite( p_dx, p_dy );
+            }
+
+            constexpr void moveSprite( s8 p_dx, s8 p_dy ) {
                 m_pos.moveSprite( p_dx, p_dy );
+            }
+
+            constexpr bool isVisible( ) const {
+                return m_pos.isVisible( );
             }
         };
 
@@ -156,25 +189,27 @@ namespace MAP {
         std::pair<bool, managedSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32
         std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32
 
-        mapSpriteData _itemBallData;   // 16x16
-        mapSpriteData _hmBallData;     // 16x16
-        mapSpriteData _strengthData;   // 16x16
-        mapSpriteData _rockSmashData;  // 16x16
-        mapSpriteData _rockSmash2Data; // crushed rock (16x16)
-        mapSpriteData _cutData;        // 16x16
-        mapSpriteData _cut2Data;       // cut tree (16x16)
+        mapSpriteData _itemBallData;  // 16x16
+        mapSpriteData _hmBallData;    // 16x16
+        mapSpriteData _strengthData;  // 16x16
+        mapSpriteData _rockSmashData; // 16x16
+        mapSpriteData _cutData;       // 16x16
         // mapSpriteData _rustlingGrass;
         // mapSpriteData _rustlingLargeGrass;
         // mapSpriteData _waterBubbles;
 
         std::pair<u8, mapSpritePos> _hmSpriteInfo[ MAX_HM_PARTICLE ];
 
+        constexpr s16 camShift( u16 p_cam, u16 p_pos ) const {
+            return ( p_pos - p_cam ) * 16;
+        }
+
         constexpr u16 screenX( u16 p_camX, u16 p_posX, u8 p_width = 16 ) const {
-            return 128 - p_width / 2 + ( p_posX - p_camX ) * 16;
+            return 128 - p_width / 2 + camShift( p_camX, p_posX );
         }
 
         constexpr u16 screenY( u16 p_camY, u16 p_posY, u8 p_height = 32 ) const {
-            return 96 - ( p_height - 8 ) + ( p_posY - p_camY ) * 16;
+            return 96 - ( p_height - 8 ) + camShift( p_camY, p_posY );
         }
 
         managedSprite& getManagedSprite( u8 p_spriteId );
@@ -197,13 +232,9 @@ namespace MAP {
             SPTYPE_PARTICLE = 4, // item icon, hm particles, etc
         };
 
-        void init( );
+        void reset( );
 
-        /*
-         * @brief: Removes all sprites that are more than p_radius blocks away from
-         * (p_centerX, p_centerY) (in max norm)
-         */
-        void purge( u16 p_centerX, u16 p_centerY, u16 p_radius );
+        void init( );
 
         /*
          * @brief: Moves the camera in the specified direction. (moves all sprites by the
@@ -265,6 +296,11 @@ namespace MAP {
         void moveSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update = true );
 
         /*
+         * @brief: Changes the position relative to the camera of the specified sprite.
+         */
+        void translateSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update = true );
+
+        /*
          * @brief: Returns the current priority of the specified sprite.
          */
         ObjPriority getPriority( u8 p_spriteId ) const;
@@ -298,5 +334,7 @@ namespace MAP {
 
         void currentFrame( u8 p_spriteId, bool p_update = true );
         void nextFrame( u8 p_spriteId, bool p_update = true );
+
+        void update( );
     };
 } // namespace MAP
