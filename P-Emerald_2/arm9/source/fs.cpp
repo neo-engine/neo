@@ -310,22 +310,26 @@ namespace FS {
         return N;
     }
 
-    bool readBankData( u8 p_bank, MAP::bankInfo& p_result ) {
+    bool readBankData( u8 /* p_bank */, MAP::bankInfo& /*p_result*/ ) {
+        return false;
+
+        /*
         snprintf( TMP_BUFFER_SHORT, 45, "%hhu/%hhu", p_bank, p_bank );
         FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bnk" );
         if( !f ) return false;
         read( f, &p_result.m_locationId, sizeof( u16 ), 1 );
         close( f );
         return true;
+        */
     }
 
     bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result ) {
-        FILE* f = open( MAP_DATA_PATH,
-                        ( std::to_string( p_bank ) + "/" + std::to_string( p_mapY ) + "/"
-                          + std::to_string( p_mapY ) + "_" + std::to_string( p_mapX ) )
-                            .c_str( ),
-                        ".map.data" );
-        if( !f ) { return false; }
+        snprintf( TMP_BUFFER_SHORT, 45, "%hhu/%hu/%hu_%hu", p_bank, p_mapY, p_mapY, p_mapX );
+        FILE* f = open( MAP_DATA_PATH, TMP_BUFFER_SHORT, ".map.data" );
+        if( !f ) {
+            std::memset( &p_result, 0, sizeof( MAP::mapData ) );
+            return false;
+        }
         fread( &p_result, sizeof( MAP::mapData ), 1, f );
         close( f );
         return true;

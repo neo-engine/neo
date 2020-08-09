@@ -66,6 +66,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleTrainer.h"
 
 #include "Border.h"
+#include "locationNames.h"
 
 #include "arrow_up.h"
 #include "noselection_96_32_1.h"
@@ -278,10 +279,53 @@ namespace NAV {
         printMessage( p_message );
     }
 
+    u16  CURRENT_LOCATION = 0;
+    u8   LOCATION_TIMER   = 0;
+    void showNewLocation( u16 p_newLocation ) {
+        if( p_newLocation == CURRENT_LOCATION ) { return; }
+
+        if( p_newLocation == L_POKEMON_CENTER || p_newLocation == L_POKEMON_MART ) { return; }
+
+        CURRENT_LOCATION = p_newLocation;
+        LOCATION_TIMER   = 120;
+
+        std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+        IO::regularFont->setColor( 3, 1 );
+        IO::regularFont->setColor( 2, 2 );
+        IO::regularFont->printStringBC( FS::getLocation( p_newLocation ).c_str( ), TEXT_PAL,
+                                        TEXT_BUF, 128 );
+        u16 tileCnt = SPR_MSG_GFX;
+        u16 x = 8, y = 8;
+        tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, 32, TEXT_BUF, 64 * 32 / 2,
+                                   false, false, false, OBJPRIORITY_0, false );
+        tileCnt
+            = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32, TEXT_BUF + 64 * 32,
+                               64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::updateOAM( false );
+    }
+
+    void hideLocation( u8 p_remTime ) {
+        if( !p_remTime ) {
+            LOCATION_TIMER = 0;
+            std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM ].isHidden     = true;
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 1 ].isHidden = true;
+        } else {
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM ].y -= 2;
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 1 ].y -= 2;
+        }
+        IO::updateOAM( false );
+    }
+
     void doPrintMessage( const char* p_message, style p_style, u16 p_item = 0,
                          const ITEM::itemData* p_data = 0 ) {
         u16 x = 12, y = 192 - 40, hg = 32;
         if( p_message ) {
+            if( LOCATION_TIMER ) { hideLocation( ); }
+
             if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE ) {
                 IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
@@ -330,9 +374,10 @@ namespace NAV {
         } else {
             TEXT_CACHE = TEXT_CACHE + p_message;
             // TODO: Auto rotate msgbox text.
-            /* auto ln = */ IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF,
-                                                            256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                                            16 - ( 4 * !!p_item ), 64, hg );
+            /* auto ln = */
+            IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF,
+                                            256 - ( 64 * !!p_item ), IO::font::LEFT,
+                                            16 - ( 4 * !!p_item ), 64, hg );
             u16 tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
             tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, hg, TEXT_BUF,
                                        64 * hg / 2, false, false, false, OBJPRIORITY_0, false );
@@ -1403,6 +1448,9 @@ namespace NAV {
                 init( );
                 break;
             case 2: {
+                init( );
+                MAP::curMap->faintPlayer( );
+                /*
                 BOX::boxViewer bxv;
                 ANIMATE_MAP = false;
                 videoSetMode( MODE_5_2D );
@@ -1423,6 +1471,7 @@ namespace NAV {
                 SOUND::restoreVolume( );
                 init( );
                 MAP::curMap->draw( );
+                */
                 break;
             }
             case 3: {
@@ -1483,24 +1532,6 @@ IO::bg3sub ); auto pal = SCREENS_SWAPPED ? BG_PALETTE : BG_PALETTE_SUB;
                         drawMapMug( );
                     }
                     if( p_initMainSrites && ALLOW_INIT ) initMainSprites( STATE != HOME );
-                }
-
-                void showNewMap( u8 p_newMap ) {
-                    if( p_newMap == CURRENT_BANK ) return;
-                    CURRENT_BANK = p_newMap;
-                    CURRENT_MAP  = MAP::curMap->getCurrentLocationId( );
-                    char buffer[ 100 ];
-                    snprintf( buffer, 99, "%03hhu/%hu_%hhu", CURRENT_BANK / FS::ITEMS_PER_DIR,
-                              CURRENT_BANK, getCurrentDaytime( ) % 4 );
-                    if( FS::exists( "nitro:/PICS/MAP_MUG/", buffer ) )
-                        STATE = MAP_MUG;
-                    else if( STATE == MAP_MUG )
-                        STATE = HOME;
-
-                    IO::Oam->oamBuffer[ BACK_ID ].isHidden = ( STATE == HOME );
-                    IO::updateOAM( true );
-
-                    draw( false );
                 }
 
                 void updateMap( u16 p_newMap ) {

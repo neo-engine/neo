@@ -32,10 +32,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     bankInfo CURRENT_BANK;
 
-    void loadNewBank( u8 p_bank ) {
-        memset( &CURRENT_BANK, 0, sizeof( bankInfo ) );
-        CURRENT_BANK.m_bank = p_bank;
-        if( !FS::readBankData( p_bank, CURRENT_BANK ) ) CURRENT_BANK.m_locationId = 1234;
+    void loadNewBank( u8 /* p_bank */ ) {
+        // memset( &CURRENT_BANK, 0, sizeof( bankInfo ) );
+        // CURRENT_BANK.m_bank = p_bank;
+        // if( !FS::readBankData( p_bank, CURRENT_BANK ) ) CURRENT_BANK.m_locationId = 1234;
     }
     /*
         // locationId, battlebg

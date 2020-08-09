@@ -107,6 +107,7 @@ namespace MAP {
         EVENT_GENERIC   = 7,
         EVENT_HMOBJECT  = 8, // cut, rock smash, strength
         EVENT_BERRYTREE = 9,
+        EVENT_NPC_MESSAGE   = 10,
     };
     enum eventTrigger : u8 {
         TRIGGER_NONE           = 0,
@@ -231,6 +232,7 @@ namespace MAP {
                     u8  m_movementType;
                     u16 m_spriteId;
                     u16 m_scriptId;
+                    u8  m_scriptType;
                 } m_npc;
                 struct {
                     warpType m_warpType;
@@ -243,6 +245,7 @@ namespace MAP {
                 } m_warp;
                 struct {
                     u16 m_scriptId;
+                    u8  m_scriptType;
                 } m_generic;
                 struct {
                     u8 m_hmType;

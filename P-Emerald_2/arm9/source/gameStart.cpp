@@ -319,8 +319,8 @@ namespace SAVE {
                     IO::updateOAM( true );
                 } );
 
-            SAV.getActiveFile( ).setVar( V_RIVAL_APPEARANCE,
-                                         1 - SAV.getActiveFile( ).m_appearance );
+            SAV.getActiveFile( ).setFlag( F_RIVAL_APPEARANCE,
+                                          1 - SAV.getActiveFile( ).m_appearance );
 
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_s" );
             SAV.getActiveFile( ).drawTrainersCard( false, true );
@@ -497,8 +497,8 @@ namespace SAVE {
         case 0:
             std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
             SAV.getActiveFile( ).m_appearance = rand( ) % 2;
-            SAV.getActiveFile( ).setVar( V_RIVAL_APPEARANCE,
-                                         1 - SAV.getActiveFile( ).m_appearance );
+            SAV.getActiveFile( ).setFlag( F_RIVAL_APPEARANCE,
+                                          1 - SAV.getActiveFile( ).m_appearance );
             SAV.getActiveFile( ).m_player
                 = MAP::mapPlayer( { 0x93, 0x4a, 3 }, u16( 10 * SAV.getActiveFile( ).m_appearance ),
                                   MAP::moveMode::WALK );

@@ -208,7 +208,15 @@ void vblankIRQ( ) {
         SAVE::CURRENT_DATE.m_year  = tStruct->tm_year;
     }
 
-    if( !ANIMATE_MAP ) return;
+    if( !ANIMATE_MAP ) {
+        return;
+    } else {
+        if( NAV::LOCATION_TIMER && !--NAV::LOCATION_TIMER ) {
+            NAV::hideLocation( );
+        } else if( NAV::LOCATION_TIMER > 0 && NAV::LOCATION_TIMER < 16 ) {
+            NAV::hideLocation( NAV::LOCATION_TIMER );
+        }
+    }
     FRAME_COUNT++;
     if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
 }
@@ -254,8 +262,8 @@ int main( int, char** p_argv ) {
     ANIMATE_MAP = true;
     NAV::init( );
     //    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
-    //    MAP::curMap->registerOnLocationChangedHandler( NAV::updateMap );
-    //    NAV::showNewMap( SAVE::SAV.getActiveFile( ).m_currentMap );
+    MAP::curMap->registerOnLocationChangedHandler( NAV::showNewLocation );
+    NAV::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
 
     irqSet( IRQ_VBLANK, vblankIRQ );
 

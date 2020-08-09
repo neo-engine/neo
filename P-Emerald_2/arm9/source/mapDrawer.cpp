@@ -35,6 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "choiceBox.h"
 #include "defines.h"
 #include "fs.h"
+#include "gameStart.h"
 #include "mapDrawer.h"
 #include "nav.h"
 #include "saveGame.h"
@@ -66,6 +67,24 @@ namespace MAP {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         switch( p_mapObject.second.m_event.m_type ) {
+        case EVENT_NPC_MESSAGE:
+        case EVENT_NPC: {
+#ifdef DESQUID
+            IO::fadeScreen( IO::UNFADE );
+#endif
+            p_mapObject.first = _mapSprites.loadSprite(
+                curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
+                mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
+#ifdef DESQUID
+            NAV::printMessage( ( std::to_string( p_mapObject.first ) + " " + std::to_string( curx )
+                                 + " " + std::to_string( cury ) + " "
+                                 + std::to_string( p_mapObject.second.m_pos.m_posX ) + " "
+                                 + std::to_string( p_mapObject.second.m_pos.m_posY ) )
+                                   .c_str( ),
+                               MSG_NORMAL );
+#endif
+            break;
+        }
         case EVENT_HMOBJECT: {
             if( p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
                 p_mapObject.first = _mapSprites.loadSprite(
@@ -94,17 +113,30 @@ namespace MAP {
         }
     }
 
-    mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
-        bool x = ( p_x / SIZE != CUR_SLICE->m_x ), y = ( p_y / SIZE != CUR_SLICE->m_y );
+    const mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
+        bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-            ->m_blocks[ p_y % SIZE ][ p_x % SIZE ];
+            .m_blocks[ p_y % SIZE ][ p_x % SIZE ];
     }
-    block& mapDrawer::at( u16 p_x, u16 p_y ) const {
-        bool x = ( p_x / SIZE != CUR_SLICE->m_x ), y = ( p_y / SIZE != CUR_SLICE->m_y );
+    const block& mapDrawer::at( u16 p_x, u16 p_y ) const {
+        bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
         u16  blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-                           ->m_blocks[ p_y % SIZE ][ p_x % SIZE ]
+                           .m_blocks[ p_y % SIZE ][ p_x % SIZE ]
                            .m_blockidx;
-        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]->m_blockSet.m_blocks[ blockidx ];
+        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ].m_blockSet.m_blocks[ blockidx ];
+    }
+
+    mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) {
+        bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
+        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
+            .m_blocks[ p_y % SIZE ][ p_x % SIZE ];
+    }
+    block& mapDrawer::at( u16 p_x, u16 p_y ) {
+        bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
+        u16  blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
+                           .m_blocks[ p_y % SIZE ][ p_x % SIZE ]
+                           .m_blockidx;
+        return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ].m_blockSet.m_blocks[ blockidx ];
     }
 
     const mapData& mapDrawer::currentData( ) const {
@@ -116,7 +148,7 @@ namespace MAP {
         u16 curx = p_x;
         u16 cury = p_y;
 
-        bool x = ( curx / SIZE != CUR_SLICE->m_x ), y = ( cury / SIZE != CUR_SLICE->m_y );
+        bool x = ( curx / SIZE != CUR_SLICE.m_x ), y = ( cury / SIZE != CUR_SLICE.m_y );
         return _data[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ];
     }
 
@@ -177,19 +209,20 @@ namespace MAP {
             u16 mx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 my = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
-                            _slices[ _curX ][ _curY ], _slices );
+                            &_slices[ _curX ][ _curY ], _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
                              _data[ _curX ][ _curY ] );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                            my / SIZE, _slices[ _curX ^ 1 ][ _curY ], _slices );
+                            my / SIZE, &_slices[ _curX ^ 1 ][ _curY ], _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE, _data[ _curX ^ 1 ][ _curY ] );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
-                            my / SIZE + currentHalf( my ), _slices[ _curX ][ _curY ^ 1 ], _slices );
+                            my / SIZE + currentHalf( my ), &_slices[ _curX ][ _curY ^ 1 ],
+                            _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                              my / SIZE + currentHalf( my ), _data[ _curX ][ _curY ^ 1 ] );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                            my / SIZE + currentHalf( my ), _slices[ _curX ^ 1 ][ _curY ^ 1 ],
+                            my / SIZE + currentHalf( my ), &_slices[ _curX ^ 1 ][ _curY ^ 1 ],
                             _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
@@ -201,9 +234,9 @@ namespace MAP {
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
             // for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
-            //    swiCopy( CUR_SLICE->m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
-            dmaCopy( CUR_SLICE->m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
-            dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
+            //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
+            dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
+            dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
             for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
                 bgSetPriority( i - 1, i );
@@ -211,8 +244,8 @@ namespace MAP {
 
             for( u8 i = 0; i < 4; ++i ) {
                 constructAndAddNewMapObjects( _data[ i % 2 ][ i & 2 ],
-                                              _slices[ i % 2 ][ i & 2 ]->m_x,
-                                              _slices[ i % 2 ][ i & 2 ]->m_y );
+                                              _slices[ i % 2 ][ i & 2 ].m_x,
+                                              _slices[ i % 2 ][ i & 2 ].m_y );
             }
         }
 
@@ -360,7 +393,11 @@ namespace MAP {
             || ( dir[ p_direction ][ 0 ] == -1 && _cx % 32 == 15 )
             || ( dir[ p_direction ][ 1 ] == 1 && _cy % 32 == 16 )
             || ( dir[ p_direction ][ 1 ] == -1 && _cy % 32 == 15 ) ) {
-            loadSlice( p_direction );
+
+            // Hacky optimization: Don't load new slices on inside maps.
+            if( ( CUR_DATA.m_mapType & CAVE ) || !( CUR_DATA.m_mapType & INSIDE ) ) {
+                loadSlice( p_direction );
+            }
 #ifdef DESQUID_MORE
             NAV::printMessage( "Load Slice" );
 #endif
@@ -376,9 +413,9 @@ namespace MAP {
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
             // for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
-            //    swiCopy( CUR_SLICE->m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
-            dmaCopy( CUR_SLICE->m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
-            dmaCopy( CUR_SLICE->m_pals, BG_PALETTE, 512 );
+            //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
+            dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
+            dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
 
 #ifdef DESQUID_MORE
             char buffer[ 100 ];
@@ -445,15 +482,12 @@ namespace MAP {
     }
 
     void mapDrawer::loadSlice( direction p_direction ) {
-        // Remove map objects that are no longer relevant
-        // purgeMapObjects( );
-
-        auto mx = CUR_SLICE->m_x + dir[ p_direction ][ 0 ],
-             my = CUR_SLICE->m_y + dir[ p_direction ][ 1 ];
+        auto mx = CUR_SLICE.m_x + dir[ p_direction ][ 0 ],
+             my = CUR_SLICE.m_y + dir[ p_direction ][ 1 ];
 
         constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
-                        _slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
-                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
+                        &_slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
+                                [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
                         _slices );
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                          _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
@@ -466,10 +500,10 @@ namespace MAP {
 
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ]
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
-        mx = neigh->m_x + dir[ p_direction ][ 0 ];
-        my = neigh->m_y + dir[ p_direction ][ 1 ];
+        mx = neigh.m_x + dir[ p_direction ][ 0 ];
+        my = neigh.m_y + dir[ p_direction ][ 1 ];
         constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
-                        _slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
+                        &_slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                          _data[ _curX ^ 1 ][ _curY ^ 1 ] );
 
@@ -680,7 +714,10 @@ namespace MAP {
         } else {
             SOUND::playBGM( SOUND::BGMforWildBattle( pkmnId ) );
         }
-        stopPlayer( );
+        _playerIsFast = false;
+        fastBike      = false;
+        _mapSprites.setFrame( _playerSprite,
+                              getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
 
         IO::fadeScreen( IO::BATTLE );
         IO::BG_PAL( true )[ 0 ] = 0;
@@ -720,7 +757,7 @@ namespace MAP {
                             plat2, battleBack, getBattlePolicy( true ) )
                 .start( )
             == BATTLE::battle::BATTLE_OPPONENT_WON ) {
-            // TODO: faint player
+            faintPlayer( );
         }
         SOUND::restartBGM( );
         FADE_TOP_DARK( );
@@ -786,19 +823,21 @@ namespace MAP {
     }
 
     void mapDrawer::animateMap( u8 p_frame ) {
-        if( !CUR_SLICE ) return;
+        return;
+
+        // if( !CUR_SLICE ) return;
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-        if( !CUR_SLICE->m_tileSet.m_animationCount1 ) return;
-        for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount1; ++i ) {
-            auto& a = CUR_SLICE->m_tileSet.m_animations[ i ];
+        if( !CUR_SLICE.m_tileSet.m_animationCount1 ) return;
+        for( u8 i = 0; i < CUR_SLICE.m_tileSet.m_animationCount1; ++i ) {
+            auto& a = CUR_SLICE.m_tileSet.m_animations[ i ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
                 dmaCopy( a.m_tiles + a.m_acFrame, tileMemory + a.m_tileIdx * 32, sizeof( tile ) );
             }
         }
-        if( !CUR_SLICE->m_tileSet.m_animationCount2 ) return;
-        for( u8 i = 0; i < CUR_SLICE->m_tileSet.m_animationCount2; ++i ) {
-            auto& a = CUR_SLICE->m_tileSet.m_animations[ i + MAX_ANIM_PER_TILE_SET ];
+        if( !CUR_SLICE.m_tileSet.m_animationCount2 ) return;
+        for( u8 i = 0; i < CUR_SLICE.m_tileSet.m_animationCount2; ++i ) {
+            auto& a = CUR_SLICE.m_tileSet.m_animations[ i + MAX_ANIM_PER_TILE_SET ];
             if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                 a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
                 dmaCopy( a.m_tiles + a.m_acFrame,
@@ -901,10 +940,10 @@ namespace MAP {
             if( !( p_moveMode & WALK ) ) return false;
             break;
         case 0xc0:
-            if( p_direction % 2 ) return false;
+            if( ( p_direction & 1 ) == 0 ) return false;
             break;
         case 0xc1:
-            if( p_direction % 2 == 0 ) return false;
+            if( p_direction & 1 ) return false;
             break;
         case 0x62:
             if( p_direction == RIGHT ) return true;
@@ -934,10 +973,10 @@ namespace MAP {
             if( !( p_moveMode & WALK ) ) return false;
             break;
         case 0xc0:
-            if( p_direction % 2 ) return false;
+            if( ( p_direction & 1 ) == 0 ) return false;
             break;
         case 0xc1:
-            if( p_direction % 2 == 0 ) return false;
+            if( p_direction & 1 ) return false;
             break;
         case 0x13: return false;
         case 0xd3: // Bike stuff
@@ -1056,7 +1095,7 @@ namespace MAP {
                 return;
             }
 
-            // Check for jumps/slides/
+            // Check for jumps/slides/...
             if( !canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, p_direction,
                           SAVE::SAV.getActiveFile( ).m_player.m_movement ) ) {
                 stopPlayer( p_direction );
@@ -1107,11 +1146,6 @@ namespace MAP {
                 }
 
             // Warpy stuff
-            case 0x60:
-                walkPlayer( p_direction, p_fast );
-                handleWarp( NO_SPECIAL );
-                hadjump = false;
-                break;
             case 0x62:
                 if( p_direction == RIGHT ) {
                     walkPlayer( p_direction, p_fast );
@@ -1174,7 +1208,6 @@ namespace MAP {
                     walkPlayer( UP );
                     p_direction = UP;
                     break;
-                case 0x60:
                 case 0x43:
                     if( !canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, DOWN,
                                   SAVE::SAV.getActiveFile( ).m_player.m_movement ) )
@@ -1291,7 +1324,7 @@ namespace MAP {
                     case 0x60:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( CAVE_ENTRY );
-                        break;
+                        return;
                     case 0x61:
                     case 0x68:
                     case 0x6e:
@@ -1406,13 +1439,15 @@ namespace MAP {
 
         u8 newMapType = u8( ndata.m_mapType );
 
-        bool entryCave = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) );
+        bool entryCave
+            = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) && !( newMapType & INSIDE ) );
         if( entryCave ) {
             SAVE::SAV.getActiveFile( ).m_lastCaveEntry
                 = { SAVE::SAV.getActiveFile( ).m_currentMap,
                     SAVE::SAV.getActiveFile( ).m_player.m_pos };
         }
-        bool exitCave = ( ( oldMapType & CAVE ) && !( newMapType & CAVE ) );
+        bool exitCave
+            = ( ( oldMapType & CAVE ) && !( oldMapType & INSIDE ) && !( newMapType & CAVE ) );
         if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
         switch( p_type ) {
         case DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break;
@@ -1443,14 +1478,21 @@ namespace MAP {
             }
             break;
         case LAST_VISITED:
-        case NO_SPECIAL:
         default:
             SOUND::playSoundEffect( SFX_CAVE_WARP );
             IO::fadeScreen( IO::CLEAR_DARK );
             break;
+        case NO_SPECIAL: break;
         }
         swiWaitForVBlank( );
         swiWaitForVBlank( );
+
+        if( ( ( oldMapType & INSIDE ) && ( newMapType & INSIDE ) && p_type == CAVE_ENTRY ) ) {
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            stopPlayer( DOWN );
+            stopPlayer( );
+        }
 
         SAVE::SAV.getActiveFile( ).m_player.m_pos = p_target.second;
         //        if( SAVE::SAV.getActiveFile( ).m_currentMap != p_target.first ) {
@@ -1468,7 +1510,7 @@ namespace MAP {
         for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
         //        }
 
-        if( exitCave ) movePlayer( DOWN );
+        // if( exitCave ) movePlayer( DOWN );
         u8 behave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                         SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                         .m_bottombehave;
@@ -1481,8 +1523,13 @@ namespace MAP {
             changeMoveMode( MAP::WALK );
         }
 
+        if( ( ( oldMapType & INSIDE ) && ( newMapType & INSIDE ) && p_type == CAVE_ENTRY ) ) {
+            stopPlayer( DOWN );
+        }
+
         switch( behave ) {
         case 0x6e: walkPlayer( UP, false ); break;
+        case 0x60:
         case 0x69: walkPlayer( DOWN, false ); break;
 
         default: break;
@@ -1732,14 +1779,19 @@ namespace MAP {
     }
 
     void mapDrawer::changeMoveMode( moveMode p_newMode ) {
-        u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
-        fastBike   = false;
-        u8 ydif    = 0;
+        bool change  = SAVE::SAV.getActiveFile( ).m_player.m_movement != p_newMode;
+        u8   basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
+        fastBike     = false;
+        bool surfing = false;
+        u8   ydif    = 0;
         SAVE::SAV.getActiveFile( ).m_player.m_movement = p_newMode;
         switch( p_newMode ) {
         case WALK: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic; break;
         case SURF:
-        case ROCK_CLIMB: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3; break;
+        case ROCK_CLIMB:
+            SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
+            surfing                                      = true;
+            break;
         case BIKE:
         case MACH_BIKE: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1; break;
         case ACRO_BIKE:
@@ -1761,6 +1813,15 @@ namespace MAP {
         if( ydif ) { _mapSprites.moveSprite( _playerSprite, UP, ydif, true ); }
         _mapSprites.setFrame( _playerSprite,
                               getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+
+        if( surfing ) {
+            _playerPlatSprite
+                = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPR_PLATFORM );
+            _mapSprites.setFrame( _playerPlatSprite,
+                                  getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+            if( !change ) { _mapSprites.moveSprite( _playerSprite, UP, 3 ); }
+        }
+
         for( auto fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
     }
 
@@ -1865,8 +1926,6 @@ namespace MAP {
         u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
                                                 SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
-        if( surfing ) { _mapSprites.moveSprite( _playerSprite, UP, 3 ); }
-
         for( u8 i = 0; i < 5; ++i ) {
             _mapSprites.drawFrame( _playerSprite, i, false, true );
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
@@ -1892,12 +1951,6 @@ namespace MAP {
         }
         IO::updateOAM( false );
         changeMoveMode( surfing ? SURF : WALK );
-        if( surfing ) {
-            _playerPlatSprite
-                = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPR_PLATFORM );
-            _mapSprites.setFrame( _playerPlatSprite,
-                                  getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
-        }
         swiWaitForVBlank( );
     }
 
@@ -2130,7 +2183,24 @@ namespace MAP {
                 res.push_back( cur );
                 break;
             }
+            case EVENT_NPC:
+            case EVENT_NPC_MESSAGE: {
+                mapObject obj   = mapObject( );
+                obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
+                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                              p_data.m_events[ i ].m_posZ };
+                obj.m_picNum    = p_data.m_events[ i ].m_data.m_npc.m_spriteId;
+                obj.m_movement  = (MAP::moveMode) p_data.m_events[ i ].m_data.m_npc.m_movementType;
+                obj.m_range     = 0;
+                obj.m_direction = UP; // TODO
+                obj.m_event     = p_data.m_events[ i ];
 
+                std::pair<u8, mapObject> cur = { 0, obj };
+                loadMapObject( cur );
+                res.push_back( cur );
+
+                break;
+            }
             default: break;
             }
         }
@@ -2167,5 +2237,51 @@ namespace MAP {
                 if( o.second.m_event.m_data.m_hmObject.m_hmType == mapSpriteManager::SPR_CUT ) {}
             }
         }
+    }
+
+    void mapDrawer::faintPlayer( ) {
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        ANIMATE_MAP = false;
+        videoSetMode( MODE_5_2D );
+        IO::initVideo( true );
+        IO::clearScreen( true, true, true );
+        IO::initOAMTable( true );
+        IO::initOAMTable( false );
+        SOUND::setVolume( 0 );
+        bgUpdate( );
+
+        auto tgpos = SAVE::SAV.getActiveFile( ).m_lastPokeCenter;
+        if( !SAVE::SAV.getActiveFile( ).m_lastPokeCenter.first
+            || SAVE::SAV.getActiveFile( ).m_lastPokeCenter.first == 255 ) {
+            SAVE::printTextAndWait( GET_STRING( 562 ) );
+            if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                tgpos = { 21, { 0x2b, 0x29, 3 } };
+            } else {
+                tgpos = { 21, { 0x31, 0x49, 3 } };
+            }
+        } else {
+            SAVE::printTextAndWait( GET_STRING( 561 ) );
+        }
+        _mapSprites.setPriority( _playerSprite,
+                                 SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_2 );
+
+        FADE_TOP_DARK( );
+        FADE_SUB_DARK( );
+        IO::clearScreen( false );
+        videoSetMode( MODE_5_2D );
+        bgUpdate( );
+
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+            SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->heal( );
+        }
+
+        changeMoveMode( MAP::WALK );
+        SOUND::setVolume( 0 );
+        IO::initVideoSub( );
+        IO::resetScale( true, false );
+        ANIMATE_MAP = true;
+        NAV::init( );
+        redirectPlayer( DOWN, false );
+        warpPlayer( NO_SPECIAL, tgpos );
     }
 } // namespace MAP

@@ -42,6 +42,10 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 // } (female)
 //
 
+// ,, \x5e
+// '' \x5d
+// ´´ \"
+
 const char* SAVE::EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ]
     = { { "Dev's Heaven", "Dev's Heaven" } };
 
@@ -195,6 +199,152 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "Fossil Maniac's House", "Haus des Fossilienmaniac" },
     { "Lanette's House", "Lanettes Haus" },
+    { "Littleroot Town\n\x5d"
+      "A town that can't be shaded any hue.\"",
+      "Wurzelheim" },
+    { "Prof. Birch's Lab", "Prof. Birks Labor" },
+    { "[PLAYER]'s House", "Haus von [PLAYER]" },
+
+    // 10
+
+    { "Prof. Birch's House", "Haus von Prof. Birk" },
+    { "Prof. Birch's House", "Haus von Prof. Birk" },
+    { "Mom: Welcome to Littleroot Town, honey.\r"
+      "How do you like it?\nThis is our new home.\r"
+      "It has a quaint feel, but it seems to be an easy place to live, don't you think?\r"
+      "And you get your own room, [PLAYER]! Let's go inside.",
+      "Mutter: Willkommen in Wurzelheim, Schatz.\r"
+      "Wie gef\xe4llt es dir?\nDas ist unser neues zu Hause." },
+    { "", "" },
+    { "", "" },
+
+    { "", "" },
+    { "Mom: See, [PLAYER]?\nIsn't it nice in here, too?\r"
+      "The mover's Pok\xe9mon do all the work of moving us in and cleaning up after.\r"
+      "This is so convenient!\r"
+      "[PLAYER], your room is upstairs. Go check it out, dear!\r"
+      "Dad bought you a new PC to mark our move here.\r"
+      "Don't forget to check it out.",
+      "" },
+    { "", "" },
+    { "", "" },
+    { "", "" },
+
+    // 20
+
+    { "", "" },
+    { "", "" },
+    { "Mom: Well, [PLAYER]?\r"
+      "Aren't you interested in seeing your very own room?",
+      "" },
+    { "", "" },
+    { "Fugiiih!", "" },
+
+    { "Huggoh, uggo uggo|", "" },
+    { "Dad might like this program.\n| | | | | | | | | | | | |\r"
+      "Better get going!",
+      "" },
+    { "", "" },
+    { "It's a Nintendo GameCube.", "" },
+    { "[PLAYER] flipped open the notebook.\r"
+      "Adventure Rule No.1\nOpen the menu with X or START.\r"
+      "Adventure Rule No.2\nRecord your progress with Save.\r"
+      "The remaining pages are blank|",
+      "" },
+
+    // 30
+
+    { "", "" },
+    { "", "" },
+    { "", "" },
+    { "[PLAYER] booted up the PC.", "" },
+    { "A message from Dad!\r"
+      "Dad: Hi [PLAYER]! Welcome to our new home.\r"
+      "Please come visit me in my Gym in Petalburg City.\r"
+      "Ah, this Potion may come in handy.",
+      "" },
+
+    { "", "" },
+    { "", "" },
+    { "", "" },
+    { "There is another message.\r"
+      "???: Greetings [PLAYER]. This gift was delivered just for you.",
+      "" },
+    { "", "" },
+
+    // 40
+
+    { "Mom: [PLAYER], how do you like your new room?\r"
+      "Good! Everything's put away neatly!\r"
+      "They finished moving everything in downstairs, too!\r"
+      "Pok\xe9mon movers are so convenient!",
+      "" },
+    { "", "" },
+    { "", "" },
+    { "", "" },
+    { "Mom: Oh! [PLAYER], [PLAYER]!\nQuick! Come quickly!", "" },
+
+    { "Mom: Look it's Petalburg Gym!\nMaybe Dad will be on!\r"
+      "Interviewer: |this report from in front of Petalburg Gym.",
+      "" },
+    { "", "" },
+    { "Mom: Oh| It's over.\r"
+      "I think Dad was on, but we missed him. Too bad.\r"
+      "Oh yes.\nOne of Dad's friends lives in town.\r"
+      "Prof. Birch is his name.\r"
+      "He lives right next door, so you shold go over and introduce yourself.",
+      "" },
+    { "", "" },
+    { "", "" },
+
+    // 50
+
+    { "", "" },
+    { "", "" },
+    { "Mom: See you, honey!", "" },
+    { "Prof. Birch spends days in his lab studying, then he'll suddenly go out\r"
+      "in the wild to do more research|\r"
+      "When does Prof. Birch spend time at home?",
+      "" },
+    { "", "" },
+
+    { "", "" },
+    { "Using a PC you can send even items!\r"
+      "The power of science is staggering!",
+      "" },
+    { "", "" },
+    { "Um, um, um!\r"
+      "If you go outside and go in the grass, wild Pok\xe9mon will jump out!",
+      "" },
+    { "", "" },
+
+    // 60
+
+    { "It's dangerous if you don't have your own Pok\xe9mon!", "" },
+    { "It's crammed with books on Pok\xe9mon.", "" },
+    { "It's a PC used for research.\nBetter not mess around with it.", "" },
+    { "It's a serious-looking machine.\nIt must be used for research.", "" },
+    { "Hunh? Prof. Birch?\r"
+      "The Prof's away on fieldwork.\nErgo, he isn't here.",
+      "" },
+
+    { "", "" },
+    { "Oh, let me explain what fieldwork is.\r"
+      "It is to study things in the natural environment, like fields of mountains,\r"
+      "instead of a laboratory\r"
+      "The Prof isn't one for doing desk work. He's the type of person who would\r"
+      "rather go outside andexperience things than read about them here.",
+      "" },
+    { "", "" },
+    { "", "" },
+    { "", "" },
+
+    // 70
+
+    { "", "" },
+    { "It's a book that is too hand to read.", "" },
+    { "It's a half-empty pot of warm coffee.", "" },
+    { "It's a half-full pot of cold coffee.", "" },
 };
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
@@ -701,12 +851,14 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "A huge whirlpool. ", "Ein riesiger Strudel. " },
     { "The water is a deep blue| ", "Das Wasser ist tiefblau| " },
     { "The sea is deep here. ", "Das Wasser ist sehr tief. " },
-    { "It's a big boulder. ", "Ein gro\xdf""er Felsen. " },
+    { "It's a big boulder. ", "Ein gro\xdf"
+                              "er Felsen. " },
     { "The wall is very rocky|\n", "Eine steile Felswand|\n" },
 
     // 320
 
-    { "It's a large Waterfall. ", "Ein gro\xdf""er Wasserfall. " },
+    { "It's a large Waterfall. ", "Ein gro\xdf"
+                                  "er Wasserfall. " },
     { "Something moved! ", "Da hat sich etwas bewegt! " },
     { "Light is shining from the surface. ", "Licht scheint von der Oberfl\xe4"
                                              "che. " },
@@ -1088,10 +1240,20 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s? I can make one for %lu grams ash.", "%s? Alles klar, das macht dann %lu Gramm Asche." },
     { "Collected ash: %lu grams.", "Gesammelte Asche: %lu Gramm." },
     { "A big boulder that became moveable thanks to your Pok\xe9mon's Strength.",
-        "Ein gro\xdf""er Felsen, der durch die St\xe4rke deiner Pok\xe9mon bewegbar wurde." },
+      "Ein gro\xdf"
+      "er Felsen, der durch die St\xe4rke deiner Pok\xe9mon bewegbar wurde." },
     { "You booted up the PC.", "Du hast den PC angeschaltet." },
 
     // 560
 
     { "It's a map of the Hoenn region.", "Eine Karte der Hoenn-Region." },
+    { "You scurried to a Pok\xe9mon Center,\nprotecting your exhausted\n"
+      "and fainted Pok\xe9mon\nfrom further harm|",
+      "Du rennst zu einem Pok\xe9mon-Center\num deine ersch\xf6pten und\n"
+      "besiegten Pok\xe9mon vor\nweiterem Schaden zu sch\xfctzen|" },
+    { "You scurried back home,\nprotecting your exhausted\n"
+      "and fainted Pok\xe9mon\nfrom further harm|",
+      "Du rennst zurück nach Hause\num deine ersch\xf6pten\n"
+      "und besiegten Pok\xe9mon vor\nweiterem Schaden zu sch\xfctzen|" },
+
 };

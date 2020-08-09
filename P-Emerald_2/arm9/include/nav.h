@@ -38,6 +38,8 @@ namespace NAV {
 #define MAXBG 13
 #define START_BG 0
 
+    extern u8 LOCATION_TIMER;
+
     enum menuOption {
         VIEW_PARTY = 0,
         VIEW_DEX   = 1,
@@ -75,4 +77,7 @@ namespace NAV {
     void handleInput( const char* p_path );
 
     void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod );
+
+    void showNewLocation( u16 p_newLocation );
+    void hideLocation( u8 p_remTime = 0 );
 } // namespace NAV

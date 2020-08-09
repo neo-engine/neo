@@ -44,8 +44,8 @@ namespace MAP {
         mapWeather       _weather;
         mapSpriteManager _mapSprites;
 
-        std::unique_ptr<mapSlice> _slices[ 2 ][ 2 ] = { { 0 } }; //[x][y]
-        u8                        _curX, _curY; // Current main slice from the _slices array
+        mapSlice _slices[ 2 ][ 2 ]; //[x][y]
+        u8       _curX, _curY;      // Current main slice from the _slices array
 
         mapData _data[ 2 ][ 2 ];
 
@@ -116,10 +116,12 @@ namespace MAP {
                                               bool               p_distributeEXP = true );
 
       public:
-        block&         at( u16 p_x, u16 p_y ) const;
-        mapBlockAtom&  atom( u16 p_x, u16 p_y ) const;
-        const mapData& currentData( ) const;
-        const mapData& currentData( u16 p_x, u16 p_y ) const;
+        const block&        at( u16 p_x, u16 p_y ) const;
+        block&              at( u16 p_x, u16 p_y );
+        const mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
+        mapBlockAtom&       atom( u16 p_x, u16 p_y );
+        const mapData&      currentData( ) const;
+        const mapData&      currentData( u16 p_x, u16 p_y ) const;
 
         mapDrawer( );
 
@@ -127,10 +129,23 @@ namespace MAP {
             return _weather;
         }
 
+        /*
+         * @brief: Faints the player and teleports them to the last visited PC to heal
+         * their PKMN.
+         */
+        void faintPlayer( );
+
+        /*
+         * @brief: Makes big boulders movable.
+         */
         constexpr void enableStrength( ) {
             _strengthUsed = true;
         }
 
+        /*
+         * @brief: Shows a short animation and destroys the hmobject (breakable rock,
+         * small tree) at the specified global position on the current map.
+         */
         void destroyHMObject( u16 p_globX, u16 p_globY );
 
         void registerOnBankChangedHandler( std::function<void( u8 )> p_handler );
@@ -174,12 +189,15 @@ namespace MAP {
 
         /*
          * @brief: Enables the player to buy the specified items using their money.
-         * @param p_paymentMethod: 0: money, 1: BP, 2: Coins
+         * @param p_paymentMethod: 0: money, 1: BP, 2: Coins, 3: Ash
          */
         void runPokeMart( const std::vector<std::pair<u16, u32>>& p_offeredItems,
                           const char* p_message = 0, bool p_allowItemSell = true,
                           u8 p_paymentMethod = 0 );
 
+        /*
+         * @brief: Disables wild pkmn for the specified number of steps.
+         */
         void disablePkmn( s16 p_steps = -1 );
         void enablePkmn( );
 

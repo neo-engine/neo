@@ -151,22 +151,25 @@ namespace SOUND {
     constexpr u16 BGMforLocation( u16 p_locationId ) {
         switch( p_locationId ) {
         case L_ROUTE_38: return MOD_ROUTE_38;
+        case L_HIDDEN_LAKE: return MOD_ROUTE_10;
         case L_ROUTE_101:
         case L_ROUTE_102:
         case L_ROUTE_103: return MOD_ROUTE_101;
-        case L_HIDDEN_LAKE:
         case L_ROUTE_104:
         case L_ROUTE_114:
         case L_ROUTE_115:
         case L_ROUTE_116: return MOD_ROUTE_104;
         case L_ROUTE_105:
         case L_ROUTE_106:
-        case L_ROUTE_107: return MOD_ROUTE_104;
+        case L_ROUTE_107:
+        case L_ROUTE_108:
+        case L_ROUTE_109:
+                          return MOD_ROUTE_104;
         case L_ROUTE_110:
         case L_ROUTE_111:
-        case L_ROUTE_112:
-            //            return MOD_ROUTE_111;
+        case L_ROUTE_112: return MOD_ROUTE_110;
         case L_ROUTE_113: return MOD_ROUTE_113;
+        case L_ROUTE_117:
         case L_ROUTE_118:
         case L_ROUTE_119:
             //            return MOD_ROUTE_118;
@@ -178,6 +181,8 @@ namespace SOUND {
         case L_OLDALE_TOWN: return MOD_OLDALE_TOWN;
         case L_PETALBURG_CITY: return MOD_PETALBURG_CITY;
         case L_RUSTBORO_CITY: return MOD_RUSTBORO_CITY;
+        case L_DEWFORD_TOWN: return MOD_DEWFORD_TOWN;
+        case L_SLATEPORT_CITY: return MOD_SLATEPORT_CITY;
         case L_FALLARBOR_TOWN: return MOD_FALLARBOR_TOWN;
         case L_METEOR_FALLS: return MOD_METEOR_FALLS;
         case L_SEALED_CHAMBER:
@@ -200,6 +205,7 @@ namespace SOUND {
         case L_FORTREE_GYM:
         case L_MOSSDEEP_GYM:
         case L_SOOTOPOLIS_GYM: return MOD_POKEMON_GYM;
+        case L_PROF_BIRCH_S_LAB: return MOD_PROF_BIRCH_LAB;
         default: return MOD_ABANDONED_SHIP;
         }
     }

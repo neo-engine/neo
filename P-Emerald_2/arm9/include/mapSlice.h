@@ -27,7 +27,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include <cstring>
-#include <memory>
 #include <vector>
 #include <nds/ndstypes.h>
 
@@ -38,10 +37,10 @@ namespace MAP {
 
     const char* const MAP_PATH      = "nitro:/MAPS/";
     const char* const TILESET_PATH  = "nitro:/MAPS/TILESETS/";
-    const char* const BLOCKSET_PATH  = "nitro:/MAPS/BLOCKSETS/";
+    const char* const BLOCKSET_PATH = "nitro:/MAPS/BLOCKSETS/";
     const char* const PALETTE_PATH  = "nitro:/MAPS/PALETTES/";
     const u16         SIZE          = 32;
-    const s16         dir[ 4 ][ 2 ] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+    const s16         dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
     typedef struct {
         u16 m_pal[ 16 ];
@@ -88,6 +87,7 @@ namespace MAP {
     };
 
     struct mapSlice {
+        bool         m_loaded = false;
         palette      m_pals[ 16 ];
         tileSet      m_tileSet;
         blockSet     m_blockSet;
@@ -95,9 +95,7 @@ namespace MAP {
         u8           m_map;
         u16          m_x, m_y;
         u8           m_tIdx1, m_tIdx2;
-
-        std::pair<u16, u16> m_pokemon[ 3 * 5 * 5 ];
     };
-    void constructSlice( u8 p_map, u16 p_x, u16 p_y, std::unique_ptr<mapSlice>& p_result,
-                         std::unique_ptr<mapSlice> p_cache[ 2 ][ 2 ] = 0 );
+    void constructSlice( u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
+                         mapSlice p_cache[ 2 ][ 2 ] = 0 );
 } // namespace MAP

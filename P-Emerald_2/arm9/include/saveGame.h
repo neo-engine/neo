@@ -51,13 +51,13 @@ namespace SAVE {
     constexpr u16 F_NAV_OBTAINED     = 2;
     constexpr u16 F_DEX_OBTAINED     = 3;
     constexpr u16 F_NAT_DEX_OBTAINED = 4;
+    constexpr u16 F_RIVAL_APPEARANCE = 5; // set if rival has appearance 1
 
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;
     }
 
     constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
-    constexpr u8 V_RIVAL_APPEARANCE    = 1;
 
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 

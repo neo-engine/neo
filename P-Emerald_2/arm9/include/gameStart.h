@@ -31,4 +31,5 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace SAVE {
     bool initSpecialEpisode( s8 p_episode );
+    void printTextAndWait( const char* p_text );
 }

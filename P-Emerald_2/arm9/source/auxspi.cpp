@@ -38,8 +38,9 @@ namespace FS::CARD {
 
         // Encrypted cards are always bad
         if( !!std::memcmp( header1, header2, 32 ) ) { return false; }
+#ifndef DESQUID
         if( !!std::memcmp( header1, GAME_TITLE, 12 ) ) { return false; }
-
+#endif
         return true;
     }
 

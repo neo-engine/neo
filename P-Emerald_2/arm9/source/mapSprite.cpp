@@ -59,7 +59,7 @@ namespace MAP {
                 p_imageId = SAVE::SAV.getActiveFile( ).m_appearance;
             } else if( p_imageId == 251 ) {
                 // load rival's appearance
-                p_imageId = SAVE::SAV.getActiveFile( ).getVar( SAVE::V_RIVAL_APPEARANCE );
+                p_imageId = SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE );
 
             } else {
                 p_imageId &= 255;
@@ -98,6 +98,11 @@ namespace MAP {
     }
 
     void mapSprite::drawFrame( u8 p_oamIdx, u8 p_value, bool p_hFlip ) {
+
+#ifdef DESQUID
+//        NAV::printMessage( ( std::string( " Draw Frame " ) + std::to_string( p_value ) ).c_str( )
+//        );
+#endif
         IO::setOWSpriteFrame( p_value, p_hFlip, p_oamIdx, _data.m_palData, _data.m_frameData );
     }
 

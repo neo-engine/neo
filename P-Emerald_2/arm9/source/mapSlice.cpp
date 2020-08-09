@@ -38,64 +38,64 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace MAP {
-    void constructSlice( u8 p_map, u16 p_x, u16 p_y, std::unique_ptr<mapSlice>& p_result,
-                         std::unique_ptr<mapSlice> p_cache[ 2 ][ 2 ] ) {
+    void constructSlice( u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
+                         mapSlice p_cache[ 2 ][ 2 ] ) {
         FILE* mapF;
+        char  buffer[ 50 ];
 
         if( p_map == 10 ) {
-            mapF = FS::open( MAP_PATH,
-                             ( std::to_string( p_map ) + "/" + std::to_string( p_y ) + "/"
-                               + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
-                                 .c_str( ),
-                             ".map" );
+            snprintf( buffer, 49, "%hhu/%hu/%hu_%hu", p_map, p_y, p_y, p_x );
+            mapF = FS::open( MAP_PATH, buffer, ".map" );
         } else {
-            mapF = FS::open( MAP_PATH,
-                             ( std::to_string( p_map ) + "/"
-                               + std::to_string( p_y ) + "_" + std::to_string( p_x ) )
-                                 .c_str( ),
-                             ".map" );
+            snprintf( buffer, 49, "%hhu/%hu_%hu", p_map, p_y, p_x );
+            mapF = FS::open( MAP_PATH, buffer, ".map" );
         }
+        bool nomap = false;
         if( !mapF ) {
 #ifdef DESQUID_MORE
-            char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
             NAV::printMessage( buffer, MSG_INFO );
             swiWaitForVBlank( );
 #endif
-            mapF = FS::open( MAP_PATH, "empty", ".map" );
-            if( !mapF ) return;
+            // mapF = FS::open( MAP_PATH, "empty", ".map" );
+            nomap = true;
+            // if( !mapF ) return;
         }
 
         bool reloadTs = false;
-        if( !p_result ) {
-            p_result = std::unique_ptr<mapSlice>( new mapSlice );
-            reloadTs = true;
-        }
 #ifdef DESQUID
-        if( !p_result ) { NAV::printMessage( "Not enough memory :(", MSG_INFO ); }
+        if( !p_result ) {
+            NAV::printMessage( "Bad things happened, aborting", MSG_INFO );
+            return;
+        }
 #endif
+        if( !p_result->m_loaded ) { reloadTs = !nomap; }
 
-        FS::readNop( mapF, 8 );
-        p_result->m_x = p_x;
-        p_result->m_y = p_y;
+        if( !nomap ) { FS::readNop( mapF, 8 ); }
+        p_result->m_loaded = true;
+        p_result->m_x      = p_x;
+        p_result->m_y      = p_y;
 
         u8 tsidx1, tsidx2;
-        FS::read( mapF, &tsidx1, sizeof( u8 ), 1 );
-        FS::readNop( mapF, 3 );
-        FS::read( mapF, &tsidx2, sizeof( u8 ), 1 );
-        FS::readNop( mapF, 3 );
+        if( !nomap ) {
+            FS::read( mapF, &tsidx1, sizeof( u8 ), 1 );
+            FS::readNop( mapF, 3 );
+            FS::read( mapF, &tsidx2, sizeof( u8 ), 1 );
+            FS::readNop( mapF, 3 );
 
-        u8 b1, b2;
-        FS::read( mapF, &b1, sizeof( u8 ), 1 );
-        FS::read( mapF, &b2, sizeof( u8 ), 1 );
-        FS::readNop( mapF, 2 );
+            u8 b1, b2;
+            FS::read( mapF, &b1, sizeof( u8 ), 1 );
+            FS::read( mapF, &b2, sizeof( u8 ), 1 );
+            FS::readNop( mapF, 2 );
 
-        if( b1 && b2 ) {
-            FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), b1 * b2 ); // Border blocks
+            if( b1 && b2 ) {
+                FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ),
+                          b1 * b2 ); // Border blocks
+            }
+
+            FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
+            FS::close( mapF );
         }
-
-        FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
-        FS::close( mapF );
 
         // Read the first tileset
         if( reloadTs || p_result->m_tIdx1 != tsidx1 ) {
@@ -103,21 +103,21 @@ namespace MAP {
             if( !reloadTs && p_cache ) {
                 for( u8 i = 0; i < 2; ++i )
                     for( u8 j = 0; j < 2; ++j )
-                        if( p_cache[ i ][ j ] && p_cache[ i ][ j ]->m_tIdx1 == tsidx1 ) {
+                        if( p_cache[ i ][ j ].m_loaded && p_cache[ i ][ j ].m_tIdx1 == tsidx1 ) {
                             found = true;
                             memcpy( p_result->m_tileSet.m_tiles,
-                                    p_cache[ i ][ j ]->m_tileSet.m_tiles,
+                                    p_cache[ i ][ j ].m_tileSet.m_tiles,
                                     MAX_TILES_PER_TILE_SET * sizeof( tile ) );
                             memcpy( p_result->m_blockSet.m_blocks,
-                                    p_cache[ i ][ j ]->m_blockSet.m_blocks,
+                                    p_cache[ i ][ j ].m_blockSet.m_blocks,
                                     MAX_BLOCKS_PER_TILE_SET * sizeof( block ) );
 
-                            memcpy( p_result->m_pals, p_cache[ i ][ j ]->m_pals,
+                            memcpy( p_result->m_pals, p_cache[ i ][ j ].m_pals,
                                     6 * sizeof( palette ) );
                             p_result->m_tileSet.m_animationCount1
-                                = p_cache[ i ][ j ]->m_tileSet.m_animationCount1;
+                                = p_cache[ i ][ j ].m_tileSet.m_animationCount1;
                             memcpy( p_result->m_tileSet.m_animations,
-                                    p_cache[ i ][ j ]->m_tileSet.m_animations,
+                                    p_cache[ i ][ j ].m_tileSet.m_animations,
                                     MAX_ANIM_PER_TILE_SET * sizeof( tileSet::animation ) );
                             break;
                         }
@@ -136,12 +136,12 @@ namespace MAP {
                 FS::close( mapF );
 
                 // TODO: FIX THIS!
-                mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
-                if( mapF ) {
-                    p_result->m_tileSet.m_animationCount1
-                        = FS::readAnimations( mapF, p_result->m_tileSet.m_animations );
-                    FS::close( mapF );
-                }
+                // mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
+                // if( mapF ) {
+                //     p_result->m_tileSet.m_animationCount1
+                //         = FS::readAnimations( mapF, p_result->m_tileSet.m_animations );
+                //     FS::close( mapF );
+                // }
             }
             p_result->m_tIdx1 = tsidx1;
         }
@@ -151,22 +151,21 @@ namespace MAP {
             if( !reloadTs && p_cache ) {
                 for( u8 i = 0; i < 2; ++i )
                     for( u8 j = 0; j < 2; ++j )
-                        if( p_cache[ i ][ j ] && p_cache[ i ][ j ]->m_tIdx2 == tsidx2 ) {
+                        if( p_cache[ i ][ j ].m_loaded && p_cache[ i ][ j ].m_tIdx2 == tsidx2 ) {
                             found = true;
                             memcpy( p_result->m_tileSet.m_tiles + MAX_TILES_PER_TILE_SET,
-                                    p_cache[ i ][ j ]->m_tileSet.m_tiles + MAX_TILES_PER_TILE_SET,
+                                    p_cache[ i ][ j ].m_tileSet.m_tiles + MAX_TILES_PER_TILE_SET,
                                     MAX_TILES_PER_TILE_SET * sizeof( tile ) );
                             memcpy( p_result->m_blockSet.m_blocks + MAX_BLOCKS_PER_TILE_SET,
-                                    p_cache[ i ][ j ]->m_blockSet.m_blocks
-                                        + MAX_BLOCKS_PER_TILE_SET,
+                                    p_cache[ i ][ j ].m_blockSet.m_blocks + MAX_BLOCKS_PER_TILE_SET,
                                     MAX_BLOCKS_PER_TILE_SET * sizeof( block ) );
 
-                            memcpy( p_result->m_pals + 6, p_cache[ i ][ j ]->m_pals + 6,
+                            memcpy( p_result->m_pals + 6, p_cache[ i ][ j ].m_pals + 6,
                                     8 * sizeof( palette ) );
                             p_result->m_tileSet.m_animationCount2
-                                = p_cache[ i ][ j ]->m_tileSet.m_animationCount2;
+                                = p_cache[ i ][ j ].m_tileSet.m_animationCount2;
                             memcpy( p_result->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET,
-                                    p_cache[ i ][ j ]->m_tileSet.m_animations
+                                    p_cache[ i ][ j ].m_tileSet.m_animations
                                         + MAX_ANIM_PER_TILE_SET,
                                     MAX_ANIM_PER_TILE_SET * sizeof( tileSet::animation ) );
                             break;
@@ -185,12 +184,12 @@ namespace MAP {
                 FS::readPal( mapF, p_result->m_pals + 6, 8 );
                 FS::close( mapF );
 
-                mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );
-                if( mapF ) {
-                    p_result->m_tileSet.m_animationCount2 = FS::readAnimations(
-                        mapF, p_result->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET );
-                    FS::close( mapF );
-                }
+                // mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );
+                // if( mapF ) {
+                //     p_result->m_tileSet.m_animationCount2 = FS::readAnimations(
+                //         mapF, p_result->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET );
+                //     FS::close( mapF );
+                // }
             }
             p_result->m_tIdx2 = tsidx2;
         }

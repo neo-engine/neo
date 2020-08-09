@@ -91,6 +91,39 @@ namespace MAP {
         CLEAR         = 0xFE, // Call IO::drawNav( true )
         EOP           = 0xFF  // Exit the script
     };
+
+    std::string parseLogCmd( const std::string& p_cmd ) {
+        if( p_cmd == "PLAYER" ) { return SAVE::SAV.getActiveFile( ).m_playername; }
+        if( p_cmd == "RIVAL" ) {
+            if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                return GET_STRING( 461 );
+            } else {
+                return GET_STRING( 460 );
+            }
+        }
+
+        return "";
+    }
+
+    void printMapMessage( const std::string& p_text, style p_style ) {
+        std::string res = "";
+
+        for( size_t i = 0; i < p_text.size( ); ++i ) {
+            if( p_text[ i ] == '[' ) {
+                std::string accmd = "";
+                while( p_text[ ++i ] != ']' ) { accmd += p_text[ i ]; }
+                res += parseLogCmd( accmd );
+                continue;
+            } else if( p_text[ i ] == '\r' ) {
+                NAV::printMessage( res.c_str( ), p_style );
+                res = "";
+                continue;
+            }
+            res += p_text[ i ];
+        }
+        NAV::printMessage( res.c_str( ), p_style );
+    }
+
 #ifdef false
     bool mapDrawer::executeScript( u8 p_map, u8 p_globX, u8 p_globY, u8 p_z, u8 p_number,
                                    invocationType p_inv ) {
@@ -333,8 +366,15 @@ namespace MAP {
     void mapDrawer::runEvent( mapData::event p_event ) {
         switch( p_event.m_type ) {
         case EVENT_MESSAGE:
-            NAV::printMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
-                               (style) p_event.m_data.m_message.m_msgType );
+            printMapMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
+                             (style) p_event.m_data.m_message.m_msgType );
+            break;
+        case EVENT_NPC_MESSAGE:
+            printMapMessage( GET_MAP_STRING( p_event.m_data.m_npc.m_scriptId ),
+                             ( style )( p_event.m_data.m_npc.m_scriptType & 127 ) );
+            if( p_event.m_data.m_npc.m_scriptType & 128 ) {
+                SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, true );
+            }
             break;
         case EVENT_TRAINER: {
             auto tr = BATTLE::getBattleTrainer( p_event.m_data.m_trainer.m_trainerId );
@@ -356,11 +396,7 @@ namespace MAP {
                     = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                       SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr );
                 if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
-                    // TODO: faint player
-                    // FADE_TOP_DARK( );
-                    // ANIMATE_MAP = true;
-                    // NAV::init( );
-
+                    faintPlayer( );
                 } else {
                     SAVE::SAV.getActiveFile( ).setFlag(
                         SAVE::F_TRAINER_BATTLED( p_event.m_deactivateFlag ), true );
