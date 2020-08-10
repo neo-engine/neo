@@ -176,6 +176,7 @@ namespace SOUND {
         case L_ROUTE_120:
         case L_ROUTE_121: return MOD_ROUTE_120;
         case L_ROUTE_123: return MOD_ROUTE_123;
+        case L_VERDANTURF_TOWN:
         case L_CLIFFELTA_CITY: return MOD_CLIFFELTA_CITY;
         case L_LITTLEROOT_TOWN: return MOD_LITTLEROOT_TOWN;
         case L_OLDALE_TOWN: return MOD_OLDALE_TOWN;
@@ -193,6 +194,7 @@ namespace SOUND {
         case L_ROUTE_111_DESERT: return MOD_DESERT;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
         case L_GRANITE_CAVE:
+        case L_RUSTURF_TUNNEL:
         case L_PETALBURG_WOODS:
         case L_JAGGED_PASS: return MOD_CAVE_FORESTS;
         case L_POKEMON_MART: return MOD_POKEMON_MART;

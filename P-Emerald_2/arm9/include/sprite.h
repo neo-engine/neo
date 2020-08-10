@@ -230,6 +230,8 @@ namespace IO {
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIndex, u16 p_tileCnt, bool p_bottom );
 
+    u16 loadLocationBackB( u8 p_idx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
+                           u16 p_tileCnt, bool p_bottom );
     u16 loadPlatform( u8 p_platformIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                       u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
     u16 loadRibbonIcon( u8 p_ribbonIdx, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,

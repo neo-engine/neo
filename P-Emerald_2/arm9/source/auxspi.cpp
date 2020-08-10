@@ -106,7 +106,7 @@ namespace FS::CARD {
         waitWriteInProgress( );
         write( 0x40, 0x05 );
         waitWriteInProgress( );
-        swiDelay( 24 );
+        swiDelay( 14 );
     }
 
     const u32 BLOCK_LEN = 256;
@@ -158,7 +158,7 @@ namespace FS::CARD {
             waitWriteInProgress( );
             write( 0x40, 0x05 );
             waitWriteInProgress( );
-            swiDelay( 24 );
+            swiDelay( 14 );
 
             // Verify that the write succeeded
             write( 0x40, 0x03 );
@@ -190,7 +190,7 @@ namespace FS::CARD {
             waitWriteInProgress( );
             write( 0x40, 0x05 );
             waitWriteInProgress( );
-            swiDelay( 24 );
+            swiDelay( 14 );
         }
         return !error;
     }

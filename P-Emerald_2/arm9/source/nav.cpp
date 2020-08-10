@@ -279,6 +279,49 @@ namespace NAV {
         printMessage( p_message );
     }
 
+    constexpr u8 BGforLocation( u16 p_locId ) {
+        switch( p_locId ) {
+        case L_HIDDEN_LAKE:
+        case L_ROUTE_38: return 7;
+        case L_MAUVILLE_CITY:
+        case L_PETALBURG_CITY:
+        case L_DEWFORD_TOWN:
+        case L_MOSSDEEP_CITY: return 3;
+        case L_ROUTE_105:
+        case L_ROUTE_106:
+        case L_ROUTE_107:
+        case L_ROUTE_108:
+        case L_ROUTE_109: return 2;
+        case L_RUSTBORO_CITY:
+        case L_SLATEPORT_CITY:
+        case L_SOOTOPOLIS_CITY:
+        case L_CLIFFELTA_CITY: return 6;
+        case L_METEOR_FALLS:
+        case L_SEALED_CHAMBER:
+        case L_ANCIENT_TOMB:
+        case L_ISLAND_CAVE:
+        case L_DESERT_RUINS:
+        case L_SHOAL_CAVE:
+        case L_RUSTURF_TUNNEL:
+        case L_GRANITE_CAVE: return 4;
+        case L_POKEMON_MART:
+        case L_POKEMON_CENTER:
+        case L_RUSTBORO_GYM:
+        case L_DEWFORD_GYM:
+        case L_MAUVILLE_GYM:
+        case L_LAVARIDGE_GYM:
+        case L_PETALBURG_GYM:
+        case L_FORTREE_GYM:
+        case L_MOSSDEEP_GYM:
+        case L_SOOTOPOLIS_GYM:
+        case L_PROF_BIRCH_S_LAB:
+        case L_LILYCOVE_MUSEUM: return 1;
+        case L_FORTREE_CITY:
+        case L_PETALBURG_WOODS: return 5;
+        default: return 0;
+        }
+    }
+
     u16  CURRENT_LOCATION = 0;
     u8   LOCATION_TIMER   = 0;
     void showNewLocation( u16 p_newLocation ) {
@@ -290,17 +333,23 @@ namespace NAV {
         LOCATION_TIMER   = 120;
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        IO::regularFont->setColor( 3, 1 );
+        if( BGforLocation( p_newLocation ) == 3 || BGforLocation( p_newLocation ) == 6 ) {
+            IO::regularFont->setColor( 1, 1 );
+        } else {
+            IO::regularFont->setColor( 3, 1 );
+        }
         IO::regularFont->setColor( 2, 2 );
-        IO::regularFont->printStringBC( FS::getLocation( p_newLocation ).c_str( ), TEXT_PAL,
-                                        TEXT_BUF, 128 );
+        IO::regularFont->printStringBC( ( FS::getLocation( p_newLocation ) + " " ).c_str( ),
+                                        TEXT_PAL, TEXT_BUF, 128, IO::font::CENTER );
         u16 tileCnt = SPR_MSG_GFX;
-        u16 x = 8, y = 8;
+        u16 x = 0, y = 8;
         tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, 32, TEXT_BUF, 64 * 32 / 2,
                                    false, false, false, OBJPRIORITY_0, false );
         tileCnt
             = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32, TEXT_BUF + 64 * 32,
                                64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
+        tileCnt = IO::loadLocationBackB( BGforLocation( p_newLocation ), 1, 1, SPR_MSGTEXT_OAM + 2,
+                                         tileCnt, false );
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -313,9 +362,13 @@ namespace NAV {
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM ].isHidden     = true;
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 1 ].isHidden = true;
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 2 ].isHidden = true;
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 3 ].isHidden = true;
         } else {
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM ].y -= 2;
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 1 ].y -= 2;
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 2 ].y -= 2;
+            IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + 3 ].y -= 2;
         }
         IO::updateOAM( false );
     }

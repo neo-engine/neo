@@ -1279,6 +1279,20 @@ namespace IO {
                             256, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
+    u16 loadLocationBackB( u8 p_idx, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+                           bool p_bottom ) {
+        if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/LOC/",
+                                                        ( std::to_string( p_idx ) ).c_str( ), 16,
+                                                        TEMP_PAL, 128 * 32 / 8, TEMP ) ) {
+            loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 64, 32, TEMP_PAL, TEMP, 64 * 32 / 2,
+                         false, false, false, OBJPRIORITY_0, p_bottom );
+            return loadSpriteB( ++p_oamIdx, p_tileCnt + 64, p_posX + 64, p_posY, 64, 32, TEMP_PAL,
+                                TEMP + 64 * 32 / 8, 64 * 32 / 2, false, false, false, OBJPRIORITY_0,
+                                p_bottom );
+        } else {
+            return loadLocationBackB( 0, p_posX, p_posY, p_oamIdx, p_tileCnt, p_bottom );
+        }
+    }
     u16 loadPlatform( u8 p_platform, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom ) {
 
