@@ -73,6 +73,12 @@ namespace MAP {
         constexpr auto operator<=>( const position& ) const = default;
     };
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
+
+    struct movement {
+        direction m_direction;
+        u8        m_frame;
+    };
+
     typedef std::pair<u8, position> warpPos;
     enum moveMode {
         // Player modes
@@ -87,27 +93,29 @@ namespace MAP {
         ROCK_CLIMB = ( 1 << 5 ),
         STRENGTH   = ( 1 << 6 ),
         // NPC modes
-        NO_MOVEMENT     = 0,
-        LOOK_UP         = 1,
-        LOOK_DOWN       = 2,
-        LOOK_RIGHT      = 4,
-        LOOK_LEFT       = 8,
-        WALK_LEFT_RIGHT = 16,
-        WALK_UP_DOWN    = 17,
-        WALK_CIRCLE     = 18,
+        NO_MOVEMENT            = 0,
+        LOOK_UP                = 1,
+        LOOK_DOWN              = 2,
+        LOOK_RIGHT             = 4,
+        LOOK_LEFT              = 8,
+        WALK_LEFT_RIGHT        = 16,
+        WALK_UP_DOWN           = 17,
+        WALK_CIRCLE            = 18,
+        WALK_AROUND_LEFT_RIGHT = 19,
+        WALK_AROUND_UP_DOWN    = 20,
     };
     enum eventType : u8 {
-        EVENT_NONE      = 0,
-        EVENT_MESSAGE   = 1,
-        EVENT_ITEM      = 2,
-        EVENT_TRAINER   = 3,
-        EVENT_OW_PKMN   = 4,
-        EVENT_NPC       = 5,
-        EVENT_WARP      = 6,
-        EVENT_GENERIC   = 7,
-        EVENT_HMOBJECT  = 8, // cut, rock smash, strength
-        EVENT_BERRYTREE = 9,
-        EVENT_NPC_MESSAGE   = 10,
+        EVENT_NONE        = 0,
+        EVENT_MESSAGE     = 1,
+        EVENT_ITEM        = 2,
+        EVENT_TRAINER     = 3,
+        EVENT_OW_PKMN     = 4,
+        EVENT_NPC         = 5,
+        EVENT_WARP        = 6,
+        EVENT_GENERIC     = 7,
+        EVENT_HMOBJECT    = 8, // cut, rock smash, strength
+        EVENT_BERRYTREE   = 9,
+        EVENT_NPC_MESSAGE = 10,
     };
     enum eventTrigger : u8 {
         TRIGGER_NONE           = 0,

@@ -75,6 +75,7 @@ namespace MAP {
         u16            m_range;
         direction      m_direction;
         mapData::event m_event;
+        movement       m_currentMovement;
 
         inline mapSprite sprite( ) const {
             u8 frameStart = getFrame( m_direction );

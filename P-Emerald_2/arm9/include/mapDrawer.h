@@ -56,8 +56,6 @@ namespace MAP {
         u8 _playerSprite;     // id of the player sprite
         u8 _playerPlatSprite; // id of the player platform sprite
 
-        std::vector<std::pair<u8, mapObject>> _objects;
-
         bool _strengthUsed; // Player has used HM Strength and can move boulders
 
         u16 _lastrow, // Row to be filled when extending the map to the top
@@ -89,7 +87,8 @@ namespace MAP {
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
-        void drawObjects( );
+
+        void moveMapObject( u8 p_objectId, movement p_movement );
 
         void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 

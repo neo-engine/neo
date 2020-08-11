@@ -72,7 +72,8 @@ namespace MAP {
         u8 st = rand( ) % 4;
 
         for( u8 i = 0; i < 4; ++i ) {
-            if( p_movement & ( 1 << ( ( st + i ) % 4 ) ) ) {
+            if( ( p_movement == WALK_AROUND_LEFT_RIGHT ) || ( p_movement == WALK_AROUND_UP_DOWN )
+                || ( p_movement & ( 1 << ( ( st + i ) % 4 ) ) ) ) {
                 return movement2Direction( ( st + i ) % 4 );
             }
         }
@@ -298,7 +299,6 @@ namespace MAP {
               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true ); // Draw the map
 
         drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority ); // Draw the player
-        // drawObjects( );             // Draw NPCs / stuff
 
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
@@ -318,39 +318,52 @@ namespace MAP {
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio );
     }
 
-    void mapDrawer::drawObjects( ) {
-        // u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        // u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
-        // u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+    void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement ) {
+        // redirect object
+        if( p_movement.m_frame == 0 ) {
+            _mapSprites.setFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
+                                  getFrame( p_movement.m_direction ) );
+        }
+        if( p_movement.m_frame == 15 ) {
+            _mapSprites.drawFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
+                                   getFrame( p_movement.m_direction ) );
+        }
 
-        /*
-        std::vector<mapObject> toDraw = std::vector<mapObject>( );
-        if( dist( curx, cury, i.m_pos.m_x, i.m_pos.m_y ) < 17 ) { toDraw.push_back( i ); }
-        std::sort( toDraw.begin( ), toDraw.end( ),
-                   [ & ]( const mapObject& p_a, const mapObject& p_b ) {
-                       if( dist( curx, cury, p_a.m_pos.m_posX, p_a.m_pos.m_posY )
-                           < dist( curx, cury, p_b.m_pos.m_posX, p_b.m_pos.m_posY ) ) {
-                           return true;
-                       }
-                       return p_a < p_b;
-                   } );
-
-        u8  oam     = SPR_OBJECTS_OAM;
-        u16 tileCnt = SPR_OBJECTS_GFX;
-*/
-        //        _objSprites.clear( );
-
-        // for( auto i : toDraw ) {
-        //            _objSprites.push_back( i.show( currx, curry, oam++, tileCnt ) );
-        //            _objSprites.back( ).currentFrame( );
-        //            tileCnt += 32;
-        // }
+        for( u8 i = 0; i < 16; ++i ) {
+            if( i == p_movement.m_frame ) {
+                _mapSprites.moveSprite( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
+                                        p_movement.m_direction, 1 );
+                if( i == 8 ) {
+                    _mapSprites.nextFrame(
+                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first );
+                }
+            }
+        }
+        if( p_movement.m_frame == 10 ) {
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
+                += dir[ p_movement.m_direction ][ 0 ];
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
+                += dir[ p_movement.m_direction ][ 1 ];
+            animateField(
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+        }
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         switch( behave ) {
+        case 0x24: {
+            // very hacky, I know
+            atom( p_globX, p_globY ).m_blockidx = 0x212;
+
+            loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
+                       ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
+            bgUpdate( );
+
+            break;
+        }
         default: break;
         }
 
@@ -377,20 +390,12 @@ namespace MAP {
                     SAVE::SAV.getActiveFile( ).m_ashCount = 999'999'999;
                 }
             }
-            // very hacky, I know
-            atom( p_globX, p_globY ).m_blockidx = 0x212;
-
-            loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
-                       ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
-            bgUpdate( );
-
             break;
         }
         default: break;
         }
 
         if( p_allowWildPkmn ) {
-
             // Check for trainer
 
             handleWildPkmn( p_globX, p_globY );
@@ -847,6 +852,73 @@ namespace MAP {
     }
 
     void mapDrawer::animateMap( u8 p_frame ) {
+
+        // animate map objects
+
+        bool change = false;
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+            if( o.first == 255 ) { continue; }
+
+            if( o.second.m_movement <= 15 || o.second.m_movement == WALK_AROUND_LEFT_RIGHT
+                || o.second.m_movement == WALK_AROUND_UP_DOWN ) {
+                if( ( p_frame & 127 ) == 127 ) {
+                    o.second.m_direction = getRandomLookDirection( o.second.m_movement );
+                    _mapSprites.setFrame( o.first, getFrame( o.second.m_direction ), false );
+                    change = true;
+                }
+            }
+
+            if( change ) { continue; }
+
+            if( o.second.m_currentMovement.m_frame ) {
+                moveMapObject( i, o.second.m_currentMovement );
+                o.second.m_currentMovement.m_frame
+                    = ( o.second.m_currentMovement.m_frame + 1 ) & 15;
+                continue;
+            }
+
+            if( o.second.m_movement == WALK_AROUND_LEFT_RIGHT
+                || o.second.m_movement == WALK_LEFT_RIGHT ) {
+                if( ( p_frame & 127 ) == 63 ) {
+                    if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
+                        o.second.m_currentMovement = { LEFT, 0 };
+                    } else if( ( o.second.m_pos.m_posX + 1 ) % SIZE
+                               == o.second.m_event.m_posX % SIZE ) {
+                        o.second.m_currentMovement = { RIGHT, 0 };
+                    } else {
+                        if( o.second.m_currentMovement.m_direction != LEFT
+                            && o.second.m_currentMovement.m_direction != RIGHT ) {
+                            o.second.m_currentMovement = { RIGHT, 0 };
+                        }
+                    }
+                    moveMapObject( i, o.second.m_currentMovement );
+                    o.second.m_currentMovement.m_frame++;
+                }
+            }
+            if( o.second.m_movement == WALK_AROUND_UP_DOWN
+                || o.second.m_movement == WALK_UP_DOWN ) {
+                if( ( p_frame & 127 ) == 63 ) {
+                    if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
+                        o.second.m_currentMovement = { UP, 0 };
+                    } else if( ( o.second.m_pos.m_posY + 1 ) % SIZE
+                               == o.second.m_event.m_posY % SIZE ) {
+                        o.second.m_currentMovement = { DOWN, 0 };
+
+                    } else {
+                        if( o.second.m_currentMovement.m_direction != UP
+                            && o.second.m_currentMovement.m_direction != DOWN ) {
+                            o.second.m_currentMovement = { DOWN, 0 };
+                        }
+                        o.second.m_currentMovement.m_frame = 0;
+                    }
+                    moveMapObject( i, o.second.m_currentMovement );
+                }
+            }
+        }
+
+        if( change ) { _mapSprites.update( ); }
+
         return;
 
         // if( !CUR_SLICE ) return;
@@ -2245,6 +2317,7 @@ namespace MAP {
                 obj.m_range     = (MAP::moveMode) p_data.m_events[ i ].m_data.m_trainer.m_sight;
                 obj.m_direction = getRandomLookDirection( obj.m_movement );
                 obj.m_event     = p_data.m_events[ i ];
+                obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
                 std::pair<u8, mapObject> cur = { 0, obj };
                 loadMapObject( cur );
@@ -2264,6 +2337,7 @@ namespace MAP {
                 obj.m_range     = 0;
                 obj.m_direction = getRandomLookDirection( obj.m_movement );
                 obj.m_event     = p_data.m_events[ i ];
+                obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
                 std::pair<u8, mapObject> cur = { 0, obj };
                 loadMapObject( cur );
