@@ -57,6 +57,29 @@ namespace MAP {
 #define SPR_PKMN_GFX 303
 #define SPR_CIRC_GFX 447
 
+    constexpr direction movement2Direction( u8 p_move ) {
+        switch( p_move ) {
+        case 0: return UP;
+        case 1: return DOWN;
+        case 2: return RIGHT;
+        case 3: return LEFT;
+
+        default: return DOWN;
+        }
+    }
+
+    direction getRandomLookDirection( moveMode p_movement ) {
+        u8 st = rand( ) % 4;
+
+        for( u8 i = 0; i < 4; ++i ) {
+            if( p_movement & ( 1 << ( ( st + i ) % 4 ) ) ) {
+                return movement2Direction( ( st + i ) % 4 );
+            }
+        }
+
+        return DOWN;
+    }
+
     mapDrawer* curMap = nullptr;
 #define CUR_SLICE _slices[ _curX ][ _curY ]
     constexpr s8 currentHalf( u16 p_pos ) {
@@ -73,6 +96,8 @@ namespace MAP {
             p_mapObject.first = _mapSprites.loadSprite(
                 curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
                 mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
+            _mapSprites.setFrame( p_mapObject.first, getFrame( p_mapObject.second.m_direction ),
+                                  false );
 #ifdef DESQUID_MORE
             NAV::printMessage( ( std::to_string( p_mapObject.first ) + " " + std::to_string( curx )
                                  + " " + std::to_string( cury ) + " "
@@ -2218,7 +2243,7 @@ namespace MAP {
                 obj.m_movement
                     = (MAP::moveMode) p_data.m_events[ i ].m_data.m_trainer.m_movementType;
                 obj.m_range     = (MAP::moveMode) p_data.m_events[ i ].m_data.m_trainer.m_sight;
-                obj.m_direction = UP; // TODO
+                obj.m_direction = getRandomLookDirection( obj.m_movement );
                 obj.m_event     = p_data.m_events[ i ];
 
                 std::pair<u8, mapObject> cur = { 0, obj };
@@ -2237,7 +2262,7 @@ namespace MAP {
                 obj.m_picNum    = p_data.m_events[ i ].m_data.m_npc.m_spriteId;
                 obj.m_movement  = (MAP::moveMode) p_data.m_events[ i ].m_data.m_npc.m_movementType;
                 obj.m_range     = 0;
-                obj.m_direction = UP; // TODO
+                obj.m_direction = getRandomLookDirection( obj.m_movement );
                 obj.m_event     = p_data.m_events[ i ];
 
                 std::pair<u8, mapObject> cur = { 0, obj };

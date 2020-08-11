@@ -994,11 +994,12 @@ namespace IO {
         u8 frame = p_frame;
         u8 wd = spriteInfoTop[ p_oamIdx ].m_width, hg = spriteInfoTop[ p_oamIdx ].m_height;
 
-        loadSpriteB(
-            p_oamIdx, OamTop->oamBuffer[ p_oamIdx ].gfxIndex, OamTop->oamBuffer[ p_oamIdx ].x,
-            OamTop->oamBuffer[ p_oamIdx ].y, wd, hg, p_palData,
-            reinterpret_cast<unsigned int*>( p_dataBuffer ) + wd * hg * frame / 8, wd * hg / 2,
-            false, false, false, OamTop->oamBuffer[ p_oamIdx ].priority, false );
+        loadSpriteB( p_oamIdx, OamTop->oamBuffer[ p_oamIdx ].gfxIndex,
+                     OamTop->oamBuffer[ p_oamIdx ].x, OamTop->oamBuffer[ p_oamIdx ].y, wd, hg,
+                     p_palData,
+                     reinterpret_cast<unsigned int*>( p_dataBuffer ) + wd * hg * frame / 8,
+                     wd * hg / 2, false, false, OamTop->oamBuffer[ p_oamIdx ].isHidden,
+                     OamTop->oamBuffer[ p_oamIdx ].priority, false );
 
         OamTop->oamBuffer[ p_oamIdx ].hFlip = p_flip;
     }

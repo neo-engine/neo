@@ -150,7 +150,7 @@ namespace MAP {
                          p_data.m_palData,
                          reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
                          p_data.m_width * p_data.m_height / 2, false, false,
-                         !( p_posX < 256 && p_posY < 192 ), OBJPRIORITY_1, false );
+                         !( p_posX < 256 && p_posY < 192 ), OBJPRIORITY_2, false );
     }
 
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
@@ -435,15 +435,18 @@ namespace MAP {
             getManagedSprite( p_spriteId ).m_pos.translateSprite( p_dx, p_dy );
             IO::OamTop->oamBuffer[ p_spriteId ].isHidden
                 = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
-            if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0 ) {
+            if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 16
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -16 ) {
                 IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
             } else {
                 IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
             }
 #ifdef DESQUID_MORE
             NAV::printMessage( ( std::to_string( p_spriteId ) + " hidden? "
-                        + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].isHidden ) )
-                          .c_str( ) );
+                                 + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].isHidden ) )
+                                   .c_str( ) );
 #endif
         }
 
