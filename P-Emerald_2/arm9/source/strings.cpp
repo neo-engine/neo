@@ -215,10 +215,14 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "And you get your own room, [PLAYER]! Let's go inside.",
       "Mutter: Willkommen in Wurzelheim, Schatz.\r"
       "Wie gef\xe4llt es dir?\nDas ist unser neues zu Hause." },
-    { "", "" },
-    { "", "" },
+    { "Route 101\n\x06 Oldale Town", "Route 101\n\x06 Rosaltstadt" },
+    { "Wild Pok\xe9mon will jump out at you in tall grass.\r"
+      "If you want to catch Pok\xe9mon, you have to go\ninto the tall grass and search.",
+      "" },
 
-    { "", "" },
+    { "If Pok\xe9mon get tired, take them to\na Pok\xe9mon Center.\r"
+      "There's a Pok\xe9mon Center in Oldale Town right close by.",
+      "" },
     { "Mom: See, [PLAYER]?\nIsn't it nice in here, too?\r"
       "The mover's Pok\xe9mon do all the work of moving us in and cleaning up after.\r"
       "This is so convenient!\r"
@@ -226,26 +230,29 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Dad bought you a new PC to mark our move here.\r"
       "Don't forget to check it out.",
       "" },
-    { "", "" },
-    { "", "" },
-    { "", "" },
+    { "\x5dRejuvenate your tired partners\"\nPok\xe9mon Center", "" },
+    { "Oldale Town\n\x5dWhere things start of scarce.\"", "Rosaltstadt" },
+    { "\x5dSelect items for your convenience\"\nPok\xe9mon Mart", "" },
 
     // 20
 
-    { "", "" },
-    { "", "" },
+    { "I want to take a rest,\nso I'm saving my progress.", "" },
+    { "My Pok\xe9mon is staggeringly tired|\nI should have brought a Potion|", "" },
     { "Mom: Well, [PLAYER]?\r"
       "Aren't you interested in seeing your very own room?",
       "" },
-    { "", "" },
+    { "Route 103\n\x07 Oldale Town", "Route 103\n\x07 Rosaltstadt" },
     { "Fugiiih!", "" },
 
     { "Huggoh, uggo uggo|", "" },
     { "Dad might like this program.\n| | | | | | | | | | | | |\r"
       "Better get going!",
       "" },
-    { "", "" },
-    { "It's a Nintendo GameCube.", "" },
+    { "Pok\xe9mon Centers are great!\r"
+      "You can use their services as much\nas you like, and it's all for free.\r"
+      "You never have to worry!",
+      "" },
+    { "It's a Nintendo GameCube.", "Eine Nintendo GameCube." },
     { "[PLAYER] flipped open the notebook.\r"
       "Adventure Rule No.1\nOpen the menu with X or START.\r"
       "Adventure Rule No.2\nRecord your progress with Save.\r"
@@ -254,22 +261,33 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     // 30
 
-    { "", "" },
-    { "", "" },
-    { "", "" },
-    { "[PLAYER] booted up the PC.", "" },
+    { "Pok\xe9mon magazines!\n\x5dThe Unown - Hoenn Edition\"|\r"
+      "\x5dHow to Train Your Bagon\"|\nAll of them are somewhat boring|",
+      "Pok\xe9mon-Magazine!\n\x5eIcognito in Hoenn\x5d|\r"
+      "\x5eKindwurmz\xe4hmen leicht gemacht\x5d|\nKeines wirkt besonders ansprechend|" },
+    { "I'm sorry, but we're currently\nrenovating the top floor.",
+      "Es tut mir Leid, aber wir bauen\ndas Obergeschoss gerade um." },
+    { "That PC in the corner there is for any\nPok\xe9mon Trainer to use.\r"
+      "Naturally, that means you're welcome\nto use it, too.",
+      "" },
+    { "[PLAYER] booted up the PC.", "[PLAYER] schaltet den PC ein." },
     { "A message from Dad!\r"
       "Dad: Hi [PLAYER]! Welcome to our new home.\r"
       "Please come visit me in my Gym in Petalburg City.\r"
       "Ah, this Potion may come in handy.",
       "" },
 
-    { "", "" },
-    { "", "" },
-    { "", "" },
+    { "When Pok\xe9mon battle, they eventually\nlevel up and become stronger.", "" },
+    { "If the Pok\xe9mon with you become stronger,\nyou'll be able to go farther away from here.",
+      "" },
+    { "When a Pok\xe9mon battle starts, the one at the top-left of the list goes out first.\r"
+      "So, when you get more Pok\xe9mon in your party,\ntry switching around their order.\r"
+      "It could give you an advantage.",
+      "" },
     { "There is another message.\r"
       "???: Greetings [PLAYER]. This gift was delivered just for you.",
-      "" },
+      "Es gibt eine weitere Nachricht.\r"
+      "???: Sei gegr\xfc\xdft, [PLAYER]. Dieses Geschenk ist f\xfcr dich." },
     { "", "" },
 
     // 40
@@ -279,8 +297,10 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "They finished moving everything in downstairs, too!\r"
       "Pok\xe9mon movers are so convenient!",
       "" },
-    { "", "" },
-    { "", "" },
+    { "The clerk says they're all sold out.\nI can't buy any Pok\xe9 Balls.", "" },
+    { "If a Pok\xe9mon gets hurt and loses its HP and\nfaints, it won't be able to battle.\r"
+      "To prevent your Pok\xe9mon from fainting,\nrestore its HP with a Potion.",
+      "" },
     { "", "" },
     { "Mom: Oh! [PLAYER], [PLAYER]!\nQuick! Come quickly!", "" },
 
@@ -302,14 +322,14 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "", "" },
     { "", "" },
     { "Mom: See you, honey!", "" },
-    { "Prof. Birch spends days in his lab studying, then he'll suddenly go out\r"
+    { "Prof. Birch spends days in his lab studying,\nthen he'll suddenly go out\r"
       "in the wild to do more research|\r"
       "When does Prof. Birch spend time at home?",
       "" },
     { "", "" },
 
     { "", "" },
-    { "Using a PC you can send even items!\r"
+    { "Using a PC you can send even items!\n"
       "The power of science is staggering!",
       "" },
     { "", "" },
@@ -325,15 +345,20 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "It's a PC used for research.\nBetter not mess around with it.", "" },
     { "It's a serious-looking machine.\nIt must be used for research.", "" },
     { "Hunh? Prof. Birch?\r"
-      "The Prof's away on fieldwork.\nErgo, he isn't here.",
+      "The Prof's away on fieldwork.\nErgo, he isn't here.\r"
+      "Oh, let me explain what fieldwork is.\r"
+      "It is to study things in the natural\nenvironment, like fields of mountains,\r"
+      "instead of a laboratory\r"
+      "The Prof isn't one for doing desk work.\nHe's the type of person who would\r"
+      "rather go outside and experience things\nthan read about them here.",
       "" },
 
     { "", "" },
-    { "Oh, let me explain what fieldwork is.\r"
-      "It is to study things in the natural environment, like fields of mountains,\r"
+    { "Let me explain again what fieldwork is.\r"
+      "It is to study things in the natural\nenvironment, like fields of mountains,\r"
       "instead of a laboratory\r"
-      "The Prof isn't one for doing desk work. He's the type of person who would\r"
-      "rather go outside andexperience things than read about them here.",
+      "The Prof isn't one for doing desk work.\nHe's the type of person who would\r"
+      "rather go outside and experience things\nthan read about them here.",
       "" },
     { "", "" },
     { "", "" },

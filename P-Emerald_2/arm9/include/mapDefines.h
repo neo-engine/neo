@@ -218,8 +218,8 @@ namespace MAP {
                 } m_item;
                 struct {
                     u8  m_movementType;
-                    u16 m_trainerId;
                     u16 m_spriteId;
+                    u16 m_trainerId;
                     u8  m_sight;
                 } m_trainer;
                 struct {

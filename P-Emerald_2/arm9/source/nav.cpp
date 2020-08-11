@@ -333,7 +333,8 @@ namespace NAV {
         LOCATION_TIMER   = 120;
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        if( BGforLocation( p_newLocation ) == 3 || BGforLocation( p_newLocation ) == 6 ) {
+        if( BGforLocation( p_newLocation ) == 3 || BGforLocation( p_newLocation ) == 6
+            || BGforLocation( p_newLocation ) == 0 ) {
             IO::regularFont->setColor( 1, 1 );
         } else {
             IO::regularFont->setColor( 3, 1 );

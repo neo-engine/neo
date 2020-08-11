@@ -67,15 +67,13 @@ namespace MAP {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         switch( p_mapObject.second.m_event.m_type ) {
+        case EVENT_TRAINER:
         case EVENT_NPC_MESSAGE:
         case EVENT_NPC: {
-#ifdef DESQUID
-            IO::fadeScreen( IO::UNFADE );
-#endif
             p_mapObject.first = _mapSprites.loadSprite(
                 curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
                 mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             NAV::printMessage( ( std::to_string( p_mapObject.first ) + " " + std::to_string( curx )
                                  + " " + std::to_string( cury ) + " "
                                  + std::to_string( p_mapObject.second.m_pos.m_posX ) + " "
@@ -243,9 +241,9 @@ namespace MAP {
             }
 
             for( u8 i = 0; i < 4; ++i ) {
-                constructAndAddNewMapObjects( _data[ i % 2 ][ i & 2 ],
-                                              _slices[ i % 2 ][ i & 2 ].m_x,
-                                              _slices[ i % 2 ][ i & 2 ].m_y );
+                constructAndAddNewMapObjects( _data[ i % 2 ][ i / 2 ],
+                                              _slices[ i % 2 ][ i / 2 ].m_x,
+                                              _slices[ i % 2 ][ i / 2 ].m_y );
             }
         }
 
@@ -473,9 +471,9 @@ namespace MAP {
         _mapSprites.moveCamera( p_direction, 1, !p_updatePlayer );
         if( p_autoLoadRows
             && ( ( dir[ p_direction ][ 0 ]
-                   && ( ( bgState[ 1 ].scrollX >> 8 ) - dir[ p_direction ][ 0 ] + 9 ) % 16 == 0 )
+                   && ( ( bgState[ 1 ].scrollX >> 8 ) - !!dir[ p_direction ][ 0 ] + 9 ) % 16 == 0 )
                  || ( dir[ p_direction ][ 1 ]
-                      && ( ( bgState[ 1 ].scrollY >> 8 ) - dir[ p_direction ][ 1 ] + 9 ) % 16
+                      && ( ( bgState[ 1 ].scrollY >> 8 ) - !!dir[ p_direction ][ 1 ] + 9 ) % 16
                              == 0 ) ) ) {
             loadNewRow( p_direction, p_updatePlayer );
         }
@@ -758,6 +756,7 @@ namespace MAP {
                 .start( )
             == BATTLE::battle::BATTLE_OPPONENT_WON ) {
             faintPlayer( );
+            return true;
         }
         SOUND::restartBGM( );
         FADE_TOP_DARK( );
@@ -887,6 +886,7 @@ namespace MAP {
                     } // item is not hidden
                     break;
                 case EVENT_NPC:
+                case EVENT_NPC_MESSAGE:
                 case EVENT_TRAINER:
                 case EVENT_OW_PKMN:
                 case EVENT_BERRYTREE: return false;
@@ -1431,6 +1431,11 @@ namespace MAP {
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
         u8 oldMapType = u8( CUR_DATA.m_mapType );
+
+        if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
+            SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
+        }
+
         loadNewBank( p_target.first );
 
         mapData ndata;
@@ -1450,8 +1455,14 @@ namespace MAP {
             = ( ( oldMapType & CAVE ) && !( oldMapType & INSIDE ) && !( newMapType & CAVE ) );
         if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
         switch( p_type ) {
-        case DOOR: SOUND::playSoundEffect( SFX_ENTER_DOOR ); break;
-        case SLIDING_DOOR: SOUND::playSoundEffect( SFX_SLIDING_DOOR ); break;
+        case DOOR:
+            IO::fadeScreen( IO::CLEAR_DARK );
+            SOUND::playSoundEffect( SFX_ENTER_DOOR );
+            break;
+        case SLIDING_DOOR:
+            IO::fadeScreen( IO::CLEAR_DARK );
+            SOUND::playSoundEffect( SFX_SLIDING_DOOR );
+            break;
         case TELEPORT:
             SOUND::playSoundEffect( SFX_WARP );
             for( u8 j = 0; j < 2; ++j ) {
@@ -1464,6 +1475,7 @@ namespace MAP {
                 redirectPlayer( DOWN, false );
                 for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
             }
+            IO::fadeScreen( IO::CLEAR_DARK );
             break;
         case EMERGE_WATER: break;
         case CAVE_ENTRY:
@@ -1930,6 +1942,7 @@ namespace MAP {
             _mapSprites.drawFrame( _playerSprite, i, false, true );
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
         }
+        _mapSprites.setVisibility( _playerSprite, true, false );
         IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
                          OBJPRIORITY_1, false );
         IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
@@ -2114,10 +2127,24 @@ namespace MAP {
 
         std::set<position> eventPositions;
 
+#ifdef DESQUID_MORE
+        IO::fadeScreen( IO::UNFADE );
+        NAV::printMessage( ( std::string( "constructAndAddNewMapObjects " )
+                             + std::to_string( p_mapX ) + " " + std::to_string( p_mapY ) )
+                               .c_str( ) );
+#endif
+
         // check old objects and purge them if they are not visible anymore
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
-            if( dist( o.second.m_pos.m_posX, curx, o.second.m_pos.m_posY, cury ) > 64 ) {
+            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 48 ) {
+#ifdef DESQUID_MORE
+                NAV::printMessage(
+                    ( std::string( "Destroying " ) + std::to_string( i ) + " "
+                      + std::to_string( o.second.m_pos.m_posX ) + " " + std::to_string( curx ) + " "
+                      + std::to_string( o.second.m_pos.m_posY ) + " " + std::to_string( cury ) )
+                        .c_str( ) );
+#endif
                 _mapSprites.destroySprite( o.first, false );
             } else {
                 res.push_back( o );
@@ -2156,7 +2183,6 @@ namespace MAP {
                 obj.m_direction = UP;
                 obj.m_event     = p_data.m_events[ i ];
 #ifdef DESQUID_MORE
-                IO::fadeScreen( IO::UNFADE );
                 NAV::printMessage( ( std::to_string( curx ) + "|" + std::to_string( cury ) + " : "
                                      + std::to_string( obj.m_pos.m_posX ) + " , "
                                      + std::to_string( obj.m_pos.m_posY ) )
@@ -2183,6 +2209,25 @@ namespace MAP {
                 res.push_back( cur );
                 break;
             }
+            case EVENT_TRAINER: {
+                mapObject obj = mapObject( );
+                obj.m_pos     = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
+                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                              p_data.m_events[ i ].m_posZ };
+                obj.m_picNum  = p_data.m_events[ i ].m_data.m_trainer.m_spriteId;
+                obj.m_movement
+                    = (MAP::moveMode) p_data.m_events[ i ].m_data.m_trainer.m_movementType;
+                obj.m_range     = (MAP::moveMode) p_data.m_events[ i ].m_data.m_trainer.m_sight;
+                obj.m_direction = UP; // TODO
+                obj.m_event     = p_data.m_events[ i ];
+
+                std::pair<u8, mapObject> cur = { 0, obj };
+                loadMapObject( cur );
+                res.push_back( cur );
+
+                break;
+            }
+
             case EVENT_NPC:
             case EVENT_NPC_MESSAGE: {
                 mapObject obj   = mapObject( );

@@ -156,8 +156,8 @@ namespace IO {
             break;
         case IO::BATTLE:
         case IO::BATTLE_STRONG_OPPONENT:
-            regcnt = regcnt2
-                = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2 | BLEND_SRC_BG3;
+            regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
+                               | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             for( u8 j = 0; j < p_type - IO::BATTLE + 1; ++j ) {
                 u16 val = 0x1F;
                 for( s8 i = 4; i >= 0; --i ) {

@@ -54,9 +54,9 @@ namespace SAVE {
     void printTextAndWait( const char* p_text ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         IO::clearScreen( true, true, true );
-        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE[ IO::COLOR_IDX ] = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GRAY;
         u8 nw                       = 0;
         for( u8 i = 0; i < strlen( p_text ); ++i )
             if( p_text[ i ] == '\n' ) ++nw;

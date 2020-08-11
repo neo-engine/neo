@@ -397,6 +397,7 @@ namespace MAP {
                                       SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr );
                 if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
                     faintPlayer( );
+                    return;
                 } else {
                     SAVE::SAV.getActiveFile( ).setFlag(
                         SAVE::F_TRAINER_BATTLED( p_event.m_deactivateFlag ), true );
@@ -480,6 +481,11 @@ namespace MAP {
             if( o.second.m_pos.m_posX != p_globX || o.second.m_pos.m_posY != p_globY
                 || o.second.m_pos.m_posZ != z ) {
                 continue;
+            }
+
+            // rotate sprite to player
+            if( ( o.second.m_picNum & 0xff ) <= 240 ) {
+                _mapSprites.setFrame( o.first, getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
             }
 
             runEvent( o.second.m_event );

@@ -150,7 +150,7 @@ namespace MAP {
                          p_data.m_palData,
                          reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
                          p_data.m_width * p_data.m_height / 2, false, false,
-                         !( p_posX < 256 && p_posY < 192 ), OBJPRIORITY_2, false );
+                         !( p_posX < 256 && p_posY < 192 ), OBJPRIORITY_1, false );
     }
 
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
@@ -342,6 +342,10 @@ namespace MAP {
     void mapSpriteManager::destroySprite( u8 p_spriteId, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
+#ifdef DESQUID_MORE
+        NAV::printMessage( ( std::to_string( p_spriteId ) + " destroy" ).c_str( ) );
+#endif
+
         IO::OamTop->oamBuffer[ p_spriteId ].isHidden = true;
         if( p_spriteId >= SPR_SMALL_NPC_OAM( 0 )
             && p_spriteId < SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) ) {
@@ -412,7 +416,6 @@ namespace MAP {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.translateSprite( p_dx, p_dy );
             IO::OamTop->oamBuffer[ p_spriteId ].isHidden
                 = !_hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.isVisible( );
-
 #ifdef DESQUID_MORE
             NAV::printMessage(
                 ( std::to_string( p_spriteId )
@@ -432,6 +435,16 @@ namespace MAP {
             getManagedSprite( p_spriteId ).m_pos.translateSprite( p_dx, p_dy );
             IO::OamTop->oamBuffer[ p_spriteId ].isHidden
                 = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
+            if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0 ) {
+                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
+            } else {
+                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
+            }
+#ifdef DESQUID_MORE
+            NAV::printMessage( ( std::to_string( p_spriteId ) + " hidden? "
+                        + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].isHidden ) )
+                          .c_str( ) );
+#endif
         }
 
         if( p_update ) { IO::updateOAM( false ); }
