@@ -290,7 +290,7 @@ namespace SAVE {
             /*
              * @brief: Returns the number of badges the player has obtained so far.
              */
-            u8 getBadgeCount( );
+            u8 getBadgeCount( u8 p_region = -1 );
 
             /*
              * @brief: Returns the number of pkmn currently in the player's party.

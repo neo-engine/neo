@@ -385,13 +385,12 @@ namespace SAVE {
         m_vars[ p_idx ] = p_value;
     }
 
-    u8 saveGame::playerInfo::getBadgeCount( ) {
+    u8 saveGame::playerInfo::getBadgeCount( u8 p_region ) {
         u8 cnt = 0;
-        for( u8 i = 0; i < 8; ++i ) {
-            cnt += !!( m_HOENN_Badges & ( 1 << i ) );
-            cnt += !!( m_KANTO_Badges & ( 1 << i ) );
-            cnt += !!( m_JOHTO_Badges & ( 1 << i ) );
-        }
+        if( p_region == 0 || p_region == 255 ) { cnt += std::popcount( m_HOENN_Badges ); }
+        if( p_region == 1 || p_region == 255 ) { cnt += std::popcount( m_FRONTIER_Badges ); }
+        if( p_region == 2 || p_region == 255 ) { cnt += std::popcount( m_KANTO_Badges ); }
+        if( p_region == 3 || p_region == 255 ) { cnt += std::popcount( m_JOHTO_Badges ); }
         return cnt;
     }
     u8 saveGame::playerInfo::getTeamPkmnCount( ) {
@@ -479,7 +478,7 @@ namespace SAVE {
     }
     void saveGame::clear( ) {
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) { SAV.m_saveFile[ i ].clear( ); }
-        m_version = VERSION;
+        m_version    = VERSION;
         m_activeFile = 0;
     }
 } // namespace SAVE

@@ -79,9 +79,7 @@ namespace FS {
     bool readBankData( u8 p_bank, MAP::bankInfo& p_result );
     bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result );
 
-    FILE* openScript( MAP::warpPos p_pos, u8 p_id );
-    FILE* openScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_id );
-    FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id );
+    FILE* openScript( u16 p_scriptId );
 
     u8*  readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
     u8* readSFX( u16 p_sfxID, u16& p_len );

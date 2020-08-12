@@ -226,6 +226,7 @@ namespace MAP {
             vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
 
             FADE_TOP_DARK( );
+            dmaFillHalfWords( 0, BG_PALETTE, 512 );
             bgUpdate( );
 
             _curX = _curY = 0;
@@ -261,6 +262,8 @@ namespace MAP {
             //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
+            BG_PALETTE[ 0 ] = 0;
+
             for( u8 i = 1; i < 4; ++i ) {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
                 bgSetPriority( i - 1, i );
@@ -858,7 +861,7 @@ namespace MAP {
         bool change = false;
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
-            if( o.first == 255 ) { continue; }
+            if( o.first == 255 || o.second.m_movement == NO_MOVEMENT ) { continue; }
 
             if( o.second.m_movement <= 15 || o.second.m_movement == WALK_AROUND_LEFT_RIGHT
                 || o.second.m_movement == WALK_AROUND_UP_DOWN ) {

@@ -288,7 +288,10 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "???: Greetings [PLAYER]. This gift was delivered just for you.",
       "Es gibt eine weitere Nachricht.\r"
       "???: Sei gegr\xfc\xdft, [PLAYER]. Dieses Geschenk ist f\xfcr dich." },
-    { "", "" },
+    { "Hello and welcome to the Pok\xe9mon Center.\r"
+      "We restore your tired Pok\xe9mon to full health.",
+      "Willkommen im Pok\xe9mon-Center.\r"
+      "Wir heilen deine Pok\xe9mon und\nmachen sie wieder fit." },
 
     // 40
 
@@ -301,21 +304,27 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "If a Pok\xe9mon gets hurt and loses its HP and\nfaints, it won't be able to battle.\r"
       "To prevent your Pok\xe9mon from fainting,\nrestore its HP with a Potion.",
       "" },
-    { "", "" },
+    { "Would you like to rest your Pok\xe9mon?", "OK. Wir ben\xf6tigen deine Pok\xe9mon." },
     { "Mom: Oh! [PLAYER], [PLAYER]!\nQuick! Come quickly!", "" },
 
     { "Mom: Look it's Petalburg Gym!\nMaybe Dad will be on!\r"
       "Interviewer: |this report from in front of Petalburg Gym.",
       "" },
-    { "", "" },
+    { "We hope to see you again!", "Komm jederzeit wieder vorbei!" },
     { "Mom: Oh| It's over.\r"
       "I think Dad was on, but we missed him. Too bad.\r"
       "Oh yes.\nOne of Dad's friends lives in town.\r"
       "Prof. Birch is his name.\r"
       "He lives right next door, so you shold go over and introduce yourself.",
       "" },
-    { "", "" },
-    { "", "" },
+    { "Okay, I'll take your Pok\xe9mon for a second.",
+      "Okay, ich nehme deine Pok\xe9mon für einen Moment in meine Obhut." },
+    { "Thank you for waiting.\r"
+      "We've restored your Pok\xe9mon to full health.\r"
+      "We hope to see you again.",
+      "Vielen Dank.\r"
+      "Deine Pok\xe9mon sind wieder top fit.\r"
+      "Komm jederzeit wieder vorbei!" },
 
     // 50
 

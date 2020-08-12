@@ -41,7 +41,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace MAP {
-#define MAX_SCRIPT_SIZE 64
+#define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
     // opcode : u8, paramA : u12, paramB : u12
     u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
@@ -51,45 +51,50 @@ namespace MAP {
 #define PARAM3( p_ins ) ( (p_ins) &0xFF )
 #define PARAMA( p_ins ) ( ( ( p_ins ) >> 12 ) & 0xFFF )
 #define PARAMB( p_ins ) ( (p_ins) &0xFFF )
-#define FETCH( p_var )   \
-    ( ( ( p_var ) == 0 ) \
-          ? 0            \
-          : ( ( ( p_var ) == 1 ) ? 1 : SAVE::SAV.getActiveFile( ).m_vars[ p_var ] ) )
-#define FETCH_UNSEC( p_var ) ( SAVE::SAV.getActiveFile( ).m_vars[ p_var ] )
 
-    enum opCodes {
-        // [param] : immediate
-        // $param  : value at reg param
-        NOP           = 0x00, // No operation
-        MV            = 0x01, // move $param2 to $param1
-        BRANCH        = 0x02, // if $param1 > 0 set pc = $param2
-        JUMP          = 0x03, // set pc = $param1
-        ADD           = 0x04, // $param1 = $param2 + $param3
-        CHECK_FLAG    = 0x05, // $param1 = checkFlag( $param2 )
-        SET_FLAG      = 0x06, // setFlag( $param1, 1 )
-        CLEAR_FLAG    = 0x07, // setFlag( $param1, 0 )
-        MV_I          = 0x11, // set $param1 to [param2]
-        BRANCH_I      = 0x12, // if $param1 > 0 set pc = [param2]
-        JUMP_I        = 0x13, // set pc = [param1]
-        ADD_I         = 0x14, // $param1 = $param2 + [param3]
-        CHECK_FLAG_I  = 0x15, // $param1 = checkFlag( [param2] )
-        SET_FLAG_I    = 0x16, // setFlag( [param1], 1 )
-        CLEAR_FLAG_I  = 0x17, // setFlag( [param2], 0 )
-        MSG           = 0x90, // Print string $param1. ($param2 is name if nonzero)
-        ITEM          = 0x91, // Give player item $param1 $param2 times
-        GIVE_PKMN     = 0x92, // Give player pkmn $paramA at level $paramB
-        BATTLE_PKMN   = 0x93, // As GIVE_PKMN, but pkmn battles player
-        MOVE_PLAYER   = 0x94, // Move player in dir $param1 <= $param2 steps at spd $param3
-        MSG_I         = 0xA0, // Print string [paramA]. ([paramB] is name if nonzero)
-        ITEM_I        = 0xA1, // Give player item [paramA] [paramB] times
-        GIVE_PKMN_I   = 0xA2, // Give player pkmn [paramA] at level [paramB]
-        BATTLE_PKMN_I = 0xA3, // As GIVE_PKMN, but pkmn battles player
-        MOVE_PLAYER_I = 0xA4, // Move player in dir [param1] <= [param2] steps at spd [param3]
-        HEAL_TEAM     = 0xE0, // Heal Pkmn team
-        CHOOSE_PKMN   = 0xE1, // Choose Pkmn from team, store result (-1…5) in $param1
-        GET_PKMN_STAT = 0xE2, // Store stats of pkmn $param1 starting at $param2
-        CLEAR         = 0xFE, // Call IO::drawNav( true )
-        EOP           = 0xFF  // Exit the script
+    // special functions
+    // 1 heal entire team
+    // 2 run constructed poke mart
+    // 3 get badge count (param1: region [0: Hoenn, 1: battle frontier])
+    //
+
+    enum opCode : u8 {
+        EOP = 0,  // end of program
+        SMO = 1,  // set map object
+        MMO = 2,  // move map object
+        DMO = 3,  // destroy map object
+        CFL = 4,  // check flag
+        SFL = 5,  // set flag
+        CRG = 6,  // check register
+        SRG = 7,  // set register
+        MRG = 8,  // move register value
+        JMP = 9,  // jump
+        JMB = 10, // jump backwards
+
+        SMOR = 11, // set map object
+        MMOR = 12, // move map object
+        DMOR = 13, // destroy map object
+        CFLR = 14, // check flag
+        SFLR = 15, // set flag
+
+        CRGL = 16, // check register lower
+        CRGG = 17, // check register greater
+        CRGN = 18, // check register not equal
+
+        CMO = 20, // current map object id to reg 0
+
+        BTR = 100, // Battle trainer
+
+        SMC = 118, // Set music
+        SLC = 119, // Set location
+        SWT = 120, // Set weather
+        WAT = 121, // Wait
+        MBG = 122, // Pokemart description begin
+        MIT = 123, // Mart item
+
+        YNM = 125, // yes no message
+        CLL = 126, // Call special function
+        MSG = 127, // message
     };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
@@ -124,179 +129,200 @@ namespace MAP {
         NAV::printMessage( res.c_str( ), p_style );
     }
 
-#ifdef false
-    bool mapDrawer::executeScript( u8 p_map, u8 p_globX, u8 p_globY, u8 p_z, u8 p_number,
-                                   invocationType p_inv ) {
-        FILE* sc = FS::openScript( warpPos{ p_map, { p_globX, p_globY, p_z } }, p_number );
-        if( !sc ) return false;
+    void mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject ) {
+        FILE* f = FS::openScript( p_scriptId );
+        if( !f ) { return; }
+        fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
+        FS::close( f );
+        auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ];
 
-        u8 header[ 5 ];
-        FS::read( sc, header, sizeof( u8 ), 4 );
-        // Check if this script is really a script
-        if( header[ 0 ] != scriptType::SCRIPT || header[ 3 ] == 0 ) return true;
-        /*
-                snprintf( buffer, 40, "%hhu %hhu %hhu %hhu", header[ 0 ], header[ 1 ], header[ 2 ],
-                          header[ 3 ] );
-                IO::messageBox( buffer, true );
-                NAV::draw( );*/
-        // Check if it can be executed
-        if( header[ 2 ] != p_inv || ( header[ 1 ] < 0xFF && header[ 1 ] != p_z ) ) return true;
+        u8 pc = 0;
 
-        FS::read( sc, SCRIPT_INS, sizeof( u32 ), std::min( (u8) MAX_SCRIPT_SIZE, header[ 3 ] ) );
-        FS::close( sc );
+        std::vector<std::pair<u16, u32>> martItems;
 
-        u8 pc = 0; // program counter
+        u8 registers[ 10 ] = { 0 };
 
-        while( pc < std::min( (u8) MAX_SCRIPT_SIZE, header[ 3 ] )
-               && OPCODE( SCRIPT_INS[ pc ] ) != EOP ) {
-            /*char buffer[ 50 ];
-            snprintf( buffer, 40, "Op %lx\n(%lu, %lu, %lu)\n(%lu,%lu)", OPCODE( SCRIPT_INS[ pc ] ),
-                      PARAM1( SCRIPT_INS[ pc ] ), PARAM2( SCRIPT_INS[ pc ] ),
-                      PARAM3( SCRIPT_INS[ pc ] ), PARAMA( SCRIPT_INS[ pc ] ),
-                      PARAMB( SCRIPT_INS[ pc ] ) );
-            IO::messageBox( buffer, true );
-            NAV::draw( );*/
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
-            switch( OPCODE( SCRIPT_INS[ pc ] ) ) {
-            case MV:
-                if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
-                    FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) ) = FETCH( PARAM2( SCRIPT_INS[ pc ] ) );
-                break;
-            case MV_I:
-                if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
-                    FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) ) = ( PARAM2( SCRIPT_INS[ pc ] ) );
-                break;
-            case ADD:
-                if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
-                    FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) )
-                        = FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) + FETCH( PARAM3( SCRIPT_INS[ pc ] ) );
-                break;
-            case ADD_I:
-                if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
-                    FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) )
-                        = FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) + ( PARAM3( SCRIPT_INS[ pc ] ) );
-                break;
+        u16  mapX = curx / SIZE, mapY = cury / SIZE;
+        u8   pmartCurr = 0;
+        bool martSell  = true;
 
-            case CHECK_FLAG:
-                if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
-                    FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) )
-                        = SAVE::SAV.getActiveFile( ).checkFlag(
-                            FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
-                break;
-            case CHECK_FLAG_I:
-                if( PARAM1( SCRIPT_INS[ pc ] ) > 1 )
-                    FETCH_UNSEC( PARAM1( SCRIPT_INS[ pc ] ) )
-                        = SAVE::SAV.getActiveFile( ).checkFlag( ( PARAM2( SCRIPT_INS[ pc ] ) ) );
-                break;
-            case SET_FLAG:
-                SAVE::SAV.getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
-                break;
-            case SET_FLAG_I:
-                SAVE::SAV.getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 1 );
-                break;
-            case CLEAR_FLAG:
-                SAVE::SAV.getActiveFile( ).setFlag( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
-                break;
-            case CLEAR_FLAG_I:
-                SAVE::SAV.getActiveFile( ).setFlag( ( PARAM1( SCRIPT_INS[ pc ] ) ), 0 );
-                break;
-            case BRANCH:
-                if( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ) pc = FETCH( PARAM2( SCRIPT_INS[ pc ] ) );
-                break;
-            case BRANCH_I:
-                if( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ) pc = ( PARAM2( SCRIPT_INS[ pc ] ) );
-                break;
-            case JUMP: pc = FETCH( PARAM2( SCRIPT_INS[ pc ] ) ); break;
-            case JUMP_I: pc = ( PARAM2( SCRIPT_INS[ pc ] ) ); break;
+        while( SCRIPT_INS[ pc ] ) {
+            auto ins  = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
+            u8   par1 = PARAM1( SCRIPT_INS[ pc ] );
+            u8   par2 = PARAM2( SCRIPT_INS[ pc ] );
+            u8   par3 = PARAM3( SCRIPT_INS[ pc ] );
 
-            case MSG_I:
-                /*
-                if( !PARAMB( SCRIPT_INS[ pc ] ) )
-                    IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ), true );
-                else
-                    IO::messageBox( GET_STRING( PARAMA( SCRIPT_INS[ pc ] ) ),
-                                    GET_STRING( PARAMB( SCRIPT_INS[ pc ] ) ) );
-                                    */
-                break;
-            case MSG:
-                /*
-                if( !PARAMB( SCRIPT_INS[ pc ] ) )
-                    IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ), true );
-                else
-                    IO::messageBox( GET_STRING( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) ),
-                                    GET_STRING( FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) ) );
-                                    */
-                break;
-            case ITEM_I: {
-                /*
-   ITEM::itemData itm = ITEM::getItemData( PARAMA( SCRIPT_INS[ pc ] ) );
-   IO::messageBox( PARAMA( SCRIPT_INS[ pc ] ), itm, PARAMB( SCRIPT_INS[ pc ] ) );
-   */
+            u16 parA = PARAMA( SCRIPT_INS[ pc ] );
+            u16 parB = PARAMB( SCRIPT_INS[ pc ] );
+
+            switch( ins ) {
+            case EOP: return;
+            case SMO: {
+                mapObject obj         = mapObject( );
+                obj.m_pos             = { u16( mapX * SIZE + par2 ), u16( mapY * SIZE + par3 ), 3 };
+                obj.m_picNum          = par1;
+                obj.m_movement        = NO_MOVEMENT;
+                obj.m_range           = 0;
+                obj.m_direction       = DOWN;
+                obj.m_currentMovement = movement{ obj.m_direction, 0 };
+
+                std::pair<u8, mapObject> cur = { 0, obj };
+                loadMapObject( cur );
+                registers[ 0 ] = cur.first;
                 break;
             }
-            case ITEM: {
-                /*
-     ITEM::itemData itm = ITEM::getItemData( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ) );
-     IO::messageBox( FETCH( PARAM1( SCRIPT_INS[ pc ] ) ), itm,
-                     FETCH( PARAM2( SCRIPT_INS[ pc ] ) ) );
-                     */
+            case MMO: {
+                movement m = { direction( par2 ), 0 };
+                _mapSprites.setFrame( par1, getFrame( direction( par2 ) ) );
+
+                for( u8 j = 0; j < par3; ++j ) {
+                    for( u8 i = 0; i < 16; ++i ) {
+                        moveMapObject( par1, m );
+                        m.m_frame++;
+                    }
+                }
                 break;
             }
-            case GIVE_PKMN_I: {
-                // pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
-                // TODO
-                // SAVE::SAV.getActiveFile( ).givePkmn( pk );
+            case DMO: {
+                _mapSprites.destroySprite( par1 );
                 break;
             }
-            case GIVE_PKMN: {
-                // pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
-                //                       FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
-                // TODO
-                // SAVE::SAV.getActiveFile( ).givePkmn( pk );
+            case CFL: {
+                if( SAVE::SAV.getActiveFile( ).checkFlag( par1 ) == par2 ) { pc += par3; }
                 break;
             }
-            case BATTLE_PKMN_I: {
-                // pokemon pk = pokemon( PARAMA( SCRIPT_INS[ pc ] ), PARAMB( SCRIPT_INS[ pc ] ) );
-                // TODO
+            case SFL: {
+                SAVE::SAV.getActiveFile( ).setFlag( par1, par2 );
                 break;
             }
-            case BATTLE_PKMN: {
-                // pokemon pk = pokemon( FETCH( PARAMA( SCRIPT_INS[ pc ] ) ),
-                //                       FETCH( PARAMB( SCRIPT_INS[ pc ] ) ) );
-                // TODO
+            case CRG: {
+                if( registers[ par1 ] == par2 ) { pc += par3; }
+                break;
+            }
+            case SRG: registers[ par1 ] = par2; break;
+            case MRG: registers[ par2 ] = registers[ par1 ]; break;
+            case JMP:
+                if( pc + par1 < MAX_SCRIPT_SIZE ) {
+                    pc += par1;
+                } else {
+                    return;
+                }
+                break;
+            case JMB:
+                if( par1 > pc ) {
+                    pc = 0;
+                } else {
+                    pc -= par1;
+                }
+                break;
+            case SMOR: {
+                mapObject obj         = mapObject( );
+                obj.m_pos             = { u16( mapX * SIZE + par2 ), u16( mapY * SIZE + par3 ), 3 };
+                obj.m_picNum          = registers[ par1 ];
+                obj.m_movement        = NO_MOVEMENT;
+                obj.m_range           = 0;
+                obj.m_direction       = DOWN;
+                obj.m_currentMovement = movement{ obj.m_direction, 0 };
+
+                std::pair<u8, mapObject> cur = { 0, obj };
+                loadMapObject( cur );
+                registers[ 0 ] = cur.first;
+                break;
+            }
+            case MMOR: {
+                movement m = { direction( par2 ), 0 };
+                _mapSprites.setFrame( registers[ par1 ], getFrame( direction( par2 ) ) );
+
+                for( u8 j = 0; j < par3; ++j ) {
+                    for( u8 i = 0; i < 16; ++i ) {
+                        moveMapObject( registers[ par1 ], m );
+                        m.m_frame++;
+                    }
+                }
+                break;
+            }
+            case DMOR: {
+                _mapSprites.destroySprite( registers[ par1 ] );
+                break;
+            }
+            case CFLR: {
+                if( SAVE::SAV.getActiveFile( ).checkFlag( par1 ) == registers[ par2 ] ) {
+                    pc += par3;
+                }
+                break;
+            }
+            case SFLR: {
+                SAVE::SAV.getActiveFile( ).setFlag( par1, registers[ par2 ] );
                 break;
             }
 
-            case MOVE_PLAYER_I:
-                for( u8 i = 0; i < PARAM2( SCRIPT_INS[ pc ] ); ++i )
-                    movePlayer( (MAP::direction) PARAM1( SCRIPT_INS[ pc ] ),
-                                PARAM3( SCRIPT_INS[ pc ] ) );
+            case CRGL:
+                if( registers[ par1 ] < par2 ) { pc += par3; }
                 break;
-            case MOVE_PLAYER:
-                for( u8 i = 0; i < FETCH( PARAM2( SCRIPT_INS[ pc ] ) ); ++i )
-                    movePlayer( (MAP::direction) FETCH( PARAM1( SCRIPT_INS[ pc ] ) ),
-                                FETCH( PARAM3( SCRIPT_INS[ pc ] ) ) );
+            case CRGG:
+                if( registers[ par1 ] > par2 ) { pc += par3; }
                 break;
+            case CRGN:
+                if( registers[ par1 ] != par2 ) { pc += par3; }
+                break;
+            case CMO: registers[ 0 ] = o.first; break;
+            case BTR:
+                // TODO
+                break;
+            case SMC:
+                // TODO
+                break;
+            case SLC:
+                // TODO
+                break;
+            case SWT:
+                // TODO
+                break;
+            case WAT:
+                for( u8 i = 0; i < parA; ++i ) { swiWaitForVBlank( ); }
+                break;
+            case MBG:
+                pmartCurr = par1;
+                martSell  = par2;
+                martItems.clear( );
+                break;
+            case MIT: martItems.push_back( { parA, parB } ); break;
+            case CLL:
+                switch( par1 ) {
+                case 1: { // heal pkmn team
+                    for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+                        SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->heal( );
+                    }
+                    break;
+                }
+                case 2: { // run pokemart
+                    runPokeMart( martItems, 0, martSell, pmartCurr );
+                    break;
+                }
+                case 3: {
+                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).getBadgeCount( par1 );
+                    break;
+                }
 
-            case HEAL_TEAM:
-                for( u8 i = 0; i < 6; ++i )
-                    if( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId )
-                        SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].heal( );
+                default: break;
+                }
                 break;
-            case CHOOSE_PKMN:
-                // TODO
+            case YNM: {
+                registers[ 0 ]
+                    = IO::yesNoBox::YES
+                      == IO::yesNoBox( ).getResult( GET_MAP_STRING( parA ), (style) parB );
+                NAV::init( );
                 break;
-            case GET_PKMN_STAT:
-                // TODO
-                break;
-            case CLEAR: break;
+            }
+            case MSG: printMapMessage( GET_MAP_STRING( parA ), (style) parB ); break;
             default: break;
             }
             ++pc;
         }
-        return true;
     }
-#endif
 
     void mapDrawer::interact( ) {
         u16  px = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
@@ -363,7 +389,7 @@ namespace MAP {
         handleEvents( px, py, pz, d );
     }
 
-    void mapDrawer::runEvent( mapData::event p_event ) {
+    void mapDrawer::runEvent( mapData::event p_event, u8 p_objectId ) {
         switch( p_event.m_type ) {
         case EVENT_MESSAGE:
             printMapMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
@@ -431,6 +457,14 @@ namespace MAP {
             }
             break;
         }
+        case EVENT_NPC: {
+            executeScript( p_event.m_data.m_npc.m_scriptId, p_objectId );
+            break;
+        }
+        case EVENT_GENERIC: {
+            executeScript( p_event.m_data.m_npc.m_scriptId );
+            break;
+        }
         default: break;
         }
     }
@@ -476,19 +510,22 @@ namespace MAP {
 
         auto mdata = currentData( p_globX, p_globY );
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
-            auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+            auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
             if( o.second.m_pos.m_posX != p_globX || o.second.m_pos.m_posY != p_globY
                 || o.second.m_pos.m_posZ != z ) {
                 continue;
             }
 
+            auto old = o.second.m_movement;
             // rotate sprite to player
             if( ( o.second.m_picNum & 0xff ) <= 240 ) {
+                o.second.m_movement = NO_MOVEMENT;
                 _mapSprites.setFrame( o.first, getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
             }
 
-            runEvent( o.second.m_event );
+            runEvent( o.second.m_event, i );
+            o.second.m_movement = old;
         }
         for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
             if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y

@@ -99,7 +99,9 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void runEvent( mapData::event p_event );
+        void runEvent( mapData::event p_event, u8 p_objectId = 0 );
+
+        void executeScript( u16 p_scriptId, u8 p_mapObject = 0 );
 
         void handleEvents( u8 p_localX, u8 p_localY, u8 p_z );
         void handleEvents( u16 p_localX, u16 p_localY, u8 p_z, direction p_dir );

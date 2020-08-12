@@ -48,7 +48,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
-const char SCRIPT_PATH[]   = "nitro:/MAPS/SCRIPTS/";
+const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
 
 const char CRY_PATH[]              = "nitro:/SOUND/CRIES/";
 const char SFX_PATH[]              = "nitro:/SOUND/SFX/";
@@ -153,17 +153,8 @@ namespace FS {
         return fwrite( p_buffer, p_size, p_count, p_stream );
     }
 
-    FILE* openScript( u8 p_bank, u8 p_mapX, u8 p_mapY, u8 p_relX, u8 p_relY, u8 p_id ) {
-        snprintf( TMP_BUFFER_SHORT, 50, "%hhu/%hhu_%hhu/%hhu_%hhu_%hhu", p_bank, p_mapY, p_mapX,
-                  p_relX, p_relY, p_id );
-        return open( SCRIPT_PATH, TMP_BUFFER_SHORT, ".bin", "r" );
-    }
-    FILE* openScript( MAP::warpPos p_pos, u8 p_id ) {
-        return openScript( p_pos.first, p_pos.second.m_posX, p_pos.second.m_posY, p_id );
-    }
-    FILE* openScript( u8 p_map, u16 p_globX, u16 p_globY, u8 p_id ) {
-        return openScript( p_map, u8( p_globX / MAP::SIZE ), u8( p_globY / MAP::SIZE ),
-                           u8( p_globX % MAP::SIZE ), u8( p_globY % MAP::SIZE ), p_id );
+    FILE* openScript( u16 p_scriptId ) {
+        return openSplit( SCRIPT_PATH, p_scriptId, ".mapscr", 10 * 30 );
     }
 
     bool readData( const char* p_path, const char* p_name, unsigned short p_dataCnt,
