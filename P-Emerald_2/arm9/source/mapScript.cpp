@@ -41,6 +41,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace MAP {
+#define UNUSED_MAPOBJECT 200
+
 #define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
     // opcode : u8, paramA : u12, paramB : u12
@@ -80,11 +82,15 @@ namespace MAP {
         CRGL = 16, // check register lower
         CRGG = 17, // check register greater
         CRGN = 18, // check register not equal
+        MPL  = 19, // move player
+        CMO  = 20, // current map object id to reg 0
 
-        CMO = 20, // current map object id to reg 0
+        ATT = 90, // Attach player
+        REM = 91, // Remove player
 
         BTR = 100, // Battle trainer
 
+        PMO = 117, // Play music oneshot
         SMC = 118, // Set music
         SLC = 119, // Set location
         SWT = 120, // Set weather
@@ -120,7 +126,13 @@ namespace MAP {
                 res += parseLogCmd( accmd );
                 continue;
             } else if( p_text[ i ] == '\r' ) {
-                NAV::printMessage( res.c_str( ), p_style );
+                if( p_style == MSG_NORMAL ) {
+                    NAV::printMessage( res.c_str( ), MSG_NORMAL_CONT );
+                } else if( p_style == MSG_INFO ) {
+                    NAV::printMessage( res.c_str( ), MSG_INFO_CONT );
+                } else {
+                    NAV::printMessage( res.c_str( ), p_style );
+                }
                 res = "";
                 continue;
             }
@@ -149,16 +161,25 @@ namespace MAP {
         u8   pmartCurr = 0;
         bool martSell  = true;
 
+        bool playerAttachedToObject = false;
+
         while( SCRIPT_INS[ pc ] ) {
             auto ins  = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
             u8   par1 = PARAM1( SCRIPT_INS[ pc ] );
             u8   par2 = PARAM2( SCRIPT_INS[ pc ] );
             u8   par3 = PARAM3( SCRIPT_INS[ pc ] );
 
+#ifdef DESQUID_MORE
+            NAV::printMessage( ( std::to_string( ins ) + " ( " + std::to_string( par1 ) + " , "
+                                 + std::to_string( par2 ) + " , " + std::to_string( par3 ) + ")" )
+                                   .c_str( ) );
+#endif
             u16 parA = PARAMA( SCRIPT_INS[ pc ] );
             u16 parB = PARAMB( SCRIPT_INS[ pc ] );
 
             switch( ins ) {
+            case ATT: playerAttachedToObject = true; break;
+            case REM: playerAttachedToObject = false; break;
             case EOP: return;
             case SMO: {
                 mapObject obj         = mapObject( );
@@ -171,7 +192,28 @@ namespace MAP {
 
                 std::pair<u8, mapObject> cur = { 0, obj };
                 loadMapObject( cur );
-                registers[ 0 ] = cur.first;
+
+                // Check if there is some unused map object
+
+                u8 found = 255;
+                for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                    if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first == UNUSED_MAPOBJECT ) {
+                        found = i;
+                        break;
+                    }
+                }
+
+                if( found < 255 ) {
+                    registers[ 0 ] = found;
+                } else {
+                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
+                }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ 0 ] ] = cur;
+                break;
+            }
+            case MPL: {
+                redirectPlayer( direction( par2 ), false );
+                for( u8 j = 0; j < par3; ++j ) { movePlayer( direction( par2 ) ); }
                 break;
             }
             case MMO: {
@@ -180,14 +222,21 @@ namespace MAP {
 
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
-                        moveMapObject( par1, m );
-                        m.m_frame++;
+                        moveMapObject( par1, m, playerAttachedToObject,
+                                       SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                        m.m_frame = ( m.m_frame + 1 ) & 15;
+                        swiWaitForVBlank( );
+                    }
+                    if( playerAttachedToObject ) {
+                        SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
                 break;
             }
             case DMO: {
-                _mapSprites.destroySprite( par1 );
+                _mapSprites.destroySprite( SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].first );
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ]
+                    = { UNUSED_MAPOBJECT, mapObject( ) };
                 break;
             }
             case CFL: {
@@ -229,23 +278,59 @@ namespace MAP {
 
                 std::pair<u8, mapObject> cur = { 0, obj };
                 loadMapObject( cur );
-                registers[ 0 ] = cur.first;
+
+                // Check if there is some unused map object
+
+                u8 found = 255;
+                for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                    if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first == UNUSED_MAPOBJECT ) {
+                        found = i;
+                        break;
+                    }
+                }
+
+                if( found < 255 ) {
+                    registers[ 0 ] = found;
+                } else {
+                    NAV::printMessage( "HERE" );
+                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
+                }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ 0 ] ] = cur;
                 break;
             }
             case MMOR: {
+#ifdef DESQUID_MORE
+                NAV::printMessage(
+                    ( std::to_string(
+                          SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first )
+                      + " ( " + std::to_string( registers[ par1 ] ) + " , " + std::to_string( par2 )
+                      + " , " + std::to_string( par3 ) + ")" )
+                        .c_str( ) );
+#endif
                 movement m = { direction( par2 ), 0 };
-                _mapSprites.setFrame( registers[ par1 ], getFrame( direction( par2 ) ) );
+                _mapSprites.setFrame(
+                    SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first,
+                    getFrame( direction( par2 ) ) );
 
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
-                        moveMapObject( registers[ par1 ], m );
-                        m.m_frame++;
+                        moveMapObject( registers[ par1 ], m, playerAttachedToObject,
+                                       SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                        m.m_frame = ( m.m_frame + 1 ) & 15;
+                        swiWaitForVBlank( );
+                    }
+
+                    if( playerAttachedToObject ) {
+                        SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
                 break;
             }
             case DMOR: {
-                _mapSprites.destroySprite( registers[ par1 ] );
+                _mapSprites.destroySprite(
+                    SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first );
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ]
+                    = { UNUSED_MAPOBJECT, mapObject( ) };
                 break;
             }
             case CFLR: {
@@ -272,6 +357,12 @@ namespace MAP {
             case BTR:
                 // TODO
                 break;
+            case PMO: {
+                SOUND::playBGMOneshot( parA );
+                for( u16 i = 0; i < parB; ++i ) { swiWaitForVBlank( ); }
+                SOUND::restartBGM( );
+                break;
+            }
             case SMC:
                 // TODO
                 break;
@@ -462,7 +553,7 @@ namespace MAP {
             break;
         }
         case EVENT_GENERIC: {
-            executeScript( p_event.m_data.m_npc.m_scriptId );
+            executeScript( p_event.m_data.m_generic.m_scriptId );
             break;
         }
         default: break;

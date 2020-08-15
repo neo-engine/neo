@@ -250,22 +250,22 @@ int main( int, char** p_argv ) {
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
+    irqSet( IRQ_VBLANK, vblankIRQ );
 
     FADE_TOP( );
 
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
 
-    MAP::curMap->draw( );
-    MAP::loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
-
-    ANIMATE_MAP = true;
     NAV::init( );
     //    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
     MAP::curMap->registerOnLocationChangedHandler( NAV::showNewLocation );
     NAV::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
 
-    irqSet( IRQ_VBLANK, vblankIRQ );
+    MAP::curMap->draw( );
+    MAP::loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
+
+    ANIMATE_MAP = true;
 
     IN_GAME      = true;
     bool stopped = true;

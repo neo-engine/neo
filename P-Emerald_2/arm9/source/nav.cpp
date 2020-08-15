@@ -380,7 +380,7 @@ namespace NAV {
         if( p_message ) {
             if( LOCATION_TIMER ) { hideLocation( ); }
 
-            if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE ) {
+            if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE || p_style == MSG_NORMAL_CONT ) {
                 IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
 
@@ -390,7 +390,8 @@ namespace NAV {
                 }
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 2, 2 );
-            } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE || p_style == MSG_ITEM ) {
+            } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE || p_style == MSG_ITEM
+                       || p_style == MSG_INFO_CONT ) {
                 IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
 
@@ -454,7 +455,8 @@ namespace NAV {
                                            192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt, false );
             }
 
-            if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
+            if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_NORMAL_CONT
+                || p_style == MSG_INFO_CONT ) {
                 // "Continue" char
                 IO::regularFont->printCharB( 172, TEXT_PAL, CONT_BUF, 16, 0, 0 );
                 tileCnt = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 254 - x, y + 24, 16,
@@ -509,6 +511,12 @@ namespace NAV {
     void printMessage( const char* p_message, style p_style ) {
         doPrintMessage( p_message, p_style );
 
+        if( p_style == MSG_NORMAL_CONT || p_style == MSG_INFO_CONT ) {
+            waitForInteract( );
+            std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+            TEXT_CACHE = "";
+            IO::updateOAM( false );
+        }
         if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
             waitForInteract( );
             hideMessageBox( );
@@ -768,6 +776,7 @@ namespace NAV {
             IO::yesNoBox yn;
             if( yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE ) == IO::yesNoBox::YES ) {
                 init( );
+                ANIMATE_MAP = false;
                 if( FS::writeSave( p_path, [ & ]( u16 p_perc, u16 p_total ) {
                         printMessage( 0, MSG_INFO_NOCLOSE );
                         u16         stat = p_perc * 18 / p_total;
@@ -791,6 +800,7 @@ namespace NAV {
                     printMessage( 0, MSG_INFO_NOCLOSE );
                     printMessage( GET_STRING( 95 ), MSG_INFO );
                 }
+                ANIMATE_MAP = true;
             } else {
                 init( );
             }

@@ -211,8 +211,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Prof. Birch's House", "Haus von Prof. Birk" },
     { "Mom: Welcome to Littleroot Town, honey.\r"
       "How do you like it?\nThis is our new home.\r"
-      "It has a quaint feel, but it seems to be an easy place to live, don't you think?\r"
-      "And you get your own room, [PLAYER]! Let's go inside.",
+      "It has a quaint feel, but it seems to be an\neasy place to live, don't you think?\r"
+      "And you get your own room, [PLAYER]!\nLet's go inside.",
       "Mutter: Willkommen in Wurzelheim, Schatz.\r"
       "Wie gef\xe4llt es dir?\nDas ist unser neues zu Hause." },
     { "Route 101\n\x06 Oldale Town", "Route 101\n\x06 Rosaltstadt" },

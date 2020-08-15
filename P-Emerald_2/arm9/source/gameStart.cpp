@@ -57,7 +57,7 @@ namespace SAVE {
         BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
         BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GRAY;
-        u8 nw                       = 0;
+        u8 nw                           = 0;
         for( u8 i = 0; i < strlen( p_text ); ++i )
             if( p_text[ i ] == '\n' ) ++nw;
         IO::regularFont->printString( p_text, 128, 89 - 10 * nw, true, IO::font::CENTER );
@@ -471,11 +471,11 @@ namespace SAVE {
 
         for( u8 i = 0; i < 4; ++i ) { printMBoxTextAndWait( GET_STRING( 464 + i ) ); }
 
-        // TODO: Proper location
         SAV.getActiveFile( ).m_currentMap = 10;
         SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
             { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
             u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
+        SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
         IO::clearScreen( true, true, true );
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         for( u8 i = 10; i; --i ) {
@@ -496,12 +496,15 @@ namespace SAVE {
         switch( p_episode ) {
         case 0:
             std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
-            SAV.getActiveFile( ).m_appearance = rand( ) % 2;
+            SAV.getActiveFile( ).m_appearance = 1;
             SAV.getActiveFile( ).setFlag( F_RIVAL_APPEARANCE,
                                           1 - SAV.getActiveFile( ).m_appearance );
-            SAV.getActiveFile( ).m_player
-                = MAP::mapPlayer( { 0x93, 0x4a, 3 }, u16( 10 * SAV.getActiveFile( ).m_appearance ),
-                                  MAP::moveMode::WALK );
+            SAV.getActiveFile( ).m_currentMap = 10;
+            SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
+                { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+                u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
+            SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
+
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );

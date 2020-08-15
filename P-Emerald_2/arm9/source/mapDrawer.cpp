@@ -91,6 +91,7 @@ namespace MAP {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         switch( p_mapObject.second.m_event.m_type ) {
+        default:
         case EVENT_TRAINER:
         case EVENT_NPC_MESSAGE:
         case EVENT_NPC: {
@@ -133,7 +134,6 @@ namespace MAP {
                 p_mapObject.first = 255;
             }
         }
-        default: break;
         }
     }
 
@@ -308,6 +308,9 @@ namespace MAP {
         for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
 
         IO::fadeScreen( IO::UNFADE );
+        stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false );
     }
 
     void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
@@ -321,35 +324,55 @@ namespace MAP {
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio );
     }
 
-    void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement ) {
+    void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer,
+                                   direction p_playerMovement ) {
         // redirect object
         if( p_movement.m_frame == 0 ) {
             _mapSprites.setFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
                                   getFrame( p_movement.m_direction ) );
+            if( p_movePlayer ) {
+                _mapSprites.setFrame( _playerSprite, getFrame( p_playerMovement ) );
+            }
         }
         if( p_movement.m_frame == 15 ) {
             _mapSprites.drawFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
                                    getFrame( p_movement.m_direction ) );
+
+            if( p_movePlayer ) {
+                _mapSprites.drawFrame( _playerSprite, getFrame( p_playerMovement ) );
+            }
         }
 
         for( u8 i = 0; i < 16; ++i ) {
             if( i == p_movement.m_frame ) {
+                if( p_movePlayer ) { moveCamera( p_playerMovement, true ); }
                 _mapSprites.moveSprite( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
                                         p_movement.m_direction, 1 );
                 if( i == 8 ) {
                     _mapSprites.nextFrame(
                         SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first );
+                    if( p_movePlayer ) { _mapSprites.nextFrame( _playerSprite ); }
                 }
             }
-        }
-        if( p_movement.m_frame == 10 ) {
-            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
-                += dir[ p_movement.m_direction ][ 0 ];
-            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
-                += dir[ p_movement.m_direction ][ 1 ];
-            animateField(
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+            if( p_movement.m_frame == 0 ) {
+                if( p_movePlayer ) {
+                    animateField(
+                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
+                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+
+                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                        = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX;
+                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                        = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY;
+                }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
+                    += dir[ p_movement.m_direction ][ 0 ];
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
+                    += dir[ p_movement.m_direction ][ 1 ];
+                animateField(
+                    SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
+                    SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+            }
         }
     }
 
@@ -375,8 +398,6 @@ namespace MAP {
 
     void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn ) {
         animateField( p_globX, p_globY );
-        handleEvents( p_globX, p_globY, p_z );
-
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         auto curLocId = getCurrentLocationId( );
@@ -403,6 +424,8 @@ namespace MAP {
 
             handleWildPkmn( p_globX, p_globY );
         }
+
+        handleEvents( p_globX, p_globY, p_z );
     }
 
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
@@ -855,6 +878,8 @@ namespace MAP {
     }
 
     void mapDrawer::animateMap( u8 p_frame ) {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         // animate map objects
 
@@ -884,19 +909,44 @@ namespace MAP {
             if( o.second.m_movement == WALK_AROUND_LEFT_RIGHT
                 || o.second.m_movement == WALK_LEFT_RIGHT ) {
                 if( ( p_frame & 127 ) == 63 ) {
+                    bool nomove = false;
                     if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
-                        o.second.m_currentMovement = { LEFT, 0 };
+                        if( o.second.m_pos.m_posX + dir[ LEFT ][ 0 ] != curx
+                            || o.second.m_pos.m_posY + dir[ LEFT ][ 1 ] != cury ) {
+                            o.second.m_currentMovement = { LEFT, 0 };
+                        } else {
+                            nomove = true;
+                        }
                     } else if( ( o.second.m_pos.m_posX + 1 ) % SIZE
                                == o.second.m_event.m_posX % SIZE ) {
-                        o.second.m_currentMovement = { RIGHT, 0 };
+                        if( o.second.m_pos.m_posX + dir[ RIGHT ][ 0 ] != curx
+                            || o.second.m_pos.m_posY + dir[ RIGHT ][ 1 ] != cury ) {
+                            o.second.m_currentMovement = { RIGHT, 0 };
+                        } else {
+                            nomove = true;
+                        }
                     } else {
                         if( o.second.m_currentMovement.m_direction != LEFT
                             && o.second.m_currentMovement.m_direction != RIGHT ) {
-                            o.second.m_currentMovement = { RIGHT, 0 };
+                            if( o.second.m_pos.m_posX + dir[ RIGHT ][ 0 ] != curx
+                                || o.second.m_pos.m_posY + dir[ RIGHT ][ 1 ] != cury ) {
+                                o.second.m_currentMovement = { RIGHT, 0 };
+                            } else {
+                                nomove = true;
+                            }
+                        } else if( o.second.m_pos.m_posX
+                                           + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
+                                       == curx
+                                   && o.second.m_pos.m_posY
+                                              + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
+                                          == cury ) {
+                            nomove = true;
                         }
                     }
-                    moveMapObject( i, o.second.m_currentMovement );
-                    o.second.m_currentMovement.m_frame++;
+                    if( !nomove ) {
+                        moveMapObject( i, o.second.m_currentMovement );
+                        o.second.m_currentMovement.m_frame++;
+                    }
                 }
             }
             if( o.second.m_movement == WALK_AROUND_UP_DOWN
