@@ -392,6 +392,14 @@ int main( int, char** p_argv ) {
         }
 
         NAV::handleInput( p_argv[ 0 ] );
+        // tamatama play cry of wild pkmn
+
+        if( MAP::curMap->currentData( ).m_pokemonDescrCount && FRAME_COUNT == 72
+            && rand( ) % 100 < 10 ) {
+            u8 cr = rand( ) % MAP::curMap->currentData( ).m_pokemonDescrCount;
+            SOUND::playCry( MAP::curMap->currentData( ).m_pokemon[ cr ].m_speciesId );
+        }
+
         // End
     }
     delete MAP::curMap;

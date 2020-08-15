@@ -164,7 +164,10 @@ namespace SAVE {
             std::pair<u8, MAP::mapObject> m_mapObjects[ 256 ];
             u8                            m_mapObjectCount;
 
-            u32 m_reserved[ 20 ]; // reserved for future things that need to be stored
+            u16 m_initGameItemCount = 0; // Items accessible during begin game PC check
+            u16 m_initGameItems[ 5 ];
+
+            u32 m_reserved[ 17 ]; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 

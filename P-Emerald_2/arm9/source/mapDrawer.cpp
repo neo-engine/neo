@@ -101,12 +101,12 @@ namespace MAP {
             _mapSprites.setFrame( p_mapObject.first, getFrame( p_mapObject.second.m_direction ),
                                   false );
 #ifdef DESQUID_MORE
-            NAV::printMessage( ( std::to_string( p_mapObject.first ) + " " + std::to_string( curx )
-                                 + " " + std::to_string( cury ) + " "
-                                 + std::to_string( p_mapObject.second.m_pos.m_posX ) + " "
-                                 + std::to_string( p_mapObject.second.m_pos.m_posY ) )
-                                   .c_str( ),
-                               MSG_NORMAL );
+            IO::fadeScreen( IO::UNFADE );
+            NAV::printMessage(
+                ( std::to_string( p_mapObject.first ) + " " + std::to_string( curx ) + " "
+                  + std::to_string( cury ) + " " + std::to_string( p_mapObject.second.m_pos.m_posX )
+                  + " " + std::to_string( p_mapObject.second.m_pos.m_posY ) + " "
+                  + std::to_string( IO::OamTop->oamBuffer[ p_mapObject.first ].isHidden ) ) );
 #endif
             break;
         }
@@ -354,25 +354,25 @@ namespace MAP {
                     if( p_movePlayer ) { _mapSprites.nextFrame( _playerSprite ); }
                 }
             }
-            if( p_movement.m_frame == 0 ) {
-                if( p_movePlayer ) {
-                    animateField(
-                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
-                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
-
-                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
-                        = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX;
-                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
-                        = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY;
-                }
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
-                    += dir[ p_movement.m_direction ][ 0 ];
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
-                    += dir[ p_movement.m_direction ][ 1 ];
+        }
+        if( p_movement.m_frame == 0 ) {
+            if( p_movePlayer ) {
                 animateField(
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                    = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX;
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                    = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY;
             }
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
+                += dir[ p_movement.m_direction ][ 0 ];
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
+                += dir[ p_movement.m_direction ][ 1 ];
+            animateField(
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
         }
     }
 
@@ -910,6 +910,7 @@ namespace MAP {
                 || o.second.m_movement == WALK_LEFT_RIGHT ) {
                 if( ( p_frame & 127 ) == 63 ) {
                     bool nomove = false;
+
                     if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
                         if( o.second.m_pos.m_posX + dir[ LEFT ][ 0 ] != curx
                             || o.second.m_pos.m_posY + dir[ LEFT ][ 1 ] != cury ) {
@@ -952,20 +953,44 @@ namespace MAP {
             if( o.second.m_movement == WALK_AROUND_UP_DOWN
                 || o.second.m_movement == WALK_UP_DOWN ) {
                 if( ( p_frame & 127 ) == 63 ) {
-                    if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
-                        o.second.m_currentMovement = { UP, 0 };
-                    } else if( ( o.second.m_pos.m_posY + 1 ) % SIZE
-                               == o.second.m_event.m_posY % SIZE ) {
-                        o.second.m_currentMovement = { DOWN, 0 };
-
-                    } else {
-                        if( o.second.m_currentMovement.m_direction != UP
-                            && o.second.m_currentMovement.m_direction != DOWN ) {
-                            o.second.m_currentMovement = { DOWN, 0 };
+                    bool nomove = false;
+                    if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
+                        if( o.second.m_pos.m_posX + dir[ UP ][ 0 ] != curx
+                            || o.second.m_pos.m_posY + dir[ UP ][ 1 ] != cury ) {
+                            o.second.m_currentMovement = { UP, 0 };
+                        } else {
+                            nomove = true;
                         }
-                        o.second.m_currentMovement.m_frame = 0;
+                    } else if( ( o.second.m_pos.m_posX + 1 ) % SIZE
+                               == o.second.m_event.m_posX % SIZE ) {
+                        if( o.second.m_pos.m_posX + dir[ DOWN ][ 0 ] != curx
+                            || o.second.m_pos.m_posY + dir[ DOWN ][ 1 ] != cury ) {
+                            o.second.m_currentMovement = { DOWN, 0 };
+                        } else {
+                            nomove = true;
+                        }
+                    } else {
+                        if( o.second.m_currentMovement.m_direction != DOWN
+                            && o.second.m_currentMovement.m_direction != UP ) {
+                            if( o.second.m_pos.m_posX + dir[ DOWN ][ 0 ] != curx
+                                || o.second.m_pos.m_posY + dir[ DOWN ][ 1 ] != cury ) {
+                                o.second.m_currentMovement = { DOWN, 0 };
+                            } else {
+                                nomove = true;
+                            }
+                        } else if( o.second.m_pos.m_posX
+                                           + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
+                                       == curx
+                                   && o.second.m_pos.m_posY
+                                              + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
+                                          == cury ) {
+                            nomove = true;
+                        }
                     }
-                    moveMapObject( i, o.second.m_currentMovement );
+                    if( !nomove ) {
+                        moveMapObject( i, o.second.m_currentMovement );
+                        o.second.m_currentMovement.m_frame++;
+                    }
                 }
             }
         }
@@ -1632,11 +1657,10 @@ namespace MAP {
             SOUND::playSoundEffect( SFX_CAVE_WARP );
             if( entryCave ) {
                 IO::fadeScreen( IO::CAVE_ENTRY );
-                break;
-            }
-            if( exitCave ) {
+            } else if( exitCave ) {
                 IO::fadeScreen( IO::CAVE_EXIT );
-                break;
+            } else {
+                IO::fadeScreen( IO::CLEAR_DARK );
             }
             break;
         case LAST_VISITED:
@@ -2287,6 +2311,8 @@ namespace MAP {
         // check old objects and purge them if they are not visible anymore
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+            if( o.first == UNUSED_MAPOBJECT ) { continue; }
+
             if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 48 ) {
 #ifdef DESQUID_MORE
                 NAV::printMessage(
@@ -2315,7 +2341,7 @@ namespace MAP {
             }
 
             // check if there is an event that is already loaded and as the same base
-            // coordinates as thi current event
+            // coordinates as the current event
             if( eventPositions.count( { p_data.m_events[ i ].m_posX, p_data.m_events[ i ].m_posY,
                                         p_data.m_events[ i ].m_posZ } ) ) {
                 continue;
@@ -2395,7 +2421,6 @@ namespace MAP {
                 std::pair<u8, mapObject> cur = { 0, obj };
                 loadMapObject( cur );
                 res.push_back( cur );
-
                 break;
             }
             default: break;

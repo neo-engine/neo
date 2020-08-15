@@ -150,7 +150,8 @@ namespace MAP {
                          p_data.m_palData,
                          reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
                          p_data.m_width * p_data.m_height / 2, false, false,
-                         !( p_posX < 256 && p_posY < 192 ), OBJPRIORITY_2, false );
+                         !mapSpritePos{ 0, 0, 0, 0, 128 - p_posX, 92 - p_posY }.isVisible( ),
+                         OBJPRIORITY_2, false );
     }
 
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,

@@ -62,8 +62,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define MAP_DRAGONS_DEN   223
 
 namespace MAP {
-    constexpr u8 NUM_ROWS = 16;
-    constexpr u8 NUM_COLS = 32;
+    constexpr u8 NUM_ROWS         = 16;
+    constexpr u8 NUM_COLS         = 32;
+    constexpr u8 UNUSED_MAPOBJECT = 200;
 
     struct position {
         u16 m_posX; // Global

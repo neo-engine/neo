@@ -41,8 +41,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace MAP {
-#define UNUSED_MAPOBJECT 200
-
 #define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
     // opcode : u8, paramA : u12, paramB : u12
@@ -104,6 +102,8 @@ namespace MAP {
     };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
+        u16 tmp = 0;
+
         if( p_cmd == "PLAYER" ) { return SAVE::SAV.getActiveFile( ).m_playername; }
         if( p_cmd == "RIVAL" ) {
             if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
@@ -111,6 +111,10 @@ namespace MAP {
             } else {
                 return GET_STRING( 460 );
             }
+        }
+        if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp ) {
+            SOUND::playCry( tmp );
+            return "";
         }
 
         return "";
@@ -152,18 +156,17 @@ namespace MAP {
 
         std::vector<std::pair<u16, u32>> martItems;
 
-        u8 registers[ 10 ] = { 0 };
+        u16 registers[ 10 ] = { 0 };
 
-        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-
-        u16  mapX = curx / SIZE, mapY = cury / SIZE;
         u8   pmartCurr = 0;
         bool martSell  = true;
 
         bool playerAttachedToObject = false;
 
         while( SCRIPT_INS[ pc ] ) {
+            u16  curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+            u16  cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+            u16  mapX = curx / SIZE, mapY = cury / SIZE;
             auto ins  = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
             u8   par1 = PARAM1( SCRIPT_INS[ pc ] );
             u8   par2 = PARAM2( SCRIPT_INS[ pc ] );

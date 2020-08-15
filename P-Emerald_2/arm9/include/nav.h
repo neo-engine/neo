@@ -30,12 +30,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-#include "uio.h"
 #include "defines.h"
+#include "uio.h"
 #include "yesNoBox.h"
 
 namespace NAV {
-#define MAXBG 13
+#define MAXBG    13
 #define START_BG 0
 
     extern u8 LOCATION_TIMER;
@@ -62,12 +62,27 @@ namespace NAV {
      */
     void printMessage( const char* p_message, style p_style = MSG_NORMAL );
 
+    inline void printMessage( const std::string& p_message, style p_style = MSG_NORMAL ) {
+        printMessage( p_message.c_str( ), p_style );
+    }
+
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
     printYNMessage( const char* p_message, style p_style, u8 p_selection = 255 );
+
+    inline std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
+    printYNMessage( const std::string& p_message, style p_style, u8 p_selection = 255 ) {
+        return printYNMessage( p_message.c_str( ), p_style, p_selection );
+    }
 
     std::vector<std::pair<IO::inputTarget, u8>>
     printChoiceMessage( const char* p_message, style p_style, const std::vector<u16>& p_choices,
                         u8 p_selection = 255 );
+
+    inline std::vector<std::pair<IO::inputTarget, u8>>
+    printChoiceMessage( const std::string& p_message, style p_style,
+                        const std::vector<u16>& p_choices, u8 p_selection = 255 ) {
+        return printChoiceMessage( p_message.c_str( ), p_style, p_choices, p_selection );
+    }
 
     /*
      * @brief: Initializes the bottom screen with the main menu

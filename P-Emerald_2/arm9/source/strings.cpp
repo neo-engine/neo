@@ -223,13 +223,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "If Pok\xe9mon get tired, take them to\na Pok\xe9mon Center.\r"
       "There's a Pok\xe9mon Center in Oldale Town right close by.",
       "" },
-    { "Mom: See, [PLAYER]?\nIsn't it nice in here, too?\r"
-      "The mover's Pok\xe9mon do all the work of moving us in and cleaning up after.\r"
-      "This is so convenient!\r"
-      "[PLAYER], your room is upstairs. Go check it out, dear!\r"
-      "Dad bought you a new PC to mark our move here.\r"
-      "Don't forget to check it out.",
-      "" },
+    { "Mom: See, [PLAYER]?\nIsn't it nice in here, too?", "" },
     { "\x5dRejuvenate your tired partners\"\nPok\xe9mon Center", "" },
     { "Oldale Town\n\x5dWhere things start of scarce.\"", "Rosaltstadt" },
     { "\x5dSelect items for your convenience\"\nPok\xe9mon Mart", "" },
@@ -242,9 +236,9 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Aren't you interested in seeing your very own room?",
       "" },
     { "Route 103\n\x07 Oldale Town", "Route 103\n\x07 Rosaltstadt" },
-    { "Fugiiih!", "" },
+    { "[CRY:288]Fugiiih!", "[CRY:288]Fugiiih!" },
 
-    { "Huggoh, uggo uggo|", "" },
+    { "[CRY:288]Huggoh, uggo uggo|", "[CRY:288]Huggoh, uggo uggo|" },
     { "Dad might like this program.\n| | | | | | | | | | | | |\r"
       "Better get going!",
       "" },
@@ -328,7 +322,11 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     // 50
 
-    { "", "" },
+    { "The mover's Pok\xe9mon do all the work of\nmoving us in and cleaning up after.\r"
+      "This is so convenient!\r"
+      "[PLAYER], your room is upstairs.\nGo check it out, dear!\r"
+      "Dad bought you a new PC to mark our move\nhere. Don't forget to check it out.",
+      "" },
     { "", "" },
     { "Mom: See you, honey!", "" },
     { "Prof. Birch spends days in his lab studying,\nthen he'll suddenly go out\r"
