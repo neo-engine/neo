@@ -58,6 +58,12 @@ namespace NAV {
     };
 
     /*
+     * @brief: Shows a message box informing the player that he obtained the specified
+     * item. (Also adds the specified item to the player's bag)
+     */
+    void giveItemToPlayer( u16 p_itemId, u16 p_amount = 1 );
+
+    /*
      * @brief: Prints the given message. An empty message clears the message box.
      */
     void printMessage( const char* p_message, style p_style = MSG_NORMAL );

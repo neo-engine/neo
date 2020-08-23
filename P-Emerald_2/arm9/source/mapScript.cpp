@@ -37,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sound.h"
+#include "specials.h"
 #include "sprite.h"
 #include "uio.h"
 
@@ -44,7 +45,6 @@ namespace MAP {
 #define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
     // opcode : u8, paramA : u12, paramB : u12
-    u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
 #define OPCODE( p_ins ) ( ( p_ins ) >> 24 )
 #define PARAM1( p_ins ) ( ( ( p_ins ) >> 16 ) & 0xFF )
 #define PARAM2( p_ins ) ( ( ( p_ins ) >> 8 ) & 0xFF )
@@ -56,6 +56,8 @@ namespace MAP {
     // 1 heal entire team
     // 2 run constructed poke mart
     // 3 get badge count (param1: region [0: Hoenn, 1: battle frontier])
+    // 4 get init game item count
+    // 5 get (and remove) init game item par1
     //
 
     enum opCode : u8 {
@@ -82,12 +84,40 @@ namespace MAP {
         CRGN = 18, // check register not equal
         MPL  = 19, // move player
         CMO  = 20, // current map object id to reg 0
+        GMO  = 21, // Get map object id of object at specified position to reg 0
 
-        ATT = 90, // Attach player
-        REM = 91, // Remove player
+        CPP = 22, // check player position
 
+        LCKR = 23, // Lock map object
+        ULKR = 24, // unlock map object
+
+        BNK = 25, // warp player (bank, z) (needs to be before WRP)
+        WRP = 26, // warp player (x, y)
+
+        CVR  = 27, // check variable equal
+        CVRN = 28, // check variable not equal
+        CVRG = 29, // check variable greater
+        CVRL = 30, // check variable lower
+
+        EXM  = 87, // Exclamation mark
+        EXMR = 88, // Exclamation mark (register)
+        RDR  = 89, // Redraw objects
+        ATT  = 90, // Attach player
+        REM  = 91, // Remove player
+
+        FNT = 99,  // faint player
         BTR = 100, // Battle trainer
+        BPK = 101, // Battle pkmn
+        ITM = 102, // Give item
 
+        BTRR = 105, // Battle trainer
+        BPKR = 106, // Battle pkmn
+        ITMR = 107, // Give item
+
+        MSC = 113, // play music (temporary)
+        RMS = 114, // Reset music
+        CRY = 115, // Play cry
+        SFX = 116, // Play sound effect
         PMO = 117, // Play music oneshot
         SMC = 118, // Set music
         SLC = 119, // Set location
@@ -102,7 +132,7 @@ namespace MAP {
     };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
-        u16 tmp = 0;
+        u16 tmp = -1;
 
         if( p_cmd == "PLAYER" ) { return SAVE::SAV.getActiveFile( ).m_playername; }
         if( p_cmd == "RIVAL" ) {
@@ -112,15 +142,17 @@ namespace MAP {
                 return GET_STRING( 460 );
             }
         }
-        if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp ) {
+        if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp != u16( -1 ) ) {
             SOUND::playCry( tmp );
             return "";
         }
-
+        if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
+            return getDisplayName( SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
+        }
         return "";
     }
 
-    void printMapMessage( const std::string& p_text, style p_style ) {
+    std::string convertMapString( const std::string& p_text, style p_style ) {
         std::string res = "";
 
         for( size_t i = 0; i < p_text.size( ); ++i ) {
@@ -142,12 +174,21 @@ namespace MAP {
             }
             res += p_text[ i ];
         }
-        NAV::printMessage( res.c_str( ), p_style );
+        return res;
+    }
+
+    void printMapMessage( const std::string& p_text, style p_style ) {
+        NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
+    }
+
+    void printMapYNMessage( const std::string& p_text, style p_style ) {
+        NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
     void mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject ) {
         FILE* f = FS::openScript( p_scriptId );
         if( !f ) { return; }
+        u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
         fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
         FS::close( f );
         auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ];
@@ -163,9 +204,15 @@ namespace MAP {
 
         bool playerAttachedToObject = false;
 
+        moveMode tmpmove = NO_MOVEMENT;
+
+        u8 newbnk = 255;
+        u8 newz   = 0;
+
         while( SCRIPT_INS[ pc ] ) {
             u16  curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
             u16  cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+            u16  curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
             u16  mapX = curx / SIZE, mapY = cury / SIZE;
             auto ins  = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
             u8   par1 = PARAM1( SCRIPT_INS[ pc ] );
@@ -173,14 +220,36 @@ namespace MAP {
             u8   par3 = PARAM3( SCRIPT_INS[ pc ] );
 
 #ifdef DESQUID_MORE
-            NAV::printMessage( ( std::to_string( ins ) + " ( " + std::to_string( par1 ) + " , "
-                                 + std::to_string( par2 ) + " , " + std::to_string( par3 ) + ")" )
+            NAV::printMessage( ( std::to_string( pc ) + ": " + std::to_string( ins ) + " ( "
+                                 + std::to_string( par1 ) + " , " + std::to_string( par2 ) + " , "
+                                 + std::to_string( par3 ) + ")" )
                                    .c_str( ) );
 #endif
             u16 parA = PARAMA( SCRIPT_INS[ pc ] );
             u16 parB = PARAMB( SCRIPT_INS[ pc ] );
 
             switch( ins ) {
+            case BNK: {
+                newbnk = par1;
+                newz   = par2;
+                break;
+            }
+            case WRP: {
+                warpPlayer( NO_SPECIAL, { newbnk, { parA, parB, newz } } );
+                break;
+            }
+            case RDR: {
+                constructAndAddNewMapObjects( currentData( ), mapX, mapY );
+                break;
+            }
+            case EXM: {
+                showExclamationAboveMapObject( par1 );
+                break;
+            }
+            case EXMR: {
+                showExclamationAboveMapObject( registers[ par1 ] );
+                break;
+            }
             case ATT: playerAttachedToObject = true; break;
             case REM: playerAttachedToObject = false; break;
             case EOP: return;
@@ -223,6 +292,9 @@ namespace MAP {
                 movement m = { direction( par2 ), 0 };
                 _mapSprites.setFrame( par1, getFrame( direction( par2 ) ) );
 
+                auto tmp = SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement;
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = NO_MOVEMENT;
+
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
                         moveMapObject( par1, m, playerAttachedToObject,
@@ -234,6 +306,7 @@ namespace MAP {
                         SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = tmp;
                 break;
             }
             case DMO: {
@@ -310,6 +383,11 @@ namespace MAP {
                       + " , " + std::to_string( par3 ) + ")" )
                         .c_str( ) );
 #endif
+                auto tmp = SAVE::SAV.getActiveFile( )
+                               .m_mapObjects[ registers[ par1 ] ]
+                               .second.m_movement;
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
+                    = NO_MOVEMENT;
                 movement m = { direction( par2 ), 0 };
                 _mapSprites.setFrame(
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first,
@@ -327,6 +405,8 @@ namespace MAP {
                         SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
+                    = tmp;
                 break;
             }
             case DMOR: {
@@ -356,10 +436,137 @@ namespace MAP {
             case CRGN:
                 if( registers[ par1 ] != par2 ) { pc += par3; }
                 break;
+            case CVRL:
+                if( SAVE::SAV.getActiveFile( ).getVar( par1 ) < par2 ) { pc += par3; }
+                break;
+            case CVRG:
+                if( SAVE::SAV.getActiveFile( ).getVar( par1 ) > par2 ) { pc += par3; }
+                if( registers[ par1 ] > par2 ) { pc += par3; }
+                break;
+            case CVRN:
+                if( SAVE::SAV.getActiveFile( ).getVar( par1 ) != par2 ) { pc += par3; }
+                break;
+            case CVR:
+                if( SAVE::SAV.getActiveFile( ).getVar( par1 ) == par2 ) { pc += par3; }
+                break;
+
             case CMO: registers[ 0 ] = o.first; break;
-            case BTR:
+            case LCKR: {
+                tmpmove = SAVE::SAV.getActiveFile( )
+                              .m_mapObjects[ registers[ par1 ] ]
+                              .second.m_movement;
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
+                    = NO_MOVEMENT;
+                break;
+            }
+            case ULKR: {
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
+                    = tmpmove;
+                break;
+            }
+            case GMO: {
+                registers[ 0 ] = 255;
+                for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                    auto& o2 = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+                    if( o2.second.m_pos.m_posX == par1 + mapX * SIZE
+                        && o2.second.m_pos.m_posY == par2 + mapY * SIZE
+                        && o2.second.m_pos.m_posZ == par3 ) {
+                        registers[ 0 ] = i;
+                        break;
+                    }
+                }
+                break;
+            }
+            case CPP: {
+                if( curx % SIZE == par1 && cury % SIZE == par2 && curz % SIZE == par3 ) {
+                    registers[ 0 ] = 1;
+                } else {
+                    registers[ 0 ] = 0;
+                }
+                break;
+            }
+            case FNT: {
+                faintPlayer( );
+                break;
+            }
+            case BTR: {
+                // TODO: Honor parB (i.e. single/double battle setting)
+
+                auto tr         = BATTLE::getBattleTrainer( parA );
+                auto playerPrio = _mapSprites.getPriority( _playerSprite );
+
+                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
+                FADE_TOP_DARK( );
+                ANIMATE_MAP = false;
+                swiWaitForVBlank( );
+
+                BATTLE::battle bt
+                    = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr );
+                if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+                    registers[ 0 ] = 0;
+                } else {
+                    registers[ 0 ] = 1;
+
+                    FADE_TOP_DARK( );
+                    NAV::init( );
+                    draw( playerPrio );
+                    _mapSprites.setPriority(
+                        _playerSprite, SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
+                    SOUND::restartBGM( );
+                    ANIMATE_MAP = true;
+                }
+                break;
+            }
+            case BTRR:
                 // TODO
                 break;
+            case BPK: {
+                pokemon wildPkmn = pokemon( parA, parB );
+
+                auto playerPrio = _mapSprites.getPriority( _playerSprite );
+                ANIMATE_MAP     = false;
+                DRAW_TIME       = false;
+                swiWaitForVBlank( );
+                if( BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                    SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn,
+                                    currentData( ).m_battlePlat1, currentData( ).m_battlePlat2,
+                                    currentData( ).m_battleBG, getBattlePolicy( true ) )
+                        .start( )
+                    == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+                    registers[ 0 ] = 0;
+                } else {
+                    registers[ 0 ] = 1;
+                }
+                FADE_TOP_DARK( );
+                draw( playerPrio );
+                _mapSprites.setPriority( _playerSprite,
+                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
+                ANIMATE_MAP = true;
+                NAV::init( );
+                break;
+            }
+            case BPKR:
+                // TODO
+                break;
+            case ITM: NAV::giveItemToPlayer( parA, parB ); break;
+            case ITMR: NAV::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
+            case MSC: {
+                SOUND::playBGM( parA );
+                break;
+            }
+            case RMS: {
+                SOUND::restartBGM( );
+                break;
+            }
+            case CRY: {
+                SOUND::playCry( parA, parB );
+                break;
+            }
+            case SFX: {
+                SOUND::playSoundEffect( parA );
+                break;
+            }
             case PMO: {
                 SOUND::playBGMOneshot( parA );
                 for( u16 i = 0; i < parB; ++i ) { swiWaitForVBlank( ); }
@@ -400,14 +607,53 @@ namespace MAP {
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).getBadgeCount( par1 );
                     break;
                 }
-
+                case 4: {
+                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItemCount;
+                    break;
+                }
+                case 5: {
+                    if( par1 <= 4 ) [[likely]] {
+                            par1++;
+                            registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par1 - 1 ];
+                        }
+                    else {
+                        registers[ 0 ] = 0;
+                        break;
+                    }
+                    for( u8 i = par1; i < SAVE::SAV.getActiveFile( ).m_initGameItemCount; ++i ) {
+                        if( i < 4 ) [[likely]] {
+                                SAVE::SAV.getActiveFile( ).m_initGameItems[ i ]
+                                    = SAVE::SAV.getActiveFile( ).m_initGameItems[ i + 1 ];
+                            }
+                        else {
+                            SAVE::SAV.getActiveFile( ).m_initGameItems[ i ] = 0;
+                        }
+                    }
+                    SAVE::SAV.getActiveFile( ).m_initGameItemCount--;
+                    break;
+                }
+                case 6: {
+                    // init pkmn
+                    SPX::runInitialPkmnSelection( );
+                    break;
+                }
+                case 7: {
+                    NAV::init( );
+                    break;
+                }
                 default: break;
                 }
                 break;
             case YNM: {
+                style st = (style) parB;
+                if( st == MSG_NORMAL ) { st = MSG_NOCLOSE; }
+                if( st == MSG_INFO ) { st = MSG_INFO_NOCLOSE; }
+
                 registers[ 0 ]
                     = IO::yesNoBox::YES
-                      == IO::yesNoBox( ).getResult( GET_MAP_STRING( parA ), (style) parB );
+                      == IO::yesNoBox( ).getResult(
+                          convertMapString( GET_MAP_STRING( parA ), (style) parB ).c_str( ),
+                          (style) parB );
                 NAV::init( );
                 break;
             }
@@ -484,29 +730,34 @@ namespace MAP {
     }
 
     void mapDrawer::runEvent( mapData::event p_event, u8 p_objectId ) {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16 mapX = curx / SIZE, mapY = cury / SIZE;
+
         switch( p_event.m_type ) {
         case EVENT_MESSAGE:
             printMapMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
                              (style) p_event.m_data.m_message.m_msgType );
             break;
-        case EVENT_NPC_MESSAGE:
-            printMapMessage( GET_MAP_STRING( p_event.m_data.m_npc.m_scriptId ),
-                             ( style )( p_event.m_data.m_npc.m_scriptType & 127 ) );
+        case EVENT_NPC_MESSAGE: {
+            u8 tp = p_event.m_data.m_npc.m_scriptType & 127;
+            if( tp == 10 || tp == 11 ) { tp = 0; }
+            printMapMessage( GET_MAP_STRING( p_event.m_data.m_npc.m_scriptId ), (style) tp );
             if( p_event.m_data.m_npc.m_scriptType & 128 ) {
                 SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, true );
             }
             break;
+        }
         case EVENT_TRAINER: {
             auto tr = BATTLE::getBattleTrainer( p_event.m_data.m_trainer.m_trainerId );
             if( !SAVE::SAV.getActiveFile( ).checkFlag(
-                    SAVE::F_TRAINER_BATTLED( p_event.m_deactivateFlag ) ) ) {
+                    SAVE::F_TRAINER_BATTLED( p_event.m_data.m_trainer.m_trainerId ) ) ) {
                 // player did not defeat the trainer yet
 
-                NAV::printMessage( tr.m_strings.m_message1, MSG_NORMAL );
+                printMapMessage( tr.m_strings.m_message1, MSG_NORMAL );
 
-                auto playerPrio = OBJPRIORITY_0;
-                //_sprites[ _spritePos[ SAVE::SAV.getActiveFile( ).m_player.m_id ] ]
-                //                  .getPriority( );
+                auto playerPrio = _mapSprites.getPriority( _playerSprite );
+
                 SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
                 FADE_TOP_DARK( );
                 ANIMATE_MAP = false;
@@ -520,16 +771,16 @@ namespace MAP {
                     return;
                 } else {
                     SAVE::SAV.getActiveFile( ).setFlag(
-                        SAVE::F_TRAINER_BATTLED( p_event.m_deactivateFlag ), true );
+                        SAVE::F_TRAINER_BATTLED( p_event.m_data.m_trainer.m_trainerId ), true );
                 }
                 FADE_TOP_DARK( );
                 NAV::init( );
                 draw( playerPrio );
                 SOUND::restartBGM( );
                 ANIMATE_MAP = true;
+            } else {
+                printMapMessage( tr.m_strings.m_message2, MSG_NORMAL );
             }
-
-            NAV::printMessage( tr.m_strings.m_message2, MSG_NORMAL );
             break;
         }
         case EVENT_HMOBJECT: {
@@ -538,7 +789,7 @@ namespace MAP {
                 if( _strengthUsed ) {
                     NAV::printMessage( GET_STRING( 558 ), MSG_NORMAL );
                 } else {
-                    NAV::printMessage( GET_STRING( 308 ), MSG_NORMAL );
+                    NAV::printMessage( GET_STRING( 318 ), MSG_NORMAL );
                 }
                 break;
             case mapSpriteManager::SPR_ROCKSMASH:
@@ -558,6 +809,11 @@ namespace MAP {
         case EVENT_GENERIC: {
             executeScript( p_event.m_data.m_generic.m_scriptId );
             break;
+        }
+        case EVENT_ITEM: {
+            NAV::giveItemToPlayer( p_event.m_data.m_item.m_itemId, 1 );
+            SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, 1 );
+            constructAndAddNewMapObjects( currentData( ), mapX, mapY );
         }
         default: break;
         }
@@ -587,6 +843,16 @@ namespace MAP {
                 && mdata.m_events[ i ].m_type != EVENT_GENERIC ) {
                 // These events have associated map objects
                 continue;
+            }
+            if( mdata.m_events[ i ].m_type == EVENT_GENERIC ) {
+                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 11
+                    && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
+                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 10
+                    && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
             }
             if( mdata.m_events[ i ].m_trigger == TRIGGER_STEP_ON ) {
                 runEvent( mdata.m_events[ i ] );
@@ -618,6 +884,19 @@ namespace MAP {
                 _mapSprites.setFrame( o.first, getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
             }
 
+            if( o.second.m_event.m_type == EVENT_TRAINER ) {
+                // Check for exclamation mark / music change
+
+                if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
+                        o.second.m_event.m_data.m_trainer.m_trainerId ) ) ) {
+                    // player did not defeat the trainer yet
+                    showExclamationAboveMapObject( i );
+                    auto tr
+                        = BATTLE::getBattleTrainer( o.second.m_event.m_data.m_trainer.m_trainerId );
+                    SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
+                }
+            }
+
             runEvent( o.second.m_event, i );
             o.second.m_movement = old;
         }
@@ -639,6 +918,17 @@ namespace MAP {
                 && mdata.m_events[ i ].m_type != EVENT_GENERIC ) {
                 // These events have associated map objects
                 continue;
+            }
+
+            if( mdata.m_events[ i ].m_type == EVENT_GENERIC ) {
+                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 11
+                    && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
+                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 10
+                    && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
             }
 
             if( mdata.m_events[ i ].m_trigger & dirToEventTrigger( p_dir ) ) {

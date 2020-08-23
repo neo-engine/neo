@@ -222,6 +222,8 @@ namespace SAVE {
         std::memset( m_berryPlantedDate, 0, sizeof( m_berryPlantedDate ) );
         std::memset( m_berryPlantedTime, 0, sizeof( m_berryPlantedTime ) );
 
+        m_initGameItemCount = 0;
+        std::memset( m_initGameItems, 0, sizeof( m_initGameItems ) );
         std::memset( m_reserved, 0, sizeof( m_reserved ) );
 
         std::memset( &m_bag, 0, sizeof( BAG::bag ) );
@@ -365,9 +367,9 @@ namespace SAVE {
         mxlv = std::min( s16( 93 ), s16( mxlv + 6 ) );
         mxlv = std::min( s16( 5 * getBadgeCount( ) + 8 ), s16( mxlv + 0 ) );
 
-        mxlv += m_options.m_levelModifier + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
+        mxlv += m_options.m_levelModifier / 2 + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
 
-        return u8( std::max( (s16) 1, std::min( (s16) 100, mxlv ) ) );
+        return u8( std::max( (s16) 2, std::min( (s16) 100, mxlv ) ) );
     }
 
     bool saveGame::playerInfo::checkFlag( u16 p_idx ) {

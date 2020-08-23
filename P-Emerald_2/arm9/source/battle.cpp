@@ -992,7 +992,7 @@ namespace BATTLE {
         char buffer[ 100 ];
         if( p_battleEndReason == BATTLE_OPPONENT_WON ) { SOUND::setVolume( 0 ); }
         if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
-            SOUND::playBGM( MOD_VICTORY_WILD );
+            if( p_battleEndReason != BATTLE_OPPONENT_WON ) { SOUND::playBGM( MOD_VICTORY_WILD ); }
             if( p_battleEndReason == BATTLE_CAPTURE ) {
                 handleCapture( );
             } else {

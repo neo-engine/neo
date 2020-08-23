@@ -402,6 +402,10 @@ namespace NAV {
 
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
+                if( p_style == MSG_ITEM ) {
+                    x += 48;
+                    y += 8;
+                }
             } else if( p_style == MSG_MART_ITEM ) {
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
                 TEXT_CACHE = "";
@@ -456,12 +460,12 @@ namespace NAV {
             }
 
             if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_NORMAL_CONT
-                || p_style == MSG_INFO_CONT ) {
+                || p_style == MSG_INFO_CONT || p_style == MSG_ITEM ) {
                 // "Continue" char
                 IO::regularFont->printCharB( 172, TEXT_PAL, CONT_BUF, 16, 0, 0 );
-                tileCnt = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 254 - x, y + 24, 16,
-                                           16, CONT_BUF, 16 * 16 / 2, false, false, false,
-                                           OBJPRIORITY_0, false );
+                tileCnt = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 254 - 12,
+                                           192 - 40 + 24, 16, 16, CONT_BUF, 16 * 16 / 2, false,
+                                           false, false, OBJPRIORITY_0, false );
             } else {
                 IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
             }
@@ -481,6 +485,7 @@ namespace NAV {
     }
 
     void waitForInteract( ) {
+        scanKeys( );
         cooldown = COOLDOWN_COUNT;
         u8 frame = 0;
         loop( ) {
@@ -506,6 +511,33 @@ namespace NAV {
                 break;
             }
         }
+    }
+
+    void giveItemToPlayer( u16 p_itemId, u16 p_amount ) {
+        auto data = ITEM::getItemData( p_itemId );
+        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( data.m_itemType ), p_itemId,
+                                                 p_amount );
+        char buffer[ 100 ];
+        if( p_amount > 1 ) {
+            snprintf( buffer, 99, GET_STRING( 563 ), p_amount,
+                      ITEM::getItemName( p_itemId ).c_str( ) );
+        } else {
+            snprintf( buffer, 99, GET_STRING( 564 ), ITEM::getItemName( p_itemId ).c_str( ) );
+        }
+        switch( data.m_itemType ) {
+            case ITEM::ITEMTYPE_KEYITEM:
+                SOUND::playSoundEffect( SFX_OBTAIN_KEY_ITEM );
+                break;
+            case ITEM::ITEMTYPE_TM:
+                SOUND::playSoundEffect( SFX_OBTAIN_TM );
+                break;
+            default:
+                SOUND::playSoundEffect( SFX_OBTAIN_ITEM );
+                break;
+        }
+        doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
+        waitForInteract( );
+        hideMessageBox( );
     }
 
     void printMessage( const char* p_message, style p_style ) {

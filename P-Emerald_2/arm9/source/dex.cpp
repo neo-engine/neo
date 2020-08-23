@@ -139,17 +139,19 @@ namespace DEX {
     }
 
     void dex::run( u16 p_pkmnIdx ) {
+        return;
+
+        // TODO
+
         SAVE::SAV.getActiveFile( ).m_lstDex = p_pkmnIdx;
 
         changeMode( _mode, p_pkmnIdx );
 
-        touchPosition touch;
         loop( ) {
             swiWaitForVBlank( );
             scanKeys( );
             touchRead( &touch );
 
-            int pressed = keysCurrent( );
             if( GET_AND_WAIT( KEY_B ) /* || GET_AND_WAIT_R( 224, 164, 300, 300 ) */ )
                 break;
             else if( GET_AND_WAIT( KEY_SELECT ) || GET_AND_WAIT( KEY_Y ) ) {

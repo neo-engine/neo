@@ -324,6 +324,14 @@ namespace MAP {
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio );
     }
 
+    void mapDrawer::showExclamationAboveMapObject( u8 p_objectId ) {
+        auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ];
+        _mapSprites.showExclamation( o.first );
+        SOUND::playSoundEffect( SFX_EXMARK );
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+        _mapSprites.hideExclamation( );
+    }
+
     void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer,
                                    direction p_playerMovement ) {
         // redirect object
@@ -470,6 +478,7 @@ namespace MAP {
             //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
+            BG_PALETTE[ 0 ] = 0;
 
 #ifdef DESQUID_MORE
             char buffer[ 100 ];
@@ -589,7 +598,7 @@ namespace MAP {
                 }
                 if( CUR_DATA.m_events[ i ].m_deactivateFlag
                     && SAVE::SAV.getActiveFile( ).checkFlag(
-                        CUR_DATA.m_events[ i ].m_activateFlag ) ) {
+                        CUR_DATA.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
 
@@ -954,15 +963,15 @@ namespace MAP {
                 || o.second.m_movement == WALK_UP_DOWN ) {
                 if( ( p_frame & 127 ) == 63 ) {
                     bool nomove = false;
-                    if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
+                    if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
                         if( o.second.m_pos.m_posX + dir[ UP ][ 0 ] != curx
                             || o.second.m_pos.m_posY + dir[ UP ][ 1 ] != cury ) {
                             o.second.m_currentMovement = { UP, 0 };
                         } else {
                             nomove = true;
                         }
-                    } else if( ( o.second.m_pos.m_posX + 1 ) % SIZE
-                               == o.second.m_event.m_posX % SIZE ) {
+                    } else if( ( o.second.m_pos.m_posY + 1 ) % SIZE
+                               == o.second.m_event.m_posY % SIZE ) {
                         if( o.second.m_pos.m_posX + dir[ DOWN ][ 0 ] != curx
                             || o.second.m_pos.m_posY + dir[ DOWN ][ 1 ] != cury ) {
                             o.second.m_currentMovement = { DOWN, 0 };
@@ -1036,7 +1045,6 @@ namespace MAP {
 #endif
 
         // Check if any event is occupying the target block
-
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
             if( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny ) {
@@ -1204,24 +1212,48 @@ namespace MAP {
         return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
     }
     void mapDrawer::movePlayer( direction p_direction, bool p_fast ) {
-        u8 newMoveData
-            = atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] )
-                  .m_movedata;
-        u8 lstMoveData = atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                             .m_movedata;
 
-        u8 newBehave
-            = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                  SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] )
-                  .m_bottombehave;
-        u8 lstBehave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                           SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                           .m_bottombehave;
+        u16 curx        = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury        = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u8  curz        = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+        u16 nx          = curx + dir[ p_direction ][ 0 ];
+        u16 ny          = cury + dir[ p_direction ][ 1 ];
+        u8  newMoveData = atom( nx, ny ).m_movedata;
+        u8  lstMoveData = atom( curx, cury ).m_movedata;
+        u8  newBehave   = at( nx, ny ).m_bottombehave;
+        u8  lstBehave   = at( curx, cury ).m_bottombehave;
 
-        if( SAVE::SAV.getActiveFile( ).m_player.m_movement != moveMode::WALK )
+        if( SAVE::SAV.getActiveFile( ).m_player.m_movement != moveMode::WALK ) {
             p_fast = false; // Running is only possible when the player is actually walking
+        }
+
+        // Check if any event is occupying the target block and push it if necessary
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+            auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+            if( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny ) {
+                switch( o.second.m_event.m_type ) {
+                case EVENT_HMOBJECT:
+                    if( o.second.m_event.m_data.m_hmObject.m_hmType
+                        == mapSpriteManager::SPR_STRENGTH ) {
+                        // Check if the boulder could be moved by using strength
+                        if( !canMove( { nx, ny, curz }, p_direction, STRENGTH ) ) { continue; }
+                        // Check if the player has actually used strength
+                        if( !_strengthUsed ) { continue; }
+
+                        // push the boulder one block in the current direction
+                        SOUND::playSoundEffect( SFX_HM_STRENGTH );
+                        for( u8 f = 0; f < 16; ++f ) {
+                            _mapSprites.moveSprite( o.first, p_direction, 1 );
+                            swiWaitForVBlank( );
+                        }
+                        o.second.m_pos.m_posX += dir[ p_direction ][ 0 ];
+                        o.second.m_pos.m_posY += dir[ p_direction ][ 1 ];
+                    }
+                    break;
+                default: break;
+                }
+            }
+        }
 
         bool reinit = false, moving = true, hadjump = false;
         while( moving ) {
@@ -1474,7 +1506,7 @@ namespace MAP {
                     if( p_direction == DOWN ) {
                         redirectPlayer( DOWN, p_fast );
                         handleWarp( NO_SPECIAL );
-                        break;
+                        return;
                     }
                     goto NEXT_PASS;
 
@@ -2322,6 +2354,14 @@ namespace MAP {
                         .c_str( ) );
 #endif
                 _mapSprites.destroySprite( o.first, false );
+            } else if( o.second.m_event.m_activateFlag
+                       && !SAVE::SAV.getActiveFile( ).checkFlag(
+                           o.second.m_event.m_activateFlag ) ) {
+                _mapSprites.destroySprite( o.first, false );
+            } else if( o.second.m_event.m_deactivateFlag
+                       && SAVE::SAV.getActiveFile( ).checkFlag(
+                           o.second.m_event.m_deactivateFlag ) ) {
+                _mapSprites.destroySprite( o.first, false );
             } else {
                 res.push_back( o );
                 eventPositions.insert(
@@ -2336,15 +2376,27 @@ namespace MAP {
                 continue;
             }
             if( p_data.m_events[ i ].m_deactivateFlag
-                && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_activateFlag ) ) {
+                && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
 
-            // check if there is an event that is already loaded and as the same base
+            // check if there is an event that is already loaded and has the same base
             // coordinates as the current event
             if( eventPositions.count( { p_data.m_events[ i ].m_posX, p_data.m_events[ i ].m_posY,
                                         p_data.m_events[ i ].m_posZ } ) ) {
                 continue;
+            }
+
+            if( p_data.m_events[ i ].m_type == EVENT_NPC_MESSAGE
+                || p_data.m_events[ i ].m_type == EVENT_NPC ) {
+                if( p_data.m_events[ i ].m_data.m_npc.m_scriptType == 11
+                    && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
+                if( p_data.m_events[ i ].m_data.m_npc.m_scriptType == 10
+                    && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
             }
 
             switch( p_data.m_events[ i ].m_type ) {

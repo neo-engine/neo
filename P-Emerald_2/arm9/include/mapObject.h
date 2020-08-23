@@ -79,7 +79,7 @@ namespace MAP {
 
         inline mapSprite sprite( ) const {
             u8 frameStart = getFrame( m_direction );
-            return mapSprite( m_picNum | 256, frameStart );
+            return mapSprite( m_picNum < 1000 ? ( m_picNum | 256 ) : m_picNum, frameStart );
         }
 
         void interact( );

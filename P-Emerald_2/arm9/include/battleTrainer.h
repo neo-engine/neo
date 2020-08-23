@@ -34,10 +34,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BATTLE {
     struct trainerStrings {
         char m_name[ 16 ];
-        char m_message1[ 100 ];
-        char m_message2[ 100 ];
-        char m_message3[ 100 ];
-        char m_message4[ 100 ];
+        char m_message1[ 200 ];
+        char m_message2[ 200 ];
+        char m_message3[ 200 ];
+        char m_message4[ 200 ];
     };
 
     struct trainerData {

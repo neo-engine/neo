@@ -74,6 +74,7 @@
 #define SFX_HM_FLY               38
 #define SFX_HM_ROCKSMASH         39
 #define SFX_HM_STRENGTH          40
+#define SFX_OBTAIN_TM            41
 
 void initSound( );
 
@@ -103,6 +104,7 @@ namespace SOUND {
         switch( p_trainerClassId ) {
         case 0: return MOD_ENCOUNTER_BRENDAN;
         case 1: return MOD_ENCOUNTER_MAY;
+        case 35:
         default: return MOD_ENCOUNTER_YOUNGSTER;
         }
     }
@@ -163,8 +165,7 @@ namespace SOUND {
         case L_ROUTE_106:
         case L_ROUTE_107:
         case L_ROUTE_108:
-        case L_ROUTE_109:
-                          return MOD_ROUTE_104;
+        case L_ROUTE_109: return MOD_ROUTE_104;
         case L_ROUTE_110:
         case L_ROUTE_111:
         case L_ROUTE_112: return MOD_ROUTE_110;
@@ -176,6 +177,8 @@ namespace SOUND {
         case L_ROUTE_120:
         case L_ROUTE_121: return MOD_ROUTE_120;
         case L_ROUTE_123: return MOD_ROUTE_123;
+        case L_MAUVILLE_CITY:
+        case L_LILYCOVE_CITY: return MOD_LILYCOVE_CITY;
         case L_VERDANTURF_TOWN:
         case L_CLIFFELTA_CITY: return MOD_CLIFFELTA_CITY;
         case L_LITTLEROOT_TOWN: return MOD_LITTLEROOT_TOWN;

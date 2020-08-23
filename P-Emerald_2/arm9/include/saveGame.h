@@ -44,7 +44,7 @@ namespace SAVE {
 
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
-    constexpr u8  MAX_BOXES   = 32;
+    constexpr u8  MAX_BOXES   = 35;
     constexpr u8  BERRY_SLOTS = 50;
 
     constexpr u16 F_MEGA_EVOLUTION   = 1;
@@ -170,6 +170,9 @@ namespace SAVE {
             u32 m_reserved[ 17 ]; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
+
+            boxPokemon m_dayCarePkmn[ 6 ]; // currently unused
+            boxPokemon m_dayCareEgg[ 3 ]; // currently unused
 
             BOX::box m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
 

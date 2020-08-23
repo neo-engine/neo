@@ -37,6 +37,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
 #define SPR_HM_OAM( p_idx )        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
 
+#define SPR_EXCLM_OAM 100
+
 // Strength boulder (16x16)
 // Rock Smash rock  (16x16)
 // Cut tree         (16x16)
@@ -48,10 +50,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_LARGE_NPC_GFX( p_idx ) ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC ) + 16 * ( p_idx ) )
 #define SPR_HM_GFX( p_idx )        ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 4 * ( p_idx ) )
 
+#define SPR_EXCLM_GFX 303
+
 namespace MAP {
     mapSpriteData::mapSpriteData( u16 p_imageId ) {
         FILE* f;
-        if( p_imageId < 250 ) {
+        if( p_imageId > 1000 ) {
+            f = FS::open( IO::OWP_PATH, p_imageId - 1000, ".rsd" );
+        } else  if( p_imageId < 250 ) {
             f = FS::open( IO::OW_PATH, p_imageId, ".rsd" );
         } else {
             if( p_imageId == 250 ) {
@@ -146,12 +152,12 @@ namespace MAP {
      */
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        const mapSpriteData& p_data ) {
-        IO::loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height,
-                         p_data.m_palData,
-                         reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
-                         p_data.m_width * p_data.m_height / 2, false, false,
-                         !mapSpritePos{ 0, 0, 0, 0, 128 - p_posX, 92 - p_posY }.isVisible( ),
-                         OBJPRIORITY_2, false );
+        IO::loadSpriteB(
+            p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height, p_data.m_palData,
+            reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
+            p_data.m_width * p_data.m_height / 2, false, false,
+            !mapSpritePos{ 0, 0, 0, 0, s16( 128 - p_posX ), s16( 92 - p_posY ) }.isVisible( ),
+            OBJPRIORITY_2, false );
     }
 
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
@@ -402,8 +408,15 @@ namespace MAP {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.moveSprite( p_dx, p_dy );
         } else {
             getManagedSprite( p_spriteId ).m_pos.moveSprite( p_dx, p_dy );
+            if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 16
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -16 ) {
+                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
+            } else {
+                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
+            }
         }
-
         if( p_update ) { IO::updateOAM( false ); }
     }
 
@@ -555,5 +568,22 @@ namespace MAP {
 
     void mapSpriteManager::update( ) {
         IO::updateOAM( false );
+    }
+
+    void mapSpriteManager::showExclamation( u8 p_spriteId, u8 p_emote ) {
+        auto spr = getManagedSprite( p_spriteId );
+        char buffer[ 10 ];
+        snprintf( buffer, 9, "EMO/%hhu", p_emote );
+        IO::loadSpriteB( buffer, SPR_EXCLM_OAM, SPR_EXCLM_GFX,
+                         IO::OamTop->oamBuffer[ p_spriteId ].x
+                             + ( spr.m_sprite.getData( ).m_width == 32 ? 8 : 0 ),
+                         IO::OamTop->oamBuffer[ p_spriteId ].y - 8, 16, 16, false, false, false,
+                         OBJPRIORITY_0, false );
+        update( );
+    }
+
+    void mapSpriteManager::hideExclamation( ) {
+        IO::OamTop->oamBuffer[ SPR_EXCLM_OAM ].isHidden = true;
+        update( );
     }
 } // namespace MAP

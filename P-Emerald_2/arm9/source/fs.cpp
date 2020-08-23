@@ -77,7 +77,7 @@ const char MAP_DATA_PATH[] = "nitro:/DATA/MAP_DATA/";
 namespace FS {
     char TMP_BUFFER[ 100 ];
     char TMP_BUFFER_SHORT[ 50 ];
-    u8   CRY_DATA[ 41000 ];
+    u8   CRY_DATA[ 22050 * 2 ];
 
     bool SD_ACCESSED = false, SD_READ = false;
     bool SDFound( ) {

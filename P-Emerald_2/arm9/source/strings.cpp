@@ -232,8 +232,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "I want to take a rest,\nso I'm saving my progress.", "" },
     { "My Pok\xe9mon is staggeringly tired|\nI should have brought a Potion|", "" },
-    { "Mom: Well, [PLAYER]?\r"
-      "Aren't you interested in seeing your very own room?",
+    { "Mom: [PLAYER].\r"
+      "Please check out your new PC.\nIt's a gift from Dad after all.",
       "" },
     { "Route 103\n\x07 Oldale Town", "Route 103\n\x07 Rosaltstadt" },
     { "[CRY:288]Fugiiih!", "[CRY:288]Fugiiih!" },
@@ -267,8 +267,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "[PLAYER] booted up the PC.", "[PLAYER] schaltet den PC ein." },
     { "A message from Dad!\r"
       "Dad: Hi [PLAYER]! Welcome to our new home.\r"
-      "Please come visit me in my Gym in Petalburg City.\r"
-      "Ah, this Potion may come in handy.",
+      "I'm busy right now, so could you please come\nand visit me in my Gym in Petalburg City?\r"
+      "Ah, this Potion may come in handy for your journey.",
       "" },
 
     { "When Pok\xe9mon battle, they eventually\nlevel up and become stronger.", "" },
@@ -279,7 +279,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "It could give you an advantage.",
       "" },
     { "There is another message.\r"
-      "???: Greetings [PLAYER]. This gift was delivered just for you.",
+      "???: Greetings [PLAYER], I hope you are having fun.\nThis gift was delivered just for you.",
       "Es gibt eine weitere Nachricht.\r"
       "???: Sei gegr\xfc\xdft, [PLAYER]. Dieses Geschenk ist f\xfcr dich." },
     { "Hello and welcome to the Pok\xe9mon Center.\r"
@@ -301,15 +301,14 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Would you like to rest your Pok\xe9mon?", "OK. Wir ben\xf6tigen deine Pok\xe9mon." },
     { "Mom: Oh! [PLAYER], [PLAYER]!\nQuick! Come quickly!", "" },
 
-    { "Mom: Look it's Petalburg Gym!\nMaybe Dad will be on!\r"
-      "Interviewer: |this report from in front of Petalburg Gym.",
+    { "Mom: Look it's Petalburg Gym!\nMaybe Dad will be on!"
       "" },
     { "We hope to see you again!", "Komm jederzeit wieder vorbei!" },
     { "Mom: Oh| It's over.\r"
       "I think Dad was on, but we missed him. Too bad.\r"
       "Oh yes.\nOne of Dad's friends lives in town.\r"
       "Prof. Birch is his name.\r"
-      "He lives right next door, so you shold go over and introduce yourself.",
+      "He lives right next door, so you should\ngo over and introduce yourself.",
       "" },
     { "Okay, I'll take your Pok\xe9mon for a second.",
       "Okay, ich nehme deine Pok\xe9mon für einen Moment in meine Obhut." },
@@ -327,27 +326,41 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "[PLAYER], your room is upstairs.\nGo check it out, dear!\r"
       "Dad bought you a new PC to mark our move\nhere. Don't forget to check it out.",
       "" },
-    { "", "" },
+    { "There's an e-mail from the Pok\xe9mon Trainer School.\r"
+      "| | | | | | |\r"
+      "A Pok\xe9mon may learn up to four moves.\r"
+      "A trainer's expertise is tested on the\nmove sets chosen for Pok\xe9mon.\r"
+      "| | | | | | |",
+      "" },
     { "Mom: See you, honey!", "" },
     { "Prof. Birch spends days in his lab studying,\nthen he'll suddenly go out\r"
       "in the wild to do more research|\r"
       "When does Prof. Birch spend time at home?",
       "" },
-    { "", "" },
+    { "Interviewer: |this report from in front of Petalburg Gym.", "" },
 
     { "", "" },
     { "Using a PC you can send even items!\n"
       "The power of science is staggering!",
       "" },
-    { "", "" },
-    { "Um, um, um!\r"
-      "If you go outside and go in the grass, wild Pok\xe9mon will jump out!",
+    { "Um, um, um!", "" },
+    { "If you go outside and go in the grass,\nwild Pok\xe9mon will jump out!\r"
+      "It's dangerous if you don't have your own Pok\xe9mon!",
       "" },
-    { "", "" },
+    { "Oh, hello. And you are?\r"
+      "| | | | | | | | |\n| | | | | | | | |\r"
+      "Oh, you're [PLAYER],\nour new next-door neighbor! Hi!\r"
+      "We have a son about the same age as you.\r"
+      "Our son was excited about\nmaking a new friend.\r"
+      "Our son is upstairs, I think.",
+      "" },
 
     // 60
 
-    { "It's dangerous if you don't have your own Pok\xe9mon!", "" },
+    { "Like child, like father.\r"
+      "My husband is as wild about\nPok\xe9mon as our child.\r"
+      "If my husband is not at his Lab, he's likely scrabbling about in grassy places.",
+      "" },
     { "It's crammed with books on Pok\xe9mon.", "" },
     { "It's a PC used for research.\nBetter not mess around with it.", "" },
     { "It's a serious-looking machine.\nIt must be used for research.", "" },
@@ -360,23 +373,184 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "rather go outside and experience things\nthan read about them here.",
       "" },
 
-    { "", "" },
+    { "Hi, neighbor!\r"
+      "Do you already have your own Pok\xe9mon?",
+      "" },
     { "Let me explain again what fieldwork is.\r"
       "It is to study things in the natural\nenvironment, like fields of mountains,\r"
       "instead of a laboratory\r"
       "The Prof isn't one for doing desk work.\nHe's the type of person who would\r"
       "rather go outside and experience things\nthan read about them here.",
       "" },
-    { "", "" },
-    { "", "" },
-    { "", "" },
+    { "Oh, you're [PLAYER], aren't you?\nMoved in next door, right?\r"
+      "My name's Brendan. So hi, neighbor.\r"
+      "Huh? Hey, [PLAYER],\ndon't you have a Pok\xe9mon?\r"
+      "Dad, Prof. Birch, said that our new next-door neighbor is a Gym Leader's kid,\r"
+      "so I assumed you would already have some\ncool, strong Pok\xe9mon|\r"
+      "Do you want me to go catch you one?\r"
+      "Ah, I forgot|\r"
+      "I'm supposed to go help my dad\ncatch some wild Pok\xe9mon.\r"
+      "Some other time, okay?",
+      "" },
+    { "It's Brendan's Pok\xe9 Ball!\r"
+      "Better leave it right where it is.",
+      "" },
+    { "Pok\xe9mon fully restored|\nItems all packed, and|", "" },
 
     // 70
 
-    { "", "" },
+    { "That Brendan!\r"
+      "I guess our child is too busy with Pok\xe9mon to notice that you came to visit|",
+      "" },
     { "It's a book that is too hand to read.", "" },
     { "It's a half-empty pot of warm coffee.", "" },
     { "It's a half-full pot of cold coffee.", "" },
+    { "Hey!\nYou|\r"
+      "Who are you?",
+      "" },
+
+    { "Um, hi!\r"
+      "There are scary Pok\xe9mon outside!\nI can hear their cries!\r"
+      "I want to go see what's going on,\nbut I don't have any Pok\xe9mon|\r"
+      "Can you go see what's happening for me?",
+      "" },
+    { "H-Help me!", "" },
+    { "Hello! You over there!\nPlease! Help!\r"
+      "In my bag!\nThere's a Pok\xe9 Ball!",
+      "" },
+    { "Prof. Birch: Whew|\r"
+      "I was in the tall grass studying wild\nPok\xe9mon when I was jumped.\r"
+      "You saved me. Thanks a lot!\r"
+      "Oh?\r"
+      "Hi, you're [PLAYER]!\r"
+      "This is not the place to chat, so come by my Pok\xe9mon Lab later, okay?",
+      "" },
+    { "Prof. Birch: So, [PLAYER].\r"
+      "I've heard so much about you\nfrom your father.\r"
+      "I've heard that you don't have\nyour own Pok\xe9mon yet.\r"
+      "But the way you battled earlier,\nyou pulled it off with aplomb!\r"
+      "I guess you have your father's blood\nin your veins after all!\r"
+      "Oh yes. As thanks for rescuing me, I'd like\nyou to have the Pok\xe9mon you used earlier.",
+      "" },
+
+    // 80
+
+    { "[PLAYER] received [TEAM:0].", "[PLAYER] erhielt [TEAM:0]." },
+    { "Would you like to give a nickname to [TEAM:0]?", "" },
+    { "Prof. Birch: If you work at Pok\xe9mon and gain experience,\r"
+      "I think you'll make an extremely good\nPok\xe9mon Trainer.\r"
+      "My kid, [RIVAL], is also studying Pok\xe9mon\nwhile helping me out.",
+      "" },
+    { "Prof. Birch: Oh, don't be that way.\nYou should go meet my kid.", "" },
+    { "Prof. Birch: Great!\n[RIVAL] should be happy, too.\r"
+      "Get [RIVAL] to teach you what it means\nto be a Pok\xe9mon Trainer.",
+      "" },
+
+    { "Prof. Birch: [RIVAL]?\nGone home, I think.\r"
+      "Or maybe that kid's scrabbling around in tall grass again somewhere|\r"
+      "If you or your Pok\xe9mon get  tired,\nyou should get some rest at home.",
+      "" },
+    { "Prof. Birch is studying the habitats and distribution of Pok\xe9mon.\r"
+      "The Prof enjoys [RIVAL]'s help, too.\nThere's a lot of love there.",
+      "" },
+    { "You saved Prof. Birch!\nI'm so glad!", "" },
+    { "Oh, [RIVAL] went out to Route 103 just a little while ago.\r"
+      "Like father, like child.\n[RIVAL] can't stay quietly at home.",
+      "" },
+    { "Mom: How are you doing, [PLAYER]?\nYou look a little tired.\r"
+      "I think you should rest a bit.",
+      "" },
+
+    // 90
+
+    { "Mom: Take care, honey!.", "" },
+    { "Aaaah! Wait!\nPlease don't come in here.", "" },
+    { "I just discovered the footprints of a rare Pok\xe9mon!\r"
+      "Wait until I finish sketching them, okay?",
+      "" },
+    { "", "" },
+    { "Hi!\nI work at a Pok\xe9mon Mart.\r"
+      "What is a Pok\xe9mon Mart you may ask?\r"
+      "It is a building just as the one right behind me. Just look for our blue roof.\r"
+      "We sell a variety of goods including\nPok\xe9 Balls for catching Pok\xe9mon.\r"
+      "Here, I'd like you to have these\nPotions as promotional items.",
+      "" },
+
+    { "A Potion can be used anytime, so it can be\neven more useful than a Pok\xe9mon Center.",
+      "" },
+    { "[RIVAL]: Okay, so it's this one and that one\nthat live on Route 103|", "" },
+    { "Hey, it's [PLAYER]!\r"
+      "|Oh, yeah, Dad gave you a Pok\xe9mon.\r"
+      "Since we're here, how about a little battle?\r"
+      "I'll teach you what being a Pok\xe9mon Trainer's about!",
+      "" },
+    { "[RIVAL]: I think I get it. I think I know\nwhy my dad has his eye out for you now.\r"
+      "Look, your Pok\xe9mon already likes you, even though you just got it.\r"
+      "[PLAYER], I get the feeling that you could\nbefriend any Pok\xe9mon with ease.\r"
+      "| | |\r"
+      "We should head back to the lab.",
+      "" },
+    { "", "" },
+
+    // 100
+    { "I think it's wonderful for people to travel with Pok\xe9mon.\r"
+      "But you should go home every so often\nto let you mother know you're okay.\r"
+      "She might not say it, but I'm sure she worries about you, [PLAYER].",
+      "" },
+    { "Prof. Birch: Oh, welcome back, [PLAYER]!\r"
+      "I heard you beat [RIVAL] on your first try. That's excellent!\r"
+      "[RIVAL]'s been helping with my research\nfor a long time.\r"
+      "[RIVAL] has an extensive history as a\nPok\xe9mon Trainer already.\r"
+      "Here, [PLAYER], I ordered this for my research,\nbut I think you should have this Pok\xe9"
+      "Dex.",
+      "" },
+    { "[PLAYER] received the Pok\xe9"
+      "Dex.",
+      "" },
+    { "Prof. Birch: The Pok\xe9"
+      "Dex is a high-tech tool\nthat automatically makes a record\r"
+      "of any Pok\xe9mon you meet or catch.\r"
+      "My kid, [RIVAL], goes everywhere with it.\r"
+      "Whenever my kid catches a rare Pok\xe9mon and records its data in the Pok\xe9"
+      "Dex,\r"
+      "why, [RIVAL] looks for me while I'm out doing fieldwork, and shows me.",
+      "" },
+    { "[RIVAL]: Huh|\nSo you got a Pok\xe9"
+      "Dex, too.\r"
+      "Well then, here.\nI'll give you these.",
+      "" },
+
+    { "[RIVAL]: You know it's more fun to have a\nwhole bunch of Pok\xe9mon.\r"
+      "I'm going to explore all over the place to find different Pok\xe9mon.\r"
+      "If I find any cool Pok\xe9mon, you bet I'll try\nto get them with Pok\xe9 Balls.",
+      "" },
+    { "[RIVAL]: Where should I look for Pok\xe9mon\nnext|", "" },
+    { "Prof. Birch: Countless Pok\xe9mon await you!\r"
+      "Argh, I'm getting the itch to get out and do fieldwork again!",
+      "" },
+    { "Mom: Wait, [PLAYER]!", "" },
+    { "Mom: [PLAYER]! [PLAYER]! Did you introduce\nyourself to Prof. Birch?\r"
+      "Oh! What an adorable Pok\xe9mon!\nYou got it from Prof. Birch. How nice!\r"
+      "You're your father's child, all right.\nYou look good together with Pok\xe9mon!\r"
+      "| | | | | | | | | |\n| | | | | | | | | |\r"
+      "To think that you have your very own Pok\xe9mon now|\r"
+      "Your father will be overjoyed.\r"
+      "|But please be careful.\nIf anything happens, you can come home.\r"
+      "Go on, go get them, honey!",
+      "" },
+
+    // 110
+
+    { "Are you going to catch Pok\xe9mon?\nGood luck!", "" },
+    { "I finished sketching te footprints of a rare Pok\xe9mon.\r"
+      "But it turns out they were only\nmy own footprints|",
+      "" },
+    { "Mom: Did you introduce yourself to\nProf. Birch?", "" },
+    { "[PLAYER], don't you think it might\nbe a good idea to go see [RIVAL]?", "" },
+    { "Route 102\nOldale Town \x08", "Route 102\nRosaltstadt \x08" },
+
+    { "Route 102\n\x05 Petalburg City", "Route 102\n\x05 Bl\xfctenburg City" },
+
 };
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
@@ -436,7 +610,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Possible", "Erlernbar" },
     { "Not possible", "Nicht erlernbar" },
     { "Level %3d\n%3d/%3d HP", "Level %3d\n%3d/%3d KP" },
-    { "Level %3d\n Fainted", "Level %3d\n Besiegt" },
+    { "Level %3d\nFainted", "Level %3d\nBesiegt" },
 
     // 40
 
@@ -650,9 +824,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "It got wasted|", "Es hatte keine Wirkung|" },
     { "Used %s.", "%s eingesetzt." },
     { "%s's data was\nregistred to the Pok\xe9"
-      "dex.",
+      "Dex.",
       "Die Daten von %s\nwurden im Pok\xe9"
-      "dex gespeichert." },
+      "Dex gespeichert." },
 
     { "%s was sent to\nthe Pok\xe9mon Storage System.",
       "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt." },
@@ -902,9 +1076,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Use Item", "Item nutzen" },
     { "Swap", "Austauschen" },
     { "Pok\xe9"
-      "dex",
+      "Dex",
       "Pok\xe9"
-      "dex" },
+      "Dex" },
 
     // 330
 
@@ -1021,9 +1195,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Play time", "Spielzeit" },
     { "Money", "Geld" },
     { "Pok\xe9"
-      "dex",
+      "Dex",
       "Pok\xe9"
-      "dex" },
+      "Dex" },
 
     // 410
 
@@ -1033,9 +1207,9 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "No save data in this slot.", "Kein Spielstand in diesem Slot." },
     { "Pok\xe9mon", "Pok\xe9mon" },
     { "Pok\xe9"
-      "dex",
+      "Dex",
       "Pok\xe9"
-      "dex" },
+      "Dex" },
 
     { "Bag", "Beutel" },
     { "Trainer ID", "Trainerpass" },
@@ -1287,5 +1461,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
       "and fainted Pok\xe9mon\nfrom further harm|",
       "Du rennst zurück nach Hause\num deine ersch\xf6pten\n"
       "und besiegten Pok\xe9mon vor\nweiterem Schaden zu sch\xfctzen|" },
-
+    { "Obtained %hu %ss.", "%hu %s erhalten." },
+    { "Obtained %s.", "%s erhalten." },
 };

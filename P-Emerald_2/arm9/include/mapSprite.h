@@ -335,6 +335,14 @@ namespace MAP {
         void currentFrame( u8 p_spriteId, bool p_update = true );
         void nextFrame( u8 p_spriteId, bool p_update = true );
 
+        /*
+         * @brief: Shows an emotion bubble above the specified sprite. (defaults to an
+         * exclamation mark)
+         */
+        void showExclamation( u8 p_spriteId, u8 p_emote = 0 );
+
+        void hideExclamation( );
+
         void update( );
     };
 } // namespace MAP

@@ -1622,7 +1622,7 @@ namespace BATTLE {
             oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].priority = OBJPRIORITY_3;
         }
 
-        u16 emptyPal[ 32 ]                = { 0xffff, 0xffff, 0 };
+        u16 emptyPal[ 32 ]                = { 0, 0, 0 };
         IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1LLU << 8 );
         IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
         IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1LLU << 9 );
@@ -1699,7 +1699,7 @@ namespace BATTLE {
                             p_pokemon->getForme( ) );
 
         for( u8 i = 0; i < 4; ++i ) { oam[ SPR_PKMN_START_OAM( 0 ) + i ].priority = OBJPRIORITY_3; }
-        u16 emptyPal[ 32 ]                = { 0xffff, 0xffff, 0 };
+        u16 emptyPal[ 32 ]                = { 0, 0, 0 };
         IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1LLU << 8 );
         IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
         IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1LLU << 9 );

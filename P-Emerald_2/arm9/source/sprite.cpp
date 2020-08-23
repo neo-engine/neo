@@ -82,6 +82,7 @@ unsigned short TEMP_PAL[ 256 ] = { 0 };
 
 namespace IO {
     const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
+    const char* OWP_PATH       = "nitro:/PICS/SPRITES/NPCP/";
     const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
     const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/ITEMS/";
