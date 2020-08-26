@@ -34,6 +34,12 @@ namespace SPX {
     void runInitialPkmnSelection( );
 
     /*
+     * @brief: Shows how Wally catches a Ralts (which may be shiny to troll the player; in
+     * that case flag 27 is set).
+     */
+    void runCatchingTutorial( );
+
+    /*
      * @brief: Runs a slot machine mini game (TODO)
      */
     void runSlotMachine( );

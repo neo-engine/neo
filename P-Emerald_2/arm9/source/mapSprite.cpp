@@ -53,11 +53,25 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_EXCLM_GFX 303
 
 namespace MAP {
+    void mapSpriteData::readData( FILE* p_f ) {
+        if( !p_f ) {
+#ifdef DESQUID
+            NAV::printMessage( "Sprite failed" );
+#endif
+        } else {
+            FS::read( p_f, m_palData, sizeof( u16 ), 16 );
+            FS::read( p_f, &m_frameCount, sizeof( u8 ), 1 );
+            FS::read( p_f, &m_width, sizeof( u8 ), 1 );
+            FS::read( p_f, &m_height, sizeof( u8 ), 1 );
+            FS::read( p_f, m_frameData, sizeof( u32 ), m_width * m_height * m_frameCount / 8 );
+            FS::close( p_f );
+        }
+    }
     mapSpriteData::mapSpriteData( u16 p_imageId ) {
         FILE* f;
         if( p_imageId > 1000 ) {
             f = FS::open( IO::OWP_PATH, p_imageId - 1000, ".rsd" );
-        } else  if( p_imageId < 250 ) {
+        } else if( p_imageId < 250 ) {
             f = FS::open( IO::OW_PATH, p_imageId, ".rsd" );
         } else {
             if( p_imageId == 250 ) {
@@ -72,24 +86,18 @@ namespace MAP {
             }
             f = FS::open( IO::TRAINER_PATH, p_imageId, ".rsd" );
         }
-
-        if( !f ) {
-#ifdef DESQUID
-            NAV::printMessage( "Sprite failed" );
-#endif
-        } else {
-            FS::read( f, m_palData, sizeof( u16 ), 16 );
-            FS::read( f, &m_frameCount, sizeof( u8 ), 1 );
-            FS::read( f, &m_width, sizeof( u8 ), 1 );
-            FS::read( f, &m_height, sizeof( u8 ), 1 );
-            FS::read( f, m_frameData, sizeof( u32 ), m_width * m_height * m_frameCount / 8 );
-            FS::close( f );
-        }
+        readData( f );
     }
 
     mapSprite::mapSprite( u16 p_imageId, u8 p_startFrame ) {
         _data            = mapSpriteData( p_imageId );
         _info.m_picNum   = p_imageId;
+        _info.m_curFrame = p_startFrame;
+    }
+
+    mapSprite::mapSprite( FILE* p_f, u8 p_startFrame ) {
+        _data.readData( p_f );
+        _info.m_picNum   = -1;
         _info.m_curFrame = p_startFrame;
     }
 
@@ -236,11 +244,12 @@ namespace MAP {
 
         switch( p_type ) {
         case SPTYPE_PLAYER:
-            _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 } };
+            _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 }, SPTYPE_PLAYER };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                           screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                           SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX, p_sprite );
             return SPR_MAIN_PLAYER_OAM;
+        case SPTYPE_BERRYTREE:
         case SPTYPE_NPC: {
             bool isBig = p_sprite.getData( ).m_width == 32;
 
@@ -257,7 +266,8 @@ namespace MAP {
                 _bigNpcs[ freesp ] = { true,
                                        { p_sprite,
                                          { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
-                                           camShift( p_camY, p_posY ) } } };
+                                           camShift( p_camY, p_posY ) },
+                                         p_type } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                               screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                               SPR_LARGE_NPC_OAM( freesp ), SPR_LARGE_NPC_GFX( freesp ), p_sprite );
@@ -274,7 +284,8 @@ namespace MAP {
                 _smallNpcs[ freesp ] = { true,
                                          { p_sprite,
                                            { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
-                                             camShift( p_camY, p_posY ) } } };
+                                             camShift( p_camY, p_posY ) },
+                                           p_type } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                               screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                               SPR_SMALL_NPC_OAM( freesp ), SPR_SMALL_NPC_GFX( freesp ), p_sprite );
@@ -285,6 +296,20 @@ namespace MAP {
         }
 
         return 255;
+    }
+
+    u8 mapSpriteManager::loadBerryTree( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
+                                        u8 p_berryIdx, u8 p_stage ) {
+        FILE* f;
+        u8    fr = 0;
+        if( p_stage <= 1 ) { // generic sprite for all berries
+            f  = FS::open( IO::BERRY_PATH, 999, ".rsd" );
+            fr = 2 * p_stage;
+        } else { // custom sprite
+            f  = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
+            fr = 2 * ( p_stage - 2 );
+        }
+        return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_BERRYTREE, mapSprite( f, fr ) );
     }
 
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
@@ -410,8 +435,8 @@ namespace MAP {
             getManagedSprite( p_spriteId ).m_pos.moveSprite( p_dx, p_dy );
             if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0
                 && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 16
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -16 ) {
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 14
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -14 ) {
                 IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
             } else {
                 IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
@@ -451,8 +476,8 @@ namespace MAP {
                 = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
             if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0
                 && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 16
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -16 ) {
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 14
+                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -14 ) {
                 IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
             } else {
                 IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
@@ -562,7 +587,12 @@ namespace MAP {
             [[unlikely]] {
                 return;
             }
-        getManagedSprite( p_spriteId ).m_sprite.nextFrame( p_spriteId );
+        auto& mspr = getManagedSprite( p_spriteId );
+        if( mspr.m_type != SPTYPE_BERRYTREE ) {
+            mspr.m_sprite.nextFrame( p_spriteId );
+        } else {
+            mspr.m_sprite.setFrame( p_spriteId, mspr.m_sprite.getCurrentFrame( ) ^ 1 );
+        }
         if( p_update ) { IO::updateOAM( false ); }
     }
 

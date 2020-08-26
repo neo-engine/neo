@@ -172,7 +172,7 @@ namespace SAVE {
             BAG::bag m_bag;
 
             boxPokemon m_dayCarePkmn[ 6 ]; // currently unused
-            boxPokemon m_dayCareEgg[ 3 ]; // currently unused
+            boxPokemon m_dayCareEgg[ 3 ];  // currently unused
 
             BOX::box m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
 
@@ -374,6 +374,8 @@ namespace SAVE {
              */
             bool berryIsAlive( u8 p_berrySlot ) const;
 
+            void waterBerry( u8 p_berrySlot );
+
             /*
              * @brief: Returns the number of berries the specified plant yields when
              * harvested.
@@ -383,8 +385,13 @@ namespace SAVE {
             /*
              * @brief: Returns the growth stage of the berry at the specified slot
              * @returns: 0 if no berry is present, ow stage from [1, 4].
+             * (1 - just planted, 2 - sprouting, 3 - blooming, 4 - yielding)
              */
             u8 getBerryStage( u8 p_berrySlot ) const;
+
+            inline u8 getBerry( u8 p_berrySlot ) const {
+                return m_berryTrees[ p_berrySlot ];
+            }
 
             /*
              * @brief: Removes any berry in the specified berry slot.

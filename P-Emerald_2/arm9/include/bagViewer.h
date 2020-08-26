@@ -45,6 +45,8 @@ namespace BAG {
             GIVE_TO_PKMN, // Allow only items, medicine and berries
             // TODO: USE_ON_PKMN,  // Allow only evo items, medicine, berries, and forme change
             SELL_ITEM,    // Sell items
+            CHOOSE_BERRY, // Choose a berry (to plant, for blending pokeblocks, etc)
+            MOCK_BATTLE, // Catching tutorial, show and choose a single poke ball
         };
 
       private:

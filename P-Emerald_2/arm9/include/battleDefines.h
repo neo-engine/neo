@@ -251,7 +251,7 @@ namespace BATTLE {
 
     const u8 defaultSlotConditionDurations[ MAX_SLOT_CONDITIONS ] = { 3, 1, 1 };
 
-    enum battleMode { SINGLE = 0, DOUBLE = 1 };
+    enum battleMode { SINGLE = 0, DOUBLE = 1, MOCK = 2 };
 
     struct battlePolicy {
         battleMode m_mode;

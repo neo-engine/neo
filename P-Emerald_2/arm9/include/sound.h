@@ -104,6 +104,16 @@ namespace SOUND {
         switch( p_trainerClassId ) {
         case 0: return MOD_ENCOUNTER_BRENDAN;
         case 1: return MOD_ENCOUNTER_MAY;
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+        case 30:
+        case 31:
+        case 32:
+        case 33: return MOD_ENCOUNTER_TEAM_AM;
         case 35:
         default: return MOD_ENCOUNTER_YOUNGSTER;
         }
@@ -122,6 +132,17 @@ namespace SOUND {
         case 8: // gym 7
         case 9: // gym 8
             return MOD_BATTLE_GYM_LEADER;
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 29:
+        case 30:
+        case 31:
+        case 32: return MOD_BATTLE_TEAM_AM;
+        case 28:
+        case 33:
+            // return MOD_BATTLE_TEAM_AM_LEADER;
         default: return MOD_BATTLE_TRAINER;
         }
     }

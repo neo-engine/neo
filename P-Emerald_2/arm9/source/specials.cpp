@@ -49,10 +49,60 @@
 #include "x_16_16.h"
 
 namespace SPX {
+    void runCatchingTutorial( ) {
+        ANIMATE_MAP = false;
+        videoSetMode( MODE_5_2D );
+        bgUpdate( );
+        SOUND::dimVolume( );
+        IO::initVideo( );
+        IO::initVideoSub( );
+        FADE_TOP_DARK( );
+        FADE_SUB_DARK( );
+        IO::clearScreen( true, true, true );
+
+        IO::initOAMTable( true );
+        IO::initOAMTable( false );
+
+        bool shiny = rand( ) & 1;
+        SAVE::SAV.getActiveFile( ).setFlag( 27, shiny );
+
+        pokemon ralts              = pokemon( PKMN_RALTS, 5, 0, 0, shiny * 2 );
+        ralts.IVset( 0, 31 );
+        ralts.IVset( 2, 31 );
+        ralts.EVset( 0, 252 );
+        ralts.EVset( 2, 252 );
+        ralts.m_boxdata.m_isFemale = false;
+        ralts.m_boxdata.m_shinyType = 0;
+
+        u8 platform = 1, plat2 = 1;
+        u8 battleBack = 1;
+
+        pokemon zigzagoon = pokemon( PKMN_ZIGZAGOON, 5, 0, 0, 0 );
+        zigzagoon.IVset( 1, 0 );
+        zigzagoon.EVset( 1, 0 );
+
+        BATTLE::battlePolicy policy = BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY );
+        policy.m_mode = BATTLE::battleMode::MOCK;
+
+        BATTLE::battle( &zigzagoon, 1, ralts, platform, plat2, battleBack, policy ).start( );
+        SOUND::restartBGM( );
+
+        FADE_TOP_DARK( );
+        FADE_SUB_DARK( );
+        IO::clearScreen( false );
+        videoSetMode( MODE_5_2D );
+        bgUpdate( );
+        IO::initVideoSub( );
+        ANIMATE_MAP = true;
+        SOUND::restoreVolume( );
+        NAV::init( );
+        MAP::curMap->draw( );
+    }
+
     void runInitialPkmnSelection( ) {
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 5 + 6 * ( p_pos ) )
-#define SPR_BOX_PAL_SUB 5
-#define SPR_BOX_SEL_PAL_SUB 6
+#define SPR_BOX_PAL_SUB                   5
+#define SPR_BOX_SEL_PAL_SUB               6
 
         ANIMATE_MAP = false;
         videoSetMode( MODE_5_2D );
@@ -421,8 +471,7 @@ namespace SPX {
 
             break;
         }
-        default:
-            return;
+        default: return;
         }
 
         IO::updateOAM( true );

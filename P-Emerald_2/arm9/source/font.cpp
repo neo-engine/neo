@@ -91,8 +91,25 @@ namespace IO {
         u32 current_char = 0;
         u32 width        = 0;
 
+        bool sp = false;
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) break;
+            if( p_string[ current_char ] == '[' ) {
+                sp = true;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == ']' ) {
+                sp = false;
+                width += 16 - p_charShift;
+                current_char++;
+                continue;
+            }
+            if( sp ) {
+                current_char++;
+                continue;
+            }
+
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             width += _widths[ c ] - p_charShift;
@@ -109,13 +126,30 @@ namespace IO {
 
     u32 font::stringMaxWidth( const char *p_string, u16 p_maxWidth, char p_breakChar,
                               u8 p_charShift ) const {
-        u32 current_char = 0;
-        u32 width        = 0;
-        u32 lasttmpwidth = 0;
+        u32  current_char = 0;
+        u32  width        = 0;
+        u32  lasttmpwidth = 0;
+        bool sp           = false;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) { return width; }
+            if( p_string[ current_char ] == '[' ) {
+                sp = true;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == ']' ) {
+                sp = false;
+                width += 16 - p_charShift;
+                current_char++;
+                continue;
+            }
+            if( sp ) {
+                current_char++;
+                continue;
+            }
             if( p_string[ current_char ] == p_breakChar ) { lasttmpwidth = width; }
+
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             width += _widths[ c ] - p_charShift;
@@ -130,8 +164,9 @@ namespace IO {
         return stringMaxWidth( p_string, p_maxWidth, p_breakChar, 1 );
     }
 
-    u16 font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer ) const {
-        _shiftchar( p_ch );
+    u16 font::printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer,
+                         bool p_shift ) const {
+        if( p_shift ) { _shiftchar( p_ch ); }
 
         s16 putX, putY;
         u8  getX, getY;
@@ -151,8 +186,8 @@ namespace IO {
     }
 
     u16 font::printCharB( u16 p_ch, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x,
-                          s16 p_y ) const {
-        _shiftchar( p_ch );
+                          s16 p_y, bool p_shift ) const {
+        if( p_shift ) { _shiftchar( p_ch ); }
 
         s16 putX, putY;
         u8  getX, getY;
@@ -208,6 +243,9 @@ namespace IO {
         if( p_alignment == RIGHT ) { putX = p_x - stringWidth( p_string, p_charShift ); }
         if( p_alignment == CENTER ) { putX = p_x - stringWidth( p_string, p_charShift ) / 2; }
 
+        bool sp   = false; // special character
+        u16  spch = 0;
+
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
@@ -225,6 +263,24 @@ namespace IO {
             }
             if( p_mb && p_string[ current_char ] == '`' ) {
                 _runMB( p_bottom );
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == '[' ) {
+                sp   = true;
+                spch = 0;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == ']' ) {
+                sp = false;
+                putX += printChar( spch, putX, putY, p_bottom, p_layer, false ) - p_charShift;
+                current_char++;
+                continue;
+            }
+            if( sp ) {
+                spch *= 10;
+                spch += ( p_string[ current_char ] - '0' );
                 current_char++;
                 continue;
             }
@@ -274,6 +330,8 @@ namespace IO {
         if( p_alignment == RIGHT ) putX = p_bufferWidth - lineWd;
         if( p_alignment == CENTER ) putX = ( p_bufferWidth - lineWd ) / 2;
 
+        u16  spch = 0;
+        bool sp   = false;
         while( p_string[ current_char ] && putX < p_bufferWidth ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
@@ -287,6 +345,27 @@ namespace IO {
                 lines++;
                 continue;
             }
+            if( p_string[ current_char ] == '[' ) {
+                sp   = true;
+                spch = 0;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == ']' ) {
+                sp     = false;
+                u16 wd = printCharB( spch, p_palette, p_buffer, p_bufferWidth, putX, putY, false );
+                putX += wd - p_charShift;
+                lineWd -= wd - p_charShift;
+                current_char++;
+                continue;
+            }
+            if( sp ) {
+                spch *= 10;
+                spch += ( p_string[ current_char ] - '0' );
+                current_char++;
+                continue;
+            }
+
             u16 wd = printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX,
                                  putY );
             putX += wd - p_charShift;
@@ -332,6 +411,9 @@ namespace IO {
         if( p_alignment == RIGHT ) putX = p_x - lineWd;
         if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
 
+        bool sp   = false;
+        u16  spch = 0;
+
         while( p_string[ current_char ] ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
@@ -347,6 +429,26 @@ namespace IO {
             }
             if( p_mb && p_string[ current_char ] == '`' ) {
                 _runMB( p_bottom );
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == '[' ) {
+                sp   = true;
+                spch = 0;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == ']' ) {
+                sp     = false;
+                u16 wd = printChar( spch, putX, putY, p_bottom, p_layer, false );
+                putX += wd - p_charShift;
+                lineWd -= wd - p_charShift;
+                current_char++;
+                continue;
+            }
+            if( sp ) {
+                spch *= 10;
+                spch += ( p_string[ current_char ] - '0' );
                 current_char++;
                 continue;
             }

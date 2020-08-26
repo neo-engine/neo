@@ -37,6 +37,7 @@ namespace IO {
     extern const char* OW_PATH;
     extern const char* OWP_PATH;
     extern const char* TRAINER_PATH;
+    extern const char* BERRY_PATH;
 
     extern const unsigned int*   TypeTiles[ 19 ][ 2 ];
     extern const unsigned short* TypePals[ 19 ][ 2 ];

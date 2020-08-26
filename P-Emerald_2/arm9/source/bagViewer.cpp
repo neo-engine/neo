@@ -51,7 +51,17 @@ namespace BAG {
     }
 
     void bagViewer::initView( ) {
-        auto curBg      = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
+        auto curBg = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
+        if( _context == CHOOSE_BERRY ) {
+            curBg = ( bag::bagType )( ( SAVE::SAV.getActiveFile( ).m_lstBag = 3 ) );
+        }
+        if( _context == MOCK_BATTLE ) {
+            curBg      = (bag::bagType) 0;
+            auto idata = ITEM::getItemData( I_POKE_BALL );
+            _view      = std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>( );
+            _view.push_back( std::pair( std::pair<u16, u16>{ I_POKE_BALL, 1 }, idata ) );
+            return;
+        }
         _currentViewEnd = _currentViewStart = SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ];
         _view = std::vector<std::pair<std::pair<u16, u16>, ITEM::itemData>>( );
 
@@ -115,6 +125,7 @@ namespace BAG {
     }
 
     bool bagViewer::isAllowed( u16 p_itemId ) {
+        if( _context == MOCK_BATTLE ) { return p_itemId == I_POKE_BALL; }
         if( _context == NO_SPECIAL_CONTEXT || _context == SELL_ITEM ) {
             return true;
         } else if( _context == BATTLE || _context == WILD_BATTLE ) {
@@ -159,6 +170,11 @@ namespace BAG {
             return false;
         } else if( _context == GIVE_TO_PKMN ) {
             return canGive( p_itemId );
+        } else if( _context == CHOOSE_BERRY ) {
+            if( p_itemId >= I_CHERI_BERRY && p_itemId <= I_ROWAP_BERRY ) { return true; }
+            if( p_itemId >= I_ROSELI_BERRY && p_itemId <= I_MARANGA_BERRY ) { return true; }
+            if( p_itemId == I_NION_BERRY ) { return true; }
+            if( p_itemId >= I_PUMKIN_BERRY && p_itemId <= I_EGGANT_BERRY ) { return true; }
         }
         return false;
     }
@@ -352,6 +368,15 @@ namespace BAG {
         IO::yesNoBox yn;
         char         buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 56 ), ITEM::getItemName( p_targetItem ).c_str( ) );
+
+        if( _context == MOCK_BATTLE ) {
+            // Just wait a couple of frames and return
+            _bagUI->printYNMessage( buffer, 254 );
+            _bagUI->printYNMessage( 0, false );
+            for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+            return true;
+        }
+
         if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer, 254 ); },
                           [ & ]( IO::yesNoBox::selection p_sel ) {
                               _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
@@ -797,12 +822,8 @@ namespace BAG {
             initView( );
             return 0;
         }
-        case DEREGISTER_ITEM:
-            SAVE::SAV.getActiveFile( ).m_registeredItem = 0;
-            return 0;
-        case REGISTER_ITEM:
-            SAVE::SAV.getActiveFile( ).m_registeredItem = targetItem;
-            return 0;
+        case DEREGISTER_ITEM: SAVE::SAV.getActiveFile( ).m_registeredItem = 0; return 0;
+        case REGISTER_ITEM: SAVE::SAV.getActiveFile( ).m_registeredItem = targetItem; return 0;
         case TOSS_ITEM: {
             _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                                  _currSelectedIdx );
@@ -901,8 +922,7 @@ namespace BAG {
         case VIEW_DETAILS:
             // TODO
             return 0;
-        default:
-            break;
+        default: break;
         }
         return 0;
     }
@@ -968,6 +988,16 @@ namespace BAG {
     u16 bagViewer::getItem( ) {
         _currSelectedIdx = 0;
         initUI( );
+
+        if( _context == MOCK_BATTLE ) {
+            // Just wait a couple of frames and return
+            for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+            SOUND::playSoundEffect( SFX_CHOOSE );
+            u16  targetItem = currentItem( ).first.first;
+            auto itemData   = currentItem( ).second;
+            confirmChoice( targetItem, &itemData );
+            return targetItem;
+        }
 
         cooldown = COOLDOWN_COUNT;
         loop( ) {

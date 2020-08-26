@@ -67,7 +67,7 @@ pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u
     m_statusint         = 0;
 }
 pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
-    pkmnData data = getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme );
+    pkmnData data = getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme & 0x3f );
     m_level       = p_trainerPokemon.m_level;
     m_boxdata = boxPokemon( p_trainerPokemon.m_speciesId, m_level, p_trainerPokemon.m_forme & 31, 0,
                             2 * !!p_trainerPokemon.m_shiny, false, false, 3, 0, false, &data );

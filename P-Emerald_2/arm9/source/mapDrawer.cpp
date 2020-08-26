@@ -121,6 +121,22 @@ namespace MAP {
             }
             break;
         }
+        case EVENT_BERRYTREE: {
+            // Check the growth of the specified berry tree
+            if( SAVE::SAV.getActiveFile( ).berryIsAlive(
+                    p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx ) ) {
+                u8 stage = SAVE::SAV.getActiveFile( ).getBerryStage(
+                    p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx );
+                u8 berryType = SAVE::SAV.getActiveFile( ).getBerry(
+                    p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx );
+                p_mapObject.first = _mapSprites.loadBerryTree(
+                    curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
+                    berryType, stage );
+            } else {
+                p_mapObject.first = 255;
+            }
+            break;
+        }
         case EVENT_ITEM: {
             if( p_mapObject.second.m_event.m_data.m_item.m_itemType ) {
                 p_mapObject.first = _mapSprites.loadSprite(
@@ -428,9 +444,75 @@ namespace MAP {
         }
 
         if( p_allowWildPkmn ) {
+            bool hadBattle = false;
             // Check for trainer
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
-            handleWildPkmn( p_globX, p_globY );
+                if( o.second.m_event.m_type == EVENT_TRAINER ) [[unlikely]] {
+                        // Check if trainer can see player
+
+                        if( std::abs( p_globX - o.second.m_pos.m_posX ) > o.second.m_range )
+                            [[likely]] {
+                                continue;
+                            }
+                        if( std::abs( p_globY - o.second.m_pos.m_posY ) > o.second.m_range )
+                            [[likely]] {
+                                continue;
+                            }
+                        if( std::abs( p_globY - o.second.m_pos.m_posY )
+                            && std::abs( p_globX - o.second.m_pos.m_posX ) )
+                            [[likely]] {
+                                continue;
+                            }
+
+                        direction trainerDir = UP;
+                        direction playerDir  = DOWN;
+                        if( p_globY > o.second.m_pos.m_posY ) {
+                            trainerDir = DOWN;
+                            playerDir  = UP;
+                        }
+                        if( p_globX < o.second.m_pos.m_posX ) {
+                            trainerDir = LEFT;
+                            playerDir  = RIGHT;
+                        }
+                        if( p_globX > o.second.m_pos.m_posX ) {
+                            trainerDir = RIGHT;
+                            playerDir  = LEFT;
+                        }
+
+                        if( trainerDir != o.second.m_direction ) { continue; }
+
+                        // Check for exclamation mark / music change
+                        if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
+                                o.second.m_event.m_data.m_trainer.m_trainerId ) ) )
+                            [[likely]] {
+                                // player did not defeat the trainer yet
+                                SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
+                                    = NO_MOVEMENT;
+                                showExclamationAboveMapObject( i );
+                                auto tr = BATTLE::getBattleTrainer(
+                                    o.second.m_event.m_data.m_trainer.m_trainerId );
+                                SOUND::playBGM(
+                                    SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
+
+                                // walk trainer to player
+                                redirectPlayer( playerDir, false );
+
+                                while( dist( p_globX, p_globY, o.second.m_pos.m_posX,
+                                             o.second.m_pos.m_posY )
+                                       > 1 ) {
+                                    for( u8 j = 0; j < 16; ++j ) {
+                                        moveMapObject( i, { trainerDir, j } );
+                                        swiWaitForVBlank( );
+                                    }
+                                }
+                                runEvent( o.second.m_event, i );
+                            }
+                    }
+            }
+
+            if( !hadBattle ) { handleWildPkmn( p_globX, p_globY ); }
         }
 
         handleEvents( p_globX, p_globY, p_z );
@@ -556,11 +638,6 @@ namespace MAP {
                          _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
 
-        // Add new map objects
-        constructAndAddNewMapObjects( _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
-                                           [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
-                                      mx, my );
-
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ]
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         mx = neigh.m_x + dir[ p_direction ][ 0 ];
@@ -570,8 +647,10 @@ namespace MAP {
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                          _data[ _curX ^ 1 ][ _curY ^ 1 ] );
 
-        // Add new map objects
-        constructAndAddNewMapObjects( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx, my );
+        for( u8 i = 0; i < 4; ++i ) {
+            constructAndAddNewMapObjects( _data[ i % 2 ][ i / 2 ], _slices[ i % 2 ][ i / 2 ].m_x,
+                                          _slices[ i % 2 ][ i / 2 ].m_y );
+        }
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
@@ -895,7 +974,15 @@ namespace MAP {
         bool change = false;
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
-            if( o.first == 255 || o.second.m_movement == NO_MOVEMENT ) { continue; }
+
+            if( o.first == 255 ) { continue; }
+
+            if( o.second.m_event.m_type == EVENT_BERRYTREE ) {
+                if( ( p_frame & 31 ) == 15 ) { _mapSprites.nextFrame( o.first ); }
+                continue;
+            }
+
+            if( o.second.m_movement == NO_MOVEMENT ) { continue; }
 
             if( o.second.m_movement <= 15 || o.second.m_movement == WALK_AROUND_LEFT_RIGHT
                 || o.second.m_movement == WALK_AROUND_UP_DOWN ) {
@@ -2345,7 +2432,7 @@ namespace MAP {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
 
-            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 48 ) {
+            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 40 ) {
 #ifdef DESQUID_MORE
                 NAV::printMessage(
                     ( std::string( "Destroying " ) + std::to_string( i ) + " "
@@ -2419,6 +2506,29 @@ namespace MAP {
                 std::pair<u8, mapObject> cur = { 0, obj };
                 loadMapObject( cur );
                 res.push_back( cur );
+                break;
+            }
+            case EVENT_BERRYTREE: {
+                if( !SAVE::SAV.getActiveFile( ).berryIsAlive(
+                        p_data.m_events[ i ].m_data.m_berryTree.m_treeIdx ) ) {
+                    SAVE::SAV.getActiveFile( ).harvestBerry(
+                        p_data.m_events[ i ].m_data.m_berryTree.m_treeIdx );
+                } else {
+                    // Check the growth of the specified berry tree
+                    mapObject obj   = mapObject( );
+                    obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
+                                  u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                  p_data.m_events[ i ].m_posZ };
+                    obj.m_picNum    = (u16) -1;
+                    obj.m_movement  = NO_MOVEMENT;
+                    obj.m_range     = 0;
+                    obj.m_direction = UP;
+                    obj.m_event     = p_data.m_events[ i ];
+
+                    std::pair<u8, mapObject> cur = { 0, obj };
+                    loadMapObject( cur );
+                    res.push_back( cur );
+                }
                 break;
             }
             case EVENT_ITEM: {

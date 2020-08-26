@@ -264,25 +264,33 @@ namespace SAVE {
         // Route 104 (south)
         m_berryTrees[ 2 ]  = ITEM::itemToBerry( I_ORAN_BERRY );
         m_berryHealth[ 2 ] = 255;
-        m_berryTrees[ 3 ]  = ITEM::itemToBerry( I_PECHA_BERRY );
-        m_berryHealth[ 3 ] = 255;
+        m_berryTrees[ 3 ]  = 0;
+        m_berryHealth[ 3 ] = 0;
+        m_berryTrees[ 4 ]  = ITEM::itemToBerry( I_PECHA_BERRY );
+        m_berryHealth[ 4 ] = 255;
 
         // Route 104 (north)
-        m_berryTrees[ 4 ]  = ITEM::itemToBerry( I_ORAN_BERRY );
-        m_berryHealth[ 4 ] = 255;
-        m_berryTrees[ 5 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
+        m_berryTrees[ 5 ]  = ITEM::itemToBerry( I_ORAN_BERRY );
         m_berryHealth[ 5 ] = 255;
+        m_berryTrees[ 6 ]  = 0;
+        m_berryHealth[ 6 ] = 0;
+        m_berryTrees[ 7 ]  = 0;
+        m_berryHealth[ 7 ] = 0;
+        m_berryTrees[ 8 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
+        m_berryHealth[ 8 ] = 255;
 
-        m_berryTrees[ 6 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
-        m_berryHealth[ 6 ] = 255;
-        m_berryTrees[ 7 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
-        m_berryHealth[ 7 ] = 255;
+        m_berryTrees[ 9 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
+        m_berryHealth[ 9 ] = 255;
+        m_berryTrees[ 10 ]  = 0;
+        m_berryHealth[ 10 ] = 0;
+        m_berryTrees[ 11 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 11 ] = 255;
 
         // Route 116
-        m_berryTrees[ 8 ]  = ITEM::itemToBerry( I_CHESTO_BERRY );
-        m_berryHealth[ 8 ] = 255;
-        m_berryTrees[ 9 ]  = ITEM::itemToBerry( I_PINAP_BERRY );
-        m_berryHealth[ 9 ] = 255;
+        m_berryTrees[ 12 ]  = ITEM::itemToBerry( I_CHESTO_BERRY );
+        m_berryHealth[ 12 ] = 255;
+        m_berryTrees[ 13 ]  = ITEM::itemToBerry( I_PINAP_BERRY );
+        m_berryHealth[ 13 ] = 255;
     }
 
     bool saveGame::playerInfo::berryIsAlive( u8 p_berrySlot ) const {
@@ -294,8 +302,7 @@ namespace SAVE {
             return false;
         }
 
-        // TODO
-
+        if( !m_berryHealth[ p_berrySlot ] || !m_berryTrees[ p_berrySlot ] ) { return false; }
         return true;
     }
 
@@ -320,6 +327,10 @@ namespace SAVE {
         m_berryTrees[ p_berrySlot ]       = ITEM::itemToBerry( p_berry );
         m_berryPlantedDate[ p_berrySlot ] = CURRENT_DATE;
         m_berryPlantedTime[ p_berrySlot ] = CURRENT_TIME;
+    }
+
+    void saveGame::playerInfo::waterBerry( u8 p_berrySlot ) {
+        if( m_berryHealth[ p_berrySlot ] < 200 ) { m_berryHealth[ p_berrySlot ]++; }
     }
 
     void saveGame::playerInfo::stepIncrease( ) {

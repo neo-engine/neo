@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
+#include "bagViewer.h"
 #include "battle.h"
 #include "battleTrainer.h"
 #include "boxViewer.h"
@@ -58,7 +59,9 @@ namespace MAP {
     // 3 get badge count (param1: region [0: Hoenn, 1: battle frontier])
     // 4 get init game item count
     // 5 get (and remove) init game item par1
-    //
+    // 6 Initial pkmn selection
+    // 7 NAV::init( )
+    // 8 Catching tutorial
 
     enum opCode : u8 {
         EOP = 0,  // end of program
@@ -98,6 +101,9 @@ namespace MAP {
         CVRN = 28, // check variable not equal
         CVRG = 29, // check variable greater
         CVRL = 30, // check variable lower
+
+        MFO  = 31, // move map object fast
+        MFOR = 32, // move map object fast
 
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
@@ -154,7 +160,6 @@ namespace MAP {
 
     std::string convertMapString( const std::string& p_text, style p_style ) {
         std::string res = "";
-
         for( size_t i = 0; i < p_text.size( ); ++i ) {
             if( p_text[ i ] == '[' ) {
                 std::string accmd = "";
@@ -178,10 +183,19 @@ namespace MAP {
     }
 
     void printMapMessage( const std::string& p_text, style p_style ) {
+        if( p_style == MSG_SIGN ) {
+            // TODO: properly implement signs
+            p_style = MSG_INFO;
+        }
         NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
     void printMapYNMessage( const std::string& p_text, style p_style ) {
+
+        if( p_style == MSG_SIGN ) {
+            // TODO: properly implement signs
+            p_style = MSG_INFO;
+        }
         NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
@@ -191,7 +205,7 @@ namespace MAP {
         u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
         fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
         FS::close( f );
-        auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ];
+        // auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ];
 
         u8 pc = 0;
 
@@ -309,6 +323,28 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = tmp;
                 break;
             }
+            case MFO: {
+                movement m = { direction( par2 ), 0 };
+                _mapSprites.setFrame( par1, getFrame( direction( par2 ) ) );
+
+                auto tmp = SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement;
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = NO_MOVEMENT;
+
+                for( u8 j = 0; j < par3; ++j ) {
+                    for( u8 i = 0; i < 16; ++i ) {
+                        moveMapObject( par1, m, playerAttachedToObject,
+                                       SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                        m.m_frame = ( m.m_frame + 1 ) & 15;
+                        if( i & 1 ) { swiWaitForVBlank( ); }
+                    }
+                    if( playerAttachedToObject ) {
+                        SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
+                    }
+                }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = tmp;
+                break;
+            }
+
             case DMO: {
                 _mapSprites.destroySprite( SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].first );
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ]
@@ -409,6 +445,42 @@ namespace MAP {
                     = tmp;
                 break;
             }
+            case MFOR: {
+#ifdef DESQUID_MORE
+                NAV::printMessage(
+                    ( std::to_string(
+                          SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first )
+                      + " ( " + std::to_string( registers[ par1 ] ) + " , " + std::to_string( par2 )
+                      + " , " + std::to_string( par3 ) + ")" )
+                        .c_str( ) );
+#endif
+                auto tmp = SAVE::SAV.getActiveFile( )
+                               .m_mapObjects[ registers[ par1 ] ]
+                               .second.m_movement;
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
+                    = NO_MOVEMENT;
+                movement m = { direction( par2 ), 0 };
+                _mapSprites.setFrame(
+                    SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first,
+                    getFrame( direction( par2 ) ) );
+
+                for( u8 j = 0; j < par3; ++j ) {
+                    for( u8 i = 0; i < 16; ++i ) {
+                        moveMapObject( registers[ par1 ], m, playerAttachedToObject,
+                                       SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                        m.m_frame = ( m.m_frame + 1 ) & 15;
+                        if( i & 1 ) { swiWaitForVBlank( ); }
+                    }
+
+                    if( playerAttachedToObject ) {
+                        SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
+                    }
+                }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
+                    = tmp;
+                break;
+            }
+
             case DMOR: {
                 _mapSprites.destroySprite(
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first );
@@ -450,7 +522,7 @@ namespace MAP {
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) == par2 ) { pc += par3; }
                 break;
 
-            case CMO: registers[ 0 ] = o.first; break;
+            case CMO: registers[ 0 ] = p_mapObject; break;
             case LCKR: {
                 tmpmove = SAVE::SAV.getActiveFile( )
                               .m_mapObjects[ registers[ par1 ] ]
@@ -507,15 +579,15 @@ namespace MAP {
                     registers[ 0 ] = 0;
                 } else {
                     registers[ 0 ] = 1;
-
-                    FADE_TOP_DARK( );
-                    NAV::init( );
-                    draw( playerPrio );
-                    _mapSprites.setPriority(
-                        _playerSprite, SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
-                    SOUND::restartBGM( );
-                    ANIMATE_MAP = true;
                 }
+
+                FADE_TOP_DARK( );
+                NAV::init( );
+                draw( playerPrio );
+                _mapSprites.setPriority( _playerSprite,
+                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
+                SOUND::restartBGM( );
+                ANIMATE_MAP = true;
                 break;
             }
             case BTRR:
@@ -641,6 +713,10 @@ namespace MAP {
                     NAV::init( );
                     break;
                 }
+                case 8: {
+                    SPX::runCatchingTutorial( );
+                    break;
+                }
                 default: break;
                 }
                 break;
@@ -717,7 +793,27 @@ namespace MAP {
         }
         case 0x85: { // Map
             // TODO
-            NAV::printMessage( GET_STRING( 560 ), MSG_NORMAL );
+            printMapMessage( GET_STRING( 560 ), MSG_NORMAL );
+            return;
+        }
+        case 0x86: { // TV
+            printMapMessage( GET_MAP_STRING( 26 ), MSG_NORMAL );
+            return;
+        }
+        case 0xe5: { // Pokemart shelves
+            printMapMessage( GET_MAP_STRING( 127 ), MSG_NORMAL );
+            break;
+        }
+        case 0xe0: { // picture books
+            printMapMessage( GET_MAP_STRING( 133 ), MSG_NORMAL );
+            break;
+        }
+        case 0xe1: { // picture books
+            printMapMessage( GET_MAP_STRING( 134 ), MSG_NORMAL );
+            break;
+        }
+        case 0xe2: { // PokeCenter magazines
+            printMapMessage( GET_MAP_STRING( 30 ), MSG_NORMAL );
             break;
         }
         case 0x80: { // load script one block behind
@@ -868,7 +964,101 @@ namespace MAP {
         u8 y = p_globY % SIZE;
         u8 z = p_z;
 
+        u16 mapX = p_globX / SIZE, mapY = p_globY / SIZE;
+
         auto mdata = currentData( p_globX, p_globY );
+        for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
+            if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
+                || mdata.m_events[ i ].m_posZ != z ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_activateFlag
+                && !SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_activateFlag ) ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_type != EVENT_TRAINER && mdata.m_events[ i ].m_deactivateFlag
+                && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
+                continue;
+            }
+
+            if( mdata.m_events[ i ].m_type != EVENT_MESSAGE
+                && mdata.m_events[ i ].m_type != EVENT_GENERIC
+                && mdata.m_events[ i ].m_type != EVENT_BERRYTREE ) {
+                // These events have associated map objects
+                continue;
+            }
+
+            if( mdata.m_events[ i ].m_type == EVENT_BERRYTREE ) {
+                u8 berryType = SAVE::SAV.getActiveFile( ).getBerry(
+                    mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx );
+
+                if( !berryType ) {
+                    //  ask if player wants to plant a berry
+                    if( IO::yesNoBox( ).getResult( GET_STRING( 571 ), MSG_INFO_NOCLOSE )
+                        == IO::yesNoBox::YES ) {
+
+                        FADE_TOP_DARK( );
+                        ANIMATE_MAP = false;
+                        swiWaitForVBlank( );
+
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        bgUpdate( );
+
+                        auto playerPrio = _mapSprites.getPriority( _playerSprite );
+
+                        // Make player choose berry
+                        SOUND::dimVolume( );
+                        BAG::bagViewer bv  = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                            BAG::bagViewer::CHOOSE_BERRY );
+                        u16            itm = bv.getItem( );
+
+                        FADE_TOP_DARK( );
+                        FADE_SUB_DARK( );
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        bgUpdate( );
+
+                        // plant the berry
+                        SAVE::SAV.getActiveFile( ).plantBerry(
+                            mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx, itm );
+
+                        FADE_TOP_DARK( );
+                        NAV::init( );
+                        draw( playerPrio );
+                        _mapSprites.setPriority( _playerSprite,
+                                                 SAVE::SAV.getActiveFile( ).m_playerPriority
+                                                 = playerPrio );
+                        SOUND::restartBGM( );
+                        ANIMATE_MAP = true;
+                        SOUND::restoreVolume( );
+                        char buffer[ 100 ];
+                        snprintf( buffer, 99, GET_STRING( 572 ),
+                                  ITEM::getItemName( itm ).c_str( ) );
+                        NAV::printMessage( buffer, MSG_INFO );
+                    } else {
+                        NAV::init( );
+                    }
+                    continue;
+                }
+            }
+
+            if( mdata.m_events[ i ].m_type == EVENT_GENERIC ) {
+                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 11
+                    && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
+                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 10
+                    && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                    continue;
+                }
+            }
+
+            if( mdata.m_events[ i ].m_trigger & dirToEventTrigger( p_dir ) ) {
+                runEvent( mdata.m_events[ i ] );
+            }
+        }
+
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
@@ -882,6 +1072,78 @@ namespace MAP {
             if( ( o.second.m_picNum & 0xff ) <= 240 ) {
                 o.second.m_movement = NO_MOVEMENT;
                 _mapSprites.setFrame( o.first, getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
+            }
+
+            if( o.second.m_event.m_type == EVENT_BERRYTREE ) {
+                u8 stage = SAVE::SAV.getActiveFile( ).getBerryStage(
+                    o.second.m_event.m_data.m_berryTree.m_treeIdx );
+                u8 berryType = SAVE::SAV.getActiveFile( ).getBerry(
+                    o.second.m_event.m_data.m_berryTree.m_treeIdx );
+                u8 yield = SAVE::SAV.getActiveFile( ).getBerryYield(
+                    o.second.m_event.m_data.m_berryTree.m_treeIdx );
+
+                if( !berryType ) {
+                    // handled later
+                    continue;
+                }
+
+                char buffer[ 100 ];
+
+                switch( stage ) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    snprintf( buffer, 99, GET_STRING( 565 + stage ),
+                              ITEM::getItemName( ITEM::berryToItem( berryType ) ).c_str( ) );
+                    break;
+                case 4:
+                    snprintf( buffer, 99, GET_STRING( 569 ),
+                              ITEM::getItemName( ITEM::berryToItem( berryType ) ).c_str( ), yield );
+                    break;
+                default: continue;
+                }
+                NAV::printMessage( buffer, MSG_INFO_CONT );
+                if( stage == 4 ) {
+                    // Berries can be harvested
+                    if( IO::yesNoBox( ).getResult( GET_STRING( 570 ), MSG_INFO_NOCLOSE )
+                        == IO::yesNoBox::YES ) {
+                        NAV::init( );
+                        NAV::giveItemToPlayer( ITEM::berryToItem( berryType ), yield );
+                        SAVE::SAV.getActiveFile( ).harvestBerry(
+                            o.second.m_event.m_data.m_berryTree.m_treeIdx );
+                        _mapSprites.destroySprite( o.first );
+                        o.first = 255;
+                        constructAndAddNewMapObjects( currentData( p_globX, p_globY ), mapX, mapY );
+                    }
+                    NAV::init( );
+                } else {
+                    // Ask player if they want to water the berry
+                    // (only if they have a watering can, though)
+                    if( SAVE::SAV.getActiveFile( ).m_bag.count(
+                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SPRAYDUCK )
+                        + SAVE::SAV.getActiveFile( ).m_bag.count(
+                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SPRINKLOTAD )
+                        + SAVE::SAV.getActiveFile( ).m_bag.count(
+                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WAILMER_PAIL )
+                        + SAVE::SAV.getActiveFile( ).m_bag.count(
+                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SQUIRT_BOTTLE ) ) {
+
+                        if( IO::yesNoBox( ).getResult( GET_STRING( 575 ), MSG_INFO_NOCLOSE )
+                            == IO::yesNoBox::YES ) {
+                            SAVE::SAV.getActiveFile( ).harvestBerry(
+                                o.second.m_event.m_data.m_berryTree.m_treeIdx );
+                            NAV::init( );
+                            NAV::printMessage( GET_STRING( 573 ), MSG_INFO );
+                            SAVE::SAV.getActiveFile( ).waterBerry(
+                                o.second.m_event.m_data.m_berryTree.m_treeIdx );
+                        } else {
+                            NAV::init( );
+                        }
+                    } else {
+                        NAV::init( );
+                    }
+                }
             }
 
             if( o.second.m_event.m_type == EVENT_TRAINER ) {
@@ -899,41 +1161,6 @@ namespace MAP {
 
             runEvent( o.second.m_event, i );
             o.second.m_movement = old;
-        }
-        for( u8 i = 0; i < mdata.m_eventCount; ++i ) {
-            if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
-                || mdata.m_events[ i ].m_posZ != z ) {
-                continue;
-            }
-            if( mdata.m_events[ i ].m_activateFlag
-                && !SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_activateFlag ) ) {
-                continue;
-            }
-            if( mdata.m_events[ i ].m_type != EVENT_TRAINER && mdata.m_events[ i ].m_deactivateFlag
-                && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
-                continue;
-            }
-
-            if( mdata.m_events[ i ].m_type != EVENT_MESSAGE
-                && mdata.m_events[ i ].m_type != EVENT_GENERIC ) {
-                // These events have associated map objects
-                continue;
-            }
-
-            if( mdata.m_events[ i ].m_type == EVENT_GENERIC ) {
-                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 11
-                    && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
-                    continue;
-                }
-                if( mdata.m_events[ i ].m_data.m_generic.m_scriptType == 10
-                    && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
-                    continue;
-                }
-            }
-
-            if( mdata.m_events[ i ].m_trigger & dirToEventTrigger( p_dir ) ) {
-                runEvent( mdata.m_events[ i ] );
-            }
         }
     }
 

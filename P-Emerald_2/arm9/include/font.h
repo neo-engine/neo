@@ -109,14 +109,15 @@ namespace IO {
          * @brief: Prints the given character at the given position.
          * @returns: the width (in px) of the printed char.
          */
-        u16 printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1 ) const;
+        u16 printChar( u16 p_ch, s16 p_x, s16 p_y, bool p_bottom, u8 p_layer = 1,
+                       bool p_shift = true ) const;
 
         /*
          * @brief: Prints the given character (as bitmap) in the given buffer.
          * @returns: the width (in px) of the printed char.
          */
         u16 printCharB( u16 p_ch, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x = 0,
-                        s16 p_y = 0 ) const;
+                        s16 p_y = 0, bool p_shift = true ) const;
 
         /*
          * @brief: Draws the continue triangle for message boxes.
@@ -184,15 +185,15 @@ namespace IO {
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
         u16 printStringB( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
-                          alignment p_alignment = LEFT, u8 p_yDistance = 15,
-                          u8 p_charShift = 0, u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
+                          alignment p_alignment = LEFT, u8 p_yDistance = 15, u8 p_charShift = 0,
+                          u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
         /*
          * @brief: Prints a string in the given buffer with less horizontal space between characters
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
         u16 printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
-                           alignment p_alignment = LEFT, u8 p_yDistance = 15,
-                           u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
+                           alignment p_alignment = LEFT, u8 p_yDistance = 15, u8 p_chunkSize = 64,
+                           u16 p_bufferHeight = 32 ) const;
 
         /*
          * @brief: Prints the given string, where newlines are inserted whenever the

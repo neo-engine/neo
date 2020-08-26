@@ -100,6 +100,11 @@ namespace MAP {
          * appearance's sprite; p_imageId == 251 loads the rival's sprite.
          */
         mapSpriteData( u16 p_imageId );
+
+        /*
+         * @brief: Read mapSpriteData from the specified file.
+         */
+        void readData( FILE* p_f );
     };
 
     class mapSprite {
@@ -111,6 +116,8 @@ namespace MAP {
         mapSprite( ) {
         }
         mapSprite( u16 p_imageId, u8 p_startFrame );
+
+        mapSprite( FILE* p_f, u8 p_startFrame );
 
         mapSprite( mapSpriteInfo p_info, const mapSpriteData& p_data )
             : _info( p_info ), _data( p_data ) {
@@ -149,6 +156,10 @@ namespace MAP {
          * @brief: Increments the frame and redraws the sprite.
          */
         void nextFrame( u8 p_oamIdx );
+
+        constexpr u8 getCurrentFrame( ) const {
+            return _info.m_curFrame;
+        }
     };
 
     class mapSpriteManager {
@@ -165,9 +176,19 @@ namespace MAP {
         static constexpr u8 SPR_CUT       = 5;
         static constexpr u8 SPR_PLATFORM  = 8;
 
+        enum spriteType {
+            SPTYPE_NONE      = 0,
+            SPTYPE_PLAYER    = 1,
+            SPTYPE_PLATFORM  = 2,
+            SPTYPE_NPC       = 3, // Trainer, berry trees
+            SPTYPE_PARTICLE  = 4, // item icon, hm particles, etc
+            SPTYPE_BERRYTREE = 5,
+        };
+
         struct managedSprite {
             mapSprite    m_sprite;
             mapSpritePos m_pos;
+            spriteType   m_type;
 
             constexpr void translateSprite( s8 p_dx, s8 p_dy ) {
                 m_pos.translateSprite( p_dx, p_dy );
@@ -224,14 +245,6 @@ namespace MAP {
         const mapSpriteData& getSpriteData( u8 p_spriteId ) const;
 
       public:
-        enum spriteType {
-            SPTYPE_NONE     = 0,
-            SPTYPE_PLAYER   = 1,
-            SPTYPE_PLATFORM = 2,
-            SPTYPE_NPC      = 3, // Trainer, berry trees
-            SPTYPE_PARTICLE = 4, // item icon, hm particles, etc
-        };
-
         void reset( );
 
         void init( );
@@ -266,6 +279,14 @@ namespace MAP {
          * @param p_camY: y coordinate of the current camera position
          */
         u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_partilcleId );
+
+        /*
+         * @brief: Loads a berry tree and displays it at the specified stage.
+         * @param p_camX: x coordinate of the current camera position
+         * @param p_camY: y coordinate of the current camera position
+         */
+        u8 loadBerryTree( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_berryIdx,
+                          u8 p_stage );
 
         /*
          * @brief: loads a sprite centered on the screen.

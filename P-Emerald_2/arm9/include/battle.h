@@ -65,6 +65,8 @@ namespace BATTLE {
         u16   _round, _maxRounds, _AILevel;
         field _field;
 
+        bool _isMockBattle; // Catching demonstration
+
         battleUI _battleUI;
 
         battleTrainer _opponent;

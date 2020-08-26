@@ -103,8 +103,9 @@ namespace NAV {
 
     u16         TEXT_BUF[ 64 * 256 ] = { 0 };
     u16         CONT_BUF[ 16 * 16 ]  = { 0 };
-    u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE };
-    std::string TEXT_CACHE           = "";
+    u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
+    std::string TEXT_CACHE_1         = ""; // Upper line
+    std::string TEXT_CACHE_2         = ""; // lower line
 
     void hideMessageBox( ) {
         for( u8 i = 0; i < 14; ++i ) {
@@ -116,7 +117,7 @@ namespace NAV {
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + i ].isHidden = true;
         }
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        TEXT_CACHE = "";
+        TEXT_CACHE_1 = TEXT_CACHE_2 = "";
         IO::updateOAM( false );
     }
 
@@ -375,7 +376,9 @@ namespace NAV {
     }
 
     void doPrintMessage( const char* p_message, style p_style, u16 p_item = 0,
-                         const ITEM::itemData* p_data = 0 ) {
+                         const ITEM::itemData* p_data = 0, bool p_noDelay = false ) {
+        IO::regularFont->setColor( 4, 3 );
+        IO::regularFont->setColor( 5, 4 );
         u16 x = 12, y = 192 - 40, hg = 32;
         if( p_message ) {
             if( LOCATION_TIMER ) { hideLocation( ); }
@@ -402,13 +405,19 @@ namespace NAV {
 
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
+                u16 lns = IO::regularFont->printBreakingStringC(
+                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, false, -1 );
                 if( p_style == MSG_ITEM ) {
                     x += 48;
-                    y += 8;
+                    if( lns == 1 ) {
+                        y += 8;
+                    } else {
+                        y += 2;
+                    }
                 }
             } else if( p_style == MSG_MART_ITEM ) {
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                TEXT_CACHE = "";
+                TEXT_CACHE_1 = TEXT_CACHE_2 = "";
                 IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 51, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
                 for( u8 i = 0; i < 13; ++i ) {
@@ -424,39 +433,115 @@ namespace NAV {
                     p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, false, -1 );
                 if( lns == 3 ) { y = 192 - 44; }
                 if( lns <= 2 ) { y = 192 - 38; }
+            } else if( p_style == MSG_SIGN ) {
+                // TODO: Load sign graphics
+
+                std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+                TEXT_CACHE_1 = TEXT_CACHE_2 = "";
+                IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
+                                 false, false, false, OBJPRIORITY_0, false );
+
+                for( u8 i = 0; i < 13; ++i ) {
+                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 30 + 16 * i, 192 - 46,
+                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
+                }
+
+                IO::regularFont->setColor( 3, 1 );
+                IO::regularFont->setColor( 2, 2 );
+                if( p_style == MSG_ITEM ) {
+                    x += 48;
+                    y += 8;
+                }
             }
         }
 
         if( !p_message ) {
+            TEXT_CACHE_1 = TEXT_CACHE_2 = "";
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            TEXT_CACHE = "";
         } else {
-            TEXT_CACHE = TEXT_CACHE + p_message;
-            // TODO: Auto rotate msgbox text.
-            /* auto ln = */
-            IO::regularFont->printStringBC( TEXT_CACHE.c_str( ), TEXT_PAL, TEXT_BUF,
-                                            256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                            16 - ( 4 * !!p_item ), 64, hg );
-            u16 tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
-            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, hg, TEXT_BUF,
-                                       64 * hg / 2, false, false, false, OBJPRIORITY_0, false );
-            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, hg,
-                                       TEXT_BUF + 64 * hg, 64 * hg / 2, false, false, false,
-                                       OBJPRIORITY_0, false );
-            tileCnt     = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, hg,
-                                       TEXT_BUF + 2 * 64 * hg, 64 * hg / 2, false, false, false,
-                                       OBJPRIORITY_0, false );
-            if( !p_item ) {
-                tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64, hg,
-                                           TEXT_BUF + 3 * 64 * hg, 64 * hg / 2, false, false, false,
+            u16  cpos    = 0;
+            u16  tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
+            bool sp      = false;
+            IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
+            std::string tmp                                   = "";
+            while( p_message[ cpos ] ) {
+                if( !p_noDelay ) {
+                    if( p_message[ cpos ] == '[' ) {
+                        sp = true;
+                        tmp += p_message[ cpos ];
+                        ++cpos;
+                        continue;
+                    }
+                    if( p_message[ cpos ] == ']' ) {
+                        sp = false;
+                        tmp += p_message[ cpos ];
+                    } else if( !sp ) {
+                        tmp = p_message[ cpos ];
+                    }
+                    if( sp ) {
+                        tmp += p_message[ cpos ];
+                        ++cpos;
+                        continue;
+                    }
+                }
+
+                std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+                tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
+                u8 ln   = 1;
+                if( p_noDelay ) {
+                    ln = IO::regularFont->printStringBC( p_message, TEXT_PAL, TEXT_BUF,
+                                                         256 - ( 64 * !!p_item ), IO::font::LEFT,
+                                                         16 - ( 4 * !!p_item ), 64, hg );
+                } else {
+                    ln = IO::regularFont->printStringBC(
+                        ( TEXT_CACHE_1 + TEXT_CACHE_2 + tmp ).c_str( ), TEXT_PAL, TEXT_BUF,
+                        256 - ( 64 * !!p_item ), IO::font::LEFT, 16 - ( 4 * !!p_item ), 64, hg );
+                }
+
+                if( !p_noDelay ) {
+                    if( ln == 1 || ( ln == 2 && p_message[ cpos ] == '\n' ) ) {
+                        TEXT_CACHE_1 += tmp;
+                    } else if( ln == 2 || ( ln > 2 && p_message[ cpos ] == '\n' ) ) {
+                        TEXT_CACHE_2 += tmp;
+                    } else {
+                        TEXT_CACHE_1 = TEXT_CACHE_2;
+                        TEXT_CACHE_2 = std::string( "" ) + tmp;
+                    }
+                }
+
+                tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, hg, TEXT_BUF,
+                                           64 * hg / 2, false, false, false, OBJPRIORITY_0, false );
+                tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, hg,
+                                           TEXT_BUF + 64 * hg, 64 * hg / 2, false, false, false,
                                            OBJPRIORITY_0, false );
-            } else if( !p_data || p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
-                tileCnt = IO::loadItemIconB( p_item, 16, 192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt,
-                                             false );
-            } else if( p_data && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
-                MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
-                tileCnt = IO::loadTMIconB( move.m_type, MOVE::isFieldMove( p_data->m_param2 ), 16,
-                                           192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt, false );
+                tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 2, tileCnt, x + 128, y, 64, hg,
+                                           TEXT_BUF + 2 * 64 * hg, 64 * hg / 2, false, false, false,
+                                           OBJPRIORITY_0, false );
+                if( !p_item ) {
+                    tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64,
+                                               hg, TEXT_BUF + 3 * 64 * hg, 64 * hg / 2, false,
+                                               false, false, OBJPRIORITY_0, false );
+                } else if( !cpos ) {
+                    if( !p_data || p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
+                        tileCnt = IO::loadItemIconB( p_item, 16, 192 - 40, SPR_MSGTEXT_OAM + 3,
+                                                     tileCnt, false );
+                    } else if( p_data && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
+                        MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
+                        tileCnt
+                            = IO::loadTMIconB( move.m_type, MOVE::isFieldMove( p_data->m_param2 ),
+                                               16, 192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt, false );
+                    }
+                }
+                IO::updateOAM( false );
+                for( u8 i = 0;
+                     i < 80
+                             / ( IO::TEXTSPEED
+                                 + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
+                     ++i ) {
+                    swiWaitForVBlank( );
+                }
+                if( p_noDelay ) { break; }
+                cpos++;
             }
 
             if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_NORMAL_CONT
@@ -473,6 +558,8 @@ namespace NAV {
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::regularFont->setColor( IO::BLUE_IDX, 3 );
+        IO::regularFont->setColor( IO::BLUE2_IDX, 4 );
         IO::updateOAM( false );
     }
 
@@ -518,23 +605,25 @@ namespace NAV {
         SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( data.m_itemType ), p_itemId,
                                                  p_amount );
         char buffer[ 100 ];
+        auto iname = ITEM::getItemName( p_itemId );
+
         if( p_amount > 1 ) {
-            snprintf( buffer, 99, GET_STRING( 563 ), p_amount,
-                      ITEM::getItemName( p_itemId ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 563 ), p_amount, iname.c_str( ) );
         } else {
-            snprintf( buffer, 99, GET_STRING( 564 ), ITEM::getItemName( p_itemId ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 564 ), iname.c_str( ) );
         }
         switch( data.m_itemType ) {
-            case ITEM::ITEMTYPE_KEYITEM:
-                SOUND::playSoundEffect( SFX_OBTAIN_KEY_ITEM );
-                break;
-            case ITEM::ITEMTYPE_TM:
-                SOUND::playSoundEffect( SFX_OBTAIN_TM );
-                break;
-            default:
-                SOUND::playSoundEffect( SFX_OBTAIN_ITEM );
-                break;
+        case ITEM::ITEMTYPE_KEYITEM: SOUND::playSoundEffect( SFX_OBTAIN_KEY_ITEM ); break;
+        case ITEM::ITEMTYPE_TM: SOUND::playSoundEffect( SFX_OBTAIN_TM ); break;
+        default: SOUND::playSoundEffect( SFX_OBTAIN_ITEM ); break;
         }
+        doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
+        waitForInteract( );
+        snprintf( buffer, 99, GET_STRING( 86 ), iname.c_str( ),
+                  ITEM::getItemChar( data.m_itemType ),
+                  GET_STRING( 11 + BAG::toBagType( data.m_itemType ) ) );
+        std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+        TEXT_CACHE_1 = TEXT_CACHE_2 = "";
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
         hideMessageBox( );
@@ -546,7 +635,7 @@ namespace NAV {
         if( p_style == MSG_NORMAL_CONT || p_style == MSG_INFO_CONT ) {
             waitForInteract( );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            TEXT_CACHE = "";
+            TEXT_CACHE_1 = TEXT_CACHE_2 = "";
             IO::updateOAM( false );
         }
         if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
@@ -809,21 +898,25 @@ namespace NAV {
             if( yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE ) == IO::yesNoBox::YES ) {
                 init( );
                 ANIMATE_MAP = false;
+                u16 lst     = -1;
                 if( FS::writeSave( p_path, [ & ]( u16 p_perc, u16 p_total ) {
-                        printMessage( 0, MSG_INFO_NOCLOSE );
-                        u16         stat = p_perc * 18 / p_total;
-                        char        buffer[ 100 ];
-                        std::string buf2 = "";
-                        for( u8 i = 0; i < stat; ++i ) {
-                            buf2 += "\x03";
-                            if( i % 3 == 2 ) { buf2 += " "; }
+                        u16 stat = p_perc * 18 / p_total;
+                        if( stat != lst ) {
+                            lst = stat;
+                            printMessage( 0, MSG_INFO_NOCLOSE );
+                            char        buffer[ 100 ];
+                            std::string buf2 = "";
+                            for( u8 i = 0; i < stat; ++i ) {
+                                buf2 += "\x03";
+                                if( i % 3 == 2 ) { buf2 += " "; }
+                            }
+                            for( u8 i = stat; i < 18; ++i ) {
+                                buf2 += "\x04";
+                                if( i % 3 == 2 ) { buf2 += " "; }
+                            }
+                            snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
+                            doPrintMessage( buffer, MSG_INFO_NOCLOSE, 0, 0, true );
                         }
-                        for( u8 i = stat; i < 18; ++i ) {
-                            buf2 += "\x04";
-                            if( i % 3 == 2 ) { buf2 += " "; }
-                        }
-                        snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
-                        printMessage( buffer, MSG_INFO_NOCLOSE );
                     } ) ) {
                     printMessage( 0, MSG_INFO_NOCLOSE );
                     SOUND::playSoundEffect( SFX_SAVE );
@@ -1576,7 +1669,8 @@ namespace NAV {
                 break;
             }
             case 4: {
-                SPX::runInitialPkmnSelection( );
+                // SPX::runInitialPkmnSelection( );
+                SPX::runCatchingTutorial( );
                 break;
             }
             case 5: {

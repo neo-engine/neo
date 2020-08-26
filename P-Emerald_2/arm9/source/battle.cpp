@@ -55,15 +55,14 @@ namespace BATTLE {
 
         _opponent = p_opponentId;
 
-        _opponentTeamSize = _opponent.m_data.m_numPokemon
-            = std::min( u8( 6 ), _opponent.m_data.m_numPokemon );
+        _policy = p_policy;
 
-        for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
-            _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
-            _yieldEXP[ i ]     = std::set<u8>( );
+        if( _policy.m_mode == MOCK ) {
+            _policy.m_mode = SINGLE;
+            _isMockBattle  = true;
+        } else {
+            _isMockBattle = false;
         }
-
-        _policy       = p_policy;
         _isWildBattle = false;
         _AILevel      = _opponent.m_data.m_AILevel;
 
@@ -77,24 +76,45 @@ namespace BATTLE {
 
         switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
         case 0:
+            if( _opponent.m_data.m_numPokemon > 2 ) { _opponent.m_data.m_numPokemon--; }
             if( _AILevel ) { _AILevel--; }
-            for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
-                if( _opponentTeam[ i ].m_level <= 10 ) {
+            break;
+        case 3:
+        default: break;
+        case 6:
+            // Check if the opponent actually has an extra pkmn
+            if( _opponent.m_data.m_numPokemon < 6
+                && _opponent.m_data.m_pokemon[ _opponent.m_data.m_numPokemon ].m_speciesId ) {
+                _opponent.m_data.m_numPokemon++;
+            }
+            if( _AILevel < 9 ) { _AILevel++; }
+            break;
+        }
+
+        _opponentTeamSize = _opponent.m_data.m_numPokemon
+            = std::min( u8( 6 ), _opponent.m_data.m_numPokemon );
+        for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+            _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
+            _yieldEXP[ i ]     = std::set<u8>( );
+        }
+        switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
+        case 0:
+            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                if( _opponentTeam[ i ].m_level <= 13 ) {
                     _opponentTeam[ i ].setLevel( 5 );
                 } else {
-                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level - 5 );
+                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level - 8 );
                 }
             }
             break;
         case 3:
         default: break;
         case 6:
-            if( _AILevel < 9 ) { _AILevel++; }
-            for( u8 i = 0; i < _opponent.m_data.m_numPokemon; ++i ) {
-                if( _opponentTeam[ i ].m_level > 95 ) {
+            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                if( _opponentTeam[ i ].m_level > 92 ) {
                     _opponentTeam[ i ].setLevel( 100 );
                 } else {
-                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level + 5 );
+                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level + 8 );
                 }
             }
             break;
@@ -116,7 +136,13 @@ namespace BATTLE {
         _yieldEXP[ 0 ]     = std::set<u8>( );
         _opponentTeamSize  = 1;
 
-        _policy       = p_policy;
+        _policy = p_policy;
+        if( _policy.m_mode == MOCK ) {
+            _policy.m_mode = SINGLE;
+            _isMockBattle  = true;
+        } else {
+            _isMockBattle = false;
+        }
         _AILevel      = _policy.m_aiLevel;
         _isWildBattle = true;
 
@@ -144,7 +170,9 @@ namespace BATTLE {
 
         _round = 0;
         // Main battle loop
-        while( !_maxRounds || ++_round < _maxRounds ) {
+        while( !_maxRounds || _round < _maxRounds ) {
+            _round++;
+
             // register pkmn for exp
 
             for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++i ) {
@@ -489,6 +517,21 @@ namespace BATTLE {
             strgl       = strgl || canUse[ i ];
         }
 
+        if( _isMockBattle ) {
+            // Always choose Tackle
+            _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega );
+            auto curSel = 0;
+            _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega, curSel,
+                                           res.m_megaEvolve );
+            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+            _battleUI.showAttackSelection( _field.getPkmn( false, p_slot ), canUse, mega,
+                                           curSel = 2, res.m_megaEvolve );
+            for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+            res.m_param     = _field.getPkmn( false, p_slot )->getMove( curSel );
+            _lastMoveChoice = curSel;
+            return chooseTarget( res );
+        }
+
         if( !strgl ) {
             // pkmn will struggle
             res.m_param = M_STRUGGLE;
@@ -547,6 +590,42 @@ namespace BATTLE {
         _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
         u8 curSel = 0;
         _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
+
+        if( _isMockBattle ) {
+
+            if( _field.getPkmn( false, 0 )->m_stats.m_curHP * 2
+                    > _field.getPkmn( false, 0 )->m_stats.m_maxHP
+                && _round <= 2 ) { // Choose tackle
+                for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                return chooseAttack( p_slot, p_allowMegaEvolution );
+            } else { // throw a poke ball
+                for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel = 3 );
+                for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+                BAG::bagViewer bv = BAG::bagViewer( _playerTeam, BAG::bagViewer::MOCK_BATTLE );
+                bv.getItem( );
+                res.m_type  = CAPTURE;
+                res.m_param = I_POKE_BALL;
+
+                _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
+
+                for( u8 i2 = 0; i2 < 2; ++i2 )
+                    for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                        auto st = _field.getSlotStatus( i2, j2 );
+                        if( st == slot::status::NORMAL ) {
+                            _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                        }
+                    }
+
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                return res;
+            }
+        }
 
         cooldown = COOLDOWN_COUNT;
         loop( ) {
@@ -1146,7 +1225,9 @@ namespace BATTLE {
     }
 
     bool battle::playerCaptures( u16 p_pokeball ) {
-        SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::bag::ITEMS, p_pokeball, 1 );
+        if( !_isMockBattle ) {
+            SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::bag::ITEMS, p_pokeball, 1 );
+        }
 
         char buffer[ 100 ];
         u16  ballCatchRate = 2;
@@ -1225,6 +1306,11 @@ namespace BATTLE {
             if( rn > pr ) break;
             succ++;
         }
+
+        if( _isMockBattle ) {
+            succ = 4; // Let's not make Wally sad
+        }
+
         _battleUI.animateCapturePkmn( p_pokeball, succ );
 
         switch( succ ) {
@@ -1253,6 +1339,11 @@ namespace BATTLE {
         _field.revertTransform( true, 0 );
         u16 spid = _field.getPkmn( true, 0 )->getSpecies( );
 
+        if( _isMockBattle ) {
+            // Nothing to be done here.
+            return;
+        }
+
         char buffer[ 100 ];
         if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1LLU << ( spid % 8 ) ) ) ) {
             SAVE::SAV.getActiveFile( ).registerCaughtPkmn( spid );
@@ -1273,7 +1364,7 @@ namespace BATTLE {
             }
         else if( _playerTeamSize < 6 ) {
             std::memcpy( &_playerTeam[ _playerTeamSize ], pkmn, sizeof( pokemon ) );
-            _playerTeamSize++;
+            _playerPkmnOrigLevel[ _playerTeamSize++ ] = pkmn->m_level;
         } else {
             u8 oldbx = SAVE::SAV.getActiveFile( ).m_curBox;
             u8 nb    = SAVE::SAV.getActiveFile( ).storePkmn( *pkmn );
