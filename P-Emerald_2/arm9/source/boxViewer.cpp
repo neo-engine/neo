@@ -177,9 +177,7 @@ namespace BOX {
                     // Change box name / wall paper etc.
                     runBoxSettings( );
                 } else if( _selectedIdx == PARTY_BUTTON ) {
-                    if( runParty( ) ) {
-                        return;
-                    }
+                    if( runParty( ) ) { return; }
                 }
                 cooldown = COOLDOWN_COUNT;
             }
@@ -506,6 +504,9 @@ namespace BOX {
                             u8 res = runStatusChoice( );
                             if( !res ) {
                                 cooldown = COOLDOWN_COUNT;
+                                _boxUI.showParty( SAVE::SAV.getActiveFile( ).getCurrentBox( ),
+                                                  SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                  SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) );
                                 continue;
                             }
                             if( res == 255 ) { // player pressed X
@@ -584,8 +585,7 @@ namespace BOX {
             } else if( pressed & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 switch( btns[ selectedBtn ] ) {
-                case boxUI::BUTTON_PKMN_MOVE:
-                    return 1;
+                case boxUI::BUTTON_PKMN_MOVE: return 1;
                 case boxUI::BUTTON_PKMN_STATUS: {
                     STS::statusScreen::result stsres     = STS::statusScreen::BACK;
                     u8                        curStsPage = 0;
@@ -707,8 +707,7 @@ namespace BOX {
                     }
                     return 0;
                 }
-                default:
-                    break;
+                default: break;
                 }
                 break;
             }
