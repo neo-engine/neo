@@ -75,6 +75,8 @@
 #define SFX_HM_ROCKSMASH         39
 #define SFX_HM_STRENGTH          40
 #define SFX_OBTAIN_TM            41
+#define SFX_BUY_SUCCESSFUL       42
+#define SFX_CAPTURE_SUCCESSFUL   43
 
 void initSound( );
 

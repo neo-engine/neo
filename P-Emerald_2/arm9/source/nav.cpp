@@ -1431,6 +1431,7 @@ namespace NAV {
                 printYNMessage( 0, MSG_NORMAL, p_selection == IO::yesNoBox::NO );
             } );
         if( conf == IO::yesNoBox::NO ) { return 0; }
+        SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
         return res;
     }
 

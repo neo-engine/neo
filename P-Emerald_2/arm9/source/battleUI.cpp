@@ -2204,6 +2204,7 @@ namespace BATTLE {
         for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
         if( p_ticks == 3 ) { goto BREAK; }
 
+        SOUND::playSoundEffect( SFX_CAPTURE_SUCCESSFUL );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].palette = SPR_PKMN_SHADOW_PAL;
         IO::updateOAM( false );
         return;

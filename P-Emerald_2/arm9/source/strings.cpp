@@ -328,7 +328,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "[PLAYER], your room is upstairs.\nGo check it out, dear!\r"
       "Dad bought you a new PC to mark our move\nhere. Don't forget to check it out.",
       "" },
-    { "There's an e-mail from the Pok\xe9mon Trainer School.\r"
+    { "There's an e-mail from the Pok\xe9mon\nTrainers' School.\r"
       "| | | | | | |\r"
       "A Pok\xe9mon may learn up to four moves.\r"
       "A trainer's expertise is tested on the\nmove sets chosen for Pok\xe9mon.\r"
@@ -352,9 +352,9 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Oh, hello. And you are?\r"
       "| | | | | | | | |\n| | | | | | | | |\r"
       "Oh, you're [PLAYER],\nour new next-door neighbor! Hi!\r"
-      "We have a son about the same age as you.\r"
-      "Our son was excited about\nmaking a new friend.\r"
-      "Our son is upstairs, I think.",
+      "We have a kid about the same age as you.\r"
+      "Our kid was excited about\nmaking a new friend.\r"
+      "Our kid is upstairs, I think.",
       "" },
 
     // 60
@@ -385,7 +385,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "rather go outside and experience things\nthan read about them here.",
       "" },
     { "Oh, you're [PLAYER], aren't you?\nMoved in next door, right?\r"
-      "My name's Brendan. So hi, neighbor.\r"
+      "My name's [RIVAL]. So hi, neighbor.\r"
       "Huh? Hey, [PLAYER],\ndon't you have a Pok\xe9mon?\r"
       "Dad, Prof. Birch, said that our new\nnext-door neighbor is a Gym Leader's kid|\r"
       "So, I assumed you would already have\nsome cool, strong Pok\xe9mon|\r"
@@ -394,7 +394,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "I'm supposed to go help my dad\ncatch some wild Pok\xe9mon.\r"
       "Some other time, okay?",
       "" },
-    { "It's Brendan's Pok\xe9 Ball!\r"
+    { "It's [RIVAL]'s Pok\xe9 Ball!\r"
       "Better leave it right where it is.",
       "" },
     { "Pok\xe9mon fully restored|\nItems all packed, and|", "" },
@@ -484,7 +484,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Hey, it's [PLAYER]!\r"
       "|Oh, yeah, Dad gave you a Pok\xe9mon.\r"
       "Since we're here, how about a little battle?\r"
-      "I'll teach you what being a Pok\xe9mon Trainer's about!",
+      "I'll teach you what being a\nPok\xe9mon Trainer's about!",
       "" },
     { "[RIVAL]: I think I get it. I think I know\nwhy my dad has his eye out for you now.\r"
       "Look, your Pok\xe9mon already likes you, even though you just got it.\r"
@@ -495,15 +495,16 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "", "" },
 
     // 100
-    { "I think it's wonderful for people to travel with Pok\xe9mon.\r"
+    { "I think it's wonderful for people to\ntravel with Pok\xe9mon.\r"
       "But you should go home every so often\nto let you mother know you're okay.\r"
-      "She might not say it, but I'm sure she worries about you, [PLAYER].",
+      "She might not say it, but I'm sure she\nworries about you, [PLAYER].",
       "" },
     { "Prof. Birch: Oh, welcome back, [PLAYER]!\r"
       "I heard you beat [RIVAL] on your first try.\nThat's excellent!\r"
       "[RIVAL]'s been helping with my research\nfor a long time.\r"
       "[RIVAL] has an extensive history as a\nPok\xe9mon Trainer already.\r"
-      "Here, [PLAYER], I ordered this for my research,\nbut I think you should have this Pok\xe9"
+      "That reminds me, [PLAYER].\r"
+      "Here, I ordered this for my research,\nbut I think you should have this Pok\xe9"
       "Dex.",
       "" },
     { "[PLAYER] received the Pok\xe9"
@@ -513,9 +514,9 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Dex is a high-tech tool\nthat automatically makes a record\n"
       "of any Pok\xe9mon you meet or catch.\r"
       "My kid, [RIVAL], goes everywhere with it.\r"
-      "Whenever my kid catches a rare Pok\xe9mon and records its data in the Pok\xe9"
+      "Whenever my kid catches a rare Pok\xe9mon\nand records its data in the Pok\xe9"
       "Dex,\n"
-      "why, [RIVAL] looks for me while I'm out doing fieldwork, and shows me.",
+      "why, [RIVAL] looks for me while I'm out\ndoing fieldwork, and shows me.",
       "" },
     { "[RIVAL]: Huh|\nSo you got a Pok\xe9"
       "Dex, too.\r"
@@ -535,7 +536,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Oh! What an adorable Pok\xe9mon!\nYou got it from Prof. Birch. How nice!\r"
       "You're your father's child, all right.\nYou look good together with Pok\xe9mon!\r"
       "| | | | | | | | | |\n| | | | | | | | | |\r"
-      "To think that you have your very own Pok\xe9mon now|\r"
+      "To think that you have your\nvery own Pok\xe9mon now|\r"
       "Your father will be overjoyed.\r"
       "|But please be careful.\nIf anything happens, you can come home.\r"
       "Go on, go get them, honey!",

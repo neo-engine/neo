@@ -211,7 +211,6 @@ namespace MAP {
         u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
         fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
         FS::close( f );
-        // auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ];
 
         u8 pc = 0;
 
