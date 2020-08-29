@@ -306,7 +306,8 @@ namespace MAP {
             f  = FS::open( IO::BERRY_PATH, 999, ".rsd" );
             fr = 2 * p_stage;
         } else { // custom sprite
-            f  = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
+            f = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
+            if( !f ) { f = FS::open( IO::BERRY_PATH, u16( 0 ), ".rsd" ); }
             fr = 2 * ( p_stage - 2 );
         }
         return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_BERRYTREE, mapSprite( f, fr ) );

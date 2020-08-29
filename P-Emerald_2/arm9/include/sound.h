@@ -150,6 +150,15 @@ namespace SOUND {
     }
     constexpr u16 BGMforTrainerWin( u16 p_trainerClassId ) {
         switch( p_trainerClassId ) {
+        case 2: // Roxanne
+        case 3: // gym 2
+        case 4: // gym 3
+        case 5: // gym 4
+        case 6: // gym 5
+        case 7: // gym 6
+        case 8: // gym 7
+        case 9: // gym 8
+            return MOD_VICTORY_GYM_LEADER;
         case 24: // aqua grunt
         case 25: // a
         case 26: // aqua admin
@@ -170,7 +179,11 @@ namespace SOUND {
         case PKMN_SUICUNE:
         case PKMN_ENTEI: return MOD_BATTLE_RAIKOU_ENTEI_SUICUNE;
         case PKMN_RAYQUAZA: return MOD_BATTLE_RAYQUAZA;
-        default: return MOD_BATTLE_WILD;
+        default:
+            if( p_pokemonId > PKMN_DEOXYS && p_pokemonId <= PKMN_ARCEUS ) {
+                return MOD_BATTLE_EX01;
+            }
+            return MOD_BATTLE_WILD;
         }
     }
     constexpr u16 BGMforLocation( u16 p_locationId ) {
@@ -195,8 +208,7 @@ namespace SOUND {
         case L_ROUTE_113: return MOD_ROUTE_113;
         case L_ROUTE_117:
         case L_ROUTE_118:
-        case L_ROUTE_119:
-            //            return MOD_ROUTE_118;
+        case L_ROUTE_119: return MOD_ROUTE_119;
         case L_ROUTE_120:
         case L_ROUTE_121: return MOD_ROUTE_120;
         case L_ROUTE_123: return MOD_ROUTE_123;
@@ -207,7 +219,7 @@ namespace SOUND {
         case L_CLIFFELTA_CITY: return MOD_CLIFFELTA_CITY;
         case L_LITTLEROOT_TOWN: return MOD_LITTLEROOT_TOWN;
         case L_OLDALE_TOWN: return MOD_OLDALE_TOWN;
-        case L_PRETTY_PETAL:
+        case L_PRETTY_PETAL: return MOD_EX03;
         case L_PETALBURG_CITY: return MOD_PETALBURG_CITY;
         case L_RUSTBORO_CITY: return MOD_RUSTBORO_CITY;
         case L_DEWFORD_TOWN: return MOD_DEWFORD_TOWN;

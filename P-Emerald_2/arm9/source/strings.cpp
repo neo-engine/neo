@@ -568,7 +568,10 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "See? This is Petalburg City's\nPok\xe9mon Gym.\r"
       "See that symbol on the roof?\nThat marks this building as a Gym.\r"
-      "Also, the color represents the primary type\nof Pok\xe9mon the Gym Leader uses!",
+      "Let me tell you something cool!\r"
+      "The color represents the primary type\nof Pok\xe9mon the Gym Leader uses!\r"
+      "For Petalburg, it is gray, since\nNorman uses Normal-type Pok\xe9mon.\r"
+      "But he's probably too strong\nfor you anyways|",
       "" },
     { "Let's say you have six Pok\xe9mon.\nIf you catch another one|\r"
       "It is automatically sent to a Storage Box\nover a PC connection.",
@@ -842,7 +845,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Metarost City\n[131][129]" },
     { "If a Pok\xe9mon has many battles, it can\nsometimes change in the way it looks.", "" },
     { "A Pok\xe9mon changes shape?\nIf one did that, I would be shocked!", "" },
-    { "Hello\r"
+    { "Hello!\r"
       "The more attention you give to flowers,\nthe more beautifully they bloom.\r"
       "You'll like tending flowers. I'm sure of it.\nYou can have this.",
       "" },
@@ -859,7 +862,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Your name is?\r"
       "[PLAYER]\nThat's a nice name.",
       "" },
-    { "[PLAYER], would you like to learn about Berries?", "" },
+    { "[PLAYER], would you like to\nlearn about Berries?", "" },
     { "Flowers bring so much happiness to people,\ndon't they?", "" },
     { "Berries grow on trees that thrive only\nin soft, loamy soil.\r"
       "If you take some Berries, be sure to plant\none in the loamy soil again.\r"
@@ -867,7 +870,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "then grow Berries again.\r"
       "I want to see the whole wide world\nfilled with beautiful flowers.\r"
       "That's my dream.\r"
-      "Please help me, Ichiga. Plant Berries\nand bring more flowers into the world.",
+      "Please help me, [PLAYER]. Plant Berries\nand bring more flowers into the world.",
       "" },
 
     // 210

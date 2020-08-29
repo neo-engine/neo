@@ -168,7 +168,7 @@ namespace SAVE {
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
 
-        BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
+       // BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
         printf( "Free Software, PW 2012 - 2020\n"
                 "                             \n"

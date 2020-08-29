@@ -2207,6 +2207,10 @@ namespace BATTLE {
         SOUND::playSoundEffect( SFX_CAPTURE_SUCCESSFUL );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].palette = SPR_PKMN_SHADOW_PAL;
         IO::updateOAM( false );
+        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        SOUND::playBGMOneshot( MOD_OS_PKMN_CAPTURE );
+        for( int i = 0; i < 150; ++i ) swiWaitForVBlank( );
+        SOUND::playBGM( MOD_VICTORY_WILD );
         return;
 
     BREAK:

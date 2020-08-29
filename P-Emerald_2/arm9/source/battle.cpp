@@ -1737,6 +1737,8 @@ namespace BATTLE {
         char buffer[ 100 ];
         for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
             if( _field.getSlotStatus( true, j ) == slot::status::FAINTED ) {
+                if( _yieldEXP[ j ].empty( ) ) { continue; } // already distributed
+
                 // distribute EXP
 #ifdef DESQUID_MORE
                 std::string lmsg = "Distributing EXP to ";
@@ -1801,13 +1803,11 @@ namespace BATTLE {
                                 snprintf( buffer, 99, GET_STRING( 167 ),
                                           _playerTeam[ i ].m_boxdata.m_name, curexp );
                                 _battleUI.log( buffer );
-                                for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
                                 if( _playerTeam[ i ].m_level != oldlv ) {
                                     snprintf( buffer, 99, GET_STRING( 168 ),
                                               _playerTeam[ i ].m_boxdata.m_name,
                                               _playerTeam[ i ].m_level );
                                     _battleUI.log( buffer );
-                                    for( u8 g = 0; g < 30; ++g ) { swiWaitForVBlank( ); }
                                 }
                             }
                             if( i <= u8( _policy.m_mode ) ) {
