@@ -1923,9 +1923,13 @@ namespace BATTLE {
         if( hidepkmn ) { hidePkmn( p_opponent, p_pos ); }
     }
 
-    void battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton ) {
+    std::vector<std::pair<IO::inputTarget, u8>>
+    battleUI::showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton ) {
         SpriteEntry* oam = IO::Oam->oamBuffer;
         char         buffer[ 100 ];
+
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
 
         if( p_highlightedButton == u8( -1 ) ) {
             // initialize stuff
@@ -2022,6 +2026,13 @@ namespace BATTLE {
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
+
+        res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_FITE_OAM_SUB ].x,
+                                                   oam[ SPR_BATTLE_FITE_OAM_SUB ].y,
+                                                   oam[ SPR_BATTLE_FITE_OAM_SUB ].x + 128,
+                                                   oam[ SPR_BATTLE_FITE_OAM_SUB ].y + 60 ),
+                                  0 ) );
+
         if( p_highlightedButton == 1 ) {
             IO::loadSprite( "BT/pk2", SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
@@ -2035,6 +2046,12 @@ namespace BATTLE {
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
+        res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_PKMN_OAM_SUB ].x,
+                                                   oam[ SPR_BATTLE_PKMN_OAM_SUB ].y,
+                                                   oam[ SPR_BATTLE_PKMN_OAM_SUB ].x + 64,
+                                                   oam[ SPR_BATTLE_PKMN_OAM_SUB ].y + 32 ),
+                                  1 ) );
+
         if( p_highlightedButton == 2 ) {
             if( !p_slot && !_isWildBattle ) {
                 IO::loadSprite( "BT/in2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
@@ -2064,6 +2081,15 @@ namespace BATTLE {
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         }
+
+        if( _isWildBattle ) {
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_RUN_OAM_SUB ].x,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].y,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 64,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].y + 32 ),
+                                      2 ) );
+        }
+
         if( p_highlightedButton == 3 ) {
             IO::loadSprite( "BT/bg2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
                             oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
@@ -2077,6 +2103,13 @@ namespace BATTLE {
                             oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
+
+        res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_BAG_OAM_SUB ].x,
+                                                   oam[ SPR_BATTLE_BAG_OAM_SUB ].y,
+                                                   oam[ SPR_BATTLE_BAG_OAM_SUB ].x + 64,
+                                                   oam[ SPR_BATTLE_BAG_OAM_SUB ].y + 32 ),
+                                  3 ) );
+        return res;
     }
 
     void battleUI::animateCapturePkmn( u16 p_pokeball, u8 p_ticks ) {

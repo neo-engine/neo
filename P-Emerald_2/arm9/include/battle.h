@@ -59,7 +59,7 @@ namespace BATTLE {
         };
 
         static constexpr u8 BEFORE_BATTLE = 0;
-        static constexpr u8 AFTER_BATTLE = 1;
+        static constexpr u8 AFTER_BATTLE  = 1;
 
       private:
         u16   _round, _maxRounds, _AILevel;
@@ -98,6 +98,13 @@ namespace BATTLE {
          * target for double battles.
          */
         battleMoveSelection chooseTarget( const battleMoveSelection& p_move );
+
+        /*
+         * @brief: Handles the event when the player presses A while having selected a
+         * selection during the move selection.
+         */
+        battleMoveSelection handleMoveSelectionSelection( u8 p_slot, bool p_allowMegaEvolution,
+                                                          u8 p_button );
 
         /*
          * @brief: Makes the player select a move for the pokemon in slot p_slot.

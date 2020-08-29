@@ -579,6 +579,101 @@ namespace BATTLE {
         }
     }
 
+    battleMoveSelection battle::handleMoveSelectionSelection( u8 p_slot, bool p_allowMegaEvolution,
+                                                              u8 p_button ) {
+        battleMoveSelection res = NO_OP_SELECTION;
+        res.m_user              = { field::PLAYER_SIDE, p_slot };
+        switch( p_button ) {
+        case 0: // Choose attack
+            SOUND::playSoundEffect( SFX_CHOOSE );
+            res = chooseAttack( p_slot, p_allowMegaEvolution );
+            if( res.m_type != CANCEL ) { return res; }
+            break;
+        case 1: { // Choose pkmn
+            SOUND::playSoundEffect( SFX_CHOOSE );
+
+            STS::partyScreen pt
+                = STS::partyScreen( _playerTeam, _playerTeamSize, false, false, false, 1, false,
+                                    false, false, true, 1 + u8( _policy.m_mode ), p_slot );
+
+            auto r = pt.run( p_slot );
+
+            _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
+
+            for( u8 i2 = 0; i2 < 2; ++i2 )
+                for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                    auto st = _field.getSlotStatus( i2, j2 );
+                    if( st == slot::status::NORMAL ) {
+                        _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                    }
+                }
+
+            if( r.getSelectedPkmn( ) < 255 ) {
+                res.m_type  = SWITCH;
+                res.m_param = r.getSelectedPkmn( );
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                return res;
+            }
+            break;
+        }
+        case 2: // Run / Cancel
+            if( _isWildBattle ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                res.m_type = RUN;
+            } else if( p_slot ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                res.m_type = CANCEL;
+            } else {
+                cooldown = COOLDOWN_COUNT;
+                break;
+            }
+            return res;
+        case 3: { // Choose item
+            SOUND::playSoundEffect( SFX_CHOOSE );
+
+            BAG::bagViewer bv = BAG::bagViewer(
+                _playerTeam, _isWildBattle ? BAG::bagViewer::WILD_BATTLE : BAG::bagViewer::BATTLE );
+            u16 itm = bv.getItem( );
+
+            if( itm ) {
+                auto idata = ITEM::getItemData( itm );
+
+                if( idata.m_itemType == ITEM::ITEMTYPE_POKEBALL ) {
+                    // Player throws a ball
+                    res.m_type  = CAPTURE;
+                    res.m_param = itm;
+                } else if( ( idata.m_itemType & 15 ) == 2 ) {
+                    // Already used
+                    res.m_type  = NO_OP_NO_CANCEL;
+                    res.m_param = 0;
+                } else {
+                    res.m_type  = USE_ITEM;
+                    res.m_param = itm;
+                }
+            }
+
+            _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
+
+            for( u8 i2 = 0; i2 < 2; ++i2 )
+                for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                    auto st = _field.getSlotStatus( i2, j2 );
+                    if( st == slot::status::NORMAL ) {
+                        _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                    }
+                }
+
+            if( itm ) {
+                _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                return res;
+            }
+            break;
+        }
+        default: break;
+        }
+        res.m_type = CANCEL;
+        return res;
+    }
+
     battleMoveSelection battle::getMoveSelection( u8 p_slot, bool p_allowMegaEvolution ) {
         battleMoveSelection res = NO_OP_SELECTION;
         res.m_user              = { field::PLAYER_SIDE, p_slot };
@@ -588,12 +683,11 @@ namespace BATTLE {
             return _field.getStoredMove( false, p_slot );
         }
 
-        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
-        u8 curSel = 0;
+        auto choices = _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+        u8   curSel  = 0;
         _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
 
         if( _isMockBattle ) {
-
             if( _field.getPkmn( false, 0 )->m_stats.m_curHP * 2
                     > _field.getPkmn( false, 0 )->m_stats.m_maxHP
                 && _round <= 2 ) { // Choose tackle
@@ -636,100 +730,41 @@ namespace BATTLE {
             pressed = keysUp( );
             held    = keysHeld( );
 
+            for( auto i : choices ) {
+                if( i.first.inRange( touch ) ) {
+                    _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot,
+                                                 curSel = i.second );
+
+                    bool bad = false;
+                    while( touch.px || touch.py ) {
+                        swiWaitForVBlank( );
+                        if( !i.first.inRange( touch ) ) {
+                            bad = true;
+                            break;
+                        }
+                        scanKeys( );
+                        touchRead( &touch );
+                        swiWaitForVBlank( );
+                    }
+                    if( !bad ) {
+                        res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
+                        if( res.m_type != CANCEL ) { return res; }
+                        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
+                        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot,
+                                                     curSel );
+                    }
+                }
+            }
+
             if( p_slot && ( pressed & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 res.m_type = CANCEL;
                 return res;
             }
             if( pressed & KEY_A ) {
-                switch( curSel ) {
-                case 0: // Choose attack
-                    SOUND::playSoundEffect( SFX_CHOOSE );
-                    res = chooseAttack( p_slot, p_allowMegaEvolution );
-                    if( res.m_type != CANCEL ) { return res; }
-                    break;
-                case 1: { // Choose pkmn
-                    SOUND::playSoundEffect( SFX_CHOOSE );
+                res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
+                if( res.m_type != CANCEL ) { return res; }
 
-                    STS::partyScreen pt = STS::partyScreen(
-                        _playerTeam, _playerTeamSize, false, false, false, 1, false, false, false,
-                        true, 1 + u8( _policy.m_mode ), p_slot );
-
-                    auto r = pt.run( p_slot );
-
-                    _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
-
-                    for( u8 i2 = 0; i2 < 2; ++i2 )
-                        for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
-                            auto st = _field.getSlotStatus( i2, j2 );
-                            if( st == slot::status::NORMAL ) {
-                                _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
-                            }
-                        }
-
-                    if( r.getSelectedPkmn( ) < 255 ) {
-                        res.m_type  = SWITCH;
-                        res.m_param = r.getSelectedPkmn( );
-                        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
-                        return res;
-                    }
-                    break;
-                }
-                case 2: // Run / Cancel
-                    if( _isWildBattle ) {
-                        SOUND::playSoundEffect( SFX_CHOOSE );
-                        res.m_type = RUN;
-                    } else if( p_slot ) {
-                        SOUND::playSoundEffect( SFX_CANCEL );
-                        res.m_type = CANCEL;
-                    } else {
-                        cooldown = COOLDOWN_COUNT;
-                        continue;
-                    }
-                    return res;
-                case 3: { // Choose item
-                    SOUND::playSoundEffect( SFX_CHOOSE );
-
-                    BAG::bagViewer bv
-                        = BAG::bagViewer( _playerTeam, _isWildBattle ? BAG::bagViewer::WILD_BATTLE
-                                                                     : BAG::bagViewer::BATTLE );
-                    u16 itm = bv.getItem( );
-
-                    if( itm ) {
-                        auto idata = ITEM::getItemData( itm );
-
-                        if( idata.m_itemType == ITEM::ITEMTYPE_POKEBALL ) {
-                            // Player throws a ball
-                            res.m_type  = CAPTURE;
-                            res.m_param = itm;
-                        } else if( ( idata.m_itemType & 15 ) == 2 ) {
-                            // Already used
-                            res.m_type  = NO_OP_NO_CANCEL;
-                            res.m_param = 0;
-                        } else {
-                            res.m_type  = USE_ITEM;
-                            res.m_param = itm;
-                        }
-                    }
-
-                    _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
-
-                    for( u8 i2 = 0; i2 < 2; ++i2 )
-                        for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
-                            auto st = _field.getSlotStatus( i2, j2 );
-                            if( st == slot::status::NORMAL ) {
-                                _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
-                            }
-                        }
-
-                    if( itm ) {
-                        _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
-                        return res;
-                    }
-                    break;
-                }
-                default: break;
-                }
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
 
@@ -974,9 +1009,9 @@ namespace BATTLE {
 
                 // Check for vol stat changes
                 if( _AILevel > 4 && bmove[ i ].m_moveData.m_volatileStatus ) {
-                    if( target != nullptr &&
-                            ( _field.getVolatileStatus( true, p_slot ) &
-                              bmove[ i ].m_moveData.m_volatileStatus ) ) {
+                    if( target != nullptr
+                        && ( _field.getVolatileStatus( true, p_slot )
+                             & bmove[ i ].m_moveData.m_volatileStatus ) ) {
                         score[ i ] = 1;
                         continue;
                     } else if( _AILevel > 5 ) {

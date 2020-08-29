@@ -239,7 +239,8 @@ namespace BATTLE {
          * @brief: Shows the move selection for the given pkmn ("attack", "item", "pkmn",
          * "run", etc)
          */
-        void showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton = -1 );
+        std::vector<std::pair<IO::inputTarget, u8>>
+        showMoveSelection( pokemon* p_pokemon, u8 p_slot, u8 p_highlightedButton = -1 );
 
         /*
          * @brief: Shows the attack selection for the given pkmn.
