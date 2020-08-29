@@ -279,8 +279,8 @@ namespace SAVE {
         m_berryTrees[ 8 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
         m_berryHealth[ 8 ] = 255;
 
-        m_berryTrees[ 9 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
-        m_berryHealth[ 9 ] = 255;
+        m_berryTrees[ 9 ]   = ITEM::itemToBerry( I_CHERI_BERRY );
+        m_berryHealth[ 9 ]  = 255;
         m_berryTrees[ 10 ]  = 0;
         m_berryHealth[ 10 ] = 0;
         m_berryTrees[ 11 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
@@ -289,8 +289,18 @@ namespace SAVE {
         // Route 116
         m_berryTrees[ 12 ]  = ITEM::itemToBerry( I_CHESTO_BERRY );
         m_berryHealth[ 12 ] = 255;
+        m_berryTrees[ 16 ]  = 0;
+        m_berryHealth[ 16 ] = 0;
+        m_berryTrees[ 17 ]  = 0;
+        m_berryHealth[ 17 ] = 0;
         m_berryTrees[ 13 ]  = ITEM::itemToBerry( I_PINAP_BERRY );
         m_berryHealth[ 13 ] = 255;
+
+        // Route 115
+        m_berryTrees[ 14 ]  = ITEM::itemToBerry( I_CHILAN_BERRY );
+        m_berryHealth[ 14 ] = 255;
+        m_berryTrees[ 15 ]  = ITEM::itemToBerry( I_ROSELI_BERRY );
+        m_berryHealth[ 15 ] = 255;
     }
 
     bool saveGame::playerInfo::berryIsAlive( u8 p_berrySlot ) const {
@@ -377,6 +387,8 @@ namespace SAVE {
         if( !mxlv || m_repelSteps ) return 0;
         mxlv = std::min( s16( 93 ), s16( mxlv + 6 ) );
         mxlv = std::min( s16( 5 * getBadgeCount( ) + 8 ), s16( mxlv + 0 ) );
+
+        if( !checkFlag( F_DEX_OBTAINED ) ) { mxlv = 4; }
 
         mxlv += m_options.m_levelModifier / 2 + ( rand( ) % ( 2 * ( p_tier + 1 ) ) - p_tier - 1 );
 

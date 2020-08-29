@@ -51,6 +51,9 @@ namespace MOVE {
 
         switch( p_moveId ) {
         case M_CUT: {
+            // Check for badge 1
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 0 ) ) ) { return false; }
+
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
@@ -64,6 +67,9 @@ namespace MOVE {
             return false;
         }
         case M_ROCK_SMASH: {
+            // Check for badge 3
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 2 ) ) ) { return false; }
+
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
@@ -77,6 +83,9 @@ namespace MOVE {
             return false;
         }
         case M_STRENGTH: {
+            // Check for badge 4
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 3 ) ) ) { return false; }
+
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
@@ -90,10 +99,25 @@ namespace MOVE {
             return false;
         }
 
-        case M_FLY: return false;
-        case M_FLASH: return false;
-        case M_WHIRLPOOL: return false;
+        case M_FLY: {
+            // Check for badge 6
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 5 ) ) ) { return false; }
+            return false;
+        }
+        case M_FLASH: {
+            // Check for badge 2
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 1 ) ) ) { return false; }
+            return false;
+        }
+        case M_WHIRLPOOL: {
+            // Check for badge 7
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return false; }
+            return false;
+        }
         case M_SURF:
+            // Check for badge 5
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 4 ) ) ) { return false; }
+
             return ( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::SURF )
                    && MAP::curMap->atom( tx, ty ).m_movedata == 0x4
                    && MAP::curMap
@@ -101,12 +125,27 @@ namespace MOVE {
                                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                               .m_movedata
                           == 0xc;
-        case M_DIVE: return false;
-        case M_DEFOG: return false;
-        case M_ROCK_CLIMB: return MAP::curMap->at( tx, ty ).m_bottombehave == 0x12;
-        case M_WATERFALL:
+        case M_DIVE: {
+            // Check for badge 7
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return false; }
+            return false;
+        }
+        case M_DEFOG: {
+            // Check for badge 2
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 1 ) ) ) { return false; }
+            return false;
+        }
+        case M_ROCK_CLIMB: {
+            // Check for badge 8
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 7 ) ) ) { return false; }
+            return MAP::curMap->at( tx, ty ).m_bottombehave == 0x12;
+        }
+        case M_WATERFALL: {
+            // Check for badge 8
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 7 ) ) ) { return false; }
             return ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::SURF )
                    && MAP::curMap->at( tx, ty ).m_bottombehave == 0x13;
+        }
         case M_HEADBUTT: return false;
         case M_SWEET_SCENT: {
             u8 curBehave = MAP::curMap

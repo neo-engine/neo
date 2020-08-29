@@ -315,7 +315,7 @@ namespace ITEM {
                 p_message( GET_STRING( 65 ) );
             }
             return true;
-        case I_EXP_SHARE:
+        case I_EXP_ALL:
             if( !p_dryRun ) {
                 if( SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled )
                     p_message( GET_STRING( 66 ) );
@@ -421,7 +421,7 @@ namespace ITEM {
         case I_REPEL:
         case I_SUPER_REPEL:
         case I_MAX_REPEL:
-        case I_EXP_SHARE:
+        case I_EXP_ALL:
         case I_COIN_CASE:
         case I_POINT_CARD:
         case I_SOOT_SACK: return true;

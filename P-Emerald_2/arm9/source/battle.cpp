@@ -100,11 +100,12 @@ namespace BATTLE {
         switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
         case 0:
             for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-                if( _opponentTeam[ i ].m_level <= 13 ) {
+                if( _opponentTeam[ i ].m_level <= 8 ) {
                     _opponentTeam[ i ].setLevel( 5 );
                 } else {
-                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level - 8 );
+                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level - 3 );
                 }
+                _opponentTeam[ i ].m_boxdata.m_moves[ 3 ] = 0;
             }
             break;
         case 3:
@@ -956,6 +957,7 @@ namespace BATTLE {
                     if( _AILevel > 2 && bmove[ i ].m_moveData.m_weather != _field.getWeather( ) ) {
                         if( _AILevel > 4 && _field.suppressesWeather( ) ) {
                             score[ i ] = 1;
+                            continue;
                         } else {
                             score[ i ] = 200;
                         }
@@ -968,6 +970,18 @@ namespace BATTLE {
                         continue;
                     }
                     score[ i ] = score[ i ] + 5 - ( rand( ) % ( 13 - _AILevel ) );
+                }
+
+                // Check for vol stat changes
+                if( _AILevel > 4 && bmove[ i ].m_moveData.m_volatileStatus ) {
+                    if( target != nullptr &&
+                            ( _field.getVolatileStatus( true, p_slot ) &
+                              bmove[ i ].m_moveData.m_volatileStatus ) ) {
+                        score[ i ] = 1;
+                        continue;
+                    } else if( _AILevel > 5 ) {
+                        score[ i ] += 5;
+                    }
                 }
 
                 if( _AILevel > 4 && _field.hasType( true, p_slot, bmove[ i ].m_moveData.m_type ) ) {

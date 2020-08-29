@@ -29,27 +29,33 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "bag.h"
+#include "item.h"
 #include "pokemon.h"
 #include "saveGame.h"
 
 namespace BAG {
     void bag::sort( bagType p_bagType ) {
-        std::sort( &_items[ _startIdx[ p_bagType ] ], &_items[ _nextFree[ p_bagType ] ],
-                   []( std::pair<u16, u16> p_left, std::pair<u16, u16> p_right ) {
-                       auto ldata = ITEM::getItemData( p_left.first );
-                       auto rdata = ITEM::getItemData( p_right.first );
+        std::sort(
+            &_items[ _startIdx[ p_bagType ] ], &_items[ _nextFree[ p_bagType ] ],
+            []( std::pair<u16, u16> p_left, std::pair<u16, u16> p_right ) {
+                if( ITEM::itemToBerry( p_left.first ) != ITEM::itemToBerry( p_right.first ) ) {
+                    return ITEM::itemToBerry( p_left.first ) < ITEM::itemToBerry( p_right.first );
+                }
 
-                       if( ldata.m_itemType < rdata.m_itemType ) { return true; }
-                       if( ldata.m_itemType > rdata.m_itemType ) { return false; }
+                auto ldata = ITEM::getItemData( p_left.first );
+                auto rdata = ITEM::getItemData( p_right.first );
 
-                       if( ldata.m_itemType == ITEM::ITEMTYPE_TM ) {
-                           if( ldata.m_effect < rdata.m_effect ) { return true; }
-                           if( ldata.m_effect > rdata.m_effect ) { return false; }
-                           if( ldata.m_param1 < rdata.m_param1 ) { return true; }
-                           if( ldata.m_param1 > rdata.m_param1 ) { return false; }
-                       }
-                       return p_left.first < p_right.first;
-                   } );
+                if( ldata.m_itemType < rdata.m_itemType ) { return true; }
+                if( ldata.m_itemType > rdata.m_itemType ) { return false; }
+
+                if( ldata.m_itemType == ITEM::ITEMTYPE_TM ) {
+                    if( ldata.m_effect < rdata.m_effect ) { return true; }
+                    if( ldata.m_effect > rdata.m_effect ) { return false; }
+                    if( ldata.m_param1 < rdata.m_param1 ) { return true; }
+                    if( ldata.m_param1 > rdata.m_param1 ) { return false; }
+                }
+                return p_left.first < p_right.first;
+            } );
     }
 
     void bag::insert( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {
@@ -61,7 +67,7 @@ namespace BAG {
         if( _nextFree[ p_bagType ] >= MAX_ITEMS_IN_BAG
             || _nextFree[ p_bagType ] == _startIdx[ 1 + p_bagType ] ) // Insert failed.
             return;
-        _items[ _nextFree[ p_bagType ]++ ] = {p_itemId, p_cnt};
+        _items[ _nextFree[ p_bagType ]++ ] = { p_itemId, p_cnt };
     }
 
     void bag::erase( bagType p_bagType, u16 p_itemId, u16 p_cnt ) {

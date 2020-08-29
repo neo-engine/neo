@@ -198,12 +198,14 @@ namespace SOUND {
         case L_ROUTE_120:
         case L_ROUTE_121: return MOD_ROUTE_120;
         case L_ROUTE_123: return MOD_ROUTE_123;
+        case L_TRAINERS__SCHOOL: return MOD_TRAINER_SCHOOL;
         case L_MAUVILLE_CITY:
         case L_LILYCOVE_CITY: return MOD_LILYCOVE_CITY;
         case L_VERDANTURF_TOWN:
         case L_CLIFFELTA_CITY: return MOD_CLIFFELTA_CITY;
         case L_LITTLEROOT_TOWN: return MOD_LITTLEROOT_TOWN;
         case L_OLDALE_TOWN: return MOD_OLDALE_TOWN;
+        case L_PRETTY_PETAL:
         case L_PETALBURG_CITY: return MOD_PETALBURG_CITY;
         case L_RUSTBORO_CITY: return MOD_RUSTBORO_CITY;
         case L_DEWFORD_TOWN: return MOD_DEWFORD_TOWN;

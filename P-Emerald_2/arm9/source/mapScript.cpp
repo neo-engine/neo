@@ -62,6 +62,7 @@ namespace MAP {
     // 6 Initial pkmn selection
     // 7 NAV::init( )
     // 8 Catching tutorial
+    // 9 award badge (p1: region, p2: badge)
 
     enum opCode : u8 {
         EOP = 0,  // end of program
@@ -104,6 +105,11 @@ namespace MAP {
 
         MFO  = 31, // move map object fast
         MFOR = 32, // move map object fast
+
+        GIT = 33, // return how many copies the player has of the specified item
+
+        STF = 34, // set trainer flag
+        CTF = 35, // check trainer flag
 
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
@@ -155,7 +161,7 @@ namespace MAP {
         if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
             return getDisplayName( SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
         }
-        return "";
+        return std::string( "[" ) + p_cmd + "]";
     }
 
     std::string convertMapString( const std::string& p_text, style p_style ) {
@@ -267,6 +273,12 @@ namespace MAP {
             case ATT: playerAttachedToObject = true; break;
             case REM: playerAttachedToObject = false; break;
             case EOP: return;
+            case GIT: {
+                auto idata     = ITEM::getItemData( parA );
+                registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_bag.count(
+                    BAG::toBagType( idata.m_itemType ), parA );
+                break;
+            }
             case SMO: {
                 mapObject obj         = mapObject( );
                 obj.m_pos             = { u16( mapX * SIZE + par2 ), u16( mapY * SIZE + par3 ), 3 };
@@ -357,6 +369,17 @@ namespace MAP {
             }
             case SFL: {
                 SAVE::SAV.getActiveFile( ).setFlag( par1, par2 );
+                break;
+            }
+            case STF: {
+                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_TRAINER_BATTLED( par1 ), par2 );
+                break;
+            }
+            case CTF: {
+                if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED( par1 ) )
+                    == par2 ) {
+                    pc += par3;
+                }
                 break;
             }
             case CRG: {
@@ -567,7 +590,7 @@ namespace MAP {
                 auto tr         = BATTLE::getBattleTrainer( parA );
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
-                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
+                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerBG ) );
                 FADE_TOP_DARK( );
                 ANIMATE_MAP = false;
                 swiWaitForVBlank( );
@@ -717,6 +740,10 @@ namespace MAP {
                     SPX::runCatchingTutorial( );
                     break;
                 }
+                case 9: {
+                    awardBadge( par2, par3 );
+                    break;
+                }
                 default: break;
                 }
                 break;
@@ -854,7 +881,7 @@ namespace MAP {
 
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
-                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
+                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerBG ) );
                 FADE_TOP_DARK( );
                 ANIMATE_MAP = false;
                 swiWaitForVBlank( );
@@ -1129,7 +1156,7 @@ namespace MAP {
                         + SAVE::SAV.getActiveFile( ).m_bag.count(
                             BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SQUIRT_BOTTLE ) ) {
 
-                        if( IO::yesNoBox( ).getResult( GET_STRING( 575 ), MSG_INFO_NOCLOSE )
+                        if( IO::yesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
                             == IO::yesNoBox::YES ) {
                             SAVE::SAV.getActiveFile( ).harvestBerry(
                                 o.second.m_event.m_data.m_berryTree.m_treeIdx );

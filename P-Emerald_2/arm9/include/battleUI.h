@@ -151,6 +151,11 @@ namespace BATTLE {
                         boosts p_actual );
 
         /*
+         * @brief: Logs that the given pkmn's item is effective.
+         */
+        void logItem( pokemon* p_pokemon, bool p_opponent );
+
+        /*
          * @brief: Logs that the given pkmn's ability is effective.
          */
         void logAbility( pokemon* p_pokemon, bool p_opponent );

@@ -1020,8 +1020,8 @@ namespace BATTLE {
 
     void battleUI::init( weather p_initialWeather, terrain p_initialTerrain ) {
         for( u8 i = 0; i < 2; ++i ) {
-            u16* pal   = IO::BG_PAL( i );
-            pal[ 0 ]   = 0;
+            u16* pal = IO::BG_PAL( i );
+            pal[ 0 ] = 0;
         }
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         IO::vramSetup( true );
@@ -1189,6 +1189,37 @@ namespace BATTLE {
             }
         }
         for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+    }
+
+    void battleUI::logItem( pokemon* p_pokemon, bool p_opponent ) {
+        if( !p_pokemon->getItem( ) ) { return; }
+
+        for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+        SOUND::playSoundEffect( SFX_BATTLE_ABILITY );
+
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+
+        for( u8 i = 0; i < 3; ++i ) { oam[ SPR_ABILITY_OAM( !p_opponent ) + i ].isHidden = false; }
+        IO::updateOAM( false );
+
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 393 ), p_pokemon->m_boxdata.m_name,
+                  ITEM::getItemName( p_pokemon->getItem( ) ).c_str( ),
+                  p_pokemon->m_boxdata.m_name );
+
+        IO::regularFont->printStringC( buffer, 128 + ( p_opponent ? 18 : -32 ),
+                                       oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1, false,
+                                       p_opponent ? IO::font::LEFT : IO::font::RIGHT, 14, -14 );
+
+        for( u8 i = 0; i < 75; ++i ) { swiWaitForVBlank( ); }
+
+        for( u8 i = 0; i < 3; ++i ) { oam[ SPR_ABILITY_OAM( !p_opponent ) + i ].isHidden = true; }
+        dmaFillWords(
+            0, bgGetGfxPtr( IO::bg2 ) + ( oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1 ) * 128,
+            30 * 256 );
+        IO::updateOAM( false );
+
+        for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
     }
 
     void battleUI::logAbility( pokemon* p_pokemon, bool p_opponent ) {
@@ -2553,9 +2584,7 @@ namespace BATTLE {
         for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
         IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
-        for( u8 i = 0; i <= 13; ++i ) {
-            oam[ SPR_MBOX_START_OAM + 13 - i ].isHidden = true;
-        }
+        for( u8 i = 0; i <= 13; ++i ) { oam[ SPR_MBOX_START_OAM + 13 - i ].isHidden = true; }
         IO::updateOAM( false );
     }
 

@@ -50,28 +50,28 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_blank_32_24.h"
 
 namespace BAG {
-#define SPR_TRANSFER_OAM_SUB 0
-#define SPR_MSG_BOX_OAM_SUB 1
-#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 14 + 6 * ( p_pos ) )
-#define SPR_ARROW_DOWN_OAM_SUB 52
-#define SPR_ARROW_BACK_OAM_SUB 53
-#define SPR_ARROW_UP_OAM_SUB 54
+#define SPR_TRANSFER_OAM_SUB                0
+#define SPR_MSG_BOX_OAM_SUB                 1
+#define SPR_CHOICE_START_OAM_SUB( p_pos )   ( 14 + 6 * ( p_pos ) )
+#define SPR_ARROW_DOWN_OAM_SUB              52
+#define SPR_ARROW_BACK_OAM_SUB              53
+#define SPR_ARROW_UP_OAM_SUB                54
 #define SPR_ITEM_WINDOW_OAM_SUB( p_window ) ( 55 + 5 * ( p_window ) )
-#define SPR_PKMN_START_OAM_SUB 100
-#define SPR_MSG_PKMN_SEL_OAM_SUB 106
-#define SPR_MSG_BOX_SMALL_OAM_SUB 115
-#define SPR_BAG_ICON_SEL_OAM_SUB 120
-#define SPR_BAG_ICON_OAM_SUB 121
+#define SPR_PKMN_START_OAM_SUB              100
+#define SPR_MSG_PKMN_SEL_OAM_SUB            106
+#define SPR_MSG_BOX_SMALL_OAM_SUB           115
+#define SPR_BAG_ICON_SEL_OAM_SUB            120
+#define SPR_BAG_ICON_OAM_SUB                121
 
-#define SPR_BOX_PAL_SUB 0
-#define SPR_SELECTED_PAL_SUB 1
-#define SPR_PKMN_PAL_SUB 2
-#define SPR_BAG_ICON_PAL_SUB 8
+#define SPR_BOX_PAL_SUB          0
+#define SPR_SELECTED_PAL_SUB     1
+#define SPR_PKMN_PAL_SUB         2
+#define SPR_BAG_ICON_PAL_SUB     8
 #define SPR_BAG_ICON_SEL_PAL_SUB 9
 //#define SPR_ITEM_ICON_PAL_SUB 10
-#define SPR_ARROW_X_PAL_SUB 11
-#define SPR_BACK_PAL_SUB 12
-#define SPR_DOWN_PAL_SUB 13
+#define SPR_ARROW_X_PAL_SUB  11
+#define SPR_BACK_PAL_SUB     12
+#define SPR_DOWN_PAL_SUB     13
 #define SPR_TRANSFER_PAL_SUB 15
     // #define SPR_TYPE_PAL_SUB( p_type ) ( 10 + ( p_type ) )
 
@@ -316,8 +316,14 @@ namespace BAG {
         if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
             IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
 
-            display = ITEM::getItemName( p_itemId );
-            descr   = ITEM::getItemDescr( p_itemId );
+            if( p_data->m_itemType & ITEM::ITEMTYPE_BERRY ) {
+                display = std::string( GET_STRING( 575 ) )
+                          + std::to_string( ITEM::itemToBerry( p_itemId ) ) + ": "
+                          + ITEM::getItemName( p_itemId );
+            } else {
+                display = ITEM::getItemName( p_itemId );
+            }
+            descr = ITEM::getItemDescr( p_itemId );
             if( p_data->m_itemType != ITEM::ITEMTYPE_KEYITEM
                 && p_data->m_itemType != ITEM::ITEMTYPE_FORMECHANGE ) {
                 snprintf( buffer, 99, "x %d", p_count );
@@ -1052,10 +1058,58 @@ namespace BAG {
     }
 
     std::vector<std::pair<IO::inputTarget, u8>> bagUI::getTouchPositions( ) {
-        auto res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        auto         res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        SpriteEntry* oam = IO::Oam->oamBuffer;
 
-        // TODO
+        // back
+        if( !oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden ) {
+            res.push_back( std::pair<IO::inputTarget, u8>{
+                IO::inputTarget( oam[ SPR_ARROW_BACK_OAM_SUB ].x, oam[ SPR_ARROW_BACK_OAM_SUB ].y,
+                                 oam[ SPR_ARROW_BACK_OAM_SUB ].x + 24,
+                                 oam[ SPR_ARROW_BACK_OAM_SUB ].y + 24 ),
+                0 } );
+        }
 
+        // forwards
+        if( !oam[ SPR_ARROW_DOWN_OAM_SUB ].isHidden ) {
+            res.push_back( std::pair<IO::inputTarget, u8>{
+                IO::inputTarget( oam[ SPR_ARROW_DOWN_OAM_SUB ].x, oam[ SPR_ARROW_DOWN_OAM_SUB ].y,
+                                 oam[ SPR_ARROW_DOWN_OAM_SUB ].x + 24,
+                                 oam[ SPR_ARROW_DOWN_OAM_SUB ].y + 24 ),
+                90 } );
+        }
+
+        // backwards
+        if( !oam[ SPR_ARROW_UP_OAM_SUB ].isHidden ) {
+            res.push_back( std::pair<IO::inputTarget, u8>{
+                IO::inputTarget( oam[ SPR_ARROW_UP_OAM_SUB ].x, oam[ SPR_ARROW_UP_OAM_SUB ].y,
+                                 oam[ SPR_ARROW_UP_OAM_SUB ].x + 24,
+                                 oam[ SPR_ARROW_UP_OAM_SUB ].y + 24 ),
+                91 } );
+        }
+
+        // page icons
+
+        for( u8 i = 0; i < 5; ++i ) {
+            res.push_back( std::pair<IO::inputTarget, u8>{
+                IO::inputTarget( oam[ SPR_BAG_ICON_OAM_SUB + i ].x,
+                                 oam[ SPR_BAG_ICON_OAM_SUB + i ].y,
+                                 oam[ SPR_BAG_ICON_OAM_SUB + i ].x + 27,
+                                 oam[ SPR_BAG_ICON_OAM_SUB + i ].y + 27 ),
+                1 + i } );
+        }
+
+        // items
+        for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
+            if( !oam[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].isHidden ) {
+                res.push_back( std::pair<IO::inputTarget, u8>{
+                    IO::inputTarget( oam[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].x,
+                                     oam[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].y,
+                                     oam[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].x + 118,
+                                     oam[ SPR_ITEM_WINDOW_OAM_SUB( i ) ].y + 19 ),
+                    100 + i } );
+            }
+        }
         return res;
     }
 

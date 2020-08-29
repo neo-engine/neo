@@ -516,7 +516,7 @@ namespace SAVE {
              SAVE::SAV.getActiveFile( ).m_initGameItemCount = 4;
              SAVE::SAV.getActiveFile( ).m_initGameItems[ 0 ] = I_WISHING_CHARM;
              SAVE::SAV.getActiveFile( ).m_initGameItems[ 1 ] = I_SHINY_CHARM;
-             SAVE::SAV.getActiveFile( ).m_initGameItems[ 2 ] = I_EXP_SHARE;
+             SAVE::SAV.getActiveFile( ).m_initGameItems[ 2 ] = I_EXP_ALL;
              SAVE::SAV.getActiveFile( ).m_initGameItems[ 3 ] = I_SUPER_ROD;
 
             return true;

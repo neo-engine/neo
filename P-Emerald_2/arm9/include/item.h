@@ -80,7 +80,7 @@ namespace ITEM {
         case ITEMTYPE_TM:
             return 469;
         default:
-            return ' ';
+            return 467;
         }
     }
 

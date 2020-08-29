@@ -317,6 +317,7 @@ namespace NAV {
         case L_SOOTOPOLIS_GYM:
         case L_PROF_BIRCH_S_LAB:
         case L_LILYCOVE_MUSEUM: return 1;
+        case L_PRETTY_PETAL:
         case L_FORTREE_CITY:
         case L_PETALBURG_WOODS: return 5;
         default: return 0;
@@ -416,6 +417,7 @@ namespace NAV {
                     }
                 }
             } else if( p_style == MSG_MART_ITEM ) {
+                p_noDelay = true;
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
                 TEXT_CACHE_1 = TEXT_CACHE_2 = "";
                 IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 51, 32, 64,
@@ -468,7 +470,7 @@ namespace NAV {
                 if( !p_noDelay ) {
                     if( p_message[ cpos ] == '[' ) {
                         sp = true;
-                        tmp += p_message[ cpos ];
+                        tmp = p_message[ cpos ];
                         ++cpos;
                         continue;
                     }

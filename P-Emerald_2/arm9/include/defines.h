@@ -92,7 +92,7 @@ constexpr u16 MAX_MAP_STRINGS  = 800;
 constexpr u8  MAX_ACHIEVEMENTS = 50;
 constexpr u8  MAX_BADGENAMES   = 25;
 constexpr u8  NUM_BGS          = 12;
-constexpr u8  INITIAL_NAVBG    = NUM_BGS - 1;
+constexpr u8  INITIAL_NAVBG    = 10;
 
 constexpr u8 DAYTIME_NIGHT   = 0;
 constexpr u8 DAYTIME_MORNING = 1;

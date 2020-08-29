@@ -42,8 +42,8 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 // } (female)
 //
 
-// ,, \x5e
-// '' \x5d
+// ,, [131]
+// '' [129]
 // ´´ \"
 
 const char* SAVE::EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ]
@@ -199,7 +199,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "Fossil Maniac's House", "Haus des Fossilienmaniac" },
     { "Lanette's House", "Lanettes Haus" },
-    { "Littleroot Town\n\x5d"
+    { "Littleroot Town\n[129]"
       "A town that can't be shaded any hue.\"",
       "Wurzelheim" },
     { "Prof. Birch's Lab", "Prof. Birks Labor" },
@@ -221,12 +221,12 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "" },
 
     { "If Pok\xe9mon get tired, take them to\na Pok\xe9mon Center.\r"
-      "There's a Pok\xe9mon Center in Oldale Town right close by.",
+      "There's a Pok\xe9mon Center in Oldale Town\nright close by.",
       "" },
     { "Mom: See, [PLAYER]?\nIsn't it nice in here, too?", "" },
-    { "\x5dRejuvenate your tired partners\"\nPok\xe9mon Center", "" },
-    { "Oldale Town\n\x5dWhere things start of scarce.\"", "Rosaltstadt" },
-    { "\x5dSelect items for your convenience\"\nPok\xe9mon Mart", "" },
+    { "[129]Rejuvenate your tired partners\"\nPok\xe9mon Center", "" },
+    { "Oldale Town\n[129]Where things start of scarce.\"", "Rosaltstadt" },
+    { "[129]Select items for your convenience\"\nPok\xe9mon Mart", "" },
 
     // 20
 
@@ -255,10 +255,10 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     // 30
 
-    { "Pok\xe9mon magazines!\n\x5dThe Unown - Hoenn Edition\"|\n"
-      "\x5dHow to Train Your Bagon\"|\nAll of them are somewhat boring|",
-      "Pok\xe9mon-Magazine!\n\x5eIcognito in Hoenn\x5d|\n"
-      "\x5eKindwurmz\xe4hmen leicht gemacht\x5d|\nKeines wirkt besonders ansprechend|" },
+    { "Pok\xe9mon magazines!\n[129]The Unown - Hoenn Edition\"|\n"
+      "[129]How to Train Your Bagon\"|\nAll of them are somewhat boring|",
+      "Pok\xe9mon-Magazine!\n[131]Icognito in Hoenn[129]|\n"
+      "[131]Kindwurmz\xe4hmen leicht gemacht[129]|\nKeines wirkt besonders ansprechend|" },
     { "I'm sorry, but we're currently\nrenovating the top floor.",
       "Es tut mir Leid, aber wir bauen\ndas Obergeschoss gerade um." },
     { "That PC in the corner there is for any\nPok\xe9mon Trainer to use.\r"
@@ -267,14 +267,16 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "[PLAYER] booted up the PC.", "[PLAYER] schaltet den PC ein." },
     { "A message from Dad!\r"
       "Dad: Hi [PLAYER]! Welcome to our new home.\r"
-      "I'm busy right now, so could you please come\nand visit me in my Gym in Petalburg City?\r"
-      "Ah, this Potion may come in handy for your journey.",
+      "I'm busy right now, so I can't\nwelcome you in person.\r"
+      "But we should meet nevertheless!\r"
+      "So could you please come\nand visit me in my Gym in Petalburg City?\r"
+      "Ah, this Potion may come in handy\nfor your journey.",
       "" },
 
     { "When Pok\xe9mon battle, they eventually\nlevel up and become stronger.", "" },
     { "If the Pok\xe9mon with you become stronger,\nyou'll be able to go farther away from here.",
       "" },
-    { "When a Pok\xe9mon battle starts, the one at the top-left of the list goes out first.\r"
+    { "When a Pok\xe9mon battle starts, the one at the\ntop-left of the list goes out first.\r"
       "So, when you get more Pok\xe9mon in your party,\ntry switching around their order.\r"
       "It could give you an advantage.",
       "" },
@@ -291,7 +293,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "Mom: [PLAYER], how do you like your new room?\r"
       "Good! Everything's put away neatly!\r"
-      "They finished moving everything in downstairs, too!\r"
+      "They finished moving everything in\ndownstairs, too!\r"
       "Pok\xe9mon movers are so convenient!",
       "" },
     { "The clerk says they're all sold out.\nI can't buy any Pok\xe9 Balls.", "" },
@@ -337,7 +339,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "in the wild to do more research|\r"
       "When does Prof. Birch spend time at home?",
       "" },
-    { "Interviewer: |this report from in front of Petalburg Gym.", "" },
+    { "Interviewer: |this report from in front of\nPetalburg Gym.", "" },
 
     { "", "" },
     { "Using a PC you can send even items!\n"
@@ -345,7 +347,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "" },
     { "Um, um, um!", "" },
     { "If you go outside and go in the grass,\nwild Pok\xe9mon will jump out!\r"
-      "It's dangerous if you don't have your own Pok\xe9mon!",
+      "It's dangerous if you don't have your\nown Pok\xe9mon!",
       "" },
     { "Oh, hello. And you are?\r"
       "| | | | | | | | |\n| | | | | | | | |\r"
@@ -385,8 +387,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Oh, you're [PLAYER], aren't you?\nMoved in next door, right?\r"
       "My name's Brendan. So hi, neighbor.\r"
       "Huh? Hey, [PLAYER],\ndon't you have a Pok\xe9mon?\r"
-      "Dad, Prof. Birch, said that our new next-door neighbor is a Gym Leader's kid,\n"
-      "so I assumed you would already have some\ncool, strong Pok\xe9mon|\r"
+      "Dad, Prof. Birch, said that our new\nnext-door neighbor is a Gym Leader's kid|\r"
+      "So, I assumed you would already have\nsome cool, strong Pok\xe9mon|\r"
       "Do you want me to go catch you one?\r"
       "Ah, I forgot|\r"
       "I'm supposed to go help my dad\ncatch some wild Pok\xe9mon.\r"
@@ -399,8 +401,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     // 70
 
-    { "That Brendan!\r"
-      "I guess our child is too busy with Pok\xe9mon to notice that you came to visit|",
+    { "That [RIVAL]!\r"
+      "I guess our child is too busy with Pok\xe9mon\nto notice that you came to visit|",
       "" },
     { "It's a book that is too hand to read.", "" },
     { "It's a half-empty pot of warm coffee.", "" },
@@ -423,7 +425,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "You saved me. Thanks a lot!\r"
       "Oh?\r"
       "Hi, you're [PLAYER]!\r"
-      "This is not the place to chat, so come by my Pok\xe9mon Lab later, okay?",
+      "This is not the place to chat, so come by my\nPok\xe9mon Lab later, okay?",
       "" },
     { "Prof. Birch: So, [PLAYER].\r"
       "I've heard so much about you\nfrom your father.\r"
@@ -437,8 +439,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "[PLAYER] received [TEAM:0].", "[PLAYER] erhielt [TEAM:0]." },
     { "Would you like to give a nickname to [TEAM:0]?", "" },
-    { "Prof. Birch: If you work at Pok\xe9mon and gain experience,\r"
-      "I think you'll make an extremely good\nPok\xe9mon Trainer.\r"
+    { "Prof. Birch: If you work at Pok\xe9mon and gain\nexperience, I think you'll make an\n"
+      "extremely good Pok\xe9mon Trainer.\r"
       "My kid, [RIVAL], is also studying Pok\xe9mon\nwhile helping me out.",
       "" },
     { "Prof. Birch: Oh, don't be that way.\nYou should go meet my kid.", "" },
@@ -447,14 +449,14 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "" },
 
     { "Prof. Birch: [RIVAL]?\nGone home, I think.\r"
-      "Or maybe that kid's scrabbling around in tall grass again somewhere|\r"
-      "If you or your Pok\xe9mon get  tired,\nyou should get some rest at home.",
+      "Or maybe that kid's scrabbling around in\ntall grass again somewhere|\r"
+      "If you or your Pok\xe9mon get tired,\nyou should get some rest at home.",
       "" },
-    { "Prof. Birch is studying the habitats and distribution of Pok\xe9mon.\r"
+    { "Prof. Birch is studying the habitats and\ndistribution of Pok\xe9mon.\r"
       "The Prof enjoys [RIVAL]'s help, too.\nThere's a lot of love there.",
       "" },
     { "You saved Prof. Birch!\nI'm so glad!", "" },
-    { "Oh, [RIVAL] went out to Route 103 just a little while ago.\r"
+    { "Oh, [RIVAL] went out to Route 103\njust a little while ago.\r"
       "Like father, like child.\n[RIVAL] can't stay quietly at home.",
       "" },
     { "Mom: How are you doing, [PLAYER]?\nYou look a little tired.\r"
@@ -465,13 +467,13 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
 
     { "Mom: Take care, honey!.", "" },
     { "Aaaah! Wait!\nPlease don't come in here.", "" },
-    { "I just discovered the footprints of a rare Pok\xe9mon!\r"
+    { "I just discovered the footprints\nof a rare Pok\xe9mon!\r"
       "Wait until I finish sketching them, okay?",
       "" },
     { "", "" },
     { "Hi!\nI work at a Pok\xe9mon Mart.\r"
       "What is a Pok\xe9mon Mart you may ask?\r"
-      "It is a building just as the one right behind me. Just look for our blue roof.\r"
+      "It is a building just as the one right behind me.\nJust look for our blue roof.\r"
       "We sell a variety of goods including\nPok\xe9 Balls for catching Pok\xe9mon.\r"
       "Here, I'd like you to have these\nPotions as promotional items.",
       "" },
@@ -498,7 +500,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "She might not say it, but I'm sure she worries about you, [PLAYER].",
       "" },
     { "Prof. Birch: Oh, welcome back, [PLAYER]!\r"
-      "I heard you beat [RIVAL] on your first try. That's excellent!\r"
+      "I heard you beat [RIVAL] on your first try.\nThat's excellent!\r"
       "[RIVAL]'s been helping with my research\nfor a long time.\r"
       "[RIVAL] has an extensive history as a\nPok\xe9mon Trainer already.\r"
       "Here, [PLAYER], I ordered this for my research,\nbut I think you should have this Pok\xe9"
@@ -521,12 +523,12 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "" },
 
     { "[RIVAL]: You know it's more fun to have a\nwhole bunch of Pok\xe9mon.\r"
-      "I'm going to explore all over the place to find different Pok\xe9mon.\r"
+      "I'm going to explore all over the place to find\ndifferent Pok\xe9mon.\r"
       "If I find any cool Pok\xe9mon, you bet I'll try\nto get them with Pok\xe9 Balls.",
       "" },
     { "[RIVAL]: Where should I look for Pok\xe9mon\nnext|", "" },
     { "Prof. Birch: Countless Pok\xe9mon await you!\r"
-      "Argh, I'm getting the itch to get out and do fieldwork again!",
+      "Argh, I'm getting the itch to get out and\ndo fieldwork again!",
       "" },
     { "Mom: Wait, [PLAYER]!", "" },
     { "Mom: [PLAYER]! [PLAYER]! Did you introduce\nyourself to Prof. Birch?\r"
@@ -550,7 +552,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Route 102\nOldale Town \x08", "Route 102\nRosaltstadt \x08" },
 
     { "Route 102\n\x05 Petalburg City", "Route 102\n\x05 Bl\xfctenburg City" },
-    { "Petalburg City\n\x5dWhere people mingle with nature.\"", "Bl\xfctenburg City\n\x5e\x5d" },
+    { "Petalburg City\n[129]Where people mingle with nature.\"", "Bl\xfctenburg City\n[131][129]" },
     { "Wally's House", "Haus von Heiko" },
     { "I'm|not very tall, so I sink\nright into tall grass.\r"
       "The grass goes up my nose and|\nFwafwafwafwafwa|\r"
@@ -774,7 +776,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "" },
     { "Whew|\nThat was awfully close!\r"
       "Thanks to you, he didn't rob me of\nthese important papers.\r"
-      "I know, I'll give you a Great Ball as\nmy thanks!",
+      "I know, I'll give you this Exp. All as\nmy thanks!",
       "" },
     { "Didn't that Team Aqua thug say they were\nafter something in Rustboro, too?", "" },
 
@@ -792,7 +794,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "" },
     { "Whew|\nThat was awfully close!\r"
       "I'm sorry that I got you involved in this mess|\r"
-      "I know, I'll give you a Great Ball as\nmy apology!",
+      "I know, I'll give you this Exp. All as\nmy apology!",
       "" },
 
     // 190
@@ -835,10 +837,299 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     // 200
 
     { "Rustboro City\r"
-      "\x5dThe city probing the integration of\nnature and science.\"",
-      "Metarost City\n\x5e\x5d" },
+      "[129]The city probing the integration of\nnature and science.\"",
+      "Metarost City\n[131][129]" },
     { "If a Pok\xe9mon has many battles, it can\nsometimes change in the way it looks.", "" },
     { "A Pok\xe9mon changes shape?\nIf one did that, I would be shocked!", "" },
+    { "Hello\r"
+      "The more attention you give to flowers,\nthe more beautifully they bloom.\r"
+      "You'll like tending flowers. I'm sure of it.\nYou can have this.",
+      "" },
+    { "While Berry plants are growing,\nwater them with the Wailmer Pail.\r"
+      "Oh, another thing.\r"
+      "If you don't pick Berries for a while,\nthey'll drop off onto the ground.\r"
+      "But they'll sprout again.\r"
+      "Isn't that awesome?\nIt's like they have the will to live.",
+      "" },
+
+    { "Hello!\r"
+      "This is the Pretty Petal flower shop.\nSpreading flowers all over the world!",
+      "" },
+    { "Your name is?\r"
+      "[PLAYER]\nThat's a nice name.",
+      "" },
+    { "[PLAYER], would you like to learn about Berries?", "" },
+    { "Flowers bring so much happiness to people,\ndon't they?", "" },
+    { "Berries grow on trees that thrive only\nin soft, loamy soil.\r"
+      "If you take some Berries, be sure to plant\none in the loamy soil again.\r"
+      "A planted Berry will soon sprout,\ngrow into a plant, flower beautifully,\n"
+      "then grow Berries again.\r"
+      "I want to see the whole wide world\nfilled with beautiful flowers.\r"
+      "That's my dream.\r"
+      "Please help me, Ichiga. Plant Berries\nand bring more flowers into the world.",
+      "" },
+
+    // 210
+
+    { "I'm trying to be like my big sisters.\nI'm growing flowers, too!\r"
+      "Here you go!\nIt's for you!",
+      "" },
+    { "You can plant a Berry and grow it big,\nor you can make a Pokemon hold it.\r"
+      "But now they have a machine that mixes up\ndifferent Berries and makes candies\n"
+      "for Pok\xe9mon.\r"
+      "I want some candy, too.",
+      "" },
+    { "Wow, you have Pok\xe9mon with you, too.\r"
+      "When I get bigger, I'm going to go\nplaces with Pok\xe9mon, too.",
+      "" },
+    { "Pok\xe9mon Trainers' School\r"
+      "If I go to this school, will I be able\nto catch rare Pok\xe9mon easily?",
+      "" },
+    { "Did you know this?\r"
+      "You can have a 2-on-2 battle even if\nyou're not with another Trainer.\r"
+      "If you catch the eyes of two Trainers\nwhen you have two or more Pok\xe9mon,\n"
+      "they'll both challenge you.\r"
+      "Don't you think it'd be cool if you\ncould beat two Trainers by yourself?",
+      "" },
+
+    { "Pok\xe9mon Trainers' School\n[129]We'll teach you anything about Pok\xe9mon\"", "" },
+    { "Cutter's House", "Haus des Zerschneiders" },
+    { "I challenged the Gym Leader, but|\r"
+      "It's not going to be easy winning with my\nFire-type Pok\xe9mon|\r"
+      "Fire-type Pok\xe9mon don't match up\nwell against Rock-type Pok\xe9mon|",
+      "" },
+    { "Devon Corporation\n[129]For all your living needs, we make it all.\"", "" },
+    { "Have you taken tho Pok\xe9mon Gym challenge?\r"
+      "When you get that shiny Gym Badge\nin hand, I guess Trainers begin to\n"
+      "realize what is required of them.",
+      "" },
+
+    // 220
+
+    { "The Devon Corporation|\nWe all just shorten it to Devon.\r"
+      "That company makes all sorts of\nconvenient products.",
+      "" },
+    { "Ah, the sea|\nHow I miss the sea|\r"
+      "The crushing waves below|\nThe restless sun above|\r"
+      "How I wish I could experience that\nonce again|",
+      "" },
+    { "Would you like to offer your\nWishing Charm to the old man?", "" },
+    { "Haha, thank you, but I can't accept\nsomething so precious.\r"
+      "Besides, it would be wasted on such\nan old man as myself|\r"
+      "My days as a sailor are long,\nlong gone, kid|\r"
+      "| | | | |\r"
+      "But that reminds me, you look like\na fine Pok\xe9mon Trainer.\r"
+      "Perhaps this Old Sea Map is of\ninterest to you|",
+      "" },
+    { "Back in the day, I always tried to\nfind the place marked on the map,\n"
+      "but I never succeeded.\r"
+      "But you look like someone who is\nblessed with more luck than me|",
+      "" },
+
+    { "[129]Timesaving tunnel nearing completing\"\r"
+      "|Is what it says on the sign, but there's\nalso a big [129]X\" splashed across it|",
+      "" },
+    { "Route 115\n[477] Rustboro City", "Route 115\n[477] Metarost City" },
+    { "Exploring a cave isn't like walking on a road.\r"
+      "You never know when wild Pok\xe9mon will appear.\nIt's full of suspense.",
+      "" },
+    { "Route 116\n[475] Rustboro City", "Route 116\n[475] Metarost City" },
+    { "--- Trainer Tips ---\r"
+      "If you want to stop a Pok\xe9mon from evolving,\npress the B Button while it is trying to evolve.\r"
+      "The startled Pok\xe9mon will stop.\r"
+      "This is called an evolution cancel.",
+      "" },
+
+    // 230
+
+    { "Hello? Didn't we meet before?\nI think back in Petalburg City.\r"
+      "Let me introduce myself.\nMy name's Scott.\r"
+      "I've been traveling everywhere in\nsearch of outstanding Trainers.\r"
+      "More specifically, I'm looking for\nPok\xe9mon battle experts.\r"
+      "So, what brings you to this School?\nAre you a Trainer, too?\r"
+      "The first thing you should do is to\nhave a Pok\xe9mon learn the move Cut.\r"
+      "If I remenber correctly, someone in\nthis town has Cut.",
+      "" },
+    { "Scott: Hmm|\r"
+      "The talent levels of the students here are\nunknown. The potentiel's there.",
+      "" },
+    { "It's this student's notebook|\r"
+      "Pok\xe9mon are to be caught using Pok\xe9 Balls.\r"
+      "Up to six Pok\xe9mon can accompany\na Pok\xe9mon Trainer.\r"
+      "A Trainer is someone who catches Pok\xe9mon,\nraises them, and battles with them.\r"
+      "A Trainer's mission is to defeat the strong\nTrainers who await challengers\n"
+      "in Pok\xe9mon Gyms.",
+      "" },
+    { "Students who don't study get a little taste\nof my Quick Claw.\r"
+      "Whether or not you are a good student will be\nevident from the way you use this item.",
+      "" },
+    { "A Pok\xe9mon holding the Quick Claw will\noccasionally speed up and get to move\n"
+      "before its opponent.\r"
+      "There are many other items that are meant\nto be held by Pok\xe9mon.\r"
+      "Just those alone will give you\nmany topics to study!",
+      "" },
+
+    { "I always wanted a Seedot, and\nI'm finally getting one!", "" },
+    { "I'm trading Pok\xe9mon with my friend right now.", "" },
+    { "You know how some Pok\xe9mon moves can\nconfuse a Pok\xe9mon?\r"
+      "A confused Pok\xe9mon will sometimes\nattack itself without meaning to.\r"
+      "But once it leaves battle, it will\nreturn to normal.",
+      "" },
+    { "Pok\xe9mon can hold items, but they\ndon't know what to do with man-made items\n"
+      "like Potion and Antidote.",
+      "" },
+    { "A Pok\xe9mon holding a Berry will heal itself|\r"
+      "There are many kinds of items that\nPok\xe9mon can hold|\r"
+      "Boy, it sure is hard taking notes down|",
+      "" },
+
+    // 240
+
+    { "That determined expression|\nThat limber way you move|\r"
+      "And your well-trained Pok\xe9mon|\r"
+      "You're obviously a skilled Pok\xe9mon Trainer!\r"
+      "No, wait, don't say a word.\nI can tell just by looking at you.\r"
+      "I'm sure that you can put this\nHidden Machine to good use.\r"
+      "No need to be modest or shy.\nGo on, take it!",
+      "" },
+    { "That Hidden Machine, or HM for short, is Cut.\r"
+      "An HM move is one that can be used\nby Pok\xe9mon outside of battle.\r"
+      "Any Pok\xe9mon that's learned Cut can\nchop down thin trees if the Trainer\n"
+      "has earned the Stone Badge.",
+      "" },
+    { "When they were expanding the city of\nRustboro, my dad helped out.\r"
+      "He made his Pok\xe9mon use Cut to clear\nthe land of trees.",
+      "" },
+    { "Oh, Who might you be?\nYou're a new face around these parts.\r"
+      "Have you just transferred into the\nPok\xe9mon Trainers' School?",
+      "" },
+    { "The man next door gave me an HM!\r"
+      "I used it to teach my Pok\xe9mon how to\nCut down skinny trees.",
+      "" },
+
+    { "My Pok\xe9mon has a Naive nature, and my\nfriend's has a Jolly nature.\r"
+      "It's fascinating how Pok\xe9mon\nhave personalities!",
+      "" },
+    { "The old sailor Mr. Briney lives in a\ncottage by the sea.\r"
+      "He goes for walks in the tunnel\nevery so often.",
+      "" },
+    { "My Pok\xe9mon evolved.\nIt has a lot of HP now.\r"
+      "I should buy Super Potions for it\ninstead of ordinary Potions." },
+    { "I'm getting an Escape Rope just in case\nI get lost in a cave.\r"
+      "I just need to use it to get back to\nthe entrance.",
+      "" },
+    { "I'm buying some Paralyze Heals and\nAntidotes.\r"
+      "Just in case I run into Shroomish\nin Petalburg Woods.",
+      "" },
+
+    // 250
+
+    { "I'm sorry, only authorized people\nare allowed to enter here.", "" },
+    { "Hello and welcome to the\nDevon Corporation.\r"
+      "We're proud produces of items and\nmedicine that enhance your life.",
+      "" },
+    { "Yo, how's it going?\r"
+      "Listen, my friend!\nWould you like to become the Champion?\r"
+      "I'm no Trainer, not me, but I can\nsure give you winning advice.\r"
+      "That's settled, then! We'll aim for the\nPok\xe9mon Championship together!\r"
+      "It's your job as a Trainer to collect\nGym Badges, am I right?\r"
+      "But Gym Leaders aren't pushovers!\r"
+      "And that's where I come in!\nI'm here to provide expert advice!\r"
+      "Roxanne, the Gym Leader, is a user of\nRock-type Pok\xe9mon.\r"
+      "The Rock type is very durable, but it can't\nstand Water-type and Grass-type moves.\r"
+      "Come and see me afterwards, if you beat\nthe Gym Leader.\r"
+      "Well, go for it!",
+      "" },
+    { "Whoa! What a breathtaking victory!\nMy cheering must've worked!\r"
+      "Great!\nCheck your Trainer's Card.\r"
+      "The Stone Badge you got should be\nproperly recorded on it.\r"
+      "In other words|\r"
+      "You've climbed the first step on\nthe stairs to the Championship!\r"
+      "That's got to feel awesome!",
+      "" },
+    { "Hello, I am Roxanne, the Rustboro\nPok\xe9mon Gym Leader.\r"
+      "I became a Gym Leader so that I might\napply what I learned at the Pok\xe9mon\n"
+      "Trainers' School in battle.\r"
+      "Would you kindly demonstrate how you battle,\nand with which Pok\xe9mon?",
+      "" },
+
+    { "The Pok\xe9mon League's rules state that\nTrainers are to be given this Badge\n"
+      "if they defeat a Gym Leader.\r"
+      "Please accept the official\nPok\xe9mon League Stone Badge.",
+      "" },
+    { "The Stone Badge enables your Pok\xe9mon to\nuse the HM move Cut outside of battle.\r"
+      "Further, now that you have a Gym Badge,\nstronger wild Pok\xe9mon will approach you.\r"
+      "This TM here may help you\nwhen battling them.",
+      "" },
+    { "That Technical Machine, TM48,\ncontains Rock Tomb.\r"
+      "It not only inflicts damage by dropping\nrocks, it also lowers Speed.\r"
+      "If you use a TM, it instantly teaches\nthe move to a Pok\xe9mon.\r"
+      "Remember, you can use a TM as often as you\nlike, so try to experiment a little bit.",
+      "" },
+    { "Since you are so strong, you should\nchallenge other Gym Leaders.\r"
+      "By battling many Trainers, you should\nlearn many things.",
+      "" },
+    { "Rustboro City Pok\xe9mon Gym", "Metarost City Pok\xe9mon-Arena" },
+
+    // 260
+
+    { "[RIVAL]: Oh hey, [PLAYER]!\nYou're challanging the Pok\xe9mon Gym?\r"
+      "Then let me see how strong you have\nbecome since we last battled!",
+      "" },
+    { "[RIVAL]: That was nice!\nYou sure became strong fast, [PLAYER].\r"
+      "By the way, [PLAYER], how's you Pok\xe9"
+      "Dex?\nHave you filled in any pages yet?\r"
+      "Mine rules.\r"
+      "Anyways, I gotta keep going.\nSo, see ya, [PLAYER]!",
+      "" },
+    { "Tunneler's Rest House", "" },
+    { "Rusturf Tunnel\n[129]Linking Rustboro and Verdanturf\"\r"
+      "[129]The tunnel project has been canceled.\"",
+      "" },
+    { "Nnn| Roar!\r"
+      "I want to dig that tunnel!",
+      "" },
+
+    { "Get out!\nOut of the way!", "" },
+    { "Wait! Pleeeaaase!\r"
+      "Don't take my Goods!",
+      "" },
+    { "Oh, it's you!\r"
+      "You're that fantastic Trainer who\nhelped me in Petalburg Woods!\r"
+      "Help me! I was robbed by Team Aqua!\nI have to get the Devon Goods back!\r"
+      "If I don't|\nI'm going to be in serious trouble.",
+      "" },
+    { "That shady character, I think he took\noff towards the tunnel over there.", "" },
+    { "Nnn| Roar!\nWhat's going on?\r"
+      "I was digging the tunnel without\nany tools when some goon ordered me out!\r"
+      "That tunnel's filled with Pok\xe9mon\nthat react badly to loud noises.\r"
+      "They could cause an uproar.\r"
+      "That's why we stopped using heavy\nequipment for tunneling|\r"
+      "I'm worried that the goon will do something\nstupid and startle the Pok\xe9mon into\n"
+      "an uproar.",
+      "" },
+
+    // 270
+
+    { "--- Trainer Tips ---\r"
+      "Your Bag has several Pockets.\r"
+      "Items you obtain are automatically\nplaced in the appropriate Pockets.\r"
+      "No Trainer can afford to be\nwithout a Bag of their own.",
+      "" },
+    { "Oh, neat!\nThat's the Badge from Rustboro Gym!\r"
+      "You must be a Trainer.\nYou should try using this item.",
+      "" },
+    { "It's a Miracle Seed.\r"
+      "If a Pok\xe9mon holds that item, its Grass-type\nmoves become stronger.\r"
+      "Besides Miracle Seed, I think there are other\nconvenient items for Pok\xe9mon to hold.",
+      "" },
+    { "Dad: I see| So, you've beaten\nthe Gym Leader in Rustboro City.\r"
+      "But there are many more Trainers\nwho are stronger than you, [PLAYER].\r"
+      "Across the sea in Dewford Town is a\nGym Leader named Brawly.\r"
+      "You should challenge him.",
+      "" },
+    { "Better get going|", "" },
+
 };
 
 const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
@@ -1118,8 +1409,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "%s was sent to\nthe Pok\xe9mon Storage System.",
       "%s wurde an das\nPok\xe9mon-Lagerungssystem\ngeschickt." },
-    { "Box \x5d%s\" is full.", "Box \x5e%s\x5d ist voll." },
-    { "%s was deposited to Box \x5d%s\".", "%s wurde in Box \x5e%s\x5d abgelegt." },
+    { "Box [129]%s\" is full.", "Box [131]%s[129] ist voll." },
+    { "%s was deposited to Box [129]%s\".", "%s wurde in Box [131]%s[129] abgelegt." },
     { "There is no space left for additional Pok\xe9mon.",
       "Du hast keinen Platz f\xfcr weitere Pok\xe9mon." },
     { "%s was released.", "%s wurde wieder\nfreigelassen." },
@@ -1545,7 +1836,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
       "Aber zun\xe4"
       "chst, willkommen in der Welt der Pok\xe9mon!" },
 
-    { "This is what we call a \x5dPok\xe9mon.\"", "Dies ist ein sogenanntes \x5ePok\xe9mon\x5d." },
+    { "This is what we call a [129]Pok\xe9mon.\"",
+      "Dies ist ein sogenanntes [131]Pok\xe9mon[129]." },
     { "This world is widely inhabited by creatures known as Pok\xe9mon.",
       "Auf dieser Welt leben Wesen, die als Pok\xe9mon bekannt sind." },
     { "We humans live alongside Pok\xe9mon, at times as friendly playmates,",
@@ -1772,5 +2064,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Would you like to water the berries?", "M\xf6"
                                               "chtest du die Beeren gie?\xdf"
                                               "en?" },
+
+    { "No. ", "Nr. " },
 
 };

@@ -2617,8 +2617,18 @@ namespace MAP {
                     o.first                                     = 255;
                     o.second.m_event.m_data.m_hmObject.m_hmType = 0;
                 }
+                if( o.second.m_event.m_data.m_hmObject.m_hmType == mapSpriteManager::SPR_CUT ) {
+                    SOUND::playSoundEffect( SFX_HM_CUT );
+                    for( u8 g = 1; g <= 4; ++g ) {
+                        for( u8 f = 0; f < 4; ++f ) { swiWaitForVBlank( ); }
+                        _mapSprites.drawFrame( o.first, g, false, true );
+                    }
+                    for( u8 f = 0; f < 4; ++f ) { swiWaitForVBlank( ); }
+                    _mapSprites.destroySprite( o.first );
 
-                if( o.second.m_event.m_data.m_hmObject.m_hmType == mapSpriteManager::SPR_CUT ) {}
+                    o.first                                     = 255;
+                    o.second.m_event.m_data.m_hmObject.m_hmType = 0;
+                }
             }
         }
     }

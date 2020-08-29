@@ -112,7 +112,7 @@
 #define I_ODD_KEYSTONE 111
 #define I_GRISEOUS_ORB 112
 #define I_TEA 113
-#define I_MYSTICTICKET 114
+#define I_MYSTIC_TICKET 114
 #define I_AUTOGRAPH 115
 #define I_DOUSE_DRIVE 116
 #define I_SHOCK_DRIVE 117
@@ -193,7 +193,7 @@
 #define I_BRIGHT_POWDER 213
 #define I_WHITE_HERB 214
 #define I_MACHO_BRACE 215
-#define I_EXP_SHARE 216
+#define I_EXP_ALL 216
 #define I_QUICK_CLAW 217
 #define I_SOOTHE_BELL 218
 #define I_MENTAL_HERB 219
@@ -647,7 +647,7 @@
 #define I_TM97 691
 #define I_TM98 692
 #define I_TM99 693
-#define I_TM100 694
+#define I_HM00 694
 #define I_POWER_PLANT_PASS 695
 #define I_MEGA_RING 696
 #define I_INTRIGUING_STONE 697

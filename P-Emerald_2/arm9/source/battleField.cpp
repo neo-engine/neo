@@ -58,8 +58,6 @@ binding band, grip claw
 blunder policy: inc speed by 2 when move misses
 destiny knot: if user infatuated, also attacker
 eject pack: swap out once stat is lowered
-focus band: 10% to survive fatal hit
-focus sash
 heavy-duty boots: unaffected by entry hazards
 red card
 throat spray: inc sp atk by 2 after sound-based move
@@ -116,6 +114,8 @@ namespace BATTLE {
         switch( pkmn->getItem( ) ) {
         case I_BERRY_JUICE:
             if( lowhptrigger ) {
+                p_ui->logItem( pkmn, p_opponent );
+
                 snprintf( buffer, 99, GET_STRING( 539 ),
                           p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                           ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -131,6 +131,7 @@ namespace BATTLE {
                 bs       = bs.negative( ).invert( );
                 auto res = addBoosts( p_opponent, p_pos, bs );
                 if( res != boosts( ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 537 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -143,6 +144,7 @@ namespace BATTLE {
         }
         case I_MENTAL_HERB:
             if( userVolStat & ATTRACT ) {
+                p_ui->logItem( pkmn, p_opponent );
                 snprintf( buffer, 99, GET_STRING( 537 ),
                           p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                           ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -174,6 +176,7 @@ namespace BATTLE {
                     if( ripen ) { bs.addBoosts( tmp ); };
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -187,6 +190,7 @@ namespace BATTLE {
             }
             case I_CHERI_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, PARALYSIS ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -199,6 +203,7 @@ namespace BATTLE {
                 break;
             case I_CHESTO_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, SLEEP ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -212,6 +217,7 @@ namespace BATTLE {
             case I_DRASH_BERRY:
             case I_PECHA_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, POISON ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -225,6 +231,7 @@ namespace BATTLE {
             case I_CHRO_BERRY:
             case I_RAWST_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, BURN ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -238,6 +245,7 @@ namespace BATTLE {
             case I_PUMKIN_BERRY:
             case I_ASPEAR_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, FROZEN ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -250,6 +258,7 @@ namespace BATTLE {
                 break;
             case I_ORAN_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -262,6 +271,7 @@ namespace BATTLE {
             case I_RIE_BERRY:
             case I_PERSIM_BERRY:
                 if( userVolStat & CONFUSION ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 278 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -274,6 +284,7 @@ namespace BATTLE {
                 break;
             case I_GARC_BERRY:
                 if( userVolStat & ATTRACT ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 278 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -286,6 +297,7 @@ namespace BATTLE {
                 break;
             case I_LUM_BERRY:
                 if( pkmn->m_statusint || ( userVolStat & CONFUSION ) ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -299,6 +311,7 @@ namespace BATTLE {
                 break;
             case I_SITRUS_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -311,6 +324,7 @@ namespace BATTLE {
                 break;
             case I_FIGY_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -323,6 +337,7 @@ namespace BATTLE {
                 break;
             case I_WIKI_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -335,6 +350,7 @@ namespace BATTLE {
                 break;
             case I_MAGO_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -347,6 +363,7 @@ namespace BATTLE {
                 break;
             case I_AGUAV_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -359,6 +376,7 @@ namespace BATTLE {
                 break;
             case I_IAPAPA_BERRY:
                 if( lowhptrigger ) {
+                    p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, GET_STRING( 279 ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -376,6 +394,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -394,6 +413,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -412,6 +432,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -430,6 +451,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -448,6 +470,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -474,6 +497,7 @@ namespace BATTLE {
 
                     auto res2 = addBoosts( p_opponent, p_pos, res );
                     if( res2 != boosts( ) ) {
+                        p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
@@ -527,6 +551,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 537 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -546,6 +571,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 537 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -565,6 +591,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 537 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -585,6 +612,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 537 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -604,6 +632,7 @@ namespace BATTLE {
 
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 537 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -624,6 +653,7 @@ namespace BATTLE {
                 break;
 
             case I_EJECT_BUTTON:
+                p_ui->logItem( target, p_target.first );
                 snprintf( buffer, 99, GET_STRING( 537 ),
                           p_ui->getPkmnName( target, p_target.first ).c_str( ),
                           ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -645,6 +675,7 @@ namespace BATTLE {
                 case I_ENIGMA_BERRY:
                     if( p_effectiveness > 100 && target->canBattle( )
                         && target->m_stats.m_curHP < target->m_stats.m_maxHP ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -665,6 +696,7 @@ namespace BATTLE {
                     break;
                 case I_JABOCA_BERRY:
                     if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::PHYSICAL ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -694,6 +726,7 @@ namespace BATTLE {
 
                         auto res = addBoosts( p_target.first, p_target.second, bs );
                         if( res != boosts( ) ) {
+                            p_ui->logItem( target, p_target.first );
                             snprintf( buffer, 99, GET_STRING( 279 ),
                                       p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                       ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -718,6 +751,7 @@ namespace BATTLE {
 
                         auto res = addBoosts( p_target.first, p_target.second, bs );
                         if( res != boosts( ) ) {
+                            p_ui->logItem( target, p_target.first );
                             snprintf( buffer, 99, GET_STRING( 279 ),
                                       p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                       ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -734,6 +768,7 @@ namespace BATTLE {
 
                 case I_ROWAP_BERRY:
                     if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::SPECIAL ) {
+                        p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, GET_STRING( 279 ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
@@ -1708,6 +1743,8 @@ namespace BATTLE {
                                        < getPkmn( m.m_user.first, m.m_user.second )
                                              ->m_stats.m_maxHP )
                                 [[unlikely]] {
+                                    p_ui->logItem( getPkmn( m.m_user.first, m.m_user.second ),
+                                                   m.m_user.first );
                                     bm.m_priority++;
                                     res.push_back( { MESSAGE_ITEM,
                                                      I_CUSTAP_BERRY,
@@ -2674,6 +2711,7 @@ namespace BATTLE {
                         || !_sides[ opponent ? PLAYER_SIDE : OPPONENT_SIDE ].anyHasAbility(
                             A_UNNERVE ) )
                         [[likely]] {
+                            p_ui->logItem( getPkmn( opponent, slot ), opponent );
                             snprintf(
                                 buffer, 99, GET_STRING( 279 ),
                                 p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
@@ -3478,6 +3516,7 @@ namespace BATTLE {
                 default: break;
                 }
                 if( eatitem ) {
+                    p_ui->logItem( target, p_target.first );
                     if( getPkmn( p_target.first, p_target.second )->getAbility( ) != A_RIPEN
                         || supprAbs ) {
                         damage >>= 1;
@@ -3500,8 +3539,35 @@ namespace BATTLE {
 
         p_ui->animateHitPkmn( p_target.first, p_target.second, effectiveness );
 
+        if( damage >= target->m_stats.m_curHP ) { damage = target->m_stats.m_curHP; }
+
         if( p_move.m_moveData.m_flags & MOVE::NOFAINT ) {
             if( damage >= target->m_stats.m_curHP ) { damage = target->m_stats.m_curHP - 1; }
+        }
+
+        // Check for focus sash etc
+        // focus band: 10% to survive fatal hit
+        // focus sash
+        if( damage >= target->m_stats.m_curHP ) {
+            if( target->m_stats.m_curHP == target->m_stats.m_maxHP ) {
+                if( canUseItem( p_target.first, p_target.second, !supprAbs )
+                    && target->getItem( ) == I_FOCUS_SASH ) {
+                    damage = target->m_stats.m_curHP - 1;
+                    p_ui->logItem( target, p_target.first );
+                    // consume item
+                    removeItem( p_ui, p_target.first, p_target.second );
+                }
+                if( canUseItem( p_target.first, p_target.second, !supprAbs )
+                    && target->getItem( ) == I_FOCUS_BAND && rand( ) % 100 < 10 ) {
+                    damage = target->m_stats.m_curHP - 1;
+                    p_ui->logItem( target, p_target.first );
+                }
+
+                if( !supprAbs && target->getAbility( ) == A_STURDY ) {
+                    damage = target->m_stats.m_curHP - 1;
+                    p_ui->logAbility( target, p_target.first );
+                }
+            }
         }
 
         damagePokemon( p_ui, p_target.first, p_target.second, damage );
@@ -3532,12 +3598,14 @@ namespace BATTLE {
                 p_ui->logAbility( target, p_target.first );
                 damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
             } else if( !( userVolStat & HEALBLOCK ) ) {
-                healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
-            }
+                if( user->m_stats.m_curHP < user->m_stats.m_maxHP ) {
+                    healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
-            snprintf( buffer, 99, GET_STRING( 288 ),
-                      p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
-            p_ui->log( buffer );
+                    snprintf( buffer, 99, GET_STRING( 288 ),
+                              p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
+                    p_ui->log( buffer );
+                }
+            }
         }
 
         if( p_move.m_moveData.m_recoil ) {
@@ -3646,6 +3714,7 @@ namespace BATTLE {
                 else if( canUseItem( opponent, slot )
                          && getPkmn( opponent, slot )->getItem( ) == I_POWER_HERB )
                     [[unlikely]] {
+                        p_ui->logItem( getPkmn( opponent, slot ), opponent );
                         snprintf(
                             buffer, 99, GET_STRING( 305 ),
                             p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
