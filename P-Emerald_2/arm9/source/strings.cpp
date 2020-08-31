@@ -442,7 +442,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "It's a PC used for research.\nBetter not mess around with it.",
       "Ein PC, der in der Forschung eingesetzt wird.\nBesser nicht damit spielen!" },
     { "It's a serious-looking machine.\nIt must be used for research.",
-      "Das ist eine kompliziert aussehende Maschine.\nDer Prof wird sie f\xfcr seine Forschungen brauchen|" },
+      "Das ist eine kompliziert aussehende Maschine.\nSie wird wohl f\xfcr Forschungen gebraucht|" },
     { "Hunh? Prof. Birch?\r"
       "The Prof's away on fieldwork.\nErgo, he isn't here.\r"
       "Oh, let me explain what fieldwork is.\r"
@@ -732,7 +732,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "bergl\xfc"
       "cklich sein.\r"
       "| Aber sei bitte vorsichtig.\r"
-      "Sollte etwas passieren, komm wieder nach Hause.\r"
+      "Sollte etwas passieren,\nkomm wieder nach Hause.\r"
       "Lauf, schnapp' sie dir alle, Schatz!" },
 
     // 110
@@ -756,7 +756,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "I'm|not very tall, so I sink\nright into tall grass.\r"
       "The grass goes up my nose and|\nFwafwafwafwafwa|\r"
       "Fwatchoo!",
-      "Ich| bin nicht gro\xdf, ich versinke im hohen Gras.\r"
+      "Ich| bin nicht gro\xdf, ich versinke\nim hohen Gras.\r"
       "Das Gras erreicht meine Nase und|\nHahahaha|\r"
       "Haaatschiiii!" },
     { "Hiya! Are you maybe|\nA rookie Pok\xe9mon Trainer?\r"
@@ -890,8 +890,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Wally: I'm going to go stay with my\nrelatives in Verdanturf Town.\r"
       "I thought I would be lonely by myself,\nso I wanted to take a Pok\xe9mon along.\r"
       "But I've never caught a Pok\xe9mon before.\nI don't know how|",
-      "Heiko: Ich werde meine Verwandten\ninWiesenflur besuchen.\r"
-      "Ich glaube, ich werde mich da doch einsam f\xfchlen,\ndaher w\xfcrde ich gerne ein Pok\xe9mon mitnehmen.\r"
+      "Heiko: Ich werde meine Verwandten\nin Wiesenflur besuchen.\r"
+      "Ich glaube, ich werde mich da einsam f\xfc""hlen,\ndaher m\xf6""chte ich ein Pok\xe9mon mitnehmen.\r"
       "Aber ich habe noch nie eines gefangen.\nIch wei\xdf nicht, wie das geht|" },
     { "Dad: Hm. I see.", "Vater: Oh, ich verstehe|" },
     { "Dad: [PLAYER], you heard that, right?\r"
@@ -916,7 +916,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Wally: [PLAYER]|\nPok\xe9mon hide in tall grass like this, right?\r"
       "Please watch me and see if I can\ncatch one properly.\r"
       "|Whoa!",
-      "Heiko: [PLAYER]|\nPok\xe9mon verstecken sich in hohem Gras, wie hier, nicht?\r"
+      "Heiko: [PLAYER]|\nPok\xe9mon verstecken sich in hohem Gras,\nwie hier, nicht?\r"
       "Bitte bleib hier und schau, ob ich beim\nFangen alles richtig mache.\r"
       "| Whoa!" },
     { "Wally: I did it| It's my|\nMy Pok\xe9mon!",
@@ -951,9 +951,10 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "[PLAYER], wenn du ein guter Trainer werden\nwillst - hier ist mein Rat.\r"
       "Gehe nach Metarost City, gleich hinter\ndiesem Ort.\r"
       "Dort solltest du die Arenaleiterin\nFelizia herausfordern.\r"
-      "Suche danach die anderen Pok\xe9mon Arenen auf\nund besiege deren Leiter.\r"
+      "Suche danach die anderen Pok\xe9mon Arenen\nauf und besiege deren Leiter.\r"
       "Sammle die Orden der verschiedenen Arenen,\nverstehst du?\r"
-      "Ich bin nat\xfcrlich auch ein Arenaleiter.\nAuch wir werden eines Tages gegeneinander antreten.\r"
+      "Ich bin nat\xfcrlich auch ein Arenaleiter.\r"
+      "Auch wir werden eines Tages\ngegeneinander antreten.\r"
       "Aber erst, wenn du st\xe4rker geworden bist,\n[PLAYER]." },
     { "Dad: Hm? Aren't you going to the\nPok\xe9mon Gym in Rustboro City?\r"
       "There's no challenge for me to\nbattle a greenhorn Pok\xe9mon Trainer.\r"
@@ -974,19 +975,19 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "You're either a rookie Pok\xe9mon Trainer,\nor maybe you're just an ordinary kid.",
       "| | | | |\r"
       "Nun, vielleicht auch nicht.\nDeine Kleidung ist noch relativ sauber.\r"
-      "Entweder bist du gerade erst Trainer geworden\noder du bist einfach nur ein ganz normales Kind." },
+      "Entweder bist du ein neuer Trainer\noder du bist nur ein ganz normales Kind." },
 
     // 160
 
     { "I'm roaming the land in search of\ntalented Pok\xe9mon Trainers.\r"
       "I'm sorry to have taken your time.",
-      "Ich reise durch das Land, immer auf der Suche nach talentierten Trainern.\r"
+      "Ich reise durch das Land, immer auf der\nSuche nach talentierten Trainern.\r"
       "Tut mir Leid, wenn ich dich aufgehalten habe." },
     { "I wonder how our Wally is doing|", "Ich frage mich, wie es\nunserem Heiko geht|" },
     { "Wally was really happy when he told\nus that he caught a Pok\xe9mon.\r"
       "It's been ages since I've seen him\nsmile like that.",
-      "Heiko war richtig gl\xfc"
-      "cklich, als er und erz\xe4hlte,\ndass er ein Pok\xe9mon gefangen habe.\r"
+      "Heiko war so gl\xfc"
+      "cklich, als er uns erz\xe4hlte,\ndass er ein Pok\xe9mon gefangen habe.\r"
       "Ich habe ihn schon seit Ewigkeiten\nnicht mehr so gl\xfc"
       "cklich erlebt!" },
     { "You're|\nAh, you must be [PLAYER], right?\r"
@@ -1005,7 +1006,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Ich frage mich, wo er jetzt who sein mag?" },
     { "Wally: Thank you, yes, it did.\nHere's your Pok\xe9mon back.",
       "Heiko: Danke. Ja, wunderbar.\nHier haben Sie Ihr Pok\xe9mon zur\xfc"
-      "ck.\r" },
+      "ck." },
 
     { "Dad: Is that a | Ralts|?\r"
       "I've seen many Ralts already, but this\nis the first blue one I've met.\r"
@@ -1025,13 +1026,14 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Bevor du einen Pok\xe9"
       "ball wirfst,\nschw\xe4"
       "che das Pok\xe9mon zuerst.\r"
-      "Wenn es vergiftet ist, eine Verbrennung hat oder\nschl\xe4"
-      "ft, kann es leichter gefangen werden." },
+      "Wenn es schl\xe4""ft, eine Verbrennung hat oder\n"
+      "vergiftet ist, kann es leichter\ngefangen werden." },
     { "Oh, no, I'm not a Pok\xe9mon Trainer.\r"
       "But that's right, if Pok\xe9mon Trainers lock\neyes, it's a challenge to battle.\r"
       "If you don't want to battle, stay out\nof their sight.",
       "Oh, nein, ich bin kein Trainer.\r"
-      "Aber es stimmt schon, wenn Trainer sich in die\nAugen schauen, ist das eine Herausforderung.\r"
+      "Aber es stimmt schon, wenn Trainer sich in die\nAugen schauen, ist das eine\n"
+      "Herausforderung zum Kampf.\r"
       "Willst du nicht k\xe4mpfen, weiche den Blicken\nder Trainer aus." },
 
     // 170
@@ -1044,17 +1046,19 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "chte zu gerne wissen, wie es auf dem\nMeeresgrund aussieht|" },
     { "You're a thief if you try to steal\nsomeone else's Pok\xe9mon.\r"
       "You should throw Pok\xe9 Balls\nonly at wild Pok\xe9mon.",
-      "Du bist ein gemeiner Dieb, wenn du versuchst,\ndas Pok\xe9mon eines anderen zu fangen."
+      "Du bist ein gemeiner Dieb, wenn du versuchst,\ndas Pok\xe9mon eines anderen zu fangen.\r"
       "Du solltest deine Pok\xe9"
-      "b\xe4lle nur auf\nwilde Pok\xe9mon werfen." },
+      "b\xe4lle\nnur auf wilde Pok\xe9mon werfen." },
     { "--- Trainer Tips ---\r"
       "Any Pok\xe9mon that appears even once\nin a battle is awarded EXP Points.\r"
       "To raise a weak Pok\xe9mon, put it at the\ntop-left of the team list.\r"
       "As soon as a battle starts, switch it out.\nIt will earn EXP Points without taking damage.",
       "--- Tipps f\xfcr Trainer ---\r"
-      "Jedes Pok\xe9mon, das am Kampf teilnimmt, erh\xe4lt\nErfahrungspunkte, auch wenn es nur kurz dabei ist.\r"
+      "Jedes Pok\xe9mon, das am Kampf teilnimmt, erh\xe4lt\nErfahrungspunkte, auch wenn es nur\n"
+      "kurz dabei ist.\r"
       "Setze eines deiner schwachen Pok\xe9mon\ndaher an die Spitze der Liste.\r"
-      "Sobald der Kampf beginnt, wechselst du es aus.\nEs wird E-Punkte bekommen und bleibt unbeschadet." },
+      "Sobald der Kampf beginnt, wechselst du es\naus. Es wird E-Punkte bekommen und\n"
+      "bleibt unbeschadet." },
     { "Sometimes, there ar things on the ground\neven if you can't see them.\r"
       "That's why I always check where I'm walking",
       "Manchmal liegen auf dem Boden Dinge\ndie einem auf Anhieb gar nicht auffallen.\r"
@@ -1079,7 +1083,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Devon Researcher: Hiyaahh!\r"
       "You're a Pok\xe9mon Trainer, aren't you?\nYou've got to help me, please!",
       "Devon-Forscher: Ahhh!\r"
-      "Du bist ean Pok\xe9mon-Trainer, oder?\nDu musst mir bitte helfen!" },
+      "Du bist ein Pok\xe9mon-Trainer, oder?\nDu musst mir bitte helfen!" },
 
     // 180
 
@@ -1109,7 +1113,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Dank dir konnte er mir diese wichtigen\nPapiere nicht rauben.\r"
       "Ich wei\xdf! Ich gebe dir diesen EP-Teiler\nals Dankesch\xf6n!" },
     { "Didn't that Team Aqua thug say they were\nafter something in Rustboro, too?",
-      "Hat dieser Schuft von Team Aqua nicht gesagt,\ndass sie irgendetwas in Metarost City vorhaben?" },
+      "Hat dieser Schuft von Team Aqua nicht gesagt,\ndass sie etwas in Metarost City vorhaben?" },
 
     { "Uh-oh! It's a crisis!\nI can't be wasting time!",
       "Oh oh! Ein Notfall!\nIch darf keine Zeit verlieren!" },
@@ -1140,23 +1144,23 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     // 190
 
     { "Tch, trying to hide behind a kid|",
-      "Erb\xe4rmlich\nVersuchen sich hinter einem Kind zu verstecken|" },
+      "Erb\xe4rmlich| Zu versuchen\nsich hinter einem Kind zu verstecken|" },
     { "Yo, there!\nYour Pok\xe9mon doing okay?\r"
       "If your Pok\xe9mon are weak and you don't want\nto battle, you should stay out of tall grass.",
       "Hey, du!\nGeht es deinen Pok\xe9mon gut?\r"
-      "Wenn deine Pok\xe9mon schwach sind und du K\xe4mpfe\nvermeiden willst, dann meide hohes Gras!" },
+      "Sind deine Pok\xe9mon schwach und du willst\nK\xe4mpfe vermeiden? Dann meide hohes Gras!" },
     { "--- Trainer Tips ---\r"
       "In addition to Hit Points (HP), Pok\xe9mon have\nPower Points (PP) that are used to\n"
       "make moves during battle.\r"
       "If a Pok\xe9mon runs out of PP, it must be\ntaken to a Pok\xe9mon Center.",
       "--- Tipps f\xfcr Trainer ---\r"
-      "Neben den Kraftpunkten (KP) besitzt ein\nPok\xe9mon auch Angriffspunkte (AP),\n"
-      "die f\xfcr die Attacken im Kampf gebraucht werden.\r"
-      "Wenn ein Pok\xe9mon keine AP mehr besitzt,\nmuss es in ein Pok\xe9mon-Center gebracht werden." },
+      "Neben den Kraftpunkten (KP) besitzt ein\nPok\xe9mon auch Angriffspunkte (AP), die f\xfcr\n"
+      "die Attacken im Kampf gebraucht werden.\r"
+      "Wenn ein Pok\xe9mon keine AP mehr besitzt, muss\nes in ein Pok\xe9mon-Center gebracht werden." },
     { "I like filling my mouth with seeds,\nthen spitting them out fast!\r"
       "You can have this to try it out!\r"
       "Use it on a Pok\xe9mon, and it will learn\na move for firing seeds rapidly.",
-      "Ich liebe es, meinen Mund voller Saatk\xf6ren zu\nnehmen und sie dann in hohem Bogen auszuspucken.\r"
+      "Ich liebe es, meinen Mund voller Saatk\xf6ren zu\nnehmen und sie dann auszuspucken.\r"
       "Nimm das hier und probier es selbst!\r"
       "Wende es auf ein Pok\xe9mon an und es erlernt, in\nschneller Folge Saatk\xf6rner auszuspucken." },
     { "A word of advice!\r"
@@ -1164,7 +1168,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "In contrast, a TR, Technical Record, is\ngood only for one-time use.",
       "Ein Hinweis noch!\r"
       "Eine TM, eine Technische Maschine, kann\nbeliebig oft eingesetzt werden.\r"
-      "Im Gegensatz dazu kann eine TP, eine\nTechnische Platte, nur einmal eingesetzt werden." },
+      "Im Gegensatz dazu kann eine TP, eine\nTechnische Platte, nur einmal eingesetzt\nwerden." },
 
     { "Pretty Petal Flower Shop", "Bl\xfctentraum Blumenladen" },
     { "--- Trainer Tips ---\r"
@@ -1173,15 +1177,15 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "In a Double Battle, the Trainer must send out\ntwo Pok\xe9mon, the ones at the top of the list.\r"
       "Watch how Pok\xe9mon are lined up.",
       "--- Tipps f\xfcr Trainer ---\r"
-      "In der Hoenn-Region gibt es Paare von Trainern,\ndie andere zu einem 2-gegen-2-Pok\xe9mon-Kampf,\n"
-      "einem Doppelkampf herausfordern.\r"
+      "In der Hoenn-Region gibt es Paare von\nTrainern, die andere zu einem 2-gegen-2-\n"
+      "Pok\xe9mon-Kampf, einem Doppelkampf,\nherausfordern.\r"
       "In einem Doppelkampf muss der Trainer\nzwei Pok\xe9mon antreten lassen:\r"
       "Die beiden Pok\xe9mon oben in der Liste.\r"
       "Achte also auf die Reihenfolge\ndeiner Pok\xe9mon." },
     { "If you see Berries growing in loamy\nsoil, feel free to take them.\r"
       "But make sure you plant a Berry in the\nsame spot. That's common courtesy.\r"
       "Here, I'll share this with you.",
-      "Wenn du Beeren siehst, die im Lehmboden wachsen,\npfl\xfc"
+      "Wenn du Beeren siehst, die im Lehmboden\nwachsen, pfl\xfc"
       "cke sie ruhig.\r"
       "Aber pflanze eine neue Beere an der Stelle.\nDas ist einfache H\xf6"
       "flichkeit.\r"
@@ -1205,7 +1209,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "irgendwann sein Aussehen ver\xe4ndert." },
     { "A Pok\xe9mon changes shape?\nIf one did that, I would be shocked!",
       "Ein Pok\xe9mon ver\xe4n"
-      "dert sein Aussehen?\nWenn es das t\xe4te, w\xe4re ich zutiefst schockiert!" },
+      "dert sein Aussehen? Wenn\nes das t\xe4te, w\xe4re ich zutiefst schockiert!" },
     { "Hello!\r"
       "The more attention you give to flowers,\nthe more beautifully they bloom.\r"
       "You'll like tending flowers. I'm sure of it.\nYou can have this.",
@@ -1270,8 +1274,9 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "But now they have a machine that mixes up\ndifferent Berries and makes candies\n"
       "for Pok\xe9mon.\r"
       "I want some candy, too.",
-      "Du kannst eine Beere pflanzen und sie wachsen\nlassen, oder du gibst sie einem Pok\xe9mon zum Tragen.\r"
-      "Und neuerdings kann man Beren mit einer\nMaschine zu verschiedensten S\xfc\xdfigkeiten mixen.\r"
+      "Du kannst eine Beere pflanzen und sie\nwachsen lassen, oder du gibst sie\neinem Pok\xe9mon zum Tragen.\r"
+      "Und neuerdings kann man Beren mit einer\nMaschine zu verschiedensten S\xfc\xdfigkeiten\n"
+      "f\xfcr Pok\xe9mon mixen.\r"
       "Ich m\xf6"
       "chte auch S\xfc\xdfigkeiten haben." },
     { "Wow, you have Pok\xe9mon with you, too.\r"
@@ -1360,7 +1365,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "Route 115\n[477] Rustboro City", "Route 115\n[477] Metarost City" },
     { "Exploring a cave isn't like walking on a road.\r"
       "You never know when wild Pok\xe9mon will appear.\nIt's full of suspense.",
-      "H\xf6hlenforschung ist nicht mit einem Spaziergang\nauf einer Stra\xdf"
+      "H\xf6hlenforschung ist nicht mit einem Spazier-\ngang auf einer Stra\xdf"
       "e zu vergleichen.\r"
       "Du wei\xdft nie, wann ein wildes Pok\xe9mon\nauftaucht. Du bist immer angespannt." },
     { "Route 116\n[475] Rustboro City", "Route 116\n[475] Metarost City" },
@@ -1383,7 +1388,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "So, what brings you to this School?\nAre you a Trainer, too?\r"
       "The first thing you should do is to\nhave a Pok\xe9mon learn the move Cut.\r"
       "If I remenber correctly, someone in\nthis town has the HM for Cut.",
-      "Hallo? Haben wir uns nicht schon einmal gesehen?\nIch glaube, das war in Bl\xfctenburg City?\r"
+      "Hallo? Haben wir uns nicht schonnmal gesehen?\nIch glaube, das war in Bl\xfctenburg City?\r"
       "Ich will mich mal vorstellen.\nMein Name ist Scott.\r"
       "Ich reise durch die Lande, auf der Suche\nnach herausragenden Trainern.\r"
       "Genauer gesagt bin ich auf der Suche\nnach Experten des Pok\xe9mon-Kampfes.\r"
@@ -1405,10 +1410,10 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "b\xe4llen gefangen.\r"
       "Bis zu sechs Pok\xe9mon k\xf6nnen\nden Trainer begleiten.\r"
       "Ein Trainer ist jemand, der Pok\xe9mon f\xe4ngt,\nsie aufzieht, und mit ihnen k\xe4mpft.\r"
-      "Die Aufgabe eines Trainers ist es, die starken\nTrainer zu besiegen, die in ihn in Arenen erwarten." },
+      "Die Aufgabe eines Trainers ist es, die starken\nTrainer zu besiegen, die in ihn\nin Arenen erwarten." },
     { "Students who don't study get a little taste\nof my Quick Claw.\r"
       "Whether or not you are a good student will be\nevident from the way you use this item.",
-      "Sch\xfcler, die nicht aufpassen, bekommon\nmeine Flinkklaue zu sp\xfcren.\r"
+      "Sch\xfcler, die nicht aufpassen, bekommen\nmeine Flinkklaue zu sp\xfcren.\r"
       "Wie du dieses Item einsetzt, zeigt, ob du ein\nguter Sch\xfcler bist oder nicht." },
     { "A Pok\xe9mon holding the Quick Claw will\noccasionally speed up and get to move\n"
       "before its opponent.\r"
@@ -1422,7 +1427,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
     { "I always wanted a Seedot, and\nI'm finally getting one!",
       "Ich wollte schon immer ein Samurzel haben -\nund endlich habe ich eines!" },
     { "I'm trading Pok\xe9mon with my friend right now.",
-      "Ich tausche gerade mit meinem Freund Pok\xe9mon." },
+      "Ich tausche gerade mit meinem\nFreund Pok\xe9mon." },
     { "You know how some Pok\xe9mon moves can\nconfuse a Pok\xe9mon?\r"
       "A confused Pok\xe9mon will sometimes\nattack itself without meaning to.\r"
       "But once it leaves battle, it will\nreturn to normal.",
@@ -1460,7 +1465,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Any Pok\xe9mon that's learned Cut can\nchop down thin trees if the Trainer\n"
       "has earned the Stone Badge.",
       "Diese VM, oder Versteckte Maschine,\nsie enth\xe4lt Zerschneider.\r"
-      "Eine VM-Attacke kann auch au\xdf"
+      "Eine VM-Attacke kann au\xdf"
       "erhalb des Kampfes\nvon einem Pok\xe9mon eingesetzt werden kann.\r"
       "Jedes Pok\xe9mon, das diese Attacke gelernt\nhat, kann kleine B\xe4ume damit zerschneiden,\n"
       "wenn der Trainer den Steinorden besitzt." },
@@ -1638,7 +1643,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Dieser Tunnel ist voller Pok\xe9mon, die\nsensibel auf L\xe4rm reagieren.\r"
       "Sie k\xf6nnen einen Aufruhr veranstalten.\r"
       "Daher arbeiten wir ohne schwere Maschinen an dem Tunnel|\r"
-      "Ich bef\xfcrchte, dieser Idiot wird irgendetwas\nDummes tun und die Pok\xd\xe9mon in Aufruhr versetzen." },
+      "Ich bef\xfcrchte, dieser Idiot wird etwas\nDummes tun und die Pok\xd\xe9mon in Aufruhr versetzen." },
 
     // 270
 
@@ -2335,7 +2340,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Bag", "Beutel" },
     { "Trainer ID", "Trainerpass" },
-    { "Save", "Speichern" },
+    { "Save", "Sichern" },
     { "Options", "Optionen" },
     { "Text Speed", "Textgeschw." },
 

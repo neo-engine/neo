@@ -410,6 +410,10 @@ namespace SAVE {
         m_vars[ p_idx ] = p_value;
     }
 
+    void saveGame::playerInfo::increaseVar( u8 p_idx ) {
+        if( m_vars[ p_idx ] < u16( -1 ) ) { m_vars[ p_idx ]++; }
+    }
+
     u8 saveGame::playerInfo::getBadgeCount( u8 p_region ) {
         u8 cnt = 0;
         if( p_region == 0 || p_region == 255 ) { cnt += std::popcount( m_HOENN_Badges ); }

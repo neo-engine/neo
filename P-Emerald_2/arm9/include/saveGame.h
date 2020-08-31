@@ -58,6 +58,7 @@ namespace SAVE {
     }
 
     constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
+    constexpr u8 V_NUM_FAINTED = 1; // how often the player fainted
 
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 
@@ -280,6 +281,11 @@ namespace SAVE {
              * @brief: Sets the specified var to the specified value.
              */
             void setVar( u8 p_idx, u16 p_value );
+
+            /*
+             * @brief: Increases the variable; does nothing if an overflow would occur.
+             */
+            void increaseVar( u8 p_idx );
 
             /*
              * @brief: Increases the number of steps the player has walked by 1.

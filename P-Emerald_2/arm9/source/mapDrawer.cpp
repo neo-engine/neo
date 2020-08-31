@@ -2634,6 +2634,7 @@ namespace MAP {
     }
 
     void mapDrawer::faintPlayer( ) {
+        SAVE::SAV.getActiveFile( ).increaseVar( SAVE::V_NUM_FAINTED );
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         ANIMATE_MAP = false;
         videoSetMode( MODE_5_2D );

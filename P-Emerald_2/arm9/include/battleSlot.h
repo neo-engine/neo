@@ -608,11 +608,11 @@ namespace BATTLE {
             // apply boosts
             s8 bst = _boosts.getBoost( p_stat );
             if( bst > 0 && !p_ignorePositive ) {
-                base *= bst;
+                base *= ( bst + 2 );
                 base >>= 1;
             } else if( bst < 0 && !p_ignoreNegative ) {
                 base *= 2;
-                base /= -bst;
+                base /= ( -bst + 2 );
             }
 
             // status (par)
