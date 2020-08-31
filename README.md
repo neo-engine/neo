@@ -2,9 +2,11 @@ Pokémon _neo_
 ===========
 [![Travis](https://travis-ci.org/PH111P/perm2.svg?branch=master)](https://travis-ci.org/PH111P/perm2)
 
-An experimental Pokémon engine for Nintendo DS.
+An experimental Pokémon engine for Nintendo DS. For demonstration purposes only, currently
+_neo_ includes some (updated) maps from Pokémon Emerald, as well as images from other
+mainline Pokémon games. These are not part of _neo_.
 
-This engine is intended to be run on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) seems to be capable of emulating most of real hardware's features, too.
+This engine is intended to be run on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) and melonDS seem to be capable of emulating most of real hardware's features, too.
 
 Features
 --------
@@ -16,16 +18,16 @@ _Partially_ implemented features are in _italics_.
       * [x] Gen 1 - Gen 5 Sprites (Pokémon Black 2 / White 2 Versions)
       * [x] Gen 6 - Gen 8 Sprites ([Smogon XY Sprite Project](http://www.smogon.com/forums/threads/xy-sprite-project-read-1st-post-release-v1-1-on-post-3240.3486712/), [Smogon Sun/Moon Sprite Project](https://www.smogon.com/forums/threads/sun-moon-sprite-project.3577711/), [Smogon Sword/Shied Sprite Project](https://www.smogon.com/forums/threads/sword-shield-sprite-project.3647722/))
     * [x] An in-game Pokémon storage system
-    * [x] A fully working PokéDex, loading its data from the ROM's file system and displaying the various forms of the Pokémon
+    * [ ] A fully working PokéDex
     * [x] A working battle engine including
-        * [x] Single, double trainer battles
+        * [x] Single trainer battles
         * [x] Wild Pokémon battles
         * [x] Switch Pokémon, use moves, use items
-        * [ ] Move effects
+        * [x] Move effects
         * [ ] Move animations
     * [x] A fully working bag
-    * [x] The ability to load maps (for now only GBA-style maps are supported, 3D maps are planned) including
-      * [ ] Events
+    * [x] The ability to load maps (for now only GBA-style maps are supported) including
+      * [x] Events
       * [x] Wild Pokémon encounter
       * [x] Animated map tiles (at least some are animated)
       * [x] Player sprite, animated moving, surfing, cycling, and fishing
@@ -33,36 +35,96 @@ _Partially_ implemented features are in _italics_.
     * [x] BGM and SFX using MaxMod
     * [x] A real time clock (doesn't work fully on DeSmuME)
       * [ ] Overworld changes based on time
+      * [x] Different wild Pokémon encounters based on time.
     * [x] Support for save games
       * [x] Saving the progress to the micro SD (saves may break with a new version)
-      * [x] Saving the progress to flash memory (highly experimental, currently only works
-        in MelonDS)
+      * [x] Saving the progress to flash memory (highly experimental)
     * [ ] Support for communication with “the originals”
       * [ ] Playing with / importing a save from a GBA version
       * [ ] Link trading with Gen IV and Gen V games
     * [x] A clean UI
-    * [ ] Dynamic difficulty
-      * [ ] Adjust the encounter rate at will
-      * [ ] Adjust opposing Pokémon's level (between battles)
+    * [x] Dynamic difficulty
+      * [x] Wild Pokémon's levels scale with the story progression
+      * [x] Adjust the difficulty anytime via the Options.
     * [x] Support for multiple save files
-      * [x] Shared PokéDex and stored Pokémon
-    * [x] Support for multiple languages (English, German)
-* [ ] _Easy-to-understand and ready-to-(re)use code_
+    * [x] Full support for multiple languages (English, German)
+      * [x] Kana are supported font-wise, getting Kana text for story content still
+        requires some work.
+* [x] Easy-to-understand and ready-to-(re)use code
     * [x] Strict and intuitive naming conventions
-    * [ ] _Good documentation_
-    * [x] _Modular code (strict separation of each feature and between core and UI)_
+    * [x] Documentation
 
 Build requirements
 ------------------
 * devkitARM ≥ r54
-* libnds ≥ 1.8.0
+* libnds ≥ 1.8.1
 * libfilesystem ≥ 0.9.14
 * libfat-nds ≥ 1.1.5
 * dswifi ≥ 0.4.2 (currently unused)
-* maxmod-nds ≥ 1.0.13
+* maxmod-nds ≥ 1.0.14
 
-* gcc/g++ ≥ 9.0
+* gcc/g++ ≥ 10.0
 
 * make
 
-_More to come_, as this README.md is still under construction!
+Having installed the above tools, _neo_ can be built with a single `make` command. The
+optional make parameter `DESQUID=1` enables the desquid mode; the parameter `EXTRA_FLAGS="-DNO_SOUND"` disables any sound of the complied ROM image.
+
+The main data for the maps, 'mons, etc, is stored in the separate `perm2-FSROOT`
+repository; some data can be configured and build via tools and `csv` files found in the
+`perm2-fsdata` repository.
+
+Further helper scripts to convert images and other data can be found in the `perm2-helper`
+repository.
+
+Screenshots
+-----------
+
+##### General gameplay
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/st01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/st02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm03.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm04.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm05.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm06.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm07.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm08.png)
+
+##### Pokémon status screens
+
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts03.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts04.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts05.png)
+
+##### The storage system
+
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx03.png)
+
+##### The Bag
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg03.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg04.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg05.png)
+
+##### Battles
+###### Wild Pokémon battles
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt02.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt03.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt04.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt05.png)
+
+###### Trainer battles
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt06.png)
+
+#### Miscellaneous
+
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/tc01.png)
+![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/op01.png)
