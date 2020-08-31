@@ -330,7 +330,8 @@ namespace FS {
         FILE* f = FS::openSplit( LOCATION_NAME_PATH, p_locationId, ".str", 5000 );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, LOCATION_NAMELENGTH, f ); }
+        std::fseek( f, p_language * LOCATION_NAMELENGTH, SEEK_SET );
+        fread( p_out, 1, LOCATION_NAMELENGTH, f );
         fclose( f );
         return true;
     }
@@ -397,7 +398,8 @@ namespace ITEM {
         FILE* f = FS::openSplit( ITEM_NAME_PATH, p_itemId, ".str" );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ITEM_NAMELENGTH, f ); }
+        std::fseek( f, p_language * ITEM_NAMELENGTH, SEEK_SET );
+        fread( p_out, 1, ITEM_NAMELENGTH, f );
         fclose( f );
         return true;
     }
@@ -414,7 +416,8 @@ namespace ITEM {
         FILE* f = FS::openSplit( ITEM_DSCR_PATH, p_itemId, ".str" );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, ITEM_DSCRLENGTH, f ); }
+        std::fseek( f, p_language * ITEM_DSCRLENGTH, SEEK_SET );
+        fread( p_out, 1, ITEM_DSCRLENGTH, f );
         fclose( f );
         return true;
     }
@@ -456,7 +459,8 @@ namespace MOVE {
         FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, MOVE_NAMELENGTH, f ); }
+        std::fseek( f, p_language * MOVE_NAMELENGTH, SEEK_SET );
+        fread( p_out, 1, MOVE_NAMELENGTH, f );
         fclose( f );
         return true;
     }
@@ -475,7 +479,8 @@ namespace MOVE {
         FILE* f = FS::openSplit( MOVE_DSCR_PATH, p_moveId, ".str" );
         if( !f ) return false;
 
-        for( int i = 0; i <= p_language; ++i ) { fread( p_out, 1, MOVE_DSCRLENGTH, f ); }
+        std::fseek( f, p_language * MOVE_DSCRLENGTH, SEEK_SET );
+        fread( p_out, 1, MOVE_DSCRLENGTH, f );
         fclose( f );
         return true;
     }
@@ -517,7 +522,8 @@ namespace BATTLE {
         FILE* f = FS::openSplit( TCLASS_NAME_PATH, p_trainerClass, ".str" );
         if( !f ) return false;
 
-        for( u8 i = 0; i <= p_language; ++i ) { fread( p_out, 1, TCLASS_NAMELENGTH, f ); }
+        std::fseek( f, p_language * TCLASS_NAMELENGTH, SEEK_SET );
+        fread( p_out, 1, TCLASS_NAMELENGTH, f );
         fclose( f );
         return true;
     }
@@ -583,7 +589,8 @@ bool getAbilityDescr( u16 p_abilityId, u8 p_language, char* p_out ) {
     FILE* f = FS::openSplit( ABILITY_DSCR_PATH, p_abilityId, ".str" );
     if( !f ) return false;
 
-    for( u8 i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_DSCRLENGTH, f ); }
+    std::fseek( f, p_language * ABILITY_DSCRLENGTH, SEEK_SET );
+    fread( p_out, 1, ABILITY_DSCRLENGTH, f );
     fclose( f );
     return true;
 }
@@ -599,7 +606,7 @@ std::string getAbilityDescr( u16 p_abilityId ) {
 }
 
 std::string getSpeciesName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
-    char tmpbuf[ 40 ];
+    char tmpbuf[ SPECIES_NAMELENGTH + 2 ];
     if( !getSpeciesName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
     return std::string( tmpbuf );
 }
@@ -611,22 +618,21 @@ std::string getSpeciesName( u16 p_pkmnId, u8 p_forme ) {
 bool getSpeciesName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
     FILE* f;
     if( p_forme ) {
-        char tmpbuf[ 20 ];
+        char tmpbuf[ 40 ];
         snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
         f = FS::openSplit( POKEMON_SPECIES_PATH, p_pkmnId, tmpbuf );
     }
     if( !p_forme || !f ) { f = FS::openSplit( POKEMON_SPECIES_PATH, p_pkmnId, ".str" ); }
     if( !f ) return false;
 
-    for( int i = 0; i <= p_language; ++i ) {
-        assert( SPECIES_NAMELENGTH == fread( p_out, 1, SPECIES_NAMELENGTH, f ) );
-    }
+    std::fseek( f, p_language * SPECIES_NAMELENGTH, SEEK_SET );
+    assert( SPECIES_NAMELENGTH == fread( p_out, 1, SPECIES_NAMELENGTH, f ) );
     fclose( f );
     return true;
 }
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
-    char tmpbuf[ 20 ];
+    char tmpbuf[ 50 ];
     if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
     return std::string( tmpbuf );
 }
@@ -645,10 +651,11 @@ bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
     if( !p_forme || !f ) { f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, ".str" ); }
     if( !f ) return false;
 
-    for( int i = 0; i <= p_language; ++i ) {
-        assert( PKMN_NAMELENGTH + ( 15 * !!p_forme )
-                == fread( p_out, 1, PKMN_NAMELENGTH + ( 15 * !!p_forme ), f ) );
-    }
+    u8 len = PKMN_NAMELENGTH;
+    if( p_forme ) { len = 30; }
+
+    std::fseek( f, p_language * len, SEEK_SET );
+    assert( len == fread( p_out, 1, len, f ) );
     fclose( f );
     return true;
 }

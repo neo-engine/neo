@@ -272,7 +272,7 @@ namespace BAG {
                                           p_pokemon.isFemale( ), false );
                     initUI( );
                 }
-                return false;
+                return _context == BATTLE || _context == WILD_BATTLE;
             }
             _bagUI->printMessage( GET_STRING( 53 ) );
             waitForInteract( );
@@ -1038,13 +1038,11 @@ namespace BAG {
                 if( SAVE::SAV.getActiveFile( ).m_bag.empty(
                         (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
                     continue;
+
                 u16  targetItem = currentItem( ).first.first;
                 auto itemData   = currentItem( ).second;
                 u8   res        = 0;
                 if( targetItem && ( res = confirmChoice( targetItem, &itemData ) ) ) {
-                    if( _context != context::BATTLE && _context != context::WILD_BATTLE )
-                        SAVE::SAV.getActiveFile( ).m_bag.erase(
-                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, targetItem, 1 );
                     return targetItem;
                 }
                 _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,

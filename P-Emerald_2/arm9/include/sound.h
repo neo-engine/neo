@@ -116,7 +116,14 @@ namespace SOUND {
         case 31:
         case 32:
         case 33: return MOD_ENCOUNTER_TEAM_AM;
+        case 34:
+        case 41:
+        case 48:
+        case 52:
+                 return MOD_ENCOUNTER_TWINS;
         case 35:
+        case 43:
+        case 44:
         default: return MOD_ENCOUNTER_YOUNGSTER;
         }
     }
