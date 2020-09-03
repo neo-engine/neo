@@ -5,7 +5,12 @@ language: cpp
 services:
   - docker
 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq g++-10
+
 install:
+  -
   - docker pull devkitpro/devkitarm
   - docker run -p 4000:80 --name devkitarm devkitpro/devkitarm
   - mkdir -p /opt/devkitpro
@@ -14,7 +19,7 @@ install:
   - docker rm -f devkitarm
 
 script:
-  - cd perm2/P-Emerald_2
+  - cd P-Emerald_2
   - make NOSOUND=1
   - mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
   - make DESQUID=1 NOSOUND=1 rebuild
