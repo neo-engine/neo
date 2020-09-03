@@ -15,9 +15,10 @@ script:
   - mkdir -p /opt/devkitpro
   - docker cp devkitarm:/opt/devkitpro /opt || true
   - PATH=/opt/devkitpro/tools/bin:$PATH
-  - echo $PATH
-  - which grit
   - ls /opt/devkitpro/tools/bin
+  - ls /opt/devkitpro/tools/
+  - ls /opt/devkitpro/
+  - ls /opt/
   - cd P-Emerald_2
   - make NOSOUND=1
   - mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
