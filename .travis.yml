@@ -7,9 +7,8 @@ services:
 
 before_install:
   - docker pull devkitpro/devkitarm
-  - docker images
-  - docker build devkitpro/devkitarm
-  - sudo apt-get update -qq
+  - docker run devkitpro/devkitarm
+    #- sudo apt-get update -qq
     #  - sudo apt-get install -qq git curl wget libarchive13
     # - curl -L https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb -o pacman.deb
     #- sudo apt-get install -qq gdebi-core
