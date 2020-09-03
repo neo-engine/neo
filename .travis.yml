@@ -14,6 +14,7 @@ script:
   - docker run -p 4000:80 --name devkitarm devkitpro/devkitarm
   - mkdir -p /opt/devkitpro
   - docker cp devkitarm:/opt/devkitpro /opt || true
+  - docker cp devkitarm:/opt/devkitpro/tools /opt/devkitpro || true
   - PATH=/opt/devkitpro/tools/bin:$PATH
   - ls /opt/devkitpro/tools/bin
   - ls /opt/devkitpro/tools/
