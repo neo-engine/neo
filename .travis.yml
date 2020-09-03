@@ -11,7 +11,7 @@ before_install:
     - curl -L https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb -o pacman.deb
     - sudo dpkg -i pacman.deb
 
-    - sudo dkp-pacman -Sy
+      #    - sudo dkp-pacman -Sy
     - sudo dkp-pacman -S nds-dev --noconfirm
 
 script:
