@@ -3,6 +3,7 @@
 source /etc/profile.d/devkit-env.sh
 
 ls -a
+echo $TRAVIS_BUILD_DIR
 
 cd P-Emerald_2
 make NOSOUND=1
