@@ -7,9 +7,18 @@ services:
 
 install:
   - docker pull devkitpro/devkitarm
+  - mkdir -p /opt/devkitpro
+  - docker cp devkitarm:/opt/devkitpro /opt/devkitpro
 
 script:
-  - docker run -e ENABLE_COMPATIBILITY_REPORTING -v $TRAVIS_BUILD_DIR:/perm2 devkitpro/devkitarm /bin/bash -ex /perm2/.travis/docker.sh
+  - cd perm2/P-Emerald_2
+  - make NOSOUND=1
+  - mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
+  - make DESQUID=1 NOSOUND=1 rebuild
+  - mv P-Emerald_2.nds P-Emerald_2_NOSOUND_DESQUID.nds
+  - make DESQUID=1 rebuild
+  - mv P-Emerald_2.nds P-Emerald_2_DESQUID.nds
+  - make rebuild
 
 notifications:
   email: false
