@@ -687,7 +687,7 @@ namespace BAG {
                                 oam[ SPR_MSG_BOX_OAM_SUB ].y + 31, true, 0 );
             auto lineCnt = IO::regularFont->printBreakingStringC(
                                p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8, 196, true,
-                               IO::font::CENTER, 14, ' ', 0, false, false, -1 )
+                               IO::font::CENTER, 14, ' ', 0, false, -1 )
                            - 1;
             IO::regularFont->printBreakingStringC( p_message, 128,
                                                    oam[ SPR_MSG_BOX_OAM_SUB ].y + 8 - lineCnt * 7,
@@ -721,7 +721,7 @@ namespace BAG {
 
             auto lineCnt = IO::regularFont->printBreakingStringC(
                                p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8, 196, true,
-                               IO::font::CENTER, 14, ' ', 0, false, false, -1 )
+                               IO::font::CENTER, 14, ' ', 0, false, -1 )
                            - 1;
             IO::regularFont->printBreakingStringC( p_message, 128,
                                                    oam[ SPR_MSG_BOX_OAM_SUB ].y + 8 - lineCnt * 7,

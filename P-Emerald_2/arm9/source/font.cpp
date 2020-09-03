@@ -43,43 +43,6 @@ namespace IO {
         _shiftchar                                                          = p_shiftchar;
     }
 
-    void font::_runMB( bool p_bottom, u8 p_layer ) const {
-        u8   c  = 0;
-        bool on = false;
-        if( p_bottom ) {
-            Oam->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-            updateOAM( true );
-        } else {
-            OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = false;
-            IO::updateOAM( false );
-        }
-
-        loop( ) {
-            swiWaitForVBlank( );
-            scanKeys( );
-            int pressed = keysCurrent( );
-            if( ++c == 45 ) {
-                c = 0;
-                if( on )
-                    hideContinue( 243, 51, p_layer );
-                else
-                    drawContinue( 243, 51, p_layer );
-                on = !on;
-            }
-            if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) break;
-            touchPosition t;
-            touchRead( &t );
-            if( t.px > 224 && t.py > 164 && waitForTouchUp( 224, 164 ) ) { break; }
-        }
-        if( p_bottom ) {
-            Oam->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-            updateOAM( true );
-        } else {
-            OamTop->oamBuffer[ ASpriteOamIndex ].isHidden = true;
-            IO::updateOAM( false );
-        }
-    }
-
     void font::_charDelay( ) const {
         for( u8 i = 0;
              i < 80 / ( TEXTSPEED + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
@@ -236,7 +199,7 @@ namespace IO {
 
     u16 font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
-                           bool p_delay, bool p_mb, u8 p_layer ) const {
+                           bool p_delay, u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
         u16 lines = 1;
@@ -259,11 +222,6 @@ namespace IO {
 
                 current_char++;
                 lines++;
-                continue;
-            }
-            if( p_mb && p_string[ current_char ] == '`' ) {
-                _runMB( p_bottom );
-                current_char++;
                 continue;
             }
             if( p_string[ current_char ] == '[' ) {
@@ -297,27 +255,16 @@ namespace IO {
 
     u16 font::printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX, bool p_delay,
-                            bool p_mb, u8 p_layer ) const {
+                            u8 p_layer ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX, 1,
-                            p_delay, p_mb, p_layer );
+                            p_delay, p_layer );
     }
 
     u16 font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
-                            bool p_mb, u8 p_layer ) const {
+                            u8 p_layer ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX,
-                            p_charShift, true, p_mb, p_layer );
-    }
-
-    u16 font::printMBString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_charShift,
-                             bool p_delay, u8 p_layer ) const {
-        return printString( p_string, p_x, p_y, p_bottom, font::LEFT, FONT_HEIGHT - 2, 0,
-                            p_charShift, p_delay, true, p_layer );
-    }
-
-    u16 font::printMBStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, u8 p_charShift,
-                              u8 p_layer ) const {
-        return printMBString( p_string, p_x, p_y, p_bottom, p_charShift, true, p_layer );
+                            p_charShift, true, p_layer );
     }
 
     u16 font::printStringB( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
@@ -402,7 +349,7 @@ namespace IO {
     u16 font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                    bool p_bottom, alignment p_alignment, u8 p_yDistance,
                                    char p_breakChar, s8 p_adjustX, u8 p_charShift, bool p_delay,
-                                   bool p_mb, u8 p_layer ) const {
+                                   u8 p_layer ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
         u16 lines = 1;
@@ -425,11 +372,6 @@ namespace IO {
 
                 current_char++;
                 lines++;
-                continue;
-            }
-            if( p_mb && p_string[ current_char ] == '`' ) {
-                _runMB( p_bottom );
-                current_char++;
                 continue;
             }
             if( p_string[ current_char ] == '[' ) {
@@ -466,10 +408,10 @@ namespace IO {
 
     u16 font::printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                     bool p_bottom, alignment p_alignment, u8 p_yDistance,
-                                    char p_breakChar, s8 p_adjustX, bool p_delay, bool p_mb,
+                                    char p_breakChar, s8 p_adjustX, bool p_delay,
                                     u8 p_layer ) const {
         return printBreakingString( p_string, p_x, p_y, p_maxWidth, p_bottom, p_alignment,
-                                    p_yDistance, p_breakChar, p_adjustX, 1, p_delay, p_mb,
+                                    p_yDistance, p_breakChar, p_adjustX, 1, p_delay,
                                     p_layer );
     }
 

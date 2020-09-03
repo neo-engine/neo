@@ -32,16 +32,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace FS::CARD {
     bool checkCard( ) {
+#ifdef NO_AUXSPI
+        return false;
+#else
         u8 header1[ 512 ], header2[ 512 ];
         cardReadHeader( header1 );
         cardReadHeader( header2 );
 
         // Encrypted cards are always bad
         if( !!std::memcmp( header1, header2, 32 ) ) { return false; }
-// #ifndef DESQUID
-//         if( !!std::memcmp( header1, GAME_TITLE, 12 ) ) { return false; }
-// #endif
         return true;
+#endif
     }
 
     void waitBusy( ) {

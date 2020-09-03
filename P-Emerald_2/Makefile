@@ -55,6 +55,9 @@ endif
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
+	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN)" $(_ADDFILES)
+
+ifeq (1,2)
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
 		-d ./FSROOT -B $(GAME_ICON) \
 		"$(GAME_TITLE_JP);$(GAME_SUBTITLE1_JP);$(GAME_SUBTITLE2_JP)" $(_ADDFILES) \
@@ -65,6 +68,7 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 		"$(GAME_TITLE_ES);$(GAME_SUBTITLE1_ES);$(GAME_SUBTITLE2_ES)" $(_ADDFILES) \
 		-g $(GAME_CODE) $(DEV_CODE) "$(GAME_TITLE)" $(VERSION)
 	padbin 0x8000000 $(TARGET).nds
+endif
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 arm7/$(TARGET).elf: FORCE

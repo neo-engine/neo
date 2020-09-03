@@ -102,8 +102,6 @@ namespace IO {
     extern font*        smallFont;
     extern ConsoleFont* consoleFont;
 
-    extern u8 ASpriteOamIndex;
-
     extern OAMTable*  Oam;
     extern SpriteInfo spriteInfo[ SPRITE_COUNT ];
 

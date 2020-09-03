@@ -44,8 +44,6 @@ namespace IO {
         = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
     ConsoleFont *consoleFont = new ConsoleFont( );
 
-    u8 ASpriteOamIndex = 0;
-
     OAMTable * Oam = new OAMTable( );
     SpriteInfo spriteInfo[ SPRITE_COUNT ];
 
@@ -63,9 +61,9 @@ namespace IO {
 
     void initVideo( bool p_noFade ) {
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
-        vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
+//        vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
 
-        vramSetBankE( VRAM_E_MAIN_SPRITE );
+        vramSetBankB( VRAM_B_MAIN_SPRITE );
 
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                       | DISPLAY_SPR_1D );
@@ -86,6 +84,7 @@ namespace IO {
         bgUpdate( );
     }
     void initVideoSub( bool p_noFade ) {
+        // vramSetBankC( VRAM_C_SUB_BG_0x06200000 );
         vramSetBankC( VRAM_C_SUB_BG_0x06200000 );
         vramSetBankD( VRAM_D_SUB_SPRITE );
 

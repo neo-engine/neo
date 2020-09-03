@@ -68,7 +68,7 @@ Build requirements
 * make
 
 Having installed the above tools, _neo_ can be built with a single `make` command. The
-optional make parameter `DESQUID=1` enables the desquid mode; the parameter `EXTRA_FLAGS="-DNO_SOUND"` disables any sound of the complied ROM image.
+optional make parameter `DESQUID=1` enables the desquid mode; the parameter `NOSOUND=1` disables any sound of the complied ROM image (which makes it run much more stable on HW).
 
 The main data for the maps, 'mons, etc, is stored in the separate `perm2-FSROOT`
 repository; some data can be configured and build via tools and `csv` files found in the

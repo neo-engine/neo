@@ -84,7 +84,7 @@ namespace IO {
     const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
     const char* OWP_PATH       = "nitro:/PICS/SPRITES/NPCP/";
     const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
-    const char* BERRY_PATH   = "nitro:/PICS/SPRITES/BERRIES/";
+    const char* BERRY_PATH     = "nitro:/PICS/SPRITES/BERRIES/";
     const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/ITEMS/";
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/PKMN/";
@@ -377,11 +377,11 @@ namespace IO {
                     for( u8 y = 0; y < 8; ++y ) {
                         for( u8 x = 0; x < 8; x += 2, ++i ) {
                             u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
-                            u8 up = cur >> 4, down = cur & 0xf;
+                            u8 up = ( cur >> 4 ) & 0xf, down = cur & 0xf;
                             BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ]
-                                = ( !!up ) * ( ( 1 << 15 ) | p_spritePal[ up ] );
+                                = up ? ( ( 1 << 15 ) | p_spritePal[ up ] ) : 0;
                             BITMAP_SPRITE[ 2 * ( i + shift ) ]
-                                = ( !!down ) * ( ( 1 << 15 ) | p_spritePal[ down ] );
+                                = down ? ( ( 1 << 15 ) | p_spritePal[ down ] ) : 0;
                         }
                         shift += 4 * ( p_width / 8 - 1 );
                     }
@@ -393,8 +393,8 @@ namespace IO {
                 for( u8 x = 0; x < p_width; x += 2, ++i ) {
                     u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
                     u8 up = cur >> 4, down = cur & 0xf;
-                    BITMAP_SPRITE[ 2 * ( i ) + 1 ] = ( !!up ) * ( ( 1 << 15 ) | p_spritePal[ up ] );
-                    BITMAP_SPRITE[ 2 * ( i ) ] = ( !!down ) * ( ( 1 << 15 ) | p_spritePal[ down ] );
+                    BITMAP_SPRITE[ 2 * ( i ) + 1 ] = up ? ( ( 1 << 15 ) | p_spritePal[ up ] ) : 0;
+                    BITMAP_SPRITE[ 2 * ( i ) ] = down ? ( ( 1 << 15 ) | p_spritePal[ down ] ) : 0;
                 }
             }
         }
@@ -452,8 +452,8 @@ namespace IO {
 
         spriteEntry->isRotateScale = false;
         spriteEntry->isMosaic      = false;
-        spriteEntry->blendMode     = OBJMODE_BITMAP;
-        spriteEntry->colorMode     = OBJCOLOR_256;
+        spriteEntry->blendMode     = (ObjBlendMode) SpriteColorFormat_Bmp;
+        spriteEntry->colorMode     = (ObjColMode) 0;
 
         spriteEntry->shape = ( ( p_width == p_height )
                                    ? OBJSHAPE_SQUARE
@@ -469,6 +469,7 @@ namespace IO {
         auto gfx = p_bottom ? &SPRITE_GFX_SUB[ (u32) p_tileCnt * 64 ]
                             : &SPRITE_GFX[ (u32) p_tileCnt * 64 ];
         if( p_spriteData ) {
+            //            dmaFillHalfWords( ARGB16( 1, 31, 0, 0 ), gfx, p_width * p_height / 2 );
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, gfx, p_width * p_height * 2 );
         }
         return p_tileCnt + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );

@@ -407,7 +407,7 @@ namespace NAV {
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
                 u16 lns = IO::regularFont->printBreakingStringC(
-                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, false, -1 );
+                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
                 if( p_style == MSG_ITEM ) {
                     x += 48;
                     if( lns == 1 ) {
@@ -432,7 +432,7 @@ namespace NAV {
                 x = 54, y = 192 - 50, hg = 64;
 
                 u16 lns = IO::regularFont->printBreakingStringC(
-                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, false, -1 );
+                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
                 if( lns == 3 ) { y = 192 - 44; }
                 if( lns <= 2 ) { y = 192 - 38; }
             } else if( p_style == MSG_SIGN ) {

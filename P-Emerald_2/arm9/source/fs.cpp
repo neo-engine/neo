@@ -345,13 +345,14 @@ namespace FS {
     }
 
     bool readSave( const char* p_path ) {
-        if( CARD::checkCard( ) ) {
-            CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
-            if( SAVE::SAV.isGood( ) ) { return true; }
-        }
-
         FILE* f = FS::open( "", p_path, ".sav" );
-        if( !f ) return 0;
+        if( !f ) {
+            if( CARD::checkCard( ) ) {
+                CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
+                if( SAVE::SAV.isGood( ) ) { return true; }
+            }
+            return false;
+        }
 
         FS::read( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
@@ -372,23 +373,23 @@ namespace FS {
         SAVE::SAV.getActiveFile( ).m_lastSaveDate     = SAVE::CURRENT_DATE;
         SAVE::SAV.getActiveFile( ).m_lastSaveTime     = SAVE::CURRENT_TIME;
 
-        if( CARD::checkCard( ) ) {
-            if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
-                                 p_progress ) ) {
-                return true;
-            }
-        }
-
         FILE* f = FS::open( "", p_path, ".sav", "w" );
         if( !f ) {
+            FS::close( f );
+            if( CARD::checkCard( ) ) {
+                if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
+                                     p_progress ) ) {
+                    return true;
+                }
+            }
             SAVE::SAV.getActiveFile( ).m_lastSaveLocation = oldl;
             SAVE::SAV.getActiveFile( ).m_lastSaveDate     = oldd;
             SAVE::SAV.getActiveFile( ).m_lastSaveTime     = oldt;
-
             return false;
         }
         FS::write( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
         FS::close( f );
+
         return true;
     }
 } // namespace FS

@@ -1079,7 +1079,7 @@ namespace BATTLE {
 
         u8 height
             = IO::regularFont->printBreakingStringC( p_message.c_str( ), 16, 24, 256 - 32, true,
-                                                     IO::font::LEFT, 14, ' ', 0, false, false, -1 );
+                                                     IO::font::LEFT, 14, ' ', 0, false, -1 );
 
         if( _currentLogLine + height > 12 ) { _currentLogLine = 1; }
 
