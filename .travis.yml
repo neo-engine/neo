@@ -1,40 +1,41 @@
 sudo: required
 dist: focal
 language: cpp
-  #addons:
-  #  apt:
-  #      sources: [ 'ubuntu-toolchain-r-test']
-  #      packages: ['libstdc++6']
+
+services:
+  - docker
+
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq git curl wget libarchive13
-    - curl -L https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb -o pacman.deb
-    - sudo apt-get install -qq gdebi-core
-    - sudo gdebi --n pacman.deb
-    - sudo dkp-pacman -Sy
-    - sudo dkp-pacman -S nds-dev --noconfirm
+  - docker pull devkitpro/devkitarm
+  - sudo apt-get update -qq
+    #  - sudo apt-get install -qq git curl wget libarchive13
+    # - curl -L https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb -o pacman.deb
+    #- sudo apt-get install -qq gdebi-core
+    #- sudo gdebi --n pacman.deb
+    # - sudo dkp-pacman -Sy
+    #- sudo dkp-pacman -S nds-dev --noconfirm
 
 script:
-    - cd P-Emerald_2
-    - make NOSOUND=1
-    - mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
-    - make DESQUID=1 NOSOUND=1 rebuild
-    - mv P-Emerald_2.nds P-Emerald_2_NOSOUND_DESQUID.nds
-    - make DESQUID=1 rebuild
-    - mv P-Emerald_2.nds P-Emerald_2_DESQUID.nds
-    - make rebuild
+  - cd P-Emerald_2
+  - make NOSOUND=1
+  - mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
+  - make DESQUID=1 NOSOUND=1 rebuild
+  - mv P-Emerald_2.nds P-Emerald_2_NOSOUND_DESQUID.nds
+  - make DESQUID=1 rebuild
+  - mv P-Emerald_2.nds P-Emerald_2_DESQUID.nds
+  - make rebuild
 
 notifications:
-    email: false
+  email: false
 
 deploy:
-    provider: releases
-    edge: true
-    file:
+  provider: releases
+  edge: true
+  file:
     - "P-Emerald_2_NOSOUND.nds"
     - "P-Emerald_2_NOSOUND_DESQUID.nds"
     - "P-Emerald_2.nds"
     - "P-Emerald_2_DESQUID.nds"
-    draft: true
-    on:
-        tags: true
+  draft: true
+  on:
+    tags: true
