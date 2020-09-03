@@ -75,7 +75,8 @@ arm7/$(TARGET).elf: FORCE
 	$(MAKE) -C arm7
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-arm9/$(TARGET).elf: FORCE soundbank ndstool
+#arm9 / $( TARGET ).elf : FORCE soundbank ndstool
+arm9/$(TARGET).elf: FORCE ndstool
 	$(MAKE) -C arm9
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
