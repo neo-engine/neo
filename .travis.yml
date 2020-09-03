@@ -9,7 +9,7 @@ install:
   - docker pull devkitpro/devkitarm
   - docker run -p 4000:80 --name devkitarm devkitpro/devkitarm
   - mkdir -p /opt/devkitpro
-  - docker cp devkitarm:/opt/devkitpro /opt/devkitpro
+  - docker cp devkitarm:/opt/devkitpro /opt/devkitpro || true
   - docker container stop devkitarm
   - docker rm -f devkitarm
 
