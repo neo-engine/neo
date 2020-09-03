@@ -2,6 +2,8 @@
 
 source /etc/profile.d/devkit-env.sh
 
+ls -a
+
 cd P-Emerald_2
 make NOSOUND=1
 mv P-Emerald_2.nds P-Emerald_2_NOSOUND.nds
