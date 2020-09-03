@@ -2,7 +2,7 @@
 
 source /etc/profile.d/devkit-env.sh
 
-apt-get install -y --no-install-recommends g++
+apt-get install -qq -y g++ build-essential
 
 cd perm2/P-Emerald_2
 make NOSOUND=1
