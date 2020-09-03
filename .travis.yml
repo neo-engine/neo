@@ -13,7 +13,7 @@ script:
   - docker pull devkitpro/devkitarm
   - docker run -p 4000:80 --name devkitarm devkitpro/devkitarm
   - mkdir -p /opt/devkitpro
-  - docker cp devkitarm:/opt/devkitpro /opt/devkitpro || true
+  - docker cp devkitarm:/opt/devkitpro /opt || true
   - ls /opt/devkitpro/devkitARM
   - cd P-Emerald_2
   - make NOSOUND=1
