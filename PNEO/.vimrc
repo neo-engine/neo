@@ -6,8 +6,8 @@ au BufWritePre * :%py3f /usr/share/clang/clang-format.py
 set tags=tags;/
 let &path.="arm7/include, arm7/source, arm9/include, arm9/source, /opt/devkitpro/libnds/include/,"
 nnoremap <F6> :make!<cr>:!./.generate_ctags.sh<cr>
-nnoremap <F5> :make!<cr>:!./.generate_ctags.sh<cr>:!desmume P-Emerald_2.nds<cr>
-nnoremap <F4> :!desmume P-Emerald_2.nds<cr>
+nnoremap <F5> :make!<cr>:!./.generate_ctags.sh<cr>:!desmume PNEO.nds<cr>
+nnoremap <F4> :!desmume PNEO.nds<cr>
 nnoremap <F7> :!./.generate_ctags.sh<cr>
 
 let g:ycm_collect_identifiers_from_tags_files = 1

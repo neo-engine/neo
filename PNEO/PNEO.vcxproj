@@ -152,7 +152,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeBuildCommandLine>make EXTRA_FLAGS="-DNO_SOUND -DDESQUID" 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeBuildCommandLine>
-    <NMakeOutput>P-Emerald_2.nds</NMakeOutput>
+    <NMakeOutput>PNEO.nds</NMakeOutput>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make EXTRA_FLAGS="-DNO_SOUND -DDESQUID" rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>_EMULATOR;ARM7;ARM9;NO_SOUND;DESQUID;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
@@ -162,7 +162,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>make 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeBuildCommandLine>
-    <NMakeOutput>P-Emerald_2.nds</NMakeOutput>
+    <NMakeOutput>PNEO.nds</NMakeOutput>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make rebuild 2&gt;&amp;1 | sed -e 's/\(\w\+\):\([0-9]\+\):/\1(\2):/'</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>ARM7;ARM9;WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>

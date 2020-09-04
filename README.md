@@ -81,50 +81,50 @@ Screenshots
 -----------
 
 ##### General gameplay
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/st01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/st02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm05.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm06.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm07.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/gm08.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/st01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/st02.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm02.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm03.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm04.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm05.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm06.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm07.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/gm08.png)
 
 ##### Pokémon status screens
 
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/sts05.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/sts01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/sts02.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/sts03.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/sts04.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/sts05.png)
 
 ##### The storage system
 
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bx03.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bx01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bx02.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bx03.png)
 
 ##### The Bag
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bg05.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bg01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bg02.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bg03.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bg04.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bg05.png)
 
 ##### Battles
 ###### Wild Pokémon battles
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt02.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt03.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt04.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt05.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bt01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bt02.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bt03.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bt04.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bt05.png)
 
 ###### Trainer battles
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/bt06.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/bt06.png)
 
 #### Miscellaneous
 
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/tc01.png)
-![](https://github.com/PH111P/perm2/blob/master/P-Emerald_2/Screens/op01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/tc01.png)
+![](https://github.com/PH111P/perm2/blob/master/PNEO/Screens/op01.png)

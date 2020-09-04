@@ -37,7 +37,7 @@ export DEV_CODE			:=	01
 export GAME_CODE		:=	ADAJ
 export GAME_TITLE		:=	POKEMON NEO
 export VERSION			:=	9
-export VERSION_NAME		:=	Magnetizing Magnemite neo
+export VERSION_NAME		:=	Mystic Gardevoir neo
 
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
