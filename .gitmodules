@@ -1,11 +1,11 @@
 [submodule "PNEO/FSROOT"]
 	path = PNEO/FSROOT
-    url = https://github.com/ph111p/perm2-fsroot
+    url = https://github.com/neo-engine/fsroot
     ignore = dirty
 [submodule "PNEO/tools/ndstool"]
 	path = PNEO/tools/ndstool
-	url = https://github.com/PH111P/ndstool
+	url = https://github.com/neo-engine/ndstool
     ignore = dirty
 [submodule "PNEO/tools/fsdata"]
 	path = PNEO/tools/fsdata
-	url = https://github.com/PH111P/perm2-fsdata
+	url = https://github.com/neo-engine/fsdata
