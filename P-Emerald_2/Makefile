@@ -36,7 +36,7 @@ GAME_ICON       :=  $(CURDIR)/icon.bmp
 export DEV_CODE			:=	01
 export GAME_CODE		:=	ADAJ
 export GAME_TITLE		:=	POKEMON NEO
-export VERSION			:=	8
+export VERSION			:=	9
 export VERSION_NAME		:=	Magnetizing Magnemite neo
 
 export TARGET		:=	$(shell basename $(CURDIR))
@@ -54,10 +54,11 @@ _ADDFILES	:=	-d $(NITRO_FILES)
 endif
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+ifdef FLASHCARD
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
-	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN)" $(_ADDFILES)
-
-ifeq (1,2)
+	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
+else
+$(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
 		-d ./FSROOT -B $(GAME_ICON) \
 		"$(GAME_TITLE_JP);$(GAME_SUBTITLE1_JP);$(GAME_SUBTITLE2_JP)" $(_ADDFILES) \
