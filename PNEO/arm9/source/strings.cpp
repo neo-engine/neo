@@ -1665,7 +1665,7 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Besides Miracle Seed, I think there are other\nconvenient items for Pok\xe9mon to hold.",
       "Das ist eine Wundersaat.\r"
       "Wenn ein Pok\xe9mon sie tr\xe4gt, werden\nseine Pflanzen-Attacken st\xe4rker.\r"
-      "Neben der Wundersaat gibt es noch andere\nItems, die von Pok\xe9mon getragen werden k\xf6nnen." },
+      "Neben der Wundersaat gibt es noch andere\nItems, die von Pok\xe9mon getragen werden\nk\xf6nnen." },
     { "Dad: I see| So, you've beaten\nthe Gym Leader in Rustboro City.\r"
       "But there are many more Trainers\nwho are stronger than you, [PLAYER].\r"
       "Across the sea in Dewford Town is a\nGym Leader named Brawly.\r"
