@@ -1,6 +1,6 @@
 Pokémon _neo_
 ===========
-[![Travis](https://travis-ci.org/PH111P/perm2.svg?branch=master)](https://travis-ci.org/PH111P/perm2)
+[![Travis](https://travis-ci.org/neo-engine/neo.svg?branch=master)](https://travis-ci.org/neo-engine/neo)
 
 An experimental Pokémon engine for Nintendo DS. For demonstration purposes only, currently
 _neo_ includes some (updated) maps from Pokémon Emerald, as well as images from other
