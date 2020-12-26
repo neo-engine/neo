@@ -59,7 +59,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #undef RAND_MAX
 #define RAND_MAX 4294967295
 
-enum GameMod : u8 { DEVELOPER, ALPHA, BETA, RELEASE, EMULATOR };
+enum GameMod : u8 { DEVELOPER, ALPHA, BETA, RELEASE, EMULATOR, FCARD };
 extern GameMod gMod;
 
 u8 getCurrentDaytime( );

@@ -64,7 +64,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "consoleFont.h"
 
-#ifdef DESQUID
+#ifdef FLASHCARD
+GameMod gMod = GameMod::FCARD;
+#elif DESQUID
 GameMod gMod = GameMod::DEVELOPER;
 #else
 GameMod gMod = GameMod::ALPHA;
@@ -238,14 +240,14 @@ int main( int, char** p_argv ) {
     keysSetRepeat( 25, 5 );
     sysSetBusOwners( true, true );
 
+    MAP::curMap = new MAP::mapDrawer( );
+
     // Read the savegame
     if( gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
         || !FS::readSave( p_argv[ 0 ] ) ) {
         std::memset( &SAVE::SAV, 0, sizeof( SAVE::saveGame ) );
         SAVE::SAV.clear( );
     }
-
-    MAP::curMap = new MAP::mapDrawer( );
 
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );

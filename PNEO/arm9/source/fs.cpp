@@ -345,18 +345,22 @@ namespace FS {
     }
 
     bool readSave( const char* p_path ) {
-        FILE* f = FS::open( "", p_path, ".sav" );
-        if( !f ) {
-            if( CARD::checkCard( ) ) {
-                CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
-                if( SAVE::SAV.isGood( ) ) { return true; }
-            }
-            return false;
+#ifndef FLASHCARD
+        if( CARD::checkCard( ) ) {
+            CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
+            if( SAVE::SAV.isGood( ) ) { return true; }
         }
+#else
+        return false; // Disable reading of save file on flashcards for now, not enough RAM available
+#endif
 
-        FS::read( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
-        FS::close( f );
-        return SAVE::SAV.isGood( );
+        FILE* f = FS::open( p_path, "PNEO", ".sav", "r" );
+        if( f != nullptr ) {
+            fread( &SAVE::SAV, sizeof( SAVE::saveGame ), 1, f );
+            fclose( f );
+            return SAVE::SAV.isGood( );
+        }
+        return false;
     }
 
     bool writeSave( const char* p_path ) {
@@ -373,24 +377,28 @@ namespace FS {
         SAVE::SAV.getActiveFile( ).m_lastSaveDate     = SAVE::CURRENT_DATE;
         SAVE::SAV.getActiveFile( ).m_lastSaveTime     = SAVE::CURRENT_TIME;
 
-        FILE* f = FS::open( "", p_path, ".sav", "w" );
-        if( !f ) {
-            FS::close( f );
-            if( CARD::checkCard( ) ) {
-                if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
-                                     p_progress ) ) {
-                    return true;
-                }
+#ifndef FLASHCARD
+        if( CARD::checkCard( ) ) {
+            if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
+                        p_progress ) ) {
+                return true;
             }
-            SAVE::SAV.getActiveFile( ).m_lastSaveLocation = oldl;
-            SAVE::SAV.getActiveFile( ).m_lastSaveDate     = oldd;
-            SAVE::SAV.getActiveFile( ).m_lastSaveTime     = oldt;
-            return false;
         }
-        FS::write( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
-        FS::close( f );
+#else
+        (void) p_progress;
+#endif
 
-        return true;
+        FILE* f = FS::open( p_path, "PNEO", ".sav", "w" );
+        if( f != nullptr ) {
+            FS::write( f, &SAVE::SAV, sizeof( SAVE::saveGame ), 1 );
+            FS::close( f );
+            return true;
+        }
+        FS::close( f );
+        SAVE::SAV.getActiveFile( ).m_lastSaveLocation = oldl;
+        SAVE::SAV.getActiveFile( ).m_lastSaveDate     = oldd;
+        SAVE::SAV.getActiveFile( ).m_lastSaveTime     = oldt;
+        return false;
     }
 } // namespace FS
 

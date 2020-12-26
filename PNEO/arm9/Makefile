@@ -35,13 +35,16 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\
 			$(EXTRA_FLAGS) -DGAME_CODE="\"$(GAME_CODE)\"" -DVERSION=$(VERSION) \
-			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" $(ARCH)
+			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" $(ARCH) \
 
 ifdef DESQUID
 CFLAGS	+=	-DDESQUID -fanalyzer -Wno-analyzer-null-dereference
 endif
 ifdef NOSOUND
 CFLAGS	+=	-DNO_SOUND
+endif
+ifdef FLASHCARD
+CFLAGS	+=	-DFLASHCARD
 endif
 
 
