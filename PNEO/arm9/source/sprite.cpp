@@ -39,44 +39,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "damage_1.h"
 #include "damage_2.h"
 
-#include "type_bug_de.h"
-#include "type_bug_en.h"
-#include "type_dark_de.h"
-#include "type_dark_en.h"
-#include "type_dragon_de.h"
-#include "type_dragon_en.h"
-#include "type_electr_de.h"
-#include "type_electr_en.h"
-#include "type_fairy_de.h"
-#include "type_fairy_en.h"
-#include "type_fight_de.h"
-#include "type_fight_en.h"
-#include "type_fire_de.h"
-#include "type_fire_en.h"
-#include "type_flying_de.h"
-#include "type_flying_en.h"
-#include "type_ghost_de.h"
-#include "type_ghost_en.h"
-#include "type_grass_de.h"
-#include "type_grass_en.h"
-#include "type_ground_de.h"
-#include "type_ground_en.h"
-#include "type_ice_de.h"
-#include "type_ice_en.h"
-#include "type_normal_de.h"
-#include "type_normal_en.h"
-#include "type_poison_de.h"
-#include "type_poison_en.h"
-#include "type_psychic_de.h"
-#include "type_psychic_en.h"
-#include "type_rock_de.h"
-#include "type_rock_en.h"
-#include "type_steel_de.h"
-#include "type_steel_en.h"
-#include "type_unknown.h"
-#include "type_water_de.h"
-#include "type_water_en.h"
-
 unsigned int   TEMP[ 12288 ]   = { 0 };
 unsigned short TEMP_PAL[ 256 ] = { 0 };
 
@@ -90,38 +52,6 @@ namespace IO {
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/PKMN/";
     const char* PKMN_BACK_PATH = "nitro:/PICS/SPRITES/PKMNBACK/";
     const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
-
-    const unsigned int* TypeTiles[ 19 ][ LANGUAGES ]
-        = { { type_normal_enTiles, type_normal_deTiles },
-            { type_fight_enTiles, type_fight_deTiles },
-            { type_flying_enTiles, type_flying_deTiles },
-            { type_poison_enTiles, type_poison_deTiles },
-            { type_ground_enTiles, type_ground_deTiles },
-            { type_rock_enTiles, type_rock_deTiles },
-            { type_bug_enTiles, type_bug_deTiles },
-            { type_ghost_enTiles, type_ghost_deTiles },
-            { type_steel_enTiles, type_steel_deTiles },
-            { type_unknownTiles, type_unknownTiles },
-            { type_water_enTiles, type_water_deTiles },
-            { type_fire_enTiles, type_fire_deTiles },
-            { type_grass_enTiles, type_grass_deTiles },
-            { type_electr_enTiles, type_electr_deTiles },
-            { type_psychic_enTiles, type_psychic_deTiles },
-            { type_ice_enTiles, type_ice_deTiles },
-            { type_dragon_enTiles, type_dragon_deTiles },
-            { type_dark_enTiles, type_dark_deTiles },
-            { type_fairy_enTiles, type_fairy_deTiles } };
-    const unsigned short* TypePals[ 19 ][ LANGUAGES ]
-        = { { type_normal_enPal, type_normal_dePal },   { type_fight_enPal, type_fight_dePal },
-            { type_flying_enPal, type_flying_dePal },   { type_poison_enPal, type_poison_dePal },
-            { type_ground_enPal, type_ground_dePal },   { type_rock_enPal, type_rock_dePal },
-            { type_bug_enPal, type_bug_dePal },         { type_ghost_enPal, type_ghost_dePal },
-            { type_steel_enPal, type_steel_dePal },     { type_unknownPal, type_unknownPal },
-            { type_water_enPal, type_water_dePal },     { type_fire_enPal, type_fire_dePal },
-            { type_grass_enPal, type_grass_dePal },     { type_electr_enPal, type_electr_dePal },
-            { type_psychic_enPal, type_psychic_dePal }, { type_ice_enPal, type_ice_dePal },
-            { type_dragon_enPal, type_dragon_dePal },   { type_dark_enPal, type_dark_dePal },
-            { type_fairy_enPal, type_fairy_dePal } };
 
     const unsigned int*   HitTypeTiles[ 3 ] = { damage_0Tiles, damage_1Tiles, damage_2Tiles };
     const unsigned short* HitTypePals[ 3 ]  = { damage_0Pal, damage_1Pal, damage_2Pal };
@@ -1271,16 +1201,16 @@ namespace IO {
 
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
-        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
-                           TypePals[ p_type ][ p_language ], TypeTiles[ p_type ][ p_language ], 256,
+        snprintf( BUFFER, 99, "TP/type_%hhu_%hhu", p_type, p_language );
+        return loadSprite( BUFFER, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
                            false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadTypeIconB( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        bool p_bottom, const SAVE::language p_language ) {
-        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16,
-                            TypePals[ p_type ][ p_language ], TypeTiles[ p_type ][ p_language ],
-                            256, false, false, false, OBJPRIORITY_0, p_bottom );
+        snprintf( BUFFER, 99, "TP/type_%hhu_%hhu", p_type, p_language );
+        return loadSpriteB( BUFFER, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16,
+                            false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadLocationBackB( u8 p_idx, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
@@ -1299,9 +1229,9 @@ namespace IO {
     }
     u16 loadPlatform( u8 p_platform, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom ) {
-
+        snprintf( BUFFER, 99, "plat%hhu", p_platform );
         if( FS::readData<unsigned short, unsigned int>(
-                "nitro:/PICS/SPRITES/PLAT/", ( "plat" + std::to_string( p_platform ) ).c_str( ), 16,
+                "nitro:/PICS/SPRITES/PLAT/", BUFFER, 16,
                 TEMP_PAL, 128 * 64 / 8, TEMP ) ) {
             loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL, TEMP,
                         128 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,

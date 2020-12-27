@@ -47,7 +47,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
 
-#ifdef DESQUID_MORE
+#ifdef DESQUID
 // BEGIN TEST
 #include "animations.h"
 #include "bagViewer.h"
@@ -116,7 +116,7 @@ namespace SAVE {
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
-#ifdef DESQUID_MORE
+#ifdef DESQUID
         // BEGIN TEST
 
         pokemon testTeam[ 6 ];
@@ -148,8 +148,8 @@ namespace SAVE {
         //    BOX::boxViewer bxv;
         //  bxv.run( );
 
-        //      STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-        //        sts.run( );
+        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+        sts.run( );
 
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );
@@ -158,9 +158,9 @@ namespace SAVE {
 
         //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
         //        2 ),
-        BATTLE::battle bt = BATTLE::battle( testTeam, 6, 0 );
+        // BATTLE::battle bt = BATTLE::battle( testTeam, 6, 0 );
 
-        bt.start( );
+        // bt.start( );
 
         // END TEST
 #endif
