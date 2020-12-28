@@ -42,68 +42,73 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "backarrow.h"
 #include "box_arrow.h"
 #include "box_arrow2.h"
-#include "boxsub.h"
-#include "boxsub2.h"
+//#include "boxsub.h"
+//#include "boxsub2.h"
 #include "noselection_128_32_1.h"
 #include "noselection_128_32_2.h"
 #include "noselection_64_20.h"
 #include "noselection_64_32.h"
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
-#include "partybg.h"
+//#include "partybg.h"
 #include "status_shiny.h"
 #include "x_16_16.h"
 
 namespace BOX {
 
     // Top screen
-#define SPR_PKMN_START_OAM 0
-#define SPR_MOVEWINDOW_START_OAM 5
-#define SPR_TYPE_OAM( p_type ) ( 10 + ( p_type ) )
-#define SPR_BALL_ICON_OAM 12
-#define SPR_CHOICE_START_OAM 14
-#define SPR_SHINY_ICON_OAM 23
-#define SPR_INFOPAGE_START_OAM 24
+#define SPR_PKMN_START_OAM        0
+#define SPR_MOVEWINDOW_START_OAM  5
+#define SPR_TYPE_OAM( p_type )    ( 10 + ( p_type ) )
+#define SPR_BALL_ICON_OAM         12
+#define SPR_CHOICE_START_OAM      14
+#define SPR_SHINY_ICON_OAM        23
+#define SPR_INFOPAGE_START_OAM    24
 #define SPR_PKMN_SHADOW_START_OAM 40
-#define SPR_NAME_BG_OAM 44
+#define SPR_NAME_BG_OAM           44
 
-#define SPR_PKMN_PAL 0
+#define SPR_PKMN_PAL           0
 #define SPR_TYPE_PAL( p_type ) ( 1 + ( p_type ) )
-#define SPR_INFOPAGE_PAL 3
-#define SPR_BALL_ICON_PAL 4
-#define SPR_BOX_PAL 5
-#define SPR_SHINY_ICON_PAL 6
-#define SPR_PKMN_SHADOW_PAL 7
+#define SPR_INFOPAGE_PAL       3
+#define SPR_BALL_ICON_PAL      4
+#define SPR_BOX_PAL            5
+#define SPR_SHINY_ICON_PAL     6
+#define SPR_PKMN_SHADOW_PAL    7
 
     // bottom screen
-#define SPR_PKMN_SEL_OAM_SUB 0
+#define SPR_PKMN_SEL_OAM_SUB   0
 #define SPR_PKMN_START_OAM_SUB 1
-#define SPR_X_OAM_SUB 39
+#define SPR_X_OAM_SUB          39
 // #define SPR_ARROW_BACK_OAM_SUB 40
 // #define SPR_ARROW_BACK_BG_OAM_SUB 41
-#define SPR_NEXT_BG_OAM_SUB 42
-#define SPR_NEXT_ARR_OAM_SUB 43
-#define SPR_NAME_BG_OAM_SUB 44
-#define SPR_PREV_BG_OAM_SUB 46
-#define SPR_PREV_ARR_OAM_SUB 47
-#define SPR_SEL_ARROW_OAM_SUB 48
-#define SPR_PARTY_BG_OAM_SUB 49
-#define SPR_PARTY_TEXT_OAM_SUB 52
+#define SPR_NEXT_BG_OAM_SUB            42
+#define SPR_NEXT_ARR_OAM_SUB           43
+#define SPR_NAME_BG_OAM_SUB            44
+#define SPR_PREV_BG_OAM_SUB            46
+#define SPR_PREV_ARR_OAM_SUB           47
+#define SPR_SEL_ARROW_OAM_SUB          48
+#define SPR_PARTY_BG_OAM_SUB           49
+#define SPR_PARTY_TEXT_OAM_SUB         52
 #define SPR_PKMN_OPTS_OAM_SUB( p_opt ) ( 54 + 3 * ( p_opt ) )
 
 #define MAX_WALLPAPERS 3
-#define INFO_X 8
-#define INFO_Y 32
-#define ANCHOR_X ( 256 - 96 - 8 )
-#define ANCHOR_Y 8
+#define INFO_X         8
+#define INFO_Y         32
+#define ANCHOR_X       ( 256 - 96 - 8 )
+#define ANCHOR_Y       8
 
     void boxUI::initTop( ) {
         IO::initVideo( true );
 
         IO::clearScreen( false, false, true );
         IO::initOAMTable( false );
-        dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
-        dmaCopy( partybgPal, BG_PALETTE, 5 * 2 );
+
+        FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4, TEMP,
+                                                    256, TEMP_PAL );
+        dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+        dmaCopy( TEMP_PAL, BG_PALETTE, 5 * 2 );
+        // dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+        // dmaCopy( partybgPal, BG_PALETTE, 5 * 2 );
         bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
         bgSetScroll( IO::bg3, 0, 0 );
         REG_BLDCNT   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -321,9 +326,12 @@ namespace BOX {
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/BOX/",
-                std::to_string( p_box->m_wallpaper % MAX_WALLPAPERS ).c_str( ), 128, 49152, true );
-        dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
-        dmaCopy( boxsub2Pal, BG_PALETTE_SUB, 13 * 2 );
+                             std::to_string( p_box->m_wallpaper % MAX_WALLPAPERS ).c_str( ), 128,
+                             49152, true );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "boxsub2", 26, 0, true );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "boxsub", 0, 49152, true );
+        // dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        // dmaCopy( boxsub2Pal, BG_PALETTE_SUB, 13 * 2 );
 
         // Load some placeholder
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
@@ -409,8 +417,7 @@ namespace BOX {
                       .y
                   - 8;
             break;
-        default:
-            break;
+        default: break;
         }
         if( _heldPkmn.getSpecies( ) ) {
             IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].isHidden = false;
@@ -927,7 +934,8 @@ namespace BOX {
     }
 
     void boxUI::showParty( box* p_box, pokemon* p_party, u8 p_partyLen ) {
-        dmaCopy( boxsub2Bitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        // dmaCopy( boxsub2Bitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "boxsub2", 0, 49152, true );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
@@ -973,7 +981,8 @@ namespace BOX {
     }
 
     void boxUI::hideParty( box* p_box ) {
-        dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "boxsub", 0, 49152, true );
+        // dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );

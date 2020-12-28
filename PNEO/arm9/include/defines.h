@@ -83,7 +83,7 @@ extern u8            cooldown;
 
 extern bool TWL_CONFIG;
 
-extern unsigned int   TEMP[ 12288 ];
+extern unsigned int   TEMP[ 256 * 256 / 4 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
 constexpr u8  LANGUAGES        = 2;

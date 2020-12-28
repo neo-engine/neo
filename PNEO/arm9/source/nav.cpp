@@ -65,7 +65,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle.h"
 #include "battleTrainer.h"
 
-#include "Border.h"
+// #include "Border.h"
 #include "locationNames.h"
 
 #include "arrow_up.h"
@@ -137,7 +137,7 @@ namespace NAV {
 
         auto ptr  = !p_bottom ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
         auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
-        auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
+        // auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
 
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
@@ -148,8 +148,10 @@ namespace NAV {
                 ptr3, "nitro:/PICS/NAV/",
                 std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
                 192 * 256, p_bottom );
-            dmaCopy( BorderBitmap, ptr, 256 * 192 );
-            dmaCopy( BorderPal + 192, pal + 192, 64 );
+            FS::readPictureData( ptr, "nitro:/PICS/", "Border", 64, 192, 192 * 256, p_bottom );
+
+            // dmaCopy( BorderBitmap, ptr, 256 * 192 );
+            // dmaCopy( BorderPal + 192, pal + 192, 64 );
         }
 
         u16 tileCnt = 0;

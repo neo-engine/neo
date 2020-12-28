@@ -182,11 +182,13 @@ namespace FS {
         if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL ) )
             return false;
 
-        dmaCopy( TEMP, p_layer, p_tileCnt );
-        if( p_bottom )
-            dmaCopy( TEMP_PAL, BG_PALETTE_SUB, p_palSize );
-        else
-            dmaCopy( TEMP_PAL, BG_PALETTE, p_palSize );
+        if( p_tileCnt ) { dmaCopy( TEMP, p_layer, p_tileCnt ); }
+        if( p_palSize ) {
+            if( p_bottom )
+                dmaCopy( TEMP_PAL, BG_PALETTE_SUB, p_palSize );
+            else
+                dmaCopy( TEMP_PAL, BG_PALETTE, p_palSize );
+        }
         return true;
     }
 
@@ -195,11 +197,13 @@ namespace FS {
         if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL ) )
             return false;
 
-        dmaCopy( TEMP, p_layer, p_tileCnt );
-        if( p_bottom )
-            dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE_SUB + p_palStart, p_palSize );
-        else
-            dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE + p_palStart, p_palSize );
+        if( p_tileCnt ) { dmaCopy( TEMP, p_layer, p_tileCnt ); }
+        if( p_palSize ) {
+            if( p_bottom )
+                dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE_SUB + p_palStart, p_palSize );
+            else
+                dmaCopy( TEMP_PAL + p_palStart, BG_PALETTE + p_palStart, p_palSize );
+        }
         return true;
     }
 
@@ -350,8 +354,6 @@ namespace FS {
             CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
             if( SAVE::SAV.isGood( ) ) { return true; }
         }
-#else
-        return false; // Disable reading of save file on flashcards for now, not enough RAM available
 #endif
 
         FILE* f = FS::open( p_path, "PNEO", ".sav", "r" );
@@ -380,7 +382,7 @@ namespace FS {
 #ifndef FLASHCARD
         if( CARD::checkCard( ) ) {
             if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
-                        p_progress ) ) {
+                                 p_progress ) ) {
                 return true;
             }
         }

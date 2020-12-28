@@ -39,7 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "damage_1.h"
 #include "damage_2.h"
 
-unsigned int   TEMP[ 12288 ]   = { 0 };
+unsigned int   TEMP[ 256 * 256 / 4 ]   = { 0 };
 unsigned short TEMP_PAL[ 256 ] = { 0 };
 
 namespace IO {

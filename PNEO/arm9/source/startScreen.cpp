@@ -47,7 +47,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
 
-#ifdef DESQUID
+#ifdef DESQUID_MORE
 // BEGIN TEST
 #include "animations.h"
 #include "bagViewer.h"
@@ -116,7 +116,7 @@ namespace SAVE {
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
-#ifdef DESQUID
+#ifdef DESQUID_MORE
         // BEGIN TEST
 
         pokemon testTeam[ 6 ];

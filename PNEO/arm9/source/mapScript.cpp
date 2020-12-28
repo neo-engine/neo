@@ -205,9 +205,16 @@ namespace MAP {
         NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
-    void mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject ) {
+    static u16 CURRENT_SCRIPT = -1;
+    void       mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject ) {
+        if( CURRENT_SCRIPT == p_scriptId ) { return; }
+        CURRENT_SCRIPT = p_scriptId;
+
         FILE* f = FS::openScript( p_scriptId );
-        if( !f ) { return; }
+        if( !f ) {
+            CURRENT_SCRIPT = -1;
+            return;
+        }
         u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
         fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
         FS::close( f );
@@ -271,7 +278,10 @@ namespace MAP {
             }
             case ATT: playerAttachedToObject = true; break;
             case REM: playerAttachedToObject = false; break;
-            case EOP: return;
+            case EOP: {
+                CURRENT_SCRIPT = -1;
+                return;
+            }
             case GIT: {
                 auto idata     = ITEM::getItemData( parA );
                 registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_bag.count(
@@ -391,6 +401,7 @@ namespace MAP {
                 if( pc + par1 < MAX_SCRIPT_SIZE ) {
                     pc += par1;
                 } else {
+                    CURRENT_SCRIPT = -1;
                     return;
                 }
                 break;
@@ -584,6 +595,12 @@ namespace MAP {
                 break;
             }
             case BTR: {
+                // If the player can't battle, they'll just lose
+                if( !SAVE::SAV.getActiveFile( ).countAlivePkmn( ) ) {
+                    registers[ 0 ] = 0;
+                    break;
+                }
+
                 // TODO: Honor parB (i.e. single/double battle setting)
 
                 auto tr         = BATTLE::getBattleTrainer( parA );
@@ -613,9 +630,21 @@ namespace MAP {
                 break;
             }
             case BTRR:
+                // If the player can't battle, they'll just lose
+                if( !SAVE::SAV.getActiveFile( ).countAlivePkmn( ) ) {
+                    registers[ 0 ] = 0;
+                    break;
+                }
+
                 // TODO
                 break;
             case BPK: {
+                // If the player can't battle, they'll just lose
+                if( !SAVE::SAV.getActiveFile( ).countAlivePkmn( ) ) {
+                    registers[ 0 ] = 0;
+                    break;
+                }
+
                 pokemon wildPkmn = pokemon( parA, parB );
 
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
@@ -641,6 +670,12 @@ namespace MAP {
                 break;
             }
             case BPKR:
+                // If the player can't battle, they'll just lose
+                if( !SAVE::SAV.getActiveFile( ).countAlivePkmn( ) ) {
+                    registers[ 0 ] = 0;
+                    break;
+                }
+
                 // TODO
                 break;
             case ITM: NAV::giveItemToPlayer( parA, parB ); break;
@@ -707,19 +742,17 @@ namespace MAP {
                 }
                 case 5: {
                     if( par1 <= 4 ) [[likely]] {
-                            par1++;
-                            registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par1 - 1 ];
-                        }
-                    else {
+                        par1++;
+                        registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par1 - 1 ];
+                    } else {
                         registers[ 0 ] = 0;
                         break;
                     }
                     for( u8 i = par1; i < SAVE::SAV.getActiveFile( ).m_initGameItemCount; ++i ) {
                         if( i < 4 ) [[likely]] {
-                                SAVE::SAV.getActiveFile( ).m_initGameItems[ i ]
-                                    = SAVE::SAV.getActiveFile( ).m_initGameItems[ i + 1 ];
-                            }
-                        else {
+                            SAVE::SAV.getActiveFile( ).m_initGameItems[ i ]
+                                = SAVE::SAV.getActiveFile( ).m_initGameItems[ i + 1 ];
+                        } else {
                             SAVE::SAV.getActiveFile( ).m_initGameItems[ i ] = 0;
                         }
                     }
@@ -764,6 +797,7 @@ namespace MAP {
             }
             ++pc;
         }
+        CURRENT_SCRIPT = -1;
     }
 
     void mapDrawer::interact( ) {

@@ -39,7 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "noselection_64_20.h"
 #include "noselection_96_32_4.h"
 #include "x_16_16.h"
-#include "Border.h"
+// #include "Border.h"
 
 namespace SAVE {
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 0 + 10 * ( p_pos ) )
@@ -243,8 +243,11 @@ namespace SAVE {
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-        dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaCopy( BorderPal + 192, BG_PALETTE + 192, 64 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "Border", 64, 192,
+                             192 * 256, false );
+
+        // dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+        // dmaCopy( BorderPal + 192, BG_PALETTE + 192, 64 );
 
         for( u8 i = 0; i < 2; ++i ) {
             u16* pal             = IO::BG_PAL( i );

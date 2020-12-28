@@ -69,68 +69,70 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "status_txc.h"
 #include "x_16_16.h"
 
-#include "partybg.h"
-#include "partybg2.h"
-#include "statussub.h"
-#include "statustop.h"
-
 namespace STS {
     // top screen sprites
 #define SPR_WINDOW_START_OAM 0
-#define SPR_HP_BAR_OAM 10
-#define SPR_PKMN_START_OAM 13
+#define SPR_HP_BAR_OAM       10
+#define SPR_PKMN_START_OAM   13
 //#define SPR_ITEM_OAM 21
-#define SPR_TYPE_OAM( p_type ) ( 22 + ( p_type ) )
-#define SPR_BALL_ICON_OAM 24
-#define SPR_EXP_BAR_OAM 25
-#define SPR_CHOICE_START_OAM 28
-#define SPR_STATUS_ICON_OAM 36
-#define SPR_SHINY_ICON_OAM 37
-#define SPR_INFOPAGE_START_OAM 38
+#define SPR_TYPE_OAM( p_type )    ( 22 + ( p_type ) )
+#define SPR_BALL_ICON_OAM         24
+#define SPR_EXP_BAR_OAM           25
+#define SPR_CHOICE_START_OAM      28
+#define SPR_STATUS_ICON_OAM       36
+#define SPR_SHINY_ICON_OAM        37
+#define SPR_INFOPAGE_START_OAM    38
 #define SPR_PKMN_SHADOW_START_OAM 48
-#define SPR_PAGE_OAM 52
-#define SPR_WINDOW_OAM 53
+#define SPR_PAGE_OAM              52
+#define SPR_WINDOW_OAM            53
 
 #define SPR_INFOPAGE_PAL 0
-#define SPR_PKMN_PAL 1
+#define SPR_PKMN_PAL     1
 //#define SPR_ITEM_PAL 2
-#define SPR_WINDOW_PAL 3
+#define SPR_WINDOW_PAL         3
 #define SPR_TYPE_PAL( p_type ) ( 4 + ( p_type ) )
-#define SPR_BALL_ICON_PAL 6
-#define SPR_EXP_BAR_PAL 7
-#define SPR_BOX_PAL 8
-#define SPR_STATUS_ICON_PAL 9
-#define SPR_SHINY_ICON_PAL 10
-#define SPR_PKMN_SHADOW_PAL 11
-#define SPR_PAGE_PAL 12
-#define SPR_ARROW_X_PAL 13
+#define SPR_BALL_ICON_PAL      6
+#define SPR_EXP_BAR_PAL        7
+#define SPR_BOX_PAL            8
+#define SPR_STATUS_ICON_PAL    9
+#define SPR_SHINY_ICON_PAL     10
+#define SPR_PKMN_SHADOW_PAL    11
+#define SPR_PAGE_PAL           12
+#define SPR_ARROW_X_PAL        13
 
     // Sub screen sprites
-#define SPR_INFOPAGE_START_OAM_SUB 0
-#define SPR_ARROW_UP_OAM_SUB 18
-#define SPR_ARROW_DOWN_OAM_SUB 19
-#define SPR_X_OAM_SUB 20
-#define SPR_PAGE_LEFT_OAM_SUB 21
-#define SPR_PAGE_OAM_SUB( p_page ) ( 22 + ( p_page ) )
-#define SPR_NAVIGATION_OAM_SUB( p_page ) ( 25 + ( p_page ) )
-#define SPR_TYPE_OAM_SUB( p_idx ) ( 30 + ( p_idx ) )
-#define SPR_MOVE_OAM_SUB( p_move ) ( 34 + 6 * ( p_move ) )
-#define SPR_ABILITY_OAM_SUB 60
-#define SPR_ARROW_BACK_OAM_SUB 70
+#define SPR_INFOPAGE_START_OAM_SUB        0
+#define SPR_ARROW_UP_OAM_SUB              18
+#define SPR_ARROW_DOWN_OAM_SUB            19
+#define SPR_X_OAM_SUB                     20
+#define SPR_PAGE_LEFT_OAM_SUB             21
+#define SPR_PAGE_OAM_SUB( p_page )        ( 22 + ( p_page ) )
+#define SPR_NAVIGATION_OAM_SUB( p_page )  ( 25 + ( p_page ) )
+#define SPR_TYPE_OAM_SUB( p_idx )         ( 30 + ( p_idx ) )
+#define SPR_MOVE_OAM_SUB( p_move )        ( 34 + 6 * ( p_move ) )
+#define SPR_ABILITY_OAM_SUB               60
+#define SPR_ARROW_BACK_OAM_SUB            70
 #define SPR_WINDOW_ICON_OAM_SUB( p_page ) ( 71 + ( p_page ) )
-#define SPR_WINDOW_PKMN_OAM_SUB 71
-#define SPR_WINDOW_MOVE_OAM_SUB 72
+#define SPR_WINDOW_PKMN_OAM_SUB           71
+#define SPR_WINDOW_MOVE_OAM_SUB           72
 // #define SPR_WINDOW_CONTEST_OAM_SUB 73
-#define SPR_MOVE_DETAILS_OAM_SUB 75
+#define SPR_MOVE_DETAILS_OAM_SUB      75
 #define SPR_CATEGORY_OAM_SUB( p_idx ) ( 100 + ( p_idx ) )
 
-#define SPR_INFOPAGE_PAL_SUB 0
-#define SPR_ARROW_X_PAL_SUB 1
-#define SPR_BOX_PAL_SUB 2
-#define SPR_TYPE_PAL_SUB( p_idx ) ( 3 + ( p_idx ) )
-#define SPR_ABILITY_PAL_SUB 8
-#define SPR_WINDOW_PAL_SUB 9
+#define SPR_INFOPAGE_PAL_SUB          0
+#define SPR_ARROW_X_PAL_SUB           1
+#define SPR_BOX_PAL_SUB               2
+#define SPR_TYPE_PAL_SUB( p_idx )     ( 3 + ( p_idx ) )
+#define SPR_ABILITY_PAL_SUB           8
+#define SPR_WINDOW_PAL_SUB            9
 #define SPR_CATEGORY_PAL_SUB( p_idx ) ( 10 + ( p_idx ) )
+
+    // Palettes hardcoded for speed
+    const u16 STAT_BG_PAL[ 14 ]
+        = { 0x0000, 0x1062, 0x1483, 0x2107, 0x14A5, 0x1CE8, 0x3DEF, 0x5294, 0x1062 };
+    const u16 STAT_BG_PAL_SUB[ 14 ] = {
+        0x0000, 0x1062, 0x1483, 0x2107, 0x2107, 0x2107, 0x14A5, 0x1CE8, 0x3DEF, 0x1062, 0x5294,
+    };
 
     u16 statusScreenUI::initTopScreen( pokemon* p_pokemon, bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
@@ -359,11 +361,8 @@ namespace STS {
 
     u16 statusScreenUI::initBottomScreen( pokemon* p_pokemon, bool p_bottom ) {
         IO::clearScreen( p_bottom, false, true );
-        if( p_bottom ) {
-            dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        } else {
-            dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        }
+        FS::readPictureData( p_bottom ? bgGetGfxPtr( IO::bg2sub ) : bgGetGfxPtr( IO::bg2 ),
+                             "nitro:/PICS/", "statussub", 0, 192 * 256, p_bottom );
 
         IO::initOAMTable( p_bottom );
 
@@ -610,11 +609,10 @@ namespace STS {
     }
 
     void statusScreenUI::drawBasicInfoTop( pokemon* p_pokemon, bool p_bottom ) {
-        if( p_bottom ) {
-            dmaCopy( statustopBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        } else {
-            dmaCopy( statustopBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        }
+
+        FS::readPictureData( p_bottom ? bgGetGfxPtr( IO::bg2sub ) : bgGetGfxPtr( IO::bg2 ),
+                             "nitro:/PICS/", "statustop", 0, 192 * 256, p_bottom );
+
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         for( u8 i = 0; i < 6; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = true; }
         oam[ SPR_TYPE_OAM( 1 ) ].isHidden = true;
@@ -814,10 +812,8 @@ namespace STS {
 
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
 
-        dmaCopy( partybgPal, BG_PALETTE, 3 * 2 );
-        dmaCopy( statustopPal + 3, BG_PALETTE + 3, 8 * 2 );
-        dmaCopy( partybgPal, BG_PALETTE_SUB, 3 * 2 );
-        dmaCopy( statussubPal + 3, BG_PALETTE_SUB + 3, 8 * 2 );
+        dmaCopy( STAT_BG_PAL, BG_PALETTE, 3 * 10 );
+        dmaCopy( STAT_BG_PAL_SUB, BG_PALETTE_SUB, 3 * 10 );
 
         for( u8 i = 0; i < 2; ++i ) {
             u16* pal             = IO::BG_PAL( i );
@@ -840,8 +836,13 @@ namespace STS {
             pal[ 245 ] = IO::RGB( 30, 15, 12 ); // hp bar red 1
             pal[ 246 ] = IO::RGB( 20, 7, 7 );   // hp bar red 2
         }
-        dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
-        dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+
+        FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4, TEMP,
+                                                    256, TEMP_PAL );
+        dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+        FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4, TEMP,
+                                                    256, TEMP_PAL );
+        dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
 
         _needsInit       = false;
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -905,8 +906,13 @@ namespace STS {
             IO::updateOAM( true );
             IO::updateOAM( false );
 
-            dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
-            dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4,
+                                                        TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4,
+                                                        TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+
             if( !_needsInit ) {
                 IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
                 REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -918,7 +924,9 @@ namespace STS {
             return;
         }
 
-        dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "statussub", 0, 256 * 192,
+                             true );
+        // dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         char buffer[ 50 ];
 
         switch( _currentPage ) {
@@ -1299,13 +1307,18 @@ namespace STS {
                 oamSub[ SPR_INFOPAGE_START_OAM_SUB + i ].isHidden = true;
             }
         }
-        default:
-            break;
+        default: break;
         }
         IO::updateOAM( true );
         IO::updateOAM( false );
-        dmaCopy( partybg2Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
-        dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+
+        FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4, TEMP,
+                                                    256, TEMP_PAL );
+        dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
+        FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4, TEMP,
+                                                    256, TEMP_PAL );
+        dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+
         if( !_needsInit ) {
             IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
             REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
@@ -1445,7 +1458,9 @@ namespace STS {
             }
 
             // Clear text window
-            dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 78 );
+            FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "statussub", 0,
+                                 256 * 78, true );
+            // dmaCopy( statussubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 78 );
 
             // Write move details
             if( p_detailsPage < 4 ) {
@@ -1498,8 +1513,7 @@ namespace STS {
             IO::updateOAM( true );
             break;
         }
-        default:
-            break;
+        default: break;
         }
     }
 } // namespace STS

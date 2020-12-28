@@ -2403,7 +2403,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "In fact, there are many, many secrets surrounding Pok\xe9mon.",
       "Es gibt noch viele, viele Geheimnisse um die Pok\xe9mon." },
     { "To unravel Pok\xe9mon mysteries, I've been undertaking research.",
-      "Um ihre Mysterien aufzudecken, widme ich der Forschung." },
+      "Um ihre Mysterien aufzudecken, widme ich mich der Forschung." },
     { "That's what I do.", "Ja, genau das tue ich." },
     { "Ah sorry, I got carried away|", "Ah, ich schweife ab|" },
 

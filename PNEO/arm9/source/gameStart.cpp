@@ -42,7 +42,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
-#include "Border.h"
+// #include "Border.h"
 #include "noselection_96_32_1.h"
 #include "noselection_96_32_2.h"
 #include "noselection_96_32_4.h"
@@ -142,8 +142,11 @@ namespace SAVE {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "intro", 240 * 2, 256 * 192,
                              true );
-        dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Border", 64, 192,
+                             192 * 256, true );
+        // dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        // dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
         u16 tileCnt = 0;
         tileCnt     = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt     = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
@@ -443,8 +446,11 @@ namespace SAVE {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "intro", 240 * 2, 256 * 192,
                              true );
-        dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Border", 64, 192,
+                             192 * 256, true );
+        // dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        // dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
         tileCnt = 0;
         tileCnt = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
