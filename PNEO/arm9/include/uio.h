@@ -85,6 +85,8 @@ namespace IO {
     constexpr u16 DRAGON_COLOR  = RGB( 7, 7, 24 );
     constexpr u16 UNKNOWN_COLOR = RGB( 0, 42, 42 );
 
+    const u16 SELECTED_SPR_PAL[ 16 ] = { 0x7FFF, 0x20C3, 0x5208, 0x7FFF, 0x7F2C, 0x318C };
+
     inline u16* BG_PAL( bool p_bottom ) {
         return p_bottom ? BG_PALETTE_SUB : BG_PALETTE;
     }

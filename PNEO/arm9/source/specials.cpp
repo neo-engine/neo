@@ -43,11 +43,6 @@
 #include "uio.h"
 #include "yesNoBox.h"
 
-#include "noselection_96_32_1.h"
-#include "noselection_96_32_2.h"
-#include "noselection_96_32_4.h"
-#include "x_16_16.h"
-
 namespace SPX {
     void runCatchingTutorial( ) {
         ANIMATE_MAP = false;
@@ -66,12 +61,12 @@ namespace SPX {
         bool shiny = rand( ) & 1;
         SAVE::SAV.getActiveFile( ).setFlag( 27, shiny );
 
-        pokemon ralts              = pokemon( PKMN_RALTS, 5, 0, 0, shiny * 2 );
+        pokemon ralts = pokemon( PKMN_RALTS, 5, 0, 0, shiny * 2 );
         ralts.IVset( 0, 31 );
         ralts.IVset( 2, 31 );
         ralts.EVset( 0, 252 );
         ralts.EVset( 2, 252 );
-        ralts.m_boxdata.m_isFemale = false;
+        ralts.m_boxdata.m_isFemale  = false;
         ralts.m_boxdata.m_shinyType = 0;
 
         u8 platform = 1, plat2 = 1;
@@ -82,7 +77,7 @@ namespace SPX {
         zigzagoon.EVset( 1, 0 );
 
         BATTLE::battlePolicy policy = BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY );
-        policy.m_mode = BATTLE::battleMode::MOCK;
+        policy.m_mode               = BATTLE::battleMode::MOCK;
 
         BATTLE::battle( &zigzagoon, 1, ralts, platform, plat2, battleBack, policy ).start( );
         SOUND::restartBGM( );
@@ -163,48 +158,42 @@ namespace SPX {
         for( u8 i = 0; i < 1; i++ ) {
             u8 pos = 2 * i;
 
-            tileCnt = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt, 29,
-                                      y, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                                      noselection_96_32_1TilesLen, false, false, true,
+            tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM_SUB( pos ),
+                                      SPR_BOX_PAL_SUB, tileCnt, 29, y, 16, 32, false, false, true,
                                       OBJPRIORITY_0, true, OBJMODE_BLENDED );
-            tileCnt = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
-                                      29 + 16, y, 16, 32, noselection_96_32_2Pal,
-                                      noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
-                                      false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            tileCnt
+                = IO::loadSprite( "SEL/noselection_96_32_2", SPR_CHOICE_START_OAM_SUB( pos ) + 1,
+                                  SPR_BOX_PAL_SUB, tileCnt, 29 + 16, y, 16, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
             for( u8 j = 2; j < 5; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
-                                29 + j * 16, y, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                29 + j * 16, y, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_BLENDED );
             }
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
-                            29 + 5 * 16, y, 16, 32, noselection_96_32_1Pal,
-                            noselection_96_32_1Tiles, noselection_96_32_1TilesLen, true, true, true,
-                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            29 + 5 * 16, y, 16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
         }
         for( u8 i = 0; i < 1; i++ ) {
             u8 pos = 2 * i + 1;
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131, y,
-                            16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3, true,
+                            16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
                             OBJMODE_BLENDED );
             for( u8 j = 1; j < 5; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
-                                131 + j * 16, y, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                131 + j * 16, y, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_BLENDED );
             }
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
-                            131 + 5 * 16, y, 16, 32, noselection_96_32_1Pal,
-                            noselection_96_32_1Tiles, noselection_96_32_1TilesLen, true, true, true,
-                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                            131 + 5 * 16, y, 16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
         }
-        IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
+        IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
 
         ynpos.push_back( std::pair(
             IO::inputTarget( IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x,
@@ -421,9 +410,8 @@ namespace SPX {
         IO::regularFont->setColor( 0, 2 );
         u16 tileCnt = 0;
         // x
-        tileCnt = IO::loadSprite( 9, 15, tileCnt, 236, 172, 16, 16, x_16_16Pal, x_16_16Tiles,
-                                  x_16_16TilesLen, false, false, false, OBJPRIORITY_1, true,
-                                  OBJMODE_NORMAL );
+        tileCnt = IO::loadSprite( "UI/x_16_16", 9, 15, tileCnt, 236, 172, 16, 16, false, false,
+                                  false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
 
         for( u8 i = 0; i < 8; ++i ) { IO::Oam->oamBuffer[ i ].isHidden = true; }
 

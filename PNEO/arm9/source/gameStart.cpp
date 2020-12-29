@@ -42,11 +42,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
-// #include "Border.h"
-#include "noselection_96_32_1.h"
-#include "noselection_96_32_2.h"
-#include "noselection_96_32_4.h"
-
 namespace SAVE {
     constexpr u16 EP_INTRO_TEXT_START[] = { 111 };
     constexpr u8  EP_INTRO_TEXT_LEN[]   = { 3 };
@@ -145,8 +140,6 @@ namespace SAVE {
 
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Border", 64, 192,
                              192 * 256, true );
-        // dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        // dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
         u16 tileCnt = 0;
         tileCnt     = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt     = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
@@ -362,67 +355,58 @@ namespace SAVE {
                 u8 pos = 2 * i;
 
                 if( !i ) {
-                    tileCnt = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
-                                              tileCnt, 29, 42 + i * 36, 16, 32,
-                                              noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                                              noselection_96_32_1TilesLen, false, false, true,
+                    tileCnt = IO::loadSprite( "SEL/noselection_96_32_1",
+                                              SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
+                                              tileCnt, 29, 42 + i * 36, 16, 32, false, false, true,
                                               OBJPRIORITY_3, true, OBJMODE_BLENDED );
-                    tileCnt = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
-                                              tileCnt, 29 + 16, 42 + i * 36, 16, 32,
-                                              noselection_96_32_2Pal, noselection_96_32_2Tiles,
-                                              noselection_96_32_2TilesLen, false, false, true,
-                                              OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                    tileCnt = IO::loadSprite( "SEL/noselection_96_32_2",
+                                              SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
+                                              tileCnt, 29 + 16, 42 + i * 36, 16, 32, false, false,
+                                              true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 } else {
                     IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                                     IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
-                                    29, 42 + i * 36, 16, 32, noselection_96_32_1Pal,
-                                    noselection_96_32_1Tiles, noselection_96_32_1TilesLen, false,
-                                    false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                    29, 42 + i * 36, 16, 32, 0, 0, 0, false, false, true,
+                                    OBJPRIORITY_3, true, OBJMODE_BLENDED );
                     IO::loadSprite(
                         SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
                         IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 16,
-                        42 + i * 36, 16, 32, noselection_96_32_2Pal, noselection_96_32_2Tiles,
-                        noselection_96_32_2TilesLen, false, false, true, OBJPRIORITY_3, true,
+                        42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
                         OBJMODE_BLENDED );
                 }
                 for( u8 j = 2; j < 7; j++ ) {
                     IO::loadSprite(
                         SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                         IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
-                        29 + j * 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
-                        noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false, true,
+                        29 + j * 11, 42 + i * 36, 16, 32, 0, 0, 0, false, false, true,
                         OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 }
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
-                                29 + 5 * 16, 42 + i * 36, 16, 32, noselection_96_32_1Pal,
-                                noselection_96_32_1Tiles, noselection_96_32_1TilesLen, true, true,
-                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                29 + 5 * 16, 42 + i * 36, 16, 32, 0, 0, 0, true, true, true,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
 
             for( u8 i = 0; i < 3; i++ ) {
                 u8 pos = 2 * i + 1;
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131,
-                                42 + i * 36, 16, 32, noselection_96_32_1Pal,
-                                noselection_96_32_1Tiles, noselection_96_32_1TilesLen, false, false,
-                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_BLENDED );
                 for( u8 j = 1; j < 7; j++ ) {
                     IO::loadSprite(
                         SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                         IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
-                        131 + j * 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
-                        noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false, true,
+                        131 + j * 11, 42 + i * 36, 16, 32, 0, 0, 0, false, false, true,
                         OBJPRIORITY_3, true, OBJMODE_BLENDED );
                 }
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
-                                131 + 5 * 16, 42 + i * 36, 16, 32, noselection_96_32_1Pal,
-                                noselection_96_32_1Tiles, noselection_96_32_1TilesLen, true, true,
-                                true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                                131 + 5 * 16, 42 + i * 36, 16, 32, 0, 0, 0, true, true, true,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
 
-            IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
+            IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
 
 #undef SPR_BOX_PAL_SUB
 #undef SPR_BOX_SEL_PAL_SUB
@@ -449,8 +433,6 @@ namespace SAVE {
 
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "Border", 64, 192,
                              192 * 256, true );
-        // dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        // dmaCopy( BorderPal + 192, BG_PALETTE_SUB + 192, 64 );
         tileCnt = 0;
         tileCnt = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
@@ -519,11 +501,11 @@ namespace SAVE {
                 SOUND::setVolume( 0x10 * i );
                 swiWaitForVBlank( );
             }
-             SAVE::SAV.getActiveFile( ).m_initGameItemCount = 4;
-             SAVE::SAV.getActiveFile( ).m_initGameItems[ 0 ] = I_WISHING_CHARM;
-             SAVE::SAV.getActiveFile( ).m_initGameItems[ 1 ] = I_SHINY_CHARM;
-             SAVE::SAV.getActiveFile( ).m_initGameItems[ 2 ] = I_EXP_ALL;
-             SAVE::SAV.getActiveFile( ).m_initGameItems[ 3 ] = I_SUPER_ROD;
+            SAVE::SAV.getActiveFile( ).m_initGameItemCount  = 4;
+            SAVE::SAV.getActiveFile( ).m_initGameItems[ 0 ] = I_WISHING_CHARM;
+            SAVE::SAV.getActiveFile( ).m_initGameItems[ 1 ] = I_SHINY_CHARM;
+            SAVE::SAV.getActiveFile( ).m_initGameItems[ 2 ] = I_EXP_ALL;
+            SAVE::SAV.getActiveFile( ).m_initGameItems[ 3 ] = I_SUPER_ROD;
 
             return true;
         default: SAV.getActiveFile( ).m_gameType = UNUSED; return false;

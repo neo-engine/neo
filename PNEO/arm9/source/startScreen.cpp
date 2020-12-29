@@ -40,14 +40,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
-#include "arrow.h"
-#include "noselection_32_64.h"
-#include "noselection_64_20.h"
-#include "noselection_96_32_1.h"
-#include "noselection_96_32_2.h"
-#include "noselection_96_32_4.h"
+// #include "arrow.h"
+// #include "noselection_32_64.h"
+// #include "noselection_64_20.h"
+// #include "noselection_96_32_1.h"
+// #include "noselection_96_32_2.h"
+// #include "noselection_96_32_4.h"
 
-#ifdef DESQUID_MORE
+#ifdef DESQUID
 // BEGIN TEST
 #include "animations.h"
 #include "bagViewer.h"
@@ -116,7 +116,7 @@ namespace SAVE {
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
-#ifdef DESQUID_MORE
+#ifdef DESQUID_
         // BEGIN TEST
 
         pokemon testTeam[ 6 ];
@@ -168,7 +168,7 @@ namespace SAVE {
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
 
-       // BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
+        // BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
 
         printf( "Free Software, PW 2012 - 2020\n"
                 "                             \n"
@@ -243,54 +243,49 @@ namespace SAVE {
     startScreen::drawMainChoice( const std::vector<choice>& p_choices, u8 p_slot ) {
         std::vector<std::pair<IO::inputTarget, startScreen::choice>> res
             = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
-        IO::initOAMTable( true );
-
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
 
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
         bgUpdate( );
+        IO::fadeScreen( IO::CLEAR_DARK_FAST, true, true );
+        IO::initOAMTable( true );
+
 
         // Sprites
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         u16 tileCnt = 0;
 
-        tileCnt = IO::loadSprite( SPR_LARGE_CHOICE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32,
-                                  noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                                  noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( SPR_LARGE_CHOICE_OAM_SUB + 1, SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16,
-                                  32, noselection_96_32_2Pal, noselection_96_32_2Tiles,
-                                  noselection_96_32_2TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( SPR_SMALL_CHOICE_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32,
-                                  noselection_64_20Pal, noselection_64_20Tiles,
-                                  noselection_64_20TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_LARGE_CHOICE_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", SPR_LARGE_CHOICE_OAM_SUB + 1,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_SMALL_CHOICE_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         // Arrows
-        tileCnt = IO::loadSprite( SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4, 76, 16,
-                                  16, arrowPal, arrowTiles, arrowTilesLen, false, false, true,
-                                  OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt
+            = IO::loadSprite( "UI/arrow", SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4,
+                              76, 16, 16, false, false, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
         IO::loadSprite( SPR_ARROW_RIGHT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                        oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, arrowPal,
-                        arrowTiles, arrowTilesLen, false, true, true, OBJPRIORITY_1, true,
-                        OBJMODE_NORMAL );
+                        oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, 0, 0, 0, false,
+                        true, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
 
         // page windows
-        tileCnt = IO::loadSprite( SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 0 - 8, 57 - 12,
-                                  32, 64, noselection_32_64Pal, noselection_32_64Tiles,
-                                  noselection_32_64TilesLen, true, true, true, OBJPRIORITY_2, true,
-                                  OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB,
+                                  tileCnt, 0 - 8, 57 - 12, 32, 64, true, true, true, OBJPRIORITY_2,
+                                  true, OBJMODE_BLENDED );
         IO::loadSprite( SPR_PAGE_RIGHT_OAM_SUB, SPR_BOX_PAL_SUB,
-                        oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * 2, 32, 64,
-                        noselection_32_64Pal, noselection_32_64Tiles, noselection_32_64TilesLen,
-                        false, false, true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
+                        oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * 2, 32, 64, 0, 0,
+                        0, false, false, true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
 
         // Pals
-        IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, true );
-        IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
+        // IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, true );
+        IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
 
         if( _currentSlot != p_slot ) {
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
