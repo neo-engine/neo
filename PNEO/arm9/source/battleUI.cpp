@@ -49,41 +49,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "screenFade.h"
 
-// Sprites
-// #include "noselection_96_32_1.h"
-// #include "noselection_96_32_2.h"
-// #include "noselection_96_32_4.h"
-
-// #include "hpbar_battle.h"
-// #include "hpbar_battle_opp.h"
-
-// #include "status_brn.h"
-// #include "status_fnt.h"
-// #include "status_frz.h"
-// #include "status_par.h"
-// #include "status_psn.h"
-// #include "status_shiny.h"
-// #include "status_slp.h"
-// #include "status_txc.h"
-
-// #include "battle_ability.h"
-
-// #include "stat_down.h"
-// #include "stat_up.h"
-
-// #include "shiny_big.h"
-// #include "shiny_big_alt.h"
-// #include "shiny_big_alt2.h"
-
-// #include "message_24.h"
-// #include "message_large.h"
-
-// #include "movebox2.h"
-// #include "movebox3.h"
-// #include "movebox4.h"
-
-// #include "NoPkmn.h"
-
 namespace BATTLE {
 
 // Top screen

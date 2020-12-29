@@ -42,12 +42,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 // Sprites
 #include "NoItem.h"
-#include "noselection_64_20.h"
-#include "noselection_64_32.h"
-#include "noselection_96_32_1.h"
-#include "noselection_96_32_2.h"
-#include "noselection_96_32_4.h"
-#include "noselection_blank_32_24.h"
 
 namespace BAG {
 #define SPR_TRANSFER_OAM_SUB                0
@@ -151,9 +145,9 @@ namespace BAG {
 
         // item windows
 
-        tileCnt = IO::loadSprite( SPR_ITEM_WINDOW_OAM_SUB( 0 ), SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32,
-                                  32, noselection_64_20Pal, noselection_64_20Tiles, NoItemTilesLen,
-                                  false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_ITEM_WINDOW_OAM_SUB( 0 ),
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
             for( u8 j = 0; j < 4; ++j ) {
@@ -174,38 +168,33 @@ namespace BAG {
             u8 pos = 2 * i;
 
             if( !i ) {
-                tileCnt = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt,
-                                          29, 80 + i * 36, 16, 32, noselection_96_32_1Pal,
-                                          noselection_96_32_1Tiles, noselection_96_32_1TilesLen,
-                                          false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
                 tileCnt
-                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
-                                      29 + 16, 80 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                      noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
+                    = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM_SUB( pos ),
+                                      SPR_BOX_PAL_SUB, tileCnt, 29, 80 + i * 36, 16, 32, false,
                                       false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                tileCnt = IO::loadSprite( "SEL/noselection_96_32_2",
+                                          SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
+                                          tileCnt, 29 + 16, 80 + i * 36, 16, 32, false, false, true,
+                                          OBJPRIORITY_3, true, OBJMODE_NORMAL );
             } else {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29, 80 + i * 36, 16,
-                                32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                                noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
-                                true, OBJMODE_NORMAL );
+                                32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
+                                OBJMODE_NORMAL );
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 16,
-                                80 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                                80 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_NORMAL );
             }
             for( u8 j = 2; j < 5; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 16,
-                                80 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                                80 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_NORMAL );
             }
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 80 + i * 36,
-                            16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, true,
+                            16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true,
                             OBJMODE_NORMAL );
         }
 
@@ -213,67 +202,55 @@ namespace BAG {
             u8 pos = 2 * i + 1;
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131, 80 + i * 36, 16, 32,
-                            noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3, true,
-                            OBJMODE_NORMAL );
+                            0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
             for( u8 j = 1; j < 5; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 16,
-                                80 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                                80 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                true, OBJMODE_NORMAL );
             }
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 5, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16,
-                            80 + i * 36, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, true,
+                            80 + i * 36, 16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true,
                             OBJMODE_NORMAL );
         }
 
         // message box
-        IO::loadSprite(
-            SPR_MSG_BOX_OAM_SUB, SPR_BOX_PAL_SUB, oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29,
-            80 - 36, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-            noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_MSG_BOX_OAM_SUB, SPR_BOX_PAL_SUB,
+                        oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29, 80 - 36, 16, 32, 0, 0, 0,
+                        false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
         for( u8 j = 1; j < 12; j++ ) {
             IO::loadSprite( SPR_MSG_BOX_OAM_SUB + j, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 16, 80 - 36,
-                            16, 32, noselection_96_32_2Pal, noselection_96_32_2Tiles,
-                            noselection_96_32_2TilesLen, false, false, true, OBJPRIORITY_3, true,
+                            16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
                             OBJMODE_NORMAL );
         }
         IO::loadSprite( SPR_MSG_BOX_OAM_SUB + 12, SPR_BOX_PAL_SUB,
                         oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 20 + 12 * 16, 80 - 36, 16,
-                        32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                        noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, true,
-                        OBJMODE_NORMAL );
+                        32, 0, 0, 0, true, true, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
 
         // Pkmn selection
 
         for( u8 i = 1; i < 5; ++i ) {
             IO::loadSprite( SPR_MSG_PKMN_SEL_OAM_SUB + i, SPR_SELECTED_PAL_SUB, tileCnt,
-                            4 + 24 * ( 5 - i ), 33, 32, 32, 0, noselection_blank_32_24Tiles,
-                            noselection_blank_32_24TilesLen, false, false, true, OBJPRIORITY_3,
-                            true, OBJMODE_BLENDED );
+                            4 + 24 * ( 5 - i ), 33, 32, 32, 0, 0, 0, false, false, true,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
-        tileCnt
-            = IO::loadSprite( SPR_MSG_PKMN_SEL_OAM_SUB, SPR_SELECTED_PAL_SUB, tileCnt, 8, 33, 32,
-                              32, 0, noselection_blank_32_24Tiles, noselection_blank_32_24TilesLen,
-                              false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_blank_32_24", SPR_MSG_PKMN_SEL_OAM_SUB,
+                                  SPR_SELECTED_PAL_SUB, tileCnt, 8, 33, 32, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         // Small message box
         for( u8 i = 1; i < 5; ++i ) {
             IO::loadSprite( SPR_MSG_BOX_SMALL_OAM_SUB + i, SPR_BOX_PAL_SUB, tileCnt,
-                            3 + 24 * ( 5 - i ), -9, 32, 32, noselection_64_20Pal,
-                            noselection_64_20Tiles, noselection_64_20TilesLen, true, true, true,
+                            3 + 24 * ( 5 - i ), -9, 32, 32, 0, 0, 0, true, true, true,
                             OBJPRIORITY_3, true, OBJMODE_NORMAL );
         }
-        tileCnt = IO::loadSprite( SPR_MSG_BOX_SMALL_OAM_SUB, SPR_BOX_PAL_SUB, tileCnt, 3, 3, 32, 32,
-                                  noselection_64_20Pal, noselection_64_20Tiles,
-                                  noselection_64_20TilesLen, false, false, true, OBJPRIORITY_3,
-                                  true, OBJMODE_NORMAL );
+        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_MSG_BOX_SMALL_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 3, 3, 32, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_NORMAL );
 
-        IO::copySpritePal( noselection_96_32_4Pal, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
+        IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( true );
 
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "BagUpper" );
@@ -835,8 +812,8 @@ namespace BAG {
                 }
             }
             if( !found ) [[unlikely]] {
-                    snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
-                }
+                snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
+            }
         } else {
             snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
         }
@@ -1124,9 +1101,9 @@ namespace BAG {
 
         if( p_idx >= MAX_ITEMS_PER_PAGE ) { // It's a PKMN
             if( !_playerTeam[ p_idx - MAX_ITEMS_PER_PAGE ].getItem( ) ) [[unlikely]] {
-                    // Something went wrong
-                    return false;
-                }
+                // Something went wrong
+                return false;
+            }
         }
 
         if( p_data->m_itemType != ITEM::ITEMTYPE_TM ) {

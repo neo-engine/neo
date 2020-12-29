@@ -450,66 +450,63 @@ namespace MAP {
                 auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
                 if( o.second.m_event.m_type == EVENT_TRAINER ) [[unlikely]] {
-                        // Check if trainer can see player
+                    // Check if trainer can see player
 
-                        if( std::abs( p_globX - o.second.m_pos.m_posX ) > o.second.m_range )
-                            [[likely]] {
-                                continue;
-                            }
-                        if( std::abs( p_globY - o.second.m_pos.m_posY ) > o.second.m_range )
-                            [[likely]] {
-                                continue;
-                            }
-                        if( std::abs( p_globY - o.second.m_pos.m_posY )
-                            && std::abs( p_globX - o.second.m_pos.m_posX ) )
-                            [[likely]] {
-                                continue;
-                            }
-
-                        direction trainerDir = UP;
-                        direction playerDir  = DOWN;
-                        if( p_globY > o.second.m_pos.m_posY ) {
-                            trainerDir = DOWN;
-                            playerDir  = UP;
-                        }
-                        if( p_globX < o.second.m_pos.m_posX ) {
-                            trainerDir = LEFT;
-                            playerDir  = RIGHT;
-                        }
-                        if( p_globX > o.second.m_pos.m_posX ) {
-                            trainerDir = RIGHT;
-                            playerDir  = LEFT;
-                        }
-
-                        if( trainerDir != o.second.m_direction ) { continue; }
-
-                        // Check for exclamation mark / music change
-                        if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
-                                o.second.m_event.m_data.m_trainer.m_trainerId ) ) )
-                            [[likely]] {
-                                // player did not defeat the trainer yet
-                                SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
-                                    = NO_MOVEMENT;
-                                showExclamationAboveMapObject( i );
-                                auto tr = BATTLE::getBattleTrainer(
-                                    o.second.m_event.m_data.m_trainer.m_trainerId );
-                                SOUND::playBGM(
-                                    SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
-
-                                // walk trainer to player
-                                redirectPlayer( playerDir, false );
-
-                                while( dist( p_globX, p_globY, o.second.m_pos.m_posX,
-                                             o.second.m_pos.m_posY )
-                                       > 1 ) {
-                                    for( u8 j = 0; j < 16; ++j ) {
-                                        moveMapObject( i, { trainerDir, j } );
-                                        swiWaitForVBlank( );
-                                    }
-                                }
-                                runEvent( o.second.m_event, i );
-                            }
+                    if( std::abs( p_globX - o.second.m_pos.m_posX ) > o.second.m_range )
+                        [[likely]] {
+                        continue;
                     }
+                    if( std::abs( p_globY - o.second.m_pos.m_posY ) > o.second.m_range )
+                        [[likely]] {
+                        continue;
+                    }
+                    if( std::abs( p_globY - o.second.m_pos.m_posY )
+                        && std::abs( p_globX - o.second.m_pos.m_posX ) ) [[likely]] {
+                        continue;
+                    }
+
+                    direction trainerDir = UP;
+                    direction playerDir  = DOWN;
+                    if( p_globY > o.second.m_pos.m_posY ) {
+                        trainerDir = DOWN;
+                        playerDir  = UP;
+                    }
+                    if( p_globX < o.second.m_pos.m_posX ) {
+                        trainerDir = LEFT;
+                        playerDir  = RIGHT;
+                    }
+                    if( p_globX > o.second.m_pos.m_posX ) {
+                        trainerDir = RIGHT;
+                        playerDir  = LEFT;
+                    }
+
+                    if( trainerDir != o.second.m_direction ) { continue; }
+
+                    // Check for exclamation mark / music change
+                    if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
+                            o.second.m_event.m_data.m_trainer.m_trainerId ) ) ) [[likely]] {
+                        // player did not defeat the trainer yet
+                        SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
+                            = NO_MOVEMENT;
+                        showExclamationAboveMapObject( i );
+                        auto tr = BATTLE::getBattleTrainer(
+                            o.second.m_event.m_data.m_trainer.m_trainerId );
+                        SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
+
+                        // walk trainer to player
+                        redirectPlayer( playerDir, false );
+
+                        while(
+                            dist( p_globX, p_globY, o.second.m_pos.m_posX, o.second.m_pos.m_posY )
+                            > 1 ) {
+                            for( u8 j = 0; j < 16; ++j ) {
+                                moveMapObject( i, { trainerDir, j } );
+                                swiWaitForVBlank( );
+                            }
+                        }
+                        runEvent( o.second.m_event, i );
+                    }
+                }
             }
 
             if( !hadBattle ) { handleWildPkmn( p_globX, p_globY ); }
@@ -540,7 +537,11 @@ namespace MAP {
 
             // Hacky optimization: Don't load new slices on inside maps.
             if( ( CUR_DATA.m_mapType & CAVE ) || !( CUR_DATA.m_mapType & INSIDE ) ) {
+                ANIMATE_MAP = false;
+                DRAW_TIME   = false;
                 loadSlice( p_direction );
+                ANIMATE_MAP = true;
+                DRAW_TIME   = true;
             }
 #ifdef DESQUID_MORE
             NAV::printMessage( "Load Slice" );
@@ -848,7 +849,7 @@ namespace MAP {
                             BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
                             ? !( rand( ) & 127 )
                             : !( rand( ) & 2047 );
-        bool charm = SAVE::SAV.getActiveFile( ).m_bag.count(
+        bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
             BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
         if( luckyenc ) {
@@ -1900,7 +1901,7 @@ namespace MAP {
     }
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
         direction di   = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 )
-                                                  : p_direction );
+                                                    : p_direction );
         u16       curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
         u16       cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
 
