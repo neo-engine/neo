@@ -51,6 +51,8 @@ const char* SAVE::EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ]
 
 const char* LANGUAGE_NAMES[ LANGUAGES ] = { "English", "Deutsch" };
 
+const char* HP_ICONS[ LANGUAGES ] = { "\xd", "\xe" };
+
 #ifdef DESQUID
 const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
     { "Desquid" },
@@ -138,7 +140,7 @@ const char* const MONTHS[ 12 ][ LANGUAGES ]
 const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ] = {
     { "", "" },
     { "Won the Stone Badge on %s", "Steinorden erhalten am %s" },
-    { "Won the Knuckle Badge on %s", "Kn\f6"
+    { "Won the Knuckle Badge on %s", "Kn\xf6"
                                      "chelorden erhalten am %s" },
     { "Won the Dynamo Badge on %s", "Dynamo-Orden erhalten am %s" },
     { "Won the Heat Badge on %s", "Hitzeorden erhalten am %s" },
@@ -891,7 +893,9 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "I thought I would be lonely by myself,\nso I wanted to take a Pok\xe9mon along.\r"
       "But I've never caught a Pok\xe9mon before.\nI don't know how|",
       "Heiko: Ich werde meine Verwandten\nin Wiesenflur besuchen.\r"
-      "Ich glaube, ich werde mich da einsam f\xfc""hlen,\ndaher m\xf6""chte ich ein Pok\xe9mon mitnehmen.\r"
+      "Ich glaube, ich werde mich da einsam f\xfc"
+      "hlen,\ndaher m\xf6"
+      "chte ich ein Pok\xe9mon mitnehmen.\r"
       "Aber ich habe noch nie eines gefangen.\nIch wei\xdf nicht, wie das geht|" },
     { "Dad: Hm. I see.", "Vater: Oh, ich verstehe|" },
     { "Dad: [PLAYER], you heard that, right?\r"
@@ -1026,7 +1030,8 @@ const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ] = {
       "Bevor du einen Pok\xe9"
       "ball wirfst,\nschw\xe4"
       "che das Pok\xe9mon zuerst.\r"
-      "Wenn es schl\xe4""ft, eine Verbrennung hat oder\n"
+      "Wenn es schl\xe4"
+      "ft, eine Verbrennung hat oder\n"
       "vergiftet ist, kann es leichter\ngefangen werden." },
     { "Oh, no, I'm not a Pok\xe9mon Trainer.\r"
       "But that's right, if Pok\xe9mon Trainers lock\neyes, it's a challenge to battle.\r"
@@ -1773,7 +1778,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Cache", "Zwischenablage" },
     { "All boxes", "Alle Boxen" },
-    { "New name for box %s", "Name f\xfcr Box %s" },
+    { "New name for box [129]%s\"", "Name f\xfcr Box [131]%s[129]" },
     { "Repel activated.", "Schutz eingesetzt." },
     { "Super Repel activated.", "Superschutz eingesetzt." },
 
@@ -1972,7 +1977,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Pwr", "Stk" },
 
     { "Meteor Falls", "Meteorf\xe4lle" },
-    { "\xd", "\xe" }, // HP icon
+    { "\xd", "\xe" }, // hp icon
     { "Hardy", "Robust" },
     { "Lonely", "Einsam" },
     { "Brave", "Mutig" },
@@ -2278,7 +2283,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Pok\xe9"
       "blocks.",
       "Pok\xe9riegel." },
-    { "%2hhu/%2hhu", "%2hhu/%2hhu" }, // PP
+    { "%2hhu/%2hhu", "%2hhu/%2hhu" },
     { "Nature", "Wesen" },
     { "Move Pok\xe9mon", "Pok\xe9mon bewegen" },
 
@@ -2304,10 +2309,10 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "You encountered a wild %s!", "Ein wildes %s erscheint!" },
 
     { "Go %s!", "Los %s!" },
-    { "%s detects %s.", "%s erkennt %s." },                 // Forewarn
-    { "%s shudders.", "%s erschaudert." },                  // Anticipation
-    { "%s identifies %s.", "%s erkennt %s." },              // Frisk
-    { "%s identifies %s and %s.", "%s erkennt %s und%s." }, // Frisk
+    { "%s detects %s.", "%s erkennt %s." },
+    { "%s shudders.", "%s erschaudert." },
+    { "%s identifies %s.", "%s erkennt %s." },
+    { "%s identifies %s and %s.", "%s erkennt %s und%s." },
 
     // 400
 

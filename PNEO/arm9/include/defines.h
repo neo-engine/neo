@@ -114,6 +114,7 @@ enum style {
 };
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
+extern const char*       HP_ICONS[ LANGUAGES ];
 extern const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ];
 extern const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ];
 extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
@@ -137,6 +138,8 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #else
 #define GET_STRING( p_stringId ) STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
 #endif
+
+#define HP_ICON HP_ICONS[ CURRENT_LANGUAGE ]
 
 #define GET_MAP_STRING( p_stringId ) MAP_STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
 #define NO_DATA                      GET_STRING( 0 )

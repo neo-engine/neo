@@ -1130,7 +1130,7 @@ namespace STS {
                 }
             }
 
-            IO::smallFont->printString( GET_STRING( 186 ), oam[ SPR_HP_BAR_OAM ].x - 14,
+            IO::smallFont->printString( HP_ICON, oam[ SPR_HP_BAR_OAM ].x - 14,
                                         oam[ SPR_HP_BAR_OAM ].y - 10,
                                         false ); // HP "icon"
             IO::smallFont->setColor( IO::WHITE_IDX, 1 );

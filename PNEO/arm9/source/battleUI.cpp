@@ -1357,7 +1357,7 @@ namespace BATTLE {
             IO::smallFont->setColor( HP_OUTLINE_COL, 2 );
             IO::smallFont->setColor( HP_COL( p_opponent, p_pos ) + 1, 3 );
             IO::smallFont->printString(
-                GET_STRING( 186 ), oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + 10,
+                HP_ICON, oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + 10,
                 oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y - 6, false ); // HP "icon"
 
             IO::displayHP( _curHP[ !p_opponent ][ p_pos ],
@@ -1368,7 +1368,7 @@ namespace BATTLE {
                 = p_pokemon->m_stats.m_curHP * 100 / p_pokemon->m_stats.m_maxHP;
 
             IO::smallFont->printString(
-                GET_STRING( 186 ), oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + 10,
+                HP_ICON, oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].x + 10,
                 oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].y - 6, false ); // HP "icon"
 
             // hp

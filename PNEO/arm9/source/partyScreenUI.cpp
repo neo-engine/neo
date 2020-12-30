@@ -614,7 +614,7 @@ namespace STS {
                     }
                 }
 
-                IO::smallFont->printString( GET_STRING( 186 ), anchor_x + 116 - 62, anchor_y + 20,
+                IO::smallFont->printString( HP_ICON, anchor_x + 116 - 62, anchor_y + 20,
                                             false ); // HP "icon"
                 IO::smallFont->setColor( IO::WHITE_IDX, 1 );
                 IO::smallFont->setColor( IO::GRAY_IDX, 2 );
