@@ -25,6 +25,10 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+#include <cstdio>
+#include <vector>
+
 #include "bagUI.h"
 #include "bagViewer.h"
 #include "berry.h"
@@ -35,10 +39,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "screenFade.h"
 #include "yesNoBox.h"
-
-#include <algorithm>
-#include <cstdio>
-#include <vector>
 
 // Sprites
 #include "NoItem.h"

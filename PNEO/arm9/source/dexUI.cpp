@@ -36,7 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#include "star.h"
+// #include "star.h"
 
 #include <algorithm>
 #include <cstdio>

@@ -68,12 +68,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // #include "Border.h"
 #include "locationNames.h"
 
-#include "arrow_up.h"
-#include "noselection_96_32_1.h"
-#include "noselection_96_32_2.h"
-#include "noselection_96_32_4.h"
-#include "x_16_16.h"
-
 namespace NAV {
 #define SPR_MSGTEXT_OAM 108
 #define SPR_MSGCONT_OAM 112
@@ -106,6 +100,11 @@ namespace NAV {
     u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
     std::string TEXT_CACHE_1         = ""; // Upper line
     std::string TEXT_CACHE_2         = ""; // lower line
+
+    const u16 ARR_X_SPR_PAL[ 16 ] = {
+        0x7FFF, 0x5A6E, 0x6F2D, 0x564A, // arrow_up
+        0x001F, 0x0011, 0x18CE          // x_16_16
+    };
 
     void hideMessageBox( ) {
         for( u8 i = 0; i < 14; ++i ) {
@@ -149,9 +148,6 @@ namespace NAV {
                 std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
                 192 * 256, p_bottom );
             FS::readPictureData( ptr, "nitro:/PICS/", "Border", 64, 192, 192 * 256, p_bottom );
-
-            // dmaCopy( BorderBitmap, ptr, 256 * 192 );
-            // dmaCopy( BorderPal + 192, pal + 192, 64 );
         }
 
         u16 tileCnt = 0;
@@ -184,9 +180,8 @@ namespace NAV {
                                   p_bottom );
 
         // x
-        tileCnt = IO::loadSprite( SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16, 16,
-                                  x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, true,
-                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16,
+                                  16, false, false, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // arrows
         for( u8 i = 0; i < 6; ++i ) {
@@ -195,9 +190,9 @@ namespace NAV {
             IO::loadSprite( SPR_ARROW_DOWN_OAM_SUB( i ), SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16, 0, 0,
                             0, true, true, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
         }
-        tileCnt = IO::loadSprite( SPR_ARROW_UP_OAM_SUB( 0 ), SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16,
-                                  arrow_upPal, arrow_upTiles, arrow_upTilesLen, false, false, true,
-                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadSprite( "UI/arrow_up", SPR_ARROW_UP_OAM_SUB( 0 ), SPR_X_PAL_SUB, tileCnt,
+                                  0, 0, 16, 16, false, false, true, OBJPRIORITY_1, p_bottom,
+                                  OBJMODE_NORMAL );
 
         // mbox
         for( u8 i = 0; i < 9; ++i ) {
@@ -214,38 +209,32 @@ namespace NAV {
 
             if( !i ) {
                 tileCnt
-                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt, 29,
-                                      42 + i * 36, 16, 32, noselection_96_32_1Pal,
-                                      noselection_96_32_1Tiles, noselection_96_32_1TilesLen, false,
+                    = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM_SUB( pos ),
+                                      SPR_BOX_PAL_SUB, tileCnt, 29, 42 + i * 36, 16, 32, false,
                                       false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-                tileCnt
-                    = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
-                                      29 + 11, 42 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                      noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false,
-                                      false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                tileCnt = IO::loadSprite( "SEL/noselection_96_32_2",
+                                          SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
+                                          tileCnt, 29 + 11, 42 + i * 36, 16, 32, false, false, true,
+                                          OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             } else {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29, 42 + i * 36, 16,
-                                32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                                noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
-                                p_bottom, OBJMODE_BLENDED );
+                                32, 0, 0, 0, false, false, true, OBJPRIORITY_3, p_bottom,
+                                OBJMODE_BLENDED );
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + 11,
-                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                                42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                p_bottom, OBJMODE_BLENDED );
             }
             for( u8 j = 2; j < 7; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 11,
-                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                                42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                p_bottom, OBJMODE_BLENDED );
             }
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 42 + i * 36,
-                            16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
+                            16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, p_bottom,
                             OBJMODE_BLENDED );
         }
 
@@ -253,27 +242,21 @@ namespace NAV {
             u8 pos = 2 * i + 1;
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131, 42 + i * 36, 16, 32,
-                            noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, false, false, true, OBJPRIORITY_3,
-                            p_bottom, OBJMODE_BLENDED );
+                            0, 0, 0, false, false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
             for( u8 j = 1; j < 7; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 11,
-                                42 + i * 36, 16, 32, noselection_96_32_2Pal,
-                                noselection_96_32_2Tiles, noselection_96_32_2TilesLen, false, false,
-                                true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                                42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
+                                p_bottom, OBJMODE_BLENDED );
             }
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16,
-                            42 + i * 36, 16, 32, noselection_96_32_1Pal, noselection_96_32_1Tiles,
-                            noselection_96_32_1TilesLen, true, true, true, OBJPRIORITY_3, p_bottom,
+                            42 + i * 36, 16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, p_bottom,
                             OBJMODE_BLENDED );
         }
 
-        IO::copySpritePal( arrow_upPal, SPR_X_PAL_SUB, 0, 2 * 4, p_bottom );
-        IO::copySpritePal( x_16_16Pal + 4, SPR_X_PAL_SUB, 4, 2 * 3, p_bottom );
-
-        IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
+        IO::copySpritePal( ARR_X_SPR_PAL, SPR_X_PAL_SUB, 0, 2 * 7, p_bottom );
+        IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( p_bottom );
         if( !p_noPic ) { hideMessageBox( ); }
     }
@@ -471,7 +454,7 @@ namespace NAV {
             while( p_message[ cpos ] ) {
                 if( !p_noDelay ) {
                     if( p_message[ cpos ] == '[' ) {
-                        sp = true;
+                        sp  = true;
                         tmp = p_message[ cpos ];
                         ++cpos;
                         continue;

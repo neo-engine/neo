@@ -38,8 +38,6 @@
 #include "screenFade.h"
 #include "uio.h"
 
-#include "star.h"
-
 namespace SAVE {
     saveGame   SAV;
     SAVE::date CURRENT_DATE;
@@ -108,18 +106,18 @@ namespace SAVE {
         }
 
         // stars
-        IO::loadSprite( 1, 1, tileCnt, 100, 37, 16, 16, starPal, starTiles, starTilesLen, false,
-                        false, true, OBJPRIORITY_2, p_bottom );
-        IO::loadSprite( 2, 1, tileCnt, 112, 37, 16, 16, starPal, starTiles, starTilesLen, false,
-                        false, true, OBJPRIORITY_2, p_bottom );
-        IO::loadSprite( 3, 1, tileCnt, 124, 37, 16, 16, starPal, starTiles, starTilesLen, false,
-                        false, true, OBJPRIORITY_2, p_bottom );
-        IO::loadSprite( 4, 1, tileCnt, 136, 37, 16, 16, starPal, starTiles, starTilesLen, false,
-                        false, true, OBJPRIORITY_2, p_bottom );
-        IO::loadSprite( 5, 1, tileCnt, 148, 37, 16, 16, starPal, starTiles, starTilesLen, false,
-                        false, true, OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( 6, 1, tileCnt, 160, 37, 16, 16, starPal, starTiles, starTilesLen,
-                                  false, false, true, OBJPRIORITY_2, p_bottom );
+        IO::loadSprite( 1, 1, tileCnt, 100, 37, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2,
+                        p_bottom );
+        IO::loadSprite( 2, 1, tileCnt, 112, 37, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2,
+                        p_bottom );
+        IO::loadSprite( 3, 1, tileCnt, 124, 37, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2,
+                        p_bottom );
+        IO::loadSprite( 4, 1, tileCnt, 136, 37, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2,
+                        p_bottom );
+        IO::loadSprite( 5, 1, tileCnt, 148, 37, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2,
+                        p_bottom );
+        tileCnt = IO::loadSprite( "UI/star", 6, 1, tileCnt, 160, 37, 16, 16, false, false, true,
+                                  OBJPRIORITY_2, p_bottom );
 
         for( u8 i = 0; i < achvs; ++i ) { oam[ 1 + i ].isHidden = false; }
 

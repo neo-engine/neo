@@ -28,26 +28,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "defines.h"
+#include "fs.h"
 #include "saveGame.h"
 #include "saveOptions.h"
 #include "screenFade.h"
 #include "sound.h"
 #include "sprite.h"
 #include "uio.h"
-#include "fs.h"
-
-#include "noselection_64_20.h"
-#include "noselection_96_32_4.h"
-#include "x_16_16.h"
-// #include "Border.h"
 
 namespace SAVE {
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 0 + 10 * ( p_pos ) )
-#define SPR_X_OAM_SUB 60
+#define SPR_X_OAM_SUB                     60
 
-#define SPR_BOX_PAL_SUB 7
+#define SPR_BOX_PAL_SUB     7
 #define SPR_BOX_SEL_PAL_SUB 8
-#define SPR_X_PAL_SUB 9
+#define SPR_X_PAL_SUB       9
 
     constexpr u8 MAX_SETTINGS = 6;
 
@@ -243,11 +238,8 @@ namespace SAVE {
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
 
-        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "Border", 64, 192,
-                             192 * 256, false );
-
-        // dmaCopy( BorderBitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        // dmaCopy( BorderPal + 192, BG_PALETTE + 192, 64 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "Border", 64, 192, 192 * 256,
+                             false );
 
         for( u8 i = 0; i < 2; ++i ) {
             u16* pal             = IO::BG_PAL( i );
@@ -271,9 +263,8 @@ namespace SAVE {
         u16 tileCnt = 0;
 
         // x
-        tileCnt = IO::loadSprite( SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16, 16,
-                                  x_16_16Pal, x_16_16Tiles, x_16_16TilesLen, false, false, false,
-                                  OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16,
+                                  16, false, false, false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
 
         // Choice boxes
         for( u8 i = 0; i < MAX_SETTINGS; ++i ) {
@@ -286,17 +277,16 @@ namespace SAVE {
                                 false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         }
-        tileCnt = IO::loadSprite( SPR_CHOICE_START_OAM_SUB( 0 ), SPR_BOX_PAL_SUB, tileCnt, 12, 24,
-                                  32, 32, noselection_64_20Pal, noselection_64_20Tiles,
-                                  noselection_64_20TilesLen, false, false, false, OBJPRIORITY_3,
-                                  true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_CHOICE_START_OAM_SUB( 0 ),
+                                  SPR_BOX_PAL_SUB, tileCnt, 12, 24, 32, 32, false, false, false,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
-        IO::copySpritePal( noselection_96_32_4Pal, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
+        IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( true );
 
         drawSub( );
-        REG_BLDCNT   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
-        REG_BLDALPHA = TRANSPARENCY_COEFF;
+        REG_BLDCNT       = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+        REG_BLDALPHA     = TRANSPARENCY_COEFF;
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
         bgUpdate( );
@@ -351,8 +341,7 @@ namespace SAVE {
         case 5: // BG
             SAVE::SAV.getActiveFile( ).m_options.m_bgIdx
                 = ( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx + 1 ) % NUM_BGS;
-        default:
-            break;
+        default: break;
         }
         drawSub( );
     }
@@ -394,8 +383,7 @@ namespace SAVE {
         case 5: // BG
             SAVE::SAV.getActiveFile( ).m_options.m_bgIdx
                 = ( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx + NUM_BGS - 1 ) % NUM_BGS;
-        default:
-            break;
+        default: break;
         }
         drawSub( );
     }
