@@ -74,6 +74,11 @@ const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/";
 
 const char MAP_DATA_PATH[] = "nitro:/DATA/MAP_DATA/";
 
+const char STRING_PATH[]      = "nitro:/STRN/STR/";
+const char MAPSTRING_PATH[]   = "nitro:/STRN/MAP/";
+const char BADGENAME_PATH[]   = "nitro:/STRN/BDG/";
+const char ACHIEVEMENT_PATH[] = "nitro:/STRN/AVM/";
+
 namespace FS {
     char TMP_BUFFER[ 100 ];
     char TMP_BUFFER_SHORT[ 50 ];
@@ -577,41 +582,73 @@ namespace BATTLE {
     }
 } // namespace BATTLE
 
-bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {
-    FILE* f = FS::openSplit( ABILITY_NAME_PATH, p_abilityId, ".str" );
+bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out ) {
+    FILE* f = FS::openSplit( p_path, p_stringId, ".str" );
     if( !f ) return false;
 
-    for( u8 i = 0; i <= p_language; ++i ) { fread( p_out, 1, ABILITY_NAMELENGTH, f ); }
+    std::fseek( f, p_language * p_maxLen, SEEK_SET );
+    fread( p_out, 1, p_maxLen, f );
     fclose( f );
+
     return true;
 }
 
-std::string getAbilityName( u16 p_abilityId, u8 p_language ) {
-    char tmpbuf[ ABILITY_NAMELENGTH ];
-    if( !getAbilityName( p_abilityId, p_language, tmpbuf ) ) { return "---"; }
+const char* getMapString( u16 p_stringId ) {
+    static char st_buffer[ MAPSTRING_LEN + 10 ];
+
+    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    if( getString( MAPSTRING_PATH, MAPSTRING_LEN, p_stringId, CURRENT_LANGUAGE, st_buffer ) ) {
+        return st_buffer;
+    }
+    return "";
+}
+
+const char* getBadge( u16 p_stringId ) {
+    static char st_buffer[ BADGENAME_LEN + 10 ];
+
+    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    if( getString( BADGENAME_PATH, BADGENAME_LEN, p_stringId, CURRENT_LANGUAGE, st_buffer ) ) {
+        return st_buffer;
+    }
+    return "";
+}
+
+const char* getAchievement( u16 p_stringId, u8 p_language ) {
+    static char st_buffer[ ACHIEVEMENT_LEN + 10 ];
+
+    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    if( getString( ACHIEVEMENT_PATH, ACHIEVEMENT_LEN, p_stringId, p_language, st_buffer ) ) {
+        return st_buffer;
+    }
+    return "";
+}
+
+std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language ) {
+    char tmpbuf[ p_maxLen + 5 ];
+    if( !getString( p_path, p_maxLen, p_stringId, p_language, tmpbuf ) ) { return "---"; }
     return std::string( tmpbuf );
 }
 
+std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId ) {
+    return getString( p_path, p_maxLen, p_stringId, CURRENT_LANGUAGE );
+}
+
+bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {
+    return getString( ABILITY_NAME_PATH, ABILITY_NAMELENGTH, p_abilityId, p_language, p_out );
+}
+std::string getAbilityName( u16 p_abilityId, u8 p_language ) {
+    return getString( ABILITY_NAME_PATH, ABILITY_NAMELENGTH, p_abilityId, p_language );
+}
 std::string getAbilityName( u16 p_abilityId ) {
     return getAbilityName( p_abilityId, CURRENT_LANGUAGE );
 }
 
 bool getAbilityDescr( u16 p_abilityId, u8 p_language, char* p_out ) {
-    FILE* f = FS::openSplit( ABILITY_DSCR_PATH, p_abilityId, ".str" );
-    if( !f ) return false;
-
-    std::fseek( f, p_language * ABILITY_DSCRLENGTH, SEEK_SET );
-    fread( p_out, 1, ABILITY_DSCRLENGTH, f );
-    fclose( f );
-    return true;
+    return getString( ABILITY_DSCR_PATH, ABILITY_DSCRLENGTH, p_abilityId, p_language, p_out );
 }
-
 std::string getAbilityDescr( u16 p_abilityId, u8 p_language ) {
-    char tmpbuf[ ABILITY_DSCRLENGTH ];
-    if( !getAbilityDescr( p_abilityId, p_language, tmpbuf ) ) { return "---"; }
-    return std::string( tmpbuf );
+    return getString( ABILITY_DSCR_PATH, ABILITY_DSCRLENGTH, p_abilityId, p_language );
 }
-
 std::string getAbilityDescr( u16 p_abilityId ) {
     return getAbilityDescr( p_abilityId, CURRENT_LANGUAGE );
 }

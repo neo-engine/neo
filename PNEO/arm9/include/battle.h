@@ -236,6 +236,6 @@ namespace BATTLE {
         /*
          * @brief: Returns messages of the battle trainer.
          */
-        const char* getString( u8 p_stringId );
+        const char* getMessage( u8 p_stringId );
     };
 } // namespace BATTLE

@@ -1822,7 +1822,7 @@ namespace BATTLE {
         }
     }
 
-    const char* battle::getString( u8 p_stringId ) {
+    const char* battle::getMessage( u8 p_stringId ) {
         if( _isWildBattle ) { return 0; }
 
         switch( p_stringId ) {

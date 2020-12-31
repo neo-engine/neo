@@ -43,7 +43,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_ITEMS_IN_BAG    MAX_ITEMS
 #define MAX_ATTACK          820
 #define MAX_MOVE            MAX_ATTACK
-#define MAX_PKMN            893
+#define MAX_PKMN            900
 #define OTLENGTH            8
 #define SPECIES_NAMELENGTH  30
 #define PKMN_NAMELENGTH     15
@@ -55,6 +55,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define TCLASS_NAMELENGTH   30
 #define ABILITY_DSCRLENGTH  200
 #define LOCATION_NAMELENGTH 25
+
+#define MAPSTRING_LEN   800
+#define BADGENAME_LEN   50
+#define ACHIEVEMENT_LEN 100
 
 #undef RAND_MAX
 #define RAND_MAX 4294967295
@@ -86,13 +90,10 @@ extern bool TWL_CONFIG;
 extern unsigned int   TEMP[ 256 * 256 / 4 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
-constexpr u8  LANGUAGES        = 2;
-constexpr u16 MAX_STRINGS      = 800;
-constexpr u16 MAX_MAP_STRINGS  = 800;
-constexpr u8  MAX_ACHIEVEMENTS = 50;
-constexpr u8  MAX_BADGENAMES   = 25;
-constexpr u8  NUM_BGS          = 12;
-constexpr u8  INITIAL_NAVBG    = 10;
+constexpr u8  LANGUAGES     = 2;
+constexpr u16 MAX_STRINGS   = 600;
+constexpr u8  NUM_BGS       = 12;
+constexpr u8  INITIAL_NAVBG = 10;
 
 constexpr u8 DAYTIME_NIGHT   = 0;
 constexpr u8 DAYTIME_MORNING = 1;
@@ -115,19 +116,25 @@ enum style {
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char*       HP_ICONS[ LANGUAGES ];
-extern const char* const ACHIEVEMENTS[ MAX_ACHIEVEMENTS ][ LANGUAGES ];
-extern const char* const BADGENAME[ MAX_BADGENAMES ][ LANGUAGES ];
-extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
-extern const char* const MAP_STRINGS[ MAX_MAP_STRINGS ][ LANGUAGES ];
 extern const char* const MONTHS[ 12 ][ LANGUAGES ];
+extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 
-#define getBadgeName( p_type, p_badge )                                                            \
-    ( ( ( p_type ) == 0 )                                                                          \
-          ? BADGENAME[ (p_badge) -1 ][ CURRENT_LANGUAGE ]                                          \
-          : ( ( p_type ) == 1 ? BADGENAME[ 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) \
-                                           - 1 ][ CURRENT_LANGUAGE ]                               \
-                              : 0 ) )
+bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
+std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );
+std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );
+
+#define GET_STRING_L( p_stringId, p_language ) STRINGS[ p_stringId ][ p_language ]
+const char* getMapString( u16 p_stringId );
+const char* getBadge( u16 p_badgeId );
+const char* getAchievement( u16 p_badgeId, u8 p_language );
+
+#define getBadgeName( p_type, p_badge )                                                     \
+    ( ( ( p_type ) == 0 )                                                                   \
+          ? getBadge( (p_badge) -1 )                                                        \
+          : ( ( p_type ) == 1                                                               \
+                  ? getBadge( 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) - 1 ) \
+                  : nullptr ) )
 
 #ifdef DESQUID
 constexpr u16            MAX_DESQUID_STRINGS = 100;
@@ -138,10 +145,9 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
 #else
 #define GET_STRING( p_stringId ) STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
 #endif
-
 #define HP_ICON HP_ICONS[ CURRENT_LANGUAGE ]
 
-#define GET_MAP_STRING( p_stringId ) MAP_STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
+#define GET_MAP_STRING( p_stringId ) getMapString( p_stringId )
 #define NO_DATA                      GET_STRING( 0 )
 #define FARAWAY_PLACE                GET_STRING( 1 )
 #define UNKNOWN_SPECIES              GET_STRING( 2 )

@@ -103,7 +103,7 @@ namespace STS {
             std::function<void( u32 )> m_counterUpdate;  // Callback when counter value changed
             std::function<std::string( u32 )>
                         m_nameForValue; // Used to obtain name for value (0 for n/a)
-            std::string getString( );
+            std::string computeString( );
         };
 
         constexpr u16 getTextForDesquidChoice( const desquidChoice p_choice ) const {

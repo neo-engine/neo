@@ -207,7 +207,7 @@ namespace SAVE {
             }
             ++frame;
             if( !( frame % 120 ) ) {
-                IO::boldFont->printString( STRINGS[ 70 ][ _currentLanguage ], 128, 176, false,
+                IO::boldFont->printString( GET_STRING_L( 70, _currentLanguage ), 128, 176, false,
                                            IO::font::CENTER );
                 frame = 0;
             } else if( ( frame % 120 ) == 60 ) {
@@ -250,7 +250,6 @@ namespace SAVE {
         bgUpdate( );
         IO::fadeScreen( IO::CLEAR_DARK_FAST, true, true );
         IO::initOAMTable( true );
-
 
         // Sprites
         SpriteEntry* oam = IO::Oam->oamBuffer;
@@ -342,8 +341,8 @@ namespace SAVE {
         for( auto c : p_choices ) {
             if( c == CONTINUE ) {
                 IO::regularFont->printStringC(
-                    STRINGS[ getTextForMainChoice( c ) ][ _currentLanguage ], 128, cury + 8, true,
-                    IO::font::CENTER );
+                    GET_STRING_L( getTextForMainChoice( c ), _currentLanguage ), 128, cury + 8,
+                    true, IO::font::CENTER );
 
                 res.push_back( std::pair( IO::inputTarget( 28, cury, 236, cury + 32 ), ln ) );
                 // load sprites
@@ -364,8 +363,8 @@ namespace SAVE {
                 cury += 34;
             } else {
                 IO::regularFont->printStringC(
-                    STRINGS[ getTextForMainChoice( c ) ][ _currentLanguage ], 128, cury + 2, true,
-                    IO::font::CENTER );
+                    GET_STRING_L( getTextForMainChoice( c ), _currentLanguage ), 128, cury + 2,
+                    true, IO::font::CENTER );
 
                 res.push_back( std::pair( IO::inputTarget( 28, cury, 236, cury + 20 ), ln ) );
 
@@ -420,7 +419,7 @@ namespace SAVE {
                 IO::regularFont->printStringC( EPISODE_NAMES[ episodes[ c ] ][ _currentLanguage ],
                                                128, cury + 2, true, IO::font::CENTER );
             } else {
-                IO::regularFont->printStringC( STRINGS[ 330 ][ _currentLanguage ], 128, cury + 2,
+                IO::regularFont->printStringC( GET_STRING_L( 330, _currentLanguage ), 128, cury + 2,
                                                true, IO::font::CENTER );
                 res.push_back(
                     std::pair( IO::inputTarget( 0, 0, 0 ), IO::choiceBox::BACK_CHOICE ) );
@@ -591,7 +590,7 @@ namespace SAVE {
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                STRINGS[ 80 ][ _currentLanguage ], oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
+                GET_STRING_L( 80, _currentLanguage ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8, true, IO::font::CENTER );
 
             res.push_back(
@@ -606,7 +605,7 @@ namespace SAVE {
                                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                STRINGS[ 81 ][ _currentLanguage ], oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
+                GET_STRING_L( 81, _currentLanguage ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, true, IO::font::CENTER );
 
             res.push_back(
@@ -625,7 +624,7 @@ namespace SAVE {
         IO::clearScreen( true, true, true );
         IO::yesNoBox yn;
         while( yn.getResult(
-                   [ & ]( ) { return printYNMessage( STRINGS[ 85 ][ _currentLanguage ], 254 ); },
+                   [ & ]( ) { return printYNMessage( GET_STRING_L( 85, _currentLanguage ), 254 ); },
                    [ & ]( IO::yesNoBox::selection p_sel ) {
                        printYNMessage( 0, p_sel == IO::yesNoBox::NO );
                    } )
@@ -640,14 +639,14 @@ namespace SAVE {
                                         oam[ SPR_MSG_BOX_OAM_SUB ].y + 31, true, 0 );
 
                     auto lineCnt = IO::regularFont->printBreakingStringC(
-                                       STRINGS[ 109 ][ _currentLanguage ], 128,
+                                       GET_STRING_L( 109, _currentLanguage ), 128,
                                        oam[ SPR_MSG_BOX_OAM_SUB ].y + 8, 196, true,
                                        IO::font::CENTER, 14, ' ', 0, false, -1 )
                                    - 1;
-                    IO::regularFont->printBreakingStringC( STRINGS[ 109 ][ _currentLanguage ], 128,
-                                                           oam[ SPR_MSG_BOX_OAM_SUB ].y + 8
-                                                               - lineCnt * 7,
-                                                           196, true, IO::font::CENTER, 14 );
+                    IO::regularFont->printBreakingStringC(
+                        GET_STRING_L( 109, _currentLanguage ), 128,
+                        oam[ SPR_MSG_BOX_OAM_SUB ].y + 8 - lineCnt * 7, 196, true, IO::font::CENTER,
+                        14 );
 
                     for( u8 i = 0; i < LANGUAGES; ++i ) {
                         for( u8 j = 0; j < 6; j++ ) {
@@ -715,7 +714,9 @@ namespace SAVE {
 
             IO::yesNoBox yn;
             if( yn.getResult(
-                    [ & ]( ) { return printYNMessage( STRINGS[ 79 ][ _currentLanguage ], 254 ); },
+                    [ & ]( ) {
+                        return printYNMessage( GET_STRING_L( 79, _currentLanguage ), 254 );
+                    },
                     [ & ]( IO::yesNoBox::selection p_sel ) {
                         printYNMessage( 0, p_sel == IO::yesNoBox::NO );
                     } )

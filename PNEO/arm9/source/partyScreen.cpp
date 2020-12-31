@@ -122,7 +122,7 @@ namespace STS {
         return res;
     }
 
-    std::string partyScreen::desquidItem::getString( ) {
+    std::string partyScreen::desquidItem::computeString( ) {
         if( m_hasCounterName ) {
             snprintf( BUFFER, 49, GET_STRING( m_string ),
                       m_nameForValue( m_currentValue( ) ).c_str( ) );
@@ -432,7 +432,7 @@ namespace STS {
         u32  oldval        = 0;
 
         for( u8 i = 0; i < choices.size( ); ++i ) {
-            _partyUI->drawDesquidItem( i, choices[ i ].getString( ).c_str( ),
+            _partyUI->drawDesquidItem( i, choices[ i ].computeString( ).c_str( ),
                                        choices[ i ].m_currentValue( ), choices[ i ].m_maxValue,
                                        i == selectedLine );
         }
@@ -456,7 +456,7 @@ namespace STS {
                     editing = false;
                     UPDATE_VALUE( oldval );
                     _partyUI->drawDesquidItem( selectedLine,
-                                               choices[ selectedLine ].getString( ).c_str( ),
+                                               choices[ selectedLine ].computeString( ).c_str( ),
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue, true );
                     cooldown = COOLDOWN_COUNT;
@@ -470,7 +470,7 @@ namespace STS {
                     editing       = true;
                     selectedDigit = 0;
                     _partyUI->drawDesquidItem(
-                        selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                        selectedLine, choices[ selectedLine ].computeString( ).c_str( ),
                         choices[ selectedLine ].m_currentValue( ),
                         choices[ selectedLine ].m_maxValue, true, selectedDigit );
                 } else {
@@ -482,7 +482,7 @@ namespace STS {
                     _partyUI->select( _currentSelection, BUFFER );
 
                     for( u8 i = 0; i < choices.size( ); ++i ) {
-                        _partyUI->drawDesquidItem( i, choices[ i ].getString( ).c_str( ),
+                        _partyUI->drawDesquidItem( i, choices[ i ].computeString( ).c_str( ),
                                                    choices[ i ].m_currentValue( ),
                                                    choices[ i ].m_maxValue, i == selectedLine );
                     }
@@ -504,17 +504,17 @@ namespace STS {
                         UPDATE_VALUE( choices[ selectedLine ].m_currentValue( ) - change );
                     }
                     _partyUI->drawDesquidItem(
-                        selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                        selectedLine, choices[ selectedLine ].computeString( ).c_str( ),
                         choices[ selectedLine ].m_currentValue( ),
                         choices[ selectedLine ].m_maxValue, true, selectedDigit );
                 } else {
                     _partyUI->drawDesquidItem( selectedLine,
-                                               choices[ selectedLine ].getString( ).c_str( ),
+                                               choices[ selectedLine ].computeString( ).c_str( ),
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue );
                     selectedLine = ( selectedLine + 1 ) % choices.size( );
                     _partyUI->drawDesquidItem( selectedLine,
-                                               choices[ selectedLine ].getString( ).c_str( ),
+                                               choices[ selectedLine ].computeString( ).c_str( ),
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue, true );
                 }
@@ -535,17 +535,17 @@ namespace STS {
                         UPDATE_VALUE( choices[ selectedLine ].m_currentValue( ) + change );
                     }
                     _partyUI->drawDesquidItem(
-                        selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                        selectedLine, choices[ selectedLine ].computeString( ).c_str( ),
                         choices[ selectedLine ].m_currentValue( ),
                         choices[ selectedLine ].m_maxValue, true, selectedDigit );
                 } else {
                     _partyUI->drawDesquidItem( selectedLine,
-                                               choices[ selectedLine ].getString( ).c_str( ),
+                                               choices[ selectedLine ].computeString( ).c_str( ),
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue );
                     selectedLine = ( selectedLine + choices.size( ) - 1 ) % choices.size( );
                     _partyUI->drawDesquidItem( selectedLine,
-                                               choices[ selectedLine ].getString( ).c_str( ),
+                                               choices[ selectedLine ].computeString( ).c_str( ),
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue, true );
                 }
@@ -558,7 +558,7 @@ namespace STS {
                     ;
                 selectedDigit = ( selectedDigit + 1 ) % numDig;
                 _partyUI->drawDesquidItem(
-                    selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                    selectedLine, choices[ selectedLine ].computeString( ).c_str( ),
                     choices[ selectedLine ].m_currentValue( ), choices[ selectedLine ].m_maxValue,
                     true, selectedDigit );
 
@@ -571,7 +571,7 @@ namespace STS {
                     ;
                 selectedDigit = ( selectedDigit + numDig - 1 ) % numDig;
                 _partyUI->drawDesquidItem(
-                    selectedLine, choices[ selectedLine ].getString( ).c_str( ),
+                    selectedLine, choices[ selectedLine ].computeString( ).c_str( ),
                     choices[ selectedLine ].m_currentValue( ), choices[ selectedLine ].m_maxValue,
                     true, selectedDigit );
 
