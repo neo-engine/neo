@@ -39,11 +39,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // Assumes that the Backup is a 512k flash memory
 #define BACKUP_SIZE ( 512 * 1024 )
 
-#define MAX_ITEMS           1280
-#define MAX_ITEMS_IN_BAG    MAX_ITEMS
-#define MAX_ATTACK          820
+#define MAX_ITEMS           1300
+#define MAX_ITEMS_IN_BAG    1280
+#define MAX_ATTACK          830
 #define MAX_MOVE            MAX_ATTACK
-#define MAX_PKMN            900
+#define MAX_PKMN            898
 #define OTLENGTH            8
 #define SPECIES_NAMELENGTH  30
 #define PKMN_NAMELENGTH     15

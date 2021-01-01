@@ -281,6 +281,9 @@ namespace ITEM {
         case 15: { // nature mint
             return p_pokemon.setNature( (pkmnNatures) item.m_param1 );
         }
+        case 16: { // ability patch
+            return p_pokemon.swapAbilities( true );
+        }
         default: break;
         }
         return change;

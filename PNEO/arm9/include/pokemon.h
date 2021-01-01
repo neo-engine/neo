@@ -136,7 +136,7 @@ struct boxPokemon {
     constexpr u16 getAbility( ) const {
         return m_ability;
     }
-    bool           swapAbilities( );
+    bool           swapAbilities( bool p_toHidden = false );
     constexpr bool isShiny( ) const {
         return !( ( ( ( m_oTId ^ m_oTSid ) >> 3 )
                     ^ ( ( ( m_pid >> 16 ) ^ ( m_pid % ( 1 << 16 ) ) ) ) >> 3 ) );
@@ -593,8 +593,8 @@ struct pokemon {
     bool        setLevel( u8 p_newLevel );
     bool        setExperience( u32 p_amount );
     bool        gainExperience( u32 p_amount );
-    inline bool swapAbilities( ) {
-        return m_boxdata.swapAbilities( );
+    inline bool swapAbilities( bool p_toHidden = false ) {
+        return m_boxdata.swapAbilities( p_toHidden );
     }
 
     void recalculateStats( );

@@ -260,9 +260,16 @@ bool boxPokemon::setNature( pkmnNatures p_newNature ) {
     return true;
 }
 
-bool boxPokemon::swapAbilities( ) {
+bool boxPokemon::swapAbilities( bool p_toHidden ) {
+    if( p_toHidden && m_abilitySlot >= 2 ) {
+        return false; // pkmn already has a hidden ability.
+    }
     auto old = m_ability;
-    setAbility( m_abilitySlot ^ 1 );
+    if( !p_toHidden ) {
+        setAbility( m_abilitySlot ^ 1 );
+    } else {
+        setAbility( m_abilitySlot + 2 );
+    }
     if( old == m_ability ) {
         m_abilitySlot ^= 1;
         return false;
