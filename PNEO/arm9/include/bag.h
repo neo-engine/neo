@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2020
+    Copyright (C) 2012 - 2021
     Philip Wellnitz
 
     This file is part of Pokémon neo.
@@ -41,8 +41,8 @@ namespace BAG {
         static const u16 BERRIES_START   = 850;
         static const u16 KEY_ITEMS_START = 950;
 
-        u16                 _startIdx[ 6 ] = {ITEM_START,    MEDICINE_START,  TM_HM_START,
-                              BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG};
+        u16                 _startIdx[ 6 ] = { ITEM_START,    MEDICINE_START,  TM_HM_START,
+                               BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG };
         std::pair<u16, u16> _items[ MAX_ITEMS_IN_BAG ];
         u16                 _nextFree[ 5 ];
 
@@ -133,12 +133,9 @@ namespace BAG {
 
         switch( p_itemType ) {
         case ITEM::ITEMTYPE_FORMECHANGE:
-        case ITEM::ITEMTYPE_KEYITEM:
-            return bag::bagType::KEY_ITEMS;
-        case ITEM::ITEMTYPE_TM:
-            return bag::bagType::TM_HM;
-        default:
-            break;
+        case ITEM::ITEMTYPE_KEYITEM: return bag::bagType::KEY_ITEMS;
+        case ITEM::ITEMTYPE_TM: return bag::bagType::TM_HM;
+        default: break;
         }
         return bag::bagType::ITEMS;
     }

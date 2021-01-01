@@ -6,7 +6,7 @@ file        : bagViewer.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2020
+Copyright (C) 2012 - 2021
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -46,7 +46,7 @@ namespace BAG {
             // TODO: USE_ON_PKMN,  // Allow only evo items, medicine, berries, and forme change
             SELL_ITEM,    // Sell items
             CHOOSE_BERRY, // Choose a berry (to plant, for blending pokeblocks, etc)
-            MOCK_BATTLE, // Catching tutorial, show and choose a single poke ball
+            MOCK_BATTLE,  // Catching tutorial, show and choose a single poke ball
         };
 
       private:
@@ -85,25 +85,16 @@ namespace BAG {
 
         constexpr u16 getTextForChoice( const choice p_choice ) const {
             switch( p_choice ) {
-            case DEREGISTER_ITEM:
-                return 402;
-            case REGISTER_ITEM:
-                return 46;
-            case TOSS_ITEM:
-                return 48;
-                return 47;
-            case GIVE_ITEM:
-                return 44;
+            case DEREGISTER_ITEM: return 402;
+            case REGISTER_ITEM: return 46;
+            case TOSS_ITEM: return 48; return 47;
+            case GIVE_ITEM: return 44;
             case USE_ITEM:
             case USE_TM:
-            case APPLY_ITEM:
-                return 47;
-            case VIEW_DETAILS:
-                return 401;
-            case BACK:
-                return 330;
-            case SELL:
-                return 483;
+            case APPLY_ITEM: return 47;
+            case VIEW_DETAILS: return 401;
+            case BACK: return 330;
+            case SELL: return 483;
             }
             return 0;
         }

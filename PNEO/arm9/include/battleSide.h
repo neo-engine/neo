@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2020
+    Copyright (C) 2012 - 2021
     Philip Wellnitz
 
     This file is part of Pokémon neo.
@@ -359,31 +359,27 @@ namespace BATTLE {
          */
         constexpr u16 getStat( u8 p_slot, u8 p_stat, bool p_allowAbilities = true,
                                bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
-            if( getPkmn( p_slot ) == nullptr ) [[unlikely]] {
-                    return 0;
-                }
+            if( getPkmn( p_slot ) == nullptr ) [[unlikely]] { return 0; }
             u16 base = _slots[ p_slot ].getStat( p_stat, p_allowAbilities, p_ignoreNegative,
                                                  p_ignorePositive );
 
             if( !p_ignorePositive && p_stat == SPEED && _sideConditionAmount[ 8 ] )
                 [[unlikely]] { // Tailwind
-                    base *= 2;
-                }
+                base *= 2;
+            }
 
             // plus / minus
             if( p_allowAbilities && !p_ignorePositive ) [[likely]] {
-                    if( p_stat == SATK
-                        && ( getPkmn( p_slot )->getAbility( ) == A_PLUS
-                             || getPkmn( p_slot )->getAbility( ) == A_MINUS ) )
-                        [[unlikely]] {
-                            auto ot = getPkmn( !p_slot );
-                            if( ot != nullptr
-                                && ( ot->getAbility( ) == A_MINUS
-                                     || ot->getAbility( ) == A_PLUS ) ) {
-                                base = 3 * base / 2;
-                            }
-                        }
+                if( p_stat == SATK
+                    && ( getPkmn( p_slot )->getAbility( ) == A_PLUS
+                         || getPkmn( p_slot )->getAbility( ) == A_MINUS ) ) [[unlikely]] {
+                    auto ot = getPkmn( !p_slot );
+                    if( ot != nullptr
+                        && ( ot->getAbility( ) == A_MINUS || ot->getAbility( ) == A_PLUS ) ) {
+                        base = 3 * base / 2;
+                    }
                 }
+            }
 
             return std::max( u16( 1 ), base );
         }
@@ -401,10 +397,9 @@ namespace BATTLE {
 
             if( getPkmn( !p_slot ) == nullptr
                 && MOVE::getMoveData( getPkmn( p_slot )->getMove( p_moveIdx ) ).m_target
-                       == MOVE::ALLY )
-                [[unlikely]] {
-                    return false;
-                }
+                       == MOVE::ALLY ) [[unlikely]] {
+                return false;
+            }
 
             return _slots[ p_slot ].canSelectMove( p_moveIdx );
         }

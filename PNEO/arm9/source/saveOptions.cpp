@@ -6,7 +6,7 @@ file        : saveOptions.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2020 - 2020
+Copyright (C) 2021 - 2021
 Philip Wellnitz
 
 This file is part of Pokémon neo.

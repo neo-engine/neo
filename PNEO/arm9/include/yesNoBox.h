@@ -6,7 +6,7 @@ file        : yesNoBox.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2020
+Copyright (C) 2012 - 2021
 Philip Wellnitz
 
 This file is part of Pokémon neo.

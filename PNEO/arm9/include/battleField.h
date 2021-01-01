@@ -6,7 +6,7 @@ file        : battleField.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2020
+Copyright (C) 2012 - 2021
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -220,9 +220,7 @@ namespace BATTLE {
                                            u8 p_duration = 255 ) {
 
             auto pkmn = getPkmn( p_opponent, p_slot );
-            if( pkmn == nullptr ) [[unlikely]] {
-                    return false;
-                }
+            if( pkmn == nullptr ) [[unlikely]] { return false; }
 
             if( !suppressesAbilities( ) && !suppressesWeather( )
                 && pkmn->getAbility( ) == A_LEAF_GUARD
@@ -546,9 +544,7 @@ namespace BATTLE {
          */
         inline bool breaksAbilities( bool p_opponent, u8 p_pos ) {
             auto p = getPkmn( p_opponent, p_pos );
-            if( p == nullptr ) [[unlikely]] {
-                    return false;
-                }
+            if( p == nullptr ) [[unlikely]] { return false; }
 
             return p->getAbility( ) == A_MOLD_BREAKER || p->getAbility( ) == A_TERAVOLT
                    || p->getAbility( ) == A_TURBOBLAZE;
@@ -568,9 +564,7 @@ namespace BATTLE {
          */
         constexpr u16 getStat( bool p_opponent, u8 p_slot, u8 p_stat, bool p_allowAbilities = true,
                                bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
-            if( getPkmn( p_opponent, p_slot ) == nullptr ) [[unlikely]] {
-                    return 0;
-                }
+            if( getPkmn( p_opponent, p_slot ) == nullptr ) [[unlikely]] { return 0; }
 
             bool allowAbilities = p_allowAbilities && !suppressesAbilities( );
             bool allowWeather   = suppressesWeather( );
@@ -689,39 +683,32 @@ namespace BATTLE {
         inline bool canSwitchOut( bool p_opponent, u8 p_slot ) {
             if( !_sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].canSwitchOut( p_slot ) )
                 [[unlikely]] {
-                    return false;
-                }
+                return false;
+            }
 
             if( !suppressesAbilities( ) ) [[likely]] {
-                    auto p1 = getPkmn( !p_opponent, 0 );
-                    auto p2 = getPkmn( !p_opponent, 1 );
-                    // Shadow tag
-                    if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG ) [[likely]] {
-                            if( ( p1 != nullptr && p1->getAbility( ) == A_SHADOW_TAG )
-                                || ( p2 != nullptr && p2->getAbility( ) == A_SHADOW_TAG ) )
-                                [[unlikely]] {
-                                    return false;
-                                }
-                        }
-
-                    // Arena trap
-                    if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
-                        || ( p2 != nullptr && p2->getAbility( ) == A_ARENA_TRAP ) )
-                        [[unlikely]] {
-                            if( isGrounded( p_opponent, p_slot ) ) [[likely]] {
-                                    return false;
-                                }
-                        }
-
-                    // Magnet pull
-                    if( ( p1 != nullptr && p1->getAbility( ) == A_MAGNET_PULL )
-                        || ( p2 != nullptr && p2->getAbility( ) == A_MAGNET_PULL ) )
-                        [[unlikely]] {
-                            if( hasType( p_opponent, p_slot, STEEL ) ) [[unlikely]] {
-                                    return false;
-                                }
-                        }
+                auto p1 = getPkmn( !p_opponent, 0 );
+                auto p2 = getPkmn( !p_opponent, 1 );
+                // Shadow tag
+                if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_SHADOW_TAG ) [[likely]] {
+                    if( ( p1 != nullptr && p1->getAbility( ) == A_SHADOW_TAG )
+                        || ( p2 != nullptr && p2->getAbility( ) == A_SHADOW_TAG ) ) [[unlikely]] {
+                        return false;
+                    }
                 }
+
+                // Arena trap
+                if( ( p1 != nullptr && p1->getAbility( ) == A_ARENA_TRAP )
+                    || ( p2 != nullptr && p2->getAbility( ) == A_ARENA_TRAP ) ) [[unlikely]] {
+                    if( isGrounded( p_opponent, p_slot ) ) [[likely]] { return false; }
+                }
+
+                // Magnet pull
+                if( ( p1 != nullptr && p1->getAbility( ) == A_MAGNET_PULL )
+                    || ( p2 != nullptr && p2->getAbility( ) == A_MAGNET_PULL ) ) [[unlikely]] {
+                    if( hasType( p_opponent, p_slot, STEEL ) ) [[unlikely]] { return false; }
+                }
+            }
 
             return true;
         }
@@ -733,9 +720,7 @@ namespace BATTLE {
                               u8 p_targetSlot ) {
             auto tg = getPkmn( p_targetOpp, p_targetSlot );
             auto sc = getPkmn( p_sourceOpp, p_sorceSlot );
-            if( tg == nullptr || sc == nullptr ) [[unlikely]] {
-                    return;
-                }
+            if( tg == nullptr || sc == nullptr ) [[unlikely]] { return; }
 
             u16 item = sc->getItem( );
             removeItem( p_ui, p_sourceOpp, p_sorceSlot, false );
@@ -847,9 +832,7 @@ namespace BATTLE {
 
             // Check for symbiosis
             auto p2 = getPkmn( p_opponent, !p_slot );
-            if( p2 == nullptr ) [[likely]] {
-                    return;
-                }
+            if( p2 == nullptr ) [[likely]] { return; }
 
             if( !suppressesAbilities( ) && p_used && p2->getAbility( ) == A_SYMBIOSIS
                 && p2->getItem( ) ) {
@@ -889,8 +872,8 @@ namespace BATTLE {
             bool grn = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].isGrounded( p_slot, ab );
 
             if( _pseudoWeatherTimer[ 4 ] ) [[unlikely]] { // gravity
-                    grn = false;
-                }
+                grn = false;
+            }
 
             return grn;
         }

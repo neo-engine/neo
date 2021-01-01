@@ -6,7 +6,7 @@ file        : pokemon.cpp
 author      : Philip Wellnitz
 description : The main Pokémon engine
 
-Copyright (C) 2012 - 2020
+Copyright (C) 2012 - 2021
 Philip Wellnitz
 
 This file is part of Pokémon neo.

@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file (item.cpp) for details.
 
-    Copyright (C) 2012 - 2020
+    Copyright (C) 2012 - 2021
     Philip Wellnitz
 
     This file is part of Pokémon neo.
@@ -118,12 +118,20 @@ namespace SOUND {
         case 33: return MOD_ENCOUNTER_TEAM_AM;
         case 34:
         case 41:
+        case 86: return MOD_ENCOUNTER_TWINS;
         case 48:
         case 52:
-                 return MOD_ENCOUNTER_TWINS;
+        case 88: return MOD_ENCOUNTER_TUBER;
         case 35:
         case 43:
-        case 44:
+        case 44: return MOD_ENCOUNTER_YOUNGSTER;
+        case 36:
+        case 38:
+        case 71:
+        case 72:
+        case 77:
+        case 81: return MOD_ENCOUNTER_HIKER;
+
         default: return MOD_ENCOUNTER_YOUNGSTER;
         }
     }
@@ -237,6 +245,8 @@ namespace SOUND {
         case L_ANCIENT_TOMB:
         case L_ISLAND_CAVE:
         case L_DESERT_RUINS: return MOD_SEALED_CHAMBER;
+        case L_FIERY_PATH: return MOD_MT_PYRE_PEAK;
+        case L_MT_PYRE:
         case L_SHOAL_CAVE: return MOD_SHOAL_CAVE;
         case L_ROUTE_111_DESERT: return MOD_DESERT;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
