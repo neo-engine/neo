@@ -256,22 +256,20 @@ namespace BATTLE {
                           || moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_FLUFFY_TAIL
                           || moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_POKE_TOY ) ) )
                 [[likely]] {
-                    if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == USE_ITEM ) {
-                        SAVE::SAV.getActiveFile( ).m_bag.erase(
-                            BAG::bag::ITEMS, moves[ field::PLAYER_SIDE ][ 0 ].m_param, 1 );
-                    }
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == USE_ITEM ) {
+                    SAVE::SAV.getActiveFile( ).m_bag.erase(
+                        BAG::bag::ITEMS, moves[ field::PLAYER_SIDE ][ 0 ].m_param, 1 );
+                }
 
-                    SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
-                    _battleUI.log( std::string( GET_STRING( 163 ) ) );
-                    for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
-                    endBattle( battleEnd = BATTLE_RUN );
-                    return battleEnd;
-                }
-            else if( playerWillRun )
-                [[unlikely]] {
-                    _battleUI.log( std::string( GET_STRING( 164 ) ) );
-                    for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
-                }
+                SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
+                _battleUI.log( std::string( GET_STRING( 163 ) ) );
+                for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
+                endBattle( battleEnd = BATTLE_RUN );
+                return battleEnd;
+            } else if( playerWillRun ) [[unlikely]] {
+                _battleUI.log( std::string( GET_STRING( 164 ) ) );
+                for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
+            }
 
             if( playerWillCatch && playerCaptures( playerWillCatch ) ) {
                 endBattle( battleEnd = BATTLE_CAPTURE );
@@ -285,14 +283,13 @@ namespace BATTLE {
                     // Check for pursuit
                     if( moves[ i ][ j ].m_type == ATTACK && moves[ i ][ j ].m_param == M_PURSUIT )
                         [[unlikely]] {
-                            if( moves[ moves[ i ][ j ].m_target.first ]
-                                     [ moves[ i ][ j ].m_target.second ]
-                                         .m_type
-                                == SWITCH )
-                                [[unlikely]] {
-                                    moves[ i ][ j ].m_type = SWITCH_PURSUIT;
-                                }
+                        if( moves[ moves[ i ][ j ].m_target.first ]
+                                 [ moves[ i ][ j ].m_target.second ]
+                                     .m_type
+                            == SWITCH ) [[unlikely]] {
+                            moves[ i ][ j ].m_type = SWITCH_PURSUIT;
                         }
+                    }
                     if( moves[ i ][ j ].m_type == NO_OP_NO_CANCEL ) {
                         moves[ i ][ j ].m_type = NO_OP;
                     }
@@ -344,80 +341,75 @@ namespace BATTLE {
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
                 for( u8 j = 0; j < 30; ++j ) { swiWaitForVBlank( ); }
                 if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_ITEM ) [[unlikely]] {
-                        auto itmnm = ITEM::getItemName( sortedMoves[ i ].m_param );
+                    auto itmnm = ITEM::getItemName( sortedMoves[ i ].m_param );
+                    snprintf( buffer, 99, GET_STRING( 169 ), itmnm.c_str( ),
+                              _battleUI
+                                  .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                                                sortedMoves[ i ].m_user.second ),
+                                                sortedMoves[ i ].m_user.first, false )
+                                  .c_str( ),
+                              itmnm.c_str( ) );
+                    _battleUI.log( std::string( buffer ) );
+                }
+
+                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE ) [[unlikely]] {
+                    switch( sortedMoves[ i ].m_param ) {
+                    case M_SHELL_TRAP:
                         snprintf(
-                            buffer, 99, GET_STRING( 169 ), itmnm.c_str( ),
+                            buffer, 99, GET_STRING( 269 ),
                             _battleUI
                                 .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
                                                               sortedMoves[ i ].m_user.second ),
                                               sortedMoves[ i ].m_user.first, false )
-                                .c_str( ),
-                            itmnm.c_str( ) );
-                        _battleUI.log( std::string( buffer ) );
+                                .c_str( ) );
+                        _battleUI.log( buffer );
+                        _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
+                                                  sortedMoves[ i ].m_user.second, SHELLTRAP, 1 );
+                        break;
+                    case M_FOCUS_PUNCH:
+                        snprintf(
+                            buffer, 99, GET_STRING( 270 ),
+                            _battleUI
+                                .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                                              sortedMoves[ i ].m_user.second ),
+                                              sortedMoves[ i ].m_user.first, false )
+                                .c_str( ) );
+                        _battleUI.log( buffer );
+                        _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
+                                                  sortedMoves[ i ].m_user.second, FOCUSPUNCH, 1 );
+                        break;
+                    case M_BEAK_BLAST:
+                        snprintf(
+                            buffer, 99, GET_STRING( 271 ),
+                            _battleUI
+                                .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                                              sortedMoves[ i ].m_user.second ),
+                                              sortedMoves[ i ].m_user.first, false )
+                                .c_str( ) );
+                        _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
+                                                  sortedMoves[ i ].m_user.second, BEAKBLAST, 1 );
+                        _battleUI.log( buffer );
+                        break;
+                    default: break;
                     }
-
-                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE ) [[unlikely]] {
-                        switch( sortedMoves[ i ].m_param ) {
-                        case M_SHELL_TRAP:
-                            snprintf(
-                                buffer, 99, GET_STRING( 269 ),
-                                _battleUI
-                                    .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                                  sortedMoves[ i ].m_user.second ),
-                                                  sortedMoves[ i ].m_user.first, false )
-                                    .c_str( ) );
-                            _battleUI.log( buffer );
-                            _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
-                                                      sortedMoves[ i ].m_user.second, SHELLTRAP,
-                                                      1 );
-                            break;
-                        case M_FOCUS_PUNCH:
-                            snprintf(
-                                buffer, 99, GET_STRING( 270 ),
-                                _battleUI
-                                    .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                                  sortedMoves[ i ].m_user.second ),
-                                                  sortedMoves[ i ].m_user.first, false )
-                                    .c_str( ) );
-                            _battleUI.log( buffer );
-                            _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
-                                                      sortedMoves[ i ].m_user.second, FOCUSPUNCH,
-                                                      1 );
-                            break;
-                        case M_BEAK_BLAST:
-                            snprintf(
-                                buffer, 99, GET_STRING( 271 ),
-                                _battleUI
-                                    .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                                  sortedMoves[ i ].m_user.second ),
-                                                  sortedMoves[ i ].m_user.first, false )
-                                    .c_str( ) );
-                            _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
-                                                      sortedMoves[ i ].m_user.second, BEAKBLAST,
-                                                      1 );
-                            _battleUI.log( buffer );
-                            break;
-                        default: break;
-                        }
-                    }
+                }
 
                 if( sortedMoves[ i ].m_type == battleMoveType::ATTACK ) [[likely]] {
-                        std::vector<battleMove> targets    = std::vector<battleMove>( );
-                        std::vector<battleMove> targetedBy = std::vector<battleMove>( );
+                    std::vector<battleMove> targets    = std::vector<battleMove>( );
+                    std::vector<battleMove> targetedBy = std::vector<battleMove>( );
 
-                        for( auto m : sortedMoves ) {
-                            for( auto t : sortedMoves[ i ].m_target )
-                                if( t == m.m_user ) { targets.push_back( m ); }
-                            for( auto t : m.m_target )
-                                if( t == sortedMoves[ i ].m_user ) { targetedBy.push_back( m ); }
-                        }
-
-                        _field.executeBattleMove( &_battleUI, sortedMoves[ i ], targets,
-                                                  targetedBy );
-
-                        distributeEXP( );
-                        checkAndRefillBattleSpots( slot::status::RECALLED );
+                    for( auto m : sortedMoves ) {
+                        for( auto t : sortedMoves[ i ].m_target )
+                            if( t == m.m_user ) { targets.push_back( m ); }
+                        for( auto t : m.m_target )
+                            if( t == sortedMoves[ i ].m_user ) { targetedBy.push_back( m ); }
                     }
+
+                    _field.executeBattleMove( &_battleUI, sortedMoves[ i ], targets, targetedBy );
+
+                    distributeEXP( );
+                    checkAndRefillBattleSpots( slot::status::RECALLED );
+                }
 
                 if( sortedMoves[ i ].m_type == battleMoveType::SWITCH ) {
                     switchPokemon( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
@@ -897,7 +889,7 @@ namespace BATTLE {
                 auto mdata     = MOVE::getMoveData( res.m_param );
                 res.m_moveData = mdata;
                 auto tg        = mdata.m_pressureTarget != MOVE::NO_TARGET ? mdata.m_pressureTarget
-                                                                    : mdata.m_target;
+                                                                           : mdata.m_target;
 
                 bool canTarget[ 4 ];
                 for( u8 i = 0; i < 4; ++i ) {
@@ -953,7 +945,8 @@ namespace BATTLE {
                         continue;
                     }
                     if( _AILevel > 3 ) {
-                        canTarget[ j ] = !!_field.getEffectiveness( bmove[ i ], { j / 2, j % 2 } );
+                        canTarget[ j ]
+                            = !!_field.getEffectiveness( bmove[ i ], { j / 2, j % 2 } );
                     } else {
                         canTarget[ j ] = true;
                     }
@@ -1409,9 +1402,8 @@ namespace BATTLE {
         // Check whether the pkmn fits in the team
         auto pkmn = _field.getPkmn( true, 0 );
         if( pkmn == nullptr ) [[unlikely]] {
-                return;
-            }
-        else if( _playerTeamSize < 6 ) {
+            return;
+        } else if( _playerTeamSize < 6 ) {
             std::memcpy( &_playerTeam[ _playerTeamSize ], pkmn, sizeof( pokemon ) );
             _playerPkmnOrigLevel[ _playerTeamSize++ ] = pkmn->m_level;
         } else {
@@ -1469,9 +1461,9 @@ namespace BATTLE {
 
                         if( res.getSelectedPkmn( ) == 255 ) [[unlikely]] {
 #ifdef DESQUID
-                                _battleUI.log( "Oh well, time to desquid..." );
+                            _battleUI.log( "Oh well, time to desquid..." );
 #endif
-                            }
+                        }
 
                         _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
@@ -1525,9 +1517,9 @@ namespace BATTLE {
                 }
             }
             if( !itemfound ) [[unlikely]] {
-                    // cannot use non-existing item . . .
-                    return;
-                }
+                // cannot use non-existing item . . .
+                return;
+            }
 
             snprintf( buffer, 99, GET_STRING( 551 ),
                       getTrainerClassName( _opponent.getClass( ) ).c_str( ),
@@ -1691,9 +1683,7 @@ namespace BATTLE {
         u8*      perm = p_opponent ? _opponentPkmnPerm : _playerPkmnPerm;
         u8       len  = p_opponent ? _opponentTeamSize : _playerTeamSize;
 
-        if( len > 6 ) [[unlikely]] {
-                len = 6;
-            }
+        if( len > 6 ) [[unlikely]] { len = 6; }
 
         for( u8 i = 0; i < len - 1; ++i ) {
             if( !pkmn[ 0 ].canBattle( ) ) {

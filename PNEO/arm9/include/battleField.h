@@ -872,7 +872,7 @@ namespace BATTLE {
             bool grn = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].isGrounded( p_slot, ab );
 
             if( _pseudoWeatherTimer[ 4 ] ) [[unlikely]] { // gravity
-                grn = false;
+                grn = true;
             }
 
             return grn;

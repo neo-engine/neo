@@ -538,19 +538,17 @@ namespace BATTLE {
          * @brief: returns whether the specified pkmn currently touches the ground.
          */
         inline bool isGrounded( bool p_allowAbilities = true ) {
-            if( _pokemon == nullptr ) [[unlikely]] { return false; }
+            if( _pokemon == nullptr ) [[unlikely]] { return true; }
 
-            bool grn
-                = hasType( FLYING )
-                  || ( p_allowAbilities && getPkmn( )->getAbility( ) == A_LEVITATE )
-                  || ( canUseItem( p_allowAbilities ) && getPkmn( )->getItem( ) == I_AIR_BALLOON )
-                  || _volatileStatusCounter[ 16 ] /* telekinesis */
-                  || _volatileStatusCounter[ 17 ] /* magnet rise */;
+            bool grn = !(
+                hasType( FLYING ) || ( p_allowAbilities && getPkmn( )->getAbility( ) == A_LEVITATE )
+                || ( canUseItem( p_allowAbilities ) && getPkmn( )->getItem( ) == I_AIR_BALLOON )
+                || _volatileStatusCounter[ 16 ] /* telekinesis */
+                || _volatileStatusCounter[ 17 ] ) /* magnet rise */;
 
-            grn = grn
-                  && !( canUseItem( p_allowAbilities ) && getPkmn( )->getItem( ) == I_IRON_BALL )
-                  && !_volatileStatusCounter[ 37 ] /* ingrain */
-                  && !_volatileStatusCounter[ 10 ] /* smack down / Thousand arrows */;
+            grn = grn || ( canUseItem( p_allowAbilities ) && getPkmn( )->getItem( ) == I_IRON_BALL )
+                  || _volatileStatusCounter[ 37 ] /* ingrain */
+                  || _volatileStatusCounter[ 10 ] /* smack down / Thousand arrows */;
 
             return grn;
         }
