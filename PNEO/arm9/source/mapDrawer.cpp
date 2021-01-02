@@ -98,6 +98,7 @@ namespace MAP {
             p_mapObject.first = _mapSprites.loadSprite(
                 curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
                 mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
+
             _mapSprites.setFrame( p_mapObject.first, getFrame( p_mapObject.second.m_direction ),
                                   false );
 #ifdef DESQUID_MORE
@@ -547,6 +548,21 @@ namespace MAP {
             NAV::printMessage( "Load Slice" );
 #endif
         }
+
+        // Check if map objects should be updated
+        if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 16 == 8 )
+            || ( dir[ p_direction ][ 0 ] == -1 && _cx % 16 == 7 )
+            || ( dir[ p_direction ][ 1 ] == 1 && _cy % 16 == 8 )
+            || ( dir[ p_direction ][ 1 ] == -1 && _cy % 16 == 7 ) ) {
+            ANIMATE_MAP = false;
+            for( u8 i = 0; i < 4; ++i ) {
+                constructAndAddNewMapObjects( _data[ i % 2 ][ i / 2 ],
+                                              _slices[ i % 2 ][ i / 2 ].m_x,
+                                              _slices[ i % 2 ][ i / 2 ].m_y );
+            }
+            ANIMATE_MAP = true;
+        }
+
         // Check if a new slice got stepped onto
         if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 32 == 0 )
             || ( dir[ p_direction ][ 0 ] == -1 && _cx % 32 == 31 )
@@ -557,11 +573,13 @@ namespace MAP {
             // Update tileset, block and palette data
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
+            ANIMATE_MAP = false;
             // for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
             //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
             BG_PALETTE[ 0 ] = 0;
+            ANIMATE_MAP     = true;
 
 #ifdef DESQUID_MORE
             char buffer[ 100 ];
@@ -647,11 +665,6 @@ namespace MAP {
                         &_slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                          _data[ _curX ^ 1 ][ _curY ^ 1 ] );
-
-        for( u8 i = 0; i < 4; ++i ) {
-            constructAndAddNewMapObjects( _data[ i % 2 ][ i / 2 ], _slices[ i % 2 ][ i / 2 ].m_x,
-                                          _slices[ i % 2 ][ i / 2 ].m_y );
-        }
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
@@ -2433,7 +2446,7 @@ namespace MAP {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
 
-            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 40 ) {
+            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 24 ) {
 #ifdef DESQUID_MORE
                 NAV::printMessage(
                     ( std::string( "Destroying " ) + std::to_string( i ) + " "
@@ -2456,6 +2469,8 @@ namespace MAP {
                     { o.second.m_event.m_posX, o.second.m_event.m_posY, o.second.m_event.m_posZ } );
             }
         }
+
+        //        bool loadingNewObjectFailed = false;
 
         // add new objects
         for( u8 i = 0; i < p_data.m_eventCount; ++i ) {
@@ -2487,6 +2502,8 @@ namespace MAP {
                 }
             }
 
+            std::pair<u8, mapObject> cur;
+
             switch( p_data.m_events[ i ].m_type ) {
             case EVENT_HMOBJECT: {
                 mapObject obj   = mapObject( );
@@ -2504,9 +2521,7 @@ namespace MAP {
                                      + std::to_string( obj.m_pos.m_posY ) )
                                        .c_str( ) );
 #endif
-                std::pair<u8, mapObject> cur = { 0, obj };
-                loadMapObject( cur );
-                res.push_back( cur );
+                cur = { 0, obj };
                 break;
             }
             case EVENT_BERRYTREE: {
@@ -2514,6 +2529,7 @@ namespace MAP {
                         p_data.m_events[ i ].m_data.m_berryTree.m_treeIdx ) ) {
                     SAVE::SAV.getActiveFile( ).harvestBerry(
                         p_data.m_events[ i ].m_data.m_berryTree.m_treeIdx );
+                    continue;
                 } else {
                     // Check the growth of the specified berry tree
                     mapObject obj   = mapObject( );
@@ -2526,9 +2542,7 @@ namespace MAP {
                     obj.m_direction = UP;
                     obj.m_event     = p_data.m_events[ i ];
 
-                    std::pair<u8, mapObject> cur = { 0, obj };
-                    loadMapObject( cur );
-                    res.push_back( cur );
+                    cur = { 0, obj };
                 }
                 break;
             }
@@ -2543,9 +2557,7 @@ namespace MAP {
                 obj.m_direction = UP;
                 obj.m_event     = p_data.m_events[ i ];
 
-                std::pair<u8, mapObject> cur = { 0, obj };
-                loadMapObject( cur );
-                res.push_back( cur );
+                cur = { 0, obj };
                 break;
             }
             case EVENT_TRAINER: {
@@ -2561,10 +2573,7 @@ namespace MAP {
                 obj.m_event     = p_data.m_events[ i ];
                 obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
-                std::pair<u8, mapObject> cur = { 0, obj };
-                loadMapObject( cur );
-                res.push_back( cur );
-
+                cur = { 0, obj };
                 break;
             }
 
@@ -2581,14 +2590,57 @@ namespace MAP {
                 obj.m_event     = p_data.m_events[ i ];
                 obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
-                std::pair<u8, mapObject> cur = { 0, obj };
-                loadMapObject( cur );
-                res.push_back( cur );
+                cur = { 0, obj };
                 break;
             }
-            default: break;
+            default: continue;
+            }
+
+            loadMapObject( cur );
+            /*  if( cur.first == 255 ) {
+                  // this is not exactly true (e.g. for items that were already picked up)
+                  loadingNewObjectFailed = true;
+              }*/
+            res.push_back( cur );
+        }
+
+        /*
+        if( loadingNewObjectFailed ) {
+            // Sort the map objects based on their distance to the camera
+            std::sort(
+                res.begin( ), res.end( ),
+                [ & ]( const std::pair<u8, mapObject>& p_l, const std::pair<u8, mapObject>& p_r ) {
+                    if( p_l.first == UNUSED_MAPOBJECT && p_r.first != UNUSED_MAPOBJECT ) {
+                        return false;
+                    }
+                    if( p_l.first != UNUSED_MAPOBJECT && p_r.first == UNUSED_MAPOBJECT ) {
+                        return true;
+                    }
+                    return dist( p_l.second.m_pos.m_posX, p_l.second.m_pos.m_posY, curx, cury )
+                           < dist( p_r.second.m_pos.m_posX, p_r.second.m_pos.m_posY, curx, cury );
+                } );
+            // Check for objects that weren't loaded and try to make them replace other
+            // objects that are farther away from the camera.
+
+            auto good = res.begin( ), bad = --res.end( );
+            while( good < bad ) {
+                if( good->first == 255 ) {
+                    // sprite wasn't loaded, try to find some sprite to unload
+                    while( ( bad->first == 255 || bad->first == UNUSED_MAPOBJECT ) && good < bad ) {
+                        bad--;
+                    }
+                    if( good >= bad ) {
+                        // nothing to unload, give up
+                        break;
+                    }
+                    _mapSprites.destroySprite( bad->first, false );
+                    bad->first = 255;
+                    loadMapObject( *good ); // let's just hope it works this time...
+                }
+                ++good;
             }
         }
+        */
 
         SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( );
         for( u8 i = 0; i < res.size( ); ++i ) {
