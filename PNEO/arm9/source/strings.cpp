@@ -297,7 +297,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s already\nknows %s!", "%s beherrscht\n%s bereits!" },
     { "%s learned\n%s!", "%s erlernt\n%s!" },
     { "%s already knows 4 moves. Forget a move?",
-      "%s beherrscht bereits 4 Attacken. Soll eine verlernt werden?" },
+      "%s kennt bereits 4 Attacken. Soll eine verlernt werden?" },
 
     { "Select a move!", "Welche Attacke?" },
     { "%s can't\nforget %s!", "%s kann\n%s nicht vergessen!" },
