@@ -65,7 +65,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle.h"
 #include "battleTrainer.h"
 
-// #include "Border.h"
 #include "locationNames.h"
 
 namespace NAV {
@@ -95,11 +94,12 @@ namespace NAV {
 #define SPR_X_PAL_SUB             9
 #define SPR_MSGBOX_PAL_SUB        10
 
-    u16         TEXT_BUF[ 64 * 256 ] = { 0 };
-    u16         CONT_BUF[ 16 * 16 ]  = { 0 };
-    u16         TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
-    std::string TEXT_CACHE_1         = ""; // Upper line
-    std::string TEXT_CACHE_2         = ""; // lower line
+    u16  TEXT_BUF[ 64 * 256 ] = { 0 };
+    char TMP_TEXT_BUF[ 512 ]  = { 0 };
+    u16  CONT_BUF[ 16 * 16 ]  = { 0 };
+    u16  TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
+    char TEXT_CACHE_1[ 256 ]  = { 0 }; // top line
+    char TEXT_CACHE_2[ 256 ]  = { 0 }; // bottom line
 
     const u16 ARR_X_SPR_PAL[ 16 ] = {
         0x7FFF, 0x5A6E, 0x6F2D, 0x564A, // arrow_up
@@ -116,7 +116,8 @@ namespace NAV {
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + i ].isHidden = true;
         }
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        TEXT_CACHE_1 = TEXT_CACHE_2 = "";
+        std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
+        std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         IO::updateOAM( false );
     }
 
@@ -404,7 +405,8 @@ namespace NAV {
             } else if( p_style == MSG_MART_ITEM ) {
                 p_noDelay = true;
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                TEXT_CACHE_1 = TEXT_CACHE_2 = "";
+                std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
+                std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
                 IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 51, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
                 for( u8 i = 0; i < 13; ++i ) {
@@ -424,7 +426,8 @@ namespace NAV {
                 // TODO: Load sign graphics
 
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                TEXT_CACHE_1 = TEXT_CACHE_2 = "";
+                std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
+                std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
                 IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
                                  false, false, false, OBJPRIORITY_0, false );
 
@@ -443,36 +446,44 @@ namespace NAV {
         }
 
         if( !p_message ) {
-            TEXT_CACHE_1 = TEXT_CACHE_2 = "";
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+            std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
+            std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         } else {
             u16  cpos    = 0;
             u16  tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
             bool sp      = false;
             IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
-            std::string tmp                                   = "";
+            std::memset( TMP_TEXT_BUF, 0, sizeof( TMP_TEXT_BUF ) );
+
+            u8   tmppos         = 0;
+            char shortbuf[ 20 ] = { 0 };
             while( p_message[ cpos ] ) {
                 if( !p_noDelay ) {
+                    // Check for special escaped characters ([escape sequence]), that need
+                    // to be treated as a single character.
                     if( p_message[ cpos ] == '[' ) {
-                        sp  = true;
-                        tmp = p_message[ cpos ];
+                        std::memset( shortbuf, 0, sizeof( shortbuf ) );
+                        tmppos               = 0;
+                        sp                   = true;
+                        shortbuf[ tmppos++ ] = p_message[ cpos ];
                         ++cpos;
                         continue;
                     }
                     if( p_message[ cpos ] == ']' ) {
-                        sp = false;
-                        tmp += p_message[ cpos ];
+                        sp                   = false;
+                        shortbuf[ tmppos++ ] = p_message[ cpos ];
                     } else if( !sp ) {
-                        tmp = p_message[ cpos ];
+                        std::memset( shortbuf, 0, sizeof( shortbuf ) );
+                        shortbuf[ tmppos = 0 ] = p_message[ cpos ];
                     }
                     if( sp ) {
-                        tmp += p_message[ cpos ];
+                        shortbuf[ tmppos++ ] = p_message[ cpos ];
                         ++cpos;
                         continue;
                     }
                 }
 
-                std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
                 tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
                 u8 ln   = 1;
                 if( p_noDelay ) {
@@ -480,19 +491,25 @@ namespace NAV {
                                                          256 - ( 64 * !!p_item ), IO::font::LEFT,
                                                          16 - ( 4 * !!p_item ), 64, hg );
                 } else {
-                    ln = IO::regularFont->printStringBC(
-                        ( TEXT_CACHE_1 + TEXT_CACHE_2 + tmp ).c_str( ), TEXT_PAL, TEXT_BUF,
-                        256 - ( 64 * !!p_item ), IO::font::LEFT, 16 - ( 4 * !!p_item ), 64, hg );
+                    std::strncat( TMP_TEXT_BUF, shortbuf, 20 );
+                    std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+                    ln = IO::regularFont->printStringBC( TMP_TEXT_BUF, TEXT_PAL, TEXT_BUF,
+                                                         256 - ( 64 * !!p_item ), IO::font::LEFT,
+                                                         16 - ( 4 * !!p_item ), 64, hg );
                 }
 
                 if( !p_noDelay ) {
                     if( ln == 1 || ( ln == 2 && p_message[ cpos ] == '\n' ) ) {
-                        TEXT_CACHE_1 += tmp;
+                        std::strncat( TEXT_CACHE_1, shortbuf, 20 );
                     } else if( ln == 2 || ( ln > 2 && p_message[ cpos ] == '\n' ) ) {
-                        TEXT_CACHE_2 += tmp;
+                        std::strncat( TEXT_CACHE_2, shortbuf, 20 );
                     } else {
-                        TEXT_CACHE_1 = TEXT_CACHE_2;
-                        TEXT_CACHE_2 = std::string( "" ) + tmp;
+                        std::strncpy( TEXT_CACHE_1, TEXT_CACHE_2, 256 );
+                        std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
+                        std::strncat( TEXT_CACHE_2, shortbuf, 20 );
+                        std::memset( TMP_TEXT_BUF, 0, sizeof( TMP_TEXT_BUF ) );
+                        std::strncat( TMP_TEXT_BUF, TEXT_CACHE_1, 256 );
+                        std::strncat( TMP_TEXT_BUF, shortbuf, 20 );
                     }
                 }
 
@@ -610,7 +627,8 @@ namespace NAV {
                   ITEM::getItemChar( data.m_itemType ),
                   GET_STRING( 11 + BAG::toBagType( data.m_itemType ) ) );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        TEXT_CACHE_1 = TEXT_CACHE_2 = "";
+        std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
+        std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
         hideMessageBox( );
@@ -622,7 +640,8 @@ namespace NAV {
         if( p_style == MSG_NORMAL_CONT || p_style == MSG_INFO_CONT ) {
             waitForInteract( );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            TEXT_CACHE_1 = TEXT_CACHE_2 = "";
+            std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
+            std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
             IO::updateOAM( false );
         }
         if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {

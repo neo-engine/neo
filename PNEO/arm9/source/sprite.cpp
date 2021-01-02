@@ -39,8 +39,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "damage_1.h"
 #include "damage_2.h"
 
-unsigned int   TEMP[ 256 * 256 / 4 ]   = { 0 };
-unsigned short TEMP_PAL[ 256 ] = { 0 };
+unsigned int   TEMP[ 256 * 256 / 4 ] = { 0 };
+unsigned short TEMP_PAL[ 256 ]       = { 0 };
 
 namespace IO {
     const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
@@ -103,8 +103,9 @@ namespace IO {
         73, 82, 88, 86, 87, 89, 85, 81, 84, 92, 96, 93, 95, 94, 96, 96, 88, 90, 90, 81, 82, 75, 93,
         94, 93, 90, 71, 75, 68, 76, 88, 71, 77, 88, 69, 73, 88, 72, 85, 68, 91, 82, 70, 69, 92, 74,
         80, 69, 77, 70, 85, 71, 72, 69, 84, 68, 77, 89, 67, 77, 83, 68, 75, 84, 65, 66, 73, 90, 67,
-        84, 66, 80, 72, 88, 66, 74, 87, 73, 78, 87, 88, 78, 91, 95, 76, 86, 65, 0,  74, 68, 62, 91,
-        86, 89, 74, 73, 74, 83, 84, 88, 89, 80, 85, 78, 89, 87, 95, 92, 96,
+        84, 66, 80, 72, 88, 66, 74, 87, 73, 78, 87, 88, 78, 91, 95, 76, 86, 65, 75, 74, 68, 62, 91,
+        86, 89, 74, 73, 74, 83, 84, 88, 89, 80, 85, 78, 89, 87, 95, 92, 96, 75, 88, 82, 85, 84, 87,
+        87, 90,
     };
 
     void updateOAM( bool p_bottom ) {
@@ -1202,15 +1203,15 @@ namespace IO {
     u16 loadTypeIcon( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
         snprintf( BUFFER, 99, "TP/type_%hhu_%hhu", p_type, p_language );
-        return loadSprite( BUFFER, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
-                           false, false, false, OBJPRIORITY_0, p_bottom );
+        return loadSprite( BUFFER, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, false,
+                           false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadTypeIconB( type p_type, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        bool p_bottom, const SAVE::language p_language ) {
         snprintf( BUFFER, 99, "TP/type_%hhu_%hhu", p_type, p_language );
-        return loadSpriteB( BUFFER, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16,
-                            false, false, false, OBJPRIORITY_0, p_bottom );
+        return loadSpriteB( BUFFER, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, false, false,
+                            false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadLocationBackB( u8 p_idx, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
@@ -1230,9 +1231,8 @@ namespace IO {
     u16 loadPlatform( u8 p_platform, const u16 p_posX, const u16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom ) {
         snprintf( BUFFER, 99, "plat%hhu", p_platform );
-        if( FS::readData<unsigned short, unsigned int>(
-                "nitro:/PICS/SPRITES/PLAT/", BUFFER, 16,
-                TEMP_PAL, 128 * 64 / 8, TEMP ) ) {
+        if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/PLAT/", BUFFER, 16,
+                                                        TEMP_PAL, 128 * 64 / 8, TEMP ) ) {
             loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL, TEMP,
                         128 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
                         p_platform > 40 ? OBJMODE_BLENDED : OBJMODE_NORMAL );
