@@ -945,8 +945,7 @@ namespace BATTLE {
                         continue;
                     }
                     if( _AILevel > 3 ) {
-                        canTarget[ j ]
-                            = !!_field.getEffectiveness( bmove[ i ], { j / 2, j % 2 } );
+                        canTarget[ j ] = !!_field.getEffectiveness( bmove[ i ], { j / 2, j % 2 } );
                     } else {
                         canTarget[ j ] = true;
                     }
@@ -1327,7 +1326,9 @@ namespace BATTLE {
             if( _round < 2 ) ballCatchRate = 10;
             break;
         case I_DUSK_BALL:
-            if( MOVE::possible( M_DIG, 0 ) || getCurrentDaytime( ) == 4 ) ballCatchRate = 7;
+            if( MOVE::possible( M_DIG, 0 ) || getCurrentDaytime( ) == DAYTIME_EVENING
+                || getCurrentDaytime( ) == DAYTIME_NIGHT )
+                ballCatchRate = 7;
             break;
 
         default: break;

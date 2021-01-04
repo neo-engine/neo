@@ -266,6 +266,8 @@ namespace BATTLE {
 
     constexpr battlePolicy DEFAULT_TRAINER_POLICY
         = { SINGLE, true, true, true, false, NO_WEATHER, 5, 0 };
+    constexpr battlePolicy DEFAULT_DOUBLE_TRAINER_POLICY
+        = { DOUBLE, true, true, true, false, NO_WEATHER, 5, 0 };
     constexpr battlePolicy DEFAULT_WILD_POLICY
         = { SINGLE, true, true, true, true, NO_WEATHER, 0, 0 };
 

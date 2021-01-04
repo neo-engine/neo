@@ -112,8 +112,11 @@ namespace MAP {
                                     p_cache[ i ][ j ].m_blockSet.m_blocks,
                                     MAX_BLOCKS_PER_TILE_SET * sizeof( block ) );
 
-                            memcpy( p_result->m_pals, p_cache[ i ][ j ].m_pals,
-                                    6 * sizeof( palette ) );
+                            for( u8 k = 0; k < 5; ++k ) {
+                                memcpy( p_result->m_pals + k * 16,
+                                        p_cache[ i ][ j ].m_pals + k * 16, 6 * sizeof( palette ) );
+                            }
+
                             p_result->m_tileSet.m_animationCount1
                                 = p_cache[ i ][ j ].m_tileSet.m_animationCount1;
                             memcpy( p_result->m_tileSet.m_animations,
@@ -132,9 +135,8 @@ namespace MAP {
                 FS::close( mapF );
 
                 mapF = FS::open( PALETTE_PATH, tsidx1, ".p2l" );
-                FS::readPal( mapF, p_result->m_pals );
+                for( u8 i = 0; i < 5; ++i ) { FS::readPal( mapF, p_result->m_pals + i * 16, 8 ); }
                 FS::close( mapF );
-
                 // TODO: FIX THIS!
                 // mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
                 // if( mapF ) {
@@ -143,6 +145,7 @@ namespace MAP {
                 //     FS::close( mapF );
                 // }
             }
+
             p_result->m_tIdx1 = tsidx1;
         }
         // Read the second tileset
@@ -160,8 +163,12 @@ namespace MAP {
                                     p_cache[ i ][ j ].m_blockSet.m_blocks + MAX_BLOCKS_PER_TILE_SET,
                                     MAX_BLOCKS_PER_TILE_SET * sizeof( block ) );
 
-                            memcpy( p_result->m_pals + 6, p_cache[ i ][ j ].m_pals + 6,
-                                    8 * sizeof( palette ) );
+                            for( u8 k = 0; k < 5; ++k ) {
+                                memcpy( p_result->m_pals + 6 + k * 16,
+                                        p_cache[ i ][ j ].m_pals + 6 + k * 16,
+                                        8 * sizeof( palette ) );
+                            }
+
                             p_result->m_tileSet.m_animationCount2
                                 = p_cache[ i ][ j ].m_tileSet.m_animationCount2;
                             memcpy( p_result->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET,
@@ -181,7 +188,9 @@ namespace MAP {
                 FS::close( mapF );
 
                 mapF = FS::open( PALETTE_PATH, tsidx2, ".p2l" );
-                FS::readPal( mapF, p_result->m_pals + 6, 8 );
+                for( u8 i = 0; i < 5; ++i ) {
+                    FS::readPal( mapF, p_result->m_pals + 6 + i * 16, 8 );
+                }
                 FS::close( mapF );
 
                 // mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );

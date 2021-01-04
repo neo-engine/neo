@@ -97,8 +97,8 @@ u8 getCurrentDaytime( ) {
     u8 t = SAVE::CURRENT_TIME.m_hours, m = SAVE::CURRENT_DATE.m_month;
 
     for( u8 i = 0; i < 5; ++i )
-        if( DAY_TIMES[ m / 4 ][ i ] <= t ) return i;
-    return 254;
+        if( DAY_TIMES[ m / 4 ][ i ] >= t ) return i;
+    return 2;
 }
 
 void initGraphics( ) {
@@ -286,33 +286,34 @@ int main( int, char** p_argv ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
-            snprintf(
-                buffer, 99,
-                "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
-                "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | %hhu %hhu %hhu | %hhx",
-                SAVE::SAV.getActiveFile( ).m_currentMap,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, MAP::CURRENT_BANK.m_bank,
-                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
-                MAP::curMap->getCurrentLocationId( ),
-                MAP::curMap
-                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                    .m_bottombehave,
-                MAP::curMap
-                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                    .m_topbehave,
-                SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins, SAVE::CURRENT_TIME.m_secs,
-                MAP::curMap
-                    ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                    .m_movedata );
+            snprintf( buffer, 99,
+                      "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
+                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | TM %hhu %02hhu:%02hhu.%02hhu | %hhx",
+                      SAVE::SAV.getActiveFile( ).m_currentMap,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      MAP::CURRENT_BANK.m_bank,
+                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                      MAP::curMap->getCurrentLocationId( ),
+                      MAP::curMap
+                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                          .m_bottombehave,
+                      MAP::curMap
+                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                          .m_topbehave,
+                      getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
+                      SAVE::CURRENT_TIME.m_secs,
+                      MAP::curMap
+                          ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                  SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                          .m_movedata );
             NAV::printMessage( buffer );
         }
 #endif

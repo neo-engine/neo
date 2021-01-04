@@ -88,7 +88,7 @@ namespace MAP {
 
     struct mapSlice {
         bool         m_loaded = false;
-        palette      m_pals[ 16 ];
+        palette      m_pals[ 16 * 5 ];
         tileSet      m_tileSet;
         blockSet     m_blockSet;
         mapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]

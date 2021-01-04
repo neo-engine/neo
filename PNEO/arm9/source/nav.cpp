@@ -1645,8 +1645,10 @@ namespace NAV {
                 break;
             case 2: {
                 init( );
-                MAP::curMap->faintPlayer( );
+                SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5 ) % 24;
                 /*
+                init( );
+                MAP::curMap->faintPlayer( );
                 BOX::boxViewer bxv;
                 ANIMATE_MAP = false;
                 videoSetMode( MODE_5_2D );

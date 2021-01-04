@@ -274,11 +274,12 @@ namespace MAP {
                 bgSetScroll( i - 1, 120, 40 );
             }
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-
-            // for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
-            //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
-            dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
+
+            // for palettes, the unchanged day-time pal comes first
+            u8 currDT = ( getCurrentDaytime( ) + 3 ) % 5;
+            if( ( CUR_DATA.m_mapType & INSIDE ) || ( CUR_DATA.m_mapType & CAVE ) ) { currDT = 0; }
+            dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 );
             BG_PALETTE[ 0 ] = 0;
 
             for( u8 i = 1; i < 4; ++i ) {
@@ -574,10 +575,12 @@ namespace MAP {
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
             ANIMATE_MAP = false;
-            // for( u16 i = 0; i < MAX_TILES_PER_TILE_SET * 2; ++i )
-            //    swiCopy( CUR_SLICE.m_tileSet.m_tiles[ i ].m_tile, tileMemory + i * 32, 16 );
             dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
-            dmaCopy( CUR_SLICE.m_pals, BG_PALETTE, 512 );
+
+            // for palettes, the unchanged day-time pal comes first
+            u8 currDT = ( getCurrentDaytime( ) + 3 ) % 5;
+            if( ( CUR_DATA.m_mapType & INSIDE ) || ( CUR_DATA.m_mapType & CAVE ) ) { currDT = 0; }
+            dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 );
             BG_PALETTE[ 0 ] = 0;
             ANIMATE_MAP     = true;
 

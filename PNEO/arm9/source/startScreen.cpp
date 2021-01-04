@@ -40,13 +40,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
-// #include "arrow.h"
-// #include "noselection_32_64.h"
-// #include "noselection_64_20.h"
-// #include "noselection_96_32_1.h"
-// #include "noselection_96_32_2.h"
-// #include "noselection_96_32_4.h"
-
 #ifdef DESQUID
 // BEGIN TEST
 #include "animations.h"
@@ -148,8 +141,8 @@ namespace SAVE {
         //    BOX::boxViewer bxv;
         //  bxv.run( );
 
-        STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-        sts.run( );
+        // STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
+        // sts.run( );
 
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );
@@ -158,9 +151,9 @@ namespace SAVE {
 
         //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
         //        2 ),
-        // BATTLE::battle bt = BATTLE::battle( testTeam, 6, 0 );
+        BATTLE::battle bt = BATTLE::battle( testTeam, 6, 0, BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY );
 
-        // bt.start( );
+        bt.start( );
 
         // END TEST
 #endif
