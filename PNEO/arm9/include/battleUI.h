@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -248,6 +249,14 @@ namespace BATTLE {
         std::vector<std::pair<IO::inputTarget, u8>>
         showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ], bool p_showMegaEvolution,
                              u8 p_highlightedButton = -1, bool p_megaButtonActive = false );
+
+        /*
+         * @brief: Shows the target selection for the specified choices.
+         */
+        std::vector<std::pair<IO::inputTarget, u8>>
+        showTargetSelection( u8 p_choices, bool p_hasChoices,
+                             std::function<pokemon*( bool, u8 )> p_getPkmn,
+                             u8                                  p_highlightedButton = -1 );
 
         /*
          * @brief: Animates an attempt at capturing the wild pkmn with the given ball and

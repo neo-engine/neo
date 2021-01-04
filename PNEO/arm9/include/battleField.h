@@ -65,8 +65,10 @@ namespace BATTLE {
 
         side _sides[ 2 ];
 
+        battleMode _mode;
+
       public:
-        field( weather       p_initialWeather       = NO_WEATHER,
+        field( battleMode p_battleMode = SINGLE, weather p_initialWeather = NO_WEATHER,
                pseudoWeather p_initialPseudoWeather = NO_PSEUDO_WEATHER,
                terrain       p_initialTerrain       = NO_TERRAIN );
 

@@ -2389,6 +2389,158 @@ namespace BATTLE {
         return res;
     }
 
+    std::vector<std::pair<IO::inputTarget, u8>>
+    battleUI::showTargetSelection( u8 p_choices, bool p_hasChoice,
+                                   std::function<pokemon*( bool, u8 )> p_getPkmn,
+                                   u8                                  p_highlightedButton ) {
+
+        auto         res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        char         buffer[ 100 ];
+
+        // hide yn choice boxes here b/c learn move.
+        for( u8 i = 0; i < 4; i++ ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
+            }
+        }
+
+        if( p_highlightedButton == u8( -1 ) ) {
+            // initialize stuff
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "battlesub3", 512,
+                                 49152, true );
+            u16* pal   = IO::BG_PAL( true );
+            pal[ 0 ]   = 0;
+            pal[ 250 ] = IO::WHITE;
+            pal[ 251 ] = IO::GRAY;
+            pal[ 252 ] = IO::RGB( 18, 22, 31 );
+            pal[ 254 ] = IO::RGB( 31, 18, 18 );
+            pal[ 253 ] = IO::RGB( 0, 0, 25 );
+            pal[ 255 ] = IO::RGB( 23, 0, 0 );
+
+            // Clear log window
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            for( u8 i = 0; i < 12; ++i ) { oam[ SPR_LARGE_MESSAGE_OAM_SUB + i ].isHidden = true; }
+
+            for( u8 i = 0; i < 8; ++i ) { oam[ SPR_SMALL_MESSAGE_OAM_SUB + i ].isHidden = false; }
+
+            for( u8 i = 0; i < 2; ++i ) {
+                oam[ SPR_BATTLE_FITE_OAM_SUB + i ].isHidden = true;
+                oam[ SPR_BATTLE_PKMN_OAM_SUB + i ].isHidden = true;
+                oam[ SPR_BATTLE_RUN_OAM_SUB + i ].isHidden  = false;
+                oam[ SPR_BATTLE_BAG_OAM_SUB + i ].isHidden  = true;
+            }
+
+            oam[ SPR_BATTLE_ICON_OAM_SUB ].isHidden = true;
+
+            IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32, 32,
+                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            IO::regularFont->setColor( 0, 2 );
+            IO::smallFont->setColor( IO::WHITE_IDX, 1 );
+            IO::smallFont->setColor( 0, 2 );
+            for( int i = 0; i < 4; i++ ) {
+                oam[ SPR_TYPE_OAM_SUB( i ) ].isHidden    = true;
+                oam[ SPR_DMG_CAT_OAM_SUB( i ) ].isHidden = true;
+                for( u8 j = 0; j < 6; j++ ) { oam[ SPR_MOVE_OAM_SUB( i ) + j ].isHidden = false; }
+
+                res.push_back( std::pair(
+                    IO::inputTarget( oam[ SPR_MOVE_OAM_SUB( i ) ].x, oam[ SPR_MOVE_OAM_SUB( i ) ].y,
+                                     oam[ SPR_MOVE_OAM_SUB( i ) ].x + 96,
+                                     oam[ SPR_MOVE_OAM_SUB( i ) ].y + 32 ),
+                    !p_hasChoice || ( p_choices & ( 1 << i ) ) ? i
+                                                               : IO::choiceBox::DISABLED_CHOICE ) );
+
+                if( !( p_choices & ( 1 << i ) ) ) {
+                    IO::loadTypeIcon( type::NORMAL, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
+                                      oam[ SPR_TYPE_OAM_SUB( i ) ].y, SPR_TYPE_OAM_SUB( i ),
+                                      SPR_TYPE_PAL_SUB( i ), oam[ SPR_TYPE_OAM_SUB( i ) ].gfxIndex,
+                                      true, CURRENT_LANGUAGE );
+                } else {
+                    IO::loadTypeIcon( type::WATER, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
+                                      oam[ SPR_TYPE_OAM_SUB( i ) ].y, SPR_TYPE_OAM_SUB( i ),
+                                      SPR_TYPE_PAL_SUB( i ), oam[ SPR_TYPE_OAM_SUB( i ) ].gfxIndex,
+                                      true, CURRENT_LANGUAGE );
+                }
+            }
+
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_RUN_OAM_SUB ].x,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].y,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 64,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].y + 32 ),
+                                      4 ) );
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_RUN_OAM_SUB ].x,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].y,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 64,
+                                                       oam[ SPR_BATTLE_RUN_OAM_SUB ].y + 32 ),
+                                      IO::choiceBox::BACK_CHOICE ) );
+
+            IO::updateOAM( true );
+
+            IO::regularFont->printStringC( GET_STRING( 268 ), oam[ SPR_BATTLE_RUN_OAM_SUB ].x + 32,
+                                           oam[ SPR_BATTLE_RUN_OAM_SUB ].y + 9, true,
+                                           IO::font::CENTER ); // "BACK"
+
+            IO::regularFont->printStringC( GET_STRING( 166 ), 128,
+                                           oam[ SPR_SMALL_MESSAGE_OAM_SUB ].y + 4, true,
+                                           IO::font::CENTER ); // "Choose a target"
+
+            for( int i = 0; i < 4; i++ ) {
+                if( !( p_choices & ( 1 << i ) ) ) { continue; }
+
+                auto pk = p_getPkmn( i < 2, ( i < 2 ) ^ ( i % 2 ) );
+                if( pk == nullptr ) { continue; }
+
+                snprintf( buffer, 20, "%s", pk->m_boxdata.m_name );
+
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->printStringC( buffer, oam[ SPR_MOVE_OAM_SUB( i ) ].x + 48,
+                                               oam[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true,
+                                               IO::font::CENTER );
+            }
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        }
+
+        for( u8 i = 0; i < 4; ++i ) {
+            oam[ SPR_TYPE_OAM_SUB( i ) ].isHidden    = true;
+            oam[ SPR_DMG_CAT_OAM_SUB( i ) ].isHidden = true;
+            IO::copySpritePal( MOVEBOX4_SPR_PAL, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
+        }
+
+        if( p_highlightedButton < 4 && p_hasChoice ) {
+            IO::copySpritePal( MOVEBOX3_SPR_PAL, SPR_TYPE_PAL_SUB( p_highlightedButton ), 4, 2 * 4,
+                               true );
+        }
+
+        // If the selection is forced, the actual selection of the player doesn't matter.
+        if( !p_hasChoice && p_highlightedButton < 4 ) {
+            for( u8 i = 0; i < 4; ++i ) {
+                if( p_choices & ( 1 << i ) ) {
+                    IO::copySpritePal( MOVEBOX3_SPR_PAL, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
+                }
+            }
+        }
+
+        if( p_highlightedButton == 4 ) {
+            IO::loadSprite( "BT/rn2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        } else {
+            IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
+                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+
+        IO::updateOAM( true );
+        return res;
+    }
+
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
     battleUI::printYNMessage( u8 p_selection ) {
 

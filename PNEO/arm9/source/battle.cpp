@@ -66,7 +66,7 @@ namespace BATTLE {
         _isWildBattle = false;
         _AILevel      = _opponent.m_data.m_AILevel;
 
-        _field    = field( p_policy.m_weather );
+        _field    = field( _policy.m_mode, p_policy.m_weather );
         _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
                               _opponent.m_data.m_battleBG, _policy.m_mode, false );
 
@@ -148,7 +148,7 @@ namespace BATTLE {
         _isWildBattle = true;
 
         // Initialize the field with the wild pkmn
-        _field    = field( p_policy.m_weather, NO_PSEUDO_WEATHER, NO_TERRAIN );
+        _field    = field( _policy.m_mode, p_policy.m_weather, NO_PSEUDO_WEATHER, NO_TERRAIN );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
                               p_background, _policy.m_mode, true );
 
@@ -178,9 +178,9 @@ namespace BATTLE {
 
             for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++i ) {
                 for( u8 j = 0; j < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++j ) {
-                    if( _field.getPkmn( false, j )->canBattle( ) ) {
-                        _yieldEXP[ i ].insert( _playerPkmnPerm[ j ] );
-                    }
+                    auto pk = _field.getPkmn( false, j );
+                    if( pk == nullptr ) { continue; }
+                    if( pk->canBattle( ) ) { _yieldEXP[ i ].insert( _playerPkmnPerm[ j ] ); }
                 }
             }
 
@@ -191,6 +191,11 @@ namespace BATTLE {
             u16  playerWillCatch = 0;
             loop( ) {
                 for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
+
+                if( _field.getPkmn( false, 0 ) == nullptr ) {
+                    // There is no first pkmn, so it cannot move.
+                    moves[ field::PLAYER_SIDE ][ 0 ].m_type = NO_OP_NO_CANCEL;
+                }
 
                 if( moves[ field::PLAYER_SIDE ][ 0 ].m_type != NO_OP_NO_CANCEL ) {
                     // Compute player's first pokemon's move
@@ -212,9 +217,14 @@ namespace BATTLE {
                 }
 
                 if( _policy.m_mode == DOUBLE ) {
-                    moves[ field::PLAYER_SIDE ][ 1 ] = getMoveSelection(
-                        1, _policy.m_allowMegaEvolution
-                               && !moves[ field::PLAYER_SIDE ][ 0 ].m_megaEvolve );
+                    if( _field.getPkmn( false, 0 ) == nullptr ) {
+                        // There is no first pkmn, so it cannot move.
+                        moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
+                    } else {
+                        moves[ field::PLAYER_SIDE ][ 1 ] = getMoveSelection(
+                            1, _policy.m_allowMegaEvolution
+                                   && !moves[ field::PLAYER_SIDE ][ 0 ].m_megaEvolve );
+                    }
 
                     // Player wishes to start over
                     if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == CANCEL ) { continue; }
@@ -461,6 +471,10 @@ namespace BATTLE {
 
         for( u8 i = u8( _isWildBattle ); i < 2; ++i )
             for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+                if( ( i && _playerTeamSize <= j ) || ( !i && _opponentTeamSize <= j ) ) {
+                    _field.setSlot( !i, j, nullptr );
+                    continue;
+                }
                 _battleUI.sendOutPkmn( !i, j, ( i ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
                 _field.setSlot( !i, j, ( i ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
             }
@@ -469,6 +483,9 @@ namespace BATTLE {
 
         for( u8 i = 0; i < 2; ++i )
             for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+                if( ( i && _playerTeamSize <= j ) || ( !i && _opponentTeamSize <= j ) ) {
+                    continue;
+                }
                 _field.checkOnSendOut( &_battleUI, !i, j );
             }
     }
@@ -491,9 +508,85 @@ namespace BATTLE {
             }
         }
 
-        // User needs to choose / confirm target (TODO)
+        if( _policy.m_mode == DOUBLE ) {
+            // User needs to choose / confirm target (TODO)
+            u8   possibleTargets = 0;
+            u8   initialSel      = 0;
+            bool hasChoice       = true;
 
-        res.m_type = CANCEL;
+            const u8 opp1 = _field.getPkmn( true, 0 ) != nullptr ? ( 1 << 0 ) : 0,
+                     opp2 = _field.getPkmn( true, 0 ) != nullptr ? ( 1 << 1 ) : 0,
+                     self = _field.getPkmn( false, p_move.m_user.second ) != nullptr
+                                ? ( 1 << ( 2 + p_move.m_user.second ) )
+                                : 0,
+                     ally = _field.getPkmn( false, !p_move.m_user.second ) != nullptr
+                                ? ( 1 << ( 2 + !p_move.m_user.second ) )
+                                : 0;
+            switch( res.m_moveData.m_target ) {
+            case MOVE::ANY: possibleTargets |= opp1 | opp2 | ally; break;
+            case MOVE::ANY_FOE: possibleTargets |= opp1 | opp2; break;
+            case MOVE::ALLY_OR_SELF: possibleTargets |= self | ally; break;
+            case MOVE::ALLY:
+                initialSel   = ( 2 + !p_move.m_user.second );
+                res.m_target = { false, !p_move.m_user.second };
+                possibleTargets |= ally;
+                hasChoice = false;
+                break;
+            case MOVE::RANDOM: res.m_target = { true, rand( ) % 2 }; [[fallthrough]];
+            case MOVE::SCRIPTED:
+            case MOVE::NO_TARGET:
+            case MOVE::SELF:
+                initialSel = ( 2 + p_move.m_user.second );
+                possibleTargets |= self;
+                hasChoice = false;
+                break;
+            case MOVE::ALL_FOES: res.m_target = { true, 0 }; [[fallthrough]];
+            case MOVE::FOE_SIDE:
+                possibleTargets |= opp1 | opp2;
+                hasChoice = false;
+                break;
+            case MOVE::FIELD:
+                possibleTargets |= opp1 | opp2 | ally | self;
+                hasChoice = false;
+                break;
+            case MOVE::ALL_FOES_AND_ALLY:
+                res.m_target = { true, 0 };
+                possibleTargets |= opp1 | opp2 | ally;
+                hasChoice = false;
+                break;
+            case MOVE::ALL_ALLIES: res.m_target = { false, 0 }; [[fallthrough]];
+            case MOVE::ALLY_SIDE:
+            case MOVE::ALLY_TEAM:
+                possibleTargets |= self | ally;
+                hasChoice = false;
+                break;
+            }
+
+            IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
+
+            auto getPkmn
+                = [ & ]( bool p_opp, u8 p_slot ) { return _field.getPkmn( p_opp, p_slot ); };
+
+            u8 rs = cb.getResult(
+                [ & ]( u8 ) {
+                    return _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmn );
+                },
+                [ & ]( u8 p_selection ) {
+                    _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmn,
+                                                   p_selection );
+                },
+                initialSel );
+            if( rs < 4 ) {
+                // player selects a target
+                if( hasChoice ) { res.m_target = { rs < 2, ( rs < 2 ) ^ ( rs % 2 ) }; }
+                return res;
+            }
+            // cancel selection
+            res.m_type = CANCEL;
+            return res;
+        }
+        res.m_type   = CANCEL;
+        res.m_target = { 255, 255 };
         return res;
     }
 

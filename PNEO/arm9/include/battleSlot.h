@@ -158,7 +158,7 @@ namespace BATTLE {
         inline std::vector<type> getTypes( ) const {
             std::vector<type> res = std::vector<type>( );
 
-            for( u8 i = 0; i < 18; ++i ) {
+            for( u8 i = 0; i <= 18; ++i ) {
                 if( hasType( type( i ) ) ) { res.push_back( type( i ) ); }
             }
 
@@ -843,6 +843,11 @@ namespace BATTLE {
          * @brief: Sets the pkmn to the specified value.
          */
         inline void setPkmn( pokemon* p_pokemon ) {
+            if( !p_pokemon ) {
+                _status = EMPTY;
+                reset( );
+                return;
+            }
             _pokemon  = p_pokemon;
             _pkmnData = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
             reset( );

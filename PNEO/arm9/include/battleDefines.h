@@ -253,6 +253,11 @@ namespace BATTLE {
 
     enum battleMode { SINGLE = 0, DOUBLE = 1, MOCK = 2 };
 
+    constexpr u8 getOpposingPkmn( u8 p_slot, battleMode p_mode ) {
+        if( p_mode == DOUBLE ) { return !p_slot; }
+        return p_mode;
+    }
+
     struct battlePolicy {
         battleMode m_mode;
         bool       m_allowMegaEvolution;

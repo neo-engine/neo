@@ -109,19 +109,20 @@ namespace SAVE {
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
-#ifdef DESQUID_
+#ifdef DESQUID_MORE
         // BEGIN TEST
 
         pokemon testTeam[ 6 ];
         for( u16 i = 0; i < 6; i++ ) {
-            testTeam[ i ] = pokemon( rand( ) % MAX_PKMN + 1, 100 );
+            // testTeam[ i ] = pokemon( rand( ) % MAX_PKMN + 1, 100 );
+            testTeam[ i ] = pokemon( PKMN_XERNEAS, 100 );
             //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
             //     SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
             //                                                    1 + rand( ) % 100, 0, 0, i, rand(
             //                                                    ) % 2, 3 * i == 490, rand( ) % 20
             //                                                    ) );
             //            testTeam[ i ].m_boxdata.m_experienceGained += 3500;
-            //         testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_FOCUS_PUNCH;
+            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_SURF;
             //            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_TOXIC;
             // testTeam[ i ].m_boxdata.m_moves[ 0 ] = M_BOUNCE;
             //           testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;

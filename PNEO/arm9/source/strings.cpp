@@ -546,16 +546,16 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Evasion", "Fluchtwert" },
 
     { "Accuracy", "Genauigkeit" },
-    { "%s's %s did not change.", "%.0s%s von %s blieb unver\xe4ndert." },
-    { "%s's %s rose.", "%.0s%s von %s stieg." },
-    { "%s's %s rose sharply.", "%.0s%s von %s stieg stark." },
-    { "%s's %s rose drastically.", "%.0s%s von %s stieg drastisch." },
+    { "%s's %s did not change.", "%.0s%s von %s bleibt unver\xe4ndert." },
+    { "%s's %s rose.", "%.0s%s von %s steigt." },
+    { "%s's %s rose sharply.", "%.0s%s von %s steigt stark." },
+    { "%s's %s rose drastically.", "%.0s%s von %s steigt drastisch." },
 
     // 260
 
-    { "%s's %s fell.", "%.0s%s von %s sank." },
-    { "%s's %s harshly fell.", "%.0s%s von %s sank stark." },
-    { "%s's %s severely fell.", "%.0s%s von %s sank drastisch." },
+    { "%s's %s fell.", "%.0s%s von %s sinkt." },
+    { "%s's %s harshly fell.", "%.0s%s von %s sinkt stark." },
+    { "%s's %s severely fell.", "%.0s%s von %s sinkt drastisch." },
     { "%s %s sends out %s.", "%s %s schickt %s in den Kampf." },
     { "F I G H T", "K A M P F" },
 
@@ -571,26 +571,26 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s is tightening its focus.", "%s versch\xe4rft seinen Fokus." },
     { "%s's beak glows.", "Der Schnabel von %s gl\xfcht." },
     { "%s returned to you.", "%s kam zu dir zur\xfc"
-                             "ck" },
-    { "That is enough %s.", "Das reicht, %s." },
-    { "%s returned to %s.", "%s kam zu %s zur\xfc"
+                             "ck." },
+    { "That is enough %s!", "Das reicht, %s!" },
+    { "%s returned to %s.", "%s kommt zu %s zur\xfc"
                             "ck." },
 
-    { "%s withdrew %s.", "%s rief %s zur\xfc"
+    { "%s withdrew %s.", "%s ruft %s zur\xfc"
                          "ck." },
     { "%s recharges.", "%s l\xe4"
                        "dt sich wieder auf." },
     { "%s became confused.", "%s ist vor Ersch\xf6pfung verwirrt." },
-    { "%s ate its %s. Its confusion vanished.", "%s a\xdf die %s. Es ist nicht mehr verwirrt." },
-    { "%s ate its %s.", "%s a\xdf die %s." },
+    { "%s ate its %s. Its confusion vanished.", "%s isst die %s. Es ist nicht mehr verwirrt." },
+    { "%s ate its %s.", "%s isst die %s." },
 
     // 280
 
-    { "%s evaded the attack.", "%s wich aus." },
+    { "%s evaded the attack.", "%s weicht aus." },
     { "%s passes its %s. The %s found its purpose.",
-      "%s gibt seine %s weiter. Die %s fand ihre Bestimmung." },
+      "%s gibt seine %s weiter. Die %s findet ihre Bestimmung." },
     { "The %s protects %s.", "Die %s sch\xfctzt %s." },
-    { "%s obtained the %s.", "%s erhielt das Item %s." },
+    { "%s obtained the %s.", "%s erh\xe4lt das Item %s." },
     { "It has no effect on %s|", "Es hat keine Wirkung auf %s|" },
 
     { "It is super effective on %s.", "Es ist sehr effektiv gegen %s." },
@@ -602,7 +602,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 290
 
-    { "It missed %s.", "%s wich aus." },
+    { "It missed %s.", "%s weicht aus." },
     { "A critical hit!", "Ein Volltreffer!" },
     { "%s prepares a move.", "%s bereitet einen Angriff vor." },
     { "%s is confused.", "%s ist verwirrt." },
@@ -925,15 +925,15 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 490
 
     { "Shoot! It was so close, too!", "Verflixt! Es war doch fast gefangen." },
-    { "The weather became normal again.", "Das Wetter wurde wieder normal." },
-    { "It started to rain.", "Es begann zu regnen." },
-    { "It started to hail.", "Es begann zu hageln." },
-    { "The air became foggy.", "Dichter Nebel zog auf." },
+    { "The weather became normal again.", "Das Wetter wird wieder normal." },
+    { "It started to rain.", "Es beginnt zu regnen." },
+    { "It started to hail.", "Es beginnt zu hageln." },
+    { "The air became foggy.", "Dichter Nebel zieht auf." },
 
-    { "A sandstorm formed.", "Ein Sandsturm zog auf." },
-    { "The sunlight turned harsh.", "Das Sonnenlicht wurde st\xe4rker." },
-    { "A heavy rain began to fall.", "Es begann enornm zu regnen." },
-    { "The sunlight turned extremely harsh.", "Das Sonnenlicht wurde enorm kr\xe4rker." },
+    { "A sandstorm formed.", "Ein Sandsturm zieht auf." },
+    { "The sunlight turned harsh.", "Das Sonnenlicht wird st\xe4rker." },
+    { "A heavy rain began to fall.", "Es beginnt enorm zu regnen." },
+    { "The sunlight turned extremely harsh.", "Das Sonnenlicht wird enorm kr\xe4rker." },
     { "Mysterious strong winds are protecting Flying-type Pok\xe9mon.",
       "Starke Winde sch\xfctzen Flug-Pok\xe9mon." },
 
@@ -941,21 +941,21 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Rain continues to fall.", "Es regnet weiter." },
     { "Hail continues to fall.", "Es hagelt." },
     { "The air is foggy.", "Dichter Nebel." },
-    { "The sandstorm rages.", "Der Sandsturm w\xfctet" },
+    { "The sandstorm rages.", "Der Sandsturm w\xfctet." },
     { "The sunlight is harsh.", "Das Sonnenlicht ist stark." },
 
     { "Heavy rain continues to fall.", "Enormer Regen." },
     { "The extremely harsh sunlight continues.", "Extremes Sonnenlicht." },
     { "Strong winds continue to blow.", "Starke Winde." },
-    { "The battlefield became normal.", "Das Feld wurde normal." },
-    { "The battlefield became weird.", "Das Feld wurde komisch." },
+    { "The battlefield became normal.", "Das Feld wird normal." },
+    { "The battlefield became weird.", "Das Feld wird komisch." },
 
     // 510
 
     { "An electric current runs across the battlefield.",
       "Eine elektrische Str\xf6mung flie\xdft durch das Feld." },
-    { "Mist swrils around the battlefield.", "Das Feld wurde in Nebel geh\xfcllt." },
-    { "Grass grew to cover the battlefield.", "Gras wuchs \xfc"
+    { "Mist swrils around the battlefield.", "Das Feld wird in Nebel geh\xfcllt." },
+    { "Grass grew to cover the battlefield.", "Gras w\xe4""chst \xfc"
                                               "ber das Feld." },
     { "A deluge of ions showers the battlefield.",
       "Ein elektrisch geladener Niederschlag regnet auf das Feld herab." },
@@ -965,26 +965,26 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "It created a bizarre area in which the Defense and Sp. Defense stats are swapped.",
       "Es entsteht ein Raum, in dem Vert. und Sp.Vert. vertauscht sind." },
     { "It twisted the dimensions.", "Es hat die Dimensionen verdreht." },
-    { "The gravity intensifies.", "Die Schwerkraft wurde st\xe4rker." },
-    { "Fire's power was weakened.", "Die St\xe4rke des Feuers wurde geschw\xe4"
+    { "The gravity intensifies.", "Die Schwerkraft wird st\xe4rker." },
+    { "Fire's power was weakened.", "Die St\xe4rke des Feuers wird geschw\xe4"
                                     "cht." },
-    { "Electricity's power was weakened.", "Die St\xe4rke der Elektrizit\xe4t wurde geschw\xe4"
+    { "Electricity's power was weakened.", "Die St\xe4rke der Elektrizit\xe4t wird geschw\xe4"
                                            "cht." },
 
     // 520
 
     { "All Pok\xe9mon become locked to the field for the next turn.",
       "Alle Pok\xe9mon sind f\xfcr eine Runde an das Feld gebunden." },
-    { "The ion shower disappeared.", "Der elektrisch geladene Niederschlag verschwand." },
-    { "The Magic Room disappeared.", "Der Magieraum verschwand." },
+    { "The ion shower disappeared.", "Der elektrisch geladene Niederschlag verschwindet." },
+    { "The Magic Room disappeared.", "Der Magieraum verschwindet." },
 
-    { "The Wonder Room disappeared.", "Der Wunderraum verschwand." },
-    { "The twisted dimensions returned to normal.", "Die Dimensionen wurden wieder normal." },
+    { "The Wonder Room disappeared.", "Der Wunderraum verschwindet." },
+    { "The twisted dimensions returned to normal.", "Die Dimensionen sind wieder normal." },
 
-    { "The gravity became normal again.", "Die Schwerkraft wurde wieder normal." },
-    { "Fire's power returned to normal", "Die St\xe4rke des Feuers wurde wieder normal" },
+    { "The gravity became normal again.", "Die Schwerkraft ist wieder normal." },
+    { "Fire's power returned to normal", "Die St\xe4rke des Feuers ist wieder normal" },
     { "Electricity's power returned to normal.",
-      "Die St\xe4rke der Elektrizit\xe4t wurde wieder normal." },
+      "Die St\xe4rke der Elektrizit\xe4t ist wieder normal." },
     { "The Fairy Lock stopped.", "Feenschloss l\xe4sst nach." },
     { "%s is poisoned.", "%s ist vergiftet." },
 
@@ -1008,16 +1008,16 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s dives.", "%s taucht ab." },
     { "%s dug a hole.", "%s gr\xe4"
                         "bt sich ein." },
-    { "%s flies up high.", "%s flog hoch." },
-    { "%s jumps up high.", "%s sprang hoch." },
+    { "%s flies up high.", "%s fliegt hoch." },
+    { "%s jumps up high.", "%s springt hoch." },
     { "%s <SKYDROP>.", "%s <SKYDROP>" },
 
-    { "%s disappeared.", "%s verschwand." },
+    { "%s disappeared.", "%s verschwindet." },
     { "%s continues and crashes.", "%s macht weiter und bricht zusammen." },
     { "It's a one-hit KO!", "Ein K.O.-Treffer!" },
     { "%s lost its focus and cannot attack.",
       "%s hat seinen Fokus verloren und kann nicht angreifen." },
-    { "%s's trap failed.", "Die Falle von %s blieb wirkungslos." },
+    { "%s's trap failed.", "Die Falle von %s bleibt wirkungslos." },
 
     // 550
 

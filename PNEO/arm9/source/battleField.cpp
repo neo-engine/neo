@@ -67,8 +67,9 @@ seeds / when enter terrain
    */
 
 namespace BATTLE {
-    field::field( weather p_initialWeather, pseudoWeather p_initialPseudoWeather,
-                  terrain p_initialTerrain ) {
+    field::field( battleMode p_battleMode, weather p_initialWeather,
+                  pseudoWeather p_initialPseudoWeather, terrain p_initialTerrain ) {
+        _mode         = p_battleMode;
         _weather      = p_initialWeather;
         _weatherTimer = u8( -1 ); // Initial weather stays forever
 
@@ -931,7 +932,9 @@ namespace BATTLE {
 
                 // Form change abilities
                 case A_IMPOSTER:
-                    if( transformPkmn( p_opponent, p_slot, getSlot( !p_opponent, p_slot ) ) ) {
+                    if( transformPkmn(
+                            p_opponent, p_slot,
+                            getSlot( !p_opponent, getOpposingPkmn( p_slot, _mode ) ) ) ) {
                         p_ui->logAbility( pkmn, p_opponent );
                         p_ui->updatePkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ) );
                         if( getPkmn( p_opponent, p_slot )->getAbility( ) != A_IMPOSTER ) {
@@ -942,7 +945,7 @@ namespace BATTLE {
 
                 case A_TRACE: {
                     p_ui->logAbility( pkmn, p_opponent );
-                    auto tmp = getPkmn( !p_opponent, p_slot );
+                    auto tmp = getPkmn( !p_opponent, getOpposingPkmn( p_slot, _mode ) );
                     if( tmp != nullptr && allowsCopy( tmp->getAbility( ) )
                         && changeAbility( p_opponent, p_slot, tmp->getAbility( ) ) ) {
                         p_ui->logAbility( pkmn, p_opponent );
@@ -1272,7 +1275,7 @@ namespace BATTLE {
                     }
                 }
                 if( volst & CURSE ) {
-#ifdef DESQUID
+#ifdef DESQUID_MORE
                     p_ui->log( std::to_string( volst ) );
 #endif
                     snprintf( buffer, 99, GET_STRING( 533 ),
@@ -3700,9 +3703,30 @@ namespace BATTLE {
                   MOVE::getMoveName( p_move.m_param ).c_str( ) );
         p_ui->log( buffer );
 
+        bool moveHadTarget = false;
         for( u8 i = 0; i < p_move.m_target.size( ); ++i ) {
-            // Check for multi-hit moves
+            // Check if the move needs to be redirected
 
+            auto curTg = getPkmn( p_move.m_target[ i ].first, p_move.m_target[ i ].second );
+            if( curTg == nullptr ) {
+                if( p_move.m_target.size( ) == 1 && _mode == DOUBLE
+                    && p_move.m_target[ i ].first != opponent ) {
+                    // in double battles, moves targeting a single opponent get redirected
+                    // to an opponent that actually exists.
+                    // If both opponents fainted, the move will fail
+                    p_move.m_target[ i ].second ^= 1;
+                    curTg = getPkmn( p_move.m_target[ i ].first, p_move.m_target[ i ].second );
+                    if( curTg == nullptr ) {
+                        // both opposing pkmn fainted
+                        break;
+                    }
+                } else {
+                    continue;
+                }
+            }
+            moveHadTarget = true;
+
+            // Check for multi-hit moves
             u8 numHits = 1, strengthMod = 100;
             if( p_move.m_moveData.getMultiHitMax( ) > 1 ) [[unlikely]] {
                 numHits = p_move.m_moveData.getMultiHitMin( );
@@ -3820,7 +3844,6 @@ namespace BATTLE {
                 if( getSlotStatus( p_move.m_target[ i ].first, p_move.m_target[ i ].second )
                     == slot::status::FAINTED ) {
                     break;
-                    ;
                 }
 
                 if( p_move.m_moveData.m_flags & MOVE::FORCESWITCH ) {
@@ -3859,7 +3882,12 @@ namespace BATTLE {
                 p_ui->log( buffer );
             }
 
-            if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { return; }
+            if( getSlotStatus( opponent, slot ) == slot::status::FAINTED ) { continue; }
+        }
+
+        if( !moveHadTarget ) {
+            p_ui->log( GET_STRING( 304 ) ); // "It failed."
+            return;
         }
 
         // Check for flags and stuff
