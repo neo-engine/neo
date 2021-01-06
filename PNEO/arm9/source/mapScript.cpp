@@ -601,19 +601,20 @@ namespace MAP {
                     break;
                 }
 
-                // TODO: Honor parB (i.e. single/double battle setting)
-
+                auto policy     = parB == 1 && SAVE::SAV.getActiveFile( ).countAlivePkmn( ) > 1
+                                      ? BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY
+                                      : BATTLE::DEFAULT_TRAINER_POLICY;
                 auto tr         = BATTLE::getBattleTrainer( parA );
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
-                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerBG ) );
+                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
                 FADE_TOP_DARK( );
                 ANIMATE_MAP = false;
                 swiWaitForVBlank( );
 
                 BATTLE::battle bt
                     = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr );
+                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr, policy );
                 if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
                     registers[ 0 ] = 0;
                 } else {
@@ -914,14 +915,20 @@ namespace MAP {
 
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
-                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerBG ) );
+                SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
+
+                // Check the trainer class, for some classes start a double battle
+                auto policy = BATTLE::isDoubleBattleTrainerClass( tr.m_data.m_trainerClass )
+                                  ? BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY
+                                  : BATTLE::DEFAULT_TRAINER_POLICY;
+
                 FADE_TOP_DARK( );
                 ANIMATE_MAP = false;
                 swiWaitForVBlank( );
 
                 BATTLE::battle bt
                     = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr );
+                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr, policy );
                 if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
                     faintPlayer( );
                     return;

@@ -1640,8 +1640,6 @@ namespace BATTLE {
         u8 pertub[ 4 ] = { 0, 1, 2, 3 };
         for( u8 i = 0; i < 4; ++i ) { std::swap( pertub[ i ], pertub[ rand( ) % 4 ] ); }
 
-        // TODO: add redirecting from follow me / abilities / etc
-
         for( u8 j = 0; j < p_selectedMoves.size( ); ++j ) {
             battleMove bm;
             auto       m = p_selectedMoves[ j ];
@@ -1807,6 +1805,15 @@ namespace BATTLE {
                     break;
                 case MOVE::ALLY:
                     bm.m_target.push_back( fieldPosition( m.m_user.first, !m.m_user.second ) );
+                    break;
+                case MOVE::FIELD:
+                case MOVE::SCRIPTED:
+                case MOVE::ALLY_SIDE:
+                case MOVE::ALLY_TEAM:
+                    bm.m_target.push_back( fieldPosition( m.m_user.first, m.m_user.second ) );
+                    break;
+                case MOVE::FOE_SIDE:
+                    bm.m_target.push_back( fieldPosition( m.m_user.first, m.m_user.second ) );
                     break;
                 default: break;
                 }
@@ -3703,7 +3710,7 @@ namespace BATTLE {
                   MOVE::getMoveName( p_move.m_param ).c_str( ) );
         p_ui->log( buffer );
 
-        bool moveHadTarget = false;
+        bool moveHadTarget = _mode == SINGLE;
         for( u8 i = 0; i < p_move.m_target.size( ); ++i ) {
             // Check if the move needs to be redirected
 

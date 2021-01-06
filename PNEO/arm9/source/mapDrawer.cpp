@@ -488,25 +488,33 @@ namespace MAP {
                     if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
                             o.second.m_event.m_data.m_trainer.m_trainerId ) ) ) [[likely]] {
                         // player did not defeat the trainer yet
-                        SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
-                            = NO_MOVEMENT;
-                        showExclamationAboveMapObject( i );
                         auto tr = BATTLE::getBattleTrainer(
                             o.second.m_event.m_data.m_trainer.m_trainerId );
-                        SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
 
-                        // walk trainer to player
-                        redirectPlayer( playerDir, false );
+                        // Check if the battle would be a double battle; if so and if the
+                        // player has only a single pkmn, the battle is optional
+                        if( !BATTLE::isDoubleBattleTrainerClass( tr.m_data.m_trainerClass )
+                            || SAVE::SAV.getActiveFile( ).countAlivePkmn( ) >= 2 ) {
 
-                        while(
-                            dist( p_globX, p_globY, o.second.m_pos.m_posX, o.second.m_pos.m_posY )
-                            > 1 ) {
-                            for( u8 j = 0; j < 16; ++j ) {
-                                moveMapObject( i, { trainerDir, j } );
-                                swiWaitForVBlank( );
+                            SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
+                                = NO_MOVEMENT;
+                            showExclamationAboveMapObject( i );
+                            SOUND::playBGM(
+                                SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
+
+                            // walk trainer to player
+                            redirectPlayer( playerDir, false );
+
+                            while( dist( p_globX, p_globY, o.second.m_pos.m_posX,
+                                         o.second.m_pos.m_posY )
+                                   > 1 ) {
+                                for( u8 j = 0; j < 16; ++j ) {
+                                    moveMapObject( i, { trainerDir, j } );
+                                    swiWaitForVBlank( );
+                                }
                             }
+                            runEvent( o.second.m_event, i );
                         }
-                        runEvent( o.second.m_event, i );
                     }
                 }
             }

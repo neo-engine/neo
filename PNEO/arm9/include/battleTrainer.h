@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 #include "defines.h"
 #include "pokemon.h"
+#include "trainerClassNames.h"
 
 namespace BATTLE {
     struct trainerStrings {
@@ -69,4 +70,24 @@ namespace BATTLE {
     battleTrainer getBattleTrainer( u16 p_battleTrainerId );
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );
     bool          getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
+
+    constexpr bool isDoubleBattleTrainerClass( u16 p_trainerClass ) {
+        switch( p_trainerClass ) {
+        case TC_ACE_DUO:
+        case TC_BRAINS_BRAWN:
+        case TC_HONEYMOONERS:
+        case TC_INTERVIEWERS:
+        case TC_LEADERS:
+        case TC_MYSTERIOUS_SISTERS:
+        case TC_POKE_FAN_FAMILY:
+        case TC_PUNK_COUPLE:
+        case TC_SIS_BRO:
+        case TC_SWIMMERS:
+        case TC_TEAMMATES:
+        case TC_TWINS:
+        case TC_YOUNG_COUPLE: return true;
+        default: break;
+        }
+        return false;
+    }
 } // namespace BATTLE

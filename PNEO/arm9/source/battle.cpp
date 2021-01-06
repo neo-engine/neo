@@ -514,7 +514,7 @@ namespace BATTLE {
             u8   initialSel      = 0;
             bool hasChoice       = true;
 
-            const u8 opp1 = _field.getPkmn( true, 0 ) != nullptr ? ( 1 << 0 ) : 0,
+            const u8 opp1 = _field.getPkmn( true, 1 ) != nullptr ? ( 1 << 0 ) : 0,
                      opp2 = _field.getPkmn( true, 0 ) != nullptr ? ( 1 << 1 ) : 0,
                      self = _field.getPkmn( false, p_move.m_user.second ) != nullptr
                                 ? ( 1 << ( 2 + p_move.m_user.second ) )
@@ -522,6 +522,7 @@ namespace BATTLE {
                      ally = _field.getPkmn( false, !p_move.m_user.second ) != nullptr
                                 ? ( 1 << ( 2 + !p_move.m_user.second ) )
                                 : 0;
+            if( !opp2 ) { initialSel++; }
             switch( res.m_moveData.m_target ) {
             case MOVE::ANY: possibleTargets |= opp1 | opp2 | ally; break;
             case MOVE::ANY_FOE: possibleTargets |= opp1 | opp2; break;
@@ -1213,7 +1214,7 @@ namespace BATTLE {
             }
         } else if( !_isWildBattle ) {
             if( p_battleEndReason == BATTLE_PLAYER_WON ) {
-                SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerBG ) );
+                SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerClass ) );
                 _battleUI.handleBattleEnd( true );
 
                 if( _opponent.m_data.m_moneyEarned ) {

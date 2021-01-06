@@ -121,11 +121,11 @@ namespace BATTLE {
 #define OWN_1_HP_Y 120
 
 #define PKMN_OPP_1_X        192
-#define PKMN_OPP_1_Y        ( OPP_PLAT_Y + 32 - 96 )
+#define PKMN_OPP_1_Y        ( OPP_PLAT_Y + 38 - 96 )
 #define PKMN_OPP_1_X_SINGLE 160
 #define PKMN_OPP_1_Y_SINGLE ( OPP_PLAT_Y + 35 - 96 )
 #define PKMN_OPP_2_X        128
-#define PKMN_OPP_2_Y        ( OPP_PLAT_Y + 38 - 96 )
+#define PKMN_OPP_2_Y        ( OPP_PLAT_Y + 32 - 96 )
 
 #define PKMN_OWN_1_X        -40
 #define PKMN_OWN_1_Y        84
@@ -2612,7 +2612,7 @@ namespace BATTLE {
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
             BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
-            IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 192, false,
+            IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 232, false,
                                                    IO::font::LEFT, 16, ' ', 0, true );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         }
@@ -2713,6 +2713,17 @@ namespace BATTLE {
                             0, 0, 0, false, true, false, OBJPRIORITY_3, false );
         }
         IO::updateOAM( false );
+
+        // Cut the message after the first "page"
+        for( char* pos = p_playerWon ? _battleTrainer->m_strings.m_message2
+                                     : _battleTrainer->m_strings.m_message3;
+             *pos; ++pos ) {
+            if( *pos == '\r' ) {
+                *pos = 0;
+                break;
+            }
+        }
+
         printTopMessage( p_playerWon ? _battleTrainer->m_strings.m_message2
                                      : _battleTrainer->m_strings.m_message3,
                          false );

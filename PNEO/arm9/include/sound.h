@@ -32,6 +32,7 @@
 #include "mapDefines.h"
 #include "pokemonNames.h"
 #include "soundbank.h"
+#include "trainerClassNames.h"
 
 #define SFX_BATTLE_ABILITY       0
 #define SFX_BATTLE_BALLDROP      1
@@ -104,87 +105,82 @@ namespace SOUND {
     u16           BGMforMoveMode( MAP::moveMode p_moveMode );
     constexpr u16 BGMforTrainerEncounter( u16 p_trainerClassId ) {
         switch( p_trainerClassId ) {
-        case 0: return MOD_ENCOUNTER_BRENDAN;
-        case 1: return MOD_ENCOUNTER_MAY;
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-        case 28:
-        case 29:
-        case 30:
-        case 31:
-        case 32:
-        case 33: return MOD_ENCOUNTER_TEAM_AM;
-        case 34:
-        case 41:
-        case 86: return MOD_ENCOUNTER_TWINS;
-        case 48:
-        case 52:
-        case 88: return MOD_ENCOUNTER_TUBER;
-        case 35:
-        case 43:
-        case 44: return MOD_ENCOUNTER_YOUNGSTER;
-        case 36:
-        case 38:
-        case 71:
-        case 72:
-        case 77:
-        case 81: return MOD_ENCOUNTER_HIKER;
-
+        case TC_POKEMON_TRAINER: return MOD_ENCOUNTER_BRENDAN;
+        case TC__POKEMON_TRAINER: return MOD_ENCOUNTER_MAY;
+        case TC_AQUA_ADMIN:
+        case TC_AQUA_LEADER:
+        case TC_TEAM_AQUA:
+        case TC_MAGMA_ADMIN:
+        case TC_MAGMA_LEADER:
+        case TC_TEAM_MAGMA: return MOD_ENCOUNTER_TEAM_AM;
+        case TC_TWINS:
+        case TC_SCHOOLBOY:
+        case TC_SCHOOLGIRL:
+        case TC_SCHOOLKID: return MOD_ENCOUNTER_TWINS;
+        case TC_TUBER:
+        case TC__TUBER:
+        case TC_PRESCHOOLER:
+        case TC__PRESCHOOLER:
+        case TC_FAIRY_TALE_GIRL: return MOD_ENCOUNTER_TUBER;
+        case TC_YOUNGSTER:
+        case TC_CAMPER:
+        case TC_PICNICKER:
+        case TC_LASS:
+        case TC_SIS_BRO:
+        case TC_BUG_CATCHER:
+        case TC_YOUNG_COUPLE: return MOD_ENCOUNTER_YOUNGSTER;
+        case TC_HIKER:
+        case TC_RUIN_MANIAC:
+        case TC_TOURIST:
+        case TC__TOURIST:
+        case TC_BACKPACKER:
+        case TC_WORKER: return MOD_ENCOUNTER_HIKER;
+        case TC_DELINQUENT:
+        case TC_GUITARIST:
+        case TC_PUNK_COUPLE:
+        case TC_PUNK_GIRL:
+        case TC_PUNK_GUY: return MOD_ENCOUNTER_ELECTRIC;
+        case TC_SAILOR:
+        case TC_RANGERS:
+        case TC_MONSIEUR:
+        case TC_MADAME:
+        case TC_GENTLEMAN:
+        case TC_EXPERT:
+        case TC__EXPERT:
+        case TC_FISHERMAN:
+        case TC_BUG_MANIAC:
+        case TC_COLLECTOR: return MOD_ENCOUNTER_SAILOR;
         default: return MOD_ENCOUNTER_YOUNGSTER;
         }
     }
     constexpr u16 BGMforTrainerBattle( u16 p_trainerClassId ) {
         switch( p_trainerClassId ) {
-        case 0: // Brendan
-        case 1: // May
-            return MOD_BATTLE_MAY_BRENDAN;
-        case 2: // Roxanne
-        case 3: // gym 2
-        case 4: // gym 3
-        case 5: // gym 4
-        case 6: // gym 5
-        case 7: // gym 6
-        case 8: // gym 7
-        case 9: // gym 8
-            return MOD_BATTLE_GYM_LEADER;
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-        case 29:
-        case 30:
-        case 31:
-        case 32: return MOD_BATTLE_TEAM_AM;
-        case 28:
-        case 33:
+        case TC_POKEMON_TRAINER:
+        case TC__POKEMON_TRAINER: return MOD_BATTLE_MAY_BRENDAN;
+        case TC_LEADER:
+        case TC__LEADER:
+        case TC_LEADERS: return MOD_BATTLE_GYM_LEADER;
+        case TC_MAGMA_LEADER:
+        case TC_AQUA_LEADER:
             // return MOD_BATTLE_TEAM_AM_LEADER;
+        case TC_AQUA_ADMIN:
+        case TC_TEAM_AQUA:
+        case TC_MAGMA_ADMIN:
+        case TC_TEAM_MAGMA: return MOD_BATTLE_TEAM_AM;
         default: return MOD_BATTLE_TRAINER;
         }
     }
     constexpr u16 BGMforTrainerWin( u16 p_trainerClassId ) {
         switch( p_trainerClassId ) {
-        case 2: // Roxanne
-        case 3: // gym 2
-        case 4: // gym 3
-        case 5: // gym 4
-        case 6: // gym 5
-        case 7: // gym 6
-        case 8: // gym 7
-        case 9: // gym 8
-            return MOD_VICTORY_GYM_LEADER;
-        case 24: // aqua grunt
-        case 25: // a
-        case 26: // aqua admin
-        case 27:
-        case 28: // archie
-        case 29: // magma grunt
-        case 30:
-        case 31: // magma admin
-        case 32:
-        case 33: // maxie
-            return MOD_VICTORY_TEAM_AM_GRUNT;
+        case TC_LEADER:
+        case TC__LEADER:
+        case TC_LEADERS: return MOD_VICTORY_GYM_LEADER;
+        case TC_MAGMA_LEADER:
+        case TC_AQUA_LEADER:
+        case TC_AQUA_ADMIN:
+        case TC_TEAM_AQUA:
+        case TC_MAGMA_ADMIN:
+        case TC_TEAM_MAGMA: return MOD_VICTORY_TEAM_AM_GRUNT;
         default: return MOD_VICTORY_TRAINER;
         }
     }

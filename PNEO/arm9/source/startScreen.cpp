@@ -40,7 +40,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
-#ifdef DESQUID
+#ifdef DESQUID_MORE
 // BEGIN TEST
 #include "animations.h"
 #include "bagViewer.h"
@@ -152,7 +152,8 @@ namespace SAVE {
 
         //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
         //        2 ),
-        BATTLE::battle bt = BATTLE::battle( testTeam, 6, 0, BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY );
+        BATTLE::battle bt
+            = BATTLE::battle( testTeam, 6, 23, BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY );
 
         bt.start( );
 
