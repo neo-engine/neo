@@ -27,45 +27,33 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <map>
 
+#include "bagViewer.h"
+#include "battle.h"
+#include "battleTrainer.h"
+#include "boxViewer.h"
 #include "choiceBox.h"
 #include "counter.h"
 #include "defines.h"
+#include "dex.h"
 #include "fs.h"
-#include "keyboard.h"
-#include "nav.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
-#include "yesNoBox.h"
-
-#include "berry.h"
 #include "item.h"
 #include "itemNames.h"
-#include "moveNames.h"
-#include "pokemon.h"
-#include "specials.h"
-
-#include "bagUI.h"
-#include "bagViewer.h"
-
-#include "partyScreen.h"
-#include "statusScreen.h"
-
-#include "boxUI.h"
-#include "boxViewer.h"
-
-#include "dex.h"
-#include "dexUI.h"
-
+#include "keyboard.h"
+#include "locationNames.h"
 #include "mapDrawer.h"
 #include "mapObject.h"
 #include "mapSlice.h"
-
-#include "battle.h"
-#include "battleTrainer.h"
-
-#include "locationNames.h"
+#include "moveNames.h"
+#include "nav.h"
+#include "partyScreen.h"
+#include "pokemon.h"
+#include "screenFade.h"
+#include "sound.h"
+#include "specials.h"
+#include "sprite.h"
+#include "statusScreen.h"
+#include "uio.h"
+#include "yesNoBox.h"
 
 namespace NAV {
 #define SPR_MSGTEXT_OAM 108
@@ -790,7 +778,9 @@ namespace NAV {
         switch( p_selection ) {
         case VIEW_PARTY: {
             ANIMATE_MAP = false;
-            SOUND::dimVolume( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
 
             u8 teamSize = 0;
             for( ; teamSize < 6; ++teamSize ) {
@@ -801,9 +791,7 @@ namespace NAV {
             STS::partyScreen sts
                 = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam, teamSize );
 
-            IO::clearScreen( false );
-            videoSetMode( MODE_5_2D );
-            bgUpdate( );
+            SOUND::dimVolume( );
 
             auto res = sts.run( );
 
@@ -831,13 +819,15 @@ namespace NAV {
         }
         case VIEW_DEX: {
             ANIMATE_MAP = false;
-            SOUND::dimVolume( );
-
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
 
-            DEX::dex( DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV.getActiveFile( ).m_lstDex );
+            DEX::dex dx = DEX::dex( );
+            SOUND::dimVolume( );
+
+            dx.run( );
+            // DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV.getActiveFile( ).m_lstDex );
 
             FADE_TOP_DARK( );
             FADE_SUB_DARK( );
@@ -853,14 +843,13 @@ namespace NAV {
             return;
         }
         case VIEW_BAG: {
-            BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
-            ANIMATE_MAP       = false;
-            SOUND::dimVolume( );
-
+            ANIMATE_MAP = false;
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
 
+            BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam );
+            SOUND::dimVolume( );
             u16 res = bv.run( );
 
             FADE_TOP_DARK( );

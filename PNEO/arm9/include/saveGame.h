@@ -40,20 +40,20 @@
 
 namespace SAVE {
 #ifdef FLASHCARD
-    constexpr u8 MAX_SAVE_FILES       = 1;
+    constexpr u8 MAX_SAVE_FILES = 1;
 #else
-    constexpr u8 MAX_SAVE_FILES       = 3;
+    constexpr u8 MAX_SAVE_FILES = 3;
 #endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
 #ifdef FLASHCARD
-    constexpr u8  MAX_BOXES   = 2;
+    constexpr u8 MAX_BOXES = 2;
 #else
-    constexpr u8  MAX_BOXES   = 35;
+    constexpr u8 MAX_BOXES = 35;
 #endif
-    constexpr u8  BERRY_SLOTS = 50;
+    constexpr u8 BERRY_SLOTS = 50;
 
     constexpr u16 F_MEGA_EVOLUTION   = 1;
     constexpr u16 F_NAV_OBTAINED     = 2;
@@ -66,7 +66,7 @@ namespace SAVE {
     }
 
     constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
-    constexpr u8 V_NUM_FAINTED = 1; // how often the player fainted
+    constexpr u8 V_NUM_FAINTED         = 1; // how often the player fainted
 
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 
@@ -231,6 +231,12 @@ namespace SAVE {
                 return res;
             }
 
+            /*
+             * @brief: Returns a local dex no if the player has no national dex; otherwise
+             * returns national dex no.
+             */
+            u16 getPkmnDisplayDexId( u16 p_pokemon ) const;
+
             constexpr void registerSeenPkmn( u16 p_pokemon ) {
                 m_seenPkmn[ p_pokemon / 8 ] |= 1 << ( p_pokemon % 8 );
             }
@@ -273,7 +279,7 @@ namespace SAVE {
             /*
              * @brief: Checks whether the given flag is set.
              */
-            bool checkFlag( u16 p_idx );
+            bool checkFlag( u16 p_idx ) const;
 
             /*
              * @brief: Sets the specified flag to the specified value.

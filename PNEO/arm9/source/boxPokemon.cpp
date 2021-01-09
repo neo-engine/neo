@@ -288,10 +288,10 @@ void boxPokemon::hatch( ) {
 bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_message,
                             std::function<u8( boxPokemon*, u16 )> p_getMove,
                             std::function<bool( const char* )>    p_yesNoMessage ) {
-    char buffer[ 50 ];
+    char buffer[ 100 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        snprintf( buffer, 49, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
         p_message( buffer );
         return false;
     } else if( canLearn( m_speciesId, p_move, LEARN_TM ) ) {
@@ -302,25 +302,25 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                 m_moves[ i ] = p_move;
                 m_curPP[ i ] = mdata.m_pp;
 
-                snprintf( buffer, 49, GET_STRING( 103 ), m_name,
+                snprintf( buffer, 99, GET_STRING( 103 ), m_name,
                           MOVE::getMoveName( p_move ).c_str( ) );
                 p_message( buffer );
                 freeSpot = true;
                 break;
             }
         if( !freeSpot ) {
-            snprintf( buffer, 49, GET_STRING( 139 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 139 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
             p_message( buffer );
-            snprintf( buffer, 49, GET_STRING( 104 ), m_name );
+            snprintf( buffer, 99, GET_STRING( 104 ), m_name );
             if( p_yesNoMessage( buffer ) ) {
                 loop( ) {
                     u8 res = p_getMove( this, p_move );
                     if( res < 4 ) {
                         if( MOVE::isFieldMove( m_moves[ res ] ) ) {
-                            snprintf( buffer, 49, GET_STRING( 106 ), m_name,
+                            snprintf( buffer, 99, GET_STRING( 106 ), m_name,
                                       MOVE::getMoveName( m_moves[ res ] ).c_str( ) );
                             p_message( buffer );
-                            snprintf( buffer, 49, GET_STRING( 104 ), m_name );
+                            snprintf( buffer, 99, GET_STRING( 104 ), m_name );
                             p_message( buffer );
                             continue;
                         } else {
@@ -332,12 +332,12 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                     break;
                 }
             }
-            snprintf( buffer, 49, GET_STRING( 403 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 403 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
             p_message( buffer );
             return false;
         }
     } else {
-        snprintf( buffer, 49, GET_STRING( 107 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( 107 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
         p_message( buffer );
         return false;
     }

@@ -26,30 +26,61 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
-
-#include <string>
+#include <vector>
 #include <nds.h>
 
+#include "uio.h"
+
 namespace DEX {
-#define PAGE_START 1         // + 3
-#define FRAME_START_2 10     // + 5
-#define PKMN_ICON_START_2 15 // + 5
-#define PKMN_ICON_START 32   // + 32
-#define FRAME_START 64       // + 32
-#define BG_SPR_START 96      // + 2 * 8
     class dexUI {
       private:
-        bool _useInDex;
-        u16  _maxPkmn;
-
-        void drawFormes( u16 p_pkmnId, u8 p_forme, u8 p_formeCnt, bool p_isFemale,
-                         bool p_isGenderless );
-
       public:
-        dexUI( bool p_useInDex, u16 p_maxPkmn );
+        /*
+         * @brief: Creates a new dexUI. Does not destroy any screens.
+         */
+        dexUI( ) {
+        }
 
-        void drawPage( u16 p_pkmnIdx, u8 p_page, u8 p_forme );
-        void drawSub( u8 p_mode, u16 p_pkmnIdcs[ 32 ], u16 p_idxStart, u8 p_selectedIdx,
-                      u8 p_oldIdx = 0 );
+        /*
+         * @brief: Initializes the general dex UI. Destroys everything on both screens.
+         */
+        void init( );
+
+        /*
+         * @brief: draws the dex mode choice. Destroys everything on both screens.
+         */
+        void drawModeChoice( bool p_showLocalDex = true, bool p_showNationalDex = false,
+                             u8 p_selection = 0 );
+
+        /*
+         * @brief: Prints the dex information.
+         * @param p_page: 1-general information; 2-forms; 3-habitats
+         */
+        void drawPkmnInfo( u16 p_pkmnId, u8 p_page, u8 p_forme = 0, bool p_shiny = false,
+                           bool p_female = false, bool p_bottom = false );
+
+        /*
+         * @brief: Draws the bottom screen of the national pokedex with the specified pkmn
+         * selected. (bottom screen of the national dex is organized as a vertical list of
+         * entries)
+         */
+        void selectNationalIndex( u16 p_pkmnIdx, bool p_bottom = true );
+
+        /*
+         * @brief: Draws the bottom screen of the local pokedex with the specified pkmn
+         * selected. (bottom screen of the local dex is organized a horizontal list of
+         * columns with up to 3 icons per column.)
+         */
+        void selectLocalPageSlot( u16 p_page, u8 p_slot, bool p_bottom = true );
+
+        /*
+         * @brief: Highlights the specified button or none if p_button is -1.
+         */
+        void highlightButton( u8 p_button = 255, bool p_bottom = true );
+
+        /*
+         * @brief: Returns information for the current buttons on the screen.
+         */
+        std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( bool p_bottom = true );
     };
-}
+} // namespace DEX

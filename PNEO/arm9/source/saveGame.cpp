@@ -30,6 +30,7 @@
 
 #include "abilityNames.h"
 #include "battleTrainer.h"
+#include "dex.h"
 #include "fs.h"
 #include "item.h"
 #include "itemNames.h"
@@ -140,7 +141,8 @@ namespace SAVE {
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
         // player name
-        IO::regularFont->printString( GET_STRING_L( 406, m_options.m_language ), 108, 52, p_bottom );
+        IO::regularFont->printString( GET_STRING_L( 406, m_options.m_language ), 108, 52,
+                                      p_bottom );
         IO::regularFont->printString( m_playername, 234, 52, p_bottom, IO::font::RIGHT );
 
         // play time
@@ -393,7 +395,7 @@ namespace SAVE {
         return u8( std::max( (s16) 2, std::min( (s16) 100, mxlv ) ) );
     }
 
-    bool saveGame::playerInfo::checkFlag( u16 p_idx ) {
+    bool saveGame::playerInfo::checkFlag( u16 p_idx ) const {
         return m_flags[ p_idx >> 4 ] & ( 1 << ( p_idx & 15 ) );
     }
     void saveGame::playerInfo::setFlag( u16 p_idx, bool p_value ) {
@@ -432,6 +434,12 @@ namespace SAVE {
             if( IN_DEX( i ) ) cnt++;
         return cnt;
     }
+
+    u16 saveGame::playerInfo::getPkmnDisplayDexId( u16 p_pokemon ) const {
+        if( checkFlag( F_NAT_DEX_OBTAINED ) ) { return p_pokemon; }
+        return DEX::getDexNo( p_pokemon );
+    }
+
     // Return the idx of the resulting Box
     s8 saveGame::playerInfo::storePkmn( const boxPokemon& p_pokemon ) {
         s8 idx = m_storedPokemon[ m_curBox ].getFirstFreeSpot( );

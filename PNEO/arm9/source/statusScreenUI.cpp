@@ -906,10 +906,19 @@ namespace STS {
                             oam[ SPR_WINDOW_OAM ].gfxIndex, 148 + 32 - 9, 6, 16, 16, false, false,
                             false, OBJPRIORITY_1, false, OBJMODE_NORMAL );
 
-            // Dex Nr
-            snprintf( buffer, 49, "%03hu", p_pokemon->getSpecies( ) );
-            writeLineTop( GET_STRING( 337 ), buffer, 0, IO::WHITE_IDX,
-                          p_pokemon->isShiny( ) ? IO::RED2_IDX : IO::BLACK_IDX );
+            if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ) ) {
+                // Dex No
+                u16 dexno
+                    = SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId( p_pokemon->getSpecies( ) );
+
+                if( dexno != u16( -1 ) ) {
+                    snprintf( buffer, 49, "%03hu", dexno );
+                } else {
+                    snprintf( buffer, 49, "???" );
+                }
+                writeLineTop( GET_STRING( 337 ), buffer, 0, IO::WHITE_IDX,
+                              p_pokemon->isShiny( ) ? IO::RED2_IDX : IO::BLACK_IDX );
+            }
             // Species Name
             writeLineTop( GET_STRING( 338 ), getDisplayName( p_pokemon->getSpecies( ) ).c_str( ),
                           1 );
