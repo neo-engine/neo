@@ -1474,13 +1474,15 @@ namespace BATTLE {
 
     void battle::handleCapture( ) {
         _field.revertTransform( true, 0 );
-        u16 spid = _field.getPkmn( true, 0 )->getSpecies( );
-
-        if( _isMockBattle ) {
+        if( _isMockBattle ) [[unlikely]] {
             // Nothing to be done here.
             return;
         }
 
+        auto pkmn = _field.getPkmn( true, 0 );
+        if( pkmn == nullptr ) [[unlikely]] { return; }
+
+        u16  spid = pkmn->getSpecies( );
         char buffer[ 100 ];
         if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1LLU << ( spid % 8 ) ) ) ) {
             SAVE::SAV.getActiveFile( ).registerCaughtPkmn( spid );
@@ -1489,16 +1491,12 @@ namespace BATTLE {
 
             for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
-            // TODO
-            // DEX::dex( DEX::dex::SHOW_SINGLE, -1 ).run( spid );
+            DEX::dex( ).run( spid, pkmn->getForme( ), pkmn->isShiny( ), pkmn->isFemale( ) );
         }
         _battleUI.handleCapture( _field.getPkmn( true, 0 ) );
 
         // Check whether the pkmn fits in the team
-        auto pkmn = _field.getPkmn( true, 0 );
-        if( pkmn == nullptr ) [[unlikely]] {
-            return;
-        } else if( _playerTeamSize < 6 ) {
+        if( _playerTeamSize < 6 ) {
             std::memcpy( &_playerTeam[ _playerTeamSize ], pkmn, sizeof( pokemon ) );
             _playerPkmnOrigLevel[ _playerTeamSize++ ] = pkmn->m_level;
         } else {

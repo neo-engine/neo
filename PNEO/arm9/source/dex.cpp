@@ -25,13 +25,14 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "dex.h"
+#include <cmath>
+
+#include "choiceBox.h"
 #include "defines.h"
+#include "dex.h"
 #include "dexUI.h"
 #include "saveGame.h"
 #include "uio.h"
-
-#include <cmath>
 
 namespace DEX {
     u16 nextEntry( u16 p_startIdx ) {
@@ -62,15 +63,36 @@ namespace DEX {
     void dex::selectLocal( u16 p_page, u8 p_slot ) {
     }
 
-    void dex::runModeChoice( ) {
+    bool dex::runModeChoice( ) {
+        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+
+        auto res = cb.getResult(
+            [ & ]( u8 ) {
+                return _dexUI->drawModeChoice(
+                    SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ),
+                    SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED ) );
+            },
+            [ & ]( u8 p_newSel ) { _dexUI->selectMode( p_newSel ); }, 0 );
+
+        if( res == IO::choiceBox::EXIT_CHOICE || res == IO::choiceBox::BACK_CHOICE ) {
+            return true;
+        }
+        _mode = mode( res );
+        return false;
     }
 
     void dex::runDex( ) {
     }
 
     void dex::run( ) {
+        // run "welcome screen"/mode selection
+        if( runModeChoice( ) ) { return; }
+
+        // run actual dex
+        runDex( );
     }
 
-    void dex::run( u16 p_pkmnIdx ) {
+    void dex::run( u16 p_pkmnIdx, u8 p_forme, bool p_shiny, bool p_female ) {
+        _mode = SHOW_SINGLE;
     }
 } // namespace DEX

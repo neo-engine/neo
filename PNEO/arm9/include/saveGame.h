@@ -210,19 +210,26 @@ namespace SAVE {
             /*
              * @brief: Returns the number of seen pkmn.
              */
-            constexpr u16 getSeenCount( ) const {
+            inline u16 getSeenCount( ) const {
+                if( !checkFlag( F_NAT_DEX_OBTAINED ) ) { return getLocalSeenCount( ); }
                 u16 res = 0;
                 for( u8 i = 0; i < 125; ++i ) {
                     // Count the number of set bits
                     res += std::popcount( m_seenPkmn[ i ] );
                 }
-                return res;
+                return std::max( res, getCaughtCount( ) );
             }
+
+            /*
+             * @brief: Returns the number of seen pkmn in the local pkdex.
+             */
+            u16 getLocalSeenCount( ) const;
 
             /*
              * @brief: Returns the number of caught pkmn.
              */
-            constexpr u16 getCaughtCount( ) const {
+            inline u16 getCaughtCount( ) const {
+                if( !checkFlag( F_NAT_DEX_OBTAINED ) ) { return getLocalCaughtCount( ); }
                 u16 res = 0;
                 for( u8 i = 0; i < 125; ++i ) {
                     // Count the number of set bits
@@ -232,17 +239,37 @@ namespace SAVE {
             }
 
             /*
+             * @brief: Returns the number of caught pkmn in the local pkdex.
+             */
+            u16 getLocalCaughtCount( ) const;
+
+            /*
              * @brief: Returns a local dex no if the player has no national dex; otherwise
              * returns national dex no.
              */
             u16 getPkmnDisplayDexId( u16 p_pokemon ) const;
 
+            bool dexCompleted( ) const;
+
+            bool localDexCompleted( ) const;
+
+            constexpr bool seen( u16 p_pokemon ) const {
+                return !!( m_seenPkmn[ p_pokemon / 8 ] & ( 1 << ( p_pokemon % 8 ) ) );
+            }
+
+            constexpr bool caught( u16 p_pokemon ) const {
+                return !!( m_caughtPkmn[ p_pokemon / 8 ] & ( 1 << ( p_pokemon % 8 ) ) );
+            }
+
             constexpr void registerSeenPkmn( u16 p_pokemon ) {
                 m_seenPkmn[ p_pokemon / 8 ] |= 1 << ( p_pokemon % 8 );
             }
 
-            constexpr void registerCaughtPkmn( u16 p_pokemon ) {
+            inline void registerCaughtPkmn( u16 p_pokemon ) {
+                registerSeenPkmn( p_pokemon );
                 m_caughtPkmn[ p_pokemon / 8 ] |= 1 << ( p_pokemon % 8 );
+
+                if( localDexCompleted( ) ) { m_achievements |= ACHIEVEMENT_DEX; }
             }
 
             /*
@@ -255,11 +282,6 @@ namespace SAVE {
             s8 storePkmn( const pokemon& p_pokemon );
 
             u16 countPkmn( u16 p_pkmnIdx );
-
-            /*
-             * @brief: Return the number of seen pkmn.
-             */
-            u16 getDexCount( );
 
             /*
              * @brief: Returns the box of the storage system the player used most recently.

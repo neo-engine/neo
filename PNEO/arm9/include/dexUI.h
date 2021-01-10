@@ -34,6 +34,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace DEX {
     class dexUI {
       private:
+        std::vector<std::pair<IO::inputTarget, u8>> _touchPostiions;
+
       public:
         /*
          * @brief: Creates a new dexUI. Does not destroy any screens.
@@ -49,8 +51,13 @@ namespace DEX {
         /*
          * @brief: draws the dex mode choice. Destroys everything on both screens.
          */
-        void drawModeChoice( bool p_showLocalDex = true, bool p_showNationalDex = false,
-                             u8 p_selection = 0 );
+        std::vector<std::pair<IO::inputTarget, u8>>
+        drawModeChoice( bool p_showLocalDex = true, bool p_showNationalDex = false );
+
+        /*
+         * @brief: selects a mode during the mode selection phase.
+         */
+        void selectMode( u8 p_newMode );
 
         /*
          * @brief: Prints the dex information.

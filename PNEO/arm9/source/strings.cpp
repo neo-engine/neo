@@ -955,7 +955,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "An electric current runs across the battlefield.",
       "Eine elektrische Str\xf6mung flie\xdft durch das Feld." },
     { "Mist swrils around the battlefield.", "Das Feld wird in Nebel geh\xfcllt." },
-    { "Grass grew to cover the battlefield.", "Gras w\xe4""chst \xfc"
+    { "Grass grew to cover the battlefield.", "Gras w\xe4"
+                                              "chst \xfc"
                                               "ber das Feld." },
     { "A deluge of ions showers the battlefield.",
       "Ein elektrisch geladener Niederschlag regnet auf das Feld herab." },
@@ -1072,5 +1073,18 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
                                               "en?" },
 
     { "No. ", "Nr. " },
+    { "P O K \xc9 D E X", "P O K \xc9 D E X" },
+    { "Hoenn Pok\xe9"
+      "Dex",
+      "Hoenn-Pok\xe9"
+      "Dex" },
+    { "National Pok\xe9"
+      "Dex",
+      "Nationaler Pok\xe9"
+      "Dex" },
+    { "Seen", "Ges." },
 
+    // 580
+
+    { "Caught", "Gef." },
 };

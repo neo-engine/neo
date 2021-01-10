@@ -661,6 +661,34 @@ namespace DEX {
         return u16( -1 );
     }
 
+    constexpr bool requiredForCompletion( u16 p_pkmnIdx ) {
+        switch( p_pkmnIdx ) {
+        case PKMN_MEW:
+        case PKMN_CELEBI:
+        case PKMN_JIRACHI:
+        case PKMN_DEOXYS:
+        case PKMN_PHIONE:
+        case PKMN_MANAPHY:
+        case PKMN_SHAYMIN:
+        case PKMN_DARKRAI:
+        case PKMN_ARCEUS:
+        case PKMN_VICTINI:
+        case PKMN_KELDEO:
+        case PKMN_MELOETTA:
+        case PKMN_GENESECT:
+        case PKMN_HOOPA:
+        case PKMN_DIANCIE:
+        case PKMN_VOLCANION:
+        case PKMN_MAGEARNA:
+        case PKMN_MARSHADOW:
+        case PKMN_MELTAN:
+        case PKMN_MELMETAL:
+        case PKMN_ZERAORA:
+        case PKMN_ZARUDE: return false;
+        }
+        return true;
+    }
+
     class dex {
       public:
         enum mode { LOCAL_DEX = 0, NATIONAL_DEX = 1, SHOW_SINGLE = 2 };
@@ -681,6 +709,11 @@ namespace DEX {
         void changeMode( mode p_newMode, u16 p_startIdx );
 
         /*
+         * @brief: Shows the dex entry of the specified pkmn.
+         */
+        void showEntry( u16 p_pkmnIdx, u8 p_forme = 0, bool p_shiny = false,
+                        bool p_female = false );
+        /*
          * @brief: Select an entry while in the national dex mode.
          */
         void selectNational( u16 p_pkmnIdx );
@@ -693,8 +726,9 @@ namespace DEX {
         /*
          * @brief: Run dex welcome screen which shows the progress and an initial dex mode
          * selection (local/national), if the national dex is already unlocked.
+         * @returns: true if the player wants to exit the dex.
          */
-        void runModeChoice( );
+        bool runModeChoice( );
 
         /*
          * @brief: Runs the main logic of the dex, handles mode switching and selecting
@@ -718,6 +752,6 @@ namespace DEX {
          * or habitats. Displays the national dex number iff the player has unlocked the
          * national dex (local dex no otherwise).
          */
-        void run( u16 p_pkmnIdx );
+        void run( u16 p_pkmnIdx, u8 p_forme = 0, bool p_shiny = false, bool p_female = false );
     };
 } // namespace DEX

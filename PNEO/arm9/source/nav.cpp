@@ -1600,8 +1600,9 @@ namespace NAV {
                         a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
                     }
 
-                    for( u16 j = 1; j <= MAX_PKMN; ++j )
-                        SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( j ) / 8 ] |= ( 1 << ( j % 8 ) );
+                    for( u16 j = 1; j <= MAX_PKMN; ++j ) {
+                        SAVE::SAV.getActiveFile( ).registerCaughtPkmn( j );
+                    }
                 }
                 for( u16 j : { 493, 649, 648, 647, 487, 492, 641, 642, 646, 645, 643, 644 } ) {
                     auto a       = pokemon( j, 50, 0, 0, j ).m_boxdata;

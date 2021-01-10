@@ -162,7 +162,7 @@ namespace SAVE {
                 // PokeDex
                 IO::regularFont->printString( GET_STRING_L( 409, m_options.m_language ), 108, 100,
                                               p_bottom );
-                snprintf( buffer, 99, "%hhu/%hhu", getSeenCount( ), getCaughtCount( ) );
+                snprintf( buffer, 99, "%hu/%hu", getSeenCount( ), getCaughtCount( ) );
                 IO::regularFont->printString( buffer, 234, 100, p_bottom, IO::font::RIGHT );
             }
 
@@ -428,11 +428,41 @@ namespace SAVE {
         return res;
     }
 
-    u16 saveGame::playerInfo::getDexCount( ) {
-        u16 cnt = 0;
-        for( u16 i = 0; i < MAX_PKMN; ++i )
-            if( IN_DEX( i ) ) cnt++;
-        return cnt;
+    u16 saveGame::playerInfo::getLocalSeenCount( ) const {
+        u16 res = 0;
+
+        for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
+            if( seen( DEX::LOCAL_DEX[ i ] ) ) { ++res; }
+        }
+
+        return std::max( res, getLocalCaughtCount( ) );
+    }
+
+    u16 saveGame::playerInfo::getLocalCaughtCount( ) const {
+        u16 res = 0;
+
+        for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
+            if( caught( DEX::LOCAL_DEX[ i ] ) ) { ++res; }
+        }
+
+        return res;
+    }
+
+    bool saveGame::playerInfo::dexCompleted( ) const {
+        for( u16 i = 1; i <= MAX_PKMN; ++i ) {
+            if( DEX::requiredForCompletion( i ) && !caught( i ) ) { return false; }
+        }
+        return true;
+    }
+
+    bool saveGame::playerInfo::localDexCompleted( ) const {
+        for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
+            if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ] )
+                && !caught( DEX::LOCAL_DEX[ i ] ) ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     u16 saveGame::playerInfo::getPkmnDisplayDexId( u16 p_pokemon ) const {
