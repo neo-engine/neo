@@ -455,10 +455,27 @@ namespace SAVE {
         return true;
     }
 
+    bool saveGame::playerInfo::dexSeenCompleted( ) const {
+        for( u16 i = 1; i <= MAX_PKMN; ++i ) {
+            if( DEX::requiredForCompletion( i ) && !seen( i ) ) { return false; }
+        }
+        return true;
+    }
+
     bool saveGame::playerInfo::localDexCompleted( ) const {
         for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
             if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ] )
                 && !caught( DEX::LOCAL_DEX[ i ] ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool saveGame::playerInfo::localDexSeenCompleted( ) const {
+        for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
+            if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ] )
+                && !seen( DEX::LOCAL_DEX[ i ] ) ) {
                 return false;
             }
         }

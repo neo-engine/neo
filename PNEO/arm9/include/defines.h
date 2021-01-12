@@ -55,6 +55,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define TCLASS_NAMELENGTH   30
 #define ABILITY_DSCRLENGTH  200
 #define LOCATION_NAMELENGTH 25
+#define DEXENTRY_NAMELENGTH 200
 
 #define MAPSTRING_LEN   800
 #define BADGENAME_LEN   50

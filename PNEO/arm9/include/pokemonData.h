@@ -227,6 +227,10 @@ std::string getSpeciesName( u16 p_pkmnId, u8 p_language, u8 p_forme );
 std::string getSpeciesName( u16 p_pkmnId, u8 p_forme = 0 );
 bool        getSpeciesName( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
 
+std::string getDexEntry( u16 p_pkmnId, u8 p_language, u8 p_forme );
+std::string getDexEntry( u16 p_pkmnId, u8 p_forme = 0 );
+bool        getDexEntry( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
+
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme );
 std::string getDisplayName( u16 p_pkmnId, u8 p_forme = 0 );
 bool        getDisplayName( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );

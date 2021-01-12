@@ -829,13 +829,14 @@ namespace NAV {
             dx.run( );
             // DEX::dex::SHOW_CAUGHT, MAX_PKMN ).run( SAVE::SAV.getActiveFile( ).m_lstDex );
 
+            IO::initVideoSub( );
+            IO::resetScale( true, false );
             FADE_TOP_DARK( );
             FADE_SUB_DARK( );
             IO::clearScreen( false );
             videoSetMode( MODE_5_2D );
             bgUpdate( );
 
-            IO::clearScreenConsole( true, true );
             ANIMATE_MAP = true;
             SOUND::restoreVolume( );
             MAP::curMap->draw( );
@@ -1636,6 +1637,7 @@ namespace NAV {
             case 2: {
                 init( );
                 SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5 ) % 24;
+                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED, true );
                 /*
                 init( );
                 MAP::curMap->faintPlayer( );

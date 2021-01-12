@@ -35,6 +35,7 @@ namespace DEX {
     class dexUI {
       private:
         std::vector<std::pair<IO::inputTarget, u8>> _touchPostiions;
+        u8                                          _mode;
 
       public:
         /*
@@ -58,6 +59,11 @@ namespace DEX {
          * @brief: selects a mode during the mode selection phase.
          */
         void selectMode( u8 p_newMode );
+
+        /*
+         * @brief: initializes the specified mode for the main dex.
+         */
+        void changeMode( u8 p_newMode );
 
         /*
          * @brief: Prints the dex information.

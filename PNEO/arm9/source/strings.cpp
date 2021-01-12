@@ -1086,5 +1086,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     // 580
 
-    { "Caught", "Gef." },
+    { "Own", "Gef." },
+    { "???", "???" },
+    { "%s Pok\xe9mon  HT %.1f m  WT %.1f kg", "%s-Pok\xe9mon  GR %.1f m  GW %.1f kg" },
 };

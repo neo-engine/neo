@@ -143,7 +143,9 @@ namespace SAVE {
             MAP::warpPos   m_lastWarp;
             u8             m_curBox;
             u16            m_lstDex;
-            u16            m_lstViewedItem[ 5 ]; // Last viewed item in the bag
+            u16            m_lstLocalDexPage;
+            u16            m_lstLocalDexSlot;
+            u16            m_lstViewedItem[ 3 ]; // Last viewed item in the bag
 
             ObjPriority m_playerPriority;
 
@@ -251,7 +253,11 @@ namespace SAVE {
 
             bool dexCompleted( ) const;
 
+            bool dexSeenCompleted( ) const;
+
             bool localDexCompleted( ) const;
+
+            bool localDexSeenCompleted( ) const;
 
             constexpr bool seen( u16 p_pokemon ) const {
                 return !!( m_seenPkmn[ p_pokemon / 8 ] & ( 1 << ( p_pokemon % 8 ) ) );

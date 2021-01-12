@@ -420,6 +420,7 @@ namespace IO {
     }
 
     u16 pkmnSpriteHeight( u16 p_speciesId ) {
+        if( p_speciesId > MAX_PKMN ) { return 96 - SPECIES_HEIGHTS[ 0 ]; }
         return 96 - SPECIES_HEIGHTS[ p_speciesId ];
     }
 

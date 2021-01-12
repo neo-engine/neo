@@ -32,35 +32,117 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dex.h"
 #include "dexUI.h"
 #include "saveGame.h"
+#include "sound.h"
 #include "uio.h"
 
 namespace DEX {
-    u16 nextEntry( u16 p_startIdx ) {
-        if( p_startIdx > MAX_PKMN ) return MAX_PKMN + 1;
-        for( u16 i = p_startIdx + 1; i <= MAX_PKMN; ++i )
-            if( IN_DEX( i ) ) return i;
-        return MAX_PKMN + 1;
-    }
-
-    u16 previousEntry( u16 p_startIdx ) {
-        if( p_startIdx > MAX_PKMN ) p_startIdx = MAX_PKMN + 1;
-        if( !p_startIdx ) return 0;
-        for( u16 i = p_startIdx - 1; i && i <= MAX_PKMN; --i )
-            if( IN_DEX( i ) ) return i;
-        return 0;
-    }
-
     dex::dex( ) {
         _dexUI = new dexUI( );
     }
 
     void dex::changeMode( mode p_newMode, u16 p_startPkmn ) {
+        _mode = p_newMode;
+        _dexUI->changeMode( _mode );
+
+        if( !p_startPkmn ) [[unlikely]] {
+            if( _mode == NATIONAL_DEX ) {
+                selectNational( SAVE::SAV.getActiveFile( ).m_lstDex );
+            } else if( _mode == LOCAL_DEX ) {
+                u16 oldslot = SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot;
+                SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = 4;
+                selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, oldslot );
+            }
+            return;
+        }
+
+        if( _mode == NATIONAL_DEX ) {
+            selectNational( p_startPkmn );
+            return;
+        } else if( _mode == LOCAL_DEX ) {
+            for( u16 i = 0; i < MAX_LOCAL_DEX_PAGES; ++i ) {
+                for( u8 j = 0; j < MAX_LOCAL_DEX_SLOTS; ++i ) {
+                    if( LOCAL_DEX_PAGES[ i ][ j ] == p_startPkmn ) {
+                        selectLocal( i, j );
+                        return;
+                    }
+                }
+            }
+            selectLocal( 2, 0 );
+            return;
+        }
     }
 
     void dex::selectNational( u16 p_idx ) {
+        if( !p_idx || p_idx > MAX_PKMN ) [[unlikely]] {
+            // out of bounds
+            return;
+        }
+
+        if( SAVE::SAV.getActiveFile( ).seen( p_idx ) ) { SOUND::playCry( p_idx, 0, false ); }
+
+        SAVE::SAV.getActiveFile( ).m_lstDex = p_idx;
+        _dexUI->selectNationalIndex( SAVE::SAV.getActiveFile( ).m_lstDex );
+    }
+
+    u8 getNextEntryInRow( u16 p_row, u8 p_slot = 0 ) {
+        for( u8 i = p_slot; i < MAX_LOCAL_DEX_SLOTS; ++i ) {
+            if( LOCAL_DEX_PAGES[ p_row ][ i ] ) { return i; }
+        }
+        for( u8 i = p_slot + 1; i; --i ) {
+            if( LOCAL_DEX_PAGES[ p_row ][ i - 1 ] ) { return i - 1; }
+        }
+        return 255;
+    }
+    u8 getPrevEntryInRow( u16 p_row, u8 p_slot = 0 ) {
+        for( u8 i = p_slot + 1; i; --i ) {
+            if( LOCAL_DEX_PAGES[ p_row ][ i - 1 ] ) { return i - 1; }
+        }
+        for( u8 i = p_slot; i < MAX_LOCAL_DEX_SLOTS; ++i ) {
+            if( LOCAL_DEX_PAGES[ p_row ][ i ] ) { return i; }
+        }
+        return 255;
     }
 
     void dex::selectLocal( u16 p_page, u8 p_slot ) {
+        if( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage < 2 ) [[unlikely]] {
+            // save uninitialized
+            p_page = SAVE::SAV.getActiveFile( ).m_lstLocalDexPage = 2;
+            p_slot = SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = 0;
+        }
+        if( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage > MAX_LOCAL_DEX_PAGES - 5 ) [[unlikely]] {
+            // save uninitialized
+            p_page = SAVE::SAV.getActiveFile( ).m_lstLocalDexPage = MAX_LOCAL_DEX_PAGES - 4;
+            p_slot = SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = 1;
+        }
+        if( p_page < 2 || p_page > MAX_LOCAL_DEX_PAGES - 5 ) [[unlikely]] {
+            // out of bounds
+            return;
+        }
+        s8 dir = p_page - SAVE::SAV.getActiveFile( ).m_lstLocalDexPage;
+        while( p_page >= 2 && p_page <= MAX_LOCAL_DEX_PAGES - 5 ) {
+            SAVE::SAV.getActiveFile( ).m_lstLocalDexPage += dir;
+            u8 slot = p_slot;
+            if( p_slot >= SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ) {
+                slot = getNextEntryInRow( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, p_slot );
+            } else {
+                slot = getPrevEntryInRow( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, p_slot );
+            }
+            if( !dir && ( slot == SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot || slot == 255 ) ) {
+                return;
+            }
+            if( slot < 255 ) {
+                SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = slot;
+                break;
+            }
+        }
+
+        u16 pkmn = LOCAL_DEX_PAGES[ SAVE::SAV.getActiveFile( ).m_lstLocalDexPage ]
+                                  [ SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ];
+        if( SAVE::SAV.getActiveFile( ).seen( pkmn % ALOLAN_FORME ) ) {
+            SOUND::playCry( pkmn % ALOLAN_FORME, pkmn > ALOLAN_FORME, false );
+        }
+        _dexUI->selectLocalPageSlot( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
+                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot );
     }
 
     bool dex::runModeChoice( ) {
@@ -82,6 +164,104 @@ namespace DEX {
     }
 
     void dex::runDex( ) {
+        _dexUI->init( );
+        changeMode( _mode, 0 );
+        cooldown = COOLDOWN_COUNT;
+
+        loop( ) {
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) ) {
+                SOUND::playSoundEffect( SFX_CANCEL );
+                return;
+            } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                if( _mode == mode::NATIONAL_DEX ) {
+                    // Next page
+                    // TODO
+                } else if( _mode == mode::LOCAL_DEX ) {
+                    selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage + 1,
+                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot );
+                }
+
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
+                SOUND::playSoundEffect( SFX_SELECT );
+                if( _mode == mode::NATIONAL_DEX ) {
+                    // prev page
+                    // TODO
+                } else if( _mode == mode::LOCAL_DEX ) {
+                    selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage - 1,
+                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot );
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
+                if( _mode == mode::NATIONAL_DEX ) {
+                    if( SAVE::SAV.getActiveFile( ).m_lstDex < MAX_PKMN ) {
+                        SOUND::playSoundEffect( SFX_SELECT );
+                        selectNational( SAVE::SAV.getActiveFile( ).m_lstDex + 1 );
+                    }
+                } else if( _mode == mode::LOCAL_DEX ) {
+                    if( SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot < MAX_LOCAL_DEX_SLOTS ) {
+                        SOUND::playSoundEffect( SFX_SELECT );
+                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
+                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot + 1 );
+                    }
+                }
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
+                if( _mode == mode::NATIONAL_DEX ) {
+                    if( SAVE::SAV.getActiveFile( ).m_lstDex > 1 ) {
+                        SOUND::playSoundEffect( SFX_SELECT );
+                        selectNational( SAVE::SAV.getActiveFile( ).m_lstDex - 1 );
+                    }
+                } else if( _mode == mode::LOCAL_DEX ) {
+                    if( SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ) {
+                        SOUND::playSoundEffect( SFX_SELECT );
+                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
+                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot - 1 );
+                    }
+                }
+                cooldown = COOLDOWN_COUNT;
+            } /* else if( GET_KEY_COOLDOWN( KEY_L ) ) {
+                // switch to prev page
+                SOUND::playSoundEffect( SFX_SELECT );
+                // TODO
+                cooldown = COOLDOWN_COUNT;
+            } else if( GET_KEY_COOLDOWN( KEY_R ) ) {
+                // switch to next page
+                SOUND::playSoundEffect( SFX_SELECT );
+                // TODO
+                cooldown = COOLDOWN_COUNT;
+            } */
+            else if( GET_KEY_COOLDOWN( KEY_SELECT ) ) {
+                // switch mode local/national dex
+                if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED )
+                    && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED ) ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    if( _mode == NATIONAL_DEX ) {
+                        changeMode( mode::LOCAL_DEX, SAVE::SAV.getActiveFile( ).m_lstDex );
+                    } else if( _mode == mode::LOCAL_DEX ) {
+                        changeMode(
+                            mode::NATIONAL_DEX,
+                            LOCAL_DEX_PAGES[ SAVE::SAV.getActiveFile( ).m_lstLocalDexPage ]
+                                           [ SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ] );
+                    }
+                    cooldown = COOLDOWN_COUNT;
+                }
+            } else if( GET_KEY_COOLDOWN( KEY_Y ) || GET_KEY_COOLDOWN( KEY_A ) ) {
+                // switch info on current page (next forme, etc)
+                SOUND::playSoundEffect( SFX_SELECT );
+                // TODO
+                cooldown = COOLDOWN_COUNT;
+            }
+
+            swiWaitForVBlank( );
+        }
     }
 
     void dex::run( ) {
@@ -94,5 +274,6 @@ namespace DEX {
 
     void dex::run( u16 p_pkmnIdx, u8 p_forme, bool p_shiny, bool p_female ) {
         _mode = SHOW_SINGLE;
+        // TODO
     }
 } // namespace DEX

@@ -38,10 +38,11 @@ namespace DEX {
     constexpr u16 LOCAL_DEX_SIZE = 250;
     constexpr u8  MAX_PAGES      = 3;
 
-    constexpr u16 MAX_LOCALDEX_PAGES = 250;
-    constexpr u16 EMPTY              = 0;
-    constexpr u16 ALOLAN_FORME       = 10000;
-    constexpr u16 GALARIAN_FORME     = 20000;
+    constexpr u16 MAX_LOCAL_DEX_PAGES = 250;
+    constexpr u8  MAX_LOCAL_DEX_SLOTS = 3;
+    constexpr u16 EMPTY               = 0;
+    constexpr u16 ALOLAN_FORME        = 10000;
+    constexpr u16 GALARIAN_FORME      = 20000;
 
     constexpr u16 LOCAL_DEX[ LOCAL_DEX_SIZE ] = {
         PKMN_TREECKO,
@@ -397,7 +398,7 @@ namespace DEX {
 
     };
 
-    constexpr u16 LOCAL_DEX_PAGES[ MAX_LOCALDEX_PAGES ][ 3 ] = {
+    constexpr u16 LOCAL_DEX_PAGES[ MAX_LOCAL_DEX_PAGES ][ MAX_LOCAL_DEX_SLOTS ] = {
         { EMPTY, EMPTY, EMPTY },
         { EMPTY, EMPTY, EMPTY },
         { PKMN_TREECKO, PKMN_GROVYLE, PKMN_SCEPTILE },
@@ -695,12 +696,9 @@ namespace DEX {
 
       private:
         dexUI* _dexUI;
-        mode   _mode                     = LOCAL_DEX;
-        u16    _currentNationalSelection = 0;
-        u16    _currentLocalPage         = 0;
-        u16    _currentLocalSlot         = 0;
-        u8     _currentPage              = 0;
-        u8     _currentForme             = 0; // only available for the national dex mode
+        mode   _mode         = LOCAL_DEX;
+        u8     _currentPage  = 0;
+        u8     _currentForme = 0; // only available for the national dex mode
 
         /*
          * @brief: Swaps between the local/national dex modes.
@@ -708,11 +706,6 @@ namespace DEX {
          */
         void changeMode( mode p_newMode, u16 p_startIdx );
 
-        /*
-         * @brief: Shows the dex entry of the specified pkmn.
-         */
-        void showEntry( u16 p_pkmnIdx, u8 p_forme = 0, bool p_shiny = false,
-                        bool p_female = false );
         /*
          * @brief: Select an entry while in the national dex mode.
          */

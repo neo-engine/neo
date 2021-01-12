@@ -679,6 +679,32 @@ bool getSpeciesName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
     return true;
 }
 
+std::string getDexEntry( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
+    char tmpbuf[ DEXENTRY_NAMELENGTH + 2 ];
+    if( !getDexEntry( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
+    return std::string( tmpbuf );
+}
+
+std::string getDexEntry( u16 p_pkmnId, u8 p_forme ) {
+    return getDexEntry( p_pkmnId, CURRENT_LANGUAGE, p_forme );
+}
+
+bool getDexEntry( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
+    FILE* f;
+    if( p_forme ) {
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
+        f = FS::openSplit( POKEMON_DEXENTRY_PATH, p_pkmnId, tmpbuf );
+    }
+    if( !p_forme || !f ) { f = FS::openSplit( POKEMON_DEXENTRY_PATH, p_pkmnId, ".str" ); }
+    if( !f ) return false;
+
+    std::fseek( f, p_language * DEXENTRY_NAMELENGTH, SEEK_SET );
+    assert( DEXENTRY_NAMELENGTH == fread( p_out, 1, DEXENTRY_NAMELENGTH, f ) );
+    fclose( f );
+    return true;
+}
+
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
     char tmpbuf[ 50 ];
     if( !getDisplayName( p_pkmnId, tmpbuf, p_language, p_forme ) ) { return "???"; }
