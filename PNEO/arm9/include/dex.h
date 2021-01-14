@@ -709,12 +709,12 @@ namespace DEX {
         /*
          * @brief: Select an entry while in the national dex mode.
          */
-        void selectNational( u16 p_pkmnIdx );
+        void selectNational( u16 p_pkmnIdx, bool p_forceDraw = false );
 
         /*
          * @brief: Select an entry while in the local dex mode.
          */
-        void selectLocal( u16 p_page, u8 p_slot );
+        void selectLocal( u16 p_page, u8 p_slot, bool p_forceDraw = false );
 
         /*
          * @brief: Run dex welcome screen which shows the progress and an initial dex mode

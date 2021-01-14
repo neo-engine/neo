@@ -45,6 +45,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dextop1.h"
 #include "dextop2.h"
 
+#include "dexsp1.h"
+#include "dexsp2.h"
+
 #include "crown1.h"
 #include "crown2.h"
 #include "crown3.h"
@@ -76,7 +79,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_SHADOW_PAL         8
 #define SPR_CAUGHT_PAL         9
 
-#define SPR_X_OAM_SUB       0
+#define SPR_X_OAM_SUB         0
+#define SPR_DX1_OAM_SUB       1
+#define SPR_DX2_OAM_SUB       2
+#define SPR_DX3_OAM_SUB       3
+#define SPR_CAUGHT_OAM_SUB    4
+#define SPR_BOX_START_OAM_SUB 5
+
+#define SPR_NAT_DX_START_OAM_SUB     20
+#define SPR_NAT_PKMN_START_OAM_SUB   30
+#define SPR_NAT_CAUGHT_START_OAM_SUB 38
+
 #define SPR_X_PAL_SUB       0
 #define SPR_BOX_PAL_SUB     7
 #define SPR_BOX_SEL_PAL_SUB 8
@@ -147,6 +160,17 @@ namespace DEX {
         // x
         tileCnt = IO::loadSpriteB( "UI/x_16_16", SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16, false,
                                    false, false, OBJPRIORITY_2, true );
+
+        // dex entry bg
+
+        // no entry
+        tileCnt = IO::loadSpriteB( SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
+                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp2Pal, dexsp2Tiles,
+                                   dexsp2TilesLen, false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
+                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_0, true, true,
+                                   0b1001'0100'0001'1101 );
 
         // top screen sprites
         tileCnt = 0;
@@ -565,6 +589,8 @@ namespace DEX {
 
     void dexUI::selectNationalIndex( u16 p_pkmnIdx, bool p_bottom ) {
         drawPkmnInfo( p_pkmnIdx, 0, 0, false, false, !p_bottom );
+
+        // draw bottom screen, vertical list in national dex mode
     }
 
     void dexUI::selectLocalPageSlot( u16 p_page, u8 p_slot, bool p_bottom ) {
@@ -573,6 +599,8 @@ namespace DEX {
     }
 
     void dexUI::highlightButton( u8 p_button, bool p_bottom ) {
+        (void) p_button;
+        (void) p_bottom;
     }
 
     std::vector<std::pair<IO::inputTarget, u8>> dexUI::getTouchPositions( bool p_bottom ) {

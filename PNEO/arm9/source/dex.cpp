@@ -46,37 +46,42 @@ namespace DEX {
 
         if( !p_startPkmn ) [[unlikely]] {
             if( _mode == NATIONAL_DEX ) {
-                selectNational( SAVE::SAV.getActiveFile( ).m_lstDex );
+                if( !SAVE::SAV.getActiveFile( ).m_lstDex ) {
+                    SAVE::SAV.getActiveFile( ).m_lstDex = 1;
+                }
+                selectNational( SAVE::SAV.getActiveFile( ).m_lstDex, true );
             } else if( _mode == LOCAL_DEX ) {
                 u16 oldslot = SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot;
-                SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = 4;
-                selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, oldslot );
+                selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, oldslot, true );
             }
             return;
         }
 
         if( _mode == NATIONAL_DEX ) {
-            selectNational( p_startPkmn );
+            if( !p_startPkmn ) { p_startPkmn = 1; }
+            selectNational( p_startPkmn, true );
             return;
         } else if( _mode == LOCAL_DEX ) {
             for( u16 i = 0; i < MAX_LOCAL_DEX_PAGES; ++i ) {
                 for( u8 j = 0; j < MAX_LOCAL_DEX_SLOTS; ++i ) {
                     if( LOCAL_DEX_PAGES[ i ][ j ] == p_startPkmn ) {
-                        selectLocal( i, j );
+                        selectLocal( i, j, true );
                         return;
                     }
                 }
             }
-            selectLocal( 2, 0 );
+            selectLocal( 2, 0, true );
             return;
         }
     }
 
-    void dex::selectNational( u16 p_idx ) {
+    void dex::selectNational( u16 p_idx, bool p_forceDraw ) {
         if( !p_idx || p_idx > MAX_PKMN ) [[unlikely]] {
             // out of bounds
             return;
         }
+
+        if( !p_forceDraw && SAVE::SAV.getActiveFile( ).m_lstDex == p_idx ) { return; }
 
         if( SAVE::SAV.getActiveFile( ).seen( p_idx ) ) { SOUND::playCry( p_idx, 0, false ); }
 
@@ -103,7 +108,7 @@ namespace DEX {
         return 255;
     }
 
-    void dex::selectLocal( u16 p_page, u8 p_slot ) {
+    void dex::selectLocal( u16 p_page, u8 p_slot, bool p_forceDraw ) {
         if( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage < 2 ) [[unlikely]] {
             // save uninitialized
             p_page = SAVE::SAV.getActiveFile( ).m_lstLocalDexPage = 2;
@@ -122,13 +127,14 @@ namespace DEX {
         while( p_page >= 2 && p_page <= MAX_LOCAL_DEX_PAGES - 5 ) {
             SAVE::SAV.getActiveFile( ).m_lstLocalDexPage += dir;
             u8 slot = p_slot;
-            if( p_slot >= SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ) {
+            if( dir >= 0 ) {
                 slot = getNextEntryInRow( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, p_slot );
             } else {
                 slot = getPrevEntryInRow( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage, p_slot );
             }
-            if( !dir && ( slot == SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot || slot == 255 ) ) {
-                return;
+            if( !dir && !p_forceDraw
+                && ( slot == SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot || slot == 255 ) ) {
+                //  return;
             }
             if( slot < 255 ) {
                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = slot;
@@ -206,10 +212,12 @@ namespace DEX {
                         selectNational( SAVE::SAV.getActiveFile( ).m_lstDex + 1 );
                     }
                 } else if( _mode == mode::LOCAL_DEX ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot < MAX_LOCAL_DEX_SLOTS ) {
-                        SOUND::playSoundEffect( SFX_SELECT );
                         selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
                                      SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot + 1 );
+                    } else {
+                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage + 1, 0 );
                     }
                 }
                 cooldown = COOLDOWN_COUNT;
@@ -220,10 +228,13 @@ namespace DEX {
                         selectNational( SAVE::SAV.getActiveFile( ).m_lstDex - 1 );
                     }
                 } else if( _mode == mode::LOCAL_DEX ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
                     if( SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ) {
-                        SOUND::playSoundEffect( SFX_SELECT );
                         selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
                                      SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot - 1 );
+                    } else {
+                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage - 1,
+                                     MAX_LOCAL_DEX_SLOTS - 1 );
                     }
                 }
                 cooldown = COOLDOWN_COUNT;
