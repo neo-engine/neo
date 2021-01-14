@@ -591,11 +591,14 @@ namespace DEX {
         drawPkmnInfo( p_pkmnIdx, 0, 0, false, false, !p_bottom );
 
         // draw bottom screen, vertical list in national dex mode
+        IO::printRectangle( 30, 30, 220, 160, true, 0 );
     }
 
     void dexUI::selectLocalPageSlot( u16 p_page, u8 p_slot, bool p_bottom ) {
         drawPkmnInfo( LOCAL_DEX_PAGES[ p_page ][ p_slot ] % ALOLAN_FORME, 0,
                       LOCAL_DEX_PAGES[ p_page ][ p_slot ] > ALOLAN_FORME, false, false, !p_bottom );
+
+        IO::printRectangle( 30, 30, 220, 160, true, 0 );
     }
 
     void dexUI::highlightButton( u8 p_button, bool p_bottom ) {
