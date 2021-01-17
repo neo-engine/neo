@@ -89,8 +89,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #define SPR_START_GFX_SUB 240
 
-#define PKMN_BOX_HG 40
-#define PKMN_BOX_WD 40
+#define PKMN_BOX_HG_I 32
+#define PKMN_BOX_WD_I 32
+#define PKMN_BOX_HG   ( PKMN_BOX_HG_I + 8 )
+#define PKMN_BOX_WD   ( PKMN_BOX_WD_I + 8 )
 
 // 10 slots per entry (1 spr window, 1 pkmn/number sprite, 2 pkmn name, 1 caught, 5 name_bg)
 #define SPR_NAT_DX_START_OAM_SUB 20
@@ -109,13 +111,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_LOC_DX_SLOT_GFX_SIZE              32
 #define SPR_LOC_DX_SLOT_ROW_COUNT             3
 #define SPR_LOC_DX_SLOT_COL_COUNT             6
-#define SPR_LOC_DX_HIDDEN( p_page, p_slot )   false
 #define SPR_LOC_DX_BG_POS_X( p_page, p_slot ) ( 8 + PKMN_BOX_WD * ( p_page ) )
 #define SPR_LOC_DX_BG_POS_Y( p_page, p_slot ) ( 24 + PKMN_BOX_HG * ( p_slot ) )
 
-#define SPR_X_PAL_SUB       0
-#define SPR_BOX_PAL_SUB     7
-#define SPR_BOX_SEL_PAL_SUB 8
+#define SPR_X_PAL_SUB 0
 
 namespace DEX {
 
@@ -307,6 +306,13 @@ namespace DEX {
         IO::updateOAM( false );
 
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
+
+        _backChoice     = { IO::touchInputTarget( IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].x,
+                                              IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y,
+                                              IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].x + 32,
+                                              IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y + 32 ),
+                        0 };
+        _touchPositions = std::vector<std::pair<IO::touchInputTarget, u16>>( );
     }
 
     std::vector<std::pair<IO::inputTarget, u8>> dexUI::drawModeChoice( bool p_showLocalDex,
@@ -944,6 +950,7 @@ namespace DEX {
             oam[ oamStart + 8 ].gfxIndex
                 = SPR_NAT_DX_START_GFX_SUB + i * SPR_NAT_DX_SLOT_GFX_SIZE + 16 + 32;
         }
+
         for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
             u16 pidx = ( p_centerPkmnIdx + i >= SPR_NAT_DX_SLOT_COUNT / 3 )
                            ? ( p_centerPkmnIdx - SPR_NAT_DX_SLOT_COUNT / 3 + i - 1 )
@@ -960,13 +967,35 @@ namespace DEX {
         if( !_nationalSelectedIdx || _nationalSelectedIdx == p_pkmnIdx ) {
             nationalInitSub( p_pkmnIdx, p_pkmnIdxUB, p_bottom );
         } else if( _nationalSelectedIdx > p_pkmnIdx ) {
-            nationalRotateBackward( p_pkmnIdxUB, p_bottom );
+            while( _nationalSelectedIdx > p_pkmnIdx ) {
+                nationalRotateBackward( p_pkmnIdxUB, p_bottom );
+            }
         } else if( _nationalSelectedIdx < p_pkmnIdx ) {
-            nationalRotateForward( p_pkmnIdxUB, p_bottom );
+            while( _nationalSelectedIdx < p_pkmnIdx ) {
+                nationalRotateForward( p_pkmnIdxUB, p_bottom );
+            }
+        }
+
+        // update touch positions
+        _touchPositions = std::vector<std::pair<IO::touchInputTarget, u16>>( );
+        _touchPositions.push_back( _backChoice );
+        for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
+            u16 pidx = ( _nationalSelectedIdx + i >= SPR_NAT_DX_SLOT_COUNT / 3 )
+                           ? ( _nationalSelectedIdx - SPR_NAT_DX_SLOT_COUNT / 3 + i - 1 )
+                           : 0;
+            if( p_pkmnIdxUB && pidx > p_pkmnIdxUB ) { pidx = 0; }
+            if( pidx && !SPR_NAT_DX_HIDDEN( i ) ) {
+                _touchPositions.push_back( { IO::touchInputTarget( IO::touchVerticalRhombus(
+                                                 SPR_NAT_DX_BG_POS_X( i ), SPR_NAT_DX_BG_POS_Y( i ),
+                                                 PKMN_BOX_WD_I, PKMN_BOX_HG_I ) ),
+                                             pidx } );
+            }
         }
     }
 
     void dexUI::localDrawPage( u16 p_page, u16 p_pageUB, bool p_inverted, bool p_bottom ) {
+        _touchPositions = std::vector<std::pair<IO::touchInputTarget, u16>>( );
+        _touchPositions.push_back( _backChoice );
 
         for( s8 x = 0; x < SPR_LOC_DX_SLOT_COL_COUNT; ++x ) {
             for( u8 y = 0; y < SPR_LOC_DX_SLOT_ROW_COUNT; ++y ) {
@@ -984,6 +1013,14 @@ namespace DEX {
 
                 loadPkmnEntry( pkmnIdx, pkmnForme, oamStart, false, SPR_LOC_DX_BG_POS_X( ix, y ),
                                SPR_LOC_DX_BG_POS_Y( ix, y ), p_bottom );
+
+                if( pkmnIdx ) {
+                    _touchPositions.push_back(
+                        { IO::touchInputTarget( IO::touchVerticalRhombus(
+                              SPR_LOC_DX_BG_POS_X( ix, y ), SPR_LOC_DX_BG_POS_Y( ix, y ),
+                              PKMN_BOX_WD_I, PKMN_BOX_HG_I ) ),
+                          pkmnIdx } );
+                }
             }
         }
     }
@@ -1025,10 +1062,10 @@ namespace DEX {
         }
     }
 
-    std::vector<std::pair<IO::inputTarget, u16>> dexUI::getTouchPositions( bool p_bottom ) {
-        std::vector<std::pair<IO::inputTarget, u16>> res
-            = std::vector<std::pair<IO::inputTarget, u16>>( );
+    std::vector<std::pair<IO::touchInputTarget, u16>> dexUI::getTouchPositions( u8 p_mode ) {
+        if( p_mode == _mode ) { return _touchPositions; }
 
-        return res;
+        // disable every choice except "back/exit"
+        return { _backChoice };
     }
 } // namespace DEX

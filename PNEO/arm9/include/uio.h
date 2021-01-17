@@ -29,8 +29,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "font.h"
-#include "sprite.h"
 #include "saveGame.h"
+#include "sprite.h"
 
 namespace IO {
 
@@ -128,6 +128,66 @@ namespace IO {
 
     void setDefaultConsoleTextColors( u16* p_palette, u8 p_start = 1 );
 
+    /*
+     * @brief: Returns a predicate to detect a rhombus with two edges parallel to the y
+     * axis.
+     *
+     * (p_topX, p_topY)
+     * |\   \
+     * |_\  | 2 * p_height
+     * \ |  |
+     *  \|  /
+     *
+     * \_/
+     * p_width
+     */
+    inline std::function<bool( touchPosition& )> touchVerticalRhombus( u16 p_topX, u16 p_topY,
+                                                                       u16 p_width, u16 p_height ) {
+        return [ = ]( touchPosition& p_touch ) {
+            return ( p_touch.py >= p_topY && p_touch.py < p_topY + p_height && p_touch.px >= p_topX
+                     && p_touch.px < p_topX + p_touch.py - p_topY )
+                   || ( p_touch.py >= p_topY + p_height && p_touch.py < p_topY + 2 * p_height
+                        && p_touch.px >= p_topX + p_touch.py - p_topY - p_height
+                        && p_touch.px < p_topX + p_width );
+        };
+    }
+
+    inline std::function<bool( touchPosition& )> touchCircle( u16 p_targetX1, u16 p_targetY1,
+                                                              u16 p_targetR ) {
+        return [ = ]( touchPosition& p_touch ) {
+            return sq( p_touch.px - p_targetX1 ) + sq( p_touch.py - p_targetY1 ) <= sq( p_targetR );
+        };
+    }
+
+    inline std::function<bool( touchPosition& )> touchRectangle( u16 p_targetX1, u16 p_targetY1,
+                                                                 u16 p_targetX2, u16 p_targetY2 ) {
+        return [ = ]( touchPosition& p_touch ) {
+            return p_touch.px >= p_targetX1 && p_touch.py >= p_targetY1 && p_touch.px <= p_targetX2
+                   && p_touch.py <= p_targetY2;
+        };
+    }
+
+    struct touchInputTarget {
+        std::function<bool( touchPosition& )> m_customTouch = 0;
+
+        touchInputTarget( ) {
+        }
+        touchInputTarget( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
+            m_customTouch = touchRectangle( p_targetX1, p_targetY1, p_targetX2, p_targetY2 );
+        }
+        touchInputTarget( u16 p_targetX1, u16 p_targetY1, u16 p_targetR ) {
+            m_customTouch = touchCircle( p_targetX1, p_targetY1, p_targetR );
+        }
+        touchInputTarget( std::function<bool( touchPosition& )> p_customTouch )
+            : m_customTouch( p_customTouch ) {
+        }
+
+        inline bool inRange( touchPosition& p_touch ) const {
+            if( m_customTouch ) { return m_customTouch( p_touch ); }
+            return false;
+        }
+    };
+
     struct inputTarget {
         enum inputType { BUTTON, TOUCH, TOUCH_CIRCLE };
         inputType   m_inputType;
@@ -150,15 +210,16 @@ namespace IO {
         }
 
         constexpr bool inRange( touchPosition& p_touch ) const {
-            if( !m_targetX1 && !m_targetY1 && !m_targetR
-                    && !m_targetX2 && !m_targetY2 ) { return false; }
+            if( !m_targetX1 && !m_targetY1 && !m_targetR && !m_targetX2 && !m_targetY2 ) {
+                return false;
+            }
 
             if( m_inputType == TOUCH ) {
                 return p_touch.px >= m_targetX1 && p_touch.py >= m_targetY1
-                    && p_touch.px <= m_targetX2 && p_touch.py <= m_targetY2;
+                       && p_touch.px <= m_targetX2 && p_touch.py <= m_targetY2;
             } else if( m_inputType == TOUCH_CIRCLE ) {
                 return sq( p_touch.px - m_targetX1 ) + sq( p_touch.py - m_targetY1 )
-                    <= sq( m_targetR );
+                       <= sq( m_targetR );
             } else {
                 return false;
             }
@@ -200,66 +261,26 @@ namespace IO {
 
     constexpr u16 getColor( type p_type ) {
         switch( p_type ) {
-        case NORMAL:
-            return NORMAL_COLOR;
-            break;
-        case FIGHTING:
-            return RED;
-            break;
-        case FLYING:
-            return TURQOISE;
-            break;
-        case POISON:
-            return POISON_COLOR;
-            break;
-        case GROUND:
-            return GROUND_COLOR;
-            break;
-        case ROCK:
-            return ROCK_COLOR;
-            break;
-        case BUG:
-            return BUG_COLOR;
-            break;
-        case GHOST:
-            return GHOST_COLOR;
-            break;
-        case STEEL:
-            return STEEL_COLOR;
-            break;
-        case UNKNOWN:
-            return UNKNOWN_COLOR;
-            break;
-        case WATER:
-            return BLUE;
-            break;
-        case FIRE:
-            return ORANGE;
-            break;
-        case GRASS:
-            return GREEN;
-            break;
-        case LIGHTNING:
-            return YELLOW;
-            break;
-        case PSYCHIC:
-            return PURPLE;
-            break;
-        case ICE:
-            return ICE_COLOR;
-            break;
-        case DRAGON:
-            return DRAGON_COLOR;
-            break;
-        case DARKNESS:
-            return BLACK;
-            break;
-        case FAIRY:
-            return FAIRY_COLOR;
-            break;
-        default:
-            return DRAGON_COLOR;
-            break;
+        case NORMAL: return NORMAL_COLOR; break;
+        case FIGHTING: return RED; break;
+        case FLYING: return TURQOISE; break;
+        case POISON: return POISON_COLOR; break;
+        case GROUND: return GROUND_COLOR; break;
+        case ROCK: return ROCK_COLOR; break;
+        case BUG: return BUG_COLOR; break;
+        case GHOST: return GHOST_COLOR; break;
+        case STEEL: return STEEL_COLOR; break;
+        case UNKNOWN: return UNKNOWN_COLOR; break;
+        case WATER: return BLUE; break;
+        case FIRE: return ORANGE; break;
+        case GRASS: return GREEN; break;
+        case LIGHTNING: return YELLOW; break;
+        case PSYCHIC: return PURPLE; break;
+        case ICE: return ICE_COLOR; break;
+        case DRAGON: return DRAGON_COLOR; break;
+        case DARKNESS: return BLACK; break;
+        case FAIRY: return FAIRY_COLOR; break;
+        default: return DRAGON_COLOR; break;
         }
         return WHITE;
     }

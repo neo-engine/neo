@@ -41,6 +41,9 @@ namespace DEX {
 
         u16 _localSelectedPage;
 
+        std::vector<std::pair<IO::touchInputTarget, u16>> _touchPositions;
+        std::pair<IO::touchInputTarget, u16>              _backChoice;
+
         /*
          * @brief: Loads the specified pkmn and its corresponding bg to the specified
          * position on-screen. Assumes that the gfx for the bg sprites are loaded already
@@ -142,6 +145,6 @@ namespace DEX {
         /*
          * @brief: Returns information for the current buttons on the screen.
          */
-        std::vector<std::pair<IO::inputTarget, u16>> getTouchPositions( bool p_bottom = true );
+        std::vector<std::pair<IO::touchInputTarget, u16>> getTouchPositions( u8 p_mode );
     };
 } // namespace DEX

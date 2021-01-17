@@ -341,6 +341,43 @@ namespace DEX {
                 cooldown = COOLDOWN_COUNT;
             }
 
+            for( auto t : _dexUI->getTouchPositions( _mode ) ) {
+                if( ( touch.px || touch.py ) && t.first.inRange( touch ) ) {
+                    bool bad = false;
+                    while( touch.px || touch.py ) {
+                        swiWaitForVBlank( );
+                        if( !t.first.inRange( touch ) ) {
+                            bad = true;
+                            break;
+                        }
+                        scanKeys( );
+                        touchRead( &touch );
+                        swiWaitForVBlank( );
+                    }
+
+                    if( !bad ) {
+                        if( !t.second ) {
+                            // Back
+                            SOUND::playSoundEffect( SFX_CANCEL );
+                            return;
+                        }
+
+                        if( _mode == NATIONAL_DEX ) {
+                            SOUND::playSoundEffect( SFX_SELECT );
+                            selectNational( t.second, true );
+                            break;
+                        } else if( _mode == LOCAL_DEX ) {
+                            SOUND::playSoundEffect( SFX_SELECT );
+                            auto slot = getLocSlotForNat( t.second );
+                            SAVE::SAV.getActiveFile( ).m_lstLocalDexPage = slot.first;
+                            SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = slot.second;
+                            selectLocal( slot.first, slot.second, 0, true );
+                            break;
+                        }
+                    }
+                }
+            }
+
             swiWaitForVBlank( );
         }
     }
@@ -386,6 +423,30 @@ namespace DEX {
             if( ( pressed & KEY_X ) || ( pressed & KEY_B ) || ( pressed & KEY_A ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 return;
+            }
+
+            for( auto t : _dexUI->getTouchPositions( _mode ) ) {
+                if( ( touch.px || touch.py ) && t.first.inRange( touch ) ) {
+                    bool bad = false;
+                    while( touch.px || touch.py ) {
+                        swiWaitForVBlank( );
+                        if( !t.first.inRange( touch ) ) {
+                            bad = true;
+                            break;
+                        }
+                        scanKeys( );
+                        touchRead( &touch );
+                        swiWaitForVBlank( );
+                    }
+
+                    if( !bad ) {
+                        if( !t.second ) {
+                            // Back
+                            SOUND::playSoundEffect( SFX_CANCEL );
+                            return;
+                        }
+                    }
+                }
             }
         }
     }
