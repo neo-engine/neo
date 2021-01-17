@@ -128,12 +128,12 @@ namespace IO {
     u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
                         u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
                         bool p_shiny = false, bool p_female = false, bool p_flipX = false,
-                        bool p_topOnly = false, u8 p_forme = 0 );
+                        bool p_topOnly = false, u8 p_forme = 0, bool p_blackOverlay = false );
 
     u16 loadPKMNSprite( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                         u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
-                        u8 p_forme = 0 );
+                        u8 p_forme = 0, bool p_blackOverlay = false );
 
     u16 loadPKMNSpriteB( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
                          u8 p_oamIndex, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
@@ -164,7 +164,7 @@ namespace IO {
     u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                              u16 p_tileCnt, ObjPriority p_priority = OBJPRIORITY_2,
                              bool p_bottom = false, bool p_outline = false,
-                             u16 p_outlineColor = 0xFFFF );
+                             u16 p_outlineColor = 0xFFFF, bool p_blackOverlay = false );
 
     u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                       u8 p_palCnt, u16 p_tileCnt );
@@ -208,7 +208,8 @@ namespace IO {
      */
     u16 loadPKMNIconB( const u16 p_pkmnNo, const u16 p_posX, const u16 p_posY, u8 p_oamIndex,
                        u16 p_tileCnt, bool p_bottom = true, u8 p_forme = 0, bool p_shiny = false,
-                       bool p_female = false, bool p_outline = false, u16 p_outlineColor = 0xFFFF );
+                       bool p_female = false, bool p_outline = false, u16 p_outlineColor = 0xFFFF,
+                       bool p_blackOverlay = false );
 
     /*
      * @brief: Loads an egg icon from the nitro FAT. (1D tiled)

@@ -34,8 +34,57 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace DEX {
     class dexUI {
       private:
-        std::vector<std::pair<IO::inputTarget, u8>> _touchPostiions;
-        u8                                          _mode;
+        u8 _mode;
+
+        u16 _nationalSelectedIdx;
+        u8  _nationalOAMStart;
+
+        u16 _localSelectedPage;
+
+        /*
+         * @brief: Loads the specified pkmn and its corresponding bg to the specified
+         * position on-screen. Assumes that the gfx for the bg sprites are loaded already
+         * via init.
+         */
+        void loadPkmnEntry( u16 p_pkmnIdx, u8 p_pkmnForme, u8 p_OAMstart, bool p_isHidden, u16 p_x,
+                            u16 p_y, bool p_bottom = true );
+
+        /*
+         * @brief: Loads the (bottom screen) sprites for a single national dex entry into
+         * the specified slot (relative to _nationalOAMStart).
+         */
+        void nationalLoadPkmnEntry( u16 p_pkmnIdx, u8 p_OAMslot, bool p_bottom );
+
+        /*
+         * @brief: Initializes and redraws the bottom screen in the national mode, entry
+         * no. p_centerPkmnIdx will appear vertically centered.
+         */
+        void nationalInitSub( u16 p_centerPkmnIdx, u16 p_pkmnIdxUB = 0, bool p_bottom = true );
+
+        /*
+         * @brief: Rotate the national dex view one entry forward by shifting the
+         * corresponding sprites onscreen, deleting non-visible sprites and preloading
+         * required new sprites.
+         */
+        void nationalRotateForward( u16 p_pkmnIdxUB = 0, bool p_bottom = true );
+
+        /*
+         * @brief: Rotate the national dex view one entry backward by shifting the
+         * corresponding sprites onscreen, deleting non-visible sprites and preloading
+         * required new sprites.
+         */
+        void nationalRotateBackward( u16 p_pkmnIdxUB = 0, bool p_bottom = true );
+
+        /*
+         * @brief: draws a page of the local pokedex.
+         */
+        void localDrawPage( u16 p_page, u16 p_pageUB = 0, bool p_inverted = false,
+                            bool p_bottom = true );
+
+        /*
+         * @brief: Initializes and redraws the bottom screen in the local dex mode.
+         */
+        void localInitSub( bool p_bottom = true );
 
       public:
         /*
@@ -76,24 +125,23 @@ namespace DEX {
          * @brief: Draws the bottom screen of the national pokedex with the specified pkmn
          * selected. (bottom screen of the national dex is organized as a vertical list of
          * entries)
+         * @param p_pkmnIdxUB: Entries above this value will be hidden.
          */
-        void selectNationalIndex( u16 p_pkmnIdx, bool p_bottom = true );
+        void nationalSelectIndex( u16 p_pkmnIdx, u16 p_pkmnIdxUB = 0, bool p_bottom = true,
+                                  u8 p_forme = 0, bool p_shiny = false, bool p_female = false );
 
         /*
          * @brief: Draws the bottom screen of the local pokedex with the specified pkmn
          * selected. (bottom screen of the local dex is organized a horizontal list of
          * columns with up to 3 icons per column.)
+         * @param p_pageUB: Pages above this value will be hidden.
          */
-        void selectLocalPageSlot( u16 p_page, u8 p_slot, bool p_bottom = true );
-
-        /*
-         * @brief: Highlights the specified button or none if p_button is -1.
-         */
-        void highlightButton( u8 p_button = 255, bool p_bottom = true );
+        void localSelectPageSlot( u16 p_page, u8 p_slot, u16 p_pageUB = 0, bool p_bottom = true,
+                                  u8 p_forme = 0, bool p_shiny = false, bool p_female = false );
 
         /*
          * @brief: Returns information for the current buttons on the screen.
          */
-        std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( bool p_bottom = true );
+        std::vector<std::pair<IO::inputTarget, u16>> getTouchPositions( bool p_bottom = true );
     };
 } // namespace DEX

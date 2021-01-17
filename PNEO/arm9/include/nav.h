@@ -38,7 +38,8 @@ namespace NAV {
 #define MAXBG    13
 #define START_BG 0
 
-    extern u8 LOCATION_TIMER;
+    extern u8  LOCATION_TIMER;
+    extern u16 TEXT_BUF[ 64 * 256 ];
 
     enum menuOption {
         VIEW_PARTY = 0,

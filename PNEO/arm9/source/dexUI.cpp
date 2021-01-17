@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dex.h"
 #include "dexUI.h"
 #include "fs.h"
+#include "nav.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sprite.h"
@@ -80,27 +81,108 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_CAUGHT_PAL         9
 
 #define SPR_X_OAM_SUB         0
-#define SPR_DX1_OAM_SUB       1
-#define SPR_DX2_OAM_SUB       2
-#define SPR_DX3_OAM_SUB       3
+#define SPR_DX3_OAM_SUB       1
+#define SPR_DX1_OAM_SUB       2
+#define SPR_DX2_OAM_SUB       3
 #define SPR_CAUGHT_OAM_SUB    4
 #define SPR_BOX_START_OAM_SUB 5
 
-#define SPR_NAT_DX_START_OAM_SUB     20
-#define SPR_NAT_PKMN_START_OAM_SUB   30
-#define SPR_NAT_CAUGHT_START_OAM_SUB 38
+#define SPR_START_GFX_SUB 240
+
+#define PKMN_BOX_HG 40
+#define PKMN_BOX_WD 40
+
+// 10 slots per entry (1 spr window, 1 pkmn/number sprite, 2 pkmn name, 1 caught, 5 name_bg)
+#define SPR_NAT_DX_START_OAM_SUB 20
+#define SPR_NAT_DX_START_GFX_SUB SPR_START_GFX_SUB
+#define SPR_NAT_DX_SLOT_SIZE     10
+#define SPR_NAT_DX_SLOT_GFX_SIZE 56
+#define SPR_NAT_DX_SLOT_COUNT    7
+#define SPR_NAT_DX_HIDDEN( p_slot ) \
+    ( ( ( p_slot ) == 0 || ( p_slot ) == SPR_NAT_DX_SLOT_COUNT - 1 ) )
+#define SPR_NAT_DX_BG_POS_X( p_slot ) 40
+#define SPR_NAT_DX_BG_POS_Y( p_slot ) ( -64 + PKMN_BOX_HG * ( p_slot ) )
+
+#define SPR_LOC_DX_START_OAM_SUB              20
+#define SPR_LOC_DX_START_GFX_SUB              SPR_START_GFX_SUB
+#define SPR_LOC_DX_SLOT_SIZE                  4
+#define SPR_LOC_DX_SLOT_GFX_SIZE              32
+#define SPR_LOC_DX_SLOT_ROW_COUNT             3
+#define SPR_LOC_DX_SLOT_COL_COUNT             6
+#define SPR_LOC_DX_HIDDEN( p_page, p_slot )   false
+#define SPR_LOC_DX_BG_POS_X( p_page, p_slot ) ( 8 + PKMN_BOX_WD * ( p_page ) )
+#define SPR_LOC_DX_BG_POS_Y( p_page, p_slot ) ( 24 + PKMN_BOX_HG * ( p_slot ) )
 
 #define SPR_X_PAL_SUB       0
 #define SPR_BOX_PAL_SUB     7
 #define SPR_BOX_SEL_PAL_SUB 8
 
 namespace DEX {
+
+    constexpr u16 TEXT_PAL[ 16 ] = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
+
+    void initSubSprites( ) {
+        IO::initOAMTable( true );
+        SpriteRotation* oamM = IO::Oam->matrixBuffer;
+        SpriteEntry*    oam  = IO::Oam->oamBuffer;
+
+        oamM[ 0 ].hdx = ( 1LLU << 8 ) | ( 1 << 6 );
+        oamM[ 0 ].hdy = ( 0 << 8 );
+        oamM[ 0 ].vdx = ( 0 << 8 );
+        oamM[ 0 ].vdy = ( 1LLU << 8 ) | ( 1 << 6 );
+
+        oamM[ 1 ].hdx = ( 1LLU << 8 ) | ( 1LLU << 7 );
+        oamM[ 1 ].hdy = ( 0 << 8 );
+        oamM[ 1 ].vdx = ( 0 << 8 );
+        oamM[ 1 ].vdy = ( 1LLU << 8 ) | ( 1LLU << 7 );
+
+        // Bottom screen sprites
+        u16 tileCnt = 0;
+
+        // x
+        tileCnt = IO::loadSpriteB( "UI/x_16_16", SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16, false,
+                                   false, false, OBJPRIORITY_2, true );
+
+        // no entry
+        tileCnt = IO::loadSpriteB( SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
+                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp2Pal, dexsp2Tiles,
+                                   dexsp2TilesLen, false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
+                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_3, true, true,
+                                   0b1001'0100'0001'1101 );
+
+        // caught ball
+        tileCnt
+            = IO::loadSpriteB( SPR_CAUGHT_OAM_SUB, tileCnt, 20, 112, 16, 16, caughtPal, caughtTiles,
+                               caughtTilesLen, false, false, true, OBJPRIORITY_3, true );
+
+        // pkmn name box sub
+        tileCnt = IO::loadSpriteB( "SEL/noselection_64_20", SPR_BOX_START_OAM_SUB, tileCnt, 18, 0,
+                                   32, 32, false, false, false, OBJPRIORITY_3, true );
+        for( u8 i = 0; i < 10; ++i ) {
+            oam[ SPR_BOX_START_OAM_SUB + i ] = oam[ SPR_BOX_START_OAM_SUB ];
+            oam[ SPR_BOX_START_OAM_SUB + i ].x += 24 * i;
+        }
+
+        dmaFillHalfWords( 0, &SPRITE_PALETTE[ SPR_SHADOW_PAL * 16 ], 32 );
+        IO::updateOAM( true );
+    }
+
+    void moveSpriteBlock( u8 p_OAMStart, u8 p_blockSize, s16 p_x, s16 p_y, bool p_bottom ) {
+        SpriteEntry* oam = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+        for( u8 i = 0; i < p_blockSize; ++i ) {
+            oam[ p_OAMStart + i ].x += p_x;
+            oam[ p_OAMStart + i ].y += p_y;
+        }
+    }
+
     void dexUI::init( ) {
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
-        _touchPostiions = std::vector<std::pair<IO::inputTarget, u8>>( );
 
-        IO::initOAMTable( true );
         IO::initOAMTable( false );
+        _nationalSelectedIdx = 0;
+        _localSelectedPage   = -1;
 
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                       | DISPLAY_SPR_1D );
@@ -139,7 +221,7 @@ namespace DEX {
         IO::smallFont->setColor( 0, 0 );
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        //        SpriteEntry* oam = IO::Oam->oamBuffer;
 
         for( u8 i = 0; i < 2; ++i ) {
             u16* pal             = IO::BG_PAL( i );
@@ -154,26 +236,10 @@ namespace DEX {
             pal[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
         }
 
-        // Bottom screen sprites
-        u16 tileCnt = 0;
-
-        // x
-        tileCnt = IO::loadSpriteB( "UI/x_16_16", SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16, false,
-                                   false, false, OBJPRIORITY_2, true );
-
-        // dex entry bg
-
-        // no entry
-        tileCnt = IO::loadSpriteB( SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
-                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp2Pal, dexsp2Tiles,
-                                   dexsp2TilesLen, false, false, true, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
-                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_0, true, true,
-                                   0b1001'0100'0001'1101 );
+        initSubSprites( );
 
         // top screen sprites
-        tileCnt = 0;
+        u16 tileCnt = 0;
 
         // window name bg ("hoenn dex" / "national dex")
         for( u8 i = 0; i < 4; ++i ) {
@@ -185,8 +251,12 @@ namespace DEX {
                               4 + 22 * 3, 0, 64, 32, false, false, false, OBJPRIORITY_3, false );
 
         // pkmn sprite
-        tileCnt = IO::loadPKMNSprite( 0, 128 - 48, 24, SPR_PKMN_START_OAM, SPR_PKMN_PAL, tileCnt,
-                                      false, false, false, false, false, 0 );
+        IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM ].gfxIndex = tileCnt;
+        IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM ].palette  = SPR_PKMN_PAL;
+        IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM ].x        = 128 - 48;
+        IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM ].x        = 24;
+        tileCnt += 144;
+
         IO::OamTop->oamBuffer[ SPR_PKMN2_START_OAM ].gfxIndex = tileCnt;
         IO::OamTop->oamBuffer[ SPR_PKMN2_START_OAM ].palette  = SPR_PKMN2_PAL;
         tileCnt += 144;
@@ -438,13 +508,36 @@ namespace DEX {
         if( p_newMode > 1 ) { return; }
         _mode = p_newMode;
 
+        char buffer[ 90 ];
+
+        initSubSprites( );
         IO::printRectangle( 0, 6, 97, 22, false, 0 );
+        IO::printRectangle( 20, 0, 235, 22, true, 0 );
         if( p_newMode == 0 ) { // local dex
             IO::regularFont->printStringC( GET_STRING( 577 ), 94 / 2 + 1, 5, false,
                                            IO::font::CENTER );
+            localInitSub( true );
+            std::snprintf( buffer, 89, GET_STRING( 583 ),
+                           SAVE::SAV.getActiveFile( ).getLocalSeenCount( ) );
+            IO::regularFont->printStringC( buffer, 74, 2, true, IO::font::CENTER );
+            std::snprintf( buffer, 89, GET_STRING( 584 ),
+                           SAVE::SAV.getActiveFile( ).getLocalCaughtCount( ) );
+            IO::regularFont->printStringC( buffer, 54 + 128, 2, true, IO::font::CENTER );
+
+            _nationalSelectedIdx = 0;
+            _localSelectedPage   = -1;
         } else if( p_newMode == 1 ) { // national dex
             IO::regularFont->printStringC( GET_STRING( 578 ), 94 / 2 + 1, 5, false,
                                            IO::font::CENTER );
+            std::snprintf( buffer, 89, GET_STRING( 583 ),
+                           SAVE::SAV.getActiveFile( ).getSeenCount( ) );
+            IO::regularFont->printStringC( buffer, 74, 2, true, IO::font::CENTER );
+            std::snprintf( buffer, 89, GET_STRING( 584 ),
+                           SAVE::SAV.getActiveFile( ).getCaughtCount( ) );
+            IO::regularFont->printStringC( buffer, 54 + 128, 2, true, IO::font::CENTER );
+
+            _nationalSelectedIdx = 0;
+            _localSelectedPage   = -1;
         }
     }
 
@@ -470,16 +563,12 @@ namespace DEX {
 
         if( p_page == 0 ) {
             // load pkmn sprite
-            IO::loadPKMNSprite( seen ? p_pkmnId : 0, SPR_PKMN_X,
-                                SPR_PKMN_Y - 96 + IO::pkmnSpriteHeight( seen ? p_pkmnId : 0 ),
-                                SPR_PKMN_START_OAM, SPR_PKMN_PAL,
-                                oamTop[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom, p_shiny, p_female,
-                                false, false, seen ? p_forme : 0 );
-            if( seen && !caught ) {
-                for( u8 i = 0; i < 4; ++i ) {
-                    oamTop[ SPR_PKMN_START_OAM + i ].palette = SPR_SHADOW_PAL;
-                }
-            }
+            IO::loadPKMNSprite(
+                ( seen || caught ) ? p_pkmnId : 0, SPR_PKMN_X,
+                SPR_PKMN_Y - 96 + IO::pkmnSpriteHeight( ( seen || caught ) ? p_pkmnId : 0 ),
+                SPR_PKMN_START_OAM, SPR_PKMN_PAL, oamTop[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom,
+                p_shiny, p_female, false, false, seen ? p_forme : 0, seen && !caught );
+
             // load types
             if( caught ) {
                 IO::loadTypeIcon( data.m_baseForme.m_types[ 1 ], SPR_TYPE_X( 1 ), SPR_TYPE_Y( 1 ),
@@ -503,7 +592,7 @@ namespace DEX {
 
             IO::printRectangle( 20, 32, 235, 192, false, 0 );
             // pkmn name
-            if( seen ) {
+            if( seen || caught ) {
                 if( !p_forme ) {
                     IO::regularFont->printStringC( getDisplayName( p_pkmnId, p_forme ).c_str( ),
                                                    128, 112, p_bottom, IO::font::CENTER );
@@ -587,28 +676,358 @@ namespace DEX {
         IO::updateOAM( p_bottom );
     }
 
-    void dexUI::selectNationalIndex( u16 p_pkmnIdx, bool p_bottom ) {
-        drawPkmnInfo( p_pkmnIdx, 0, 0, false, false, !p_bottom );
+    void dexUI::loadPkmnEntry( u16 p_pkmnIdx, u8 p_pkmnForme, u8 p_OAMstart, bool p_isHidden,
+                               u16 p_x, u16 p_y, bool p_bottom ) {
+        bool ispkmn = p_pkmnIdx && p_pkmnIdx <= MAX_PKMN;
 
+        bool seen   = ispkmn && SAVE::SAV.getActiveFile( ).seen( p_pkmnIdx );
+        bool caught = ispkmn && SAVE::SAV.getActiveFile( ).caught( p_pkmnIdx );
+
+        SpriteEntry* oam = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+
+        // sprite bg
+        oam[ p_OAMstart + 2 ]          = ispkmn ? oam[ SPR_DX2_OAM_SUB ] : oam[ SPR_DX1_OAM_SUB ];
+        oam[ p_OAMstart + 2 ].isHidden = p_isHidden;
+        oam[ p_OAMstart + 2 ].x        = p_x;
+        oam[ p_OAMstart + 2 ].y        = p_y;
+        oam[ p_OAMstart + 2 ].priority = OBJPRIORITY_3;
+
+        // pkmn icon
+        if( caught ) {
+            IO::loadPKMNIconB( p_pkmnIdx, p_x, p_y + 16, p_OAMstart + 1,
+                               oam[ p_OAMstart + 1 ].gfxIndex, p_bottom, 0, false, false );
+            oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;
+            if( p_isHidden ) {
+                oam[ p_OAMstart + 1 ].isRotateScale = false;
+                oam[ p_OAMstart + 1 ].isHidden      = true;
+            } else {
+                oam[ p_OAMstart + 1 ].isHidden      = false;
+                oam[ p_OAMstart + 1 ].isRotateScale = true;
+                oam[ p_OAMstart + 1 ].rotationIndex = 0;
+            }
+
+            //   oam[ p_OAMstart ]          = oam[ SPR_CAUGHT_OAM_SUB ];
+            // oam[ p_OAMstart ].isHidden = p_isHidden;
+            // if( !p_isHidden ) {
+            //     oam[ p_OAMstart ].isRotateScale = true;
+            //     oam[ p_OAMstart ].rotationIndex = 1;
+            //  }
+            //  oam[ p_OAMstart ].x        = p_x - 2;
+            //  oam[ p_OAMstart ].y        = p_y + 6;
+            //  oam[ p_OAMstart ].priority = OBJPRIORITY_3;
+        } else if( seen ) {
+            IO::loadPKMNIconB( p_pkmnIdx, p_x, p_y + 16, p_OAMstart + 1,
+                               oam[ p_OAMstart + 1 ].gfxIndex, p_bottom, 0, false, false, false, 0,
+                               true );
+            oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;
+            if( p_isHidden ) {
+                oam[ p_OAMstart + 1 ].isRotateScale = false;
+                oam[ p_OAMstart + 1 ].isHidden      = true;
+            } else {
+                oam[ p_OAMstart + 1 ].isHidden      = false;
+                oam[ p_OAMstart + 1 ].isRotateScale = true;
+                oam[ p_OAMstart + 1 ].rotationIndex = 0;
+            }
+
+            oam[ p_OAMstart ].isRotateScale = false;
+            oam[ p_OAMstart ].isHidden      = true;
+        } else {
+            if( !_mode && !p_isHidden && ispkmn ) {
+                // load dex no (only in local dex mode
+                char buffer[ 20 ];
+                snprintf( buffer, 99, "%03hu%c", _mode ? p_pkmnIdx : getDexNo( p_pkmnIdx ),
+                          p_pkmnForme ? 'a' + p_pkmnForme - 1 : 0 );
+
+                std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
+
+                IO::regularFont->setColor( 1, 1 );
+                IO::regularFont->setColor( 0, 2 );
+                IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32,
+                                                IO::font::CENTER );
+                IO::loadSpriteB( p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex, p_x - 1, p_y + 25,
+                                 32, 32, NAV::TEXT_BUF, 32 * 32 / 2, false, false, false,
+                                 OBJPRIORITY_3, p_bottom );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            } else if( _mode && !p_isHidden && ispkmn ) {
+                IO::loadPKMNIconB( 0, p_x, p_y + 16, p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex,
+                                   p_bottom, 0, false, false );
+                oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;
+                if( p_isHidden ) {
+                    oam[ p_OAMstart + 1 ].isRotateScale = false;
+                    oam[ p_OAMstart + 1 ].isHidden      = true;
+                } else {
+                    oam[ p_OAMstart + 1 ].isHidden      = false;
+                    oam[ p_OAMstart + 1 ].isRotateScale = true;
+                    oam[ p_OAMstart + 1 ].rotationIndex = 0;
+                }
+            } else {
+                oam[ p_OAMstart + 1 ].isRotateScale = false;
+                oam[ p_OAMstart + 1 ].isHidden      = true;
+            }
+        }
+
+        oam[ p_OAMstart ].isRotateScale    = false;
+        oam[ p_OAMstart ].isHidden         = true;
+        oam[ p_OAMstart + 3 ].isSizeDouble = oam[ p_OAMstart + 4 ].isSizeDouble = false;
+        oam[ p_OAMstart + 3 ].isRotateScale = oam[ p_OAMstart + 4 ].isRotateScale = false;
+        oam[ p_OAMstart + 3 ].isHidden = oam[ p_OAMstart + 4 ].isHidden = true;
+        IO::updateOAM( p_bottom );
+    }
+
+    void dexUI::nationalLoadPkmnEntry( u16 p_pkmnIdx, u8 p_OAMslot, bool p_bottom ) {
+        u8 currRot  = ( _nationalOAMStart - SPR_NAT_DX_START_OAM_SUB ) / SPR_NAT_DX_SLOT_SIZE;
+        u8 oamStart = SPR_NAT_DX_START_OAM_SUB
+                      + ( ( currRot + p_OAMslot ) % SPR_NAT_DX_SLOT_COUNT ) * SPR_NAT_DX_SLOT_SIZE;
+
+        bool         seen   = SAVE::SAV.getActiveFile( ).seen( p_pkmnIdx );
+        bool         caught = SAVE::SAV.getActiveFile( ).caught( p_pkmnIdx );
+        SpriteEntry* oam    = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+
+        char buffer[ 10 ];
+
+        // load pkmn icon w/ corresponding bg
+        loadPkmnEntry( p_pkmnIdx, 0, oamStart, SPR_NAT_DX_HIDDEN( p_OAMslot ),
+                       SPR_NAT_DX_BG_POS_X( p_OAMslot ), SPR_NAT_DX_BG_POS_Y( p_OAMslot ),
+                       p_bottom );
+
+        if( !p_pkmnIdx || p_pkmnIdx > MAX_PKMN ) {
+            oam[ oamStart + 5 ].isHidden = true;
+            oam[ oamStart + 6 ].isHidden = true;
+            oam[ oamStart + 7 ].isHidden = true;
+            oam[ oamStart + 8 ].isHidden = true;
+        } else {
+            // load pkmn name
+            std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
+
+            IO::regularFont->setColor( 1, 1 );
+            IO::regularFont->setColor( 0, 2 );
+            snprintf( buffer, 9, "%03hu", p_pkmnIdx );
+            IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32 );
+            IO::loadSpriteB( oamStart + 5, oam[ oamStart + 5 ].gfxIndex,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 40,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF,
+                             16 * 32 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
+
+            std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
+            if( seen || caught ) {
+                IO::regularFont->printStringBC( getDisplayName( p_pkmnIdx ).c_str( ), TEXT_PAL,
+                                                NAV::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
+            } else {
+                IO::regularFont->printStringBC( GET_STRING( 581 ), TEXT_PAL, NAV::TEXT_BUF, 96,
+                                                IO::font::LEFT, 15, 32, 16 );
+            }
+            IO::loadSpriteB( oamStart + 6, oam[ oamStart + 6 ].gfxIndex,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF,
+                             32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
+            IO::loadSpriteB( oamStart + 7, oam[ oamStart + 7 ].gfxIndex,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64 + 32,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF + 32 * 16,
+                             32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
+            IO::loadSpriteB( oamStart + 8, oam[ oamStart + 8 ].gfxIndex,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64 + 64,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF + 32 * 32,
+                             32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        }
+    }
+
+    void dexUI::nationalRotateBackward( u16 p_pkmnIdxUB, bool p_bottom ) {
+        if( p_pkmnIdxUB && _nationalSelectedIdx >= p_pkmnIdxUB ) { return; }
+
+        u8 currRot       = ( _nationalOAMStart - SPR_NAT_DX_START_OAM_SUB ) / SPR_NAT_DX_SLOT_SIZE;
+        u8 nextRot       = ( currRot + SPR_NAT_DX_SLOT_COUNT - 1 ) % SPR_NAT_DX_SLOT_COUNT;
+        SpriteEntry* oam = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+
+        _nationalOAMStart = SPR_NAT_DX_START_OAM_SUB + nextRot * SPR_NAT_DX_SLOT_SIZE;
+
+        _nationalSelectedIdx--;
+        u16 pidx = ( _nationalSelectedIdx >= SPR_NAT_DX_SLOT_COUNT / 3 )
+                       ? ( _nationalSelectedIdx - SPR_NAT_DX_SLOT_COUNT / 3 - 1 )
+                       : 0;
+
+        if( p_pkmnIdxUB && pidx > p_pkmnIdxUB ) { pidx = 0; }
+        nationalLoadPkmnEntry( pidx, 0, p_bottom );
+
+        for( u8 i = 1; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
+            u8 oamStart = SPR_NAT_DX_START_OAM_SUB
+                          + ( ( nextRot + i ) % SPR_NAT_DX_SLOT_COUNT ) * SPR_NAT_DX_SLOT_SIZE;
+            moveSpriteBlock( oamStart, SPR_NAT_DX_SLOT_SIZE, 0, PKMN_BOX_HG, p_bottom );
+        }
+
+        for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
+            u8 oamStart = SPR_NAT_DX_START_OAM_SUB
+                          + ( ( nextRot + i ) % SPR_NAT_DX_SLOT_COUNT ) * SPR_NAT_DX_SLOT_SIZE;
+            pidx = ( _nationalSelectedIdx + i > SPR_NAT_DX_SLOT_COUNT / 3 - 1 )
+                       ? _nationalSelectedIdx + i - SPR_NAT_DX_SLOT_COUNT / 3 - 1
+                       : 0;
+            if( p_pkmnIdxUB && pidx > p_pkmnIdxUB ) { pidx = 0; }
+
+            bool isHidden                = SPR_NAT_DX_HIDDEN( i );
+            oam[ oamStart + 2 ].isHidden = isHidden;
+            isHidden |= !pidx;
+            oam[ oamStart + 1 ].isHidden       = isHidden;
+            oam[ oamStart + 1 ].isRotateScale  = !isHidden;
+            oam[ oamStart + 5 ].isHidden       = oam[ oamStart + 6 ].isHidden
+                = oam[ oamStart + 7 ].isHidden = oam[ oamStart + 8 ].isHidden = isHidden;
+        }
+
+        IO::updateOAM( p_bottom );
+    }
+
+    void dexUI::nationalRotateForward( u16 p_pkmnIdxUB, bool p_bottom ) {
+        if( !_nationalSelectedIdx ) { return; }
+
+        u8 currRot       = ( _nationalOAMStart - SPR_NAT_DX_START_OAM_SUB ) / SPR_NAT_DX_SLOT_SIZE;
+        u8 nextRot       = ( currRot + 1 ) % SPR_NAT_DX_SLOT_COUNT;
+        SpriteEntry* oam = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+
+        _nationalOAMStart = SPR_NAT_DX_START_OAM_SUB + nextRot * SPR_NAT_DX_SLOT_SIZE;
+
+        u16 pidx = SPR_NAT_DX_SLOT_COUNT + _nationalSelectedIdx - SPR_NAT_DX_SLOT_COUNT / 3 - 1;
+        _nationalSelectedIdx++;
+
+        if( p_pkmnIdxUB && pidx > p_pkmnIdxUB ) { pidx = 0; }
+        nationalLoadPkmnEntry( pidx, SPR_NAT_DX_SLOT_COUNT - 1, p_bottom );
+
+        for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT - 1; ++i ) {
+            u8 oamStart = SPR_NAT_DX_START_OAM_SUB
+                          + ( ( nextRot + i ) % SPR_NAT_DX_SLOT_COUNT ) * SPR_NAT_DX_SLOT_SIZE;
+            moveSpriteBlock( oamStart, SPR_NAT_DX_SLOT_SIZE, 0, -PKMN_BOX_HG, p_bottom );
+        }
+        for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
+            u8 oamStart = SPR_NAT_DX_START_OAM_SUB
+                          + ( ( nextRot + i ) % SPR_NAT_DX_SLOT_COUNT ) * SPR_NAT_DX_SLOT_SIZE;
+            pidx = ( _nationalSelectedIdx + i > SPR_NAT_DX_SLOT_COUNT / 3 - 1 )
+                       ? _nationalSelectedIdx + i - SPR_NAT_DX_SLOT_COUNT / 3 - 1
+                       : 0;
+            if( p_pkmnIdxUB && pidx > p_pkmnIdxUB ) { pidx = 0; }
+
+            bool isHidden                = SPR_NAT_DX_HIDDEN( i );
+            oam[ oamStart + 2 ].isHidden = isHidden;
+            isHidden |= !pidx;
+            oam[ oamStart + 1 ].isHidden       = isHidden;
+            oam[ oamStart + 1 ].isRotateScale  = !isHidden;
+            oam[ oamStart + 5 ].isHidden       = oam[ oamStart + 6 ].isHidden
+                = oam[ oamStart + 7 ].isHidden = oam[ oamStart + 8 ].isHidden = isHidden;
+        }
+
+        IO::updateOAM( p_bottom );
+    }
+
+    void dexUI::nationalInitSub( u16 p_centerPkmnIdx, u16 p_pkmnIdxUB, bool p_bottom ) {
         // draw bottom screen, vertical list in national dex mode
-        IO::printRectangle( 30, 30, 220, 160, true, 0 );
+
+        // clear anything on the screen
+        IO::printRectangle( 30, 30, 220, 160, p_bottom, 0 );
+
+        _nationalSelectedIdx = p_centerPkmnIdx;
+        _nationalOAMStart    = SPR_NAT_DX_START_OAM_SUB;
+
+        SpriteEntry* oam = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+
+        oam[ SPR_DX3_OAM_SUB ].isHidden = false;
+        oam[ SPR_DX3_OAM_SUB ].x        = SPR_NAT_DX_BG_POS_X( 3 );
+        oam[ SPR_DX3_OAM_SUB ].y        = SPR_NAT_DX_BG_POS_Y( 3 );
+
+        for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
+            u8 oamStart                  = _nationalOAMStart + i * SPR_NAT_DX_SLOT_SIZE;
+            oam[ oamStart + 1 ].gfxIndex = SPR_NAT_DX_START_GFX_SUB + i * SPR_NAT_DX_SLOT_GFX_SIZE;
+            oam[ oamStart + 5 ].gfxIndex
+                = SPR_NAT_DX_START_GFX_SUB + i * SPR_NAT_DX_SLOT_GFX_SIZE + 16;
+            oam[ oamStart + 6 ].gfxIndex
+                = SPR_NAT_DX_START_GFX_SUB + i * SPR_NAT_DX_SLOT_GFX_SIZE + 16 + 16;
+            oam[ oamStart + 7 ].gfxIndex
+                = SPR_NAT_DX_START_GFX_SUB + i * SPR_NAT_DX_SLOT_GFX_SIZE + 16 + 24;
+            oam[ oamStart + 8 ].gfxIndex
+                = SPR_NAT_DX_START_GFX_SUB + i * SPR_NAT_DX_SLOT_GFX_SIZE + 16 + 32;
+        }
+        for( u8 i = 0; i < SPR_NAT_DX_SLOT_COUNT; ++i ) {
+            u16 pidx = ( p_centerPkmnIdx + i >= SPR_NAT_DX_SLOT_COUNT / 3 )
+                           ? ( p_centerPkmnIdx - SPR_NAT_DX_SLOT_COUNT / 3 + i - 1 )
+                           : 0;
+            if( p_pkmnIdxUB && pidx > p_pkmnIdxUB ) { pidx = 0; }
+            nationalLoadPkmnEntry( pidx, i, p_bottom );
+        }
+        IO::updateOAM( p_bottom );
     }
 
-    void dexUI::selectLocalPageSlot( u16 p_page, u8 p_slot, bool p_bottom ) {
-        drawPkmnInfo( LOCAL_DEX_PAGES[ p_page ][ p_slot ] % ALOLAN_FORME, 0,
-                      LOCAL_DEX_PAGES[ p_page ][ p_slot ] > ALOLAN_FORME, false, false, !p_bottom );
-
-        IO::printRectangle( 30, 30, 220, 160, true, 0 );
+    void dexUI::nationalSelectIndex( u16 p_pkmnIdx, u16 p_pkmnIdxUB, bool p_bottom, u8 p_forme,
+                                     bool p_shiny, bool p_female ) {
+        drawPkmnInfo( p_pkmnIdx, 0, p_forme, p_shiny, p_female, !p_bottom );
+        if( !_nationalSelectedIdx || _nationalSelectedIdx == p_pkmnIdx ) {
+            nationalInitSub( p_pkmnIdx, p_pkmnIdxUB, p_bottom );
+        } else if( _nationalSelectedIdx > p_pkmnIdx ) {
+            nationalRotateBackward( p_pkmnIdxUB, p_bottom );
+        } else if( _nationalSelectedIdx < p_pkmnIdx ) {
+            nationalRotateForward( p_pkmnIdxUB, p_bottom );
+        }
     }
 
-    void dexUI::highlightButton( u8 p_button, bool p_bottom ) {
-        (void) p_button;
-        (void) p_bottom;
+    void dexUI::localDrawPage( u16 p_page, u16 p_pageUB, bool p_inverted, bool p_bottom ) {
+
+        for( s8 x = 0; x < SPR_LOC_DX_SLOT_COL_COUNT; ++x ) {
+            for( u8 y = 0; y < SPR_LOC_DX_SLOT_ROW_COUNT; ++y ) {
+                s8  ix = p_inverted ? x : SPR_LOC_DX_SLOT_COL_COUNT - x - 1;
+                u16 pg = p_page + ix;
+
+                u16 pkmnIdx   = LOCAL_DEX_PAGES[ pg ][ y ];
+                u16 pkmnForme = 0;
+
+                if( p_pageUB && pg > p_pageUB ) { pkmnIdx = pkmnForme = 0; }
+
+                u16 linearizedIdx = ix * SPR_LOC_DX_SLOT_ROW_COUNT + y;
+
+                u8 oamStart = SPR_LOC_DX_START_OAM_SUB + linearizedIdx * SPR_LOC_DX_SLOT_SIZE;
+
+                loadPkmnEntry( pkmnIdx, pkmnForme, oamStart, false, SPR_LOC_DX_BG_POS_X( ix, y ),
+                               SPR_LOC_DX_BG_POS_Y( ix, y ), p_bottom );
+            }
+        }
     }
 
-    std::vector<std::pair<IO::inputTarget, u8>> dexUI::getTouchPositions( bool p_bottom ) {
-        std::vector<std::pair<IO::inputTarget, u8>> res
-            = std::vector<std::pair<IO::inputTarget, u8>>( );
+    void dexUI::localInitSub( bool p_bottom ) {
+        // draw bottom screen, 3 rows, horizontal scrolling list for local mode
+
+        // clear anything on the screen
+        IO::printRectangle( 30, 30, 220, 160, p_bottom, 0 );
+
+        SpriteEntry* oam = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+
+        for( u8 i = 0; i < SPR_LOC_DX_SLOT_ROW_COUNT * SPR_LOC_DX_SLOT_COL_COUNT; ++i ) {
+            u8 oamStart                  = SPR_LOC_DX_START_OAM_SUB + i * SPR_LOC_DX_SLOT_SIZE;
+            oam[ oamStart + 1 ].gfxIndex = SPR_LOC_DX_START_GFX_SUB + i * SPR_LOC_DX_SLOT_GFX_SIZE;
+        }
+        _localSelectedPage = -1;
+    }
+
+    void dexUI::localSelectPageSlot( u16 p_page, u8 p_slot, u16 p_pageUB, bool p_bottom, u8 p_forme,
+                                     bool p_shiny, bool p_female ) {
+        drawPkmnInfo( LOCAL_DEX_PAGES[ p_page ][ p_slot ], 0, p_forme, p_shiny, p_female,
+                      !p_bottom );
+        SpriteEntry* oam   = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
+        u16          dpage = ( p_page - 1 ) / 4 * 4;
+
+        oam[ SPR_DX3_OAM_SUB ].isHidden = false;
+        oam[ SPR_DX3_OAM_SUB ].x        = SPR_LOC_DX_BG_POS_X( p_page - dpage, p_slot );
+        oam[ SPR_DX3_OAM_SUB ].y        = SPR_LOC_DX_BG_POS_Y( p_page - dpage, p_slot );
+
+        IO::updateOAM( p_bottom );
+
+        bool inv = _localSelectedPage < dpage;
+        if( _localSelectedPage == u16( -1 ) ) { inv = true; }
+
+        if( _localSelectedPage != dpage ) {
+            localDrawPage( dpage, p_pageUB, inv, p_bottom );
+            _localSelectedPage = dpage;
+        }
+    }
+
+    std::vector<std::pair<IO::inputTarget, u16>> dexUI::getTouchPositions( bool p_bottom ) {
+        std::vector<std::pair<IO::inputTarget, u16>> res
+            = std::vector<std::pair<IO::inputTarget, u16>>( );
 
         return res;
     }

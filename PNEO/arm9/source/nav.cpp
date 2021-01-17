@@ -82,9 +82,9 @@ namespace NAV {
 #define SPR_X_PAL_SUB             9
 #define SPR_MSGBOX_PAL_SUB        10
 
-    u16  TEXT_BUF[ 64 * 256 ] = { 0 };
     char TMP_TEXT_BUF[ 512 ]  = { 0 };
     u16  CONT_BUF[ 16 * 16 ]  = { 0 };
+    u16  TEXT_BUF[ 64 * 256 ] = { 0 };
     u16  TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
     char TEXT_CACHE_1[ 256 ]  = { 0 }; // top line
     char TEXT_CACHE_2[ 256 ]  = { 0 }; // bottom line

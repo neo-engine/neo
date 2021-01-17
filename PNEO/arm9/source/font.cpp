@@ -148,7 +148,7 @@ namespace IO {
         return _widths[ p_ch ];
     }
 
-    u16 font::printCharB( u16 p_ch, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x,
+    u16 font::printCharB( u16 p_ch, const u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x,
                           s16 p_y, bool p_shift ) const {
         if( p_shift ) { _shiftchar( p_ch ); }
 
@@ -267,9 +267,9 @@ namespace IO {
                             p_charShift, true, p_layer );
     }
 
-    u16 font::printStringB( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
-                            alignment p_alignment, u8 p_yDistance, u8 p_charShift, u8 p_chunkSize,
-                            u16 p_bufferHeight ) const {
+    u16 font::printStringB( const char *p_string, const u16 *p_palette, u16 *p_buffer,
+                            u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance,
+                            u8 p_charShift, u8 p_chunkSize, u16 p_bufferHeight ) const {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
         u16 lines  = 1;
@@ -339,9 +339,9 @@ namespace IO {
         return lines;
     }
 
-    u16 font::printStringBC( const char *p_string, u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth,
-                             alignment p_alignment, u8 p_yDistance, u8 p_chunkSize,
-                             u16 p_bufferHeight ) const {
+    u16 font::printStringBC( const char *p_string, const u16 *p_palette, u16 *p_buffer,
+                             u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance,
+                             u8 p_chunkSize, u16 p_bufferHeight ) const {
         return printStringB( p_string, p_palette, p_buffer, p_bufferWidth, p_alignment, p_yDistance,
                              1, p_chunkSize, p_bufferHeight );
     }
@@ -411,8 +411,7 @@ namespace IO {
                                     char p_breakChar, s8 p_adjustX, bool p_delay,
                                     u8 p_layer ) const {
         return printBreakingString( p_string, p_x, p_y, p_maxWidth, p_bottom, p_alignment,
-                                    p_yDistance, p_breakChar, p_adjustX, 1, p_delay,
-                                    p_layer );
+                                    p_yDistance, p_breakChar, p_adjustX, 1, p_delay, p_layer );
     }
 
     void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
