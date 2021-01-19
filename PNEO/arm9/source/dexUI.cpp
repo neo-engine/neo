@@ -42,7 +42,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dexsub1.h"
 #include "dexsub2.h"
 #include "dexsub3.h"
-#include "dexsub4.h"
 #include "dextop1.h"
 #include "dextop2.h"
 
