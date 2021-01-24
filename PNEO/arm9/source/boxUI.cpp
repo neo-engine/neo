@@ -653,7 +653,14 @@ namespace BOX {
 
             IO::regularFont->setColor( 0, 2 );
             char buffer[ 50 ];
-            snprintf( buffer, 49, "%03hu", p_pokemon->getSpecies( ) );
+            // dex no
+            u16 dexno = SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId( p_pokemon->getSpecies( ) );
+
+            if( dexno != u16( -1 ) ) {
+                snprintf( buffer, 49, "%03hu", dexno );
+            } else {
+                snprintf( buffer, 49, "???" );
+            }
             IO::regularFont->printStringC( GET_STRING( 337 ), INFO_X + 12, INFO_Y + 27, false );
             if( p_pokemon->isShiny( ) ) {
                 IO::regularFont->setColor( IO::RED2_IDX, 1 );
