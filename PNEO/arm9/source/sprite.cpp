@@ -35,9 +35,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 #include "NoItem.h"
-#include "damage_0.h"
-#include "damage_1.h"
-#include "damage_2.h"
 
 unsigned int   TEMP[ 256 * 256 / 4 ] = { 0 };
 unsigned short TEMP_PAL[ 256 ]       = { 0 };
@@ -52,9 +49,6 @@ namespace IO {
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/PKMN/";
     const char* PKMN_BACK_PATH = "nitro:/PICS/SPRITES/PKMNBACK/";
     const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
-
-    const unsigned int*   HitTypeTiles[ 3 ] = { damage_0Tiles, damage_1Tiles, damage_2Tiles };
-    const unsigned short* HitTypePals[ 3 ]  = { damage_0Pal, damage_1Pal, damage_2Pal };
 
     const u8  SPRITE_DMA_CHANNEL      = 2;
     const u16 BYTES_PER_16_COLOR_TILE = 32;
@@ -1275,16 +1269,18 @@ namespace IO {
 
     u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                 u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16,
-                           HitTypePals[ p_type - 1 ], HitTypeTiles[ p_type - 1 ], 256, false, false,
-                           false, OBJPRIORITY_0, p_bottom );
+        char buffer[ 30 ];
+        snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
+        return loadSprite( buffer, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, false,
+                           false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadDamageCategoryIconB( MOVE::moveHitTypes p_type, const u16 p_posX, const u16 p_posY,
                                  u8 p_oamIdx, u16 p_tileCnt, bool p_bottom ) {
-        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, HitTypePals[ p_type - 1 ],
-                            HitTypeTiles[ p_type - 1 ], 256, false, false, false, OBJPRIORITY_0,
-                            p_bottom );
+        char buffer[ 30 ];
+        snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
+        return loadSpriteB( buffer, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, false, false,
+                            false, OBJPRIORITY_0, p_bottom );
     }
 
 } // namespace IO
