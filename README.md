@@ -55,11 +55,6 @@ _Partially_ implemented features are in _italics_.
     * [x] Support for multiple save files
     * [x] Full support for multiple languages (English, German)
         * [x] Kana are supported font-wise, getting Kana text for story content still requires some work.
-    * [x] A demo story based on Pokémon Emerald that includes
-        * [x] An introduction sequence featuring Prof. Birch
-        * [x] Obtaining a first Pokémon
-        * [x] Exploring a part of Hoenn
-        * [x] Obtaining a first gym badge
 
 * [x] Easy-to-understand and ready-to-(re)use code
     * [x] Strict and intuitive naming conventions
