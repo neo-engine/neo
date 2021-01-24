@@ -55,8 +55,11 @@ _Partially_ implemented features are in _italics_.
     * [x] Support for multiple save files
     * [x] Full support for multiple languages (English, German)
         * [x] Kana are supported font-wise, getting Kana text for story content still requires some work.
-    * [x] A demo story based on Pokémon Emerald
-        * [x]
+    * [x] A demo story based on Pokémon Emerald that includes
+        * [x] An introduction sequence featuring Prof. Birch
+        * [x] Obtaining a first Pokémon
+        * [x] Exploring a part of Hoenn
+        * [x] Obtaining a first gym badge
 
 * [x] Easy-to-understand and ready-to-(re)use code
     * [x] Strict and intuitive naming conventions
@@ -89,50 +92,50 @@ Screenshots
 -----------
 
 ##### General gameplay
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/st01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/st02.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm02.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm03.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm04.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm05.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm06.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm07.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/gm08.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/st01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/st02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm04.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm05.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm07.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm08.png)
 
 ##### Pokémon status screens
 
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/sts01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/sts02.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/sts03.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/sts04.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/sts05.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts04.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts05.png)
 
 ##### The storage system
 
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bx01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bx02.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bx03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm06.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bx01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bx02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bx03.png)
 
 ##### The Bag
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bg01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bg02.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bg03.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bg04.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bg05.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg04.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg05.png)
 
 ##### Battles
 ###### Wild Pokémon battles
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bt01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bt02.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bt03.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bt04.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bt05.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt04.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt05.png)
 
 ###### Trainer battles
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/bt06.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt06.png)
 
 #### Miscellaneous
 
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/tc01.png)
-![](https://github.com/neo-engine/neo/blob/master/PNEO/Screens/op01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/tc01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/op01.png)
