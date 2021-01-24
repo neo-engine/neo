@@ -39,22 +39,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#include "dexsub1.h"
-#include "dexsub2.h"
-#include "dexsub3.h"
-#include "dextop1.h"
-#include "dextop2.h"
-
-#include "dexsp1.h"
-#include "dexsp2.h"
-
-#include "crown1.h"
-#include "crown2.h"
-#include "crown3.h"
-#include "crown4.h"
-
-#include "caught.h"
-
 #define SPR_WINDOW_NAME_OAM    0
 #define SPR_PKMN_START_OAM     6
 #define SPR_PKMN2_START_OAM    10
@@ -142,18 +126,16 @@ namespace DEX {
                                    false, false, OBJPRIORITY_2, true );
 
         // no entry
-        tileCnt = IO::loadSpriteB( SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
-                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp2Pal, dexsp2Tiles,
-                                   dexsp2TilesLen, false, false, true, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64, dexsp1Pal, dexsp1Tiles,
-                                   dexsp1TilesLen, false, false, true, OBJPRIORITY_3, true, true,
-                                   0b1001'0100'0001'1101 );
+        tileCnt = IO::loadSpriteB( "DX/dexsp1", SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, false,
+                                   false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( "DX/dexsp2", SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64, false,
+                                   false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( "DX/dexsp1", SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64, false,
+                                   false, true, OBJPRIORITY_3, true, true, 0b1001'0100'0001'1101 );
 
         // caught ball
-        tileCnt
-            = IO::loadSpriteB( SPR_CAUGHT_OAM_SUB, tileCnt, 20, 112, 16, 16, caughtPal, caughtTiles,
-                               caughtTilesLen, false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSpriteB( "DX/caught", SPR_CAUGHT_OAM_SUB, tileCnt, 20, 112, 16, 16, false,
+                                   false, true, OBJPRIORITY_3, true );
 
         // pkmn name box sub
         tileCnt = IO::loadSpriteB( "SEL/noselection_64_20", SPR_BOX_START_OAM_SUB, tileCnt, 18, 0,
@@ -206,12 +188,14 @@ namespace DEX {
 
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
 
-        dmaCopy( dexsub2Bitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        dmaCopy( dextop2Bitmap, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaCopy( dexsub3Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( dexsub3Bitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
-        dmaCopy( dextop1Pal, BG_PALETTE, 200 * 2 );
-        dmaCopy( dextop1Pal, BG_PALETTE_SUB, 200 * 2 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/DEX/", "dexsub2", 0, 49152,
+                             true );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/DEX/", "dexsub3", 2 * 200,
+                             49152, true );
+        FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/DEX/", "dextop2", 0, 49152,
+                             false );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/DEX/", "dexsub3", 2 * 200, 49152,
+                             false );
 
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -297,9 +281,8 @@ namespace DEX {
         tileCnt += 8;
 
         // init caught ball
-        tileCnt = IO::loadSprite( SPR_CAUGHT_OAM, SPR_CAUGHT_PAL, tileCnt, 20, 112, 16, 16,
-                                  caughtPal, caughtTiles, caughtTilesLen, false, false, true,
-                                  OBJPRIORITY_0, false );
+        tileCnt = IO::loadSprite( "DX/caught", SPR_CAUGHT_OAM, SPR_CAUGHT_PAL, tileCnt, 20, 112, 16,
+                                  16, false, false, true, OBJPRIORITY_0, false );
 
         IO::updateOAM( true );
         IO::updateOAM( false );
@@ -345,10 +328,10 @@ namespace DEX {
 
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
-        dmaCopy( dexsub1Bitmap, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
-        dmaCopy( dextop1Bitmap, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
-        dmaCopy( dextop1Pal, BG_PALETTE, 200 * 2 );
-        dmaCopy( dextop1Pal, BG_PALETTE_SUB, 200 * 2 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/DEX/", "dexsub1", 2 * 200,
+                             49152, true );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/DEX/", "dextop1", 2 * 200, 49152,
+                             false );
 
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -430,17 +413,14 @@ namespace DEX {
 
             // crown sprites for completed dex
             if( SAVE::SAV.getActiveFile( ).getLocalCaughtCount( ) == LOCAL_DEX_SIZE ) {
-                tileCnt = IO::loadSprite( 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16, crown3Pal,
-                                          crown3Tiles, crown3TilesLen, false, false, false,
-                                          OBJPRIORITY_3, true );
+                tileCnt = IO::loadSprite( "DX/crown3", 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16,
+                                          false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).localDexCompleted( ) ) {
-                tileCnt = IO::loadSprite( 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16, crown2Pal,
-                                          crown2Tiles, crown2TilesLen, false, false, false,
-                                          OBJPRIORITY_3, true );
+                tileCnt = IO::loadSprite( "DX/crown2", 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16,
+                                          false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).localDexSeenCompleted( ) ) {
-                tileCnt = IO::loadSprite( 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16, crown1Pal,
-                                          crown1Tiles, crown1TilesLen, false, false, false,
-                                          OBJPRIORITY_3, true );
+                tileCnt = IO::loadSprite( "DX/crown1", 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16,
+                                          false, false, false, OBJPRIORITY_3, true );
             }
         } else {
             res.push_back(
@@ -474,17 +454,14 @@ namespace DEX {
 
             // crown sprites for completed dex
             if( SAVE::SAV.getActiveFile( ).getCaughtCount( ) == MAX_PKMN ) {
-                tileCnt = IO::loadSprite( 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16, crown3Pal,
-                                          crown3Tiles, crown3TilesLen, false, false, false,
-                                          OBJPRIORITY_3, true );
+                tileCnt = IO::loadSprite( "DX/crown3", 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16,
+                                          false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).dexCompleted( ) ) {
-                tileCnt = IO::loadSprite( 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16, crown2Pal,
-                                          crown2Tiles, crown2TilesLen, false, false, false,
-                                          OBJPRIORITY_3, true );
+                tileCnt = IO::loadSprite( "DX/crown2", 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16,
+                                          false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).dexSeenCompleted( ) ) {
-                tileCnt = IO::loadSprite( 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16, crown1Pal,
-                                          crown1Tiles, crown1TilesLen, false, false, false,
-                                          OBJPRIORITY_3, true );
+                tileCnt = IO::loadSprite( "DX/crown1", 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16,
+                                          false, false, false, OBJPRIORITY_3, true );
             }
 
         } else {
