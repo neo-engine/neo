@@ -464,7 +464,7 @@ namespace SAVE {
 
     bool saveGame::playerInfo::localDexCompleted( ) const {
         for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
-            if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ] )
+            if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ], true )
                 && !caught( DEX::LOCAL_DEX[ i ] ) ) {
                 return false;
             }
@@ -474,7 +474,7 @@ namespace SAVE {
 
     bool saveGame::playerInfo::localDexSeenCompleted( ) const {
         for( u16 i = 0; i < DEX::LOCAL_DEX_SIZE; ++i ) {
-            if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ] )
+            if( DEX::requiredForCompletion( DEX::LOCAL_DEX[ i ], true )
                 && !seen( DEX::LOCAL_DEX[ i ] ) ) {
                 return false;
             }

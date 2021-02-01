@@ -31,16 +31,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 namespace MAP {
-    const u8  MAX_ANIM_PER_TILE_SET   = 32;
-    const u16 MAX_TILES_PER_TILE_SET  = 512;
-    const u16 MAX_BLOCKS_PER_TILE_SET = 512;
+    constexpr u8  MAX_ANIM_PER_TILE_SET   = 32;
+    constexpr u16 MAX_TILES_PER_TILE_SET  = 512;
+    constexpr u16 MAX_BLOCKS_PER_TILE_SET = 512;
 
     const char* const MAP_PATH      = "nitro:/MAPS/";
     const char* const TILESET_PATH  = "nitro:/MAPS/TILESETS/";
     const char* const BLOCKSET_PATH = "nitro:/MAPS/BLOCKSETS/";
     const char* const PALETTE_PATH  = "nitro:/MAPS/PALETTES/";
-    const u16         SIZE          = 32;
-    const s16         dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
+    constexpr u16     SIZE          = 32;
+    constexpr s16     dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
     typedef struct {
         u16 m_pal[ 16 ];
@@ -49,10 +49,10 @@ namespace MAP {
         u8 m_tile[ 32 ];
     } tile;
     // typedef struct{
-    //    u16 tileidx      : 10;
-    //    u8 vflip         :  1;
-    //    u8 hflip         :  1;
-    //    PalNo palno      :  4;
+    //    u16 m_tileidx   : 10;
+    //    u8 m_vflip      :  1;
+    //    u8 m_hflip      :  1;
+    //    u8 m_palno      :  4;
     //}blockAtom;
     typedef u16 blockAtom;
 
@@ -91,7 +91,7 @@ namespace MAP {
         palette      m_pals[ 16 * 5 ];
         tileSet      m_tileSet;
         blockSet     m_blockSet;
-        mapBlockAtom m_blocks[ 32 ][ 32 ]; // [ y ][ x ]
+        mapBlockAtom m_blocks[ SIZE ][ SIZE ]; // [ y ][ x ]
         u8           m_map;
         u16          m_x, m_y;
         u8           m_tIdx1, m_tIdx2;
