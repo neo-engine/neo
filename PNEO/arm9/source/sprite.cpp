@@ -287,21 +287,22 @@ namespace IO {
         return p_tileCnt + ( p_width * p_height / 2 ) / BYTES_PER_16_COLOR_TILE;
     }
 
-    u16 BITMAP_SPRITE[ 64 * 64 * 2 ];
+    u16 BITMAP_SPRITE[ 64 * 64 * 2 ] = { 0 };
     u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileCnt, const u16 p_posX, const u16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
                      const unsigned int* p_spriteData, const u32 p_spriteDataLen, bool p_flipX,
                      bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
                      bool p_outline, u16 p_outlineColor, bool p_tiled ) {
         memset( BITMAP_SPRITE, 0, sizeof( BITMAP_SPRITE ) );
+        const u8* spriteData = reinterpret_cast<const u8*>( p_spriteData );
         if( p_spritePal && p_spriteData && p_tiled ) {
             u32 i = 0;
             for( u8 tiley = 0; tiley < p_height / 8; ++tiley ) {
                 for( u8 tilex = 0; tilex < p_width / 8; ++tilex ) {
-                    int shift = tilex * ( -28 ); // size per tile
+                    s32 shift = tilex * ( -28 ); // size per tile
                     for( u8 y = 0; y < 8; ++y ) {
                         for( u8 x = 0; x < 8; x += 2, ++i ) {
-                            u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
+                            u8 cur = spriteData[ i ];
                             u8 up = ( cur >> 4 ) & 0xf, down = cur & 0xf;
                             BITMAP_SPRITE[ 2 * ( i + shift ) + 1 ]
                                 = up ? ( ( 1 << 15 ) | p_spritePal[ up ] ) : 0;
@@ -316,7 +317,7 @@ namespace IO {
             u32 i = 0;
             for( u8 y = 0; y < p_height; ++y ) {
                 for( u8 x = 0; x < p_width; x += 2, ++i ) {
-                    u8 cur = reinterpret_cast<const u8*>( p_spriteData )[ i ];
+                    u8 cur = spriteData[ i ];
                     u8 up = cur >> 4, down = cur & 0xf;
                     BITMAP_SPRITE[ 2 * ( i ) + 1 ] = up ? ( ( 1 << 15 ) | p_spritePal[ up ] ) : 0;
                     BITMAP_SPRITE[ 2 * ( i ) ] = down ? ( ( 1 << 15 ) | p_spritePal[ down ] ) : 0;

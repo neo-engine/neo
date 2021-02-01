@@ -153,7 +153,7 @@ namespace IO {
         if( p_shift ) { _shiftchar( p_ch ); }
 
         s16 putX, putY;
-        u8  getX, getY;
+        u16 getX, getY;
         u32 offset = p_ch * FONT_WIDTH * FONT_HEIGHT;
 
         for( putY = p_y, getY = 0; putY < p_y + FONT_HEIGHT; ++putY, ++getY ) {
@@ -277,6 +277,8 @@ namespace IO {
         if( p_alignment == RIGHT ) putX = p_bufferWidth - lineWd;
         if( p_alignment == CENTER ) putX = ( p_bufferWidth - lineWd ) / 2;
 
+        std::memset( TMPBUF, 0, sizeof( TMPBUF ) );
+
         u16  spch = 0;
         bool sp   = false;
         while( p_string[ current_char ] && putX < p_bufferWidth ) {
@@ -300,7 +302,7 @@ namespace IO {
             }
             if( p_string[ current_char ] == ']' ) {
                 sp     = false;
-                u16 wd = printCharB( spch, p_palette, p_buffer, p_bufferWidth, putX, putY, false );
+                u16 wd = printCharB( spch, p_palette, TMPBUF, p_bufferWidth, putX, putY, false );
                 putX += wd - p_charShift;
                 lineWd -= wd - p_charShift;
                 current_char++;
@@ -313,27 +315,24 @@ namespace IO {
                 continue;
             }
 
-            u16 wd = printCharB( p_string[ current_char ], p_palette, p_buffer, p_bufferWidth, putX,
+            u16 wd = printCharB( p_string[ current_char ], p_palette, TMPBUF, p_bufferWidth, putX,
                                  putY );
             putX += wd - p_charShift;
             lineWd -= wd - p_charShift;
             current_char++;
         }
 
-        if( p_chunkSize < p_bufferWidth ) {
-            u16 pos = 0;
+        //      if( p_chunkSize < p_bufferWidth ) {
+        u32 pos = 0;
 
-            for( u8 i = 0; i < p_bufferWidth / p_chunkSize; ++i ) {
-                for( u8 y = 0; y < p_bufferHeight; ++y ) {
-                    for( u8 x = 0; x < std::min( int( p_chunkSize ),
-                                                 p_bufferWidth - i * p_bufferWidth / p_chunkSize );
-                         ++x ) {
-                        TMPBUF[ pos++ ] = p_buffer[ y * p_bufferWidth + x + i * p_chunkSize ];
-                    }
+        for( u32 i = 0; i < p_bufferWidth / p_chunkSize; ++i ) {
+            u32 ub
+                = std::min( u32( p_chunkSize ), p_bufferWidth - i * p_bufferWidth / p_chunkSize );
+            for( u32 y = 0; y < p_bufferHeight; ++y ) {
+                for( u32 x = 0; x < ub; ++x ) {
+                    p_buffer[ pos++ ] = TMPBUF[ y * p_bufferWidth + x + i * p_chunkSize ];
                 }
             }
-
-            std::memcpy( p_buffer, TMPBUF, p_bufferHeight * p_bufferWidth * sizeof( u16 ) );
         }
 
         return lines;
