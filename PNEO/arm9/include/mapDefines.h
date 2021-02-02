@@ -84,7 +84,6 @@ namespace MAP {
     enum moveMode {
         // Player modes
         WALK       = 0,
-        SURF       = ( 1 << 0 ),
         BIKE       = ( 1 << 2 ),
         ACRO_BIKE  = ( 1 << 2 ) | ( 1 << 0 ),
         MACH_BIKE  = ( 1 << 2 ) | ( 1 << 1 ),
@@ -93,6 +92,7 @@ namespace MAP {
         DIVE       = ( 1 << 4 ),
         ROCK_CLIMB = ( 1 << 5 ),
         STRENGTH   = ( 1 << 6 ),
+        SURF       = ( 1 << 7 ),
         // NPC modes
         NO_MOVEMENT            = 0,
         LOOK_UP                = 1,

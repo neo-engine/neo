@@ -354,7 +354,13 @@ namespace ITEM {
             return false;
         case I_BIKE2:
         case I_BIKE:
-            if( MAP::curMap->currentData( ).m_mapType & MAP::INSIDE ) { return true; }
+            if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return true;
+            }
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
+                && !MAP::curMap->canGetOffBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return true;
+            }
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE ) {
@@ -366,7 +372,13 @@ namespace ITEM {
             } else
                 return true;
         case I_MACH_BIKE:
-            if( MAP::curMap->currentData( ).m_mapType & MAP::INSIDE ) { return true; }
+            if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return true;
+            }
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
+                && !MAP::curMap->canGetOffBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return true;
+            }
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE ) {
@@ -378,7 +390,13 @@ namespace ITEM {
             } else
                 return true;
         case I_ACRO_BIKE:
-            if( MAP::curMap->currentData( ).m_mapType & MAP::INSIDE ) { return true; }
+            if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return true;
+            }
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE
+                && !MAP::curMap->canGetOffBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return true;
+            }
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE ) {
@@ -432,15 +450,33 @@ namespace ITEM {
         case I_HONEY: return MOVE::possible( M_SWEET_SCENT, 0 );
         case I_BIKE2:
         case I_BIKE:
-            if( MAP::curMap->currentData( ).m_mapType & MAP::INSIDE ) { return false; }
+            if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return false;
+            }
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE
+                && !MAP::curMap->canGetOffBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return false;
+            }
             return SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                    || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::BIKE;
         case I_MACH_BIKE:
-            if( MAP::curMap->currentData( ).m_mapType & MAP::INSIDE ) { return false; }
+            if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return false;
+            }
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
+                && !MAP::curMap->canGetOffBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return false;
+            }
             return SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                    || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE;
         case I_ACRO_BIKE:
-            if( MAP::curMap->currentData( ).m_mapType & MAP::INSIDE ) { return false; }
+            if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return false;
+            }
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE
+                && !MAP::curMap->canGetOffBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
+                return false;
+            }
             return SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::WALK
                    || SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::ACRO_BIKE;
         case I_OLD_ROD:

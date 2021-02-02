@@ -133,6 +133,47 @@ namespace MAP {
         }
 
         /*
+         * @brief: Checks if the player can ride their bike at the specified position.
+         */
+        inline bool canBike( position p_start ) const {
+            if( currentData( ).m_mapType & MAP::INSIDE ) { return false; }
+
+            auto lstblock  = at( p_start.m_posX, p_start.m_posY );
+            u8   lstBehave = lstblock.m_bottombehave;
+
+            switch( lstBehave ) {
+                // Long grass
+            case 0x03:
+                // ladder
+            case 0x0a:
+                return false;
+                // bridge in forrtree
+            case 0x78: return p_start.m_posZ <= 3;
+            default: break;
+            }
+
+            return true;
+        }
+
+        /*
+         * @brief: Checks if the player can get off their bike at the specified position.
+         */
+        inline bool canGetOffBike( position p_start ) const {
+            auto lstblock  = at( p_start.m_posX, p_start.m_posY );
+            u8   lstBehave = lstblock.m_bottombehave;
+
+            switch( lstBehave ) {
+            case 0xd3:
+            case 0xd4:
+            case 0xd5:
+            case 0xd6: return false;
+            default: break;
+            }
+
+            return true;
+        }
+
+        /*
          * @brief: Faints the player and teleports them to the last visited PC to heal
          * their PKMN.
          */
@@ -164,6 +205,7 @@ namespace MAP {
         bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );
         void movePlayer( direction p_direction, bool p_fast = false );
 
+        void bikeJumpPlayer( direction p_direction );
         void jumpPlayer( direction p_direction );
         void slidePlayer( direction p_direction );
         void walkPlayer( direction p_direction, bool p_fast = false );

@@ -1253,8 +1253,31 @@ namespace MAP {
         case 0x6d:
             if( p_direction == DOWN ) return true;
             break;
+
+        case 0xd3: // Bike stuff
+        case 0xd5:
+            if( !( p_moveMode & BIKE ) ) { return false; }
+            if( p_direction == LEFT || p_direction == RIGHT ) {
+                if( ( curBehave != 0xd3 && curBehave != 0xd5 ) || p_moveMode != ACRO_BIKE
+                    || !( held & KEY_B ) ) {
+                    return false;
+                }
+            }
+            break;
+        case 0xd6:
+        case 0xd4:
+            if( !( p_moveMode & BIKE ) ) { return false; }
+            if( p_direction == DOWN || p_direction == UP ) {
+                if( ( curBehave != 0xd4 && curBehave != 0xd6 ) || p_moveMode != ACRO_BIKE
+                    || !( held & KEY_B ) ) {
+                    return false;
+                }
+            }
+            break;
+
         default: break;
         }
+
         switch( curBehave ) {
         // Jumpy stuff
         case 0x38:
@@ -1274,26 +1297,6 @@ namespace MAP {
             if( p_direction & 1 ) return false;
             break;
         case 0x13: return false;
-        case 0xd3: // Bike stuff
-            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
-                return true;
-            return false;
-        case 0xd4:
-            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 == 0 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
-                return true;
-            return false;
-        case 0xd5:
-            if( p_direction % 2 == 0 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
-                return true;
-            return false;
-        case 0xd6:
-            if( p_direction % 2 && ( p_moveMode & BIKE ) ) return true;
-            if( p_direction % 2 == 0 && ( p_moveMode == BIKE_JUMP ) && curBehave == lstBehave )
-                return true;
-            return false;
         case 0xd7: return false;
 
         // door-y stuff
@@ -1305,22 +1308,38 @@ namespace MAP {
             } else {
                 return false;
             }
+
+        case 0xd3: // Bike stuff
+        case 0xd5:
+            if( !( p_moveMode & BIKE ) ) { return false; }
+            break;
+        case 0xd6:
+        case 0xd4:
+            if( !( p_moveMode & BIKE ) ) { return false; }
+            break;
+
         default: break;
         }
 
+        if( ( p_moveMode & BIKE ) && !canBike( { nx, ny, p_start.m_posZ } ) ) { return false; }
+
         // Check for movedata stuff
-        if( curMoveData % 4 == 1 ) return false;
-        if( lstMoveData == 0x0a ) // Stand up (only possible for the player)
+        if( curMoveData % 4 == 1 ) { return false; }
+        if( lstMoveData == 0x0a ) { // Stand up (only possible for the player)
             return p_direction == SAVE::SAV.getActiveFile( ).m_player.m_direction;
-        if( curMoveData == 0x0a ) // Sit down
+        }
+        if( curMoveData == 0x0a ) { // Sit down
             return ( p_moveMode == WALK );
-        if( curMoveData == 4 && !( p_moveMode & SURF ) )
+        }
+        if( curMoveData == 4 && !( p_moveMode & SURF ) ) {
             return false;
-        else if( curMoveData == 4 )
+        } else if( curMoveData == 4 ) {
             return true;
-        if( curMoveData == 0x0c && lstMoveData == 4 ) return true;
-        if( !curMoveData || !lstMoveData ) return true;
-        if( curMoveData == 0x3c ) return true;
+        }
+
+        if( curMoveData == 0x0c && lstMoveData == 4 ) { return true; }
+        if( !curMoveData || !lstMoveData ) { return true; }
+        if( curMoveData == 0x3c ) { return true; }
         return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
     }
     void mapDrawer::movePlayer( direction p_direction, bool p_fast ) {
@@ -1448,6 +1467,23 @@ namespace MAP {
                 jumpPlayer( DOWN );
                 p_direction = DOWN;
                 break;
+
+            case 0xd3: // Bike stuff
+            case 0xd5:
+                if( p_direction == LEFT || p_direction == RIGHT ) {
+                    bikeJumpPlayer( p_direction );
+                    stopPlayer( p_direction );
+                    return;
+                }
+                goto NO_BREAK;
+            case 0xd6:
+            case 0xd4:
+                if( p_direction == UP || p_direction == DOWN ) {
+                    bikeJumpPlayer( p_direction );
+                    stopPlayer( p_direction );
+                    return;
+                }
+                goto NO_BREAK;
 
             case 0xd0:
                 if( p_direction == DOWN ) {
@@ -2054,6 +2090,21 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
     }
+
+    void mapDrawer::bikeJumpPlayer( direction p_direction ) {
+        SOUND::playSoundEffect( SFX_JUMP );
+
+        for( u8 i = 0; i < 16; ++i ) {
+            moveCamera( p_direction, true );
+            if( i < 3 ) { _mapSprites.moveSprite( _playerSprite, UP, 2 ); }
+            if( i > 13 ) { _mapSprites.moveSprite( _playerSprite, DOWN, 3 ); }
+            if( i % 2 ) swiWaitForVBlank( );
+        }
+        stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+    }
+
     void mapDrawer::jumpPlayer( direction p_direction ) {
         SOUND::playSoundEffect( SFX_JUMP );
 
