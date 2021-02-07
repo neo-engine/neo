@@ -221,13 +221,32 @@ namespace SOUND {
         case L_ROUTE_118:
         case L_ROUTE_119: return MOD_ROUTE_119;
         case L_ROUTE_120:
-        case L_ROUTE_121: return MOD_ROUTE_120;
+        case L_ROUTE_121:
+        case L_ROUTE_122:
+        case L_ROUTE_124:
+        case L_ROUTE_125:
+        case L_ROUTE_126:
+        case L_ROUTE_127:
+        case L_ROUTE_128:
+        case L_ROUTE_129:
+        case L_ROUTE_130:
+        case L_ROUTE_131:
+        case L_ROUTE_132:
+        case L_ROUTE_133:
+        case L_ROUTE_134: return MOD_ROUTE_120;
+        case L_ROUTE_135:
+        case L_ROUTE_136:
+        case L_ROUTE_137: return MOD_ROUTE_38;
         case L_ROUTE_123: return MOD_ROUTE_123;
         case L_TRAINERS__SCHOOL: return MOD_TRAINER_SCHOOL;
+        case L_NEW_LILYCOVE_CITY: return MOD_NEW_LILYCOVE_CITY;
+        case L_SAFARI_ZONE:
+        case L_SAFARI_ZONE2: return MOD_SAFARI_ZONE;
         case L_LILYCOVE_CITY: return MOD_LILYCOVE_CITY;
         case L_VERDANTURF_TOWN:
         case L_CLIFFELTA_CITY: return MOD_CLIFFELTA_CITY;
         case L_LITTLEROOT_TOWN: return MOD_LITTLEROOT_TOWN;
+        case L_BLOSSAND_TOWN:
         case L_OLDALE_TOWN: return MOD_OLDALE_TOWN;
         case L_PRETTY_PETAL: return MOD_EX03;
         case L_PETALBURG_CITY: return MOD_PETALBURG_CITY;
@@ -240,10 +259,13 @@ namespace SOUND {
         case L_SEALED_CHAMBER:
         case L_ANCIENT_TOMB:
         case L_ISLAND_CAVE:
+        case L_FOREST_GROTTO:
+        case L_ROCK_SHELTER:
         case L_DESERT_RUINS: return MOD_SEALED_CHAMBER;
         case L_FIERY_PATH: return MOD_MT_PYRE_PEAK;
         case L_MT_PYRE:
-        case L_SHOAL_CAVE: return MOD_SHOAL_CAVE;
+        case L_SHOAL_CAVE:
+        case L_CRYSTAL_CAVERN: return MOD_SHOAL_CAVE;
         case L_ROUTE_111_DESERT: return MOD_DESERT;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
         case L_GRANITE_CAVE:
@@ -261,6 +283,8 @@ namespace SOUND {
         case L_MOSSDEEP_GYM:
         case L_SOOTOPOLIS_GYM: return MOD_POKEMON_GYM;
         case L_PROF_BIRCH_S_LAB: return MOD_PROF_BIRCH_LAB;
+        case L_BATTLE_FRONTIER2:
+        case L_BATTLE_FRONTIER: return MOD_BATTLE_FRONTIER;
         default: return MOD_ABANDONED_SHIP;
         }
     }

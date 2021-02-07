@@ -146,6 +146,11 @@ namespace MAP {
             case 0x03:
                 // ladder
             case 0x0a:
+                //
+            case 0x74:
+            case 0x75:
+            case 0x76:
+            case 0x77:
                 return false;
                 // bridge in forrtree
             case 0x78: return p_start.m_posZ <= 3;

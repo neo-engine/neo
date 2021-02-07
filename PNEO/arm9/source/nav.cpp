@@ -257,28 +257,50 @@ namespace NAV {
     constexpr u8 BGforLocation( u16 p_locId ) {
         switch( p_locId ) {
         case L_HIDDEN_LAKE:
-        case L_ROUTE_38: return 7;
+        case L_ROUTE_135:
+        case L_ROUTE_136:
+        case L_EVER_GRANDE_CITY: return 7;
         case L_MAUVILLE_CITY:
         case L_PETALBURG_CITY:
         case L_DEWFORD_TOWN:
-        case L_MOSSDEEP_CITY: return 3;
+        case L_MOSSDEEP_CITY:
+        case L_BLOSSAND_TOWN: return 3;
         case L_ROUTE_105:
         case L_ROUTE_106:
         case L_ROUTE_107:
         case L_ROUTE_108:
-        case L_ROUTE_109: return 2;
+        case L_ROUTE_109:
+        case L_ROUTE_122:
+        case L_ROUTE_124:
+        case L_ROUTE_125:
+        case L_ROUTE_126:
+        case L_ROUTE_127:
+        case L_ROUTE_128:
+        case L_ROUTE_129:
+        case L_ROUTE_130:
+        case L_ROUTE_131:
+        case L_ROUTE_132:
+        case L_ROUTE_133:
+        case L_ROUTE_134:
+        case L_ROUTE_137:
+        case L_PACIFIDLOG_TOWN: return 2;
         case L_RUSTBORO_CITY:
         case L_SLATEPORT_CITY:
         case L_SOOTOPOLIS_CITY:
-        case L_CLIFFELTA_CITY: return 6;
+        case L_CLIFFELTA_CITY:
+        case L_LILYCOVE_CITY:
+        case L_NEW_LILYCOVE_CITY: return 6;
         case L_METEOR_FALLS:
         case L_SEALED_CHAMBER:
         case L_ANCIENT_TOMB:
         case L_ISLAND_CAVE:
         case L_DESERT_RUINS:
+        case L_FOREST_GROTTO:
+        case L_ROCK_SHELTER:
         case L_SHOAL_CAVE:
         case L_RUSTURF_TUNNEL:
-        case L_GRANITE_CAVE: return 4;
+        case L_GRANITE_CAVE:
+        case L_CRYSTAL_CAVERN: return 4;
         case L_POKEMON_MART:
         case L_POKEMON_CENTER:
         case L_RUSTBORO_GYM:
@@ -289,8 +311,15 @@ namespace NAV {
         case L_FORTREE_GYM:
         case L_MOSSDEEP_GYM:
         case L_SOOTOPOLIS_GYM:
+        case L_LILYCOVE_GYM:
         case L_PROF_BIRCH_S_LAB:
+        case L_POKEMON_LEAGUE:
+        case L_POKEMON_LEAGUE2:
+        case L_BATTLE_FRONTIER:
+        case L_BATTLE_FRONTIER2:
         case L_LILYCOVE_MUSEUM: return 1;
+        case L_SAFARI_ZONE:
+        case L_SAFARI_ZONE2:
         case L_PRETTY_PETAL:
         case L_FORTREE_CITY:
         case L_PETALBURG_WOODS: return 5;
