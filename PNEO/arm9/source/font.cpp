@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace IO {
-    u16 TMPBUF[ 256 * 32 ] = { 0 };
+    u16 TMPBUF[ 256 * 64 ] = { 0 };
 
     font::font( u8 *p_data, u8 *p_widths, void ( *p_shiftchar )( u16 &val ) ) {
         _data       = p_data;

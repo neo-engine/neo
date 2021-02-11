@@ -66,6 +66,14 @@ namespace MAP {
     constexpr u8 NUM_COLS         = 32;
     constexpr u8 UNUSED_MAPOBJECT = 200;
 
+    /*
+     * @brief: Map bank id of the OW map (i.e. the map which is displayed in the PNAV)
+     */
+    constexpr u8 OW_MAP = 10;
+
+    constexpr u8     MAP_LOCATION_RES = 8;
+    extern const u16 BANK_10_MAP_LOCATIONS[ 16 * 4 ][ 29 * 4 ];
+
     struct position {
         u16 m_posX; // Global
         u16 m_posY; // Global

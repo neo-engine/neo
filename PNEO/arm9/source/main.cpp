@@ -363,6 +363,8 @@ int main( int, char** p_argv ) {
             continue;
         }
 
+        NAV::handleInput( p_argv[ 0 ] );
+
         // Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
             MAP::direction curDir = MAP::getDir( held );
@@ -394,7 +396,6 @@ int main( int, char** p_argv ) {
             bmp     = false;
         }
 
-        NAV::handleInput( p_argv[ 0 ] );
         // tamatama play cry of wild pkmn
 
         if( MAP::curMap->currentData( ).m_pokemonDescrCount && FRAME_COUNT == 72

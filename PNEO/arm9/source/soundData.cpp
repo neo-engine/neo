@@ -36,6 +36,8 @@ namespace SOUND {
     u16           currentLocation = 0;
     MAP::moveMode currentMoveMode = MAP::WALK;
 
+    u16 currentJBoxBGM = JBOX_DISABLED;
+
     u16 LAST_CRY = -1;
 
     void playCry( u16 p_pokemonId, u8 p_formeId, bool ) {
@@ -74,10 +76,27 @@ namespace SOUND {
 #endif
     }
 
+    u16 getJBoxBGM( ) {
+        return currentJBoxBGM;
+    }
+
+    void setJBoxBGM( u16 p_id ) {
+        if( p_id != currentJBoxBGM ) {
+            if( p_id != JBOX_DISABLED ) {
+                playBGM( p_id );
+            } else {
+                playBGM( BGMforMoveMode( currentMoveMode ) );
+            }
+            currentJBoxBGM = p_id;
+        }
+    }
+
     void onLocationChange( u16 p_newLocation ) {
         if( currentLocation == p_newLocation ) { return; }
 
         currentLocation = p_newLocation;
+
+        if( currentJBoxBGM != JBOX_DISABLED ) { return; }
         if( currentMoveMode == MAP::WALK ) { playBGM( BGMforLocation( currentLocation ) ); }
     }
 
@@ -85,29 +104,30 @@ namespace SOUND {
         if( currentMoveMode == p_newMoveMode ) { return; }
 
         currentMoveMode = p_newMoveMode;
+        if( currentJBoxBGM != JBOX_DISABLED ) { return; }
         playBGM( BGMforMoveMode( currentMoveMode ) );
     }
 
     void restartBGM( ) {
-        playBGM( BGMforMoveMode( currentMoveMode ) );
+        if( currentJBoxBGM != JBOX_DISABLED ) {
+            playBGM( currentJBoxBGM );
+        } else {
+            playBGM( BGMforMoveMode( currentMoveMode ) );
+        }
     }
 
     u16 BGMforMoveMode( MAP::moveMode p_moveMode ) {
         switch( p_moveMode ) {
-        case MAP::DIVE:
-            return MOD_DIVING;
-        case MAP::SURF:
-            return MOD_SURFING;
+        case MAP::DIVE: return MOD_DIVING;
+        case MAP::SURF: return MOD_SURFING;
         case MAP::BIKE:
         case MAP::ACRO_BIKE:
         case MAP::MACH_BIKE:
-        case MAP::BIKE_JUMP:
-            return MOD_CYCLING;
+        case MAP::BIKE_JUMP: return MOD_CYCLING;
         case MAP::WALK:
         case MAP::ROCK_CLIMB:
         case MAP::SIT:
-        default:
-            return BGMforLocation( currentLocation );
+        default: return BGMforLocation( currentLocation );
         }
     }
 } // namespace SOUND

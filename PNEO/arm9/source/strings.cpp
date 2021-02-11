@@ -1091,4 +1091,94 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s Pok\xe9mon  HT %.1f m  WT %.1f kg", "%s-Pok\xe9mon  GR %.1f m  GW %.1f kg" },
     { "Seen: %hu", "Gesehen: %hu" },
     { "Own: %hu", "Gefangen: %hu" },
+
+    { "Ludicobox", "Kappalobox" },
+    { "Little Root", "Kleine Wurzel" },
+    { "Abandon Ship", "Verlasse Schiff" },
+    { "Battle-Sinnoh", "Kampf-Sinnoh" },
+    { "Battles Ahead", "K\xe4mpfe Vorraus" },
+
+    // 590
+
+    { "Battle-Gym Leader", "Kampf-Arenaleiter" },
+    { "Battle-Rival", "Kampf-Rivale" },
+    { "A Palace for Battles", "Ein Palast der K\xe4mpfe" },
+    { "Battle-Roaming Beast", "Kampf-Streifendes Biest" },
+    { "Battle-Sky High", "Kampf-Himmelhoch" },
+
+    { "Battle-Team AM", "Kampf-Team AM" },
+    { "Battle-Trainer", "Kampf-Trainer" },
+    { "Battles to the Top", "Bis nach Ganz Oben" },
+    { "Battle-Wild Pok\xe9mon", "Kampf-Wildes Pok\xe9mon" },
+    { "Battle-Rare Pok\xe9mon", "Kampf-Spz. Pok\xe9mon" },
+
+    // 600
+
+    { "Darkness Everywhere", "Finsternis \xdc"
+                             "berall" },
+    { "Lonely Cliff", "Einsame Klippe" },
+    { "Mastering the Bike", "Zu Rad" },
+    { "Riding the Waves", "Zu See" },
+    { "Exploring the Deep Sea", "Abgetaucht" },
+
+    { "Storm of Sand", "Sturm aus Sand" },
+    { "Beach Time", "Strand-Zeit" },
+    { "Orange Leaves", "Herbstfarben" },
+    { "Onwards", "Vorran" },
+    { "Golden Radiance", "Goldener Glanz" },
+
+    // 610
+
+    { "Flowers to the World", "Blumen in die Welt" },
+    { "Small Gardens", "Kleine G\xe4rten" },
+    { "Help!", "Hilfe!" },
+    { "A Lake's Secret", "Des Sees Mysterium" },
+    { "Where the Sea Begins", "Wo die See Beginnt" },
+
+    { "Round and Round", "Gro\xdf und Rund" },
+    { "Celebrating Art", "F\xfcr die Kunst" },
+    { "Celebrating the Sea", "F\xfcr die See" },
+    { "Falling Meteors", "Fallende Meteore" },
+    { "Atop a Volcano", "Auf einem Vulkan" },
+
+    // 620
+
+    { "Mysterious Gifts", "Wundersame Geschenke" },
+    { "First Rest", "Erste Pause" },
+    { "Whiff of Salt", "Salzige Brise" },
+    { "Heal me Up", "Pok\xe9mon Center" },
+    { "Pok\xe9mon Gym", "Pok\xe9mon Arena" },
+
+    { "Friendly Shop", "Pok\xe9-Markt" },
+    { "Lab in the Woods", "Labor im Wald" },
+    { "In the Mountains", "In den Bergen" },
+    { "Travelling Hoenn 8", "Durch Hoenn 8" },
+    { "Travelling Hoenn 1", "Durch Hoenn 1" },
+
+    // 630
+
+    { "Travelling Hoenn 2", "Durch Hoenn 2" },
+    { "Travelling Hoenn 3", "Durch Hoenn 3" },
+    { "Travelling Hoenn 4", "Durch Hoenn 4" },
+    { "Travelling Hoenn 5", "Durch Hoenn 5" },
+    { "Travelling Hoenn 6", "Durch Hoenn 6" },
+
+    { "Travelling Hoenn 7", "Durch Hoenn 7" },
+    { "Science and Nature", "Natur und Wissenschaft" },
+    { "Into the Wild", "In die Wildnis" },
+    { "Sealed for Eons", "Versiegelt f\xfcr \xc4onen" },
+    { "High and Low", "Ebbe und Flut" },
+
+    // 640
+
+    { "Ships and Seaweed", "Schiffe und Seegras" },
+    { "White Mountain", "Wei\xdf"
+                        "er Berg" },
+    { "Hiding", "Versteck" },
+    { "Trainer 101", "Wie man Trainer wird" },
+    { "Whats Going On?", "Was Passiert?" },
+
+    { "Another Desert", "Eine Andere W\xfcste" },
+    { "Stop playback", "Wiedergabe stoppen" },
+    { "Choose a Song", "W\xe4hle ein Lied" },
 };

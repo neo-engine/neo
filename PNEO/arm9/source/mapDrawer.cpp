@@ -1790,6 +1790,10 @@ namespace MAP {
         if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
             SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
         }
+        if( p_target.first != OW_MAP && SAVE::SAV.getActiveFile( ).m_currentMap == OW_MAP ) {
+            SAVE::SAV.getActiveFile( ).m_lastOWPos = { SAVE::SAV.getActiveFile( ).m_currentMap,
+                                                       SAVE::SAV.getActiveFile( ).m_player.m_pos };
+        }
 
         loadNewBank( p_target.first );
 
@@ -2448,8 +2452,16 @@ namespace MAP {
     }
 
     u16 mapDrawer::getCurrentLocationId( ) const {
-        u16            curx  = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16            cury  = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        if( SAVE::SAV.getActiveFile( ).m_currentMap == OW_MAP ) [[likely]] {
+            return BANK_10_MAP_LOCATIONS[ SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                                          / MAP_LOCATION_RES ]
+                                        [ SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                                          / MAP_LOCATION_RES ];
+        }
+
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+
         const mapData& mdata = currentData( );
 
         u16 res = mdata.m_baseLocationId;
@@ -2466,6 +2478,13 @@ namespace MAP {
         return res;
     }
     u16 mapDrawer::getCurrentLocationId( u8 p_file ) const {
+        if( SAVE::SAV.m_saveFile[ p_file ].m_currentMap == OW_MAP ) [[likely]] {
+            return BANK_10_MAP_LOCATIONS[ SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY
+                                          / MAP_LOCATION_RES ]
+                                        [ SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX
+                                          / MAP_LOCATION_RES ];
+        }
+
         u16 curx = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX % SIZE;
         u16 cury = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY % SIZE;
         u16 mapx = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX / SIZE;

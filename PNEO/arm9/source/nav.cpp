@@ -26,6 +26,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <map>
+#include <vector>
 
 #include "bagViewer.h"
 #include "battle.h"
@@ -45,6 +46,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "mapSlice.h"
 #include "moveNames.h"
 #include "nav.h"
+#include "navApp.h"
 #include "partyScreen.h"
 #include "pokemon.h"
 #include "screenFade.h"
@@ -56,31 +58,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "yesNoBox.h"
 
 namespace NAV {
-#define SPR_MSGTEXT_OAM 108
-#define SPR_MSGCONT_OAM 112
-#define SPR_MSGBOX_OAM  113
 
-#define SPR_MSG_GFX     348
-#define SPR_MSG_EXT_GFX 220
-#define SPR_MSGBOX_GFX  476
-#define SPR_MSGCONT_GFX 508
+    mapNavApp            MAP_NAV_APP  = mapNavApp( );
+    jboxNavApp           JBOX_NAV_APP = jboxNavApp( );
+    std::vector<navApp*> NAV_APPS     = std::vector<navApp*>( );
+    navApp*              CUR_NAV_APP  = nullptr;
 
-#define SPR_MENU_OAM_SUB( p_idx )         ( 0 + ( p_idx ) )
-#define SPR_ITEM_OAM_SUB( p_i )           ( 0 + ( p_i ) )
-#define SPR_MENU_SEL_OAM_SUB              6
-#define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 8 * ( p_pos ) )
-#define SPR_X_OAM_SUB                     56
-#define SPR_ARROW_UP_OAM_SUB( p_i )       ( 57 + ( p_i ) )
-#define SPR_ARROW_DOWN_OAM_SUB( p_i )     ( 63 + ( p_i ) )
-#define SPR_MSGBOX_OAM_SUB                70
-
-#define SPR_MENU_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
-#define SPR_ITEM_PAL_SUB( p_idx ) ( 0 + ( p_idx ) )
-#define SPR_MENU_SEL_PAL_SUB      6
-#define SPR_BOX_PAL_SUB           7
-#define SPR_BOX_SEL_PAL_SUB       8
-#define SPR_X_PAL_SUB             9
-#define SPR_MSGBOX_PAL_SUB        10
+    bool NAV_NEEDS_REDRAW = false;
 
     char TMP_TEXT_BUF[ 512 ]  = { 0 };
     u16  CONT_BUF[ 16 * 16 ]  = { 0 };
@@ -93,6 +77,24 @@ namespace NAV {
         0x7FFF, 0x5A6E, 0x6F2D, 0x564A, // arrow_up
         0x001F, 0x0011, 0x18CE          // x_16_16
     };
+
+    /*
+     * @brief: Checks which nav apps should be displayed
+     */
+    void recomputeNavApps( ) {
+        NAV_APPS.clear( );
+        NAV_APPS.push_back( &MAP_NAV_APP );
+#ifndef NO_SOUND
+        if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
+            NAV_APPS.push_back( &JBOX_NAV_APP );
+        } else {
+            if( CUR_NAV_APP == &JBOX_NAV_APP ) {
+                CUR_NAV_APP      = nullptr;
+                NAV_NEEDS_REDRAW = true;
+            }
+        }
+#endif
+    }
 
     void hideMessageBox( ) {
         for( u8 i = 0; i < 14; ++i ) {
@@ -109,7 +111,46 @@ namespace NAV {
         IO::updateOAM( false );
     }
 
+    void redraw( bool p_bottom = true ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        auto ptr  = !p_bottom ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
+        auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
+        // auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
+
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
+        bgUpdate( );
+
+        // app icons
+        for( u8 i = 0; i < MAX_NAV_APPS; ++i ) {
+            if( CUR_NAV_APP == nullptr && i < NAV_APPS.size( ) && NAV_APPS[ i ] != nullptr ) {
+                NAV_APPS[ i ]->drawIcon( SPR_NAV_APP_ICON_SUB( i ), p_bottom );
+                oam[ SPR_NAV_APP_ICON_SUB( i ) ].isHidden = false;
+            } else {
+                oam[ SPR_NAV_APP_ICON_SUB( i ) ].isHidden = true;
+            }
+        }
+
+        for( u8 i = SPR_NAV_APP_RSV_SUB; i < 128; ++i ) { oam[ i ].isHidden = true; }
+
+        FS::readPictureData( ptr, "nitro:/PICS/", "Border", 64, 192, 192 * 256, p_bottom );
+        if( CUR_NAV_APP != nullptr ) {
+            CUR_NAV_APP->load( p_bottom );
+        } else {
+            FS::readPictureData(
+                ptr3, "nitro:/PICS/NAV/",
+                std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
+                192 * 256, p_bottom );
+        }
+
+        IO::updateOAM( p_bottom );
+    }
+
     void init( bool p_noPic, bool p_bottom ) {
+        recomputeNavApps( );
+        NAV_NEEDS_REDRAW = false;
+
         BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
         BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
         BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
@@ -131,15 +172,7 @@ namespace NAV {
         REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
         bgUpdate( );
 
-        if( !p_noPic ) {
-            FS::readPictureData(
-                ptr3, "nitro:/PICS/NAV/",
-                std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ), 192 * 2,
-                192 * 256, p_bottom );
-            FS::readPictureData( ptr, "nitro:/PICS/", "Border", 64, 192, 192 * 256, p_bottom );
-        }
-
-        u16 tileCnt = 0;
+        u16 tileCnt = 32; // some space for nav apps
 
         // Main menu icons
         tileCnt = IO::loadSprite( "MM/party", SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt,
@@ -244,10 +277,35 @@ namespace NAV {
                             OBJMODE_BLENDED );
         }
 
+        // app icons
+        for( u8 i = 0; i < MAX_NAV_APPS; ++i ) {
+            tileCnt = IO::loadSprite( SPR_NAV_APP_ICON_SUB( i ), SPR_NAV_APP_ICON_PAL_SUB( i ),
+                                      tileCnt, 10, 10 + 49 * i, 64, 64, 0, 0, 64 * 64 / 2, false,
+                                      false, true, OBJPRIORITY_1, p_bottom );
+            if( CUR_NAV_APP == nullptr && i < NAV_APPS.size( ) && NAV_APPS[ i ] != nullptr ) {
+                NAV_APPS[ i ]->drawIcon( SPR_NAV_APP_ICON_SUB( i ), p_bottom );
+                oam[ SPR_NAV_APP_ICON_SUB( i ) ].isHidden = p_noPic;
+            } else {
+                oam[ SPR_NAV_APP_ICON_SUB( i ) ].isHidden = true;
+            }
+        }
+
         IO::copySpritePal( ARR_X_SPR_PAL, SPR_X_PAL_SUB, 0, 2 * 7, p_bottom );
         IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_BOX_SEL_PAL_SUB, 0, 2 * 8, true );
         IO::updateOAM( p_bottom );
-        if( !p_noPic ) { hideMessageBox( ); }
+
+        if( !p_noPic ) {
+            FS::readPictureData( ptr, "nitro:/PICS/", "Border", 64, 192, 192 * 256, p_bottom );
+            if( CUR_NAV_APP != nullptr ) {
+                CUR_NAV_APP->load( p_bottom );
+            } else {
+                FS::readPictureData(
+                    ptr3, "nitro:/PICS/NAV/",
+                    std::to_string( SAVE::SAV.getActiveFile( ).m_options.m_bgIdx ).c_str( ),
+                    192 * 2, 192 * 256, p_bottom );
+            }
+            hideMessageBox( );
+        }
     }
 
     void _printMessage( const char* p_message ) {
@@ -504,6 +562,7 @@ namespace NAV {
                 tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
                 u8 ln   = 1;
                 if( p_noDelay ) {
+                    std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
                     ln = IO::regularFont->printStringBC( p_message, TEXT_PAL, TEXT_BUF,
                                                          256 - ( 64 * !!p_item ), IO::font::LEFT,
                                                          16 - ( 4 * !!p_item ), 64, hg );
@@ -683,6 +742,7 @@ namespace NAV {
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
@@ -762,6 +822,7 @@ namespace NAV {
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
                                  true );
             for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
+            for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
 
             for( u8 i = 0; i < p_choices.size( ); i++ ) {
                 for( u8 j = 0; j < 8; j++ ) {
@@ -800,10 +861,33 @@ namespace NAV {
             }
         }
 
+        if( CUR_NAV_APP == nullptr ) {
+            for( u8 i = 0; i < MAX_NAV_APPS; ++i ) {
+                if( !oam[ SPR_NAV_APP_ICON_SUB( i ) ].isHidden ) {
+                    res.push_back(
+                        std::pair( IO::inputTarget( oam[ SPR_NAV_APP_ICON_SUB( i ) ].x,
+                                                    oam[ SPR_NAV_APP_ICON_SUB( i ) ].y,
+                                                    oam[ SPR_NAV_APP_ICON_SUB( i ) ].x + 48,
+                                                    oam[ SPR_NAV_APP_ICON_SUB( i ) ].y + 48 ),
+                                   menuOption( NAV_APP_START + i ) ) );
+                }
+            }
+        }
+
         return res;
     }
 
     void handleMenuSelection( menuOption p_selection, const char* p_path ) {
+        if( p_selection >= NAV_APP_START ) {
+            // start the nav app
+            u8 app = p_selection - NAV_APP_START;
+            if( app < NAV_APPS.size( ) && NAV_APPS[ app ] != nullptr ) {
+                CUR_NAV_APP = NAV_APPS[ app ];
+                CUR_NAV_APP->load( );
+            }
+            return;
+        }
+
         switch( p_selection ) {
         case VIEW_PARTY: {
             ANIMATE_MAP = false;
@@ -1000,6 +1084,7 @@ namespace NAV {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
 
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
         oam[ SPR_X_OAM_SUB ].isHidden = false;
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
@@ -1114,6 +1199,7 @@ namespace NAV {
         // next page (TODO)
         // prev page (TODO)
 
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
         for( u8 i = 0; i < 6; ++i ) {
             for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
@@ -1227,6 +1313,7 @@ namespace NAV {
             = std::vector<std::pair<IO::inputTarget, s32>>( );
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
 
         for( u8 i = 0; i < 6; ++i ) {
             for( u8 j = 0; j < 8; j++ ) {
@@ -1538,6 +1625,16 @@ namespace NAV {
     void handleInput( const char* p_path ) {
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
+        if( CUR_NAV_APP != nullptr ) {
+            if( CUR_NAV_APP->tick( true ) ) {
+                // nav app exited
+                CUR_NAV_APP = nullptr;
+                redraw( );
+            }
+        }
+
+        if( NAV_NEEDS_REDRAW ) { redraw( ); }
+
         if( pressed & KEY_Y ) {
             // registered item
             IO::waitForKeysUp( KEY_Y );
@@ -1562,11 +1659,12 @@ namespace NAV {
 
         for( auto c : getTouchPositions( ) ) {
             if( c.first.inRange( touch ) ) {
-                oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = false;
-                oam[ SPR_MENU_SEL_OAM_SUB ].x = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].x - 2;
-                oam[ SPR_MENU_SEL_OAM_SUB ].y = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].y - 2;
-
-                IO::updateOAM( true );
+                if( c.second < NAV_APP_START ) {
+                    oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = false;
+                    oam[ SPR_MENU_SEL_OAM_SUB ].x = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].x - 2;
+                    oam[ SPR_MENU_SEL_OAM_SUB ].y = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].y - 2;
+                    IO::updateOAM( true );
+                }
 
                 bool change = true;
                 while( touch.px || touch.py ) {

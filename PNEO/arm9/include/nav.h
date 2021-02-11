@@ -38,6 +38,59 @@ namespace NAV {
 #define MAXBG    13
 #define START_BG 0
 
+    extern const u16 ARR_X_SPR_PAL[ 16 ];
+
+    constexpr u8 MAX_NAV_APPS = 3;
+
+    constexpr u16 SPR_MSGTEXT_OAM = 108;
+    constexpr u16 SPR_MSGCONT_OAM = 112;
+    constexpr u16 SPR_MSGBOX_OAM  = 113;
+
+    constexpr u16 SPR_MSG_GFX     = 348;
+    constexpr u16 SPR_MSG_EXT_GFX = 220;
+    constexpr u16 SPR_MSGBOX_GFX  = 476;
+    constexpr u16 SPR_MSGCONT_GFX = 508;
+
+    constexpr u16 SPR_MENU_OAM_SUB( u16 p_idx ) {
+        return ( 0 + ( p_idx ) );
+    }
+    constexpr u16 SPR_ITEM_OAM_SUB( u16 p_i ) {
+        return ( 0 + ( p_i ) );
+    }
+    constexpr u16 SPR_MENU_SEL_OAM_SUB = 6;
+    constexpr u16 SPR_CHOICE_START_OAM_SUB( u16 p_pos ) {
+        return ( 7 + 8 * ( p_pos ) );
+    }
+    constexpr u16 SPR_X_OAM_SUB = 56;
+    constexpr u16 SPR_ARROW_UP_OAM_SUB( u16 p_i ) {
+        return ( 57 + ( p_i ) );
+    }
+    constexpr u16 SPR_ARROW_DOWN_OAM_SUB( u16 p_i ) {
+        return ( 63 + ( p_i ) );
+    }
+    constexpr u16 SPR_MSGBOX_OAM_SUB = 70;
+    constexpr u16 SPR_NAV_APP_ICON_SUB( u16 p_i ) {
+        return ( 80 + ( p_i ) );
+    }
+    constexpr u16 SPR_NAV_APP_RSV_SUB = 85;
+
+    constexpr u16 SPR_MENU_PAL_SUB( u16 p_idx ) {
+        return ( 0 + ( p_idx ) );
+    }
+    constexpr u16 SPR_ITEM_PAL_SUB( u16 p_idx ) {
+        return ( 0 + ( p_idx ) );
+    }
+    constexpr u16 SPR_MENU_SEL_PAL_SUB = 6;
+    constexpr u16 SPR_BOX_PAL_SUB      = 7;
+    constexpr u16 SPR_BOX_SEL_PAL_SUB  = 8;
+    constexpr u16 SPR_X_PAL_SUB        = 9;
+    constexpr u16 SPR_MSGBOX_PAL_SUB   = 10;
+    constexpr u16 SPR_NAV_APP_ICON_PAL_SUB( u16 p_i ) {
+        return ( 11 + ( p_i ) );
+    }
+    constexpr u16 SPR_NAV_APP_RSV1_PAL_SUB = 14;
+    constexpr u16 SPR_NAV_APP_RSV2_PAL_SUB = 15;
+
     extern u8  LOCATION_TIMER;
     extern u16 TEXT_BUF[ 64 * 256 ];
 
@@ -48,6 +101,11 @@ namespace NAV {
         VIEW_ID    = 3,
         SAVE       = 4,
         SETTINGS   = 5,
+
+        NAV_APP_START = 10,
+        NAV_APP_1     = 10,
+        NAV_APP_2     = 11,
+        NAV_APP_3     = 12,
     };
 
     struct backgroundSet {

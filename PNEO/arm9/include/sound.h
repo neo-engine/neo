@@ -82,6 +82,8 @@
 void initSound( );
 
 namespace SOUND {
+    constexpr u16 JBOX_DISABLED = u16( -1 );
+
     /*
      * @brief: Initializes sound effects for battles.
      */
@@ -285,9 +287,13 @@ namespace SOUND {
         case L_PROF_BIRCH_S_LAB: return MOD_PROF_BIRCH_LAB;
         case L_BATTLE_FRONTIER2:
         case L_BATTLE_FRONTIER: return MOD_BATTLE_FRONTIER;
+        case L_SOOTOPOLIS_CITY: return MOD_SOOTOPOLIS_CITY;
         default: return MOD_ABANDONED_SHIP;
         }
     }
+
+    void setJBoxBGM( u16 p_id );
+    u16  getJBoxBGM( );
 
     void onLocationChange( u16 p_newLocatonId );
     void onMovementTypeChange( MAP::moveMode p_newMoveMode );
