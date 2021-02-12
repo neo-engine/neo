@@ -36,20 +36,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#include "app01.h"
-#include "app01bg.h"
-#include "app02.h"
-#include "app02bg.h"
-#include "player0.h"
-#include "player1.h"
-
 namespace NAV {
 
     void mapNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        IO::loadSprite( p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
-                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, app01Pal, app01Tiles,
-                        app01TilesLen, false, false, false, OBJPRIORITY_1, p_bottom );
+        IO::loadSprite( "NV/app01", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
+                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, false, false, false,
+                        OBJPRIORITY_1, p_bottom );
     }
 
     void mapNavApp::load( bool p_bottom ) {
@@ -76,15 +69,15 @@ namespace NAV {
         u16 tileCnt = 0;
 
         if( !SAVE::SAV.getActiveFile( ).m_appearance ) {
-            tileCnt = IO::loadSprite( SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB, tileCnt,
-                                      _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, player0Pal,
-                                      player0Tiles, player0TilesLen, false, false, false,
-                                      OBJPRIORITY_3, p_bottom );
+            tileCnt
+                = IO::loadSprite( "NV/player0", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
+                                  tileCnt, _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, false,
+                                  false, false, OBJPRIORITY_3, p_bottom );
         } else {
-            tileCnt = IO::loadSprite( SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB, tileCnt,
-                                      _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, player1Pal,
-                                      player1Tiles, player1TilesLen, false, false, false,
-                                      OBJPRIORITY_3, p_bottom );
+            tileCnt
+                = IO::loadSprite( "NV/player1", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
+                                  tileCnt, _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, false,
+                                  false, false, OBJPRIORITY_3, p_bottom );
         }
 
         // load cursor icon
@@ -94,8 +87,8 @@ namespace NAV {
 
         // load bg
 
-        dmaCopy( app01bgBitmap, ptr3, 256 * 192 );
-        dmaCopy( app01bgPal, pal, 192 * 2 );
+        FS::readPictureData( ptr3, "nitro:/PICS/NAV_APP/", "app01bg", 192 * 2, 192 * 256,
+                             p_bottom );
         pal[ 0 ] = IO::BLACK;
 
         if( _cursorLocationId ) {
@@ -215,7 +208,7 @@ namespace NAV {
         { 643, MOD_TRAINER_SCHOOL },
         { 606, MOD_DEWFORD_TOWN },
         { 640, MOD_SLATEPORT_CITY },
-        { 616, MOD_MARINE_SCIENCE_MUSEUM },
+        { 617, MOD_MARINE_SCIENCE_MUSEUM },
         { 631, MOD_ROUTE_110 },
         { 644, MOD_TRICK_HOUSE },
         { 605, MOD_DESERT },
@@ -272,9 +265,9 @@ namespace NAV {
 
     void jboxNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        IO::loadSprite( p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
-                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, app02Pal, app02Tiles,
-                        app02TilesLen, false, false, false, OBJPRIORITY_1, p_bottom );
+        IO::loadSprite( "NV/app02", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
+                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, false, false, false,
+                        OBJPRIORITY_1, p_bottom );
     }
 
     void setSongChoiceVis( u8 p_idx, bool p_vis, bool p_bottom = true ) {
@@ -368,8 +361,8 @@ namespace NAV {
             }
         }
 
-        dmaCopy( app02bgBitmap, ptr3, 256 * 192 );
-        dmaCopy( app02bgPal, pal, 192 * 2 );
+        FS::readPictureData( ptr3, "nitro:/PICS/NAV_APP/", "app02bg", 192 * 2, 192 * 256,
+                             p_bottom );
         pal[ 0 ] = IO::BLACK;
 
         drawSongList( _currentSelStart, p_bottom );
@@ -383,6 +376,41 @@ namespace NAV {
             snprintf( buffer, 99, "%s: %s", GET_STRING( 585 ), GET_STRING( 647 ) );
         }
         IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
+    }
+
+    void jboxNavApp::hoverButton( u16 p_btn, bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        if( p_btn == FWD_CHOICE ) {
+            oam[ SPR_NAV_APP_RSV_SUB + 5 ].palette = oam[ SPR_NAV_APP_RSV_SUB + 6 ].palette
+                = SPR_BOX_SEL_PAL_SUB;
+        } else {
+            oam[ SPR_NAV_APP_RSV_SUB + 5 ].palette = oam[ SPR_NAV_APP_RSV_SUB + 6 ].palette
+                = SPR_BOX_PAL_SUB;
+        }
+        if( p_btn == BWD_CHOICE ) {
+            oam[ SPR_NAV_APP_RSV_SUB + 3 ].palette = oam[ SPR_NAV_APP_RSV_SUB + 4 ].palette
+                = SPR_BOX_SEL_PAL_SUB;
+        } else {
+            oam[ SPR_NAV_APP_RSV_SUB + 3 ].palette = oam[ SPR_NAV_APP_RSV_SUB + 4 ].palette
+                = SPR_BOX_PAL_SUB;
+        }
+
+        for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
+            if( p_btn == NUM_SPECIAL_TGS + i ) {
+                setSongChoicePal( i, SPR_BOX_SEL_PAL_SUB, p_bottom );
+            } else {
+                setSongChoicePal( i, SPR_BOX_PAL_SUB, p_bottom );
+            }
+        }
+
+        if( p_btn == STOP_PLAYBACK ) {
+            setSongChoicePal( SONGS_PER_PAGE, SPR_BOX_SEL_PAL_SUB, p_bottom );
+        } else {
+            setSongChoicePal( SONGS_PER_PAGE, SPR_BOX_PAL_SUB, p_bottom );
+        }
+
+        IO::updateOAM( p_bottom );
     }
 
     void jboxNavApp::selectSong( u16 p_idx, bool p_bottom ) {
@@ -458,7 +486,7 @@ namespace NAV {
         auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * SONGS_PER_PAGE;
         res.push_back( std::pair(
             IO::inputTarget( oam[ idx ].x, oam[ idx ].y, oam[ idx ].x + 128, oam[ idx ].y + 20 ),
-            0 + NUM_SPECIAL_TGS ) );
+            STOP_PLAYBACK ) );
 
         // back
         res.push_back( std::pair( IO::inputTarget( oam[ SPR_NAV_APP_RSV_SUB + 2 ].x,
@@ -473,6 +501,11 @@ namespace NAV {
     bool jboxNavApp::tick( bool p_bottom ) {
         for( auto c : touchPositions( ) ) {
             if( c.first.inRange( touch ) ) {
+                if( c.second >= NUM_SPECIAL_TGS ) {
+                    hoverButton( c.second - _currentSelStart, p_bottom );
+                } else {
+                    hoverButton( c.second, p_bottom );
+                }
                 bool suc = true;
                 while( touch.px || touch.py ) {
                     swiWaitForVBlank( );
@@ -485,6 +518,7 @@ namespace NAV {
                     touchRead( &touch );
                     swiWaitForVBlank( );
                 }
+                hoverButton( 0, p_bottom );
                 if( suc ) {
                     if( c.second == EXIT_CHOICE ) {
                         return true;
@@ -504,6 +538,8 @@ namespace NAV {
                             IO::updateOAM( p_bottom );
                             break;
                         }
+                    } else if( c.second == STOP_PLAYBACK ) {
+                        selectSong( 0 );
                     } else {
                         selectSong( c.second - NUM_SPECIAL_TGS );
                     }

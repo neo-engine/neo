@@ -1146,12 +1146,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Mysterious Gifts", "Wundersame Geschenke" },
     { "First Rest", "Erste Pause" },
     { "Whiff of Salt", "Salzige Brise" },
-    { "Heal me Up", "Pok\xe9mon Center" },
-    { "Pok\xe9mon Gym", "Pok\xe9mon Arena" },
+    { "Pok\xe9mon Center", "Pok\xe9mon-Center" },
+    { "Pok\xe9mon Gym", "Pok\xe9mon-Arena" },
 
     { "Friendly Shop", "Pok\xe9-Markt" },
     { "Lab in the Woods", "Labor im Wald" },
-    { "In the Mountains", "In den Bergen" },
+    { "To the Mountains", "In den Bergen" },
     { "Travelling Hoenn 8", "Durch Hoenn 8" },
     { "Travelling Hoenn 1", "Durch Hoenn 1" },
 

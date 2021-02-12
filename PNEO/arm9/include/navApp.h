@@ -83,15 +83,15 @@ namespace NAV {
         static constexpr u16 EXIT_CHOICE     = 0;
         static constexpr u16 FWD_CHOICE      = 1;
         static constexpr u16 BWD_CHOICE      = 2;
-        static constexpr u16 NUM_SPECIAL_TGS = 3;
+        static constexpr u16 STOP_PLAYBACK   = 3;
+        static constexpr u16 NUM_SPECIAL_TGS = 4;
 
         u16 _currentSelStart;
         u16 _currentSong;
 
         void drawSongList( u16 p_startIdx, bool p_bottom = true );
-
         void selectSong( u16 p_idx, bool p_bottom = true );
-
+        void hoverButton( u16 p_btn, bool p_bottom = true );
         std::vector<std::pair<IO::inputTarget, u16>> touchPositions( bool p_bottom = true );
 
       public:
