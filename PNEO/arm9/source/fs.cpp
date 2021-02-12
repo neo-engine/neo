@@ -289,27 +289,6 @@ namespace FS {
         return true;
     }
 
-    u8 readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations ) {
-        if( !p_file ) return 0;
-        u8 N;
-        fread( &N, sizeof( u8 ), 1, p_file );
-
-        if( !p_animations ) return 0;
-
-        N = std::min( N, MAP::MAX_ANIM_PER_TILE_SET );
-
-        for( int i = 0; i < N; ++i ) {
-            auto& a = p_animations[ i ];
-            fread( &a.m_tileIdx, sizeof( u16 ), 1, p_file );
-            fread( &a.m_speed, sizeof( u8 ), 1, p_file );
-            fread( &a.m_maxFrame, sizeof( u8 ), 1, p_file );
-            a.m_acFrame = 0;
-            fread( ( (u8*) a.m_tiles ), sizeof( u8 ), a.m_maxFrame * 32, p_file );
-        }
-        fclose( p_file );
-        return N;
-    }
-
     bool readBankData( u8 /* p_bank */, MAP::bankInfo& /*p_result*/ ) {
         return false;
 

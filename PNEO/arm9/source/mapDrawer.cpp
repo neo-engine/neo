@@ -1118,26 +1118,25 @@ namespace MAP {
 
         if( change ) { _mapSprites.update( ); }
 
-        return;
-
-        // if( !CUR_SLICE ) return;
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
-        if( !CUR_SLICE.m_tileSet.m_animationCount1 ) return;
-        for( u8 i = 0; i < CUR_SLICE.m_tileSet.m_animationCount1; ++i ) {
-            auto& a = CUR_SLICE.m_tileSet.m_animations[ i ];
-            if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
-                a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
-                dmaCopy( a.m_tiles + a.m_acFrame, tileMemory + a.m_tileIdx * 32, sizeof( tile ) );
+        for( u8 i = 0; i < TILE_ANIMATION_COUNT; ++i ) {
+            if( !TILE_ANIMATIONS[ i ].m_size ) { break; }
+            if( CUR_SLICE.m_tIdx1 == TILE_ANIMATIONS[ i ].m_tileSetIdx ) {
+                auto& a = TILE_ANIMATIONS[ i ];
+                if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
+                    a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
+                    dmaCopy( a.m_tileData + 32 * a.m_size * a.m_acFrame,
+                             tileMemory + a.m_tileIdx * 32, sizeof( tile ) * a.m_size );
+                }
             }
-        }
-        if( !CUR_SLICE.m_tileSet.m_animationCount2 ) return;
-        for( u8 i = 0; i < CUR_SLICE.m_tileSet.m_animationCount2; ++i ) {
-            auto& a = CUR_SLICE.m_tileSet.m_animations[ i + MAX_ANIM_PER_TILE_SET ];
-            if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
-                a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
-                dmaCopy( a.m_tiles + a.m_acFrame,
-                         tileMemory + ( a.m_tileIdx + MAX_TILES_PER_TILE_SET ) * 32,
-                         sizeof( tile ) );
+            if( CUR_SLICE.m_tIdx2 == TILE_ANIMATIONS[ i ].m_tileSetIdx ) {
+                auto& a = TILE_ANIMATIONS[ i ];
+                if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
+                    a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
+                    dmaCopy( a.m_tileData + 32 * a.m_size * a.m_acFrame,
+                             tileMemory + ( a.m_tileIdx + MAX_TILES_PER_TILE_SET ) * 32,
+                             sizeof( tile ) * a.m_size );
+                }
             }
         }
     }

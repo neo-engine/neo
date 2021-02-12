@@ -75,7 +75,6 @@ namespace FS {
     bool readPal( FILE* p_file, MAP::palette* p_palette, u8 p_count = 6 );
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
     bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
-    u8   readAnimations( FILE* p_file, MAP::tileSet::animation* p_animations );
     bool readBankData( u8 p_bank, MAP::bankInfo& p_result );
     bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result );
 

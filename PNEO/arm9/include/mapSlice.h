@@ -65,18 +65,23 @@ namespace MAP {
         u8        m_bottombehave;
     };
 
-    struct tileSet {
-        struct animation {
-            u16  m_tileIdx;
-            u8   m_acFrame;
-            u8   m_maxFrame;
-            u8   m_speed;
-            tile m_tiles[ 16 ];
-        };
-        u8        m_animationCount1, m_animationCount2;
-        animation m_animations[ 2 * MAX_ANIM_PER_TILE_SET ];
-        tile      m_tiles[ 2 * MAX_TILES_PER_TILE_SET ];
+    struct animation {
+        u16       m_tileIdx;
+        u16       m_size;
+        u8        m_tileSetIdx;
+        u8        m_acFrame;
+        u8        m_maxFrame;
+        u8        m_speed;
+        const u8* m_tileData;
     };
+
+    constexpr u8     TILE_ANIMATION_COUNT = 50;
+    extern animation TILE_ANIMATIONS[ TILE_ANIMATION_COUNT ];
+
+    struct tileSet {
+        tile m_tiles[ 2 * MAX_TILES_PER_TILE_SET ];
+    };
+
     struct blockSet {
         block m_blocks[ 2 * MAX_BLOCKS_PER_TILE_SET ];
     };

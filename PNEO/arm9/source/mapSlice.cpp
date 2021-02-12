@@ -116,12 +116,6 @@ namespace MAP {
                                 memcpy( p_result->m_pals + k * 16,
                                         p_cache[ i ][ j ].m_pals + k * 16, 6 * sizeof( palette ) );
                             }
-
-                            p_result->m_tileSet.m_animationCount1
-                                = p_cache[ i ][ j ].m_tileSet.m_animationCount1;
-                            memcpy( p_result->m_tileSet.m_animations,
-                                    p_cache[ i ][ j ].m_tileSet.m_animations,
-                                    MAX_ANIM_PER_TILE_SET * sizeof( tileSet::animation ) );
                             break;
                         }
             }
@@ -137,13 +131,6 @@ namespace MAP {
                 mapF = FS::open( PALETTE_PATH, tsidx1, ".p2l" );
                 for( u8 i = 0; i < 5; ++i ) { FS::readPal( mapF, p_result->m_pals + i * 16, 8 ); }
                 FS::close( mapF );
-                // TODO: FIX THIS!
-                // mapF = FS::open( TILESET_PATH, tsidx1, ".anm" );
-                // if( mapF ) {
-                //     p_result->m_tileSet.m_animationCount1
-                //         = FS::readAnimations( mapF, p_result->m_tileSet.m_animations );
-                //     FS::close( mapF );
-                // }
             }
 
             p_result->m_tIdx1 = tsidx1;
@@ -168,13 +155,6 @@ namespace MAP {
                                         p_cache[ i ][ j ].m_pals + 6 + k * 16,
                                         8 * sizeof( palette ) );
                             }
-
-                            p_result->m_tileSet.m_animationCount2
-                                = p_cache[ i ][ j ].m_tileSet.m_animationCount2;
-                            memcpy( p_result->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET,
-                                    p_cache[ i ][ j ].m_tileSet.m_animations
-                                        + MAX_ANIM_PER_TILE_SET,
-                                    MAX_ANIM_PER_TILE_SET * sizeof( tileSet::animation ) );
                             break;
                         }
             }
@@ -192,13 +172,6 @@ namespace MAP {
                     FS::readPal( mapF, p_result->m_pals + 6 + i * 16, 8 );
                 }
                 FS::close( mapF );
-
-                // mapF = FS::open( TILESET_PATH, tsidx2, ".anm" );
-                // if( mapF ) {
-                //     p_result->m_tileSet.m_animationCount2 = FS::readAnimations(
-                //         mapF, p_result->m_tileSet.m_animations + MAX_ANIM_PER_TILE_SET );
-                //     FS::close( mapF );
-                // }
             }
             p_result->m_tIdx2 = tsidx2;
         }
