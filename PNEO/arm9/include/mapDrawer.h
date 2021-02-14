@@ -49,6 +49,8 @@ namespace MAP {
 
         mapData _data[ 2 ][ 2 ];
 
+        std::map<position, u8> _tileAnimations;
+
         constexpr u16 dist( u16 p_globX1, u16 p_globY1, u16 p_globX2, u16 p_globY2 ) {
             return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
         }
@@ -65,6 +67,32 @@ namespace MAP {
 
         void loadBlock( block p_curblock, u32 p_memPos );
         void loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY );
+
+        void loadAnimatedTiles( u8 p_frame );
+
+        /*
+         * @brief: Loads permanent tile animations (e.g. first frame of grass, etc)
+         */
+        void animateField( u16 p_globX, u16 p_globY, u8 p_animation );
+
+        /*
+         * @brief: Loads the specified frame of the animation.
+         * @returns: The sprite id returned by the map sprite manager.
+         * @param p_animation: If p_frame is 0, the id of the animation, otherwise the
+         * sprite id of the animation.
+         */
+        u8 animateField( u16 p_globX, u16 p_globY, u8 p_animation, u8 p_frame );
+
+        /*
+         * @brief: Returns the identifier of a tile animation of the specified position or
+         * 0 if the specified position lacks any tile animations.
+         */
+        u8 getTileAnimation( u16 p_globX, u16 p_globY );
+
+        /*
+         * @brief: Clears permanent tile animations from the specified field
+         */
+        void clearFieldAnimation( u16 p_globX, u16 p_globY );
 
         /*
          * @brief: Reads the given map data and constructs mapObjects for the relevant

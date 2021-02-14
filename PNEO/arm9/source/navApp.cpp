@@ -249,16 +249,22 @@ namespace NAV {
         { 596, MOD_BATTLE_TRAINER },
         { 591, MOD_BATTLE_MAY_BRENDAN },
         { 590, MOD_BATTLE_GYM_LEADER },
+        { 650, MOD_BATTLE_FRONTIER_BRAIN },
         { 595, MOD_BATTLE_TEAM_AM },
+        { 649, MOD_BATTLE_REGI },
         { 594, MOD_BATTLE_RAYQUAZA },
         { 593, MOD_BATTLE_RAIKOU_ENTEI_SUICUNE },
+        { 651, MOD_BATTLE_DIALGA_PALKIA },
         { 588, MOD_BATTLE_EX01 },
 
         { 609, MOD_EX02 },
+        { 653, MOD_MT_MOON },
         { 607, MOD_ECRUTEAK_CITY },
         { 608, MOD_EX01 },
         { 613, MOD_LAKE_CAVE },
         { 645, MOD_UNWAVERING_EMOTIONS },
+        { 648, MOD_EX04 },
+        { 652, MOD_EX05 },
 
         { 620, MOD_MYSTERY_GIFT },
     };

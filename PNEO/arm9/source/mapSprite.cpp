@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_SMALL_NPC_OAM( p_idx ) ( 2 + ( p_idx ) )
 #define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
 #define SPR_HM_OAM( p_idx )        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
+#define SPR_MAPTILE_OAM( p_idx )   ( SPR_HM_OAM( MAX_HM_PARTICLE ) + ( p_idx ) )
 
 #define SPR_EXCLM_OAM 100
 
@@ -49,6 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_SMALL_NPC_GFX( p_idx ) ( 32 + 8 * ( p_idx ) )
 #define SPR_LARGE_NPC_GFX( p_idx ) ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC ) + 16 * ( p_idx ) )
 #define SPR_HM_GFX( p_idx )        ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 4 * ( p_idx ) )
+#define SPR_MAPTILE_GFX( p_idx )   ( SPR_HM_GFX( MAX_HM_PARTICLE_GFX_SLOTS ) + 4 * ( p_idx ) )
 
 #define SPR_EXCLM_GFX 303
 
@@ -140,6 +142,8 @@ namespace MAP {
         _strengthData  = mapSpriteData( 256 | 251 );
         _rockSmashData = mapSpriteData( 256 | 252 );
         _cutData       = mapSpriteData( 256 | 253 );
+        _grassData     = mapSpriteData( 256 | 254 );
+        _longGrassData = mapSpriteData( 256 | 255 );
 
         _playerPlatform.m_sprite = mapSprite( { 256 | 248, 0 }, mapSpriteData( 256 | 248 ) );
     }
@@ -152,6 +156,7 @@ namespace MAP {
         for( u8 i = 0; i < MAX_SMALL_NPC; ++i ) { destroySprite( SPR_SMALL_NPC_OAM( i ), false ); }
         for( u8 i = 0; i < MAX_LARGE_NPC; ++i ) { destroySprite( SPR_LARGE_NPC_OAM( i ), false ); }
         for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) { destroySprite( SPR_HM_OAM( i ), false ); }
+        for( u8 i = 0; i < MAX_TILE_ANIM; ++i ) { destroySprite( SPR_MAPTILE_OAM( i ), false ); }
         update( );
     }
 
@@ -223,6 +228,13 @@ namespace MAP {
             case SPR_CUT: return _cutData; [[unlikely]] default : break;
             }
         }
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
+            case SPR_GRASS: return _grassData;
+            case SPR_LONG_GRASS: return _longGrassData; [[unlikely]] default : break;
+            }
+        }
+
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
     }
 
@@ -234,6 +246,12 @@ namespace MAP {
             case SPR_STRENGTH: return _strengthData;
             case SPR_ROCKSMASH: return _rockSmashData;
             case SPR_CUT: return _cutData; [[unlikely]] default : break;
+            }
+        }
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
+            case SPR_GRASS: return _grassData;
+            case SPR_LONG_GRASS: return _longGrassData; [[unlikely]] default : break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -316,11 +334,18 @@ namespace MAP {
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
                                      u8 p_particleId ) {
 
+        bool isTileA = p_particleId >= TILE_ANIM_START;
+
+        auto mx   = isTileA ? MAX_TILE_ANIM : MAX_HM_PARTICLE;
+        auto info = isTileA ? _tileAnimInfo : _hmSpriteInfo;
+
         u8 nextfree = 255;
-        for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) {
-            if( !_hmSpriteInfo[ i ].first ) {
-                nextfree = i;
-                break;
+        if( p_particleId != SPR_PLATFORM ) {
+            for( u8 i = 0; i < mx; ++i ) {
+                if( !info[ i ].first ) {
+                    nextfree = i;
+                    break;
+                }
             }
         }
 
@@ -328,7 +353,7 @@ namespace MAP {
             // No space for an additional particle
             return 255;
         } else if( p_particleId != SPR_PLATFORM ) {
-            _hmSpriteInfo[ nextfree ] = {
+            info[ nextfree ] = {
                 p_particleId,
                 { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ), camShift( p_camY, p_posY ) } };
         }
@@ -360,6 +385,20 @@ namespace MAP {
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _cutData );
             return SPR_HM_OAM( nextfree );
+
+        case SPR_GRASS:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_MAPTILE_OAM( nextfree ),
+                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_0 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_LONG_GRASS:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          SPR_MAPTILE_OAM( nextfree ),
+                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_0 );
+            return SPR_MAPTILE_OAM( nextfree );
+
         case SPR_PLATFORM:
             _playerPlatform.m_pos = { p_posX, p_posY, 0, 0, 0, 0 };
             doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3,
@@ -386,6 +425,9 @@ namespace MAP {
         } else if( p_spriteId >= SPR_LARGE_NPC_OAM( 0 )
                    && p_spriteId < SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) ) {
             _bigNpcs[ p_spriteId - SPR_LARGE_NPC_OAM( 0 ) ].first = false;
+        } else if( p_spriteId >= SPR_MAPTILE_OAM( 0 )
+                   && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first = SPR_UNUSED;
         } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first = SPR_UNUSED;
         }
@@ -412,6 +454,11 @@ namespace MAP {
         for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) {
             if( _hmSpriteInfo[ i ].first ) { translateSprite( SPR_HM_OAM( i ), dx, dy, false ); }
         }
+        for( u8 i = 0; i < MAX_TILE_ANIM; ++i ) {
+            if( _tileAnimInfo[ i ].first ) {
+                translateSprite( SPR_MAPTILE_OAM( i ), dx, dy, false );
+            }
+        }
 
         update( );
     }
@@ -430,7 +477,9 @@ namespace MAP {
         IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
         IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
 
-        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].second.moveSprite( p_dx, p_dy );
+        } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.moveSprite( p_dx, p_dy );
         } else {
             getManagedSprite( p_spriteId ).m_pos.moveSprite( p_dx, p_dy );
@@ -452,7 +501,11 @@ namespace MAP {
         IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
         IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
 
-        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].second.translateSprite( p_dx, p_dy );
+            IO::OamTop->oamBuffer[ p_spriteId ].isHidden
+                = !_tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].second.isVisible( );
+        } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.translateSprite( p_dx, p_dy );
             IO::OamTop->oamBuffer[ p_spriteId ].isHidden
                 = !_hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.isVisible( );
@@ -522,10 +575,18 @@ namespace MAP {
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            auto data = getSpriteData( p_spriteId );
+            auto pid  = _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first;
+            doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
+                          IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId,
+                          SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ), data );
+            IO::setOWSpriteFrame( p_value, false, p_spriteId, data.m_palData, data.m_frameData );
+            return;
+        } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
-                return;
-            }
+            return;
+        }
         getManagedSprite( p_spriteId ).m_sprite.drawFrame( p_spriteId, p_value );
         if( p_update ) { IO::updateOAM( false ); }
     }
@@ -533,7 +594,15 @@ namespace MAP {
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_hflip, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
+            auto data = getSpriteData( p_spriteId );
+            auto pid  = _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first;
+            doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
+                          IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId,
+                          SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ), data );
+            IO::setOWSpriteFrame( p_value, p_hflip, p_spriteId, data.m_palData, data.m_frameData );
+            return;
+        } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             switch( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first ) {
             case SPR_ROCKSMASH:
                 doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
@@ -564,8 +633,8 @@ namespace MAP {
 
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
-                return;
-            }
+            return;
+        }
         getManagedSprite( p_spriteId ).m_sprite.setFrame( p_spriteId, p_value );
         if( p_update ) { IO::updateOAM( false ); }
     }
@@ -575,8 +644,8 @@ namespace MAP {
 
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
-                return;
-            }
+            return;
+        }
         getManagedSprite( p_spriteId ).m_sprite.currentFrame( p_spriteId );
         if( p_update ) { IO::updateOAM( false ); }
     }
@@ -586,8 +655,8 @@ namespace MAP {
 
         if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
-                return;
-            }
+            return;
+        }
         auto& mspr = getManagedSprite( p_spriteId );
         if( mspr.m_type != SPTYPE_BERRYTREE ) {
             mspr.m_sprite.nextFrame( p_spriteId );

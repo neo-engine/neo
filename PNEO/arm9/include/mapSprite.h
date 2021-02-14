@@ -164,9 +164,11 @@ namespace MAP {
 
     class mapSpriteManager {
       public:
-        static constexpr u8 MAX_SMALL_NPC   = 16;
-        static constexpr u8 MAX_LARGE_NPC   = 4;
-        static constexpr u8 MAX_HM_PARTICLE = 32;
+        static constexpr u8 MAX_SMALL_NPC             = 16;
+        static constexpr u8 MAX_LARGE_NPC             = 4;
+        static constexpr u8 MAX_HM_PARTICLE           = 32;
+        static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 6;
+        static constexpr u8 MAX_TILE_ANIM             = 32;
 
         static constexpr u8 SPR_UNUSED    = 0;
         static constexpr u8 SPR_ITEM      = 1;
@@ -176,13 +178,18 @@ namespace MAP {
         static constexpr u8 SPR_CUT       = 5;
         static constexpr u8 SPR_PLATFORM  = 8;
 
+        static constexpr u8 TILE_ANIM_START = 100;
+        static constexpr u8 SPR_GRASS       = 100;
+        static constexpr u8 SPR_LONG_GRASS  = 101;
+
         enum spriteType {
-            SPTYPE_NONE      = 0,
-            SPTYPE_PLAYER    = 1,
-            SPTYPE_PLATFORM  = 2,
-            SPTYPE_NPC       = 3, // Trainer, berry trees
-            SPTYPE_PARTICLE  = 4, // item icon, hm particles, etc
-            SPTYPE_BERRYTREE = 5,
+            SPTYPE_NONE       = 0,
+            SPTYPE_PLAYER     = 1,
+            SPTYPE_PLATFORM   = 2,
+            SPTYPE_NPC        = 3, // Trainer, berry trees
+            SPTYPE_PARTICLE   = 4, // item icon, hm particles, etc
+            SPTYPE_BERRYTREE  = 5,
+            SPTYPE_TIELSETAUX = 6, // grass animation, etc
         };
 
         struct managedSprite {
@@ -215,11 +222,12 @@ namespace MAP {
         mapSpriteData _strengthData;  // 16x16
         mapSpriteData _rockSmashData; // 16x16
         mapSpriteData _cutData;       // 16x16
-        // mapSpriteData _rustlingGrass;
-        // mapSpriteData _rustlingLargeGrass;
+        mapSpriteData _grassData;     // 2x16x16
+        mapSpriteData _longGrassData; // 2x16x16
         // mapSpriteData _waterBubbles;
 
         std::pair<u8, mapSpritePos> _hmSpriteInfo[ MAX_HM_PARTICLE ];
+        std::pair<u8, mapSpritePos> _tileAnimInfo[ MAX_TILE_ANIM ];
 
         constexpr s16 camShift( u16 p_cam, u16 p_pos ) const {
             return ( p_pos - p_cam ) * 16;
@@ -260,8 +268,6 @@ namespace MAP {
          * that needs to be passed when the sprite should be accessed.
          */
         u8 loadNPCSprite( u16 p_camX, u16 p_camY, u16 p_imageId, u8 p_startFrame );
-
-        u8 loadHMParticle( u16 p_camX, u16 p_camY, u16 p_imageId );
 
         /*
          * @brief: Loads the given sprite, returns an id for the sprite

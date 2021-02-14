@@ -1181,4 +1181,14 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Another Desert", "Eine Andere W\xfcste" },
     { "Stop playback", "Wiedergabe stoppen" },
     { "Choose a Song", "W\xe4hle ein Lied" },
+    { "Islands 2", "Eilande 2" },
+    { "Battle-Regis", "Kampf-Regis" },
+
+    // 650
+
+    { "Battle-FB", "Kampf-Koryph\xe4"
+                   "e" },
+    { "Battle-Time Space", "Kampf-Raum Zeit" },
+    { "Islands 3", "Islands 3" },
+    { "Moonlight", "Mondschein" },
 };

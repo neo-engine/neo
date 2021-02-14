@@ -400,13 +400,75 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
         }
+        if( p_movement.m_frame == 15 ) {
+            // clear remnants of field animation on old tile
+            clearFieldAnimation(
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
+                    - dir[ p_movement.m_direction ][ 0 ],
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
+                    - dir[ p_movement.m_direction ][ 1 ] );
+        }
+    }
+
+    void mapDrawer::clearFieldAnimation( u16 p_globX, u16 p_globY ) {
+        position p = { p_globX, p_globY, 0 };
+        if( !_tileAnimations.count( p ) ) {
+            return;
+        } else {
+            _mapSprites.destroySprite( _tileAnimations[ p ] );
+            _tileAnimations.erase( p );
+        }
+    }
+
+    u8 mapDrawer::getTileAnimation( u16 p_globX, u16 p_globY ) {
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+        switch( behave ) {
+        case 0x2:
+        case 0x24: return mapSpriteManager::SPR_GRASS;
+        case 0x3: return mapSpriteManager::SPR_LONG_GRASS;
+        default: return 0;
+        }
+    }
+
+    u8 mapDrawer::animateField( u16 p_globX, u16 p_globY, u8 p_animation, u8 p_frame ) {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( !p_frame ) {
+            auto res = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
+            _mapSprites.drawFrame( res, 1 );
+            if( p_animation == mapSpriteManager::SPR_LONG_GRASS ) {
+                _mapSprites.setPriority( res, OBJPRIORITY_0 );
+            }
+            return res;
+        } else {
+            _mapSprites.drawFrame( p_animation, p_frame );
+            _mapSprites.setPriority( p_animation, OBJPRIORITY_0 );
+            return p_animation;
+        }
+    }
+
+    void mapDrawer::animateField( u16 p_globX, u16 p_globY, u8 p_animation ) {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        _tileAnimations[ { p_globX, p_globY, 0 } ]
+            = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
+        u8 anim   = getTileAnimation( p_globX, p_globY );
 
         switch( behave ) {
+        case 0x2:
+        case 0x3: {
+            // tall grass
+            animateField( p_globX, p_globY, anim );
+            break;
+        }
         case 0x24: {
+            // ashen grass
+            animateField( p_globX, p_globY, anim );
             // very hacky, I know
             atom( p_globX, p_globY ).m_blockidx = 0x212;
 
@@ -1118,6 +1180,10 @@ namespace MAP {
 
         if( change ) { _mapSprites.update( ); }
 
+        loadAnimatedTiles( p_frame );
+    }
+
+    void mapDrawer::loadAnimatedTiles( u8 p_frame ) {
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
         for( u8 i = 0; i < TILE_ANIMATION_COUNT; ++i ) {
             if( !TILE_ANIMATIONS[ i ].m_size ) { break; }
@@ -1926,6 +1992,13 @@ namespace MAP {
     }
 
     void mapDrawer::standUpPlayer( direction p_direction ) {
+        u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( p_direction == DOWN
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+            clearFieldAnimation( gx, gy );
+        }
+
         redirectPlayer( p_direction, false );
         bool remPlat = SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
                        || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB;
@@ -1961,12 +2034,22 @@ namespace MAP {
             moveCamera( p_direction, true );
             swiWaitForVBlank( );
         }
+
+        clearFieldAnimation( gx, gy );
     }
+
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
-        direction di   = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 )
-                                                    : p_direction );
-        u16       curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16       cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        direction di = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 )
+                                                  : p_direction );
+
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16 gx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( p_direction == DOWN
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+            clearFieldAnimation( gx, gy );
+        }
 
         if( p_newMoveMode == SURF || p_newMoveMode == ROCK_CLIMB ) {
             // Load the Pkmn
@@ -1999,9 +2082,18 @@ namespace MAP {
         moveCamera( di, true );
         swiWaitForVBlank( );
         moveCamera( di, true );
+
+        clearFieldAnimation( gx, gy );
     }
 
     void mapDrawer::slidePlayer( direction p_direction ) {
+        u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( p_direction == DOWN
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+            clearFieldAnimation( gx, gy );
+        }
+
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
             _playerIsFast = false;
@@ -2013,20 +2105,27 @@ namespace MAP {
             if( i == 8 ) { _mapSprites.currentFrame( _playerSprite ); }
             swiWaitForVBlank( );
         }
+        clearFieldAnimation( gx, gy );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
     }
+
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
+        u16 gx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16 nx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ];
+        u16 ny   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ];
+        u8  anim = getTileAnimation( nx, ny );
+        if( p_direction == DOWN
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+            clearFieldAnimation( gx, gy );
+        }
+
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement != WALK ) p_fast = false;
         redirectPlayer( p_direction, p_fast );
 
-        if( /*atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                  SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ] )
-                    .m_movedata
-                == 0x3c
-            && */
-            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3
+        if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3
             && SAVE::SAV.getActiveFile( ).m_player.m_movement != SURF ) {
             _mapSprites.setPriority( _playerSprite,
                                      SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_1 );
@@ -2037,12 +2136,18 @@ namespace MAP {
             _mapSprites.setFrame( _playerSprite,
                                   ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
         }
+        u8 sid = 255;
         for( u8 i = 0; i < 16; ++i ) {
+            if( anim && i == 0 ) { sid = animateField( nx, ny, anim, 0 ); }
+            if( anim && sid < 255 && i == 5 ) { animateField( nx, ny, sid, 2 ); }
+            if( anim && sid < 255 && i == 12 ) { animateField( nx, ny, sid, 3 ); }
+
             moveCamera( p_direction, true );
             if( i == 8 ) { _mapSprites.nextFrame( _playerSprite ); }
             if( ( !p_fast || i % 3 ) && !fastBike ) swiWaitForVBlank( );
             if( i % ( fastBike / 3 + 2 ) == 0 && fastBike ) swiWaitForVBlank( );
         }
+        if( sid < 255 ) { _mapSprites.destroySprite( sid, false ); }
         _mapSprites.drawFrame( _playerSprite, ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
         if( ( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE )
             || SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
@@ -2071,17 +2176,7 @@ namespace MAP {
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) {
                 _mapSprites.setPriority( _playerPlatSprite, OBJPRIORITY_3 );
             }
-        } else if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ <= 3
-                /*
-                atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ],
-                         SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
-                             + dir[ p_direction ][ 1 ] )
-                           .m_movedata
-                       != 0x3c
-                   && atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                              .m_movedata
-                          != 0x3c */ ) {
+        } else if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ <= 3 ) {
             _mapSprites.setPriority( _playerSprite,
                                      SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_2 );
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
@@ -2089,12 +2184,20 @@ namespace MAP {
                 _mapSprites.setPriority( _playerPlatSprite, OBJPRIORITY_2 );
             }
         }
+        clearFieldAnimation( gx, gy );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
     }
 
     void mapDrawer::bikeJumpPlayer( direction p_direction ) {
+        u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( p_direction == DOWN
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+            clearFieldAnimation( gx, gy );
+        }
+
         SOUND::playSoundEffect( SFX_JUMP );
 
         for( u8 i = 0; i < 16; ++i ) {
@@ -2103,6 +2206,7 @@ namespace MAP {
             if( i > 13 ) { _mapSprites.moveSprite( _playerSprite, DOWN, 3 ); }
             if( i % 2 ) swiWaitForVBlank( );
         }
+        clearFieldAnimation( gx, gy );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
@@ -2110,6 +2214,12 @@ namespace MAP {
 
     void mapDrawer::jumpPlayer( direction p_direction ) {
         SOUND::playSoundEffect( SFX_JUMP );
+        u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( p_direction == DOWN
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+            clearFieldAnimation( gx, gy );
+        }
 
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
@@ -2124,6 +2234,7 @@ namespace MAP {
             if( i % 4 ) swiWaitForVBlank( );
         }
         _mapSprites.drawFrame( _playerSprite, getFrame( p_direction ) );
+        clearFieldAnimation( gx, gy );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );

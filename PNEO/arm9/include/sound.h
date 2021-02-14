@@ -191,6 +191,14 @@ namespace SOUND {
         case PKMN_RAIKOU:
         case PKMN_SUICUNE:
         case PKMN_ENTEI: return MOD_BATTLE_RAIKOU_ENTEI_SUICUNE;
+        case PKMN_REGIROCK:
+        case PKMN_REGICE:
+        case PKMN_REGISTEEL:
+        case PKMN_REGIGIGAS:
+        case PKMN_REGIELEKI:
+        case PKMN_REGIDRAGO: return MOD_BATTLE_REGI;
+        case PKMN_GROUDON:
+        case PKMN_KYOGRE:
         case PKMN_RAYQUAZA: return MOD_BATTLE_RAYQUAZA;
         default:
             if( p_pokemonId > PKMN_DEOXYS && p_pokemonId <= PKMN_ARCEUS ) {
