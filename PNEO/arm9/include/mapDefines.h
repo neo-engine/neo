@@ -72,7 +72,9 @@ namespace MAP {
     constexpr u8 OW_MAP = 10;
 
     constexpr u8     MAP_LOCATION_RES = 8;
-    extern const u16 BANK_10_MAP_LOCATIONS[ 16 * 4 ][ 29 * 4 ];
+    constexpr u8     OW_MAP_SIZE_X    = 29 * 4;
+    constexpr u8     OW_MAP_SIZE_Y    = 16 * 4;
+    extern const u16 BANK_10_MAP_LOCATIONS[ OW_MAP_SIZE_Y ][ OW_MAP_SIZE_X ];
 
     struct position {
         u16 m_posX; // Global
@@ -81,6 +83,19 @@ namespace MAP {
 
         constexpr auto operator<=>( const position& ) const = default;
     };
+
+    constexpr position DUMMY_POSITION = { 0, 0, 0 };
+    constexpr position getOWPosForLocation( u16 p_location ) {
+        for( u16 y = 0; y < OW_MAP_SIZE_Y; ++y ) {
+            for( u16 x = 0; x < OW_MAP_SIZE_X; ++x ) {
+                if( BANK_10_MAP_LOCATIONS[ y ][ x ] == p_location ) {
+                    return { u16( 8 * x ), u16( 8 * y ), 0 };
+                }
+            }
+        }
+        return DUMMY_POSITION;
+    }
+
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
 
     struct movement {

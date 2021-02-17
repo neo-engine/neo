@@ -130,38 +130,44 @@ namespace NAV {
         computePlayerPosition( );
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
 
-        bool change = _playerX != oldx || _playerY != oldy;
+        bool change    = _playerX != oldx || _playerY != oldy;
+        bool locChange = false;
 
         // update player sprite
 
         oam[ SPR_NAV_APP_RSV_SUB + 1 ].x = _playerX - 8;
         oam[ SPR_NAV_APP_RSV_SUB + 1 ].y = _playerY + MAP_TOP_Y - 8;
+        if( change ) {
+            locChange |= ( _playerX != _cursorX || _playerY != _cursorY );
+            _cursorX = _playerX;
+            _cursorY = _playerY;
+        }
 
         // check for (touch) input
 
         if( touch.px >= MAP_TOP_X && touch.px <= MAP_BOT_X && touch.py >= MAP_TOP_Y
             && touch.py <= MAP_BOT_Y ) {
             // move cursor
-            change |= ( touch.px != _cursorX || touch.py != _cursorY );
+            locChange |= ( touch.px != _cursorX || touch.py != _cursorY );
 
             _cursorX = touch.px;
             _cursorY = touch.py - MAP_TOP_Y;
+        }
 
+        if( locChange ) {
             oam[ SPR_NAV_APP_RSV_SUB ].x = _cursorX;
             oam[ SPR_NAV_APP_RSV_SUB ].y = _cursorY + MAP_TOP_Y - 14;
 
-            if( change ) {
-                computeCursorLocationId( );
-                if( _cursorLocationId != oldl ) {
-                    if( _cursorLocationId ) {
-                        snprintf( buffer, 99, "%s: %s", FS::getLocation( 2005 ).c_str( ),
-                                  FS::getLocation( _cursorLocationId ).c_str( ) );
-                    } else {
-                        snprintf( buffer, 99, "%s", FS::getLocation( 2005 ).c_str( ) );
-                    }
-                    IO::printRectangle( 45, 10, 200, 30, p_bottom, 0 );
-                    IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
+            computeCursorLocationId( );
+            if( _cursorLocationId != oldl ) {
+                if( _cursorLocationId ) {
+                    snprintf( buffer, 99, "%s: %s", FS::getLocation( 2005 ).c_str( ),
+                              FS::getLocation( _cursorLocationId ).c_str( ) );
+                } else {
+                    snprintf( buffer, 99, "%s", FS::getLocation( 2005 ).c_str( ) );
                 }
+                IO::printRectangle( 43, 10, 200, 30, p_bottom, 0 );
+                IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
             }
         }
 
@@ -187,7 +193,7 @@ namespace NAV {
             if( suc ) { return true; }
         }
 
-        if( change ) { IO::updateOAM( p_bottom ); }
+        if( change || locChange ) { IO::updateOAM( p_bottom ); }
         return false;
     }
 

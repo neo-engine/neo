@@ -901,6 +901,7 @@ namespace MAP {
         NAV::printMessage( ( std::to_string( total ) ).c_str( ), MSG_INFO );
 #endif
         u16 pkmnId    = 0;
+        u16 backup    = 0;
         u8  pkmnForme = 0;
 
         u8 res = rand( ) % total;
@@ -914,6 +915,16 @@ namespace MAP {
                     && ( CUR_DATA.m_pokemon[ i ].m_daytime
                          & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) ) {
                     total += CUR_DATA.m_pokemon[ i ].m_encounterRate;
+
+                    // if the player hasn't obtained the nat dex yet, they should only see
+                    // pkmn that are in the local dex
+                    if( SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId(
+                            CUR_DATA.m_pokemon[ i ].m_speciesId )
+                        != u16( -1 ) ) {
+                        backup = CUR_DATA.m_pokemon[ i ].m_speciesId;
+                    } else {
+                        continue;
+                    }
 
                     if( total > res ) {
                         pkmnId    = CUR_DATA.m_pokemon[ i ].m_speciesId;
@@ -929,6 +940,7 @@ namespace MAP {
             }
         }
 
+        if( !pkmnId ) { pkmnId = backup; }
         if( !pkmnId ) { return false; }
 
         bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
@@ -1850,7 +1862,8 @@ namespace MAP {
     }
 
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
-        u8 oldMapType = u8( CUR_DATA.m_mapType );
+        u8   oldMapType = u8( CUR_DATA.m_mapType );
+        bool checkPos   = false;
 
         if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
             SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
@@ -1858,6 +1871,8 @@ namespace MAP {
         if( p_target.first != OW_MAP && SAVE::SAV.getActiveFile( ).m_currentMap == OW_MAP ) {
             SAVE::SAV.getActiveFile( ).m_lastOWPos = { SAVE::SAV.getActiveFile( ).m_currentMap,
                                                        SAVE::SAV.getActiveFile( ).m_player.m_pos };
+
+            checkPos = true;
         }
 
         loadNewBank( p_target.first );
@@ -1867,6 +1882,15 @@ namespace MAP {
                          p_target.second.m_posY / SIZE, ndata );
 
         u8 newMapType = u8( ndata.m_mapType );
+
+        if( checkPos ) {
+            auto curL   = ndata.m_baseLocationId;
+            auto tmpPos = getOWPosForLocation( curL );
+            if( tmpPos != DUMMY_POSITION ) {
+                SAVE::SAV.getActiveFile( ).m_lastOWPos
+                    = { SAVE::SAV.getActiveFile( ).m_currentMap, tmpPos };
+            }
+        }
 
         bool entryCave
             = ( !( oldMapType & CAVE ) && ( newMapType & CAVE ) && !( newMapType & INSIDE ) );
