@@ -455,6 +455,14 @@ namespace MAP {
             = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
     }
 
+    void mapDrawer::setBlock( u16 p_globX, u16 p_globY, u16 p_newBlock ) {
+        atom( p_globX, p_globY ).m_blockidx = p_newBlock;
+
+        loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
+                   ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
+        bgUpdate( );
+    }
+
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
         u8 anim   = getTileAnimation( p_globX, p_globY );
@@ -469,14 +477,13 @@ namespace MAP {
         case 0x24: {
             // ashen grass
             animateField( p_globX, p_globY, anim );
-            // very hacky, I know
-            atom( p_globX, p_globY ).m_blockidx = 0x212;
-
-            loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
-                       ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
-            bgUpdate( );
-
+            setBlock( p_globX, p_globY, 0x212 );
             break;
+        }
+        case 0xd2: {
+            // breakable floor
+            // breaks on step on
+            setBlock( p_globX, p_globY, 0x206 );
         }
         default: break;
         }
@@ -1510,14 +1517,15 @@ namespace MAP {
                 return;
             }
 
-            // Check for jumps/slides/...
             if( !canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, p_direction,
                           SAVE::SAV.getActiveFile( ).m_player.m_movement ) ) {
-                stopPlayer( p_direction );
                 fastBike = false;
+                moving   = false;
+                stopPlayer( p_direction );
                 return;
             }
 
+            // Check for jumps/slides/...
             switch( newBehave ) {
             // First check for jumps
             case 0x38:
@@ -1561,6 +1569,14 @@ namespace MAP {
                     return;
                 }
                 goto NO_BREAK;
+
+            case 0xd2: {
+                // breakable floor
+                if( fastBike > 9 ) goto NEXT_PASS;
+                walkPlayer( p_direction, p_fast );
+                stopPlayer( p_direction );
+                return;
+            }
 
             case 0xd0:
                 if( p_direction == DOWN ) {
@@ -1762,11 +1778,12 @@ namespace MAP {
                     case 0x6e:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( NO_SPECIAL );
-                        break;
+                        return;
                     case 0x66:
                         walkPlayer( p_direction, p_fast );
-                        handleWarp( LAST_VISITED );
-                        break;
+                        fastBike = false;
+                        stopPlayer( p_direction );
+                        return;
                     case 0x69:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( DOOR );
@@ -1861,9 +1878,31 @@ namespace MAP {
         }
     }
 
+    void mapDrawer::fallthroughPlayer( ) {
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        _mapSprites.setVisibility( _playerSprite, true );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        IO::fadeScreen( IO::CLEAR_DARK );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+        redirectPlayer( DOWN, false );
+        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY += 32;
+        draw( );
+    }
+
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
         u8   oldMapType = u8( CUR_DATA.m_mapType );
         bool checkPos   = false;
+        fastBike        = 0;
+        _playerIsFast   = false;
 
         if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
             SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
@@ -2265,6 +2304,19 @@ namespace MAP {
     }
 
     void mapDrawer::stopPlayer( ) {
+        u8 lstBehave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                           SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                           .m_bottombehave;
+        if( lstBehave == 0x66 ) {
+            // fall through
+            _playerIsFast = false;
+            fastBike      = false;
+            _mapSprites.setFrame( _playerSprite,
+                                  getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+            fallthroughPlayer( );
+            return;
+        }
+
         while( fastBike ) {
             fastBike = std::max( 0, (s8) fastBike - 3 );
             if( canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos,
@@ -2278,6 +2330,19 @@ namespace MAP {
                               getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
     }
     void mapDrawer::stopPlayer( direction p_direction ) {
+        u8 lstBehave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                           SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                           .m_bottombehave;
+        if( lstBehave == 0x66 ) {
+            // fall through
+            _playerIsFast = false;
+            fastBike      = false;
+            _mapSprites.setFrame( _playerSprite,
+                                  getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+            fallthroughPlayer( );
+            return;
+        }
+
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SIT
             && ( ( p_direction % 2 == SAVE::SAV.getActiveFile( ).m_player.m_direction % 2 )
                  || atom(

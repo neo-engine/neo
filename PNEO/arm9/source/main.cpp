@@ -377,9 +377,9 @@ int main( int, char** p_argv ) {
                 bmp = false;
             } else if( !bmp ) {
                 // Play "Bump" sound
-                MAP::curMap->stopPlayer( curDir );
                 SOUND::playSoundEffect( SFX_BUMP );
                 swiWaitForVBlank( );
+                MAP::curMap->stopPlayer( curDir );
                 bmp = true;
             } else if( bmp < 2 ) {
                 swiWaitForVBlank( );

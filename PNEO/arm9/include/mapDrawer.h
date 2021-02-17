@@ -71,6 +71,11 @@ namespace MAP {
         void loadAnimatedTiles( u8 p_frame );
 
         /*
+         * @brief: Sets the specified block to the specified value.
+         */
+        void setBlock( u16 p_globX, u16 p_globY, u16 p_newBlock );
+
+        /*
          * @brief: Loads permanent tile animations (e.g. first frame of grass, etc)
          */
         void animateField( u16 p_globX, u16 p_globY, u8 p_animation );
@@ -244,6 +249,11 @@ namespace MAP {
         void walkPlayer( direction p_direction, bool p_fast = false );
 
         void warpPlayer( warpType p_type, warpPos p_target );
+
+        /*
+         * @brief: Player falls through a hole in the ground to relative position +(0,32,0).
+         */
+        void fallthroughPlayer( );
 
         void stopPlayer( );
         void stopPlayer( direction p_direction );
