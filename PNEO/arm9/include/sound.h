@@ -104,6 +104,7 @@ namespace SOUND {
     void dimVolume( );
     void restoreVolume( );
 
+    u16           BGMforWeather( MAP::mapWeather p_weather );
     u16           BGMforMoveMode( MAP::moveMode p_moveMode );
     constexpr u16 BGMforTrainerEncounter( u16 p_trainerClassId ) {
         switch( p_trainerClassId ) {
@@ -303,6 +304,7 @@ namespace SOUND {
     void setJBoxBGM( u16 p_id );
     u16  getJBoxBGM( );
 
+    void onWeatherChange( MAP::mapWeather p_newWeather );
     void onLocationChange( u16 p_newLocatonId );
     void onMovementTypeChange( MAP::moveMode p_newMoveMode );
     void restartBGM( );

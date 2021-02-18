@@ -41,11 +41,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     class mapDrawer {
       private:
-        mapWeather       _weather;
         mapSpriteManager _mapSprites;
 
         mapSlice _slices[ 2 ][ 2 ]; //[x][y]
         u8       _curX, _curY;      // Current main slice from the _slices array
+
+        u8 _weatherScrollX = 0;
+        u8 _weatherScrollY = 0;
 
         mapData _data[ 2 ][ 2 ];
 
@@ -117,6 +119,12 @@ namespace MAP {
         std::vector<std::function<void( moveMode )>> _newMoveModeCallbacks
             = std::vector<std::function<void( moveMode )>>( ); // Called when the player's moveMode
                                                                // changed
+        std::vector<std::function<void( mapWeather )>> _newWeatherCallbacks
+            = std::vector<std::function<void( mapWeather )>>( ); // Called when the map weather
+                                                                 // changed, flash
+                                                                 // excluded
+
+        void initWeather( );
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
@@ -145,7 +153,6 @@ namespace MAP {
 
         void handleWildPkmn( u16 p_globX, u16 p_globY );
         bool handleWildPkmn( wildPkmnType p_type, bool p_forceEncounter = false );
-        void handleTrainer( );
 
         BATTLE::battlePolicy getBattlePolicy( bool               p_isWildBattle,
                                               BATTLE::battleMode p_mode          = BATTLE::SINGLE,
@@ -161,8 +168,8 @@ namespace MAP {
 
         mapDrawer( );
 
-        constexpr mapWeather getWeather( ) const {
-            return _weather;
+        inline mapWeather getWeather( ) const {
+            return SAVE::SAV.getActiveFile( ).m_currentMapWeather;
         }
 
         /*
@@ -233,6 +240,9 @@ namespace MAP {
         void registerOnBankChangedHandler( std::function<void( u8 )> p_handler );
         void registerOnLocationChangedHandler( std::function<void( u16 )> p_handler );
         void registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler );
+        void registerOnWeatherChangedHandler( std::function<void( mapWeather )> p_handler );
+
+        void changeWeather( mapWeather p_newWeather );
 
         void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
 

@@ -33,8 +33,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound.h"
 
 namespace SOUND {
-    u16           currentLocation = 0;
-    MAP::moveMode currentMoveMode = MAP::WALK;
+    u16             currentLocation = 0;
+    MAP::moveMode   currentMoveMode = MAP::WALK;
+    MAP::mapWeather currentWeather  = MAP::REGULAR;
 
     u16 currentJBoxBGM = JBOX_DISABLED;
 
@@ -85,7 +86,7 @@ namespace SOUND {
             if( p_id != JBOX_DISABLED ) {
                 playBGM( p_id );
             } else {
-                playBGM( BGMforMoveMode( currentMoveMode ) );
+                playBGM( BGMforWeather( currentWeather ) );
             }
             currentJBoxBGM = p_id;
         }
@@ -105,14 +106,29 @@ namespace SOUND {
 
         currentMoveMode = p_newMoveMode;
         if( currentJBoxBGM != JBOX_DISABLED ) { return; }
-        playBGM( BGMforMoveMode( currentMoveMode ) );
+        playBGM( BGMforWeather( currentWeather ) );
+    }
+
+    void onWeatherChange( MAP::mapWeather p_newWeather ) {
+        if( currentWeather == p_newWeather ) { return; }
+
+        currentWeather = p_newWeather;
+        if( currentJBoxBGM != JBOX_DISABLED ) { return; }
+        playBGM( BGMforWeather( currentWeather ) );
     }
 
     void restartBGM( ) {
         if( currentJBoxBGM != JBOX_DISABLED ) {
             playBGM( currentJBoxBGM );
         } else {
-            playBGM( BGMforMoveMode( currentMoveMode ) );
+            playBGM( BGMforWeather( currentWeather ) );
+        }
+    }
+
+    u16 BGMforWeather( MAP::mapWeather p_weather ) {
+        switch( p_weather ) {
+        case MAP::SANDSTORM: return MOD_DESERT;
+        default: return BGMforMoveMode( currentMoveMode );
         }
     }
 

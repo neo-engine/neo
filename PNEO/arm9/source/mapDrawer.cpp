@@ -231,7 +231,58 @@ namespace MAP {
     void mapDrawer::registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler ) {
         _newMoveModeCallbacks.push_back( p_handler );
     }
+    void mapDrawer::registerOnWeatherChangedHandler( std::function<void( mapWeather )> p_handler ) {
+        _newWeatherCallbacks.push_back( p_handler );
+    }
     // Drawing of Maps and stuff
+
+    void mapDrawer::initWeather( ) {
+        _weatherScrollX = 0;
+        _weatherScrollY = 0;
+        switch( getWeather( ) ) {
+        case SANDSTORM:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "sandstorm",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            _weatherScrollX = 4;
+            _weatherScrollY = 1;
+            break;
+
+        case DARK_FLASHABLE:
+        case DARK_PERMANENT:
+        case DARK_FLASH_USED:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "flash",
+                                                        256 * 192 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 192 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            if( getWeather( ) == DARK_FLASH_USED ) {
+                bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
+                bgSetScroll( IO::bg3, 64, 48 );
+            }
+            break;
+        case CLOUDY:
+        case FOREST_CLOUDS:
+        default:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            break;
+        }
+        bgSetPriority( IO::bg3, 0 );
+    }
+
+    void mapDrawer::changeWeather( mapWeather p_newWeather ) {
+        if( getWeather( ) != p_newWeather ) {
+            SAVE::SAV.getActiveFile( ).m_currentMapWeather = p_newWeather;
+            for( auto fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
+            initWeather( );
+        }
+    }
 
     void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
         if( p_init ) {
@@ -279,7 +330,6 @@ namespace MAP {
             // for palettes, the unchanged day-time pal comes first
             u8 currDT = ( getCurrentDaytime( ) + 3 ) % 5;
             if( ( CUR_DATA.m_mapType & INSIDE ) || ( CUR_DATA.m_mapType & CAVE ) ) { currDT = 0; }
-            dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 );
             BG_PALETTE[ 0 ] = 0;
 
             for( u8 i = 1; i < 4; ++i ) {
@@ -292,6 +342,10 @@ namespace MAP {
                                               _slices[ i % 2 ][ i / 2 ].m_x,
                                               _slices[ i % 2 ][ i / 2 ].m_y );
             }
+
+            dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 - 32 );
+            initWeather( );
+            BG_PALETTE[ 0 ] = 0;
         }
 
         _lastrow = NUM_ROWS - 1;
@@ -438,12 +492,12 @@ namespace MAP {
             auto res = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
             _mapSprites.drawFrame( res, 1 );
             if( p_animation == mapSpriteManager::SPR_LONG_GRASS ) {
-                _mapSprites.setPriority( res, OBJPRIORITY_0 );
+                _mapSprites.setPriority( res, OBJPRIORITY_1 );
             }
             return res;
         } else {
             _mapSprites.drawFrame( p_animation, p_frame );
-            _mapSprites.setPriority( p_animation, OBJPRIORITY_0 );
+            _mapSprites.setPriority( p_animation, OBJPRIORITY_1 );
             return p_animation;
         }
     }
@@ -657,7 +711,7 @@ namespace MAP {
             // for palettes, the unchanged day-time pal comes first
             u8 currDT = ( getCurrentDaytime( ) + 3 ) % 5;
             if( ( CUR_DATA.m_mapType & INSIDE ) || ( CUR_DATA.m_mapType & CAVE ) ) { currDT = 0; }
-            dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 );
+            dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 - 32 );
             BG_PALETTE[ 0 ] = 0;
             ANIMATE_MAP     = true;
 
@@ -710,10 +764,11 @@ namespace MAP {
     }
 
     void mapDrawer::moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
-        for( u8 i = 0; i < 3; ++i ) {
+        for( u8 i = 0; i < 4; ++i ) {
+            if( i == IO::bg3 ) { continue; }
             bgScroll( i, dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
-            bgUpdate( );
         }
+        bgUpdate( );
         _mapSprites.moveCamera( p_direction, 1, !p_updatePlayer );
         if( p_autoLoadRows
             && ( ( dir[ p_direction ][ 0 ]
@@ -1030,7 +1085,7 @@ namespace MAP {
         res.m_allowMegaEvolution = SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION );
 
         res.m_weather = BATTLE::weather::NO_WEATHER;
-        switch( _weather ) {
+        switch( getWeather( ) ) {
         case SUNNY: res.m_weather = BATTLE::weather::SUN; break;
         case RAINY:
         case THUNDERSTORM: res.m_weather = BATTLE::weather::RAIN; break;
@@ -1044,10 +1099,6 @@ namespace MAP {
         }
 
         return res;
-    }
-
-    void mapDrawer::handleTrainer( ) {
-        // TODO
     }
 
     bool mapDrawer::requestWildPkmn( bool p_forceHighGrass ) {
@@ -1072,6 +1123,12 @@ namespace MAP {
     }
 
     void mapDrawer::animateMap( u8 p_frame ) {
+        // animate weather
+        if( _weatherScrollX || _weatherScrollY ) {
+            bgScroll( IO::bg3, _weatherScrollX, _weatherScrollY );
+            bgUpdate( );
+        }
+
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
@@ -1995,6 +2052,21 @@ namespace MAP {
         SAVE::SAV.getActiveFile( ).m_player.m_pos = p_target.second;
         //        if( SAVE::SAV.getActiveFile( ).m_currentMap != p_target.first ) {
         SAVE::SAV.getActiveFile( ).m_currentMap = p_target.first;
+
+        auto oldw = SAVE::SAV.getActiveFile( ).m_currentMapWeather;
+        if( ndata.m_mapType & mapType::DARK ) {
+            if( ndata.m_mapType & mapType::FLASHABLE ) {
+                if( SAVE::SAV.getActiveFile( ).m_currentMapWeather != DARK_FLASH_USED ) {
+                    SAVE::SAV.getActiveFile( ).m_currentMapWeather = DARK_FLASHABLE;
+                }
+            } else {
+                SAVE::SAV.getActiveFile( ).m_currentMapWeather = DARK_PERMANENT;
+            }
+        } else {
+            SAVE::SAV.getActiveFile( ).m_currentMapWeather = ndata.m_weather;
+        }
+        if( oldw != SAVE::SAV.getActiveFile( ).m_currentMapWeather ) { initWeather( ); }
+
         draw( );
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );

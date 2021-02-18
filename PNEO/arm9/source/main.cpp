@@ -258,6 +258,7 @@ int main( int, char** p_argv ) {
 
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
+    MAP::curMap->registerOnWeatherChangedHandler( SOUND::onWeatherChange );
 
     NAV::init( );
     //    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );

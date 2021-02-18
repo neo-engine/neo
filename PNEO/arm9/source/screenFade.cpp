@@ -106,6 +106,7 @@ namespace IO {
 
         case IO::CLEAR_DARK:
         case IO::CAVE_ENTRY:
+        case IO::CAVE_EXIT:
             regcnt = regcnt2 = BLEND_FADE_BLACK | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
                                | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;
@@ -143,7 +144,6 @@ namespace IO {
             break;
 
         case IO::CLEAR_WHITE:
-        case IO::CAVE_EXIT:
             regcnt = regcnt2 = BLEND_FADE_WHITE | BLEND_SRC_BG0 | BLEND_SRC_BG1 | BLEND_SRC_BG2
                                | BLEND_SRC_BG3 | BLEND_SRC_SPRITE;
             reg = reg2 = 1;

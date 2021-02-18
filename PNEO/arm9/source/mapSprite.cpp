@@ -390,13 +390,13 @@ namespace MAP {
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_MAPTILE_OAM( nextfree ),
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData );
-            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_0 );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_MAPTILE_OAM( nextfree ),
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData );
-            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_0 );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
             return SPR_MAPTILE_OAM( nextfree );
 
         case SPR_PLATFORM:

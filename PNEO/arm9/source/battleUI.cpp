@@ -956,14 +956,15 @@ namespace BATTLE {
 
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/",
                              std::to_string( bg ).c_str( ), 480, 49152 );
-        u16* pal   = BG_PALETTE;
-        pal[ 0 ]   = 0;
-        pal[ 250 ] = IO::WHITE;
-        pal[ 251 ] = IO::GRAY;
-        pal[ 252 ] = IO::RGB( 18, 22, 31 );
-        pal[ 254 ] = IO::RGB( 31, 18, 18 );
-        pal[ 253 ] = IO::RGB( 0, 0, 25 );
-        pal[ 255 ] = IO::RGB( 23, 0, 0 );
+        u16* pal              = BG_PALETTE;
+        pal[ 0 ]              = 0;
+        pal[ HP_OUTLINE_COL ] = IO::BLACK;
+        pal[ 250 ]            = IO::WHITE;
+        pal[ 251 ]            = IO::GRAY;
+        pal[ 252 ]            = IO::RGB( 18, 22, 31 );
+        pal[ 254 ]            = IO::RGB( 31, 18, 18 );
+        pal[ 253 ]            = IO::RGB( 0, 0, 25 );
+        pal[ 255 ]            = IO::RGB( 23, 0, 0 );
     }
 
     void battleUI::init( weather p_initialWeather, terrain p_initialTerrain ) {

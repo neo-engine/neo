@@ -178,8 +178,9 @@ namespace SAVE {
             u16 m_initGameItemCount = 0; // Items accessible during begin game PC check
             u16 m_initGameItems[ 5 ];
 
-            MAP::warpPos m_lastOWPos;      // last position of the player on an outside-type map
-            u16          m_reserved[ 31 ]; // reserved for future things that need to be stored
+            MAP::warpPos    m_lastOWPos; // last position of the player on an outside-type map
+            MAP::mapWeather m_currentMapWeather; // current map weather
+            u16             m_reserved[ 30 ]; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 

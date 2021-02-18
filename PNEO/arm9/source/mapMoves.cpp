@@ -107,7 +107,7 @@ namespace MOVE {
         case M_FLASH: {
             // Check for badge 2
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 1 ) ) ) { return false; }
-            return false;
+            return SAVE::SAV.getActiveFile( ).m_currentMapWeather == MAP::DARK_FLASHABLE;
         }
         case M_WHIRLPOOL: {
             // Check for badge 7
@@ -184,7 +184,23 @@ namespace MOVE {
         case M_ROCK_SMASH: MAP::curMap->destroyHMObject( tx, ty ); return;
         case M_STRENGTH: MAP::curMap->enableStrength( ); return;
         case M_FLY: return;
-        case M_FLASH: return;
+        case M_FLASH: {
+            if( SAVE::SAV.getActiveFile( ).m_currentMapWeather == MAP::DARK_FLASHABLE ) {
+                bgSetScale( IO::bg3, 1 << 7 | 1 << 6 | 1 << 5, 1 << 7 | 1 << 6 | 1 << 5 );
+                bgSetScroll( IO::bg3, 112 - 96, 84 - 72 );
+                bgUpdate( );
+                for( u8 i = 0; i < 8; ++i ) { swiWaitForVBlank( ); }
+                bgSetScale( IO::bg3, 1 << 7 | 1 << 6, 1 << 7 | 1 << 6 );
+                bgSetScroll( IO::bg3, 96 - 64, 72 - 48 );
+                bgUpdate( );
+                for( u8 i = 0; i < 8; ++i ) { swiWaitForVBlank( ); }
+                bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
+                bgSetScroll( IO::bg3, 64, 48 );
+                bgUpdate( );
+                SAVE::SAV.getActiveFile( ).m_currentMapWeather = MAP::DARK_FLASH_USED;
+            }
+            return;
+        }
         case M_WHIRLPOOL: return;
         case M_SURF:
             MAP::curMap->sitDownPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction,

@@ -1700,15 +1700,11 @@ namespace NAV {
             case 0: {
                 memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
                         sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
-                std::vector<u16> tmp
-                    = { 201, 493, PKMN_EEVEE, 649, u16( 1 + rand( ) % MAX_PKMN ), MAX_PKMN };
-                for( int i = 0; i < 6; ++i ) {
+                std::vector<u16> tmp = { PKMN_SCEPTILE, PKMN_BLAZIKEN, PKMN_SWAMPERT };
+                for( int i = 0; i < 3; ++i ) {
                     pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
                     a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
-
-                    a.m_stats.m_curHP *= i / 5.0;
-                    a.m_boxdata.m_experienceGained += 750;
 
                     // Hand out some ribbons
                     for( u8 j = 0; j < 4; ++j ) {
@@ -1738,15 +1734,16 @@ namespace NAV {
                     SAVE::SAV.getActiveFile( ).storePkmn( a );
                 }
 
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SWEET_SCENT;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 1 ] = M_DIG;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 2 ] = M_TELEPORT;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 5 ].m_boxdata.m_moves[ 0 ] = M_ROCK_SMASH;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 5 ].m_boxdata.m_moves[ 1 ] = M_CUT;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 5 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_FLASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 3 ] = M_CUT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_DIG;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_ROCK_SMASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 2 ] = M_DIVE;
 
                 init( );
                 swiWaitForVBlank( );

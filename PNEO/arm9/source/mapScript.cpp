@@ -133,7 +133,7 @@ namespace MAP {
         PMO = 117, // Play music oneshot
         SMC = 118, // Set music
         SLC = 119, // Set location
-        SWT = 120, // Set weather
+        SWT = 120, // Set weather to parA
         WAT = 121, // Wait
         MBG = 122, // Pokemart description begin
         MIT = 123, // Mart item
@@ -709,9 +709,7 @@ namespace MAP {
             case SLC:
                 // TODO
                 break;
-            case SWT:
-                // TODO
-                break;
+            case SWT: changeWeather( mapWeather( parA ) ); break;
             case WAT:
                 for( u8 i = 0; i < parA; ++i ) { swiWaitForVBlank( ); }
                 break;

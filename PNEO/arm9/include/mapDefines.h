@@ -173,22 +173,26 @@ namespace MAP {
         ROCK_SMASH,
         SWEET_SCENT,
     };
-    enum mapWeather : u8 {
-        NOTHING        = 0, // Inside
-        SUNNY          = 1,
-        REGULAR        = 2,
-        RAINY          = 3,
-        SNOW           = 4,
-        THUNDERSTORM   = 5,
-        MIST           = 6,
-        BLIZZARD       = 7,
-        SANDSTORM      = 8,
-        FOG            = 9,
-        DENSE_MIST     = 0xa,
-        CLOUDY         = 0xb, // Dark Forest clouds
-        HEAVY_SUNLIGHT = 0xc,
-        HEAVY_RAIN     = 0xd,
-        UNDERWATER     = 0xe
+    enum mapWeather : u16 {
+        NOTHING         = 0, // Inside
+        SUNNY           = 1,
+        REGULAR         = 2,
+        RAINY           = 3,
+        SNOW            = 4,
+        THUNDERSTORM    = 5,
+        MIST            = 6,
+        BLIZZARD        = 7,
+        SANDSTORM       = 8,
+        FOG             = 9,
+        DENSE_MIST      = 0xa,
+        CLOUDY          = 0xb, // "nice weather" clouds
+        HEAVY_SUNLIGHT  = 0xc,
+        HEAVY_RAIN      = 0xd,
+        UNDERWATER      = 0xe,
+        DARK_FLASHABLE  = 0xf,
+        DARK_PERMANENT  = 0x10,
+        DARK_FLASH_USED = 0x11,
+        FOREST_CLOUDS   = 0x12,
     };
     enum mapType : u8 { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
     enum warpType : u8 {
