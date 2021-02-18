@@ -471,6 +471,27 @@ namespace MAP {
                     p_amount * dir[ p_direction ][ 1 ], p_update );
     }
 
+    void mapSpriteManager::moveSprite( u8 p_spriteId, u8 p_targetSpriteId, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+        if( p_targetSpriteId == 255 ) { return; }
+
+        auto tx   = IO::OamTop->oamBuffer[ p_targetSpriteId ].x;
+        auto ty   = IO::OamTop->oamBuffer[ p_targetSpriteId ].y;
+        auto data = getManagedSprite( p_targetSpriteId ).m_sprite.getData( );
+        ty += data.m_height - 16;
+        if( data.m_width == 32 ) { tx += data.m_width - 8; }
+
+        moveSpriteT( p_spriteId, tx, ty, p_update );
+    }
+
+    void mapSpriteManager::moveSpriteT( u8 p_spriteId, u16 p_targetX, u16 p_targetY,
+                                       bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
+        moveSprite( p_spriteId, p_targetX - IO::OamTop->oamBuffer[ p_spriteId ].x,
+                    p_targetY - IO::OamTop->oamBuffer[ p_spriteId ].y, p_update );
+    }
+
     void mapSpriteManager::moveSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 

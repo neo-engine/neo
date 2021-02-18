@@ -287,34 +287,30 @@ int main( int, char** p_argv ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
-            snprintf( buffer, 99,
-                      "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | TM %hhu %02hhu:%02hhu.%02hhu | %hhx",
-                      SAVE::SAV.getActiveFile( ).m_currentMap,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      MAP::CURRENT_BANK.m_bank,
-                      FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
-                      MAP::curMap->getCurrentLocationId( ),
-                      MAP::curMap
-                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_bottombehave,
-                      MAP::curMap
-                          ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_topbehave,
-                      getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
-                      SAVE::CURRENT_TIME.m_secs,
-                      MAP::curMap
-                          ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                                  SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                          .m_movedata );
+            snprintf(
+                buffer, 99,
+                "Currently at %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
+                "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | TM %hhu %02hhu:%02hhu.%02hhu | %li %li",
+                SAVE::SAV.getActiveFile( ).m_currentMap,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, MAP::CURRENT_BANK.m_bank,
+                FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
+                MAP::curMap->getCurrentLocationId( ),
+                MAP::curMap
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_bottombehave,
+                MAP::curMap
+                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                    .m_topbehave,
+                getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
+                SAVE::CURRENT_TIME.m_secs, bgState[ 1 ].scrollX >> 8, bgState[ 1 ].scrollY >> 8 );
             NAV::printMessage( buffer );
         }
 #endif

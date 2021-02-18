@@ -320,6 +320,10 @@ namespace MAP {
          */
         void moveSprite( u8 p_spriteId, direction p_direction, s16 p_amount, bool p_update = true );
 
+        void moveSprite( u8 p_spriteId, u8 p_targetSpriteId, bool p_update = true );
+
+        void moveSpriteT( u8 p_spriteId, u16 p_targetX, u16 p_targetY, bool p_update = true );
+
         void moveSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update = true );
 
         /*

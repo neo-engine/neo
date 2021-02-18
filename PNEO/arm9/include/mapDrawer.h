@@ -124,6 +124,8 @@ namespace MAP {
                                                                  // changed, flash
                                                                  // excluded
 
+        void updatePlayer( );
+
         void initWeather( );
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );

@@ -152,6 +152,9 @@ namespace MAP {
             }
         }
         }
+        if( p_mapObject.first != 255 ) {
+            animateField( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY );
+        }
     }
 
     const mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
@@ -346,6 +349,12 @@ namespace MAP {
             dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 - 32 );
             initWeather( );
             BG_PALETTE[ 0 ] = 0;
+
+            _mapSprites.reset( );
+            // Restore the map objects
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                loadMapObject( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] );
+            }
         }
 
         _lastrow = NUM_ROWS - 1;
@@ -363,13 +372,6 @@ namespace MAP {
     }
 
     void mapDrawer::draw( ObjPriority ) {
-        _mapSprites.reset( );
-
-        // Restore the map objects
-        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
-            loadMapObject( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] );
-        }
-
         draw( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true ); // Draw the map
 
@@ -379,10 +381,10 @@ namespace MAP {
         auto curLocId = getCurrentLocationId( );
         for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
 
-        IO::fadeScreen( IO::UNFADE );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false );
+        IO::fadeScreen( IO::UNFADE );
     }
 
     void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
@@ -413,9 +415,6 @@ namespace MAP {
             if( p_movePlayer ) {
                 _mapSprites.setFrame( _playerSprite, getFrame( p_playerMovement ) );
             }
-            animateField(
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
         }
         if( p_movement.m_frame == 15 ) {
             _mapSprites.drawFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
@@ -424,9 +423,6 @@ namespace MAP {
             if( p_movePlayer ) {
                 _mapSprites.drawFrame( _playerSprite, getFrame( p_playerMovement ) );
             }
-            animateField(
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
         }
 
         for( u8 i = 0; i < 16; ++i ) {
@@ -456,9 +452,23 @@ namespace MAP {
                 += dir[ p_movement.m_direction ][ 0 ];
             SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
                 += dir[ p_movement.m_direction ][ 1 ];
-            animateField(
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+
+            auto px = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX;
+            auto py = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY;
+
+            animateField( px, py );
+
+            if( _tileAnimations.count( { px, py, 0 } ) ) {
+                // this function may get called while the player is moving, so the player may
+                // be at a fractional grid point and we need to fix this shift by hand
+                // This is extremely hacky, I know
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ],
+                                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
+                                        false );
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ],
+                                        15 * dir[ p_movement.m_direction ][ 0 ],
+                                        15 * dir[ p_movement.m_direction ][ 1 ], true );
+            }
         }
         if( p_movement.m_frame == 15 ) {
             // clear remnants of field animation on old tile
@@ -661,12 +671,7 @@ namespace MAP {
         assert( _cx != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
                 || _cy != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY );
 #endif
-        if( p_updatePlayer ) {
-            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = _cx;
-            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = _cy;
-
-            SAVE::SAV.getActiveFile( ).stepIncrease( );
-        }
+        if( p_updatePlayer ) { updatePlayer( ); }
 
         // Check if a new slice should be loaded
         if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 32 == 16 )
@@ -2179,6 +2184,13 @@ namespace MAP {
         clearFieldAnimation( gx, gy );
     }
 
+    void mapDrawer::updatePlayer( ) {
+        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = _cx;
+        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = _cy;
+
+        SAVE::SAV.getActiveFile( ).stepIncrease( );
+    }
+
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
         direction di = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 )
                                                   : p_direction );
@@ -2505,7 +2517,7 @@ namespace MAP {
         _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
                                                 SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
         _mapSprites.moveSprite( _playerSprite, 8 * dir[ p_direction ][ 0 ],
-                                8 * ( p_direction == DOWN ) );
+                                8 * ( p_direction == DOWN ), true );
 
         u8 frame = 0;
         if( p_direction == UP ) frame = 4;
