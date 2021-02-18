@@ -413,6 +413,9 @@ namespace MAP {
             if( p_movePlayer ) {
                 _mapSprites.setFrame( _playerSprite, getFrame( p_playerMovement ) );
             }
+            animateField(
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
         }
         if( p_movement.m_frame == 15 ) {
             _mapSprites.drawFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
@@ -421,6 +424,9 @@ namespace MAP {
             if( p_movePlayer ) {
                 _mapSprites.drawFrame( _playerSprite, getFrame( p_playerMovement ) );
             }
+            animateField(
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
         }
 
         for( u8 i = 0; i < 16; ++i ) {
