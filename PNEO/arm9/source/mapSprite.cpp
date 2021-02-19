@@ -37,8 +37,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
 #define SPR_HM_OAM( p_idx )        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
 #define SPR_MAPTILE_OAM( p_idx )   ( SPR_HM_OAM( MAX_HM_PARTICLE ) + ( p_idx ) )
-
-#define SPR_EXCLM_OAM 100
+#define SPR_DOOR_OAM               ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) )
+#define SPR_EXCLM_OAM              SPR_DOOR_OAM + 1
 
 // Strength boulder (16x16)
 // Rock Smash rock  (16x16)
@@ -51,6 +51,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_LARGE_NPC_GFX( p_idx ) ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC ) + 16 * ( p_idx ) )
 #define SPR_HM_GFX( p_idx )        ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 4 * ( p_idx ) )
 #define SPR_MAPTILE_GFX( p_idx )   ( SPR_HM_GFX( MAX_HM_PARTICLE_GFX_SLOTS ) + 4 * ( p_idx ) )
+#define SPR_DOOR_GFX               ( SPR_MAPTILE_GFX( MAX_TILE_ANIM_GFX_SLOTS ) )
 
 #define SPR_EXCLM_GFX 303
 
@@ -89,6 +90,20 @@ namespace MAP {
             f = FS::open( IO::TRAINER_PATH, p_imageId, ".rsd" );
         }
         readData( f );
+    }
+
+    mapSpriteData::mapSpriteData( u8 p_door, u16 p_palData[ 16 ] ) {
+        FILE* f      = FS::openSplit( IO::DOOR_PATH, p_door, ".door", 52 );
+        m_width      = 16;
+        m_height     = 32;
+        m_frameCount = 3;
+        if( f ) {
+            FS::read( f, m_frameData, sizeof( u32 ), m_width * m_height * m_frameCount / 8 );
+            FS::close( f );
+        } else {
+            std::memset( m_frameData, 0, sizeof( m_frameData ) );
+        }
+        std::memcpy( m_palData, p_palData, 16 * sizeof( u16 ) );
     }
 
     mapSprite::mapSprite( u16 p_imageId, u8 p_startFrame ) {
@@ -181,7 +196,9 @@ namespace MAP {
 
     const mapSpriteManager::managedSprite&
     mapSpriteManager::getManagedSprite( u8 p_spriteId ) const {
-        if( p_spriteId == SPR_MAIN_PLAYER_OAM ) {
+        if( p_spriteId == SPR_DOOR_OAM ) {
+            return _doorAnimation;
+        } else if( p_spriteId == SPR_MAIN_PLAYER_OAM ) {
             return _player;
         } else if( p_spriteId == SPR_MAIN_PLAYER_PLAT_OAM ) {
             return _playerPlatform;
@@ -200,7 +217,9 @@ namespace MAP {
     }
 
     mapSpriteManager::managedSprite& mapSpriteManager::getManagedSprite( u8 p_spriteId ) {
-        if( p_spriteId == SPR_MAIN_PLAYER_OAM ) {
+        if( p_spriteId == SPR_DOOR_OAM ) {
+            return _doorAnimation;
+        } else if( p_spriteId == SPR_MAIN_PLAYER_OAM ) {
             return _player;
         } else if( p_spriteId == SPR_MAIN_PLAYER_PLAT_OAM ) {
             return _playerPlatform;
@@ -261,6 +280,16 @@ namespace MAP {
                                      spriteType p_type, const mapSprite& p_sprite ) {
 
         switch( p_type ) {
+        case SPTYPE_DOOR:
+            // At most one door animation at a time; overwrite any existing door animation
+            _doorAnimation = {
+                p_sprite,
+                { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ), camShift( p_camY, p_posY ) },
+                SPTYPE_DOOR };
+            doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
+                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), SPR_DOOR_OAM,
+                          SPR_DOOR_GFX, p_sprite );
+            return SPR_DOOR_OAM;
         case SPTYPE_PLAYER:
             _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 }, SPTYPE_PLAYER };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
@@ -329,6 +358,16 @@ namespace MAP {
             fr = 2 * ( p_stage - 2 );
         }
         return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_BERRYTREE, mapSprite( f, fr ) );
+    }
+
+    mapSpriteData DOOR_DATA;
+
+    u8 mapSpriteManager::loadDoor( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_doorIdx,
+                                   u16 p_palette[ 16 ] ) {
+        DOOR_DATA          = mapSpriteData( p_doorIdx, p_palette );
+        mapSpriteInfo info = { p_doorIdx, 0 };
+        return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_DOOR,
+                           mapSprite( info, DOOR_DATA ) );
     }
 
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
@@ -459,6 +498,7 @@ namespace MAP {
                 translateSprite( SPR_MAPTILE_OAM( i ), dx, dy, false );
             }
         }
+        translateSprite( SPR_DOOR_OAM, dx, dy, false );
 
         update( );
     }
@@ -485,7 +525,7 @@ namespace MAP {
     }
 
     void mapSpriteManager::moveSpriteT( u8 p_spriteId, u16 p_targetX, u16 p_targetY,
-                                       bool p_update ) {
+                                        bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
         moveSprite( p_spriteId, p_targetX - IO::OamTop->oamBuffer[ p_spriteId ].x,

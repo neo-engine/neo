@@ -160,6 +160,8 @@ namespace MAP {
                                               BATTLE::battleMode p_mode          = BATTLE::SINGLE,
                                               bool               p_distributeEXP = true );
 
+        std::pair<bool, mapData::event::data> getWarpData( u16 p_globX, u16 p_globY, u8 p_z = 3 );
+
       public:
         const block&        at( u16 p_x, u16 p_y ) const;
         block&              at( u16 p_x, u16 p_y );
@@ -243,6 +245,12 @@ namespace MAP {
         void registerOnLocationChangedHandler( std::function<void( u16 )> p_handler );
         void registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler );
         void registerOnWeatherChangedHandler( std::function<void( mapWeather )> p_handler );
+
+        /*
+         * @brief: Plays a door opening animation if the specified position is a door that
+         * has an animation.
+         */
+        void openDoor( u16 p_globX, u16 p_globY, u8 p_z = 3 );
 
         void changeWeather( mapWeather p_newWeather );
 

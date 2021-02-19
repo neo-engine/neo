@@ -41,6 +41,7 @@ unsigned short TEMP_PAL[ 256 ]       = { 0 };
 
 namespace IO {
     const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
+    const char* DOOR_PATH      = "nitro:/PICS/SPRITES/DOOR/";
     const char* OWP_PATH       = "nitro:/PICS/SPRITES/NPCP/";
     const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
     const char* BERRY_PATH     = "nitro:/PICS/SPRITES/BERRIES/";
@@ -922,6 +923,17 @@ namespace IO {
         return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, width, height, p_palData,
                             reinterpret_cast<unsigned int*>( p_dataBuffer ), width * height / 2,
                             false, false, false, OBJPRIORITY_2, false );
+    }
+
+    u16 loadDoorSpriteB( const u16 p_doorNum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                         u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
+        FILE* f = FS::openSplit( DOOR_PATH, p_doorNum, ".door", 255 );
+        FS::read( f, p_dataBuffer, sizeof( u32 ), 32 * 16 * 3 / 8 );
+        FS::close( f );
+
+        return loadSpriteB( p_oamIndex, p_tileCnt, p_posX, p_posY, 16, 32, p_palData,
+                            reinterpret_cast<unsigned int*>( p_dataBuffer ), 32 * 16 / 2, false,
+                            false, false, OBJPRIORITY_2, false );
     }
 
     void setOWSpriteFrame( u8 p_frame, bool p_flip, u8 p_oamIdx, u16 p_palData[ 16 ],

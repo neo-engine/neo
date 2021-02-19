@@ -35,6 +35,7 @@
 
 namespace IO {
     extern const char* OW_PATH;
+    extern const char* DOOR_PATH;
     extern const char* OWP_PATH;
     extern const char* TRAINER_PATH;
     extern const char* BERRY_PATH;
@@ -170,6 +171,9 @@ namespace IO {
                       u8 p_palCnt, u16 p_tileCnt );
     u16 loadOWSpriteB( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                        u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_data[ 32 * 4 * 9 ] );
+
+    u16 loadDoorSpriteB( const u16 p_doorNum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+                         u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_data[ 32 * 4 * 9 ] );
 
     void setOWSpriteFrame( u8 p_frame, bool p_flip, u8 p_oamIndex, u16 p_palData[ 16 ],
                            u32 p_data[ 32 * 4 * 9 ] );

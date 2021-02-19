@@ -75,8 +75,18 @@ namespace MAP {
         const u8* m_tileData;
     };
 
+    struct door {
+        u8  m_tileset : 8;
+        u8  m_doorIdx : 8;
+        u8  m_palette : 4;
+        u16 m_blockIdx : 12;
+    };
+
     constexpr u8     TILE_ANIMATION_COUNT = 50;
     extern animation TILE_ANIMATIONS[ TILE_ANIMATION_COUNT ];
+
+    constexpr u8 DOOR_ANIMATION_COUNT = 50;
+    extern door  DOOR_ANIMATIONS[ DOOR_ANIMATION_COUNT ];
 
     struct tileSet {
         tile m_tiles[ 2 * MAX_TILES_PER_TILE_SET ];

@@ -816,20 +816,62 @@ namespace MAP {
     void mapDrawer::disablePkmn( s16 p_steps ) {
         SAVE::SAV.getActiveFile( ).m_repelSteps = p_steps;
     }
+
     void mapDrawer::enablePkmn( ) {
         SAVE::SAV.getActiveFile( ).m_repelSteps = 0;
     }
 
-    void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
-        warpPos tg;
-        u16     curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16     cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
-        u16     curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+    void mapDrawer::openDoor( u16 p_globX, u16 p_globY, u8 p_z ) {
+        u16  curx  = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  cury  = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        auto wdata = getWarpData( p_globX, p_globY, p_z );
+        if( !wdata.first ) { return; }
+
+        if( wdata.second.m_warp.m_warpType == DOOR ) {
+            SOUND::playSoundEffect( SFX_ENTER_DOOR );
+        } else if( wdata.second.m_warp.m_warpType == SLIDING_DOOR ) {
+            SOUND::playSoundEffect( SFX_SLIDING_DOOR );
+        } else {
+            // Not a door?
+            return;
+        }
+
+        auto block = atom( p_globX, p_globY );
+        u8   ts    = 0;
+
+        if( block.m_blockidx < MAX_BLOCKS_PER_TILE_SET ) {
+            ts = CUR_SLICE.m_tIdx1;
+        } else {
+            ts = CUR_SLICE.m_tIdx2;
+        }
+
+        for( u8 i = 0; i < DOOR_ANIMATION_COUNT; ++i ) {
+            auto d = DOOR_ANIMATIONS[ i ];
+            if( d.m_tileset != ts || d.m_blockIdx != block.m_blockidx ) { continue; }
+
+            u8 door = _mapSprites.loadDoor( curx, cury, p_globX, p_globY, d.m_doorIdx,
+                                            &BG_PALETTE[ 16 * d.m_palette ] );
+            for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+            _mapSprites.drawFrame( door, 1 );
+            for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+            _mapSprites.drawFrame( door, 2 );
+            for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+            return;
+        }
+
+        // no animation found :/
+    }
+
+    std::pair<bool, mapData::event::data> mapDrawer::getWarpData( u16 p_globX, u16 p_globY,
+                                                                  u8 p_z ) {
+        p_globX %= SIZE;
+        p_globY %= SIZE;
 
         for( u8 i = 0; i < CUR_DATA.m_eventCount; ++i ) {
-            if( CUR_DATA.m_events[ i ].m_type == EVENT_WARP && CUR_DATA.m_events[ i ].m_posX == curx
-                && CUR_DATA.m_events[ i ].m_posY == cury
-                && CUR_DATA.m_events[ i ].m_posZ == curz ) {
+            if( CUR_DATA.m_events[ i ].m_type == EVENT_WARP
+                && CUR_DATA.m_events[ i ].m_posX == p_globX
+                && CUR_DATA.m_events[ i ].m_posY == p_globY
+                && CUR_DATA.m_events[ i ].m_posZ == p_z ) {
                 if( CUR_DATA.m_events[ i ].m_activateFlag
                     && !SAVE::SAV.getActiveFile( ).checkFlag(
                         CUR_DATA.m_events[ i ].m_activateFlag ) ) {
@@ -841,20 +883,31 @@ namespace MAP {
                     continue;
                 }
 
-                if( CUR_DATA.m_events[ i ].m_data.m_warp.m_warpType != NO_SPECIAL ) {
-                    p_type = CUR_DATA.m_events[ i ].m_data.m_warp.m_warpType;
-                    if( CUR_DATA.m_events[ i ].m_data.m_warp.m_warpType == LAST_VISITED ) {
-                        tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
-                    } else {
-                        tg = warpPos( CUR_DATA.m_events[ i ].m_data.m_warp.m_bank,
-                                      position( CUR_DATA.m_events[ i ].m_data.m_warp.m_mapX * SIZE
-                                                    + CUR_DATA.m_events[ i ].m_data.m_warp.m_posX,
-                                                CUR_DATA.m_events[ i ].m_data.m_warp.m_mapY * SIZE
-                                                    + CUR_DATA.m_events[ i ].m_data.m_warp.m_posY,
-                                                +CUR_DATA.m_events[ i ].m_data.m_warp.m_posZ ) );
-                    }
-                }
-                break;
+                return { true, CUR_DATA.m_events[ i ].m_data };
+            }
+        }
+        return { false, mapData::event::data( ) };
+    }
+
+    void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
+        warpPos tg;
+        u16     curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
+        u16     cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16     curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+
+        auto wdata = getWarpData( curx, cury, curz );
+        if( !wdata.first ) { return; }
+
+        if( wdata.second.m_warp.m_warpType != NO_SPECIAL ) {
+            p_type = wdata.second.m_warp.m_warpType;
+            if( wdata.second.m_warp.m_warpType == LAST_VISITED ) {
+                tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+            } else {
+                tg = warpPos(
+                    wdata.second.m_warp.m_bank,
+                    position( wdata.second.m_warp.m_mapX * SIZE + wdata.second.m_warp.m_posX,
+                              wdata.second.m_warp.m_mapY * SIZE + wdata.second.m_warp.m_posY,
+                              +wdata.second.m_warp.m_posZ ) );
             }
         }
 
@@ -880,6 +933,7 @@ namespace MAP {
             handleWarp( p_type, current );
         }
     }
+
     void mapDrawer::handleWildPkmn( u16 p_globX, u16 p_globY ) {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave   = at( p_globX, p_globY ).m_bottombehave;
@@ -895,6 +949,7 @@ namespace MAP {
         //        else if( CUR_DATA.m_mapType & CAVE )
         //            handleWildPkmn( GRASS );
     }
+
     pokemon wildPkmn;
     bool    mapDrawer::handleWildPkmn( wildPkmnType p_type, bool p_forceEncounter ) {
         u16 rn
@@ -1853,6 +1908,8 @@ namespace MAP {
                         stopPlayer( p_direction );
                         return;
                     case 0x69:
+                        redirectPlayer( p_direction, p_fast );
+                        openDoor( nx, ny );
                         walkPlayer( p_direction, p_fast );
                         handleWarp( DOOR );
                         break;
@@ -2010,14 +2067,6 @@ namespace MAP {
             = ( ( oldMapType & CAVE ) && !( oldMapType & INSIDE ) && !( newMapType & CAVE ) );
         if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
         switch( p_type ) {
-        case DOOR:
-            IO::fadeScreen( IO::CLEAR_DARK );
-            SOUND::playSoundEffect( SFX_ENTER_DOOR );
-            break;
-        case SLIDING_DOOR:
-            IO::fadeScreen( IO::CLEAR_DARK );
-            SOUND::playSoundEffect( SFX_SLIDING_DOOR );
-            break;
         case TELEPORT:
             SOUND::playSoundEffect( SFX_WARP );
             for( u8 j = 0; j < 2; ++j ) {
@@ -2044,6 +2093,8 @@ namespace MAP {
             }
             break;
         case LAST_VISITED:
+        case DOOR:
+        case SLIDING_DOOR:
         default:
             SOUND::playSoundEffect( SFX_CAVE_WARP );
             IO::fadeScreen( IO::CLEAR_DARK );

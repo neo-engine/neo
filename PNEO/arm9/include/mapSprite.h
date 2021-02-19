@@ -102,6 +102,11 @@ namespace MAP {
         mapSpriteData( u16 p_imageId );
 
         /*
+         * @brief: reads the door data from the fs.
+         */
+        mapSpriteData( u8 p_door, u16 p_palData[ 16 ] );
+
+        /*
          * @brief: Read mapSpriteData from the specified file.
          */
         void readData( FILE* p_f );
@@ -169,6 +174,7 @@ namespace MAP {
         static constexpr u8 MAX_HM_PARTICLE           = 32;
         static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 6;
         static constexpr u8 MAX_TILE_ANIM             = 32;
+        static constexpr u8 MAX_TILE_ANIM_GFX_SLOTS   = 6;
 
         static constexpr u8 SPR_UNUSED    = 0;
         static constexpr u8 SPR_ITEM      = 1;
@@ -177,6 +183,8 @@ namespace MAP {
         static constexpr u8 SPR_ROCKSMASH = 4;
         static constexpr u8 SPR_CUT       = 5;
         static constexpr u8 SPR_PLATFORM  = 8;
+
+        static constexpr u8 SPR_DOOR = 99;
 
         static constexpr u8 TILE_ANIM_START = 100;
         static constexpr u8 SPR_GRASS       = 100;
@@ -190,6 +198,7 @@ namespace MAP {
             SPTYPE_PARTICLE   = 4, // item icon, hm particles, etc
             SPTYPE_BERRYTREE  = 5,
             SPTYPE_TIELSETAUX = 6, // grass animation, etc
+            SPTYPE_DOOR       = 7,
         };
 
         struct managedSprite {
@@ -224,6 +233,9 @@ namespace MAP {
         mapSpriteData _cutData;       // 16x16
         mapSpriteData _grassData;     // 2x16x16
         mapSpriteData _longGrassData; // 2x16x16
+
+        managedSprite _doorAnimation; // 32x16
+
         // mapSpriteData _waterBubbles;
 
         std::pair<u8, mapSpritePos> _hmSpriteInfo[ MAX_HM_PARTICLE ];
@@ -293,6 +305,14 @@ namespace MAP {
          */
         u8 loadBerryTree( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_berryIdx,
                           u8 p_stage );
+
+        /*
+         * @brief: Loads the specified door animation to the specified position on the
+         * screen.
+         * @param p_palette: The pert of the OW palette as specified by DOOR_ANIMATIONS.
+         */
+        u8 loadDoor( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_doorIdx,
+                     u16 p_palette[ 16 ] );
 
         /*
          * @brief: loads a sprite centered on the screen.
