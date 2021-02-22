@@ -123,7 +123,7 @@ namespace BATTLE {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
                 if( p_sideCondition & ( 1LLU << i ) ) {
                     if( !_sideConditionAmount[ i ] ) {
-#ifdef DESQUID
+#ifdef DESQUID_MORE
                         // TODO: proper log
                         p_ui->log( "Set side condition " + std::to_string( 1LLU << i ) );
                         for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
@@ -143,7 +143,7 @@ namespace BATTLE {
         inline bool removeSideCondition( battleUI* p_ui, sideCondition p_sideCondition ) {
             for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
                 if( p_sideCondition & ( 1LLU << i ) ) {
-#ifdef DESQUID
+#ifdef DESQUID_MORE
                     // TODO: proper log
                     p_ui->log( "Remove side condition " + std::to_string( 1LLU << i ) );
                     for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }

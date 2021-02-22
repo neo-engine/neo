@@ -301,6 +301,199 @@ namespace SAVE {
         m_berryHealth[ 14 ] = 255;
         m_berryTrees[ 15 ]  = ITEM::itemToBerry( I_ROSELI_BERRY );
         m_berryHealth[ 15 ] = 255;
+
+        // Route 115 (north)
+        m_berryTrees[ 27 ]  = ITEM::itemToBerry( I_MAGO_BERRY );
+        m_berryHealth[ 27 ] = 255;
+        m_berryTrees[ 28 ]  = ITEM::itemToBerry( I_WIKI_BERRY );
+        m_berryHealth[ 28 ] = 255;
+        m_berryTrees[ 29 ]  = ITEM::itemToBerry( I_IAPAPA_BERRY );
+        m_berryHealth[ 29 ] = 255;
+
+        // R 115 (east)
+        m_berryTrees[ 30 ]  = ITEM::itemToBerry( I_AGUAV_BERRY );
+        m_berryHealth[ 30 ] = 255;
+        m_berryTrees[ 31 ]  = ITEM::itemToBerry( I_FIGY_BERRY );
+        m_berryHealth[ 31 ] = 255;
+
+        // R 114
+        m_berryTrees[ 32 ]  = ITEM::itemToBerry( I_RINDO_BERRY );
+        m_berryHealth[ 32 ] = 255;
+        m_berryTrees[ 33 ]  = ITEM::itemToBerry( I_CHOPLE_BERRY );
+        m_berryHealth[ 33 ] = 255;
+        m_berryTrees[ 34 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 34 ] = 255;
+
+        // Route 117
+        m_berryTrees[ 18 ]  = ITEM::itemToBerry( I_WEPEAR_BERRY );
+        m_berryHealth[ 18 ] = 255;
+        m_berryTrees[ 19 ]  = ITEM::itemToBerry( I_PINAP_BERRY );
+        m_berryHealth[ 19 ] = 255;
+        m_berryTrees[ 20 ]  = ITEM::itemToBerry( I_NANAB_BERRY );
+        m_berryHealth[ 20 ] = 255;
+
+        // Route 110 (north)
+        m_berryTrees[ 21 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 21 ] = 255;
+        m_berryTrees[ 22 ]  = ITEM::itemToBerry( I_NANAB_BERRY );
+        m_berryHealth[ 22 ] = 255;
+        m_berryTrees[ 23 ]  = ITEM::itemToBerry( I_WACAN_BERRY );
+        m_berryHealth[ 23 ] = 255;
+
+        // Route 103 (east)
+        m_berryTrees[ 24 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 24 ] = 255;
+        m_berryTrees[ 25 ]  = 0;
+        m_berryHealth[ 25 ] = 0;
+        m_berryTrees[ 26 ]  = ITEM::itemToBerry( I_CHERI_BERRY );
+        m_berryHealth[ 26 ] = 255;
+
+        // R 111
+        m_berryTrees[ 35 ]  = ITEM::itemToBerry( I_RINDO_BERRY );
+        m_berryHealth[ 35 ] = 255;
+        m_berryTrees[ 36 ]  = ITEM::itemToBerry( I_CHOPLE_BERRY );
+        m_berryHealth[ 36 ] = 255;
+        m_berryTrees[ 37 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 37 ] = 255;
+        m_berryTrees[ 38 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 38 ] = 255;
+
+        // R 112
+        m_berryTrees[ 39 ]  = ITEM::itemToBerry( I_COBA_BERRY );
+        m_berryHealth[ 39 ] = 255;
+        m_berryTrees[ 40 ]  = ITEM::itemToBerry( I_SHUCA_BERRY );
+        m_berryHealth[ 40 ] = 255;
+        m_berryTrees[ 41 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 41 ] = 255;
+        m_berryTrees[ 42 ]  = ITEM::itemToBerry( I_HABAN_BERRY );
+        m_berryHealth[ 42 ] = 255;
+
+        // R 118
+        m_berryTrees[ 43 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 43 ] = 255;
+        m_berryTrees[ 44 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 44 ] = 255;
+        m_berryTrees[ 45 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 45 ] = 255;
+
+        // R 123
+        m_berryTrees[ 46 ]  = ITEM::itemToBerry( I_TAMATO_BERRY );
+        m_berryHealth[ 46 ] = 255;
+        m_berryTrees[ 47 ]  = ITEM::itemToBerry( I_BELUE_BERRY );
+        m_berryHealth[ 47 ] = 255;
+
+        m_berryTrees[ 48 ]  = ITEM::itemToBerry( I_GREPA_BERRY );
+        m_berryHealth[ 48 ] = 255;
+        m_berryTrees[ 49 ]  = ITEM::itemToBerry( I_HONDEW_BERRY );
+        m_berryHealth[ 49 ] = 255;
+
+        m_berryTrees[ 50 ]  = ITEM::itemToBerry( I_CORNN_BERRY );
+        m_berryHealth[ 50 ] = 255;
+        m_berryTrees[ 51 ]  = ITEM::itemToBerry( I_MAGOST_BERRY );
+        m_berryHealth[ 51 ] = 255;
+
+        m_berryTrees[ 52 ]  = ITEM::itemToBerry( I_RABUTA_BERRY );
+        m_berryHealth[ 52 ] = 255;
+        m_berryTrees[ 53 ]  = ITEM::itemToBerry( I_NOMEL_BERRY );
+        m_berryHealth[ 53 ] = 255;
+
+        m_berryTrees[ 54 ]  = ITEM::itemToBerry( I_SPELON_BERRY );
+        m_berryHealth[ 54 ] = 255;
+        m_berryTrees[ 55 ]  = ITEM::itemToBerry( I_PAMTRE_BERRY );
+        m_berryHealth[ 55 ] = 255;
+
+        m_berryTrees[ 56 ]  = ITEM::itemToBerry( I_WATMEL_BERRY );
+        m_berryHealth[ 56 ] = 255;
+        m_berryTrees[ 57 ]  = ITEM::itemToBerry( I_DURIN_BERRY );
+        m_berryHealth[ 57 ] = 255;
+
+        // r 123 (north east)
+
+        m_berryTrees[ 58 ]  = ITEM::itemToBerry( I_KEBIA_BERRY );
+        m_berryHealth[ 58 ] = 255;
+        m_berryTrees[ 59 ]  = ITEM::itemToBerry( I_SHUCA_BERRY );
+        m_berryHealth[ 59 ] = 255;
+        m_berryTrees[ 60 ]  = ITEM::itemToBerry( I_TANGA_BERRY );
+        m_berryHealth[ 60 ] = 255;
+
+        // r 123 (south east)
+
+        m_berryTrees[ 61 ]  = ITEM::itemToBerry( I_HABAN_BERRY );
+        m_berryHealth[ 61 ] = 255;
+        m_berryTrees[ 62 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 62 ] = 255;
+        m_berryTrees[ 63 ]  = ITEM::itemToBerry( I_BABIRI_BERRY );
+        m_berryHealth[ 63 ] = 255;
+
+        // r 119 (south)
+
+        m_berryTrees[ 64 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 64 ] = 255;
+        m_berryTrees[ 65 ]  = ITEM::itemToBerry( I_COLBUR_BERRY );
+        m_berryHealth[ 65 ] = 255;
+
+        // r 119 (north west)
+
+        m_berryTrees[ 66 ]  = ITEM::itemToBerry( I_CHARTI_BERRY );
+        m_berryHealth[ 66 ] = 255;
+        m_berryTrees[ 67 ]  = ITEM::itemToBerry( I_HONDEW_BERRY );
+        m_berryHealth[ 67 ] = 255;
+
+        // r 119 (north east)
+
+        m_berryTrees[ 67 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 67 ] = 255;
+        m_berryTrees[ 68 ]  = ITEM::itemToBerry( I_COBA_BERRY );
+        m_berryHealth[ 68 ] = 255;
+        m_berryTrees[ 69 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 69 ] = 255;
+
+        // r 120 (north east)
+
+        m_berryTrees[ 70 ]  = ITEM::itemToBerry( I_KELPSY_BERRY );
+        m_berryHealth[ 70 ] = 255;
+        m_berryTrees[ 71 ]  = ITEM::itemToBerry( I_QUALOT_BERRY );
+        m_berryHealth[ 71 ] = 255;
+        m_berryTrees[ 72 ]  = ITEM::itemToBerry( I_BLUK_BERRY );
+        m_berryHealth[ 72 ] = 255;
+
+        // r 120 s
+
+        m_berryTrees[ 73 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 73 ] = 255;
+        m_berryTrees[ 74 ]  = ITEM::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 74 ] = 255;
+        m_berryTrees[ 75 ]  = ITEM::itemToBerry( I_LUM_BERRY );
+        m_berryHealth[ 75 ] = 255;
+        m_berryTrees[ 76 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 76 ] = 255;
+
+        m_berryTrees[ 77 ]  = ITEM::itemToBerry( I_OCCA_BERRY );
+        m_berryHealth[ 77 ] = 255;
+        m_berryTrees[ 78 ]  = ITEM::itemToBerry( I_RINDO_BERRY );
+        m_berryHealth[ 78 ] = 255;
+        m_berryTrees[ 79 ]  = ITEM::itemToBerry( I_WACAN_BERRY );
+        m_berryHealth[ 79 ] = 255;
+
+        // r 121
+
+        m_berryTrees[ 80 ]  = ITEM::itemToBerry( I_ORAN_BERRY );
+        m_berryHealth[ 80 ] = 255;
+        m_berryTrees[ 81 ]  = ITEM::itemToBerry( I_LUM_BERRY );
+        m_berryHealth[ 81 ] = 255;
+        m_berryTrees[ 82 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 82 ] = 255;
+        m_berryTrees[ 83 ]  = ITEM::itemToBerry( I_LUM_BERRY );
+        m_berryHealth[ 83 ] = 255;
+
+        m_berryTrees[ 84 ]  = ITEM::itemToBerry( I_ORAN_BERRY );
+        m_berryHealth[ 84 ] = 255;
+        m_berryTrees[ 85 ]  = ITEM::itemToBerry( I_LUM_BERRY );
+        m_berryHealth[ 85 ] = 255;
+        m_berryTrees[ 86 ]  = ITEM::itemToBerry( I_SITRUS_BERRY );
+        m_berryHealth[ 86 ] = 255;
+        m_berryTrees[ 87 ]  = ITEM::itemToBerry( I_LUM_BERRY );
+        m_berryHealth[ 87 ] = 255;
     }
 
     bool saveGame::playerInfo::berryIsAlive( u8 p_berrySlot ) const {

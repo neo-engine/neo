@@ -2170,6 +2170,29 @@ namespace BATTLE {
         return;
     }
 
+    void battleUI::animateGetVolatileStatusCondition( pokemon* p_pokemon, bool p_opponent,
+                                                      u8 p_slot, volatileStatus p_status ) {
+        // TODO
+        (void) p_slot;
+
+        auto pkmnstr = getPkmnName( p_pokemon, p_opponent );
+        char buffer[ 100 ];
+
+        switch( p_status ) {
+        case CONFUSION: snprintf( buffer, 99, GET_STRING( 661 ), pkmnstr.c_str( ) ); break;
+        case LASERFOCUS: snprintf( buffer, 99, GET_STRING( 662 ), pkmnstr.c_str( ) ); break;
+        case MAGNETRISE: snprintf( buffer, 99, GET_STRING( 663 ), pkmnstr.c_str( ) ); break;
+        case AQUARING: snprintf( buffer, 99, GET_STRING( 664 ), pkmnstr.c_str( ) ); break;
+        case FOCUSENERGY: snprintf( buffer, 99, GET_STRING( 665 ), pkmnstr.c_str( ) ); break;
+        case INGRAIN: snprintf( buffer, 99, GET_STRING( 666 ), pkmnstr.c_str( ) ); break;
+        case FORESIGHT:
+        case MIRACLEEYE: snprintf( buffer, 99, GET_STRING( 667 ), pkmnstr.c_str( ) ); break;
+        case LEECHSEED: snprintf( buffer, 99, GET_STRING( 668 ), pkmnstr.c_str( ) ); break;
+        default: return;
+        }
+        log( buffer );
+    }
+
     void battleUI::animateVolatileStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
                                                    volatileStatus p_status ) {
         // TODO
@@ -2177,6 +2200,39 @@ namespace BATTLE {
         (void) p_opponent;
         (void) p_slot;
         (void) p_status;
+    }
+
+    void battleUI::animateGetStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
+                                              u8 p_status ) {
+        (void) p_slot;
+
+        auto pkmnstr = getPkmnName( p_pokemon, p_opponent );
+        char buffer[ 100 ];
+
+        if( p_status == POISON ) {
+            snprintf( buffer, 99, GET_STRING( 655 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == TOXIC ) {
+            snprintf( buffer, 99, GET_STRING( 656 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == BURN ) {
+            snprintf( buffer, 99, GET_STRING( 657 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == SLEEP ) {
+            snprintf( buffer, 99, GET_STRING( 659 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == FROZEN ) {
+            snprintf( buffer, 99, GET_STRING( 658 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
+        if( p_status == PARALYSIS ) {
+            snprintf( buffer, 99, GET_STRING( 660 ), pkmnstr.c_str( ) );
+            log( buffer );
+        }
     }
 
     void battleUI::animateStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,

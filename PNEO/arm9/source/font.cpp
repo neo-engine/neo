@@ -269,26 +269,27 @@ namespace IO {
 
     u16 font::printStringB( const char *p_string, const u16 *p_palette, u16 *p_buffer,
                             u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance,
-                            u8 p_charShift, u8 p_chunkSize, u16 p_bufferHeight ) const {
+                            u8 p_charShift, u8 p_chunkSize, u16 p_bufferHeight,
+                            u16 p_rightPadding ) const {
         u32 current_char = 0;
         s16 putX = 0, putY = 0;
-        u16 lines  = 1;
-        s16 lineWd = stringMaxWidth( p_string, p_bufferWidth, ' ', p_charShift );
-        if( p_alignment == RIGHT ) putX = p_bufferWidth - lineWd;
-        if( p_alignment == CENTER ) putX = ( p_bufferWidth - lineWd ) / 2;
+        u16 lines     = 1;
+        u16 lineSpace = p_bufferWidth - p_rightPadding;
+        s16 lineWd    = stringMaxWidth( p_string, lineSpace, ' ', p_charShift );
+        if( p_alignment == RIGHT ) putX = lineSpace - lineWd;
+        if( p_alignment == CENTER ) putX = ( lineSpace - lineWd ) / 2;
 
         std::memset( TMPBUF, 0, sizeof( TMPBUF ) );
 
         u16  spch = 0;
         bool sp   = false;
-        while( p_string[ current_char ] && putX < p_bufferWidth ) {
+        while( p_string[ current_char ] && putX < lineSpace ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
-                lineWd = stringMaxWidth( p_string + current_char + 1, p_bufferWidth, ' ',
-                                         p_charShift );
+                lineWd = stringMaxWidth( p_string + current_char + 1, lineSpace, ' ', p_charShift );
                 if( p_alignment == LEFT ) { putX = 0; }
-                if( p_alignment == RIGHT ) putX = p_bufferWidth - lineWd;
-                if( p_alignment == CENTER ) putX = ( p_bufferWidth - lineWd ) / 2;
+                if( p_alignment == RIGHT ) putX = lineSpace - lineWd;
+                if( p_alignment == CENTER ) putX = ( lineSpace - lineWd ) / 2;
 
                 current_char++;
                 lines++;
@@ -340,9 +341,9 @@ namespace IO {
 
     u16 font::printStringBC( const char *p_string, const u16 *p_palette, u16 *p_buffer,
                              u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance,
-                             u8 p_chunkSize, u16 p_bufferHeight ) const {
+                             u8 p_chunkSize, u16 p_bufferHeight, u16 p_rightPadding ) const {
         return printStringB( p_string, p_palette, p_buffer, p_bufferWidth, p_alignment, p_yDistance,
-                             1, p_chunkSize, p_bufferHeight );
+                             1, p_chunkSize, p_bufferHeight, p_rightPadding );
     }
 
     u16 font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,

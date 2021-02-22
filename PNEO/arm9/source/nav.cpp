@@ -565,13 +565,13 @@ namespace NAV {
                     std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
                     ln = IO::regularFont->printStringBC( p_message, TEXT_PAL, TEXT_BUF,
                                                          256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                                         16 - ( 4 * !!p_item ), 64, hg );
+                                                         16 - ( 4 * !!p_item ), 64, hg, 20 );
                 } else {
                     std::strncat( TMP_TEXT_BUF, shortbuf, 20 );
                     if( !cpos ) { std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) ); }
                     ln = IO::regularFont->printStringBC( TMP_TEXT_BUF, TEXT_PAL, TEXT_BUF,
                                                          256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                                         16 - ( 4 * !!p_item ), 64, hg );
+                                                         16 - ( 4 * !!p_item ), 64, hg, 20 );
                 }
 
                 if( !p_noDelay ) {

@@ -682,7 +682,7 @@ namespace MAP {
             case ITM: NAV::giveItemToPlayer( parA, parB ); break;
             case ITMR: NAV::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
-                SOUND::playBGM( parA );
+                SOUND::playBGM( parA, true );
                 break;
             }
             case RMS: {

@@ -1241,7 +1241,7 @@ namespace BATTLE {
                 if( volst & YAWN ) {
                     if( getVolatileStatusCounter( i, j, YAWN ) == 1 ) {
                         if( setStatusCondition( i, j, SLEEP, 4 + ( rand( ) & 3 ) ) ) {
-                            p_ui->animateStatusCondition( pkmn, i, j, SLEEP );
+                            p_ui->animateGetStatusCondition( pkmn, i, j, SLEEP );
                             p_ui->updatePkmnStats( i, j, pkmn, true );
                         }
 
@@ -1378,13 +1378,13 @@ namespace BATTLE {
                 }
                 if( pkmn->getItem( ) == I_FLAME_ORB ) {
                     if( setStatusCondition( i, j, BURN ) ) {
-                        p_ui->animateStatusCondition( pkmn, i, j, BURN );
+                        p_ui->animateGetStatusCondition( pkmn, i, j, BURN );
                         p_ui->updatePkmnStats( i, j, pkmn, true );
                     }
                 }
                 if( pkmn->getItem( ) == I_TOXIC_ORB ) {
                     if( setStatusCondition( i, j, TOXIC ) ) {
-                        p_ui->animateStatusCondition( pkmn, i, j, TOXIC );
+                        p_ui->animateGetStatusCondition( pkmn, i, j, TOXIC );
                         p_ui->updatePkmnStats( i, j, pkmn, true );
                     }
                 }
@@ -1925,8 +1925,8 @@ namespace BATTLE {
                 p_ui->log( GET_STRING( 304 ) );
             } else {
                 user->m_status.m_isAsleep = 3;
-                p_ui->animateStatusCondition( target, p_target.first, p_target.second,
-                                              p_move.m_moveData.m_status );
+                p_ui->animateGetStatusCondition( target, p_target.first, p_target.second,
+                                                 p_move.m_moveData.m_status );
                 p_ui->updatePkmnStats( p_target.first, p_target.second, target );
                 healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
                              user->m_stats.m_maxHP );
@@ -2020,8 +2020,8 @@ namespace BATTLE {
             if( setStatusCondition( p_target.first, p_target.second, p_move.m_moveData.m_status,
                                     p_move.m_moveData.m_status == SLEEP ? ( 4 + ( rand( ) & 3 ) )
                                                                         : ( corr ? 254 : 255 ) ) ) {
-                p_ui->animateStatusCondition( target, p_target.first, p_target.second,
-                                              p_move.m_moveData.m_status );
+                p_ui->animateGetStatusCondition( target, p_target.first, p_target.second,
+                                                 p_move.m_moveData.m_status );
                 p_ui->updatePkmnStats( p_target.first, p_target.second, target, true );
             } else {
                 p_ui->log( GET_STRING( 304 ) );
@@ -2078,11 +2078,12 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_volatileStatus ) {
-            p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
-                                                  p_move.m_moveData.m_volatileStatus );
+            p_ui->animateGetVolatileStatusCondition( target, p_target.first, p_target.second,
+                                                     p_move.m_moveData.m_volatileStatus );
             if( addVolatileStatus( p_ui, p_target.first, p_target.second,
                                    p_move.m_moveData.m_volatileStatus, 255 ) ) {
-
+                p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
+                                                      p_move.m_moveData.m_volatileStatus );
             } else {
                 p_ui->log( GET_STRING( 304 ) );
             }
@@ -2108,8 +2109,8 @@ namespace BATTLE {
                     p_target.first, p_target.second, p_move.m_moveData.m_secondaryStatus,
                     p_move.m_moveData.m_secondaryStatus == SLEEP ? ( 4 + ( rand( ) & 3 ) )
                                                                  : ( corr ? 254 : 255 ) ) ) {
-                p_ui->animateStatusCondition( target, p_target.first, p_target.second,
-                                              p_move.m_moveData.m_secondaryStatus );
+                p_ui->animateGetStatusCondition( target, p_target.first, p_target.second,
+                                                 p_move.m_moveData.m_secondaryStatus );
                 p_ui->updatePkmnStats( p_target.first, p_target.second, target, true );
             } else {
                 p_ui->log( GET_STRING( 304 ) );
@@ -2117,10 +2118,12 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_secondaryVolatileStatus ) {
-            p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
-                                                  p_move.m_moveData.m_secondaryVolatileStatus );
+            p_ui->animateGetVolatileStatusCondition( target, p_target.first, p_target.second,
+                                                     p_move.m_moveData.m_secondaryVolatileStatus );
             if( addVolatileStatus( p_ui, p_target.first, p_target.second,
                                    p_move.m_moveData.m_secondaryVolatileStatus, 255 ) ) {
+                p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
+                                                      p_move.m_moveData.m_secondaryVolatileStatus );
             } else {
                 p_ui->log( GET_STRING( 304 ) );
             }
@@ -2187,15 +2190,15 @@ namespace BATTLE {
         }
         if( tgvol & BANEFULBUNKER ) {
             if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, POISON ) ) {
-                p_ui->animateStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
-                                              POISON );
+                p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
+                                                 POISON );
                 p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second, pkmn );
             }
         }
         if( tgvol & BEAKBLAST ) {
             if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, BURN ) ) {
-                p_ui->animateStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
-                                              BURN );
+                p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
+                                                 BURN );
                 p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second, pkmn );
             }
         }
@@ -2283,6 +2286,8 @@ namespace BATTLE {
                     p_ui->logAbility( target, p_target.first );
                     addVolatileStatus( p_ui, p_move.m_user.first, p_move.m_user.second, ATTRACT,
                                        255 );
+                    p_ui->animateGetVolatileStatusCondition( target, p_target.first,
+                                                             p_target.second, ATTRACT );
                 }
                 break;
             }
@@ -2290,8 +2295,8 @@ namespace BATTLE {
                 if( !( rand( ) % 3 ) ) {
                     if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, BURN ) ) {
                         p_ui->logAbility( target, p_target.first );
-                        p_ui->animateStatusCondition( pkmn, p_move.m_user.first,
-                                                      p_move.m_user.second, BURN );
+                        p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first,
+                                                         p_move.m_user.second, BURN );
                         p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second, pkmn );
                     }
                 }
@@ -2301,8 +2306,8 @@ namespace BATTLE {
                 if( !( rand( ) % 3 ) ) {
                     if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, POISON ) ) {
                         p_ui->logAbility( target, p_target.first );
-                        p_ui->animateStatusCondition( pkmn, p_move.m_user.first,
-                                                      p_move.m_user.second, POISON );
+                        p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first,
+                                                         p_move.m_user.second, POISON );
                         p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second, pkmn );
                     }
                 }
@@ -2313,8 +2318,8 @@ namespace BATTLE {
                     if( setStatusCondition( p_move.m_user.first, p_move.m_user.second,
                                             PARALYSIS ) ) {
                         p_ui->logAbility( target, p_target.first );
-                        p_ui->animateStatusCondition( pkmn, p_move.m_user.first,
-                                                      p_move.m_user.second, PARALYSIS );
+                        p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first,
+                                                         p_move.m_user.second, PARALYSIS );
                         p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second, pkmn );
                     }
                 }
@@ -2329,8 +2334,8 @@ namespace BATTLE {
                         if( setStatusCondition( p_move.m_user.first, p_move.m_user.second,
                                                 BURN ) ) {
                             p_ui->logAbility( target, p_target.first );
-                            p_ui->animateStatusCondition( pkmn, p_move.m_user.first,
-                                                          p_move.m_user.second, BURN );
+                            p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first,
+                                                             p_move.m_user.second, BURN );
                             p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second,
                                                    pkmn );
                         }
@@ -2339,8 +2344,8 @@ namespace BATTLE {
                         if( setStatusCondition( p_move.m_user.first, p_move.m_user.second,
                                                 POISON ) ) {
                             p_ui->logAbility( target, p_target.first );
-                            p_ui->animateStatusCondition( pkmn, p_move.m_user.first,
-                                                          p_move.m_user.second, POISON );
+                            p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first,
+                                                             p_move.m_user.second, POISON );
                             p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second,
                                                    pkmn );
                         }
@@ -2349,8 +2354,8 @@ namespace BATTLE {
                         if( setStatusCondition( p_move.m_user.first, p_move.m_user.second,
                                                 PARALYSIS ) ) {
                             p_ui->logAbility( target, p_target.first );
-                            p_ui->animateStatusCondition( pkmn, p_move.m_user.first,
-                                                          p_move.m_user.second, PARALYSIS );
+                            p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first,
+                                                             p_move.m_user.second, PARALYSIS );
                             p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second,
                                                    pkmn );
                         }
@@ -2365,8 +2370,8 @@ namespace BATTLE {
                 if( !( rand( ) % 3 ) ) {
                     if( setStatusCondition( p_target.first, p_target.second, POISON ) ) {
                         p_ui->logAbility( user, p_move.m_user.first );
-                        p_ui->animateStatusCondition( pkmn, p_target.first, p_target.second,
-                                                      POISON );
+                        p_ui->animateGetStatusCondition( pkmn, p_target.first, p_target.second,
+                                                         POISON );
                         p_ui->updatePkmnStats( p_target.first, p_target.second, pkmn );
                     }
                 }

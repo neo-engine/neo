@@ -232,7 +232,7 @@ namespace NAV {
         { 635, MOD_ROUTE_123 },
         { 639, MOD_SHOAL_CAVE },
         { 641, MOD_SOOTOPOLIS_CITY },
-        { 628, MOD_ROUTE_38 },
+        { 628, MOD_ROUTE_135 },
         { 601, MOD_CLIFFELTA_CITY },
         { 615, MOD_NEW_LILYCOVE_CITY },
         { 627, MOD_ROUTE_10 },
@@ -271,6 +271,7 @@ namespace NAV {
         { 645, MOD_UNWAVERING_EMOTIONS },
         { 648, MOD_EX04 },
         { 652, MOD_EX05 },
+        { 654, MOD_EX06 },
 
         { 620, MOD_MYSTERY_GIFT },
     };

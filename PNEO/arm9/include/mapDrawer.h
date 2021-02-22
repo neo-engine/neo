@@ -140,7 +140,8 @@ namespace MAP {
         void loadNewRow( direction p_direction, bool p_updatePlayer );
         void loadSlice( direction p_direction ); // dir: dir that needs to be extended
 
-        void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true );
+        void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true,
+                     bool p_unfade = false );
 
         void animateField( u16 p_globX, u16 p_globY );
 

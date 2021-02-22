@@ -47,6 +47,8 @@ namespace SOUND {
     bool BGMLoaded  = false;
     u16  currentBGM = 0;
 
+    bool BGMforced = false; // While the bgm is forced, no music changes via map/movemode change
+
     void initBattleSound( ) {
     }
 
@@ -72,9 +74,10 @@ namespace SOUND {
 #endif
     }
 
-    void playBGM( u16 p_id ) {
+    void playBGM( u16 p_id, bool p_force ) {
 #ifndef NO_SOUND
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
+            if( p_force ) { BGMforced = true; }
             if( BGMLoaded && p_id == currentBGM ) { return; }
             if( BGMLoaded ) {
                 setVolume( 0x50 );

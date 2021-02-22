@@ -53,7 +53,7 @@ namespace SAVE {
 #else
     constexpr u8 MAX_BOXES      = 35;
 #endif
-    constexpr u8 BERRY_SLOTS = 50;
+    constexpr u8 BERRY_SLOTS = 150;
 
     constexpr u16 F_MEGA_EVOLUTION   = 1;
     constexpr u16 F_NAV_OBTAINED     = 2;
@@ -137,6 +137,7 @@ namespace SAVE {
             u32            m_money;
             u16            m_coins;
             u16            m_battlePoints;
+            u32            m_ashCount = 0; // ash collected on Route 113
             MAP::mapPlayer m_player;
             u8             m_currentMap;
             u8             m_stepCount;
@@ -158,19 +159,19 @@ namespace SAVE {
             saveOptions m_options;        // Various options and settings
             pokemon     m_pkmnTeam[ 6 ];
             u16         m_vars[ 256 ];  // variables to be set by map scripts etc.
-            u16         m_flags[ 244 ]; // flags tracking the progress of the player's adventure
+            u16         m_flags[ 256 ]; // flags tracking the progress of the player's adventure
 
             u8   m_berryTrees[ BERRY_SLOTS ];       // berry indices for each berry tree
             u8   m_berryHealth[ BERRY_SLOTS ];      // health of the berry (255 for default)
             date m_berryPlantedDate[ BERRY_SLOTS ]; // Date when the berry was planted
             time m_berryPlantedTime[ BERRY_SLOTS ]; // Time when the berry was planted
 
-            u32 m_ashCount = 0; // ash collected on Route 113
-
             MAP::warpPos m_lastPokeCenter; // position where the player is teleported to if all of
                                            // their pkmn are fainted
             MAP::warpPos m_lastCaveEntry; // position where a player is teleported to if they use an
                                           // escape rope in a cave
+            MAP::warpPos    m_lastOWPos;  // last position of the player on an outside-type map
+            MAP::mapWeather m_currentMapWeather; // current map weather
 
             std::pair<u8, MAP::mapObject> m_mapObjects[ 256 ];
             u8                            m_mapObjectCount;
@@ -178,9 +179,7 @@ namespace SAVE {
             u16 m_initGameItemCount = 0; // Items accessible during begin game PC check
             u16 m_initGameItems[ 5 ];
 
-            MAP::warpPos    m_lastOWPos; // last position of the player on an outside-type map
-            MAP::mapWeather m_currentMapWeather; // current map weather
-            u16             m_reserved[ 30 ]; // reserved for future things that need to be stored
+            u32 m_reserved[ 60 ]; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 
@@ -191,6 +190,8 @@ namespace SAVE {
 
             u8 m_caughtPkmn[ 125 ]; // The pkmn the player has caught
             u8 m_seenPkmn[ 125 ];   // The pkmn the player has seen
+            u8 m_shinyPkmn[ 125 ];  // The pkmn the player has seen as a shiny (unused)
+            u8 m_unusedPkmn[ 125 ]; // (unused)
 
             constexpr bool hasBadgeCase( u8 p_case ) const {
                 if( p_case == 0 ) { return true; }

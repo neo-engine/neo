@@ -70,6 +70,11 @@ namespace MAP {
             FS::close( p_f );
         }
     }
+
+    void mapSpriteData::updatePalette( u8 p_bgPalIdx ) {
+        std::memcpy( m_palData, &BG_PALETTE[ 16 * p_bgPalIdx ], 16 * sizeof( u16 ) );
+    }
+
     mapSpriteData::mapSpriteData( u16 p_imageId ) {
         FILE* f;
         if( p_imageId > 1000 ) {
@@ -160,6 +165,9 @@ namespace MAP {
         _grassData     = mapSpriteData( 256 | 254 );
         _longGrassData = mapSpriteData( 256 | 255 );
 
+        _grassData.updatePalette( 3 );
+        _longGrassData.updatePalette( 3 );
+
         _playerPlatform.m_sprite = mapSprite( { 256 | 248, 0 }, mapSpriteData( 256 | 248 ) );
     }
 
@@ -249,8 +257,13 @@ namespace MAP {
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
-            case SPR_GRASS: return _grassData;
-            case SPR_LONG_GRASS: return _longGrassData; [[unlikely]] default : break;
+            case SPR_GRASS: {
+                return _grassData;
+            }
+            case SPR_LONG_GRASS: {
+                return _longGrassData;
+            }
+                [[unlikely]] default : break;
             }
         }
 
@@ -269,7 +282,9 @@ namespace MAP {
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
-            case SPR_GRASS: return _grassData;
+            case SPR_GRASS: {
+                return _grassData;
+            }
             case SPR_LONG_GRASS: return _longGrassData; [[unlikely]] default : break;
             }
         }
@@ -426,12 +441,14 @@ namespace MAP {
             return SPR_HM_OAM( nextfree );
 
         case SPR_GRASS:
+            _grassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_MAPTILE_OAM( nextfree ),
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
+            _longGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           SPR_MAPTILE_OAM( nextfree ),
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData );

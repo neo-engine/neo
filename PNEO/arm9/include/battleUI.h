@@ -117,6 +117,13 @@ namespace BATTLE {
                                  bool p_sentenceStart = true ) const;
 
         /*
+         * @brief: Plays an animation that the pkmn at the specified slot obtains
+         * the specified status condition.
+         */
+        void animateGetVolatileStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
+                                                volatileStatus p_status );
+
+        /*
          * @brief: Plays an animation that the pkmn at the specified slot currently has
          * the specified status condition.
          */
@@ -124,10 +131,17 @@ namespace BATTLE {
                                              volatileStatus p_status );
 
         /*
-         * @brief: Plays an animation that the pkmn at the specified slot currently has
+         * @brief: Plays an animation that the pkmn at the specified slot obtains
          * the specified status condition.
          */
         void animateStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot, u8 p_status );
+
+        /*
+         * @brief: Plays an animation that the pkmn at the specified slot obtains
+         * the specified status condition.
+         */
+        void animateGetStatusCondition( pokemon* p_pokemon, bool p_opponent, u8 p_slot,
+                                        u8 p_status );
 
         /*
          * @brief: Runs the animation when the given move is prepared and prints

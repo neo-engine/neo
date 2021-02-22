@@ -268,7 +268,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "The language is set to English.\nChoose a different language?",
       "Die aktuelle Sprache ist Deutsch.\nSprache wechseln?" },
-    { "You put the %s\ninto the [%hu] %s bag.", "%s in der\n[%hu] %s-Tasche verstaut." },
+    { "You put the %s\ninto the [%hu] %s bag.", "%s bei den\n[%hu] %s verstaut." },
     { "Stored %s %s", "%s %s in der" },
     { "Stored %s", "%s in der" },
     { "Stored %3d %s", "%3d %s in der" },
@@ -1191,4 +1191,25 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Battle-Time Space", "Kampf-Raum Zeit" },
     { "Islands 3", "Islands 3" },
     { "Moonlight", "Mondschein" },
+    { "Hidden Land", "Verborgenes Land" },
+
+    { "%s got poisoned.", "%s wurde vergiftet." },
+    { "%s got badly poisoned.", "%s wurde schwer vergiftet." },
+    { "%s got burned.", "%s wurde verbrannt." },
+    { "%s was frozen solid.", "%s erstarrt zu Eis." },
+    { "%s fell asleep.", "%s schl\xe4"
+                         "ft ein." },
+
+    // 660
+    { "%s was paralyzed.", "%s wurde paralysiert." },
+    { "%s was confused.", "%s wurde verwirrt." },
+    { "%s gained laser focus.", "%s sch\xe4rft seine Sinne." },
+    { "%s levitated on electromagnetism.", "%s schwebt dank Elektromagnetismus." },
+    { "%s formed an Aqua Ring.", "%s bildet einen Wasserring." },
+
+    { "%s is getting pumped.", "%s pumpt sich auf." },
+    { "%s planted its roots.", "%s pflanzt seine Wurzeln." },
+    { "%s was identified.", "%s wurde erkannt." },
+    { "%s was planted.", "%s wurde bepflanzt." },
+
 };

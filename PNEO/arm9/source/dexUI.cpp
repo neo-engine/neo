@@ -101,7 +101,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace DEX {
 
-    constexpr u16 TEXT_PAL[ 16 ] = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
+    const u16 TEXT_PAL[ 16 ] = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
 
     void initSubSprites( ) {
         IO::initOAMTable( true );
@@ -725,7 +725,7 @@ namespace DEX {
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32,
-                                                IO::font::CENTER );
+                                                IO::font::CENTER, 0, 32 );
                 IO::loadSpriteB( p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex, p_x - 1, p_y + 25,
                                  32, 32, NAV::TEXT_BUF, 32 * 32 / 2, false, false, false,
                                  OBJPRIORITY_3, p_bottom );
@@ -785,7 +785,8 @@ namespace DEX {
             IO::regularFont->setColor( 1, 1 );
             IO::regularFont->setColor( 0, 2 );
             snprintf( buffer, 9, "%03hu", p_pkmnIdx );
-            IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32 );
+            IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32, IO::font::LEFT, 0,
+                                            32 );
             IO::loadSpriteB( oamStart + 5, oam[ oamStart + 5 ].gfxIndex,
                              SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 40,
                              SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF,

@@ -84,6 +84,9 @@ void initSound( );
 namespace SOUND {
     constexpr u16 JBOX_DISABLED = u16( -1 );
 
+    extern bool BGMforced;
+    extern u16  currentBGM;
+
     /*
      * @brief: Initializes sound effects for battles.
      */
@@ -94,7 +97,7 @@ namespace SOUND {
      */
     void deinitBattleSound( );
 
-    void playBGM( u16 p_id );
+    void playBGM( u16 p_id, bool p_force = false );
     void playBGMOneshot( u16 p_id );
     void playSoundEffect( u16 p_id );
 
@@ -211,7 +214,7 @@ namespace SOUND {
     constexpr u16 BGMforLocation( u16 p_locationId ) {
         switch( p_locationId ) {
         case L_ROUTE_38: return MOD_ROUTE_38;
-        case L_HIDDEN_LAKE: return MOD_ROUTE_10;
+        case L_HIDDEN_LAKE: return MOD_EX06;
         case L_ROUTE_101:
         case L_ROUTE_102:
         case L_ROUTE_103: return MOD_ROUTE_101;
@@ -247,7 +250,7 @@ namespace SOUND {
         case L_ROUTE_134: return MOD_ROUTE_120;
         case L_ROUTE_135:
         case L_ROUTE_136:
-        case L_ROUTE_137: return MOD_ROUTE_38;
+        case L_ROUTE_137: return MOD_ROUTE_135;
         case L_ROUTE_123: return MOD_ROUTE_123;
         case L_TRAINERS__SCHOOL: return MOD_TRAINER_SCHOOL;
         case L_NEW_LILYCOVE_CITY: return MOD_NEW_LILYCOVE_CITY;
@@ -273,11 +276,11 @@ namespace SOUND {
         case L_FOREST_GROTTO:
         case L_ROCK_SHELTER:
         case L_DESERT_RUINS: return MOD_SEALED_CHAMBER;
+        case L_MT_CHIMNEY:
         case L_FIERY_PATH: return MOD_MT_PYRE_PEAK;
         case L_MT_PYRE:
         case L_SHOAL_CAVE:
         case L_CRYSTAL_CAVERN: return MOD_SHOAL_CAVE;
-        case L_ROUTE_111_DESERT: return MOD_DESERT;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
         case L_GRANITE_CAVE:
         case L_RUSTURF_TUNNEL:

@@ -97,7 +97,7 @@ namespace SOUND {
 
         currentLocation = p_newLocation;
 
-        if( currentJBoxBGM != JBOX_DISABLED ) { return; }
+        if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
         if( currentMoveMode == MAP::WALK ) { playBGM( BGMforLocation( currentLocation ) ); }
     }
 
@@ -105,7 +105,7 @@ namespace SOUND {
         if( currentMoveMode == p_newMoveMode ) { return; }
 
         currentMoveMode = p_newMoveMode;
-        if( currentJBoxBGM != JBOX_DISABLED ) { return; }
+        if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
         playBGM( BGMforWeather( currentWeather ) );
     }
 
@@ -113,11 +113,12 @@ namespace SOUND {
         if( currentWeather == p_newWeather ) { return; }
 
         currentWeather = p_newWeather;
-        if( currentJBoxBGM != JBOX_DISABLED ) { return; }
+        if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
         playBGM( BGMforWeather( currentWeather ) );
     }
 
     void restartBGM( ) {
+        BGMforced = false;
         if( currentJBoxBGM != JBOX_DISABLED ) {
             playBGM( currentJBoxBGM );
         } else {

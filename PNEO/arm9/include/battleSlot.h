@@ -420,7 +420,7 @@ namespace BATTLE {
                     change = true;
                     _volatileStatusAmount[ i ]++;
                     _volatileStatusCounter[ i ] = p_duration;
-#ifdef DESQUID
+#ifdef DESQUID_MORE
                     p_ui->log( std::string( "Add volatile status condition " )
                                + std::to_string( 1LLU << i ) );
 #else
@@ -438,7 +438,7 @@ namespace BATTLE {
                     change                      = true;
                     _volatileStatusAmount[ i ]  = 0;
                     _volatileStatusCounter[ i ] = 0;
-#ifdef DESQUID
+#ifdef DESQUID_MORE
                     p_ui->log( std::string( "Remove volatile status condition " )
                                + std::to_string( 1LLU << i ) );
 #else
@@ -479,7 +479,7 @@ namespace BATTLE {
                 return false;
             }
 
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             p_ui->log( std::string( "Add slot condition " ) + std::to_string( p_slotCondition ) );
 #endif
 
@@ -501,7 +501,7 @@ namespace BATTLE {
                 if( ( 1LLU << i ) & p_slotCondition ) { _slotConditionCounter[ i ] = 0; }
             }
             _slotCondition = slotCondition( _slotCondition & ~p_slotCondition );
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             p_ui->log( std::string( "Remove slot condition " )
                        + std::to_string( p_slotCondition ) );
 #else

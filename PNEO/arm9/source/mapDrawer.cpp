@@ -38,6 +38,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gameStart.h"
 #include "mapDrawer.h"
 #include "nav.h"
+#include "pokemonNames.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sound.h"
@@ -289,6 +290,8 @@ namespace MAP {
 
     void mapDrawer::draw( u16 p_globX, u16 p_globY, bool p_init ) {
         if( p_init ) {
+            ANIMATE_MAP = false;
+
             videoSetMode( MODE_3_2D | DISPLAY_BG0_ACTIVE | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE
                           | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                           | ( ( DISPLAY_SPR_1D | DISPLAY_SPR_1D_SIZE_128 | DISPLAY_SPR_1D_BMP
@@ -366,9 +369,11 @@ namespace MAP {
         u16 mny = p_globY - 8;
         u16 mnx = p_globX - 15;
 
+        ANIMATE_MAP = false;
         for( u16 y = 0; y < NUM_ROWS; y++ )
             for( u16 x = 0; x < NUM_COLS; x++ ) { loadBlock( at( mnx + x, mny + y ), x, y ); }
         bgUpdate( );
+        ANIMATE_MAP = true;
     }
 
     void mapDrawer::draw( ObjPriority ) {
@@ -383,8 +388,7 @@ namespace MAP {
 
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false );
-        IO::fadeScreen( IO::UNFADE );
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false, true );
     }
 
     void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
@@ -547,7 +551,11 @@ namespace MAP {
         case 0x24: {
             // ashen grass
             animateField( p_globX, p_globY, anim );
-            setBlock( p_globX, p_globY, 0x212 );
+            if( CUR_SLICE.m_tIdx2 == 6 ) {
+                setBlock( p_globX, p_globY, 0x206 );
+            } else if( CUR_SLICE.m_tIdx2 == 7 ) {
+                setBlock( p_globX, p_globY, 0x212 );
+            }
             break;
         }
         case 0xd2: {
@@ -561,7 +569,8 @@ namespace MAP {
         // TODO
     }
 
-    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn ) {
+    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn,
+                            bool p_unfade ) {
         animateField( p_globX, p_globY );
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
@@ -661,6 +670,7 @@ namespace MAP {
             if( !hadBattle ) { handleWildPkmn( p_globX, p_globY ); }
         }
 
+        if( p_unfade ) { IO::fadeScreen( IO::UNFADE ); }
         handleEvents( p_globX, p_globY, p_z );
     }
 
@@ -1028,9 +1038,10 @@ namespace MAP {
 #ifdef DESQUID_MORE
         NAV::printMessage( ( std::to_string( total ) ).c_str( ), MSG_INFO );
 #endif
-        u16 pkmnId    = 0;
-        u16 backup    = 0;
-        u8  pkmnForme = 0;
+        u16 pkmnId      = 0;
+        u16 backup      = 0;
+        u8  pkmnForme   = 0;
+        u8  backupForme = 0;
 
         u8 res = rand( ) % total;
         total  = 0;
@@ -1049,7 +1060,8 @@ namespace MAP {
                     if( SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId(
                             CUR_DATA.m_pokemon[ i ].m_speciesId )
                         != u16( -1 ) ) {
-                        backup = CUR_DATA.m_pokemon[ i ].m_speciesId;
+                        backup      = CUR_DATA.m_pokemon[ i ].m_speciesId;
+                        backupForme = CUR_DATA.m_pokemon[ i ].m_forme;
                     } else {
                         continue;
                     }
@@ -1059,7 +1071,8 @@ namespace MAP {
                         pkmnForme = CUR_DATA.m_pokemon[ i ].m_forme;
 #ifdef DESQUID_MORE
                         NAV::printMessage(
-                            ( std::to_string( total ) + " " + std::to_string( res ) ).c_str( ),
+                            ( std::to_string( pkmnId ) + " " + std::to_string( pkmnForme ) )
+                                .c_str( ),
                             MSG_INFO );
 #endif
                         break;
@@ -1068,8 +1081,16 @@ namespace MAP {
             }
         }
 
-        if( !pkmnId ) { pkmnId = backup; }
+        if( !pkmnId ) {
+            pkmnId    = backup;
+            pkmnForme = backupForme;
+        }
         if( !pkmnId ) { return false; }
+
+        if( pkmnId == PKMN_PIKACHU && !( rand( ) & 0xff ) ) { pkmnId = PKMN_MIMIKYU; }
+
+        ANIMATE_MAP = false;
+        DRAW_TIME   = false;
 
         bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
                             BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
@@ -1118,8 +1139,6 @@ namespace MAP {
         }
 
         auto playerPrio = _mapSprites.getPriority( _playerSprite );
-        ANIMATE_MAP     = false;
-        DRAW_TIME       = false;
         swiWaitForVBlank( );
         if( BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                             SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn, platform,
@@ -1134,9 +1153,10 @@ namespace MAP {
         draw( playerPrio );
         _mapSprites.setPriority( _playerSprite,
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
-        ANIMATE_MAP = true;
         NAV::init( );
 
+        ANIMATE_MAP = true;
+        DRAW_TIME   = true;
         return true;
     }
 
@@ -2781,9 +2801,9 @@ namespace MAP {
                 bgUpdate( );
 
                 draw( );
-                ANIMATE_MAP = true;
                 SOUND::restoreVolume( );
                 NAV::init( );
+                ANIMATE_MAP = true;
             }
             if( !p_allowItemSell || curMode == 2 ) { break; }
         }
@@ -3148,9 +3168,9 @@ namespace MAP {
         SOUND::setVolume( 0 );
         IO::initVideoSub( );
         IO::resetScale( true, false );
-        ANIMATE_MAP = true;
         NAV::init( );
         redirectPlayer( DOWN, false );
         warpPlayer( NO_SPECIAL, tgpos );
+        ANIMATE_MAP = true;
     }
 } // namespace MAP

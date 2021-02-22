@@ -169,14 +169,16 @@ namespace IO {
          */
         u16 printStringB( const char *p_string, const u16 *p_palette, u16 *p_buffer,
                           u16 p_bufferWidth, alignment p_alignment = LEFT, u8 p_yDistance = 15,
-                          u8 p_charShift = 0, u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
+                          u8 p_charShift = 0, u8 p_chunkSize = 64, u16 p_bufferHeight = 32,
+                          u16 p_rightPadding = 0 ) const;
         /*
          * @brief: Prints a string in the given buffer with less horizontal space between characters
          * @returns: number of lines written (i.e. 1 + number of newlines or other breaks)
          */
         u16 printStringBC( const char *p_string, const u16 *p_palette, u16 *p_buffer,
                            u16 p_bufferWidth, alignment p_alignment = LEFT, u8 p_yDistance = 15,
-                           u8 p_chunkSize = 64, u16 p_bufferHeight = 32 ) const;
+                           u8 p_chunkSize = 64, u16 p_bufferHeight = 32,
+                           u16 p_rightPadding = 0 ) const;
 
         /*
          * @brief: Prints the given string, where newlines are inserted whenever the

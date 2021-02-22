@@ -110,6 +110,12 @@ namespace MAP {
          * @brief: Read mapSpriteData from the specified file.
          */
         void readData( FILE* p_f );
+
+        /*
+         * @brief: Copies BG_PALETE[ 16 * p_bgPalIdx, .., 16 * p_bgPalIdx + 15 ] to this
+         * sprites palette data.
+         */
+        void updatePalette( u8 p_bgPalIdx );
     };
 
     class mapSprite {

@@ -134,7 +134,6 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     setIsEgg( p_isEgg );
     m_fateful = p_fatefulEncounter;
 
-    setForme( p_forme );
     if( p_name ) {
         strcpy( m_name, p_name );
         setIsNicknamed( true );
@@ -150,6 +149,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
 
     m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
     setSpecies( p_pkmnId, &data );
+    setForme( p_forme );
 }
 
 bool boxPokemon::isFullyEvolved( ) const {

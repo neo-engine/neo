@@ -92,7 +92,7 @@ extern unsigned int   TEMP[ 256 * 256 / 4 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
 constexpr u8  LANGUAGES     = 2;
-constexpr u16 MAX_STRINGS   = 660;
+constexpr u16 MAX_STRINGS   = 990;
 constexpr u8  NUM_BGS       = 12;
 constexpr u8  INITIAL_NAVBG = 10;
 
