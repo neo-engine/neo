@@ -157,7 +157,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "%s used %s!", "%s setzt %s ein!" },
     { "Items", "Items" },
-    { "Medicine", "Medizin" },
+    { "Medicine", "Heilitems" },
     { "TM/HM", "TM/VM" },
     { "Berries", "Beeren" },
 

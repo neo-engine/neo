@@ -687,6 +687,10 @@ namespace NAV {
         char buffer[ 100 ];
         auto iname = ITEM::getItemName( p_itemId );
 
+        if( data.m_itemType == ITEM::ITEMTYPE_TM ) {
+            iname += " " + MOVE::getMoveName( data.m_param2 );
+        }
+
         if( p_amount > 1 ) {
             snprintf( buffer, 99, GET_STRING( 563 ), p_amount, iname.c_str( ) );
         } else {
@@ -1750,18 +1754,25 @@ namespace NAV {
                 break;
             }
             case 1:
-                for( u16 j = 1; j < MAX_ITEMS; ++j ) {
-                    auto c = ITEM::getItemData( j );
-                    if( c.m_itemType )
-                        SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( c.m_itemType ), j,
-                                                                 1 );
-                }
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_MAX_REPEL, 999 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_MASTER_BALL, 999 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::MEDICINE, I_MAX_REVIVE, 999 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_SUPER_ROD, 1 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_GO_GOGGLES, 1 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_DEVON_SCOPE, 1 );
                 init( );
                 break;
             case 2: {
                 init( );
-                SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5 ) % 24;
-                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED, true );
+                //                SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5 ) %
+                //                24; SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED,
+                //                true );
+
+                SAVE::SAV.getActiveFile( ).m_repelSteps
+                    = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 9999 );
+
                 /*
                 init( );
                 MAP::curMap->faintPlayer( );
