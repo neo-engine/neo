@@ -496,8 +496,10 @@ namespace BAG {
                     }
 
                     if( t.second >= 100 ) { // select item
+                        u8 res = 0;
+                        if( _currSelectedIdx == t.second - 100 ) { res = 2; }
                         selectItem( t.second - 100 );
-                        return 0;
+                        return res;
                     }
                 }
             }
@@ -681,13 +683,17 @@ namespace BAG {
         return 0;
     }
 
-    bool bagViewer::handleSomeInput( bool p_allowSort ) {
+    u8 bagViewer::handleSomeInput( bool p_allowSort ) {
         auto curBg   = (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag;
         auto curBgsz = SAVE::SAV.getActiveFile( ).m_bag.size( curBg );
+        auto tch     = handleTouch( );
 
-        if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X ) || handleTouch( ) ) {
+        if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X ) || tch == 1 ) {
             SOUND::playSoundEffect( SFX_CANCEL );
             return false;
+        } else if( GET_AND_WAIT( KEY_A ) || tch == 2 ) {
+            SOUND::playSoundEffect( SFX_CHOOSE );
+            return 2;
         } else if( p_allowSort && GET_AND_WAIT( KEY_SELECT ) ) {
             SOUND::playSoundEffect( SFX_CHOOSE );
             SAVE::SAV.getActiveFile( ).m_bag.sort(
@@ -970,9 +976,8 @@ namespace BAG {
                             [ & ]( u8 p_selection ) { _bagUI->selectChoice( p_selection ); } );
 
         if( res == IO::choiceBox::EXIT_CHOICE ) [[unlikely]] {
-                return 2;
-            }
-        else if( res == IO::choiceBox::BACK_CHOICE || _choices[ res ] == BACK ) {
+            return 2;
+        } else if( res == IO::choiceBox::BACK_CHOICE || _choices[ res ] == BACK ) {
             _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                                  _currSelectedIdx );
             return 0;
@@ -995,13 +1000,13 @@ namespace BAG {
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            pressed  = keysUp( );
+            held     = keysHeld( );
+            auto tmp = handleSomeInput( );
 
-            if( !handleSomeInput( ) )
+            if( !tmp )
                 break;
-            else if( GET_AND_WAIT( KEY_A ) ) {
-                SOUND::playSoundEffect( SFX_CHOOSE );
+            else if( tmp == 2 ) {
                 u16 res = handleSelection( );
                 if( res & 2 ) return ( res >> 2 );
             }
@@ -1032,9 +1037,10 @@ namespace BAG {
             pressed = keysUp( );
             held    = keysHeld( );
 
-            if( !handleSomeInput( ) ) return 0;
-            if( GET_AND_WAIT( KEY_A ) ) {
-                SOUND::playSoundEffect( SFX_CHOOSE );
+            auto tmp = handleSomeInput( );
+            if( !tmp ) {
+                return 0;
+            } else if( tmp == 2 ) {
                 if( SAVE::SAV.getActiveFile( ).m_bag.empty(
                         (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag ) )
                     continue;

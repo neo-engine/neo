@@ -132,7 +132,7 @@ namespace BAG {
 
         /*
          * @brief: Handles all touch input related things.
-         * @returns: 1 if the player pressed back.
+         * @returns: 1 if the player pressed back.; 2 if the player pressed A
          */
         u8 handleTouch( );
 
@@ -160,7 +160,7 @@ namespace BAG {
          */
         u16 handleSelection( );
 
-        bool handleSomeInput( bool p_allowSort = true );
+        u8 handleSomeInput( bool p_allowSort = true );
 
       public:
         bagViewer( pokemon* p_playerTeam, context p_context = NO_SPECIAL_CONTEXT );
