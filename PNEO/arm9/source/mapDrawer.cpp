@@ -245,6 +245,7 @@ namespace MAP {
         _weatherScrollY = 0;
         switch( getWeather( ) ) {
         case SANDSTORM:
+        case ASH_RAIN:
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             bgWrapOn( IO::bg3 );
 

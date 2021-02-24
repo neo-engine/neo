@@ -72,7 +72,8 @@ namespace NAV {
     constexpr u16 SPR_NAV_APP_ICON_SUB( u16 p_i ) {
         return ( 80 + ( p_i ) );
     }
-    constexpr u16 SPR_NAV_APP_RSV_SUB = 85;
+    constexpr u16 SPR_PAGE_BG_OAM_SUB = 84;
+    constexpr u16 SPR_NAV_APP_RSV_SUB = 90;
 
     constexpr u16 SPR_MENU_PAL_SUB( u16 p_idx ) {
         return ( 0 + ( p_idx ) );

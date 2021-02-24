@@ -277,6 +277,33 @@ namespace NAV {
                             OBJMODE_BLENDED );
         }
 
+        oam[ SPR_PAGE_BG_OAM_SUB ]     = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ];
+        oam[ SPR_PAGE_BG_OAM_SUB + 1 ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 7 ];
+        oam[ SPR_PAGE_BG_OAM_SUB + 2 ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ];
+        oam[ SPR_PAGE_BG_OAM_SUB + 3 ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 7 ];
+
+        oam[ SPR_PAGE_BG_OAM_SUB ].isHidden           = oam[ SPR_PAGE_BG_OAM_SUB + 1 ].isHidden
+            = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].isHidden = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].isHidden
+            = true;
+        oam[ SPR_PAGE_BG_OAM_SUB ].y           = oam[ SPR_PAGE_BG_OAM_SUB + 1 ].y
+            = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].y = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].y = 192 - 40;
+
+        oam[ SPR_PAGE_BG_OAM_SUB ].x     = 64 - 16;
+        oam[ SPR_PAGE_BG_OAM_SUB + 1 ].x = oam[ SPR_PAGE_BG_OAM_SUB ].x + 16;
+        oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x = 128 + 64 - 16;
+        oam[ SPR_PAGE_BG_OAM_SUB + 3 ].x = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x + 16;
+
+        tileCnt
+            = IO::loadSprite( "UI/arrow", SPR_PAGE_BG_OAM_SUB + 4, SPR_X_PAL_SUB, tileCnt,
+                              oam[ SPR_PAGE_BG_OAM_SUB ].x + 8, oam[ SPR_PAGE_BG_OAM_SUB ].y + 8,
+                              16, 16, false, false, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+
+        oam[ SPR_PAGE_BG_OAM_SUB + 5 ]   = oam[ SPR_PAGE_BG_OAM_SUB + 4 ];
+        oam[ SPR_PAGE_BG_OAM_SUB + 5 ].x = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x + 8;
+        oam[ SPR_PAGE_BG_OAM_SUB + 5 ].y = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].y + 8;
+
+        oam[ SPR_PAGE_BG_OAM_SUB + 5 ].hFlip = true;
+
         // app icons
         for( u8 i = 0; i < MAX_NAV_APPS; ++i ) {
             tileCnt = IO::loadSprite( SPR_NAV_APP_ICON_SUB( i ), SPR_NAV_APP_ICON_PAL_SUB( i ),
@@ -468,7 +495,7 @@ namespace NAV {
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
                 u16 lns = IO::regularFont->printBreakingStringC(
-                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
+                    p_message, 0, 0, 192 - 20, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
                 if( p_style == MSG_ITEM ) {
                     x += 48;
                     if( lns == 1 ) {
@@ -494,7 +521,7 @@ namespace NAV {
                 x = 54, y = 192 - 50, hg = 64;
 
                 u16 lns = IO::regularFont->printBreakingStringC(
-                    p_message, 0, 0, 192, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
+                    p_message, 0, 0, 192 - 20, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
                 if( lns == 3 ) { y = 192 - 44; }
                 if( lns <= 2 ) { y = 192 - 38; }
             } else if( p_style == MSG_SIGN ) {
@@ -1150,6 +1177,13 @@ namespace NAV {
             }
         }
 
+        oam[ SPR_PAGE_BG_OAM_SUB ].palette = oam[ SPR_PAGE_BG_OAM_SUB + 1 ].palette
+            = ( p_selection == IO::choiceBox::PREV_PAGE_CHOICE ) ? SPR_BOX_SEL_PAL_SUB
+                                                                 : SPR_BOX_PAL_SUB;
+        oam[ SPR_PAGE_BG_OAM_SUB + 2 ].palette = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].palette
+            = ( p_selection == IO::choiceBox::NEXT_PAGE_CHOICE ) ? SPR_BOX_SEL_PAL_SUB
+                                                                 : SPR_BOX_PAL_SUB;
+
         IO::updateOAM( true );
     }
 
@@ -1199,9 +1233,6 @@ namespace NAV {
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         oam[ SPR_X_OAM_SUB ].isHidden = false;
-
-        // next page (TODO)
-        // prev page (TODO)
 
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
         for( u8 i = 0; i < 6; ++i ) {
@@ -1273,21 +1304,35 @@ namespace NAV {
                                         oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
                        IO::choiceBox::BACK_CHOICE ) );
 
-        if( p_firstItem ) { // allow prev page
-            res.push_back( std::pair(
-                IO::inputTarget( 0, 0, 0 ) /* oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y -
-                                 8, oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 )*/
-                ,
-                IO::choiceBox::PREV_PAGE_CHOICE ) );
+        // prev page
+        oam[ SPR_PAGE_BG_OAM_SUB ].isHidden = oam[ SPR_PAGE_BG_OAM_SUB + 1 ].isHidden = false;
+
+        bool prevpg                             = !!p_firstItem;
+        oam[ SPR_PAGE_BG_OAM_SUB + 4 ].isHidden = !prevpg;
+        if( prevpg ) {
+            res.push_back(
+                { IO::inputTarget( oam[ SPR_PAGE_BG_OAM_SUB ].x, oam[ SPR_PAGE_BG_OAM_SUB ].y,
+                                   oam[ SPR_PAGE_BG_OAM_SUB ].x + 32,
+                                   oam[ SPR_PAGE_BG_OAM_SUB ].y + 32 ),
+                  IO::choiceBox::PREV_PAGE_CHOICE } );
         }
 
-        if( size_t( p_firstItem + 6 ) < p_offeredItems.size( ) ) { // allow next page
-            res.push_back( std::pair(
-                IO::inputTarget( 0, 0, 0 ) /* oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y -
-                                 8, oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 )*/
-                ,
-                IO::choiceBox::NEXT_PAGE_CHOICE ) );
+        // next page
+        oam[ SPR_PAGE_BG_OAM_SUB + 2 ].isHidden = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].isHidden = false;
+        bool nextpg = size_t( p_firstItem + 6 ) < p_offeredItems.size( );
+        oam[ SPR_PAGE_BG_OAM_SUB + 5 ].isHidden = !nextpg;
+        if( nextpg ) {
+            res.push_back( { IO::inputTarget( oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x,
+                                              oam[ SPR_PAGE_BG_OAM_SUB + 2 ].y,
+                                              oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x + 32,
+                                              oam[ SPR_PAGE_BG_OAM_SUB + 2 ].y + 32 ),
+                             IO::choiceBox::NEXT_PAGE_CHOICE } );
         }
+
+        // page no
+        snprintf( buffer, 90, "%i / %i", p_firstItem / 6 + 1, p_offeredItems.size( ) / 6 + 1 );
+        IO::regularFont->printStringC( buffer, 128, oam[ SPR_PAGE_BG_OAM_SUB ].y + 8, true,
+                                       IO::font::CENTER );
 
         IO::updateOAM( true );
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
@@ -1299,17 +1344,25 @@ namespace NAV {
 
     void selectItem( std::pair<u16, u32> p_item, const ITEM::itemData& p_itemData,
                      const std::string& p_descr, u8 p_selection ) {
+        if( p_selection == IO::choiceBox::PREV_PAGE_CHOICE ) {
+            selectMenuItem( p_selection );
+        } else if( p_selection == IO::choiceBox::NEXT_PAGE_CHOICE ) {
+            selectMenuItem( p_selection );
+        } else if( p_selection == IO::choiceBox::EXIT_CHOICE
+                   || p_selection == IO::choiceBox::BACK_CHOICE ) {
+            // empty!
+        } else {
+            IO::printRectangle( 128, 0, 255, 40, true, 0 );
 
-        IO::printRectangle( 128, 0, 255, 40, true, 0 );
+            char buffer[ 100 ];
+            snprintf( buffer, 99, GET_STRING( 474 ),
+                      SAVE::SAV.getActiveFile( ).m_bag.count(
+                          BAG::toBagType( p_itemData.m_itemType ), p_item.first ) );
+            IO::regularFont->printStringC( buffer, 254, 2, true, IO::font::RIGHT );
 
-        char buffer[ 100 ];
-        snprintf( buffer, 99, GET_STRING( 474 ),
-                  SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( p_itemData.m_itemType ),
-                                                          p_item.first ) );
-        IO::regularFont->printStringC( buffer, 254, 2, true, IO::font::RIGHT );
-
-        selectMenuItem( p_selection % 6 );
-        doPrintMessage( p_descr.c_str( ), MSG_MART_ITEM, p_item.first, &p_itemData );
+            selectMenuItem( p_selection % 6 );
+            doPrintMessage( p_descr.c_str( ), MSG_MART_ITEM, p_item.first, &p_itemData );
+        }
     }
 
     std::vector<std::pair<IO::inputTarget, s32>> drawCounter( s32 p_min, s32 p_max ) {
