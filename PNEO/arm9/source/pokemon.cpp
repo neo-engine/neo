@@ -494,6 +494,8 @@ void pokemon::evolve( u16 p_item, evolutionMethod p_method ) {
                  12 );
     }
 
+    SAVE::SAV.getActiveFile( ).registerCaughtPkmn( edata.m_evolutions[ tg ].m_target );
+
     // check for shedinja
 
     if( getSpecies( ) == PKMN_NINJASK ) {
@@ -501,18 +503,20 @@ void pokemon::evolve( u16 p_item, evolutionMethod p_method ) {
                                                     I_POKE_BALL ) ) {
             if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) < 6 ) {
                 // Create a Shedinja
-                auto shed = *this;
+                auto shed = pokemon( *this );
+
                 shed.setSpecies( PKMN_SHEDINJA );
                 shed.m_boxdata.m_ball = ITEM::itemToBall( I_POKE_BALL );
                 shed.heal( );
                 shed.takeItem( );
-                strcpy( shed.m_boxdata.m_name,
-                        getDisplayName( PKMN_SHEDINJA, CURRENT_LANGUAGE ).c_str( ) );
+                strncpy( shed.m_boxdata.m_name, getDisplayName( PKMN_SHEDINJA ).c_str( ), 10 );
 
                 SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( ITEM::ITEMTYPE_POKEBALL ),
                                                         I_POKE_BALL, 1 );
                 SAVE::SAV.getActiveFile( ).setTeamPkmn(
                     SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &shed );
+
+                SAVE::SAV.getActiveFile( ).registerCaughtPkmn( PKMN_SHEDINJA );
             }
         }
     }

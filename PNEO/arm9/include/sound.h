@@ -214,7 +214,7 @@ namespace SOUND {
     constexpr u16 BGMforLocation( u16 p_locationId ) {
         switch( p_locationId ) {
         case L_ROUTE_38: return MOD_ROUTE_38;
-        case L_HIDDEN_LAKE: return MOD_EX06;
+        case L_HIDDEN_LAKE: return MOD_ROUTE_10;
         case L_ROUTE_101:
         case L_ROUTE_102:
         case L_ROUTE_103: return MOD_ROUTE_101;
@@ -254,18 +254,22 @@ namespace SOUND {
         case L_ROUTE_123: return MOD_ROUTE_123;
         case L_TRAINERS__SCHOOL: return MOD_TRAINER_SCHOOL;
         case L_NEW_LILYCOVE_CITY: return MOD_NEW_LILYCOVE_CITY;
-        case L_SAFARI_ZONE:
-        case L_SAFARI_ZONE2: return MOD_SAFARI_ZONE;
+        case L_SAFARI_ZONE: return MOD_SAFARI_ZONE;
+        case L_PACIFIDLOG_TOWN:
         case L_LILYCOVE_CITY: return MOD_LILYCOVE_CITY;
-        case L_VERDANTURF_TOWN:
+        case L_POKEMON_DAY_CARE:
+        case L_VERDANTURF_TOWN: return MOD_VERDANTURF_TOWN;
+        case L_FORTREE_CITY: return MOD_FORTREE_CITY;
         case L_CLIFFELTA_CITY: return MOD_CLIFFELTA_CITY;
         case L_LITTLEROOT_TOWN: return MOD_LITTLEROOT_TOWN;
-        case L_BLOSSAND_TOWN:
+        case L_LAVARIDGE_TOWN:
         case L_OLDALE_TOWN: return MOD_OLDALE_TOWN;
         case L_PRETTY_PETAL: return MOD_EX03;
         case L_PETALBURG_CITY: return MOD_PETALBURG_CITY;
         case L_MAUVILLE_CITY:
+        case L_MOSSDEEP_CITY:
         case L_RUSTBORO_CITY: return MOD_RUSTBORO_CITY;
+        case L_BLOSSAND_TOWN:
         case L_DEWFORD_TOWN: return MOD_DEWFORD_TOWN;
         case L_SLATEPORT_CITY: return MOD_SLATEPORT_CITY;
         case L_FALLARBOR_TOWN: return MOD_FALLARBOR_TOWN;
@@ -276,16 +280,18 @@ namespace SOUND {
         case L_FOREST_GROTTO:
         case L_ROCK_SHELTER:
         case L_DESERT_RUINS: return MOD_SEALED_CHAMBER;
-        case L_MT_CHIMNEY:
-        case L_FIERY_PATH: return MOD_MT_PYRE_PEAK;
-        case L_MT_PYRE:
+        case L_MT_PYRE: return MOD_MT_PYRE_PEAK;
         case L_SHOAL_CAVE:
         case L_CRYSTAL_CAVERN: return MOD_SHOAL_CAVE;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
+        case L_OCEANIC_MUSEUM: return MOD_MARINE_SCIENCE_MUSEUM;
         case L_GRANITE_CAVE:
         case L_RUSTURF_TUNNEL:
         case L_PETALBURG_WOODS:
         case L_JAGGED_PASS: return MOD_CAVE_FORESTS;
+        case L_FIERY_PATH:
+        case L_CABLE_CAR:
+        case L_MT_CHIMNEY: return MOD_MT_CHIMNEY;
         case L_POKEMON_MART: return MOD_POKEMON_MART;
         case L_POKEMON_CENTER: return MOD_POKEMON_CENTER;
         case L_RUSTBORO_GYM:
@@ -297,7 +303,9 @@ namespace SOUND {
         case L_MOSSDEEP_GYM:
         case L_SOOTOPOLIS_GYM: return MOD_POKEMON_GYM;
         case L_PROF_BIRCH_S_LAB: return MOD_PROF_BIRCH_LAB;
-        case L_BATTLE_FRONTIER2:
+        case L_BATTLE_TOWER: return MOD_BATTLE_TOWER;
+        case L_BATTLE_PALACE: return MOD_BATTLE_PALACE;
+        case L_BATTLE_TENT:
         case L_BATTLE_FRONTIER: return MOD_BATTLE_FRONTIER;
         case L_SOOTOPOLIS_CITY: return MOD_SOOTOPOLIS_CITY;
         default: return MOD_ABANDONED_SHIP;

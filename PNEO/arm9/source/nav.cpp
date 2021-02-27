@@ -368,6 +368,7 @@ namespace NAV {
         case L_ROUTE_133:
         case L_ROUTE_134:
         case L_ROUTE_137:
+        case L_OCEANIC_MUSEUM:
         case L_PACIFIDLOG_TOWN: return 2;
         case L_RUSTBORO_CITY:
         case L_SLATEPORT_CITY:
@@ -385,6 +386,9 @@ namespace NAV {
         case L_SHOAL_CAVE:
         case L_RUSTURF_TUNNEL:
         case L_GRANITE_CAVE:
+        case L_VICTORY_ROAD:
+        case L_VICTORY_ROAD2:
+        case L_VICTORY_ROAD3:
         case L_CRYSTAL_CAVERN: return 4;
         case L_POKEMON_MART:
         case L_POKEMON_CENTER:
@@ -401,10 +405,17 @@ namespace NAV {
         case L_POKEMON_LEAGUE:
         case L_POKEMON_LEAGUE2:
         case L_BATTLE_FRONTIER:
-        case L_BATTLE_FRONTIER2:
+        case L_BATTLE_TENT:
+        case L_BATTLE_TOWER:
+        case L_BATTLE_FACTORY:
+        case L_BATTLE_DOME:
+        case L_BATTLE_PALACE:
+        case L_BATTLE_PIKE:
+        case L_BATTLE_PYRAMID:
+        case L_BATTLE_ARENA:
+        case L_CABLE_CAR:
         case L_LILYCOVE_MUSEUM: return 1;
         case L_SAFARI_ZONE:
-        case L_SAFARI_ZONE2:
         case L_PRETTY_PETAL:
         case L_FORTREE_CITY:
         case L_PETALBURG_WOODS: return 5;
@@ -773,7 +784,7 @@ namespace NAV {
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
-        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
@@ -853,7 +864,7 @@ namespace NAV {
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
                                  true );
             for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
-            for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
+            for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
 
             for( u8 i = 0; i < p_choices.size( ); i++ ) {
                 for( u8 j = 0; j < 8; j++ ) {
@@ -1115,7 +1126,7 @@ namespace NAV {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
 
-        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
         oam[ SPR_X_OAM_SUB ].isHidden = false;
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
@@ -1234,7 +1245,7 @@ namespace NAV {
 
         oam[ SPR_X_OAM_SUB ].isHidden = false;
 
-        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
         for( u8 i = 0; i < 6; ++i ) {
             for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
@@ -1330,7 +1341,8 @@ namespace NAV {
         }
 
         // page no
-        snprintf( buffer, 90, "%i / %i", p_firstItem / 6 + 1, p_offeredItems.size( ) / 6 + 1 );
+        snprintf( buffer, 90, "%i / %i", p_firstItem / 6 + 1,
+                  ( p_offeredItems.size( ) - 1 ) / 6 + 1 );
         IO::regularFont->printStringC( buffer, 128, oam[ SPR_PAGE_BG_OAM_SUB ].y + 8, true,
                                        IO::font::CENTER );
 
@@ -1370,7 +1382,7 @@ namespace NAV {
             = std::vector<std::pair<IO::inputTarget, s32>>( );
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
-        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 125; ++i ) { oam[ i ].isHidden = true; }
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
 
         for( u8 i = 0; i < 6; ++i ) {
             for( u8 j = 0; j < 8; j++ ) {

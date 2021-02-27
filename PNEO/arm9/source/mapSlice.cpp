@@ -60,6 +60,7 @@ namespace MAP {
             // mapF = FS::open( MAP_PATH, "empty", ".map" );
             nomap = true;
             // if( !mapF ) return;
+            std::memset( p_result->m_blocks, 0, SIZE * SIZE * sizeof( mapBlockAtom ) );
         }
 
         bool reloadTs = false;

@@ -141,6 +141,8 @@ namespace MAP {
         YNM = 125, // yes no message
         CLL = 126, // Call special function
         MSG = 127, // message
+
+        SBC = 196, // set block
     };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
@@ -713,6 +715,10 @@ namespace MAP {
             case WAT:
                 for( u8 i = 0; i < parA; ++i ) { swiWaitForVBlank( ); }
                 break;
+            case SBC: {
+                setBlock( u16( mapX * SIZE + par1 ), u16( mapY * SIZE + par2 ), par3 );
+                break;
+            }
             case MBG:
                 pmartCurr = par1;
                 martSell  = par2;
@@ -900,6 +906,89 @@ namespace MAP {
             printMapMessage( GET_MAP_STRING( p_event.m_data.m_npc.m_scriptId ), (style) tp );
             if( p_event.m_data.m_npc.m_scriptType & 128 ) {
                 SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, true );
+            }
+            break;
+        }
+        case EVENT_OW_PKMN: {
+            if( !SAVE::SAV.getActiveFile( ).checkFlag( p_event.m_deactivateFlag ) ) {
+                ANIMATE_MAP  = false;
+                DRAW_TIME    = false;
+                u16  pkmnIdx = p_event.m_data.m_owPkmn.m_speciesId;
+                u8   level   = p_event.m_data.m_owPkmn.m_level;
+                u8   forme   = p_event.m_data.m_owPkmn.m_forme & ( ~( ( 1 << 6 ) | ( 1 << 7 ) ) );
+                bool female  = !!( p_event.m_data.m_owPkmn.m_forme & ( 1 << 6 ) );
+                // bool genderless = !!( p_event.m_data.m_owPkmn.m_forme & ( 1 << 7 ) );
+
+                u8   shiny    = p_event.m_data.m_owPkmn.m_shiny & ( ~( ( 1 << 6 ) | ( 1 << 7 ) ) );
+                bool hiddenab = !!( p_event.m_data.m_owPkmn.m_shiny & ( 1 << 6 ) );
+                bool fateful  = !!( p_event.m_data.m_owPkmn.m_shiny & ( 1 << 7 ) );
+
+                SOUND::playCry( pkmnIdx, forme, female );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+
+                bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
+                                    BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
+                                    ? !( rand( ) & 127 )
+                                    : !( rand( ) & 2047 );
+                bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
+                    BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+
+                if( luckyenc ) {
+                    SOUND::playBGM( MOD_BATTLE_WILD_ALT );
+                } else {
+                    SOUND::playBGM( SOUND::BGMforWildBattle( pkmnIdx ) );
+                }
+
+                IO::fadeScreen( IO::BATTLE );
+                IO::BG_PAL( true )[ 0 ] = 0;
+                IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+                dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+                dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+
+                auto wildPkmn = pokemon( pkmnIdx, level, forme, 0,
+                                         shiny ? shiny : ( luckyenc ? 255 : ( charm ? 3 : 0 ) ),
+                                         hiddenab || luckyenc, false, 0, 0, fateful || luckyenc );
+
+                u8 platform = 0, plat2 = 0, battleBack = 0;
+
+                if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
+                    battleBack = currentData( ).m_surfBattleBG;
+                    platform   = currentData( ).m_surfBattlePlat1;
+                    plat2      = currentData( ).m_surfBattlePlat2;
+                } else {
+                    battleBack = currentData( ).m_battleBG;
+                    platform   = currentData( ).m_battlePlat1;
+                    plat2      = currentData( ).m_battlePlat2;
+                }
+
+                auto playerPrio = _mapSprites.getPriority( _playerSprite );
+                swiWaitForVBlank( );
+                auto battleres
+                    = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn,
+                                      platform, plat2, battleBack, getBattlePolicy( true ) )
+                          .start( );
+                if( battleres == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+                    faintPlayer( );
+                    return;
+                }
+                SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, 1 );
+                SOUND::restartBGM( );
+                FADE_TOP_DARK( );
+                draw( playerPrio );
+
+                _mapSprites.setPriority( _playerSprite,
+                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
+                NAV::init( );
+
+                ANIMATE_MAP = true;
+                DRAW_TIME   = true;
+                if( battleres != BATTLE::battle::BATTLE_CAPTURE ) {
+                    char buffer[ 100 ];
+                    snprintf( buffer, 99, GET_STRING( 672 ), wildPkmn.m_boxdata.m_name );
+                    printMapMessage( std::string( buffer ), MSG_NORMAL );
+                }
             }
             break;
         }

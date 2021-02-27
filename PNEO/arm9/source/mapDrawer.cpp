@@ -93,6 +93,7 @@ namespace MAP {
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         switch( p_mapObject.second.m_event.m_type ) {
         default:
+        case EVENT_OW_PKMN:
         case EVENT_TRAINER:
         case EVENT_NPC_MESSAGE:
         case EVENT_NPC: {
@@ -244,8 +245,19 @@ namespace MAP {
         _weatherScrollX = 0;
         _weatherScrollY = 0;
         switch( getWeather( ) ) {
-        case SANDSTORM:
         case ASH_RAIN:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "ashrain",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            _weatherScrollX = 2;
+            _weatherScrollY = -4;
+            break;
+        case SANDSTORM:
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             bgWrapOn( IO::bg3 );
 
@@ -254,8 +266,8 @@ namespace MAP {
             dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
             dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
             bgSetScroll( IO::bg3, 0, 0 );
-            _weatherScrollX = 4;
-            _weatherScrollY = 1;
+            _weatherScrollX = 40;
+            _weatherScrollY = 10;
             break;
 
         case DARK_FLASHABLE:
@@ -875,26 +887,25 @@ namespace MAP {
 
     std::pair<bool, mapData::event::data> mapDrawer::getWarpData( u16 p_globX, u16 p_globY,
                                                                   u8 p_z ) {
+        auto data = currentData( p_globX, p_globY );
         p_globX %= SIZE;
         p_globY %= SIZE;
 
-        for( u8 i = 0; i < CUR_DATA.m_eventCount; ++i ) {
-            if( CUR_DATA.m_events[ i ].m_type == EVENT_WARP
-                && CUR_DATA.m_events[ i ].m_posX == p_globX
-                && CUR_DATA.m_events[ i ].m_posY == p_globY
-                && CUR_DATA.m_events[ i ].m_posZ == p_z ) {
-                if( CUR_DATA.m_events[ i ].m_activateFlag
+        for( u8 i = 0; i < data.m_eventCount; ++i ) {
+            if( data.m_events[ i ].m_type == EVENT_WARP && data.m_events[ i ].m_posX == p_globX
+                && data.m_events[ i ].m_posY == p_globY && data.m_events[ i ].m_posZ == p_z ) {
+                if( data.m_events[ i ].m_activateFlag
                     && !SAVE::SAV.getActiveFile( ).checkFlag(
-                        CUR_DATA.m_events[ i ].m_activateFlag ) ) {
+                        data.m_events[ i ].m_activateFlag ) ) {
                     continue;
                 }
-                if( CUR_DATA.m_events[ i ].m_deactivateFlag
+                if( data.m_events[ i ].m_deactivateFlag
                     && SAVE::SAV.getActiveFile( ).checkFlag(
-                        CUR_DATA.m_events[ i ].m_deactivateFlag ) ) {
+                        data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
 
-                return { true, CUR_DATA.m_events[ i ].m_data };
+                return { true, data.m_events[ i ].m_data };
             }
         }
         return { false, mapData::event::data( ) };
@@ -902,11 +913,13 @@ namespace MAP {
 
     void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
         warpPos tg;
-        u16     curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
-        u16     cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
+        u16     curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16     cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         u16     curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
 
         auto wdata = getWarpData( curx, cury, curz );
+        curx %= SIZE;
+        cury %= SIZE;
         if( !wdata.first ) { return; }
 
         if( wdata.second.m_warp.m_warpType != NO_SPECIAL ) {
@@ -1212,7 +1225,7 @@ namespace MAP {
     void mapDrawer::animateMap( u8 p_frame ) {
         // animate weather
         if( _weatherScrollX || _weatherScrollY ) {
-            bgScroll( IO::bg3, _weatherScrollX, _weatherScrollY );
+            bgScrollf( IO::bg3, ( _weatherScrollX << 8 ) / 10, ( _weatherScrollY << 8 ) / 10 );
             bgUpdate( );
         }
 
@@ -3014,6 +3027,21 @@ namespace MAP {
                 obj.m_direction = getRandomLookDirection( obj.m_movement );
                 obj.m_event     = p_data.m_events[ i ];
                 obj.m_currentMovement = movement{ obj.m_direction, 0 };
+
+                cur = { 0, obj };
+                break;
+            }
+
+            case EVENT_OW_PKMN: {
+                mapObject obj   = mapObject( );
+                obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
+                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                              p_data.m_events[ i ].m_posZ };
+                obj.m_picNum    = p_data.m_events[ i ].m_data.m_owPkmn.m_speciesId + 1000;
+                obj.m_movement  = NO_MOVEMENT;
+                obj.m_range     = 0;
+                obj.m_direction = DOWN;
+                obj.m_event     = p_data.m_events[ i ];
 
                 cur = { 0, obj };
                 break;

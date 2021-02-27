@@ -46,8 +46,8 @@ namespace MAP {
         mapSlice _slices[ 2 ][ 2 ]; //[x][y]
         u8       _curX, _curY;      // Current main slice from the _slices array
 
-        u8 _weatherScrollX = 0;
-        u8 _weatherScrollY = 0;
+        s8 _weatherScrollX = 0;
+        s8 _weatherScrollY = 0;
 
         mapData _data[ 2 ][ 2 ];
 

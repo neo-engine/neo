@@ -1189,7 +1189,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Battle-FB", "Kampf-Koryph\xe4"
                    "e" },
     { "Battle-Time Space", "Kampf-Raum Zeit" },
-    { "Islands 3", "Islands 3" },
+    { "Islands 3", "Eilande 3" },
     { "Moonlight", "Mondschein" },
     { "Hidden Land", "Verborgenes Land" },
 
@@ -1211,5 +1211,12 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s planted its roots.", "%s pflanzt seine Wurzeln." },
     { "%s was identified.", "%s wurde erkannt." },
     { "%s was planted.", "%s wurde bepflanzt." },
+    { "Scent of Grass", "Duft der Wiese" },
 
+    // 670
+
+    { "Atop the Trees", "\xdc"
+                        "ber den B\xe4umen" },
+    { "In Silence", "In Stille" },
+    { "%s disappeared|", "%s verschwand|" },
 };

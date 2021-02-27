@@ -259,7 +259,11 @@ namespace BATTLE {
 
             if( p_damage >= getPkmn( )->m_stats.m_curHP ) {
                 getPkmn( )->m_stats.m_curHP = 0;
-                if( _isTransformed ) { _pokemon->m_stats.m_curHP = 0; }
+                getPkmn( )->m_statusint     = 0;
+                if( _isTransformed ) {
+                    _pokemon->m_stats.m_curHP = 0;
+                    _pokemon->m_statusint     = 0;
+                }
             } else {
                 getPkmn( )->m_stats.m_curHP -= p_damage;
                 if( _isTransformed ) { _pokemon->m_stats.m_curHP = getPkmn( )->m_stats.m_curHP; }
@@ -284,6 +288,7 @@ namespace BATTLE {
             if( _pokemon == nullptr ) [[unlikely]] { return; }
 
             getPkmn( )->m_stats.m_curHP = 0;
+            getPkmn( )->m_statusint     = 0;
             getPkmn( )->revertBattleTransform( );
             _status = FAINTED;
         }
