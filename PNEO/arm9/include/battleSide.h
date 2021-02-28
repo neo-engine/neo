@@ -451,6 +451,14 @@ namespace BATTLE {
         }
 
         /*
+         * @brief: returns the weight of the specified pkmn.
+         */
+        inline u16 getWeight( u8 p_slot, bool p_allowAbilities = true ) {
+            return _slots[ p_slot ].getWeight( p_allowAbilities );
+        }
+
+
+        /*
          * @brief: returns whether the specified pkmn currently touches the ground.
          */
         inline bool isGrounded( u8 p_slot, bool p_allowAbilities = true ) {

@@ -46,12 +46,15 @@ namespace MAP {
 #define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
     // opcode : u8, paramA : u12, paramB : u12
-#define OPCODE( p_ins ) ( ( p_ins ) >> 24 )
-#define PARAM1( p_ins ) ( ( ( p_ins ) >> 16 ) & 0xFF )
-#define PARAM2( p_ins ) ( ( ( p_ins ) >> 8 ) & 0xFF )
-#define PARAM3( p_ins ) ( (p_ins) &0xFF )
-#define PARAMA( p_ins ) ( ( ( p_ins ) >> 12 ) & 0xFFF )
-#define PARAMB( p_ins ) ( (p_ins) &0xFFF )
+#define OPCODE( p_ins )  ( ( p_ins ) >> 24 )
+#define PARAM1( p_ins )  ( ( ( p_ins ) >> 16 ) & 0xFF )
+#define PARAM2( p_ins )  ( ( ( p_ins ) >> 8 ) & 0xFF )
+#define PARAM3( p_ins )  ( ( p_ins ) & ( 0xFF ) )
+#define PARAM1S( p_ins ) ( ( ( p_ins ) >> 19 ) & 0x1F )
+#define PARAM2S( p_ins ) ( ( ( p_ins ) >> 14 ) & 0x1F )
+#define PARAM3S( p_ins ) ( ( p_ins ) & ( 0x3FFF ) )
+#define PARAMA( p_ins )  ( ( ( p_ins ) >> 12 ) & 0xFFF )
+#define PARAMB( p_ins )  ( ( p_ins ) & ( 0xFFF ) )
 
     // special functions
     // 1 heal entire team
@@ -208,7 +211,7 @@ namespace MAP {
     }
 
     static u16 CURRENT_SCRIPT = -1;
-    void       mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject ) {
+    void       mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject, s16 p_mapX, s16 p_mapY ) {
         if( CURRENT_SCRIPT == p_scriptId ) { return; }
         CURRENT_SCRIPT = p_scriptId;
 
@@ -238,14 +241,21 @@ namespace MAP {
         u8 newz   = 0;
 
         while( SCRIPT_INS[ pc ] ) {
-            u16  curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-            u16  cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-            u16  curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
-            u16  mapX = curx / SIZE, mapY = cury / SIZE;
-            auto ins  = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
-            u8   par1 = PARAM1( SCRIPT_INS[ pc ] );
-            u8   par2 = PARAM2( SCRIPT_INS[ pc ] );
-            u8   par3 = PARAM3( SCRIPT_INS[ pc ] );
+            u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+            u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+            u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+            u16 mapX = curx / SIZE, mapY = cury / SIZE;
+            if( p_mapX >= 0 ) { mapX = p_mapX; }
+            if( p_mapY >= 0 ) { mapY = p_mapY; }
+            auto ins   = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
+            u8   par1  = PARAM1( SCRIPT_INS[ pc ] );
+            u8   par2  = PARAM2( SCRIPT_INS[ pc ] );
+            u8   par3  = PARAM3( SCRIPT_INS[ pc ] );
+            u8   par1s = PARAM1S( SCRIPT_INS[ pc ] );
+            u8   par2s = PARAM2S( SCRIPT_INS[ pc ] );
+            u16  par3s = PARAM3S( SCRIPT_INS[ pc ] );
+            u16  parA  = PARAMA( SCRIPT_INS[ pc ] );
+            u16  parB  = PARAMB( SCRIPT_INS[ pc ] );
 
 #ifdef DESQUID_MORE
             NAV::printMessage( ( std::to_string( pc ) + ": " + std::to_string( ins ) + " ( "
@@ -253,8 +263,6 @@ namespace MAP {
                                  + std::to_string( par3 ) + ")" )
                                    .c_str( ) );
 #endif
-            u16 parA = PARAMA( SCRIPT_INS[ pc ] );
-            u16 parB = PARAMB( SCRIPT_INS[ pc ] );
 
             switch( ins ) {
             case BNK: {
@@ -716,7 +724,7 @@ namespace MAP {
                 for( u8 i = 0; i < parA; ++i ) { swiWaitForVBlank( ); }
                 break;
             case SBC: {
-                setBlock( u16( mapX * SIZE + par1 ), u16( mapY * SIZE + par2 ), par3 );
+                setBlock( u16( mapX * SIZE + par1s ), u16( mapY * SIZE + par2s ), par3s );
                 break;
             }
             case MBG:
@@ -890,7 +898,7 @@ namespace MAP {
         handleEvents( px, py, pz, d );
     }
 
-    void mapDrawer::runEvent( mapData::event p_event, u8 p_objectId ) {
+    void mapDrawer::runEvent( mapData::event p_event, u8 p_objectId, s16 p_mapX, s16 p_mapY ) {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         u16 mapX = curx / SIZE, mapY = cury / SIZE;
@@ -1057,7 +1065,7 @@ namespace MAP {
             break;
         }
         case EVENT_GENERIC: {
-            executeScript( p_event.m_data.m_generic.m_scriptId );
+            executeScript( p_event.m_data.m_generic.m_scriptId, 0, p_mapX, p_mapY );
             break;
         }
         case EVENT_ITEM: {
@@ -1334,6 +1342,22 @@ namespace MAP {
             }
         }
         return false;
+    }
+
+    void mapDrawer::runLevelScripts( const mapData& p_data, u16 p_mapX, u16 p_mapY ) {
+        for( u8 i = 0; i < p_data.m_eventCount; ++i ) {
+            if( p_data.m_events[ i ].m_activateFlag
+                && !SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_activateFlag ) ) {
+                continue;
+            }
+            if( p_data.m_events[ i ].m_deactivateFlag
+                && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_activateFlag ) ) {
+                continue;
+            }
+            if( p_data.m_events[ i ].m_trigger == TRIGGER_ON_MAP_ENTER ) {
+                runEvent( p_data.m_events[ i ], u8( 0 ), s16( p_mapX ), s16( p_mapY ) );
+            }
+        }
     }
 
 } // namespace MAP

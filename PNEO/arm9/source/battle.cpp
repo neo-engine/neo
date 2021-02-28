@@ -1394,7 +1394,7 @@ namespace BATTLE {
         case I_LOVE_BALL:
             if( wild->isFemale( ) * plpk->isFemale( ) < 0 ) ballCatchRate = 16;
             break;
-        case I_HEAVY_BALL: ballCatchRate = std::min( 128, p.m_baseForme.m_weight >> 2 ); break;
+        case I_HEAVY_BALL: ballCatchRate = std::min( 128, _field.getWeight( true, 0 ) >> 2 ); break;
         case I_FAST_BALL:
             if( p.m_baseForme.m_bases[ 5 ] >= 100 ) ballCatchRate = 16;
             break;

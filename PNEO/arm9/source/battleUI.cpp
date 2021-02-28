@@ -2188,6 +2188,7 @@ namespace BATTLE {
         case FORESIGHT:
         case MIRACLEEYE: snprintf( buffer, 99, GET_STRING( 667 ), pkmnstr.c_str( ) ); break;
         case LEECHSEED: snprintf( buffer, 99, GET_STRING( 668 ), pkmnstr.c_str( ) ); break;
+        case PROTECT: snprintf( buffer, 99, GET_STRING( 674 ), pkmnstr.c_str( ) ); break;
         default: return;
         }
         log( buffer );

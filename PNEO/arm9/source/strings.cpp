@@ -1219,4 +1219,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
                         "ber den B\xe4umen" },
     { "In Silence", "In Stille" },
     { "%s disappeared|", "%s verschwand|" },
+    { "Exchange", "Eintauschen" },
+    { "%s protects itself.", "%s sch\xfctzt sich selbst." },
+
+    { "%s's protection was broken.", "Der Schutz von %s wurde durchbrochen." },
 };

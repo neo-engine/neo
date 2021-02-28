@@ -427,7 +427,8 @@ namespace BATTLE {
                     _volatileStatusCounter[ i ] = p_duration;
 #ifdef DESQUID_MORE
                     p_ui->log( std::string( "Add volatile status condition " )
-                               + std::to_string( 1LLU << i ) );
+                               + std::to_string( 1LLU << i ) + " for "
+                               + std::to_string( p_duration ) + " rounds." );
 #else
                     (void) p_ui;
 #endif
@@ -556,6 +557,18 @@ namespace BATTLE {
                   || _volatileStatusCounter[ 10 ] /* smack down / Thousand arrows */;
 
             return grn;
+        }
+
+        /*
+         * @brief: returns the weight of the specified pkmn.
+         */
+        inline u16 getWeight( bool p_allowAbilities = true ) {
+            u16 wg = getPokemonData( ).m_baseForme.m_weight;
+
+            if( p_allowAbilities && getPkmn( )->getAbility( ) == A_HEAVY_METAL ) { wg <<= 1; }
+            if( p_allowAbilities && getPkmn( )->getAbility( ) == A_LIGHT_METAL ) { wg >>= 1; }
+
+            return wg;
         }
 
         /*

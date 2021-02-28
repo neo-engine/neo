@@ -324,20 +324,27 @@ namespace MAP {
                             &_slices[ _curX ][ _curY ], _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
                              _data[ _curX ][ _curY ] );
+            runLevelScripts( _data[ _curX ][ _curY ], mx / SIZE, my / SIZE );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                             my / SIZE, &_slices[ _curX ^ 1 ][ _curY ], _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE, _data[ _curX ^ 1 ][ _curY ] );
+            runLevelScripts( _data[ _curX ^ 1 ][ _curY ], mx / SIZE + currentHalf( mx ),
+                             my / SIZE );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                             my / SIZE + currentHalf( my ), &_slices[ _curX ][ _curY ^ 1 ],
                             _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                              my / SIZE + currentHalf( my ), _data[ _curX ][ _curY ^ 1 ] );
+            runLevelScripts( _data[ _curX ][ _curY ^ 1 ], mx / SIZE,
+                             my / SIZE + currentHalf( my ) );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                             my / SIZE + currentHalf( my ), &_slices[ _curX ^ 1 ][ _curY ^ 1 ],
                             _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
+            runLevelScripts( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx / SIZE + currentHalf( mx ),
+                             my / SIZE + currentHalf( my ) );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i - 1, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -543,7 +550,17 @@ namespace MAP {
     }
 
     void mapDrawer::setBlock( u16 p_globX, u16 p_globY, u16 p_newBlock ) {
+        if( p_newBlock > 2 * MAX_BLOCKS_PER_TILE_SET ) [[unlikely]] { return; }
         atom( p_globX, p_globY ).m_blockidx = p_newBlock;
+
+        auto curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        auto cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+
+        if( std::abs( curx - p_globX ) > NUM_COLS / 2
+            || std::abs( cury - p_globY ) > NUM_ROWS / 2 ) {
+            // A non-visible block got changed, we should not draw it on-screen.
+            return;
+        }
 
         loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
                    ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
@@ -825,6 +842,9 @@ namespace MAP {
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                          _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
+        runLevelScripts( _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
+                              [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
+                         mx, my );
 
         auto& neigh = _slices[ ( _curX + !dir[ p_direction ][ 0 ] ) & 1 ]
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
@@ -834,6 +854,7 @@ namespace MAP {
                         &_slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
         FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                          _data[ _curX ^ 1 ][ _curY ^ 1 ] );
+        runLevelScripts( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx, my );
     }
 
     void mapDrawer::disablePkmn( s16 p_steps ) {
@@ -2783,20 +2804,24 @@ namespace MAP {
 
         // Select mode (buy/sell/cancel)
 
-        u8 curMode = 0;
+        u8  curMode = 0;
+        u16 buystr  = p_paymentMethod == 0 ? 468 : 673;
 
         loop( ) {
+
             if( p_allowItemSell ) {
                 curMode = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
                               .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
-                                          { 468, 469, 387 } );
+                                          { buystr, 469, 387 } );
             } else {
-                curMode = 0;
+                curMode = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
+                              .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
+                                          { buystr, 387 } );
             }
 
             if( curMode == 0 ) {
                 NAV::buyItem( p_offeredItems, p_paymentMethod );
-            } else if( curMode == 1 ) {
+            } else if( p_allowItemSell && curMode == 1 ) {
                 BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                                     BAG::bagViewer::SELL_ITEM );
                 ANIMATE_MAP       = false;
@@ -2818,8 +2843,9 @@ namespace MAP {
                 SOUND::restoreVolume( );
                 NAV::init( );
                 ANIMATE_MAP = true;
+            } else if( ( !p_allowItemSell && curMode == 1 ) || curMode == 2 ) {
+                break;
             }
-            if( !p_allowItemSell || curMode == 2 ) { break; }
         }
 
         NAV::init( );

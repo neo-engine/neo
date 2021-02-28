@@ -34,13 +34,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BATTLE {
     void slot::age( battleUI* p_ui ) {
-        if( _pokemon == nullptr ) [[unlikely]] {
-                return;
-            }
+        if( _pokemon == nullptr ) [[unlikely]] { return; }
 
         for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
             if( _slotConditionCounter[ i ] && _slotConditionCounter[ i ] < 250 ) {
                 if( !--_slotConditionCounter[ i ] ) {
+                    _slotConditionCounter[ i ] = 1;
                     removeSlotCondition( p_ui, slotCondition( 1LLU << i ) );
                 }
             }
@@ -48,6 +47,7 @@ namespace BATTLE {
         for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
             if( _volatileStatusCounter[ i ] && _volatileStatusCounter[ i ] < 250 ) {
                 if( !--_volatileStatusCounter[ i ] ) {
+                    _volatileStatusCounter[ i ] = 1;
                     removeVolatileStatus( p_ui, volatileStatus( 1LLU << i ) );
                 }
             }

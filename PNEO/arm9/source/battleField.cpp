@@ -1218,6 +1218,8 @@ namespace BATTLE {
 
         char buffer[ 100 ];
 
+        // TODO: add log messages for volatile status?
+
         // volatile status
         for( u8 i = 0; i < 2; ++i ) {
             for( u8 j = 0; j < 2; ++j ) {
@@ -2078,12 +2080,22 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_volatileStatus ) {
-            p_ui->animateGetVolatileStatusCondition( target, p_target.first, p_target.second,
-                                                     p_move.m_moveData.m_volatileStatus );
-            if( addVolatileStatus( p_ui, p_target.first, p_target.second,
-                                   p_move.m_moveData.m_volatileStatus, 255 ) ) {
-                p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
-                                                      p_move.m_moveData.m_volatileStatus );
+            u8   duration = 255;
+            bool fail     = false;
+            if( p_move.m_moveData.m_volatileStatus & ( PROTECT | ENDURE ) ) {
+                duration = 1;
+
+                auto lstmv = getLastUsedMove( p_target.first, p_target.second );
+                if( lstmv.m_moveData.m_volatileStatus & ( PROTECT | ENDURE ) ) {
+                    fail = ( rand( ) & 31 ) > 10;
+                }
+            }
+
+            if( !fail
+                && addVolatileStatus( p_ui, p_target.first, p_target.second,
+                                      p_move.m_moveData.m_volatileStatus, duration ) ) {
+                p_ui->animateGetVolatileStatusCondition( target, p_target.first, p_target.second,
+                                                         p_move.m_moveData.m_volatileStatus );
             } else {
                 p_ui->log( GET_STRING( 304 ) );
             }
@@ -2118,12 +2130,22 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_secondaryVolatileStatus ) {
-            p_ui->animateGetVolatileStatusCondition( target, p_target.first, p_target.second,
-                                                     p_move.m_moveData.m_secondaryVolatileStatus );
-            if( addVolatileStatus( p_ui, p_target.first, p_target.second,
-                                   p_move.m_moveData.m_secondaryVolatileStatus, 255 ) ) {
-                p_ui->animateVolatileStatusCondition( target, p_target.first, p_target.second,
-                                                      p_move.m_moveData.m_secondaryVolatileStatus );
+            u8   duration = 255;
+            bool fail     = false;
+            if( p_move.m_moveData.m_secondaryVolatileStatus & ( PROTECT | ENDURE ) ) {
+                duration   = 1;
+                auto lstmv = getLastUsedMove( p_target.first, p_target.second );
+                if( lstmv.m_moveData.m_volatileStatus & ( PROTECT | ENDURE ) ) {
+                    fail = ( rand( ) & 31 ) > 10;
+                }
+            }
+
+            if( !fail
+                && addVolatileStatus( p_ui, p_target.first, p_target.second,
+                                      p_move.m_moveData.m_secondaryVolatileStatus, duration ) ) {
+                p_ui->animateGetVolatileStatusCondition(
+                    target, p_target.first, p_target.second,
+                    p_move.m_moveData.m_secondaryVolatileStatus );
             } else {
                 p_ui->log( GET_STRING( 304 ) );
             }
@@ -2912,6 +2934,13 @@ namespace BATTLE {
 
         bool items = canUseItem( p_target.first, p_target.second );
 
+        bool abilities
+            = !suppressesAbilities( ) && !( p_move.m_moveData.m_flags & MOVE::IGNOREABILITY );
+
+        bool wonderguard
+            = abilities
+              && getPkmn( p_target.first, p_target.second )->getAbility( ) == A_WONDER_GUARD;
+
         type moveType = getMoveType( p_move );
 
         // Heavy weather
@@ -2924,12 +2953,13 @@ namespace BATTLE {
         if( ( p_move.m_moveData.m_flags & MOVE::SOUND )
             && ( getPkmn( p_target.first, p_target.second )->getAbility( ) == A_SOUNDPROOF
                  || getPkmn( p_target.first, p_target.second )->getAbility( ) == A_CACOPHONY )
-            && !suppressesAbilities( ) ) [[unlikely]] {
+            && abilities ) [[unlikely]] {
             return 0;
         }
 
         // Thousand arrows
-        if( p_move.m_param == M_THOUSAND_ARROWS ) [[unlikely]] {
+        if( p_move.m_param == M_THOUSAND_ARROWS
+            || ( p_move.m_moveData.m_flags & MOVE::IGNOREIMMUNITYGROUND ) ) [[unlikely]] {
             if( !isGrounded( p_target.first, p_target.second )
                 && hasType( p_target.first, p_target.second, FLYING ) ) {
                 return res;
@@ -2951,8 +2981,10 @@ namespace BATTLE {
                 curval = ( curval * getTypeEffectiveness( FLYING, t ) ) / 100;
             }
 
+            if( !curval && ( p_move.m_moveData.m_flags & MOVE::IGNOREIMMUNITY ) ) { curval = 100; }
+
             if( t == GHOST && ( moveType == NORMAL || moveType == FIGHT ) ) [[unlikely]] {
-                if( !suppressesAbilities( )
+                if( abilities
                     && getPkmn( p_move.m_user.first, p_move.m_user.second )->getAbility( )
                            == A_SCRAPPY ) {
                     continue;
@@ -2979,6 +3011,8 @@ namespace BATTLE {
 
             res = ( res * curval / 100 );
         }
+
+        if( wonderguard && res <= 100 ) { return 0; }
 
         return res;
     }
@@ -3054,7 +3088,39 @@ namespace BATTLE {
                 }
             }
 
-            // TODO: weight-based stuff
+            // weight-based
+            auto tgweight   = getWeight( p_target.first, p_target.second, !supprAbs );
+            auto userweight = getWeight( p_move.m_user.first, p_move.m_user.second, !supprAbs );
+
+            if( p_move.m_param == M_LOW_KICK || p_move.m_param == M_GRASS_KNOT ) {
+                if( tgweight < 99 ) {
+                    movePower = 20;
+                } else if( tgweight < 249 ) {
+                    movePower = 40;
+                } else if( tgweight < 499 ) {
+                    movePower = 60;
+                } else if( tgweight < 999 ) {
+                    movePower = 80;
+                } else if( tgweight < 1999 ) {
+                    movePower = 100;
+                } else {
+                    movePower = 120;
+                }
+            }
+
+            if( p_move.m_param == M_HEAVY_SLAM || p_move.m_param == M_HEAT_CRASH ) {
+                if( tgweight * 2 > userweight ) {
+                    movePower = 40;
+                } else if( tgweight * 3 > userweight ) {
+                    movePower = 60;
+                } else if( tgweight * 4 > userweight ) {
+                    movePower = 80;
+                } else if( tgweight * 5 > userweight ) {
+                    movePower = 100;
+                } else {
+                    movePower = 120;
+                }
+            }
 
             // HP-based
             if( p_move.m_param == M_ERUPTION || p_move.m_param == M_WATER_SPOUT
@@ -3756,6 +3822,7 @@ namespace BATTLE {
                 numHits     = 2;
                 strengthMod = 25;
             }
+            bool multihit = numHits > 1;
 
             u8 hits = 0;
             for( u8 j = 0; j < numHits; ++j ) {
@@ -3764,15 +3831,36 @@ namespace BATTLE {
 
                 // Check if the move is protected against
                 bool protect = false;
-                if( p_move.m_moveData.m_flags & MOVE::PROTECT ) [[likely]] {
-                    if( ( tgsc & PROTECT ) || ( tgsc & OBSTRUCT ) || ( tgsc & SPIKYSHIELD )
-                        || ( p_move.m_moveData.m_category != MOVE::STATUS
-                             && ( tgsc & KINGSSHIELD ) ) ) [[unlikely]] {
-                        protect = true;
+                if( ( tgsc & PROTECT ) || ( tgsc & OBSTRUCT ) || ( tgsc & SPIKYSHIELD )
+                    || ( p_move.m_moveData.m_category != MOVE::STATUS && ( tgsc & KINGSSHIELD ) ) )
+                    [[unlikely]] {
+                    protect = true;
+                    if( ( p_move.m_moveData.m_flags & MOVE::PROTECT ) ) {
+                        snprintf( buffer, 99, GET_STRING( 674 ),
+                                  p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
+                                                              p_move.m_target[ i ].second ),
+                                                     p_move.m_target[ i ].first )
+                                      .c_str( ) );
+                        p_ui->log( buffer );
                     }
                 }
 
-                if( !protect ) [[likely]] {
+                if( protect && ( p_move.m_moveData.m_flags & MOVE::BREAKSPROTECT ) ) {
+                    // remove protect
+                    removeVolatileStatus( p_ui, p_move.m_target[ i ].first,
+                                          p_move.m_target[ i ].second, PROTECT );
+                    tgsc = getVolatileStatus( p_move.m_target[ i ].first,
+                                              p_move.m_target[ i ].second );
+                    snprintf( buffer, 99, GET_STRING( 675 ),
+                              p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
+                                                          p_move.m_target[ i ].second ),
+                                                 p_move.m_target[ i ].first )
+                                  .c_str( ) );
+                    p_ui->log( buffer );
+                    protect = false;
+                }
+
+                if( ( p_move.m_moveData.m_flags & MOVE::PROTECT ) && !protect ) [[likely]] {
                     bool critical = executeCriticalCheck( p_ui, p_move, p_move.m_target[ i ] );
 
                     // Check if the move misses
@@ -3889,7 +3977,7 @@ namespace BATTLE {
                 checkItemAfterAttack( p_ui, opponent, slot );
             }
 
-            if( hits > 1 ) {
+            if( multihit && hits >= 1 ) {
                 snprintf( buffer, 99, GET_STRING( 400 ), hits );
                 p_ui->log( buffer );
             }

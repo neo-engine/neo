@@ -145,9 +145,10 @@ namespace MAP {
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void runEvent( mapData::event p_event, u8 p_objectId = 0 );
+        void runEvent( mapData::event p_event, u8 p_objectId = 0, s16 p_mapX = -1,
+                       s16 p_mapY = -1 );
 
-        void executeScript( u16 p_scriptId, u8 p_mapObject = 0 );
+        void executeScript( u16 p_scriptId, u8 p_mapObject = 0, s16 p_mapX = -1, s16 p_mapY = -1 );
 
         void handleEvents( u8 p_localX, u8 p_localY, u8 p_z );
         void handleEvents( u16 p_localX, u16 p_localY, u8 p_z, direction p_dir );
@@ -162,6 +163,12 @@ namespace MAP {
                                               bool               p_distributeEXP = true );
 
         std::pair<bool, mapData::event::data> getWarpData( u16 p_globX, u16 p_globY, u8 p_z = 3 );
+
+        /*
+         * @brief: Runs all events with an "on map enter" trigger.
+         * Called "level script" for historic reasons.
+         */
+        void runLevelScripts( const mapData& p_data, u16 p_mapX, u16 p_mapY );
 
       public:
         const block&        at( u16 p_x, u16 p_y ) const;

@@ -39,6 +39,7 @@ namespace BATTLE {
         for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {
             if( _sideConditionCounter[ i ] && _sideConditionCounter[ i ] < 250 ) {
                 if( !--_sideConditionCounter[ i ] ) {
+                    _sideConditionCounter[ i ] = 1;
                     removeSideCondition( p_ui, sideCondition( 1 << i ) );
                 }
             }

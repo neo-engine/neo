@@ -486,7 +486,7 @@ namespace BATTLE {
         boosts addBoosts( bool p_opponent, u8 p_slot, boosts p_boosts,
                           bool p_allowAbilities = true ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].addBoosts(
-                p_slot, p_boosts, p_allowAbilities && suppressesAbilities( ) );
+                p_slot, p_boosts, p_allowAbilities && !suppressesAbilities( ) );
         }
         bool resetBoosts( bool p_opponent, u8 p_slot ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].resetBoosts( p_slot );
@@ -867,10 +867,25 @@ namespace BATTLE {
         void megaEvolve( battleUI* p_ui, bool p_opponent, u8 p_slot );
 
         /*
+         * @brief: returns the weight of the specified pkmn.
+         */
+        inline u16 getWeight( bool p_opponent, u8 p_slot, bool p_allowAbilities = true ) {
+            bool ab = p_allowAbilities;
+            u16  wg = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getWeight( p_slot, ab );
+
+            if( canUseItem( p_opponent, p_slot, ab )
+                && getPkmn( p_opponent, p_slot )->getItem( ) == I_FLOAT_STONE ) {
+                wg >>= 1;
+            }
+
+            return wg;
+        }
+
+        /*
          * @brief: returns whether the specified pkmn currently touches the ground.
          */
         inline bool isGrounded( bool p_opponent, u8 p_slot, bool p_allowAbilities = true ) {
-            bool ab  = p_allowAbilities && suppressesAbilities( );
+            bool ab  = p_allowAbilities;
             bool grn = _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].isGrounded( p_slot, ab );
 
             if( _pseudoWeatherTimer[ 4 ] ) [[unlikely]] { // gravity

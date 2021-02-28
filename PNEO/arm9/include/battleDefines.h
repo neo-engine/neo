@@ -325,7 +325,7 @@ namespace MOVE {
          */
         SNATCH = ( 1 << 19 ), // TODO
         /** Has no effect on Pokemon with the Soundproof Ability. */
-        SOUND = ( 1 << 20 ), // TODO
+        SOUND = ( 1 << 20 ),
         /** Forces the pokemon to use the move for another 1-2 turns. */
         LOCKEDMOVE = ( 1 << 21 ),
         /** Maintains the rage counter */
@@ -355,13 +355,13 @@ namespace MOVE {
         /** target cannot faint due to move */
         NOFAINT = ( 1ULL << 34 ),
         /** breaks protect */
-        BREAKSPROTECT = ( 1ULL << 35 ), // TODO
+        BREAKSPROTECT = ( 1ULL << 35 ),
         /** ignores type immunities */
-        IGNOREIMMUNITY = ( 1ULL << 36 ), // TODO
+        IGNOREIMMUNITY = ( 1ULL << 36 ),
         /** ignores ground type immunity */
-        IGNOREIMMUNITYGROUND = ( 1ULL << 37 ), // TODO
+        IGNOREIMMUNITYGROUND = ( 1ULL << 37 ),
         /** ignores abilities */
-        IGNOREABILITY = ( 1ULL << 38 ), // TODO
+        IGNOREABILITY = ( 1ULL << 38 ),
         /** ignores defense boosts */
         IGNOREDEFS = ( 1ULL << 39 ), // TODO
         /** ignores evasion boosts */
