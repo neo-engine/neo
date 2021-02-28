@@ -105,8 +105,6 @@ namespace MOVE {
             return false;
         }
         case M_FLASH: {
-            // Check for badge 2
-            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 1 ) ) ) { return false; }
             return SAVE::SAV.getActiveFile( ).m_currentMapWeather == MAP::DARK_FLASHABLE;
         }
         case M_WHIRLPOOL: {
@@ -131,8 +129,8 @@ namespace MOVE {
             return false;
         }
         case M_DEFOG: {
-            // Check for badge 2
-            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 1 ) ) ) { return false; }
+            // Check for badge 6
+            if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 5 ) ) ) { return false; }
             return false;
         }
         case M_ROCK_CLIMB: {

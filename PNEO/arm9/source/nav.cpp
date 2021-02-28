@@ -1879,7 +1879,8 @@ namespace NAV {
                 std::vector<std::pair<u16, u32>> items
                     = { { I_POKE_BALL, 200 },        { I_MASTER_BALL, 10 },  { I_REVIVE, 1500 },
                         { I_FULL_RESTORE, 100 },     { I_EXP_CANDY_XL, 10 }, { I_TM00, 5000 },
-                        { I_TOPO_BERRY, 100000000 }, { I_ORAN_BERRY, 20 } };
+                        { I_TOPO_BERRY, 100000000 }, { I_ORAN_BERRY, 20 },   { I_OLD_ROD, 10 },
+                        { I_GOOD_ROD, 10 } };
                 MAP::curMap->runPokeMart( items );
                 break;
             }
