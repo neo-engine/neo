@@ -114,6 +114,11 @@ namespace MAP {
         STF = 34, // set trainer flag
         CTF = 35, // check trainer flag
 
+        ADD = 36, // reg[ par1 ] += par2
+        ARG = 37, // reg[ par1 ] += reg[ par2 ]
+        DIV = 38, // reg[ par1 ] /= par2
+        DRG = 39, // reg[ par1 ] /= reg[ par2 ]
+
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
         RDR  = 89, // Redraw objects
@@ -405,6 +410,14 @@ namespace MAP {
                 if( registers[ par1 ] == par2 ) { pc += par3; }
                 break;
             }
+            case ADD: registers[ par1 ] += par2; break;
+            case DIV:
+                if( par2 ) { registers[ par1 ] /= par2; }
+                break;
+            case ARG: registers[ par1 ] += registers[ par2 ]; break;
+            case DRG:
+                if( registers[ par2 ] ) { registers[ par1 ] /= registers[ par2 ]; }
+                break;
             case SRG: registers[ par1 ] = par2; break;
             case MRG: registers[ par2 ] = registers[ par1 ]; break;
             case JMP:

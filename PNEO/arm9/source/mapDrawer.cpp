@@ -273,6 +273,8 @@ namespace MAP {
         case DARK_FLASHABLE:
         case DARK_PERMANENT:
         case DARK_FLASH_USED:
+        case DARK_FLASH_1:
+        case DARK_FLASH_2:
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "flash",
                                                         256 * 192 / 4, TEMP, 256, TEMP_PAL );
@@ -281,6 +283,14 @@ namespace MAP {
             if( getWeather( ) == DARK_FLASH_USED ) {
                 bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
                 bgSetScroll( IO::bg3, 64, 48 );
+            }
+            if( getWeather( ) == DARK_FLASH_1 ) {
+                bgSetScale( IO::bg3, 1 << 7 | 1 << 6 | 1 << 5, 1 << 7 | 1 << 6 | 1 << 5 );
+                bgSetScroll( IO::bg3, 112 - 96, 84 - 72 );
+            }
+            if( getWeather( ) == DARK_FLASH_2 ) {
+                bgSetScale( IO::bg3, 1 << 7 | 1 << 6, 1 << 7 | 1 << 6 );
+                bgSetScroll( IO::bg3, 96 - 64, 72 - 48 );
             }
             break;
         case CLOUDY:

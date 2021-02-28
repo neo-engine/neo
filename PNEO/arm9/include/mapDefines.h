@@ -194,6 +194,8 @@ namespace MAP {
         DARK_FLASH_USED = 0x11,
         FOREST_CLOUDS   = 0x12,
         ASH_RAIN        = 0x13, // route 113
+        DARK_FLASH_1    = 0x14, // dewford gym defeated 1-2 trainers
+        DARK_FLASH_2    = 0x15, // dewford gym defeated 3-4 trainers
     };
     enum mapType : u8 { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
     enum warpType : u8 {
