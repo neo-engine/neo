@@ -127,6 +127,8 @@ namespace MAP {
         WALK_CIRCLE            = 18,
         WALK_AROUND_LEFT_RIGHT = 19,
         WALK_AROUND_UP_DOWN    = 20,
+        WALK_CONT_LEFT_RIGHT   = 21,
+        WALK_CONT_UP_DOWN      = 22,
     };
     enum eventType : u8 {
         EVENT_NONE        = 0,

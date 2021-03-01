@@ -1297,8 +1297,10 @@ namespace MAP {
             }
 
             if( o.second.m_movement == WALK_AROUND_LEFT_RIGHT
-                || o.second.m_movement == WALK_LEFT_RIGHT ) {
-                if( ( p_frame & 127 ) == 63 ) {
+                || o.second.m_movement == WALK_LEFT_RIGHT
+                || o.second.m_movement == WALK_CONT_LEFT_RIGHT ) {
+                if( ( p_frame & 127 ) == 63
+                    || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_LEFT_RIGHT ) ) {
                     bool nomove = false;
 
                     if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
@@ -1340,9 +1342,10 @@ namespace MAP {
                     }
                 }
             }
-            if( o.second.m_movement == WALK_AROUND_UP_DOWN
-                || o.second.m_movement == WALK_UP_DOWN ) {
-                if( ( p_frame & 127 ) == 63 ) {
+            if( o.second.m_movement == WALK_AROUND_UP_DOWN || o.second.m_movement == WALK_UP_DOWN
+                || o.second.m_movement == WALK_CONT_UP_DOWN ) {
+                if( ( p_frame & 127 ) == 63
+                    || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_UP_DOWN ) ) {
                     bool nomove = false;
                     if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
                         if( o.second.m_pos.m_posX + dir[ UP ][ 0 ] != curx

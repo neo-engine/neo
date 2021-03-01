@@ -1069,7 +1069,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Planted a %s.", "%s eingepflanzt." },
     { "You watered the berry plant.", "Du hast die Beerenpflanze gegossen." },
     { "Would you like to water the berries?", "M\xf6"
-                                              "chtest du die Beeren gie?\xdf"
+                                              "chtest du die Beeren gie\xdf"
                                               "en?" },
 
     { "No. ", "Nr. " },
