@@ -330,6 +330,7 @@ namespace MAP {
                 } else {
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
                 }
+
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ 0 ] ] = cur;
                 break;
             }

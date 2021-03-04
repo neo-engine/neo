@@ -129,6 +129,7 @@ namespace MAP {
         WALK_AROUND_UP_DOWN    = 20,
         WALK_CONT_LEFT_RIGHT   = 21,
         WALK_CONT_UP_DOWN      = 22,
+        WALK_AROUND_SQUARE     = 23, // randomly walks around in a 3x3 square
     };
     enum eventType : u8 {
         EVENT_NONE        = 0,

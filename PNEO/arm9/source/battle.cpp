@@ -1425,6 +1425,13 @@ namespace BATTLE {
                 ballCatchRate = 7;
             break;
 
+        case I_PREMIER_BALL:
+            if( wild->isShiny( ) ) { ballCatchRate = 512; }
+            ballCatchRate = 2;
+            break;
+
+        case I_BEAST_BALL: ballCatchRate = 0; break;
+
         default: break;
         }
 
@@ -1436,6 +1443,7 @@ namespace BATTLE {
 
         u32 catchRate = ( 3 * wild->m_stats.m_maxHP - 2 * wild->m_stats.m_curHP ) * p.m_catchrate
                         * ballCatchRate / 3 / wild->m_stats.m_maxHP * status;
+        if( !catchRate ) { catchRate = 1; }
         u32 pr   = u32( ( 65535 << 4 ) / ( sqrt( sqrt( ( 255L << 18 ) / catchRate ) ) ) );
         u8  succ = 0;
         for( u8 i = 0; i < 4; ++i ) {

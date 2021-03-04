@@ -74,6 +74,7 @@ namespace MAP {
 
         for( u8 i = 0; i < 4; ++i ) {
             if( ( p_movement == WALK_AROUND_LEFT_RIGHT ) || ( p_movement == WALK_AROUND_UP_DOWN )
+                || ( p_movement == WALK_AROUND_SQUARE )
                 || ( p_movement & ( 1 << ( ( st + i ) % 4 ) ) ) ) {
                 return movement2Direction( ( st + i ) % 4 );
             }
@@ -1279,7 +1280,8 @@ namespace MAP {
             if( o.second.m_movement == NO_MOVEMENT ) { continue; }
 
             if( o.second.m_movement <= 15 || o.second.m_movement == WALK_AROUND_LEFT_RIGHT
-                || o.second.m_movement == WALK_AROUND_UP_DOWN ) {
+                || o.second.m_movement == WALK_AROUND_UP_DOWN
+                || o.second.m_movement == WALK_AROUND_SQUARE ) {
                 if( ( p_frame & 127 ) == 127 ) {
                     o.second.m_direction = getRandomLookDirection( o.second.m_movement );
                     _mapSprites.setFrame( o.first, getFrame( o.second.m_direction ), false );
@@ -1296,9 +1298,12 @@ namespace MAP {
                 continue;
             }
 
+            u8 rndir = rand( ) & 1;
+
             if( o.second.m_movement == WALK_AROUND_LEFT_RIGHT
                 || o.second.m_movement == WALK_LEFT_RIGHT
-                || o.second.m_movement == WALK_CONT_LEFT_RIGHT ) {
+                || o.second.m_movement == WALK_CONT_LEFT_RIGHT
+                || ( o.second.m_movement == WALK_AROUND_SQUARE && rndir ) ) {
                 if( ( p_frame & 127 ) == 63
                     || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_LEFT_RIGHT ) ) {
                     bool nomove = false;
@@ -1343,7 +1348,8 @@ namespace MAP {
                 }
             }
             if( o.second.m_movement == WALK_AROUND_UP_DOWN || o.second.m_movement == WALK_UP_DOWN
-                || o.second.m_movement == WALK_CONT_UP_DOWN ) {
+                || o.second.m_movement == WALK_CONT_UP_DOWN
+                || ( o.second.m_movement == WALK_AROUND_SQUARE && !rndir ) ) {
                 if( ( p_frame & 127 ) == 63
                     || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_UP_DOWN ) ) {
                     bool nomove = false;
