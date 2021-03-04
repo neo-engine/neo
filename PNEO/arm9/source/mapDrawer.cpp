@@ -3112,50 +3112,8 @@ namespace MAP {
             }
 
             loadMapObject( cur );
-            /*  if( cur.first == 255 ) {
-                  // this is not exactly true (e.g. for items that were already picked up)
-                  loadingNewObjectFailed = true;
-              }*/
             res.push_back( cur );
         }
-
-        /*
-        if( loadingNewObjectFailed ) {
-            // Sort the map objects based on their distance to the camera
-            std::sort(
-                res.begin( ), res.end( ),
-                [ & ]( const std::pair<u8, mapObject>& p_l, const std::pair<u8, mapObject>& p_r ) {
-                    if( p_l.first == UNUSED_MAPOBJECT && p_r.first != UNUSED_MAPOBJECT ) {
-                        return false;
-                    }
-                    if( p_l.first != UNUSED_MAPOBJECT && p_r.first == UNUSED_MAPOBJECT ) {
-                        return true;
-                    }
-                    return dist( p_l.second.m_pos.m_posX, p_l.second.m_pos.m_posY, curx, cury )
-                           < dist( p_r.second.m_pos.m_posX, p_r.second.m_pos.m_posY, curx, cury );
-                } );
-            // Check for objects that weren't loaded and try to make them replace other
-            // objects that are farther away from the camera.
-
-            auto good = res.begin( ), bad = --res.end( );
-            while( good < bad ) {
-                if( good->first == 255 ) {
-                    // sprite wasn't loaded, try to find some sprite to unload
-                    while( ( bad->first == 255 || bad->first == UNUSED_MAPOBJECT ) && good < bad ) {
-                        bad--;
-                    }
-                    if( good >= bad ) {
-                        // nothing to unload, give up
-                        break;
-                    }
-                    _mapSprites.destroySprite( bad->first, false );
-                    bad->first = 255;
-                    loadMapObject( *good ); // let's just hope it works this time...
-                }
-                ++good;
-            }
-        }
-        */
 
         SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( );
         for( u8 i = 0; i < res.size( ); ++i ) {

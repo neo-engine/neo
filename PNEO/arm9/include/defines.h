@@ -36,6 +36,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define DESQUID_STRING ( 1 << 13 )
 #endif
 
+#define MAP_STRING ( 1 << 11 )
+
 // Assumes that the Backup is a 512k flash memory
 #define BACKUP_SIZE ( 512 * 1024 )
 
@@ -137,22 +139,27 @@ const char* getAchievement( u16 p_badgeId, u8 p_language );
                   ? getBadge( 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) - 1 ) \
                   : nullptr ) )
 
+#define GET_MAP_STRING( p_stringId ) getMapString( p_stringId )
+
 #ifdef DESQUID
 constexpr u16            MAX_DESQUID_STRINGS = 100;
 extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
-#define GET_STRING( p_stringId )                                                                 \
-    ( ( ( p_stringId ) >= DESQUID_STRING ) ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ] \
-                                           : STRINGS[ p_stringId ][ CURRENT_LANGUAGE ] )
+#define GET_STRING( p_stringId )                                                       \
+    ( ( ( p_stringId ) >= DESQUID_STRING )                                             \
+          ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ]                        \
+          : ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - MAP_STRING ) \
+                                           : STRINGS[ p_stringId ][ CURRENT_LANGUAGE ] ) )
 #else
-#define GET_STRING( p_stringId ) STRINGS[ p_stringId ][ CURRENT_LANGUAGE ]
+#define GET_STRING( p_stringId )                                               \
+    ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - MAP_STRING ) \
+                                   : STRINGS[ p_stringId ][ CURRENT_LANGUAGE ] )
 #endif
 #define HP_ICON HP_ICONS[ CURRENT_LANGUAGE ]
 
-#define GET_MAP_STRING( p_stringId ) getMapString( p_stringId )
-#define NO_DATA                      GET_STRING( 0 )
-#define FARAWAY_PLACE                GET_STRING( 1 )
-#define UNKNOWN_SPECIES              GET_STRING( 2 )
-#define POKE_NAV                     GET_STRING( 8 )
+#define NO_DATA         GET_STRING( 0 )
+#define FARAWAY_PLACE   GET_STRING( 1 )
+#define UNKNOWN_SPECIES GET_STRING( 2 )
+#define POKE_NAV        GET_STRING( 8 )
 
 #define loop( )     while( 1 )
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )

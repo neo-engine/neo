@@ -149,6 +149,8 @@ namespace MAP {
         YNM = 125, // yes no message
         CLL = 126, // Call special function
         MSG = 127, // message
+        CBG = 128, // choice box begin
+        CIT = 129, // choice item
 
         SBC = 196, // set block
     };
@@ -232,6 +234,10 @@ namespace MAP {
         u8 pc = 0;
 
         std::vector<std::pair<u16, u32>> martItems;
+
+        std::vector<std::pair<u16, u16>> choiceBoxItems;
+        u16                              choiceBoxMessage;
+        u8                               choiceBoxMsgType;
 
         u16 registers[ 10 ] = { 0 };
 
@@ -741,6 +747,13 @@ namespace MAP {
                 setBlock( u16( mapX * SIZE + par1s ), u16( mapY * SIZE + par2s ), par3s );
                 break;
             }
+            case CBG:
+                choiceBoxItems.clear( );
+                choiceBoxMessage = parA;
+                choiceBoxMsgType = parB;
+                break;
+            case CIT: choiceBoxItems.push_back( { parA + MAP_STRING, parB } ); break;
+
             case MBG:
                 pmartCurr = par1;
                 martSell  = par2;
@@ -801,6 +814,14 @@ namespace MAP {
                 }
                 case 9: {
                     awardBadge( par2, par3 );
+                    break;
+                }
+                case 10: {
+                    IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                    registers[ 0 ] = cb.getResult( GET_STRING( choiceBoxMessage ), choiceBoxMsgType,
+                                                   choiceBoxItems );
+                    registers[ 1 ] = choiceBoxItems( registers[ 0 ] );
+                    NAV::init( );
                     break;
                 }
                 default: break;
@@ -887,10 +908,7 @@ namespace MAP {
             printMapMessage( GET_MAP_STRING( 26 ), MSG_NORMAL );
             return;
         }
-        case 0xe5: { // Pokemart shelves
-            printMapMessage( GET_MAP_STRING( 127 ), MSG_NORMAL );
-            break;
-        }
+
         case 0xe0: { // picture books
             printMapMessage( GET_MAP_STRING( 133 ), MSG_NORMAL );
             break;
@@ -901,6 +919,20 @@ namespace MAP {
         }
         case 0xe2: { // PokeCenter magazines
             printMapMessage( GET_MAP_STRING( 30 ), MSG_NORMAL );
+            break;
+        }
+        case 0xe4: { // trash bin is empty
+            if( !hasEvent( EVENT_ITEM, px, py, pz ) ) {
+                printMapMessage( GET_MAP_STRING( 404 ), MSG_NORMAL );
+            }
+            break;
+        }
+        case 0xe5: { // Pokemart shelves
+            printMapMessage( GET_MAP_STRING( 127 ), MSG_NORMAL );
+            break;
+        }
+        case 0xe6: { // blue prints
+            printMapMessage( GET_MAP_STRING( 396 ), MSG_NORMAL );
             break;
         }
         case 0x80: { // load script one block behind
