@@ -1223,4 +1223,8 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s protects itself.", "%s sch\xfctzt sich selbst." },
 
     { "%s's protection was broken.", "Der Schutz von %s wurde durchbrochen." },
+    { "Handed over %hu times the\nitem %s.", "%hu-mal das Item\n%s \xfc"
+                                             "bergeben." },
+    { "Handed over %s.", "%s \xfc"
+                         "bergeben." },
 };

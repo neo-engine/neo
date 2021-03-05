@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle.h"
 #include "battleTrainer.h"
 #include "boxViewer.h"
+#include "choiceBox.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDrawer.h"
@@ -129,10 +130,12 @@ namespace MAP {
         BTR = 100, // Battle trainer
         BPK = 101, // Battle pkmn
         ITM = 102, // Give item
+        TTM = 103, // Take item
 
         BTRR = 105, // Battle trainer
         BPKR = 106, // Battle pkmn
         ITMR = 107, // Give item
+        TTMR = 108, // Take item
 
         MSC = 113, // play music (temporary)
         RMS = 114, // Reset music
@@ -235,9 +238,10 @@ namespace MAP {
 
         std::vector<std::pair<u16, u32>> martItems;
 
-        std::vector<std::pair<u16, u16>> choiceBoxItems;
-        u16                              choiceBoxMessage;
-        u8                               choiceBoxMsgType;
+        std::vector<u16> choiceBoxItems;
+        std::vector<u16> choiceBoxPL;
+        u16              choiceBoxMessage = 0;
+        u8               choiceBoxMsgType = 0;
 
         u16 registers[ 10 ] = { 0 };
 
@@ -710,7 +714,9 @@ namespace MAP {
                 // TODO
                 break;
             case ITM: NAV::giveItemToPlayer( parA, parB ); break;
+            case TTM: NAV::takeItemFromPlayer( parA, parB ); break;
             case ITMR: NAV::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
+            case TTMR: NAV::takeItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
                 SOUND::playBGM( parA, true );
                 break;
@@ -749,10 +755,14 @@ namespace MAP {
             }
             case CBG:
                 choiceBoxItems.clear( );
+                choiceBoxPL.clear( );
                 choiceBoxMessage = parA;
                 choiceBoxMsgType = parB;
                 break;
-            case CIT: choiceBoxItems.push_back( { parA + MAP_STRING, parB } ); break;
+            case CIT:
+                choiceBoxItems.push_back( parA + MAP_STRING );
+                choiceBoxPL.push_back( parB );
+                break;
 
             case MBG:
                 pmartCurr = par1;
@@ -818,9 +828,9 @@ namespace MAP {
                 }
                 case 10: {
                     IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-                    registers[ 0 ] = cb.getResult( GET_STRING( choiceBoxMessage ), choiceBoxMsgType,
-                                                   choiceBoxItems );
-                    registers[ 1 ] = choiceBoxItems( registers[ 0 ] );
+                    registers[ 0 ]   = cb.getResult( GET_STRING( choiceBoxMessage ),
+                                                   style( choiceBoxMsgType ), choiceBoxItems );
+                    registers[ 1 ]   = choiceBoxPL[ registers[ 0 ] ];
                     NAV::init( );
                     break;
                 }
@@ -922,7 +932,7 @@ namespace MAP {
             break;
         }
         case 0xe4: { // trash bin is empty
-            if( !hasEvent( EVENT_ITEM, px, py, pz ) ) {
+            if( !currentData( ).hasEvent( EVENT_ITEM, px, py, pz ) ) {
                 printMapMessage( GET_MAP_STRING( 404 ), MSG_NORMAL );
             }
             break;

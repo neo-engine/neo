@@ -118,10 +118,17 @@ namespace NAV {
     };
 
     /*
-     * @brief: Shows a message box informing the player that he obtained the specified
+     * @brief: Shows a message box informing the player that they obtained the specified
      * item. (Also adds the specified item to the player's bag)
      */
     void giveItemToPlayer( u16 p_itemId, u16 p_amount = 1 );
+
+    /*
+     * @brief: Shows a message informing the player that they lost the specified item.
+     * (also removes the specified item from the bag)
+     */
+    void takeItemFromPlayer( u16 p_itemId, u16 p_amount = 1 );
+
 
     /*
      * @brief: Prints the given message. An empty message clears the message box.

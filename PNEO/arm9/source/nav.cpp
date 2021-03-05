@@ -718,6 +718,28 @@ namespace NAV {
         }
     }
 
+    void takeItemFromPlayer( u16 p_itemId, u16 p_amount ) {
+        auto data = ITEM::getItemData( p_itemId );
+        auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
+                                           BAG::toBagType( data.m_itemType ), p_itemId ) );
+        SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
+        char buffer[ 100 ];
+        auto iname = ITEM::getItemName( p_itemId );
+
+        if( data.m_itemType == ITEM::ITEMTYPE_TM ) {
+            iname += " " + MOVE::getMoveName( data.m_param2 );
+        }
+
+        if( cnt > 1 ) {
+            snprintf( buffer, 99, GET_STRING( 676 ), cnt, iname.c_str( ) );
+        } else {
+            snprintf( buffer, 99, GET_STRING( 677 ), iname.c_str( ) );
+        }
+        doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
+        waitForInteract( );
+        hideMessageBox( );
+    }
+
     void giveItemToPlayer( u16 p_itemId, u16 p_amount ) {
         auto data = ITEM::getItemData( p_itemId );
         SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( data.m_itemType ), p_itemId,
