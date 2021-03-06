@@ -111,6 +111,43 @@ namespace NAV {
         IO::updateOAM( false );
     }
 
+    void animateMB( u8 p_frame ) {
+        if( ( p_frame & 15 ) == 0 ) {
+            SpriteEntry* oam                = IO::OamTop->oamBuffer;
+            oam[ SPR_MSGCONT_OAM ].isHidden = !oam[ SPR_MSGCONT_OAM ].isHidden;
+            IO::updateOAM( false );
+        }
+    }
+
+    void waitForInteract( ) {
+        scanKeys( );
+        cooldown = COOLDOWN_COUNT;
+        u8 frame = 0;
+        loop( ) {
+            animateMB( ++frame );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
+                while( touch.px || touch.py ) {
+                    animateMB( ++frame );
+                    swiWaitForVBlank( );
+                    scanKeys( );
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
+
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                cooldown = COOLDOWN_COUNT;
+                break;
+            }
+        }
+    }
+
     void redraw( bool p_bottom = true ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
 
@@ -618,6 +655,7 @@ namespace NAV {
                     } else if( ln == 2 || ( ln > 2 && p_message[ cpos ] == '\n' ) ) {
                         std::strncat( TEXT_CACHE_2, shortbuf, 20 );
                     } else {
+                        waitForInteract( );
                         std::strncpy( TEXT_CACHE_1, TEXT_CACHE_2, 256 );
                         std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
                         std::strncat( TEXT_CACHE_2, shortbuf, 20 );
@@ -679,43 +717,6 @@ namespace NAV {
         IO::regularFont->setColor( IO::BLUE_IDX, 3 );
         IO::regularFont->setColor( IO::BLUE2_IDX, 4 );
         IO::updateOAM( false );
-    }
-
-    void animateMB( u8 p_frame ) {
-        if( ( p_frame & 15 ) == 0 ) {
-            SpriteEntry* oam                = IO::OamTop->oamBuffer;
-            oam[ SPR_MSGCONT_OAM ].isHidden = !oam[ SPR_MSGCONT_OAM ].isHidden;
-            IO::updateOAM( false );
-        }
-    }
-
-    void waitForInteract( ) {
-        scanKeys( );
-        cooldown = COOLDOWN_COUNT;
-        u8 frame = 0;
-        loop( ) {
-            animateMB( ++frame );
-            scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
-
-            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
-                    animateMB( ++frame );
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    touchRead( &touch );
-                    swiWaitForVBlank( );
-                }
-
-                SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
-                break;
-            }
-        }
     }
 
     void takeItemFromPlayer( u16 p_itemId, u16 p_amount ) {

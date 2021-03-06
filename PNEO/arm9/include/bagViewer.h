@@ -177,6 +177,6 @@ namespace BAG {
         /*
          * @brief: Runs the bag viewer to make the player select an item from the bag.
          */
-        u16 getItem( );
+        u16 getItem( bool p_removeItem = false );
     };
 } // namespace BAG

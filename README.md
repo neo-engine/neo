@@ -34,10 +34,10 @@ _Partially_ implemented features are in _italics_.
     * [x] The ability to load maps (for now only GBA-style maps are supported) including
         * [x] Events
         * [x] Wild Pokémon encounter
-        * [ ] Animated map tiles
+        * [x] Animated map tiles
         * [x] Player sprite, animated moving, surfing, cycling, and fishing
         * [x] Warps
-        * [ ] Weather and other overlays (flash, mist, etc)
+        * [x] Weather and other overlays (flash, mist, etc)
     * [x] BGM and SFX using MaxMod
     * [x] A real time clock
         * [x] Overworld changes based on time (map palette akin to DNS)

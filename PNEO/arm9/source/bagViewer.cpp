@@ -73,6 +73,7 @@ namespace BAG {
 
         auto sz = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBg );
         if( !sz ) { return; }
+        if( _currentViewStart >= sz ) { _currentViewEnd = _currentViewStart = 0; }
 
         for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
             for( bool done = false; !done; ) {
@@ -1015,7 +1016,7 @@ namespace BAG {
         return 0;
     }
 
-    u16 bagViewer::getItem( ) {
+    u16 bagViewer::getItem( bool p_removeItem ) {
         _currSelectedIdx = 0;
         initUI( );
 
@@ -1049,6 +1050,10 @@ namespace BAG {
                 auto itemData   = currentItem( ).second;
                 u8   res        = 0;
                 if( targetItem && ( res = confirmChoice( targetItem, &itemData ) ) ) {
+                    if( p_removeItem ) {
+                        SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, targetItem, 1 );
+                    }
                     return targetItem;
                 }
                 _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,

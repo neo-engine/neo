@@ -91,8 +91,8 @@ namespace MAP {
         }
 
         constexpr mapObject( )
-            : m_pos( { 0, 0, 0 } ), m_picNum( 0 ), m_movement( moveMode::WALK ), m_range( 0 ),
-              m_direction( direction::DOWN ), m_event( mapData::event( ) ) {
+            : m_pos( { 0, 0, 0 } ), m_picNum( 0 ), m_movement( moveMode::NO_MOVEMENT ),
+              m_range( 0 ), m_direction( direction::DOWN ), m_event( mapData::event( ) ) {
         }
     };
 } // namespace MAP

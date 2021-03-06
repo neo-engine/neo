@@ -53,6 +53,8 @@ namespace MAP {
 
         std::map<position, u8> _tileAnimations;
 
+        std::set<u16> _fixedMapObjects;
+
         constexpr u16 dist( u16 p_globX1, u16 p_globY1, u16 p_globX2, u16 p_globY2 ) {
             return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
         }
@@ -130,6 +132,9 @@ namespace MAP {
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
+
+        void fixMapObject( u8 p_objectId );
+        void unfixMapObject( u8 p_objectId );
 
         void showExclamationAboveMapObject( u8 p_objectId );
         void moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer = false,
@@ -268,7 +273,8 @@ namespace MAP {
 
         void animateMap( u8 p_frame );
 
-        bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK );
+        bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK,
+                      bool p_events = true );
         void movePlayer( direction p_direction, bool p_fast = false );
 
         void bikeJumpPlayer( direction p_direction );
@@ -287,7 +293,7 @@ namespace MAP {
         void stopPlayer( direction p_direction );
         void changeMoveMode( moveMode p_newMode );
 
-        void redirectPlayer( direction p_direction, bool p_fast );
+        void redirectPlayer( direction p_direction, bool p_fast, bool p_force = false );
 
         void standUpPlayer( direction p_direction );
         void sitDownPlayer( direction p_direction, moveMode p_newMoveMode );

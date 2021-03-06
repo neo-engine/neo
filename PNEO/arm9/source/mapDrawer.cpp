@@ -373,6 +373,11 @@ namespace MAP {
                 mapMemory[ i ] = (u16*) BG_MAP_RAM( 2 * i - 1 );
                 bgSetPriority( i - 1, i );
             }
+            // reset frame animation of objects
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                auto& o                            = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+                o.second.m_currentMovement.m_frame = 0;
+            }
 
             for( u8 i = 0; i < 4; ++i ) {
                 constructAndAddNewMapObjects( _data[ i % 2 ][ i / 2 ],
@@ -431,6 +436,13 @@ namespace MAP {
         changeMoveMode( SAVE::SAV.getActiveFile( ).m_player.m_movement );
         _mapSprites.setPriority( _playerSprite,
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio );
+    }
+
+    void mapDrawer::fixMapObject( u8 p_objectId ) {
+        _fixedMapObjects.insert( p_objectId );
+    }
+    void mapDrawer::unfixMapObject( u8 p_objectId ) {
+        _fixedMapObjects.erase( p_objectId );
     }
 
     void mapDrawer::showExclamationAboveMapObject( u8 p_objectId ) {
@@ -1300,12 +1312,43 @@ namespace MAP {
 
             u8 rndir = rand( ) & 1;
 
+            bool movemnt
+                = ( p_frame & 127 ) == 63
+                  || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_LEFT_RIGHT )
+                  || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_UP_DOWN )
+                  || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_FOLLOW_OBJECT );
+
+            if( o.second.m_movement == WALK_CONT_FOLLOW_OBJECT ) {
+                if( movemnt ) {
+                    auto curdir = o.second.m_currentMovement.m_direction;
+                    auto nxdir  = direction( ( curdir + 1 ) % 4 );
+
+                    // check if the object could do a right turn (ignoring any events)
+                    if( canMove( o.second.m_pos, nxdir, WALK, false ) ) {
+                        o.second.m_currentMovement = { nxdir, 0 };
+                    }
+
+                    // Don't glitch through the player or other objects
+                    if( canMove( o.second.m_pos, o.second.m_currentMovement.m_direction, WALK )
+                        && ( o.second.m_pos.m_posX
+                                     + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
+                                 != curx
+                             || o.second.m_pos.m_posY
+                                        + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
+                                    != cury ) ) {
+                        moveMapObject( i, o.second.m_currentMovement );
+                        o.second.m_currentMovement.m_frame++;
+                    } else {
+                        o.second.m_currentMovement = { curdir, 0 };
+                    }
+                }
+            }
+
             if( o.second.m_movement == WALK_AROUND_LEFT_RIGHT
                 || o.second.m_movement == WALK_LEFT_RIGHT
                 || o.second.m_movement == WALK_CONT_LEFT_RIGHT
                 || ( o.second.m_movement == WALK_AROUND_SQUARE && rndir ) ) {
-                if( ( p_frame & 127 ) == 63
-                    || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_LEFT_RIGHT ) ) {
+                if( movemnt ) {
                     bool nomove = false;
 
                     if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
@@ -1350,8 +1393,7 @@ namespace MAP {
             if( o.second.m_movement == WALK_AROUND_UP_DOWN || o.second.m_movement == WALK_UP_DOWN
                 || o.second.m_movement == WALK_CONT_UP_DOWN
                 || ( o.second.m_movement == WALK_AROUND_SQUARE && !rndir ) ) {
-                if( ( p_frame & 127 ) == 63
-                    || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_UP_DOWN ) ) {
+                if( movemnt ) {
                     bool nomove = false;
                     if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
                         if( o.second.m_pos.m_posX + dir[ UP ][ 0 ] != curx
@@ -1428,7 +1470,8 @@ namespace MAP {
     }
 
     // Movement stuff
-    bool mapDrawer::canMove( position p_start, direction p_direction, moveMode p_moveMode ) {
+    bool mapDrawer::canMove( position p_start, direction p_direction, moveMode p_moveMode,
+                             bool p_events ) {
         u16 nx = p_start.m_posX + dir[ p_direction ][ 0 ];
         u16 ny = p_start.m_posY + dir[ p_direction ][ 1 ];
 
@@ -1437,38 +1480,40 @@ namespace MAP {
         if( keysHeld( ) & KEY_R ) { return true; }
 #endif
 
-        // Check if any event is occupying the target block
-        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
-            auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
-            if( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny ) {
-                switch( o.second.m_event.m_type ) {
-                case EVENT_HMOBJECT:
-                    if( o.second.m_event.m_data.m_hmObject.m_hmType
-                        == mapSpriteManager::SPR_STRENGTH ) {
-                        // Check if the boulder could be moved by using strength
-                        if( p_moveMode == STRENGTH
-                            || !canMove( { nx, ny, p_start.m_posZ }, p_direction, STRENGTH ) ) {
-                            return false;
+        if( p_events ) {
+            // Check if any event is occupying the target block
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
+                if( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny ) {
+                    switch( o.second.m_event.m_type ) {
+                    case EVENT_HMOBJECT:
+                        if( o.second.m_event.m_data.m_hmObject.m_hmType
+                            == mapSpriteManager::SPR_STRENGTH ) {
+                            // Check if the boulder could be moved by using strength
+                            if( p_moveMode == STRENGTH
+                                || !canMove( { nx, ny, p_start.m_posZ }, p_direction, STRENGTH ) ) {
+                                return false;
+                            }
+                            // Check if the player has actually used strength
+                            if( !_strengthUsed ) { return false; }
+                            break;
                         }
-                        // Check if the player has actually used strength
-                        if( !_strengthUsed ) { return false; }
+                        if( o.second.m_event.m_data.m_hmObject.m_hmType ) { return false; }
                         break;
+                    case EVENT_ITEM:
+                        if( o.second.m_event.m_data.m_item.m_itemType ) {
+                            return false;
+                        } // item is not hidden
+                        break;
+                    case EVENT_NPC:
+                    case EVENT_NPC_MESSAGE:
+                    case EVENT_TRAINER:
+                    case EVENT_OW_PKMN:
+                    case EVENT_BERRYTREE: return false;
+                    case EVENT_GENERIC:
+                        if( o.second.m_event.m_trigger & TRIGGER_INTERACT ) { return false; }
+                    default: break;
                     }
-                    if( o.second.m_event.m_data.m_hmObject.m_hmType ) { return false; }
-                    break;
-                case EVENT_ITEM:
-                    if( o.second.m_event.m_data.m_item.m_itemType ) {
-                        return false;
-                    } // item is not hidden
-                    break;
-                case EVENT_NPC:
-                case EVENT_NPC_MESSAGE:
-                case EVENT_TRAINER:
-                case EVENT_OW_PKMN:
-                case EVENT_BERRYTREE: return false;
-                case EVENT_GENERIC:
-                    if( o.second.m_event.m_trigger & TRIGGER_INTERACT ) { return false; }
-                default: break;
                 }
             }
         }
@@ -2242,7 +2287,7 @@ namespace MAP {
         }
     }
 
-    void mapDrawer::redirectPlayer( direction p_direction, bool p_fast ) {
+    void mapDrawer::redirectPlayer( direction p_direction, bool p_fast, bool p_force ) {
         // Check if redirecting is allowed
         u8 lstBehave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                            SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
@@ -2253,7 +2298,7 @@ namespace MAP {
             return;
 
         // Check if the player's direction changed
-        if( p_direction != SAVE::SAV.getActiveFile( ).m_player.m_direction ) {
+        if( p_direction != SAVE::SAV.getActiveFile( ).m_player.m_direction || p_force ) {
             if( !_mapSprites.getVisibility( _playerPlatSprite ) ) {
                 _mapSprites.setFrame( _playerPlatSprite, getFrame( p_direction ), false );
             }
@@ -2945,13 +2990,21 @@ namespace MAP {
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
+            if( _fixedMapObjects.count( i ) ) {
+#ifdef DESQUID_MORE
+                NAV::printMessage(
+                    ( std::string( "skip " ) + std::to_string( o.first ) ).c_str( ) );
+#endif
+                continue;
+            }
 
             if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 24 ) {
 #ifdef DESQUID_MORE
                 NAV::printMessage(
                     ( std::string( "Destroying " ) + std::to_string( i ) + " "
-                      + std::to_string( o.second.m_pos.m_posX ) + " " + std::to_string( curx ) + " "
-                      + std::to_string( o.second.m_pos.m_posY ) + " " + std::to_string( cury ) )
+                      + std::to_string( o.first ) + " : " + std::to_string( o.second.m_pos.m_posX )
+                      + " " + std::to_string( curx ) + " " + std::to_string( o.second.m_pos.m_posY )
+                      + " " + std::to_string( cury ) )
                         .c_str( ) );
 #endif
                 _mapSprites.destroySprite( o.first, false );
@@ -3115,9 +3168,17 @@ namespace MAP {
             res.push_back( cur );
         }
 
-        SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( );
-        for( u8 i = 0; i < res.size( ); ++i ) {
-            SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = res[ i ];
+        SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( ) + _fixedMapObjects.size( );
+        for( u8 i = 0, shift = 0; i < res.size( ) + _fixedMapObjects.size( ); ++i ) {
+            if( _fixedMapObjects.count( i ) ) {
+                ++shift;
+                continue;
+            }
+            if( size_t( i - shift ) < res.size( ) ) {
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = res[ i - shift ];
+            } else {
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = { UNUSED_MAPOBJECT, mapObject( ) };
+            }
         }
 
         // force an update

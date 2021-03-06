@@ -120,11 +120,17 @@ namespace MAP {
         DIV = 38, // reg[ par1 ] /= par2
         DRG = 39, // reg[ par1 ] /= reg[ par2 ]
 
+        HPL = 40, // hide player sprite
+        SPL = 41, // show player sprite
+        WPL = 42, // walk player (also through walls, etc)
+
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
         RDR  = 89, // Redraw objects
         ATT  = 90, // Attach player
         REM  = 91, // Remove player
+        FIXR = 92, // Make map object to obtain same pos in map obj arr
+        UFXR = 93, // Make map object to obtain same pos in map obj arr
 
         FNT = 99,  // faint player
         BTR = 100, // Battle trainer
@@ -280,6 +286,8 @@ namespace MAP {
 #endif
 
             switch( ins ) {
+            case HPL: _mapSprites.setVisibility( _playerSprite, true ); break;
+            case SPL: _mapSprites.setVisibility( _playerSprite, false ); break;
             case BNK: {
                 newbnk = par1;
                 newz   = par2;
@@ -299,6 +307,14 @@ namespace MAP {
             }
             case EXMR: {
                 showExclamationAboveMapObject( registers[ par1 ] );
+                break;
+            }
+            case FIXR: {
+                fixMapObject( registers[ par1 ] );
+                break;
+            }
+            case UFXR: {
+                unfixMapObject( registers[ par1 ] );
                 break;
             }
             case ATT: playerAttachedToObject = true; break;
@@ -329,6 +345,7 @@ namespace MAP {
 
                 u8 found = 255;
                 for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                    if( _fixedMapObjects.count( i ) ) { continue; }
                     if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first == UNUSED_MAPOBJECT ) {
                         found = i;
                         break;
@@ -338,10 +355,18 @@ namespace MAP {
                 if( found < 255 ) {
                     registers[ 0 ] = found;
                 } else {
+#ifdef DESQUID_MORE
+                    NAV::printMessage( ( std::to_string( cur.first ) ).c_str( ) );
+#endif
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
                 }
 
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ 0 ] ] = cur;
+                break;
+            }
+            case WPL: {
+                redirectPlayer( direction( par2 ), false, true );
+                for( u8 j = 0; j < par3; ++j ) { walkPlayer( direction( par2 ) ); }
                 break;
             }
             case MPL: {
@@ -462,6 +487,7 @@ namespace MAP {
 
                 u8 found = 255;
                 for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                    if( _fixedMapObjects.count( i ) ) { continue; }
                     if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first == UNUSED_MAPOBJECT ) {
                         found = i;
                         break;
@@ -471,7 +497,6 @@ namespace MAP {
                 if( found < 255 ) {
                     registers[ 0 ] = found;
                 } else {
-                    NAV::printMessage( "HERE" );
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
                 }
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ 0 ] ] = cur;
@@ -828,7 +853,7 @@ namespace MAP {
                 }
                 case 10: {
                     IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-                    registers[ 0 ]   = cb.getResult( GET_STRING( choiceBoxMessage ),
+                    registers[ 0 ]   = cb.getResult( GET_MAP_STRING( choiceBoxMessage ),
                                                    style( choiceBoxMsgType ), choiceBoxItems );
                     registers[ 1 ]   = choiceBoxPL[ registers[ 0 ] ];
                     NAV::init( );
@@ -1229,7 +1254,7 @@ namespace MAP {
                         SOUND::dimVolume( );
                         BAG::bagViewer bv  = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                                             BAG::bagViewer::CHOOSE_BERRY );
-                        u16            itm = bv.getItem( );
+                        u16            itm = bv.getItem( true );
 
                         FADE_TOP_DARK( );
                         FADE_SUB_DARK( );
@@ -1272,6 +1297,7 @@ namespace MAP {
                 }
             }
 
+            if( mdata.m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
             if( mdata.m_events[ i ].m_trigger & dirToEventTrigger( p_dir ) ) {
                 runEvent( mdata.m_events[ i ] );
             }
@@ -1285,12 +1311,11 @@ namespace MAP {
                 continue;
             }
 
-            auto old = o.second.m_movement;
-            // rotate sprite to player
-            if( ( o.second.m_picNum & 0xff ) <= 240 ) {
-                o.second.m_movement = NO_MOVEMENT;
-                _mapSprites.setFrame( o.first, getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
+            if( o.second.m_movement != NO_MOVEMENT && o.second.m_currentMovement.m_frame ) {
+                continue;
             }
+
+            auto old = o.second.m_movement;
 
             if( o.second.m_event.m_type == EVENT_BERRYTREE ) {
                 u8 stage = SAVE::SAV.getActiveFile( ).getBerryStage(
@@ -1361,6 +1386,14 @@ namespace MAP {
                     } else {
                         NAV::init( );
                     }
+                }
+                continue;
+            } else {
+                // rotate sprite to player
+                if( o.second.m_picNum > 1000 || ( o.second.m_picNum & 0xff ) <= 240 ) {
+                    o.second.m_movement = NO_MOVEMENT;
+                    _mapSprites.setFrame( o.first,
+                                          getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
                 }
             }
 
