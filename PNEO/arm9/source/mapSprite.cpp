@@ -92,7 +92,7 @@ namespace MAP {
             } else {
                 p_imageId &= 255;
             }
-            f = FS::open( IO::TRAINER_PATH, p_imageId, ".rsd" );
+            f = FS::openSplit( IO::TRAINER_PATH, p_imageId, ".rsd", 255 );
         }
         readData( f );
     }
