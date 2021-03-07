@@ -244,13 +244,16 @@ namespace NAV {
         { 589, MOD_BATTLE_FRONTIER },
         { 597, MOD_BATTLE_TOWER },
         { 592, MOD_BATTLE_PALACE },
+        { 681, MOD_BATTLE_ARENA },
 
         { 623, MOD_POKEMON_CENTER },
         { 625, MOD_POKEMON_MART },
         { 624, MOD_POKEMON_GYM },
 
+        { 679, MOD_SAILING },
         { 602, MOD_CYCLING },
         { 603, MOD_SURFING },
+        { 680, MOD_SURFING_ALT },
         { 604, MOD_DIVING },
 
         { 598, MOD_BATTLE_WILD },
@@ -275,6 +278,7 @@ namespace NAV {
         { 648, MOD_EX04 },
         { 652, MOD_EX05 },
         { 654, MOD_EX06 },
+        { 678, MOD_DISTORTION_WORLD },
 
         { 620, MOD_MYSTERY_GIFT },
     };

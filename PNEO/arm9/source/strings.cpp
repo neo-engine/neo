@@ -1227,4 +1227,11 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
                                              "bergeben." },
     { "Handed over %s.", "%s \xfc"
                          "bergeben." },
+    { "Distortion World", "Zerrwelt" },
+    { "Sailing", "Zu Schiff" },
+
+    // 680
+
+    { "Surfing (alt)", "Zu See (var)" },
+    { "An Arena for Battles", "Ein Ring f\xfcr K\xe4mpfe" },
 };
