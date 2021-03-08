@@ -179,7 +179,11 @@ namespace SAVE {
             u16 m_initGameItemCount = 0; // Items accessible during begin game PC check
             u16 m_initGameItems[ 5 ];
 
-            u32 m_reserved[ 60 ]; // reserved for future things that need to be stored
+            u8  m_objectAttached    = 0; // true if there is a mapobject following the player
+            u8  m_mapObjAttachedIdx = 0; // idx of the map object following the player
+            u16 m_reserved2;
+
+            u32 m_reserved[ 59 ] = { 0 }; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 

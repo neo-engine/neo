@@ -43,6 +43,9 @@ namespace MAP {
       private:
         mapSpriteManager _mapSprites;
 
+        ObjPriority _lastPlayerPriority = OBJPRIORITY_1;
+        direction   _lastPlayerMove     = DOWN;
+
         mapSlice _slices[ 2 ][ 2 ]; //[x][y]
         u8       _curX, _curY;      // Current main slice from the _slices array
 
@@ -59,8 +62,12 @@ namespace MAP {
             return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
         }
 
-        u8 _playerSprite;     // id of the player sprite
-        u8 _playerPlatSprite; // id of the player platform sprite
+        u8        _playerSprite           = 255; // id of the player sprite
+        u8        _playerPlatSprite       = 255; // id of the player platform sprite
+        u8        _playerFollowPkmnSprite = 255; // id of the pkmn ow sprite that follows the player
+        bool      _pkmnFollowsPlayer      = false;
+        mapObject _followPkmn;
+        bool      _forceNoFollow = false;
 
         bool _strengthUsed; // Player has used HM Strength and can move boulders
 
@@ -68,6 +75,21 @@ namespace MAP {
             _lastcol; // Column to be filled when extending the map to the left
 
         u16 _cx, _cy; // Cameras's pos
+
+        /*
+         * @brief: Updates the pkmn species etc following the player. Returns false on
+         * failure.
+         */
+        bool updateFollowPkmn( );
+
+        /*
+         * @brief: Spawns the first pkmn in the player's party and makes it follow the
+         * player. May fail if there is no corresponding ow sprite or the pkmn is huge and
+         * the player is inside.
+         */
+        void spawnFollowPkmn( u16 p_globX, u16 p_globY, u8 p_z, direction p_direction );
+
+        void removeFollowPkmn( );
 
         void loadBlock( block p_curblock, u32 p_memPos );
         void loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY );
@@ -137,6 +159,8 @@ namespace MAP {
         void unfixMapObject( u8 p_objectId );
 
         void showExclamationAboveMapObject( u8 p_objectId );
+        void moveMapObject( mapObject& p_mapObject, u8 p_spriteId, movement p_movement,
+                            bool p_movePlayer = false, direction p_playerMovement = DOWN );
         void moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer = false,
                             direction p_playerMovement = DOWN );
 
@@ -188,6 +212,17 @@ namespace MAP {
         inline mapWeather getWeather( ) const {
             return SAVE::SAV.getActiveFile( ).m_currentMapWeather;
         }
+
+        /*
+         * @brief: Makes mapObject[ p_objectId ] mimic the movements of the player. At
+         * most 1 mapObject may be attached to the player at once.
+         */
+        void attachMapObjectToPlayer( u8 p_objectId );
+
+        /*
+         * @brief: Removes any mapobjects from the player.
+         */
+        void removeAttachedObjects( );
 
         /*
          * @brief: Checks if the player can ride their bike at the specified position.

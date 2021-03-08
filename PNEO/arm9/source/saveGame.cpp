@@ -203,6 +203,8 @@ namespace SAVE {
         m_HOENN_Badges = m_FRONTIER_Badges = m_KANTO_Badges = m_JOHTO_Badges = m_RESERVED_Badges
             = m_lastAchievementEvent                                         = 0;
 
+        m_achievements = 0;
+
         m_ashCount = m_money = m_coins = m_battlePoints = m_currentMap = m_stepCount = m_curBox
             = m_lstDex                                                               = 0;
         std::memset( m_lstViewedItem, 0, sizeof( m_lstViewedItem ) );

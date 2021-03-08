@@ -124,6 +124,8 @@ namespace MAP {
         SPL = 41, // show player sprite
         WPL = 42, // walk player (also through walls, etc)
 
+        HPK = 60, // Hide following pkmn
+
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
         RDR  = 89, // Redraw objects
@@ -286,6 +288,10 @@ namespace MAP {
 #endif
 
             switch( ins ) {
+            case HPK:
+                removeFollowPkmn( );
+                _forceNoFollow = true;
+                break;
             case HPL: _mapSprites.setVisibility( _playerSprite, true ); break;
             case SPL: _mapSprites.setVisibility( _playerSprite, false ); break;
             case BNK: {
@@ -376,7 +382,7 @@ namespace MAP {
             }
             case MMO: {
                 movement m = { direction( par2 ), 0 };
-                _mapSprites.setFrame( par1, getFrame( direction( par2 ) ) );
+                _mapSprites.setFrameD( par1, direction( par2 ) );
 
                 auto tmp = SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement;
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = NO_MOVEMENT;
@@ -397,7 +403,7 @@ namespace MAP {
             }
             case MFO: {
                 movement m = { direction( par2 ), 0 };
-                _mapSprites.setFrame( par1, getFrame( direction( par2 ) ) );
+                _mapSprites.setFrameD( par1, direction( par2 ) );
 
                 auto tmp = SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement;
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = NO_MOVEMENT;
@@ -517,9 +523,9 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
                     = NO_MOVEMENT;
                 movement m = { direction( par2 ), 0 };
-                _mapSprites.setFrame(
+                _mapSprites.setFrameD(
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first,
-                    getFrame( direction( par2 ) ) );
+                    direction( par2 ) );
 
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
@@ -552,9 +558,9 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
                     = NO_MOVEMENT;
                 movement m = { direction( par2 ), 0 };
-                _mapSprites.setFrame(
+                _mapSprites.setFrameD(
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first,
-                    getFrame( direction( par2 ) ) );
+                    direction( par2 ) );
 
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
@@ -984,6 +990,8 @@ namespace MAP {
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         u16 mapX = curx / SIZE, mapY = cury / SIZE;
 
+        auto oldforce = _forceNoFollow;
+
         switch( p_event.m_type ) {
         case EVENT_MESSAGE:
             printMapMessage( GET_MAP_STRING( p_event.m_data.m_message.m_msgId ),
@@ -1156,6 +1164,7 @@ namespace MAP {
         }
         default: break;
         }
+        _forceNoFollow = oldforce;
     }
 
     void mapDrawer::handleEvents( u8 p_globX, u8 p_globY, u8 p_z ) {
@@ -1392,8 +1401,7 @@ namespace MAP {
                 // rotate sprite to player
                 if( o.second.m_picNum > 1000 || ( o.second.m_picNum & 0xff ) <= 240 ) {
                     o.second.m_movement = NO_MOVEMENT;
-                    _mapSprites.setFrame( o.first,
-                                          getFrame( direction( ( u8( p_dir ) + 2 ) % 4 ) ) );
+                    _mapSprites.setFrameD( o.first, direction( ( u8( p_dir ) + 2 ) % 4 ) );
                 }
             }
 

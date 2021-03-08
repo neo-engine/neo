@@ -31,11 +31,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "uio.h"
 
-#define SPR_MAIN_PLAYER_OAM        0
-#define SPR_MAIN_PLAYER_PLAT_OAM   1
-#define SPR_SMALL_NPC_OAM( p_idx ) ( 2 + ( p_idx ) )
+#define SPR_SMALL_NPC_OAM( p_idx ) ( 0 + ( p_idx ) )
 #define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
-#define SPR_HM_OAM( p_idx )        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
+#define SPR_MAIN_PLAYER_OAM        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) )
+#define SPR_MAIN_PLAYER_PLAT_OAM   ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + 1 )
+#define SPR_HM_OAM( p_idx )        ( 2 + SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
 #define SPR_MAPTILE_OAM( p_idx )   ( SPR_HM_OAM( MAX_HM_PARTICLE ) + ( p_idx ) )
 #define SPR_DOOR_OAM               ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) )
 #define SPR_EXCLM_OAM              SPR_DOOR_OAM + 1
@@ -75,10 +75,23 @@ namespace MAP {
         std::memcpy( m_palData, &BG_PALETTE[ 16 * p_bgPalIdx ], 16 * sizeof( u16 ) );
     }
 
-    mapSpriteData::mapSpriteData( u16 p_imageId ) {
+    mapSpriteData::mapSpriteData( u16 p_imageId, u8 p_forme, bool p_shiny, bool p_female ) {
         FILE* f;
-        if( p_imageId > 1000 ) {
-            f = FS::open( IO::OWP_PATH, p_imageId - 1000, ".rsd" );
+        if( p_imageId > PKMN_SPRITE ) {
+            u16  species = p_imageId - PKMN_SPRITE;
+            u8   forme   = p_forme;
+            bool shiny   = p_shiny;
+            bool female  = p_female;
+
+            char buf[ 100 ];
+            if( !forme ) {
+                snprintf( buf, 99, "%02d/%hu%s%s", species / FS::ITEMS_PER_DIR, species,
+                          shiny ? "s" : "", female ? "f" : "" );
+            } else {
+                snprintf( buf, 99, "%02d/%hu%s%s_%hhu", species / FS::ITEMS_PER_DIR, species,
+                          shiny ? "s" : "", female ? "f" : "", forme );
+            }
+            f = FS::open( IO::OWP_PATH, buf, ".rsd" );
         } else if( p_imageId < 250 ) {
             f = FS::open( IO::OW_PATH, p_imageId, ".rsd" );
         } else {
@@ -111,8 +124,9 @@ namespace MAP {
         std::memcpy( m_palData, p_palData, 16 * sizeof( u16 ) );
     }
 
-    mapSprite::mapSprite( u16 p_imageId, u8 p_startFrame ) {
-        _data            = mapSpriteData( p_imageId );
+    mapSprite::mapSprite( u16 p_imageId, u8 p_startFrame, u8 p_forme, bool p_shiny,
+                          bool p_female ) {
+        _data            = mapSpriteData( p_imageId, p_forme, p_shiny, p_female );
         _info.m_picNum   = p_imageId;
         _info.m_curFrame = p_startFrame;
     }
@@ -133,6 +147,14 @@ namespace MAP {
                        && ( p_value % PLAYER_FAST < 12 || p_value % PLAYER_FAST == 15 ) );
     }
 
+    void mapSprite::drawFrameD( u8 p_oamIdx, direction p_direction ) {
+        if( _info.m_picNum > PKMN_SPRITE ) {
+            drawFrame( p_oamIdx, getOWPKMNFrame( p_direction ), false );
+        } else {
+            drawFrame( p_oamIdx, getFrame( p_direction ) );
+        }
+    }
+
     void mapSprite::drawFrame( u8 p_oamIdx, u8 p_value, bool p_hFlip ) {
 
 #ifdef DESQUID
@@ -147,12 +169,29 @@ namespace MAP {
         drawFrame( p_oamIdx, _info.m_curFrame );
     }
 
+    void mapSprite::setFrameD( u8 p_oamIdx, direction p_direction ) {
+        _info.m_curFrame = getFrameForDir( p_direction );
+        drawFrame( p_oamIdx, _info.m_curFrame );
+    }
+
     void mapSprite::currentFrame( u8 p_oamIdx ) {
         drawFrame( p_oamIdx, _info.m_curFrame );
     }
     void mapSprite::nextFrame( u8 p_oamIdx ) {
-        if( ( ( ++_info.m_curFrame ) % PLAYER_FAST ) % 3 == 0 ) _info.m_curFrame -= 2;
+        if( _info.m_picNum > PKMN_SPRITE ) {
+            if( ( ++_info.m_curFrame ) % 2 == 0 ) _info.m_curFrame -= 2;
+        } else {
+            if( ( ( ++_info.m_curFrame ) % PLAYER_FAST ) % 3 == 0 ) _info.m_curFrame -= 2;
+        }
         drawFrame( p_oamIdx, _info.m_curFrame );
+    }
+
+    u8 mapSprite::getFrameForDir( direction p_direction ) const {
+        if( _info.m_picNum > PKMN_SPRITE ) {
+            return MAP::getOWPKMNFrame( p_direction );
+        } else {
+            return MAP::getFrame( p_direction );
+        }
     }
 
     void mapSpriteManager::init( ) {
@@ -565,9 +604,9 @@ namespace MAP {
                 && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
                 && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 14
                 && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -14 ) {
-                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
+                //                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
             } else {
-                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
+                //                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
             }
         }
         if( p_update ) { IO::updateOAM( false ); }
@@ -669,6 +708,20 @@ namespace MAP {
         if( p_update ) { IO::updateOAM( false ); }
     }
 
+    void mapSpriteManager::drawFrameD( u8 p_spriteId, direction p_direction, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
+        if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) )
+            [[unlikely]] {
+            return;
+        } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
+            [[unlikely]] {
+            return;
+        }
+        getManagedSprite( p_spriteId ).m_sprite.drawFrameD( p_spriteId, p_direction );
+        if( p_update ) { IO::updateOAM( false ); }
+    }
+
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_hflip, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
@@ -714,6 +767,17 @@ namespace MAP {
             return;
         }
         getManagedSprite( p_spriteId ).m_sprite.setFrame( p_spriteId, p_value );
+        if( p_update ) { IO::updateOAM( false ); }
+    }
+
+    void mapSpriteManager::setFrameD( u8 p_spriteId, direction p_direction, bool p_update ) {
+        if( p_spriteId == 255 ) { return; }
+
+        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
+            [[unlikely]] {
+            return;
+        }
+        getManagedSprite( p_spriteId ).m_sprite.setFrameD( p_spriteId, p_direction );
         if( p_update ) { IO::updateOAM( false ); }
     }
 

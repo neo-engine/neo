@@ -1796,7 +1796,7 @@ namespace NAV {
                 for( int i = 0; i < 3; ++i ) {
                     pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
-                    a = pokemon( tmp[ i ], 50, !i ? ( rand( ) % 28 ) : 0, 0, i );
+                    a = pokemon( tmp[ i ], 50, 0, 0, i );
 
                     // Hand out some ribbons
                     for( u8 j = 0; j < 4; ++j ) {

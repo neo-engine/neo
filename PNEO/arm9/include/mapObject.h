@@ -41,6 +41,16 @@ namespace MAP {
         return 0;
     }
 
+    constexpr u8 getOWPKMNFrame( direction p_direction ) {
+        switch( p_direction ) {
+        case MAP::UP: return 2;
+        case MAP::RIGHT: return 6;
+        case MAP::DOWN: return 0;
+        case MAP::LEFT: return 4;
+        }
+        return 0;
+    }
+
     struct mapPlayer {
         u8        m_unused1;
         position  m_pos;
@@ -79,7 +89,9 @@ namespace MAP {
 
         inline mapSprite sprite( ) const {
             u8 frameStart = getFrame( m_direction );
-            return mapSprite( m_picNum < 1000 ? ( m_picNum | 256 ) : m_picNum, frameStart );
+            return mapSprite( m_picNum < PKMN_SPRITE ? ( m_picNum | 256 ) : m_picNum, frameStart,
+                              m_picNum >= PKMN_SPRITE ? ( m_range >> 1 ) : 0,
+                              m_picNum >= PKMN_SPRITE ? ( m_range & 1 ) : 0 );
         }
 
         void interact( );

@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     constexpr u8 PLAYER_FAST = 20;
 
+    constexpr u16 PKMN_SPRITE = 1000;
     struct mapSpriteInfo {
         u16 m_picNum;
         u8  m_curFrame;
@@ -98,8 +99,9 @@ namespace MAP {
          * @brief: reads the sprite data from the FS; if p_imageId < 250, it is
          * interpreted as a player sprite; if p_imageId == 250, loads the current player
          * appearance's sprite; p_imageId == 251 loads the rival's sprite.
+         * Anything larger than PKMN_SPRITE loads a pkmn ow sprite.
          */
-        mapSpriteData( u16 p_imageId );
+        mapSpriteData( u16 p_imageId, u8 p_forme = 0, bool p_shiny = false, bool p_female = false );
 
         /*
          * @brief: reads the door data from the fs.
@@ -126,7 +128,8 @@ namespace MAP {
       public:
         mapSprite( ) {
         }
-        mapSprite( u16 p_imageId, u8 p_startFrame );
+        mapSprite( u16 p_imageId, u8 p_startFrame, u8 p_forme = 0, bool p_shiny = false,
+                   bool p_female = false );
 
         mapSprite( FILE* p_f, u8 p_startFrame );
 
@@ -148,6 +151,11 @@ namespace MAP {
         void drawFrame( u8 p_oamIdx, u8 p_value );
 
         /*
+         * @brief: Draws the first frame of the given direction.
+         */
+        void drawFrameD( u8 p_oamIdx, direction p_direction );
+
+        /*
          * @brief: Draws the specified frame, doesn't change the internal frame of the
          * sprite.
          */
@@ -157,6 +165,8 @@ namespace MAP {
          * @brief: Sets the sprite to the specified frame and draws that frame.
          */
         void setFrame( u8 p_oamIdx, u8 p_value );
+
+        void setFrameD( u8 p_oamIdx, direction p_direction );
 
         /*
          * @brief: Draws the current frame of the sprite.
@@ -171,6 +181,8 @@ namespace MAP {
         constexpr u8 getCurrentFrame( ) const {
             return _info.m_curFrame;
         }
+
+        u8 getFrameForDir( direction p_direction ) const;
     };
 
     class mapSpriteManager {
@@ -379,6 +391,8 @@ namespace MAP {
          */
         void drawFrame( u8 p_spriteId, u8 p_value, bool p_update = true );
 
+        void drawFrameD( u8 p_spriteId, direction p_direction, bool p_update = true );
+
         /*
          * @brief: Draws the specified frame of the specified sprite.
          */
@@ -388,6 +402,8 @@ namespace MAP {
          * @brief: Sets the specified frame of the specified sprite.
          */
         void setFrame( u8 p_spriteId, u8 p_value, bool p_update = true );
+
+        void setFrameD( u8 p_spriteId, direction p_direction, bool p_update = true );
 
         void currentFrame( u8 p_spriteId, bool p_update = true );
         void nextFrame( u8 p_spriteId, bool p_update = true );

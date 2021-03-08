@@ -102,8 +102,7 @@ namespace MAP {
                 curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
                 mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
 
-            _mapSprites.setFrame( p_mapObject.first, getFrame( p_mapObject.second.m_direction ),
-                                  false );
+            _mapSprites.setFrameD( p_mapObject.first, p_mapObject.second.m_direction, false );
 #ifdef DESQUID_MORE
             IO::fadeScreen( IO::UNFADE );
             NAV::printMessage(
@@ -241,6 +240,21 @@ namespace MAP {
         _newWeatherCallbacks.push_back( p_handler );
     }
     // Drawing of Maps and stuff
+
+    void mapDrawer::attachMapObjectToPlayer( u8 p_objectId ) {
+        removeAttachedObjects( );
+        SAVE::SAV.getActiveFile( ).m_objectAttached    = 1;
+        SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx = p_objectId;
+        _fixedMapObjects.insert( p_objectId );
+    }
+
+    void mapDrawer::removeAttachedObjects( ) {
+        if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+            _fixedMapObjects.erase( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx );
+            SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx = 0;
+            SAVE::SAV.getActiveFile( ).m_objectAttached    = 0;
+        }
+    }
 
     void mapDrawer::initWeather( ) {
         _weatherScrollX = 0;
@@ -394,6 +408,19 @@ namespace MAP {
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 loadMapObject( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] );
             }
+            if( _pkmnFollowsPlayer ) {
+                if( updateFollowPkmn( ) ) {
+                    std::pair<u8, mapObject> cur = { _playerFollowPkmnSprite, _followPkmn };
+                    loadMapObject( cur );
+                    _followPkmn             = cur.second;
+                    _playerFollowPkmnSprite = cur.first;
+                } else {
+                    removeFollowPkmn( );
+                }
+            }
+            if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+                attachMapObjectToPlayer( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx );
+            }
         }
 
         _lastrow = NUM_ROWS - 1;
@@ -453,55 +480,41 @@ namespace MAP {
         _mapSprites.hideExclamation( );
     }
 
-    void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer,
-                                   direction p_playerMovement ) {
+    void mapDrawer::moveMapObject( mapObject& p_mapObject, u8 p_spriteId, movement p_movement,
+                                   bool p_movePlayer, direction p_playerMovement ) {
         // redirect object
         if( p_movement.m_frame == 0 ) {
-            _mapSprites.setFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
-                                  getFrame( p_movement.m_direction ) );
-            if( p_movePlayer ) {
-                _mapSprites.setFrame( _playerSprite, getFrame( p_playerMovement ) );
-            }
+            _mapSprites.setFrameD( p_spriteId, p_movement.m_direction );
+            if( p_movePlayer ) { _mapSprites.setFrameD( _playerSprite, p_playerMovement ); }
         }
         if( p_movement.m_frame == 15 ) {
-            _mapSprites.drawFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
-                                   getFrame( p_movement.m_direction ) );
+            _mapSprites.drawFrameD( p_spriteId, p_movement.m_direction );
 
-            if( p_movePlayer ) {
-                _mapSprites.drawFrame( _playerSprite, getFrame( p_playerMovement ) );
-            }
+            if( p_movePlayer ) { _mapSprites.drawFrameD( _playerSprite, p_playerMovement ); }
         }
 
         for( u8 i = 0; i < 16; ++i ) {
             if( i == p_movement.m_frame ) {
                 if( p_movePlayer ) { moveCamera( p_playerMovement, true ); }
-                _mapSprites.moveSprite( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
-                                        p_movement.m_direction, 1 );
+                _mapSprites.moveSprite( p_spriteId, p_movement.m_direction, 1 );
                 if( i == 8 ) {
-                    _mapSprites.nextFrame(
-                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first );
+                    _mapSprites.nextFrame( p_spriteId );
                     if( p_movePlayer ) { _mapSprites.nextFrame( _playerSprite ); }
                 }
             }
         }
         if( p_movement.m_frame == 0 ) {
             if( p_movePlayer ) {
-                animateField(
-                    SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX,
-                    SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY );
+                animateField( p_mapObject.m_pos.m_posX, p_mapObject.m_pos.m_posY );
 
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
-                    = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX;
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
-                    = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY;
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = p_mapObject.m_pos.m_posX;
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = p_mapObject.m_pos.m_posY;
             }
-            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
-                += dir[ p_movement.m_direction ][ 0 ];
-            SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
-                += dir[ p_movement.m_direction ][ 1 ];
+            p_mapObject.m_pos.m_posX += dir[ p_movement.m_direction ][ 0 ];
+            p_mapObject.m_pos.m_posY += dir[ p_movement.m_direction ][ 1 ];
 
-            auto px = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX;
-            auto py = SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY;
+            auto px = p_mapObject.m_pos.m_posX;
+            auto py = p_mapObject.m_pos.m_posY;
 
             animateField( px, py );
 
@@ -509,9 +522,7 @@ namespace MAP {
                 // this function may get called while the player is moving, so the player may
                 // be at a fractional grid point and we need to fix this shift by hand
                 // This is extremely hacky, I know
-                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ],
-                                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first,
-                                        false );
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ], p_spriteId, false );
                 _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ],
                                         15 * dir[ p_movement.m_direction ][ 0 ],
                                         15 * dir[ p_movement.m_direction ][ 1 ], true );
@@ -519,12 +530,16 @@ namespace MAP {
         }
         if( p_movement.m_frame == 15 ) {
             // clear remnants of field animation on old tile
-            clearFieldAnimation(
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posX
-                    - dir[ p_movement.m_direction ][ 0 ],
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second.m_pos.m_posY
-                    - dir[ p_movement.m_direction ][ 1 ] );
+            clearFieldAnimation( p_mapObject.m_pos.m_posX - dir[ p_movement.m_direction ][ 0 ],
+                                 p_mapObject.m_pos.m_posY - dir[ p_movement.m_direction ][ 1 ] );
         }
+    }
+
+    void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer,
+                                   direction p_playerMovement ) {
+        moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second,
+                       SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first, p_movement,
+                       p_movePlayer, p_playerMovement );
     }
 
     void mapDrawer::clearFieldAnimation( u16 p_globX, u16 p_globY ) {
@@ -1164,8 +1179,7 @@ namespace MAP {
         }
         _playerIsFast = false;
         fastBike      = false;
-        _mapSprites.setFrame( _playerSprite,
-                              getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+        _mapSprites.setFrameD( _playerSprite, SAVE::SAV.getActiveFile( ).m_player.m_direction );
 
         IO::fadeScreen( IO::BATTLE );
         IO::BG_PAL( true )[ 0 ] = 0;
@@ -1276,6 +1290,13 @@ namespace MAP {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
+        u16 cx2 = curx, cy2 = cury;
+
+        if( _pkmnFollowsPlayer ) {
+            cx2 = _followPkmn.m_pos.m_posX;
+            cy2 = _followPkmn.m_pos.m_posY;
+        }
+
         // animate map objects
 
         bool change = false;
@@ -1296,7 +1317,7 @@ namespace MAP {
                 || o.second.m_movement == WALK_AROUND_SQUARE ) {
                 if( ( p_frame & 127 ) == 127 ) {
                     o.second.m_direction = getRandomLookDirection( o.second.m_movement );
-                    _mapSprites.setFrame( o.first, getFrame( o.second.m_direction ), false );
+                    _mapSprites.setFrameD( o.first, o.second.m_direction, false );
                     change = true;
                 }
             }
@@ -1328,14 +1349,14 @@ namespace MAP {
                         o.second.m_currentMovement = { nxdir, 0 };
                     }
 
+                    auto nox = o.second.m_pos.m_posX
+                               + dir[ o.second.m_currentMovement.m_direction ][ 0 ];
+                    auto noy = o.second.m_pos.m_posY
+                               + dir[ o.second.m_currentMovement.m_direction ][ 1 ];
+
                     // Don't glitch through the player or other objects
                     if( canMove( o.second.m_pos, o.second.m_currentMovement.m_direction, WALK )
-                        && ( o.second.m_pos.m_posX
-                                     + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
-                                 != curx
-                             || o.second.m_pos.m_posY
-                                        + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
-                                    != cury ) ) {
+                        && ( nox != curx || noy != cury ) && ( nox != cx2 || noy != cy2 ) ) {
                         moveMapObject( i, o.second.m_currentMovement );
                         o.second.m_currentMovement.m_frame++;
                     } else {
@@ -1351,17 +1372,24 @@ namespace MAP {
                 if( movemnt ) {
                     bool nomove = false;
 
+                    auto nxl = o.second.m_pos.m_posX + dir[ LEFT ][ 0 ];
+                    auto nyl = o.second.m_pos.m_posX + dir[ LEFT ][ 1 ];
+                    auto nxr = o.second.m_pos.m_posX + dir[ RIGHT ][ 0 ];
+                    auto nyr = o.second.m_pos.m_posX + dir[ RIGHT ][ 1 ];
+                    auto nox = o.second.m_pos.m_posX
+                               + dir[ o.second.m_currentMovement.m_direction ][ 0 ];
+                    auto noy = o.second.m_pos.m_posY
+                               + dir[ o.second.m_currentMovement.m_direction ][ 1 ];
+
                     if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
-                        if( o.second.m_pos.m_posX + dir[ LEFT ][ 0 ] != curx
-                            || o.second.m_pos.m_posY + dir[ LEFT ][ 1 ] != cury ) {
+                        if( ( nxl != curx || nyl != cury ) && ( nxl != cx2 || nyl != cy2 ) ) {
                             o.second.m_currentMovement = { LEFT, 0 };
                         } else {
                             nomove = true;
                         }
                     } else if( ( o.second.m_pos.m_posX + 1 ) % SIZE
                                == o.second.m_event.m_posX % SIZE ) {
-                        if( o.second.m_pos.m_posX + dir[ RIGHT ][ 0 ] != curx
-                            || o.second.m_pos.m_posY + dir[ RIGHT ][ 1 ] != cury ) {
+                        if( ( nxr != curx || nyr != cury ) && ( nxr != cx2 || nyr != cy2 ) ) {
                             o.second.m_currentMovement = { RIGHT, 0 };
                         } else {
                             nomove = true;
@@ -1369,18 +1397,13 @@ namespace MAP {
                     } else {
                         if( o.second.m_currentMovement.m_direction != LEFT
                             && o.second.m_currentMovement.m_direction != RIGHT ) {
-                            if( o.second.m_pos.m_posX + dir[ RIGHT ][ 0 ] != curx
-                                || o.second.m_pos.m_posY + dir[ RIGHT ][ 1 ] != cury ) {
+                            if( ( nxr != curx || nyr != cury ) && ( nxr != cx2 || nyr != cy2 ) ) {
                                 o.second.m_currentMovement = { RIGHT, 0 };
                             } else {
                                 nomove = true;
                             }
-                        } else if( o.second.m_pos.m_posX
-                                           + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
-                                       == curx
-                                   && o.second.m_pos.m_posY
-                                              + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
-                                          == cury ) {
+                        } else if( ( nox == curx && noy == cury )
+                                   || ( nox == cx2 && noy == cy2 ) ) {
                             nomove = true;
                         }
                     }
@@ -1395,17 +1418,25 @@ namespace MAP {
                 || ( o.second.m_movement == WALK_AROUND_SQUARE && !rndir ) ) {
                 if( movemnt ) {
                     bool nomove = false;
+
+                    auto nxu = o.second.m_pos.m_posX + dir[ UP ][ 0 ];
+                    auto nyu = o.second.m_pos.m_posX + dir[ UP ][ 1 ];
+                    auto nxd = o.second.m_pos.m_posX + dir[ DOWN ][ 0 ];
+                    auto nyd = o.second.m_pos.m_posX + dir[ DOWN ][ 1 ];
+                    auto nox = o.second.m_pos.m_posX
+                               + dir[ o.second.m_currentMovement.m_direction ][ 0 ];
+                    auto noy = o.second.m_pos.m_posY
+                               + dir[ o.second.m_currentMovement.m_direction ][ 1 ];
+
                     if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
-                        if( o.second.m_pos.m_posX + dir[ UP ][ 0 ] != curx
-                            || o.second.m_pos.m_posY + dir[ UP ][ 1 ] != cury ) {
+                        if( ( nxu != curx || nyu != cury ) && ( nxu != cx2 || nyu != cy2 ) ) {
                             o.second.m_currentMovement = { UP, 0 };
                         } else {
                             nomove = true;
                         }
                     } else if( ( o.second.m_pos.m_posY + 1 ) % SIZE
                                == o.second.m_event.m_posY % SIZE ) {
-                        if( o.second.m_pos.m_posX + dir[ DOWN ][ 0 ] != curx
-                            || o.second.m_pos.m_posY + dir[ DOWN ][ 1 ] != cury ) {
+                        if( ( nxd != curx || nyd != cury ) && ( nxd != cx2 || nyd != cy2 ) ) {
                             o.second.m_currentMovement = { DOWN, 0 };
                         } else {
                             nomove = true;
@@ -1413,18 +1444,13 @@ namespace MAP {
                     } else {
                         if( o.second.m_currentMovement.m_direction != DOWN
                             && o.second.m_currentMovement.m_direction != UP ) {
-                            if( o.second.m_pos.m_posX + dir[ DOWN ][ 0 ] != curx
-                                || o.second.m_pos.m_posY + dir[ DOWN ][ 1 ] != cury ) {
+                            if( ( nxd != curx || nyd != cury ) && ( nxd != cx2 || nyd != cy2 ) ) {
                                 o.second.m_currentMovement = { DOWN, 0 };
                             } else {
                                 nomove = true;
                             }
-                        } else if( o.second.m_pos.m_posX
-                                           + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
-                                       == curx
-                                   && o.second.m_pos.m_posY
-                                              + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
-                                          == cury ) {
+                        } else if( ( nox == curx && noy == cury )
+                                   || ( nox == cx2 && noy == cy2 ) ) {
                             nomove = true;
                         }
                     }
@@ -1744,8 +1770,8 @@ namespace MAP {
                 if( SAVE::SAV.getActiveFile( ).m_player.m_movement != WALK ) return;
                 SAVE::SAV.getActiveFile( ).m_player.m_direction
                     = direction( ( u8( p_direction ) + 2 ) % 4 );
-                _mapSprites.setFrame( _playerSprite,
-                                      getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
+                _mapSprites.setFrameD( _playerSprite,
+                                       SAVE::SAV.getActiveFile( ).m_player.m_direction );
                 sitDownPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction, SIT );
                 fastBike = false;
                 return;
@@ -2002,7 +2028,7 @@ namespace MAP {
                 NEXT_PASS:
                 default:
                     if( reinit ) {
-                        _mapSprites.setFrame( _playerSprite, getFrame( p_direction ) );
+                        _mapSprites.setFrameD( _playerSprite, p_direction );
                         fastBike = false;
                         return;
                     }
@@ -2123,6 +2149,8 @@ namespace MAP {
     }
 
     void mapDrawer::fallthroughPlayer( ) {
+        removeFollowPkmn( );
+
         swiWaitForVBlank( );
         swiWaitForVBlank( );
         swiWaitForVBlank( );
@@ -2147,6 +2175,7 @@ namespace MAP {
         bool checkPos   = false;
         fastBike        = 0;
         _playerIsFast   = false;
+        removeFollowPkmn( );
 
         if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
             SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
@@ -2278,6 +2307,8 @@ namespace MAP {
             stopPlayer( DOWN );
         }
 
+        bool oldforce  = _forceNoFollow;
+        _forceNoFollow = true;
         switch( behave ) {
         case 0x6e: walkPlayer( UP, false ); break;
         case 0x60:
@@ -2285,6 +2316,7 @@ namespace MAP {
 
         default: break;
         }
+        _forceNoFollow = oldforce;
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast, bool p_force ) {
@@ -2300,7 +2332,7 @@ namespace MAP {
         // Check if the player's direction changed
         if( p_direction != SAVE::SAV.getActiveFile( ).m_player.m_direction || p_force ) {
             if( !_mapSprites.getVisibility( _playerPlatSprite ) ) {
-                _mapSprites.setFrame( _playerPlatSprite, getFrame( p_direction ), false );
+                _mapSprites.setFrameD( _playerPlatSprite, p_direction, false );
             }
             _mapSprites.setFrame( _playerSprite, ( p_fast * 20 ) + getFrame( p_direction ) );
             SAVE::SAV.getActiveFile( ).m_player.m_direction = p_direction;
@@ -2365,6 +2397,7 @@ namespace MAP {
         direction di = ( ( p_newMoveMode == SIT ) ? direction( ( u8( p_direction ) + 2 ) % 4 )
                                                   : p_direction );
 
+        removeFollowPkmn( );
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
         u16 gx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
@@ -2434,9 +2467,93 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
     }
 
+    /*
+     * @brief: Returns which pkmn should be allowed to follow the player.
+     * Currently, a pkmn needs to have a 16x32, 16x16 or 32x32 ow sprite.
+     */
+    bool canFollowPlayer( u16 p_pkmnId, bool p_shiny, u8 p_forme ) {
+        static u16  lstid  = 0;
+        static bool lstsh  = 0;
+        static u8   fm     = 0;
+        static bool lstres = false;
+
+        if( lstid == p_pkmnId && lstsh == p_shiny && fm == p_forme ) { return lstres; }
+        lstid = p_pkmnId;
+        lstsh = p_shiny;
+        fm    = p_forme;
+
+        char buf[ 100 ];
+        if( !p_forme ) {
+            snprintf( buf, 99, "%02d/%hu%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_shiny ? "s" : "" );
+        } else {
+            snprintf( buf, 99, "%02d/%hu%s_%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+                      p_shiny ? "s" : "", p_forme );
+        }
+        FILE* f = FS::open( IO::OWP_PATH, buf, ".rsd" );
+        if( !f ) { return lstres = false; }
+
+        FS::readNop( f, 16 * sizeof( u16 ) );
+        FS::readNop( f, sizeof( u8 ) );
+
+        u8 sx = 0, sy = 0;
+        FS::read( f, &sx, sizeof( u8 ), 1 );
+        FS::read( f, &sy, sizeof( u8 ), 1 );
+        FS::close( f );
+        if( sx > 32 || sy > 32 ) { return lstres = false; }
+        return lstres = true;
+    }
+
+    bool mapDrawer::updateFollowPkmn( ) {
+        if( !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) { return false; }
+        if( _forceNoFollow ) { return false; }
+
+        // only if first pkmn is not ko, it will follow the player.
+        if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].canBattle( ) ) { return false; }
+
+        u16  species = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].getSpecies( );
+        bool shiny   = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].isShiny( );
+        //        bool female  = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].isFemale( );
+        u8 forme = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].getForme( );
+
+        if( species > MAX_PKMN ) { return false; }
+        if( !canFollowPlayer( species, shiny, forme ) ) { return false; }
+
+        _followPkmn.m_picNum = species + PKMN_SPRITE;
+        _followPkmn.m_range  = ( forme << 1 ) | shiny;
+        return true;
+    }
+
+    void mapDrawer::spawnFollowPkmn( u16 p_globX, u16 p_globY, u8 p_z, direction p_direction ) {
+        _followPkmn = mapObject( );
+        if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) && updateFollowPkmn( ) ) {
+            _followPkmn.m_pos          = { p_globX, p_globY, p_z };
+            _followPkmn.m_movement     = NO_MOVEMENT;
+            _followPkmn.m_direction    = p_direction;
+            _followPkmn.m_event.m_type = EVENT_OW_PKMN;
+
+            std::pair<u8, mapObject> cur = { 0, _followPkmn };
+            loadMapObject( cur );
+            _playerFollowPkmnSprite = cur.first;
+            _mapSprites.setFrameD( _playerFollowPkmnSprite, p_direction );
+            _pkmnFollowsPlayer = true;
+        } else {
+            _pkmnFollowsPlayer = false;
+            removeFollowPkmn( );
+        }
+    }
+
+    void mapDrawer::removeFollowPkmn( ) {
+        if( _pkmnFollowsPlayer ) {
+            _mapSprites.destroySprite( _playerFollowPkmnSprite );
+            _pkmnFollowsPlayer = false;
+        }
+    }
+
     void mapDrawer::walkPlayer( direction p_direction, bool p_fast ) {
         u16 gx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 gy   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16 gz   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
         u16 nx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ];
         u16 ny   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ];
         u8  anim = getTileAnimation( nx, ny );
@@ -2446,6 +2563,14 @@ namespace MAP {
         }
 
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement != WALK ) p_fast = false;
+
+        // movement for attached objects
+        auto olddir         = _lastPlayerMove;
+        auto oldprio        = _lastPlayerPriority;
+        _lastPlayerMove     = p_direction;
+        _lastPlayerPriority = _mapSprites.getPriority( _playerSprite );
+        _mapSprites.setPriority( _playerFollowPkmnSprite, oldprio );
+
         redirectPlayer( p_direction, p_fast );
 
         if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3
@@ -2469,7 +2594,18 @@ namespace MAP {
             if( i == 8 ) { _mapSprites.nextFrame( _playerSprite ); }
             if( ( !p_fast || i % 3 ) && !fastBike ) swiWaitForVBlank( );
             if( i % ( fastBike / 3 + 2 ) == 0 && fastBike ) swiWaitForVBlank( );
+
+            if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+                moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx, { olddir, i } );
+            } else if( _pkmnFollowsPlayer ) {
+                moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, i } );
+            }
         }
+
+        if( SAVE::SAV.getActiveFile( ).m_player.m_movement == WALK && !_pkmnFollowsPlayer ) {
+            spawnFollowPkmn( gx, gy, gz, olddir );
+        }
+
         if( sid < 255 ) { _mapSprites.destroySprite( sid, false ); }
         _mapSprites.drawFrame( _playerSprite, ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
         if( ( SAVE::SAV.getActiveFile( ).m_player.m_movement & BIKE )
@@ -2495,6 +2631,7 @@ namespace MAP {
                  || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) ) {
             _mapSprites.setPriority( _playerSprite,
                                      SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_3 );
+
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF
                 || SAVE::SAV.getActiveFile( ).m_player.m_movement == ROCK_CLIMB ) {
                 _mapSprites.setPriority( _playerPlatSprite, OBJPRIORITY_3 );
@@ -2633,17 +2770,23 @@ namespace MAP {
         case WALK: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic; break;
         case SURF:
         case ROCK_CLIMB:
+            removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
             surfing                                      = true;
             break;
         case BIKE:
-        case MACH_BIKE: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1; break;
+        case MACH_BIKE:
+            removeFollowPkmn( );
+            SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1;
+            break;
         case ACRO_BIKE:
             //    SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 2;
             //    TODO
+            removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1;
             break;
         case SIT:
+            removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
             ydif                                         = 2;
             break;
@@ -3131,13 +3274,14 @@ namespace MAP {
             }
 
             case EVENT_OW_PKMN: {
-                mapObject obj   = mapObject( );
-                obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
+                mapObject obj  = mapObject( );
+                obj.m_pos      = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
                               u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
                               p_data.m_events[ i ].m_posZ };
-                obj.m_picNum    = p_data.m_events[ i ].m_data.m_owPkmn.m_speciesId + 1000;
-                obj.m_movement  = NO_MOVEMENT;
-                obj.m_range     = 0;
+                obj.m_picNum   = p_data.m_events[ i ].m_data.m_owPkmn.m_speciesId + PKMN_SPRITE;
+                obj.m_movement = NO_MOVEMENT;
+                obj.m_range    = ( ( p_data.m_events[ i ].m_data.m_owPkmn.m_forme & 0x3f ) << 1 )
+                              | !!( p_data.m_events[ i ].m_data.m_owPkmn.m_shiny & 0x3f );
                 obj.m_direction = DOWN;
                 obj.m_event     = p_data.m_events[ i ];
 
@@ -3221,6 +3365,7 @@ namespace MAP {
     }
 
     void mapDrawer::faintPlayer( ) {
+        removeFollowPkmn( );
         SAVE::SAV.getActiveFile( ).increaseVar( SAVE::V_NUM_FAINTED );
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         ANIMATE_MAP = false;
