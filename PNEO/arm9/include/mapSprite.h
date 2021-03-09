@@ -290,6 +290,7 @@ namespace MAP {
          */
         void swapSprites( u8 p_spriteId1, u8 p_spriteId2, bool p_update = true );
 
+      public:
         /*
          * @brief: Rearranges sprites in OAM so that a sprite with higher y-coordinate
          * appears earlier in the OAM, making it hide the sprites with smaller
@@ -297,7 +298,6 @@ namespace MAP {
          */
         void reorderSprites( bool p_update = true );
 
-      public:
         void reset( );
 
         void init( );

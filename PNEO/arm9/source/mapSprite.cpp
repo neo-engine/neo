@@ -31,17 +31,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "uio.h"
 
-#define SPR_SMALL_NPC_OAM( p_idx ) ( 0 + ( p_idx ) )
+#define SPR_MAPTILE_OAM( p_idx )   ( 0 + ( p_idx ) )
+#define SPR_SMALL_NPC_OAM( p_idx ) ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) + ( p_idx ) )
 #define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
 #define SPR_MAIN_PLAYER_OAM        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) )
 #define SPR_MAIN_PLAYER_PLAT_OAM   ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + 1 )
 #define SPR_HM_OAM( p_idx )        ( 2 + SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
 
-#define MAX_OAM SPR_HM_OAM( MAX_HM_PARTICLE )
+#define MAX_OAM ( SPR_HM_OAM( MAX_HM_PARTICLE ) )
 
-#define SPR_MAPTILE_OAM( p_idx ) ( SPR_HM_OAM( MAX_HM_PARTICLE ) + ( p_idx ) )
-#define SPR_DOOR_OAM             ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) )
-#define SPR_EXCLM_OAM            SPR_DOOR_OAM + 1
+#define SPR_DOOR_OAM  ( SPR_HM_OAM( MAX_HM_PARTICLE ) )
+#define SPR_EXCLM_OAM SPR_DOOR_OAM + 1
 
 // Strength boulder (16x16)
 // Rock Smash rock  (16x16)
@@ -353,6 +353,30 @@ namespace MAP {
         if( p_update ) { IO::updateOAM( false ); }
     }
 
+    s8 cmpSprY( u8 p_idx1, u8 p_idx2 ) {
+        u16 val1 = u16( IO::OamTop->oamBuffer[ p_idx1 ].y ) + 1000;
+        if( val1 > 1192 ) { val1 -= 256; }
+        u16 val2 = u16( IO::OamTop->oamBuffer[ p_idx2 ].y ) + 1000;
+        if( val2 > 1192 ) { val2 -= 256; }
+
+        val1 += IO::spriteInfoTop[ p_idx1 ].m_height;
+        val2 += IO::spriteInfoTop[ p_idx2 ].m_height;
+        /*
+                if( debug ) {
+                    NAV::printMessage( ( std::to_string( p_idx1 ) + ": " + std::to_string( val1 ) +
+           "\n"
+                                         + std::to_string( p_idx2 ) + " : " + std::to_string( val2 )
+           ) .c_str( ) );
+                }
+                */
+
+        if( val1 < val2 )
+            return -1;
+        else if( val1 == val2 )
+            return 0;
+        return 1;
+    }
+
     void mapSpriteManager::reorderSprites( bool p_update ) {
         static bool reordering = false;
 
@@ -362,6 +386,7 @@ namespace MAP {
         // sort things via bubble sort; there are only few elements so it should be fast
         // enough
         for( u8 i = 0; i < MAX_OAM; ++i ) {
+            bool swp = false;
             for( u8 j = 1; j < MAX_OAM - i; ++j ) {
                 //                NAV::printMessage( ( std::to_string( j - 1 ) + " sw " +
                 //                std::to_string( j ) + " : "
@@ -372,12 +397,13 @@ namespace MAP {
                 //                                      .c_str( ) );
 
                 // take care of potentially negative coordinates
-                if( u8( 300 + IO::OamTop->oamBuffer[ j - 1 ].y
-                        + IO::spriteInfoTop[ j - 1 ].m_height )
-                    < u8( 300 + IO::OamTop->oamBuffer[ j ].y + IO::spriteInfoTop[ j ].m_height ) ) {
+                auto cmp = cmpSprY( j - 1, j );
+                if( cmp < 0 || ( cmp == 0 && _oamPositionR[ j - 1 ] > _oamPositionR[ j ] ) ) {
                     swapSprites( j - 1, j, false );
+                    swp = true;
                 }
             }
+            if( !swp ) { break; }
         }
 
         if( _oamPosition[ SPR_MAIN_PLAYER_OAM ] > _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ] ) {
@@ -559,14 +585,14 @@ namespace MAP {
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData );
-            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
             _longGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData );
-            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
 
         case SPR_PLATFORM:

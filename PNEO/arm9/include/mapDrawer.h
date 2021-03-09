@@ -49,8 +49,9 @@ namespace MAP {
         mapSlice _slices[ 2 ][ 2 ]; //[x][y]
         u8       _curX, _curY;      // Current main slice from the _slices array
 
-        s8 _weatherScrollX = 0;
-        s8 _weatherScrollY = 0;
+        s8   _weatherScrollX = 0;
+        s8   _weatherScrollY = 0;
+        bool _weatherFollow  = false;
 
         mapData _data[ 2 ][ 2 ];
 
@@ -160,9 +161,10 @@ namespace MAP {
 
         void showExclamationAboveMapObject( u8 p_objectId );
         void moveMapObject( mapObject& p_mapObject, u8 p_spriteId, movement p_movement,
-                            bool p_movePlayer = false, direction p_playerMovement = DOWN );
+                            bool p_movePlayer = false, direction p_playerMovement = DOWN,
+                            bool p_adjustAnim = true );
         void moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer = false,
-                            direction p_playerMovement = DOWN );
+                            direction p_playerMovement = DOWN, bool p_adjustAnim = true );
 
         void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 

@@ -248,10 +248,44 @@ namespace MAP {
         }
     }
 
+    constexpr auto WEATHER_BLEND = BLEND_ALPHA | BLEND_SRC_BG3 | BLEND_DST_BG0 | BLEND_DST_BG2
+                                   | BLEND_DST_BG1 | BLEND_DST_SPRITE;
+
     void mapDrawer::initWeather( ) {
         _weatherScrollX = 0;
         _weatherScrollY = 0;
+        REG_BLDALPHA    = 0;
         switch( getWeather( ) ) {
+        case CLOUDY:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "clouds",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            _weatherScrollX = 2;
+            _weatherScrollY = 0;
+            REG_BLDALPHA    = 0xff | ( 0x08 << 8 );
+            _weatherFollow  = true;
+            break;
+
+        case FOREST_CLOUDS:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "forestcloud",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            _weatherScrollX = 0;
+            _weatherScrollY = 0;
+            REG_BLDALPHA    = 0xff | ( 0x08 << 8 );
+            _weatherFollow  = true;
+            break;
+
         case ASH_RAIN:
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             bgWrapOn( IO::bg3 );
@@ -263,8 +297,12 @@ namespace MAP {
             bgSetScroll( IO::bg3, 0, 0 );
             _weatherScrollX = 2;
             _weatherScrollY = -4;
+            _weatherFollow  = true;
             break;
-        case SANDSTORM:
+        case SANDSTORM: {
+            bool goggles = SAVE::SAV.getActiveFile( ).m_bag.count(
+                BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_GO_GOGGLES );
+
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             bgWrapOn( IO::bg3 );
 
@@ -273,10 +311,14 @@ namespace MAP {
             dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
             dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
             bgSetScroll( IO::bg3, 0, 0 );
+
+            if( goggles ) { REG_BLDALPHA = 0xff | ( 0x05 << 8 ); }
+
             _weatherScrollX = 40;
             _weatherScrollY = 10;
+            _weatherFollow  = false;
             break;
-
+        }
         case DARK_FLASHABLE:
         case DARK_PERMANENT:
         case DARK_FLASH_USED:
@@ -299,9 +341,8 @@ namespace MAP {
                 bgSetScale( IO::bg3, 1 << 7 | 1 << 6, 1 << 7 | 1 << 6 );
                 bgSetScroll( IO::bg3, 96 - 64, 72 - 48 );
             }
+            _weatherFollow = false;
             break;
-        case CLOUDY:
-        case FOREST_CLOUDS:
         default:
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             dmaFillWords( 0, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
@@ -315,6 +356,11 @@ namespace MAP {
             SAVE::SAV.getActiveFile( ).m_currentMapWeather = p_newWeather;
             for( auto fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
             initWeather( );
+            if( REG_BLDALPHA ) {
+                REG_BLDCNT = WEATHER_BLEND;
+            } else {
+                REG_BLDCNT = BLEND_NONE;
+            }
         }
     }
 
@@ -427,6 +473,7 @@ namespace MAP {
         ANIMATE_MAP = false;
         for( u16 y = 0; y < NUM_ROWS; y++ )
             for( u16 x = 0; x < NUM_COLS; x++ ) { loadBlock( at( mnx + x, mny + y ), x, y ); }
+
         bgUpdate( );
         ANIMATE_MAP = true;
     }
@@ -473,7 +520,8 @@ namespace MAP {
     }
 
     void mapDrawer::moveMapObject( mapObject& p_mapObject, u8 p_spriteId, movement p_movement,
-                                   bool p_movePlayer, direction p_playerMovement ) {
+                                   bool p_movePlayer, direction p_playerMovement,
+                                   bool p_adjustAnim ) {
         // redirect object
         if( p_movement.m_frame == 0 ) {
             _mapSprites.setFrameD( p_spriteId, p_movement.m_direction );
@@ -510,7 +558,7 @@ namespace MAP {
 
             animateField( px, py );
 
-            if( _tileAnimations.count( { px, py, 0 } ) ) {
+            if( p_adjustAnim && _tileAnimations.count( { px, py, 0 } ) ) {
                 // this function may get called while the player is moving, so the player may
                 // be at a fractional grid point and we need to fix this shift by hand
                 // This is extremely hacky, I know
@@ -528,10 +576,10 @@ namespace MAP {
     }
 
     void mapDrawer::moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer,
-                                   direction p_playerMovement ) {
+                                   direction p_playerMovement, bool p_adjustAnim ) {
         moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].second,
                        SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ].first, p_movement,
-                       p_movePlayer, p_playerMovement );
+                       p_movePlayer, p_playerMovement, p_adjustAnim );
     }
 
     void mapDrawer::clearFieldAnimation( u16 p_globX, u16 p_globY ) {
@@ -575,6 +623,9 @@ namespace MAP {
     void mapDrawer::animateField( u16 p_globX, u16 p_globY, u8 p_animation ) {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        if( _tileAnimations.count( { p_globX, p_globY, 0 } ) ) {
+            clearFieldAnimation( p_globX, p_globY );
+        }
         _tileAnimations[ { p_globX, p_globY, 0 } ]
             = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
     }
@@ -730,7 +781,15 @@ namespace MAP {
             if( !hadBattle ) { handleWildPkmn( p_globX, p_globY ); }
         }
 
-        if( p_unfade ) { IO::fadeScreen( IO::UNFADE ); }
+        if( p_unfade ) {
+            IO::fadeScreen( IO::UNFADE );
+            if( REG_BLDALPHA ) {
+                REG_BLDCNT = WEATHER_BLEND;
+            } else {
+                REG_BLDCNT = BLEND_NONE;
+            }
+            bgUpdate( );
+        }
         handleEvents( p_globX, p_globY, p_z );
     }
 
@@ -846,7 +905,7 @@ namespace MAP {
 
     void mapDrawer::moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows ) {
         for( u8 i = 0; i < 4; ++i ) {
-            if( i == IO::bg3 ) { continue; }
+            if( i == IO::bg3 && !_weatherFollow ) { continue; }
             bgScroll( i, dir[ p_direction ][ 0 ], dir[ p_direction ][ 1 ] );
         }
         bgUpdate( );
@@ -1365,23 +1424,26 @@ namespace MAP {
                     bool nomove = false;
 
                     auto nxl = o.second.m_pos.m_posX + dir[ LEFT ][ 0 ];
-                    auto nyl = o.second.m_pos.m_posX + dir[ LEFT ][ 1 ];
+                    auto nyl = o.second.m_pos.m_posY + dir[ LEFT ][ 1 ];
                     auto nxr = o.second.m_pos.m_posX + dir[ RIGHT ][ 0 ];
-                    auto nyr = o.second.m_pos.m_posX + dir[ RIGHT ][ 1 ];
+                    auto nyr = o.second.m_pos.m_posY + dir[ RIGHT ][ 1 ];
                     auto nox = o.second.m_pos.m_posX
                                + dir[ o.second.m_currentMovement.m_direction ][ 0 ];
                     auto noy = o.second.m_pos.m_posY
                                + dir[ o.second.m_currentMovement.m_direction ][ 1 ];
 
                     if( o.second.m_pos.m_posX % SIZE == ( o.second.m_event.m_posX + 1 ) % SIZE ) {
-                        if( ( nxl != curx || nyl != cury ) && ( nxl != cx2 || nyl != cy2 ) ) {
+
+                        if( canMove( o.second.m_pos, LEFT, WALK ) && ( nxl != curx || nyl != cury )
+                            && ( nxl != cx2 || nyl != cy2 ) ) {
                             o.second.m_currentMovement = { LEFT, 0 };
                         } else {
                             nomove = true;
                         }
                     } else if( ( o.second.m_pos.m_posX + 1 ) % SIZE
                                == o.second.m_event.m_posX % SIZE ) {
-                        if( ( nxr != curx || nyr != cury ) && ( nxr != cx2 || nyr != cy2 ) ) {
+                        if( canMove( o.second.m_pos, RIGHT, WALK ) && ( nxr != curx || nyr != cury )
+                            && ( nxr != cx2 || nyr != cy2 ) ) {
                             o.second.m_currentMovement = { RIGHT, 0 };
                         } else {
                             nomove = true;
@@ -1389,7 +1451,9 @@ namespace MAP {
                     } else {
                         if( o.second.m_currentMovement.m_direction != LEFT
                             && o.second.m_currentMovement.m_direction != RIGHT ) {
-                            if( ( nxr != curx || nyr != cury ) && ( nxr != cx2 || nyr != cy2 ) ) {
+                            if( canMove( o.second.m_pos, RIGHT, WALK )
+                                && ( nxr != curx || nyr != cury )
+                                && ( nxr != cx2 || nyr != cy2 ) ) {
                                 o.second.m_currentMovement = { RIGHT, 0 };
                             } else {
                                 nomove = true;
@@ -1412,23 +1476,25 @@ namespace MAP {
                     bool nomove = false;
 
                     auto nxu = o.second.m_pos.m_posX + dir[ UP ][ 0 ];
-                    auto nyu = o.second.m_pos.m_posX + dir[ UP ][ 1 ];
+                    auto nyu = o.second.m_pos.m_posY + dir[ UP ][ 1 ];
                     auto nxd = o.second.m_pos.m_posX + dir[ DOWN ][ 0 ];
-                    auto nyd = o.second.m_pos.m_posX + dir[ DOWN ][ 1 ];
+                    auto nyd = o.second.m_pos.m_posY + dir[ DOWN ][ 1 ];
                     auto nox = o.second.m_pos.m_posX
                                + dir[ o.second.m_currentMovement.m_direction ][ 0 ];
                     auto noy = o.second.m_pos.m_posY
                                + dir[ o.second.m_currentMovement.m_direction ][ 1 ];
 
                     if( o.second.m_pos.m_posY % SIZE == ( o.second.m_event.m_posY + 1 ) % SIZE ) {
-                        if( ( nxu != curx || nyu != cury ) && ( nxu != cx2 || nyu != cy2 ) ) {
+                        if( canMove( o.second.m_pos, UP, WALK ) && ( nxu != curx || nyu != cury )
+                            && ( nxu != cx2 || nyu != cy2 ) ) {
                             o.second.m_currentMovement = { UP, 0 };
                         } else {
                             nomove = true;
                         }
                     } else if( ( o.second.m_pos.m_posY + 1 ) % SIZE
                                == o.second.m_event.m_posY % SIZE ) {
-                        if( ( nxd != curx || nyd != cury ) && ( nxd != cx2 || nyd != cy2 ) ) {
+                        if( canMove( o.second.m_pos, DOWN, WALK ) && ( nxd != curx || nyd != cury )
+                            && ( nxd != cx2 || nyd != cy2 ) ) {
                             o.second.m_currentMovement = { DOWN, 0 };
                         } else {
                             nomove = true;
@@ -1436,7 +1502,9 @@ namespace MAP {
                     } else {
                         if( o.second.m_currentMovement.m_direction != DOWN
                             && o.second.m_currentMovement.m_direction != UP ) {
-                            if( ( nxd != curx || nyd != cury ) && ( nxd != cx2 || nyd != cy2 ) ) {
+                            if( canMove( o.second.m_pos, DOWN, WALK )
+                                && ( nxd != curx || nyd != cury )
+                                && ( nxd != cx2 || nyd != cy2 ) ) {
                                 o.second.m_currentMovement = { DOWN, 0 };
                             } else {
                                 nomove = true;
@@ -2551,7 +2619,9 @@ namespace MAP {
         u8  anim = getTileAnimation( nx, ny );
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
-            clearFieldAnimation( gx, gy );
+            if( !_pkmnFollowsPlayer && !SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+                clearFieldAnimation( gx, gy );
+            }
         }
 
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement != WALK ) p_fast = false;
@@ -2588,9 +2658,35 @@ namespace MAP {
             if( i % ( fastBike / 3 + 2 ) == 0 && fastBike ) swiWaitForVBlank( );
 
             if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
-                moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx, { olddir, i } );
+                moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx, { olddir, i }, false,
+                               DOWN, false );
             } else if( _pkmnFollowsPlayer ) {
-                moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, i } );
+                moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, i }, false, DOWN,
+                               false );
+            }
+        }
+
+        // check if the object following the player got somehow detached (due to a jump,  etc)
+        if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+            auto pos = SAVE::SAV.getActiveFile( )
+                           .m_mapObjects[ SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx ]
+                           .second.m_pos;
+            if( std::abs( pos.m_posX - nx ) + std::abs( pos.m_posY - ny ) > 1 ) {
+                for( u8 i = 0; i < 16; ++i ) {
+                    moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx, { olddir, i },
+                                   false, DOWN, false );
+                    if( i % 3 ) swiWaitForVBlank( );
+                }
+            }
+        } else if( _pkmnFollowsPlayer ) {
+            if( std::abs( _followPkmn.m_pos.m_posX - nx )
+                    + std::abs( _followPkmn.m_pos.m_posY - ny )
+                > 1 ) {
+                for( u8 i = 0; i < 16; ++i ) {
+                    moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, i }, false, DOWN,
+                                   false );
+                    if( i % 3 ) swiWaitForVBlank( );
+                }
             }
         }
 
@@ -2636,10 +2732,14 @@ namespace MAP {
                 _mapSprites.setPriority( _playerPlatSprite, OBJPRIORITY_2 );
             }
         }
-        clearFieldAnimation( gx, gy );
+        if( !_pkmnFollowsPlayer && !SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+            clearFieldAnimation( gx, gy );
+        }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+
+        _mapSprites.reorderSprites( true );
     }
 
     void mapDrawer::bikeJumpPlayer( direction p_direction ) {
@@ -2673,6 +2773,13 @@ namespace MAP {
             clearFieldAnimation( gx, gy );
         }
 
+        // movement for attached objects
+        auto olddir         = _lastPlayerMove;
+        auto oldprio        = _lastPlayerPriority;
+        _lastPlayerMove     = p_direction;
+        _lastPlayerPriority = _mapSprites.getPriority( _playerSprite );
+        _mapSprites.setPriority( _playerFollowPkmnSprite, oldprio );
+
         redirectPlayer( p_direction, false );
         if( _playerIsFast ) {
             _playerIsFast = false;
@@ -2684,7 +2791,18 @@ namespace MAP {
             if( i % 8 == 0 ) { _mapSprites.nextFrame( _playerSprite ); }
             if( i > 28 && i % 2 ) { _mapSprites.moveSprite( _playerSprite, DOWN, 3 ); }
             if( i % 4 ) swiWaitForVBlank( );
+
+            if( i < 16 ) {
+                if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+                    moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx, { olddir, i },
+                                   false, DOWN, false );
+                } else if( _pkmnFollowsPlayer ) {
+                    moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, i }, false, DOWN,
+                                   false );
+                }
+            }
         }
+
         _mapSprites.drawFrame( _playerSprite, getFrame( p_direction ) );
         clearFieldAnimation( gx, gy );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,

@@ -368,7 +368,7 @@ namespace IO {
         sInfo->m_angle  = 0;
         sInfo->m_entry  = spriteEntry;
 
-        spriteEntry->palette  = 1;
+        spriteEntry->palette  = 15; // this is actually the transparency
         spriteEntry->gfxIndex = p_tileCnt;
         spriteEntry->x        = p_posX;
         spriteEntry->y        = p_posY;

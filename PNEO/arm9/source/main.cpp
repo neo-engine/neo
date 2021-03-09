@@ -283,7 +283,7 @@ int main( int, char** p_argv ) {
         held    = keysHeld( );
 
 #ifdef DESQUID
-        if( held & KEY_L ) {
+        if( held & KEY_SELECT ) {
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
