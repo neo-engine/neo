@@ -36,9 +36,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_MAIN_PLAYER_OAM        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) )
 #define SPR_MAIN_PLAYER_PLAT_OAM   ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + 1 )
 #define SPR_HM_OAM( p_idx )        ( 2 + SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
-#define SPR_MAPTILE_OAM( p_idx )   ( SPR_HM_OAM( MAX_HM_PARTICLE ) + ( p_idx ) )
-#define SPR_DOOR_OAM               ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) )
-#define SPR_EXCLM_OAM              SPR_DOOR_OAM + 1
+
+#define MAX_OAM SPR_HM_OAM( MAX_HM_PARTICLE )
+
+#define SPR_MAPTILE_OAM( p_idx ) ( SPR_HM_OAM( MAX_HM_PARTICLE ) + ( p_idx ) )
+#define SPR_DOOR_OAM             ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) )
+#define SPR_EXCLM_OAM            SPR_DOOR_OAM + 1
 
 // Strength boulder (16x16)
 // Rock Smash rock  (16x16)
@@ -208,6 +211,11 @@ namespace MAP {
         _longGrassData.updatePalette( 3 );
 
         _playerPlatform.m_sprite = mapSprite( { 256 | 248, 0 }, mapSpriteData( 256 | 248 ) );
+
+        for( u8 i = 0; i < 128; ++i ) {
+            _oamPosition[ i ]  = i;
+            _oamPositionR[ i ] = i;
+        }
     }
 
     void mapSpriteManager::reset( ) {
@@ -219,6 +227,11 @@ namespace MAP {
         for( u8 i = 0; i < MAX_LARGE_NPC; ++i ) { destroySprite( SPR_LARGE_NPC_OAM( i ), false ); }
         for( u8 i = 0; i < MAX_HM_PARTICLE; ++i ) { destroySprite( SPR_HM_OAM( i ), false ); }
         for( u8 i = 0; i < MAX_TILE_ANIM; ++i ) { destroySprite( SPR_MAPTILE_OAM( i ), false ); }
+        for( u8 i = 0; i < 128; ++i ) {
+            _oamPosition[ i ]  = i;
+            _oamPositionR[ i ] = i;
+        }
+
         update( );
     }
 
@@ -330,6 +343,52 @@ namespace MAP {
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
     }
 
+    void mapSpriteManager::swapSprites( u8 p_spriteId1, u8 p_spriteId2, bool p_update ) {
+        std::swap( IO::spriteInfoTop[ p_spriteId1 ], IO::spriteInfoTop[ p_spriteId2 ] );
+        std::swap( IO::OamTop->oamBuffer[ p_spriteId1 ], IO::OamTop->oamBuffer[ p_spriteId2 ] );
+        std::swap( _oamPositionR[ p_spriteId1 ], _oamPositionR[ p_spriteId2 ] );
+        std::swap( _oamPosition[ _oamPositionR[ p_spriteId1 ] ],
+                   _oamPosition[ _oamPositionR[ p_spriteId2 ] ] );
+
+        if( p_update ) { IO::updateOAM( false ); }
+    }
+
+    void mapSpriteManager::reorderSprites( bool p_update ) {
+        static bool reordering = false;
+
+        if( reordering ) { return; }
+        reordering = true;
+
+        // sort things via bubble sort; there are only few elements so it should be fast
+        // enough
+        for( u8 i = 0; i < MAX_OAM; ++i ) {
+            for( u8 j = 1; j < MAX_OAM - i; ++j ) {
+                //                NAV::printMessage( ( std::to_string( j - 1 ) + " sw " +
+                //                std::to_string( j ) + " : "
+                //                                     + std::to_string( IO::OamTop->oamBuffer[ j -
+                //                                     1 ].y ) + " vs "
+                //                                     + std::to_string( IO::OamTop->oamBuffer[ j
+                //                                     ].y ) )
+                //                                      .c_str( ) );
+
+                // take care of potentially negative coordinates
+                if( u8( 300 + IO::OamTop->oamBuffer[ j - 1 ].y
+                        + IO::spriteInfoTop[ j - 1 ].m_height )
+                    < u8( 300 + IO::OamTop->oamBuffer[ j ].y + IO::spriteInfoTop[ j ].m_height ) ) {
+                    swapSprites( j - 1, j, false );
+                }
+            }
+        }
+
+        if( _oamPosition[ SPR_MAIN_PLAYER_OAM ] > _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ] ) {
+            //            swapSprites( _oamPosition[ SPR_MAIN_PLAYER_OAM ],
+            //                         _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ], false );
+        }
+
+        if( p_update ) { update( ); }
+        reordering = false;
+    }
+
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
                                      spriteType p_type, const mapSprite& p_sprite ) {
 
@@ -341,14 +400,16 @@ namespace MAP {
                 { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ), camShift( p_camY, p_posY ) },
                 SPTYPE_DOOR };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
-                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), SPR_DOOR_OAM,
-                          SPR_DOOR_GFX, p_sprite );
+                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                          _oamPosition[ SPR_DOOR_OAM ], SPR_DOOR_GFX, p_sprite );
+            reorderSprites( false );
             return SPR_DOOR_OAM;
         case SPTYPE_PLAYER:
             _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 }, SPTYPE_PLAYER };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                           screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
-                          SPR_MAIN_PLAYER_OAM, SPR_MAIN_PLAYER_GFX, p_sprite );
+                          _oamPosition[ SPR_MAIN_PLAYER_OAM ], SPR_MAIN_PLAYER_GFX, p_sprite );
+            reorderSprites( false );
             return SPR_MAIN_PLAYER_OAM;
         case SPTYPE_BERRYTREE:
         case SPTYPE_NPC: {
@@ -371,7 +432,9 @@ namespace MAP {
                                          p_type } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                               screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
-                              SPR_LARGE_NPC_OAM( freesp ), SPR_LARGE_NPC_GFX( freesp ), p_sprite );
+                              _oamPosition[ SPR_LARGE_NPC_OAM( freesp ) ],
+                              SPR_LARGE_NPC_GFX( freesp ), p_sprite );
+                reorderSprites( false );
                 return SPR_LARGE_NPC_OAM( freesp );
             } else {
                 u8 freesp = 255;
@@ -389,7 +452,9 @@ namespace MAP {
                                            p_type } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                               screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
-                              SPR_SMALL_NPC_OAM( freesp ), SPR_SMALL_NPC_GFX( freesp ), p_sprite );
+                              _oamPosition[ SPR_SMALL_NPC_OAM( freesp ) ],
+                              SPR_SMALL_NPC_GFX( freesp ), p_sprite );
+                reorderSprites( false );
                 return SPR_SMALL_NPC_OAM( freesp );
             }
         }
@@ -460,36 +525,46 @@ namespace MAP {
         switch( p_particleId ) {
         case SPR_ITEM:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _itemBallData );
+                          _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
+                          _itemBallData );
+            reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_HMBALL:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _hmBallData );
+                          _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
+                          _hmBallData );
+            reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_STRENGTH:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _strengthData );
+                          _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
+                          _strengthData );
+            reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_ROCKSMASH:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _rockSmashData );
+                          _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
+                          _rockSmashData );
+            reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_CUT:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_HM_OAM( nextfree ), SPR_HM_GFX( p_particleId ), _cutData );
+                          _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
+                          _cutData );
+            reorderSprites( false );
             return SPR_HM_OAM( nextfree );
 
         case SPR_GRASS:
             _grassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_MAPTILE_OAM( nextfree ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
             _longGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
-                          SPR_MAPTILE_OAM( nextfree ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_1 );
             return SPR_MAPTILE_OAM( nextfree );
@@ -497,8 +572,9 @@ namespace MAP {
         case SPR_PLATFORM:
             _playerPlatform.m_pos = { p_posX, p_posY, 0, 0, 0, 0 };
             doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3,
-                          SPR_MAIN_PLAYER_PLAT_OAM, SPR_MAIN_PLAYER_PLAT_GFX,
+                          _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ], SPR_MAIN_PLAYER_PLAT_GFX,
                           _playerPlatform.m_sprite );
+            reorderSprites( false );
             return SPR_MAIN_PLAYER_PLAT_OAM;
         default: break;
         }
@@ -513,7 +589,7 @@ namespace MAP {
         NAV::printMessage( ( std::to_string( p_spriteId ) + " destroy" ).c_str( ) );
 #endif
 
-        IO::OamTop->oamBuffer[ p_spriteId ].isHidden = true;
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden = true;
         if( p_spriteId >= SPR_SMALL_NPC_OAM( 0 )
             && p_spriteId < SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) ) {
             _smallNpcs[ p_spriteId - SPR_SMALL_NPC_OAM( 0 ) ].first = false;
@@ -526,7 +602,7 @@ namespace MAP {
         } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first = SPR_UNUSED;
         }
-        if( p_update ) { IO::updateOAM( false ); }
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::moveCamera( direction p_direction, s16 p_amount, bool p_movePlayer ) {
@@ -556,6 +632,7 @@ namespace MAP {
         }
         translateSprite( SPR_DOOR_OAM, dx, dy, false );
 
+        reorderSprites( false );
         update( );
     }
 
@@ -571,8 +648,8 @@ namespace MAP {
         if( p_spriteId == 255 ) { return; }
         if( p_targetSpriteId == 255 ) { return; }
 
-        auto tx   = IO::OamTop->oamBuffer[ p_targetSpriteId ].x;
-        auto ty   = IO::OamTop->oamBuffer[ p_targetSpriteId ].y;
+        auto tx   = IO::OamTop->oamBuffer[ _oamPosition[ p_targetSpriteId ] ].x;
+        auto ty   = IO::OamTop->oamBuffer[ _oamPosition[ p_targetSpriteId ] ].y;
         auto data = getManagedSprite( p_targetSpriteId ).m_sprite.getData( );
         ty += data.m_height - 16;
         if( data.m_width == 32 ) { tx += data.m_width - 8; }
@@ -584,15 +661,15 @@ namespace MAP {
                                         bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        moveSprite( p_spriteId, p_targetX - IO::OamTop->oamBuffer[ p_spriteId ].x,
-                    p_targetY - IO::OamTop->oamBuffer[ p_spriteId ].y, p_update );
+        moveSprite( p_spriteId, p_targetX - IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
+                    p_targetY - IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y, p_update );
     }
 
     void mapSpriteManager::moveSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
-        IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x += p_dx;
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y += p_dy;
 
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].second.moveSprite( p_dx, p_dy );
@@ -600,37 +677,32 @@ namespace MAP {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.moveSprite( p_dx, p_dy );
         } else {
             getManagedSprite( p_spriteId ).m_pos.moveSprite( p_dx, p_dy );
-            if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 14
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -14 ) {
-                //                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
-            } else {
-                //                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
-            }
         }
-        if( p_update ) { IO::updateOAM( false ); }
+        reorderSprites( false );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::translateSprite( u8 p_spriteId, s8 p_dx, s8 p_dy, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        IO::OamTop->oamBuffer[ p_spriteId ].x += p_dx;
-        IO::OamTop->oamBuffer[ p_spriteId ].y += p_dy;
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x += p_dx;
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y += p_dy;
 
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].second.translateSprite( p_dx, p_dy );
-            IO::OamTop->oamBuffer[ p_spriteId ].isHidden
+            IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden
                 = !_tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].second.isVisible( );
         } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.translateSprite( p_dx, p_dy );
-            IO::OamTop->oamBuffer[ p_spriteId ].isHidden
+            IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden
                 = !_hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.isVisible( );
 #ifdef DESQUID_MORE
             NAV::printMessage(
                 ( std::to_string( p_spriteId )
-                  + " x: " + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].x )
-                  + " y : " + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].y ) + " cam x : "
+                  + " x: " + std::to_string( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x )
+                  + " y : "
+                  + std::to_string( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y )
+                  + " cam x : "
                   + std::to_string( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.m_camDisX )
                   + " cam y : "
                   + std::to_string( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.m_camDisY )
@@ -643,50 +715,43 @@ namespace MAP {
 
         } else {
             getManagedSprite( p_spriteId ).m_pos.translateSprite( p_dx, p_dy );
-            IO::OamTop->oamBuffer[ p_spriteId ].isHidden
+            IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden
                 = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
-            if( getManagedSprite( p_spriteId ).m_pos.m_camDisY > 0
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisY <= 16
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX <= 14
-                && getManagedSprite( p_spriteId ).m_pos.m_camDisX >= -14 ) {
-                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_1;
-            } else {
-                IO::OamTop->oamBuffer[ p_spriteId ].priority = OBJPRIORITY_2;
-            }
 #ifdef DESQUID_MORE
-            NAV::printMessage( ( std::to_string( p_spriteId ) + " hidden? "
-                                 + std::to_string( IO::OamTop->oamBuffer[ p_spriteId ].isHidden ) )
-                                   .c_str( ) );
+            NAV::printMessage(
+                ( std::to_string( p_spriteId ) + " hidden? "
+                  + std::to_string( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden ) )
+                    .c_str( ) );
 #endif
         }
 
-        if( p_update ) { IO::updateOAM( false ); }
+        if( p_update ) { update( ); }
     }
 
     ObjPriority mapSpriteManager::getPriority( u8 p_spriteId ) const {
         if( p_spriteId == 255 ) { return OBJPRIORITY_0; }
 
-        return IO::OamTop->oamBuffer[ p_spriteId ].priority;
+        return IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].priority;
     }
 
     void mapSpriteManager::setVisibility( u8 p_spriteId, bool p_value, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        IO::OamTop->oamBuffer[ p_spriteId ].isHidden = p_value;
-        if( p_update ) { IO::updateOAM( false ); }
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden = p_value;
+        if( p_update ) { update( ); }
     }
 
     bool mapSpriteManager::getVisibility( u8 p_spriteId ) {
         if( p_spriteId == 255 ) { return true; }
 
-        return IO::OamTop->oamBuffer[ p_spriteId ].isHidden;
+        return IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden;
     }
 
     void mapSpriteManager::setPriority( u8 p_spriteId, ObjPriority p_value, bool p_update ) {
         if( p_spriteId == 255 ) { return; }
 
-        IO::OamTop->oamBuffer[ p_spriteId ].priority = p_value;
-        if( p_update ) { IO::updateOAM( false ); }
+        IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].priority = p_value;
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_update ) {
@@ -695,17 +760,19 @@ namespace MAP {
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             auto data = getSpriteData( p_spriteId );
             auto pid  = _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first;
-            doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
-                          IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId,
-                          SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ), data );
-            IO::setOWSpriteFrame( p_value, false, p_spriteId, data.m_palData, data.m_frameData );
+            doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
+                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                          _oamPosition[ p_spriteId ], SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ),
+                          data );
+            IO::setOWSpriteFrame( p_value, false, _oamPosition[ p_spriteId ], data.m_palData,
+                                  data.m_frameData );
             return;
         } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
             [[unlikely]] {
             return;
         }
-        getManagedSprite( p_spriteId ).m_sprite.drawFrame( p_spriteId, p_value );
-        if( p_update ) { IO::updateOAM( false ); }
+        getManagedSprite( p_spriteId ).m_sprite.drawFrame( _oamPosition[ p_spriteId ], p_value );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::drawFrameD( u8 p_spriteId, direction p_direction, bool p_update ) {
@@ -718,8 +785,9 @@ namespace MAP {
             [[unlikely]] {
             return;
         }
-        getManagedSprite( p_spriteId ).m_sprite.drawFrameD( p_spriteId, p_direction );
-        if( p_update ) { IO::updateOAM( false ); }
+        getManagedSprite( p_spriteId )
+            .m_sprite.drawFrameD( _oamPosition[ p_spriteId ], p_direction );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_hflip, bool p_update ) {
@@ -728,35 +796,38 @@ namespace MAP {
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             auto data = getSpriteData( p_spriteId );
             auto pid  = _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first;
-            doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
-                          IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId,
-                          SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ), data );
-            IO::setOWSpriteFrame( p_value, p_hflip, p_spriteId, data.m_palData, data.m_frameData );
+            doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
+                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                          _oamPosition[ p_spriteId ], SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ),
+                          data );
+            IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ], data.m_palData,
+                                  data.m_frameData );
             return;
         } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             switch( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first ) {
             case SPR_ROCKSMASH:
-                doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
-                              IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId, SPR_HM_GFX( 0 ),
-                              _rockSmashData );
-                IO::setOWSpriteFrame( p_value, p_hflip, p_spriteId, _rockSmashData.m_palData,
-                                      _rockSmashData.m_frameData );
+                doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
+                              IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                              _oamPosition[ p_spriteId ], SPR_HM_GFX( 0 ), _rockSmashData );
+                IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ],
+                                      _rockSmashData.m_palData, _rockSmashData.m_frameData );
                 break;
             case SPR_CUT:
-                doLoadSprite( IO::OamTop->oamBuffer[ p_spriteId ].x,
-                              IO::OamTop->oamBuffer[ p_spriteId ].y, p_spriteId, SPR_HM_GFX( 0 ),
-                              _cutData );
-                IO::setOWSpriteFrame( p_value, p_hflip, p_spriteId, _cutData.m_palData,
-                                      _cutData.m_frameData );
+                doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
+                              IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                              _oamPosition[ p_spriteId ], SPR_HM_GFX( 0 ), _cutData );
+                IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ],
+                                      _cutData.m_palData, _cutData.m_frameData );
                 break;
             default: return;
             }
 
-            if( p_update ) { IO::updateOAM( false ); }
+            if( p_update ) { update( ); }
             return;
         }
-        getManagedSprite( p_spriteId ).m_sprite.drawFrame( p_spriteId, p_value, p_hflip );
-        if( p_update ) { IO::updateOAM( false ); }
+        getManagedSprite( p_spriteId )
+            .m_sprite.drawFrame( _oamPosition[ p_spriteId ], p_value, p_hflip );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::setFrame( u8 p_spriteId, u8 p_value, bool p_update ) {
@@ -766,8 +837,8 @@ namespace MAP {
             [[unlikely]] {
             return;
         }
-        getManagedSprite( p_spriteId ).m_sprite.setFrame( p_spriteId, p_value );
-        if( p_update ) { IO::updateOAM( false ); }
+        getManagedSprite( p_spriteId ).m_sprite.setFrame( _oamPosition[ p_spriteId ], p_value );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::setFrameD( u8 p_spriteId, direction p_direction, bool p_update ) {
@@ -777,8 +848,9 @@ namespace MAP {
             [[unlikely]] {
             return;
         }
-        getManagedSprite( p_spriteId ).m_sprite.setFrameD( p_spriteId, p_direction );
-        if( p_update ) { IO::updateOAM( false ); }
+        getManagedSprite( p_spriteId )
+            .m_sprite.setFrameD( _oamPosition[ p_spriteId ], p_direction );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::currentFrame( u8 p_spriteId, bool p_update ) {
@@ -788,8 +860,8 @@ namespace MAP {
             [[unlikely]] {
             return;
         }
-        getManagedSprite( p_spriteId ).m_sprite.currentFrame( p_spriteId );
-        if( p_update ) { IO::updateOAM( false ); }
+        getManagedSprite( p_spriteId ).m_sprite.currentFrame( _oamPosition[ p_spriteId ] );
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::nextFrame( u8 p_spriteId, bool p_update ) {
@@ -801,11 +873,12 @@ namespace MAP {
         }
         auto& mspr = getManagedSprite( p_spriteId );
         if( mspr.m_type != SPTYPE_BERRYTREE ) {
-            mspr.m_sprite.nextFrame( p_spriteId );
+            mspr.m_sprite.nextFrame( _oamPosition[ p_spriteId ] );
         } else {
-            mspr.m_sprite.setFrame( p_spriteId, mspr.m_sprite.getCurrentFrame( ) ^ 1 );
+            mspr.m_sprite.setFrame( _oamPosition[ p_spriteId ],
+                                    mspr.m_sprite.getCurrentFrame( ) ^ 1 );
         }
-        if( p_update ) { IO::updateOAM( false ); }
+        if( p_update ) { update( ); }
     }
 
     void mapSpriteManager::update( ) {
@@ -817,15 +890,15 @@ namespace MAP {
         char buffer[ 10 ];
         snprintf( buffer, 9, "EMO/%hhu", p_emote );
         IO::loadSpriteB( buffer, SPR_EXCLM_OAM, SPR_EXCLM_GFX,
-                         IO::OamTop->oamBuffer[ p_spriteId ].x
+                         IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x
                              + ( spr.m_sprite.getData( ).m_width == 32 ? 8 : 0 ),
-                         IO::OamTop->oamBuffer[ p_spriteId ].y - 8, 16, 16, false, false, false,
-                         OBJPRIORITY_0, false );
+                         IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y - 8, 16, 16, false,
+                         false, false, OBJPRIORITY_0, false );
         update( );
     }
 
     void mapSpriteManager::hideExclamation( ) {
-        IO::OamTop->oamBuffer[ SPR_EXCLM_OAM ].isHidden = true;
+        IO::OamTop->oamBuffer[ _oamPosition[ SPR_EXCLM_OAM ] ].isHidden = true;
         update( );
     }
 } // namespace MAP

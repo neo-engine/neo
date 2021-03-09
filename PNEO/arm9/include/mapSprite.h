@@ -256,6 +256,9 @@ namespace MAP {
 
         // mapSpriteData _waterBubbles;
 
+        u8 _oamPosition[ 128 ];  // positions of the sprites in the oam
+        u8 _oamPositionR[ 128 ]; // positions of the sprites in the oam
+
         std::pair<u8, mapSpritePos> _hmSpriteInfo[ MAX_HM_PARTICLE ];
         std::pair<u8, mapSpritePos> _tileAnimInfo[ MAX_TILE_ANIM ];
 
@@ -281,6 +284,18 @@ namespace MAP {
         mapSpriteData& getSpriteData( u8 p_spriteId );
 
         const mapSpriteData& getSpriteData( u8 p_spriteId ) const;
+
+        /*
+         * @brief: Swaps two sprites in the OAM.
+         */
+        void swapSprites( u8 p_spriteId1, u8 p_spriteId2, bool p_update = true );
+
+        /*
+         * @brief: Rearranges sprites in OAM so that a sprite with higher y-coordinate
+         * appears earlier in the OAM, making it hide the sprites with smaller
+         * y-coordinate and same priority.
+         */
+        void reorderSprites( bool p_update = true );
 
       public:
         void reset( );

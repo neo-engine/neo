@@ -103,14 +103,6 @@ namespace MAP {
                 mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
 
             _mapSprites.setFrameD( p_mapObject.first, p_mapObject.second.m_direction, false );
-#ifdef DESQUID_MORE
-            IO::fadeScreen( IO::UNFADE );
-            NAV::printMessage(
-                ( std::to_string( p_mapObject.first ) + " " + std::to_string( curx ) + " "
-                  + std::to_string( cury ) + " " + std::to_string( p_mapObject.second.m_pos.m_posX )
-                  + " " + std::to_string( p_mapObject.second.m_pos.m_posY ) + " "
-                  + std::to_string( IO::OamTop->oamBuffer[ p_mapObject.first ].isHidden ) ) );
-#endif
             break;
         }
         case EVENT_HMOBJECT: {
