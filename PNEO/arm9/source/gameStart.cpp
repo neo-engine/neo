@@ -484,7 +484,7 @@ namespace SAVE {
         switch( p_episode ) {
         case 0:
             std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
-            SAV.getActiveFile( ).m_appearance = 0;
+            SAV.getActiveFile( ).m_appearance = 1;
             SAV.getActiveFile( ).setFlag( F_RIVAL_APPEARANCE,
                                           1 - SAV.getActiveFile( ).m_appearance );
             SAV.getActiveFile( ).m_currentMap = 10;
