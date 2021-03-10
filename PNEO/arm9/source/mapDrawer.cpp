@@ -2292,9 +2292,15 @@ namespace MAP {
                 = { SAVE::SAV.getActiveFile( ).m_currentMap,
                     SAVE::SAV.getActiveFile( ).m_player.m_pos };
         }
+        bool hidePlayer = true;
         bool exitCave
             = ( ( oldMapType & CAVE ) && !( oldMapType & INSIDE ) && !( newMapType & CAVE ) );
-        if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
+        if( exitCave ) {
+            hidePlayer                                 = false;
+            SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } };
+        }
+
+        if( !( oldMapType & INSIDE ) && ( newMapType & INSIDE ) ) { hidePlayer = false; }
 
         switch( p_type ) {
         case TELEPORT:
@@ -2360,7 +2366,7 @@ namespace MAP {
         if( oldw != SAVE::SAV.getActiveFile( ).m_currentMapWeather ) { initWeather( ); }
 
         // hide player, may need to open a door first
-        draw( OBJPRIORITY_2, true );
+        draw( OBJPRIORITY_2, hidePlayer );
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
 
@@ -2381,8 +2387,7 @@ namespace MAP {
             // a door, open it
             openDoor( posx, posy );
         }
-
-        drawPlayer( OBJPRIORITY_2 );
+        if( hidePlayer ) { drawPlayer( OBJPRIORITY_2 ); }
 
         if( ( currentData( ).m_mapType & INSIDE )
             && ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
