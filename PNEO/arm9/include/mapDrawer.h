@@ -154,7 +154,7 @@ namespace MAP {
         void initWeather( );
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );
-        void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2 );
+        void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2, bool p_playerHidden = false );
 
         void fixMapObject( u8 p_objectId );
         void unfixMapObject( u8 p_objectId );
@@ -302,9 +302,13 @@ namespace MAP {
          */
         void openDoor( u16 p_globX, u16 p_globY, u8 p_z = 3 );
 
+        void closeDoor( u16 p_globX, u16 p_globY, u8 p_z = 3 );
+
+        void animateDoor( u16 p_globX, u16 p_globY, u8 p_z = 3, bool p_close = false );
+
         void changeWeather( mapWeather p_newWeather );
 
-        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2 );
+        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2, bool p_playerHidden = false );
 
         void interact( );
 
@@ -328,7 +332,7 @@ namespace MAP {
 
         void stopPlayer( );
         void stopPlayer( direction p_direction );
-        void changeMoveMode( moveMode p_newMode );
+        void changeMoveMode( moveMode p_newMode, bool p_hidden = false );
 
         void redirectPlayer( direction p_direction, bool p_fast, bool p_force = false );
 

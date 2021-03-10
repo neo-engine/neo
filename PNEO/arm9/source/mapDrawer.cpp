@@ -478,11 +478,12 @@ namespace MAP {
         ANIMATE_MAP = true;
     }
 
-    void mapDrawer::draw( ObjPriority ) {
+    void mapDrawer::draw( ObjPriority, bool p_playerHidden ) {
         draw( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true ); // Draw the map
 
-        drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority ); // Draw the player
+        drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority,
+                    p_playerHidden ); // Draw the player
 
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
@@ -493,15 +494,17 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false, true );
     }
 
-    void mapDrawer::drawPlayer( ObjPriority p_playerPrio ) {
+    void mapDrawer::drawPlayer( ObjPriority p_playerPrio, bool p_playerHidden ) {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
-                                                SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
+                                                SAVE::SAV.getActiveFile( ).m_player.sprite( ),
+                                                p_playerHidden );
         changeMoveMode( SAVE::SAV.getActiveFile( ).m_player.m_movement );
-        _mapSprites.setPriority( _playerSprite,
-                                 SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio );
+        _mapSprites.setPriority(
+            _playerSprite, SAVE::SAV.getActiveFile( ).m_playerPriority = p_playerPrio, false );
+        _mapSprites.setVisibility( _playerSprite, p_playerHidden );
     }
 
     void mapDrawer::fixMapObject( u8 p_objectId ) {
@@ -954,7 +957,7 @@ namespace MAP {
         SAVE::SAV.getActiveFile( ).m_repelSteps = 0;
     }
 
-    void mapDrawer::openDoor( u16 p_globX, u16 p_globY, u8 p_z ) {
+    void mapDrawer::animateDoor( u16 p_globX, u16 p_globY, u8 p_z, bool p_close ) {
         u16  curx  = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16  cury  = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         auto wdata = getWarpData( p_globX, p_globY, p_z );
@@ -984,15 +987,33 @@ namespace MAP {
 
             u8 door = _mapSprites.loadDoor( curx, cury, p_globX, p_globY, d.m_doorIdx,
                                             &BG_PALETTE[ 16 * d.m_palette ] );
-            for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
-            _mapSprites.drawFrame( door, 1 );
-            for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
-            _mapSprites.drawFrame( door, 2 );
-            for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+            if( !p_close ) {
+                for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+                _mapSprites.drawFrame( door, 1 );
+                for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+                _mapSprites.drawFrame( door, 2 );
+                for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+            } else {
+                _mapSprites.drawFrame( door, 2 );
+                for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+                _mapSprites.drawFrame( door, 1 );
+                for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+                _mapSprites.drawFrame( door, 0 );
+                for( u8 j = 0; j < 8; ++j ) { swiWaitForVBlank( ); }
+                _mapSprites.destroySprite( door );
+            }
             return;
         }
 
         // no animation found :/
+    }
+
+    void mapDrawer::openDoor( u16 p_globX, u16 p_globY, u8 p_z ) {
+        animateDoor( p_globX, p_globY, p_z, false );
+    }
+
+    void mapDrawer::closeDoor( u16 p_globX, u16 p_globY, u8 p_z ) {
+        animateDoor( p_globX, p_globY, p_z, true );
     }
 
     std::pair<bool, mapData::event::data> mapDrawer::getWarpData( u16 p_globX, u16 p_globY,
@@ -2274,6 +2295,7 @@ namespace MAP {
         bool exitCave
             = ( ( oldMapType & CAVE ) && !( oldMapType & INSIDE ) && !( newMapType & CAVE ) );
         if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
+
         switch( p_type ) {
         case TELEPORT:
             SOUND::playSoundEffect( SFX_WARP );
@@ -2337,7 +2359,8 @@ namespace MAP {
         }
         if( oldw != SAVE::SAV.getActiveFile( ).m_currentMapWeather ) { initWeather( ); }
 
-        draw( );
+        // hide player, may need to open a door first
+        draw( OBJPRIORITY_2, true );
         for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
 
@@ -2348,12 +2371,18 @@ namespace MAP {
         }
 
         for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
-        //        }
 
-        // if( exitCave ) movePlayer( DOWN );
-        u8 behave = at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
-                        .m_bottombehave;
+        auto posx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        auto posy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+
+        u8 behave = at( posx, posy ).m_bottombehave;
+
+        if( behave == 0x69 ) {
+            // a door, open it
+            openDoor( posx, posy );
+        }
+
+        drawPlayer( OBJPRIORITY_2 );
 
         if( ( currentData( ).m_mapType & INSIDE )
             && ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
@@ -2371,8 +2400,12 @@ namespace MAP {
         _forceNoFollow = true;
         switch( behave ) {
         case 0x6e: walkPlayer( UP, false ); break;
-        case 0x60:
-        case 0x69: walkPlayer( DOWN, false ); break;
+        case 0x60: walkPlayer( DOWN, false ); break;
+        case 0x69: {
+            walkPlayer( DOWN, false );
+            closeDoor( posx, posy );
+            break;
+        }
 
         default: break;
         }
@@ -2869,7 +2902,7 @@ namespace MAP {
         _mapSprites.nextFrame( _playerSprite );
     }
 
-    void mapDrawer::changeMoveMode( moveMode p_newMode ) {
+    void mapDrawer::changeMoveMode( moveMode p_newMode, bool p_hidden ) {
         bool change  = SAVE::SAV.getActiveFile( ).m_player.m_movement != p_newMode;
         u8   basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         fastBike     = false;
@@ -2903,17 +2936,18 @@ namespace MAP {
         default: break;
         }
 
-        u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-        u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-        _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
-                                                SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        _playerSprite
+            = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
+                                      SAVE::SAV.getActiveFile( ).m_player.sprite( ), p_hidden );
         if( ydif ) { _mapSprites.moveSprite( _playerSprite, UP, ydif, true ); }
         _mapSprites.setFrame( _playerSprite,
                               getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
 
         if( surfing ) {
             _playerPlatSprite
-                = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPR_PLATFORM );
+                = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPR_PLATFORM, p_hidden );
             _mapSprites.setFrame( _playerPlatSprite,
                                   getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );
             if( !change ) { _mapSprites.moveSprite( _playerSprite, UP, 3 ); }

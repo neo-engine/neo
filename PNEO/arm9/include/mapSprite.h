@@ -309,19 +309,13 @@ namespace MAP {
         void moveCamera( direction p_direction, s16 p_amount, bool p_movePlayer = false );
 
         /*
-         * @brief: Loads an NPC sprite at the given position, returns an id for the sprite
-         * that needs to be passed when the sprite should be accessed.
-         */
-        u8 loadNPCSprite( u16 p_camX, u16 p_camY, u16 p_imageId, u8 p_startFrame );
-
-        /*
          * @brief: Loads the given sprite, returns an id for the sprite
          * that needs to be passed when the sprite should be accessed.
          * @param p_camX: x coordinate of the current camera position
          * @param p_camY: y coordinate of the current camera position
          */
         u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, spriteType p_type,
-                       const mapSprite& p_sprite );
+                       const mapSprite& p_sprite, bool p_hidden = false );
 
         /*
          * @brief: Loads a (possibly new) instance of the given sprite type, returns an id for the
@@ -329,7 +323,8 @@ namespace MAP {
          * @param p_camX: x coordinate of the current camera position
          * @param p_camY: y coordinate of the current camera position
          */
-        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_partilcleId );
+        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_partilcleId,
+                       bool p_hidden = false );
 
         /*
          * @brief: Loads a berry tree and displays it at the specified stage.
@@ -352,13 +347,13 @@ namespace MAP {
          * @param p_camX: x coordinate of the current camera position
          * @param p_camY: y coordinate of the current camera position
          */
-        inline u8 loadSprite( u16 p_camX, u16 p_camY, spriteType p_type,
-                              const mapSprite& p_sprite ) {
-            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_type, p_sprite );
+        inline u8 loadSprite( u16 p_camX, u16 p_camY, spriteType p_type, const mapSprite& p_sprite,
+                              bool p_hidden = false ) {
+            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_type, p_sprite, p_hidden );
         }
 
-        inline u8 loadSprite( u16 p_camX, u16 p_camY, u8 p_partilcleId ) {
-            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_partilcleId );
+        inline u8 loadSprite( u16 p_camX, u16 p_camY, u8 p_partilcleId, bool p_hidden = false ) {
+            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_partilcleId, p_hidden );
         }
 
         /*

@@ -239,19 +239,21 @@ namespace MAP {
      * @brief: Loads the specified sprite at the specified position on the screen.
      */
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
-                       const mapSpriteData& p_data ) {
-        IO::loadSpriteB(
-            p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height, p_data.m_palData,
-            reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
-            p_data.m_width * p_data.m_height / 2, false, false,
-            !mapSpritePos{ 0, 0, 0, 0, s16( 128 - p_posX ), s16( 92 - p_posY ) }.isVisible( ),
-            OBJPRIORITY_2, false );
+                       const mapSpriteData& p_data, bool p_hidden = false ) {
+        IO::loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height,
+                         p_data.m_palData,
+                         reinterpret_cast<const unsigned int*>( p_data.m_frameData ),
+                         p_data.m_width * p_data.m_height / 2, false, false,
+                         p_hidden
+                             || !mapSpritePos{ 0, 0, 0, 0, s16( 128 - p_posX ), s16( 92 - p_posY ) }
+                                     .isVisible( ),
+                         OBJPRIORITY_2, false );
     }
 
     void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
-                       const mapSprite& p_sprite ) {
+                       const mapSprite& p_sprite, bool p_hidden = false ) {
         auto& data = p_sprite.getData( );
-        doLoadSprite( p_posX, p_posY, p_oamIdx, p_tileCnt, data );
+        doLoadSprite( p_posX, p_posY, p_oamIdx, p_tileCnt, data, p_hidden );
     }
 
     const mapSpriteManager::managedSprite&
@@ -416,7 +418,7 @@ namespace MAP {
     }
 
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
-                                     spriteType p_type, const mapSprite& p_sprite ) {
+                                     spriteType p_type, const mapSprite& p_sprite, bool p_hidden ) {
 
         switch( p_type ) {
         case SPTYPE_DOOR:
@@ -427,14 +429,14 @@ namespace MAP {
                 SPTYPE_DOOR };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                           screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
-                          _oamPosition[ SPR_DOOR_OAM ], SPR_DOOR_GFX, p_sprite );
-            reorderSprites( false );
+                          _oamPosition[ SPR_DOOR_OAM ], SPR_DOOR_GFX, p_sprite, p_hidden );
             return SPR_DOOR_OAM;
         case SPTYPE_PLAYER:
             _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 }, SPTYPE_PLAYER };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                           screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
-                          _oamPosition[ SPR_MAIN_PLAYER_OAM ], SPR_MAIN_PLAYER_GFX, p_sprite );
+                          _oamPosition[ SPR_MAIN_PLAYER_OAM ], SPR_MAIN_PLAYER_GFX, p_sprite,
+                          p_hidden );
             reorderSprites( false );
             return SPR_MAIN_PLAYER_OAM;
         case SPTYPE_BERRYTREE:
@@ -459,7 +461,7 @@ namespace MAP {
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                               screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                               _oamPosition[ SPR_LARGE_NPC_OAM( freesp ) ],
-                              SPR_LARGE_NPC_GFX( freesp ), p_sprite );
+                              SPR_LARGE_NPC_GFX( freesp ), p_sprite, p_hidden );
                 reorderSprites( false );
                 return SPR_LARGE_NPC_OAM( freesp );
             } else {
@@ -479,7 +481,7 @@ namespace MAP {
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
                               screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
                               _oamPosition[ SPR_SMALL_NPC_OAM( freesp ) ],
-                              SPR_SMALL_NPC_GFX( freesp ), p_sprite );
+                              SPR_SMALL_NPC_GFX( freesp ), p_sprite, p_hidden );
                 reorderSprites( false );
                 return SPR_SMALL_NPC_OAM( freesp );
             }
@@ -516,7 +518,7 @@ namespace MAP {
     }
 
     u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
-                                     u8 p_particleId ) {
+                                     u8 p_particleId, bool p_hidden ) {
 
         bool isTileA = p_particleId >= TILE_ANIM_START;
 
@@ -552,31 +554,31 @@ namespace MAP {
         case SPR_ITEM:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
-                          _itemBallData );
+                          _itemBallData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_HMBALL:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
-                          _hmBallData );
+                          _hmBallData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_STRENGTH:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
-                          _strengthData );
+                          _strengthData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_ROCKSMASH:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
-                          _rockSmashData );
+                          _rockSmashData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_CUT:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
-                          _cutData );
+                          _cutData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
 
@@ -584,14 +586,14 @@ namespace MAP {
             _grassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
-                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData );
+                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
             _longGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
-                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData );
+                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
 
@@ -599,7 +601,7 @@ namespace MAP {
             _playerPlatform.m_pos = { p_posX, p_posY, 0, 0, 0, 0 };
             doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3,
                           _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ], SPR_MAIN_PLAYER_PLAT_GFX,
-                          _playerPlatform.m_sprite );
+                          _playerPlatform.m_sprite, p_hidden );
             reorderSprites( false );
             return SPR_MAIN_PLAYER_PLAT_OAM;
         default: break;
@@ -739,7 +741,7 @@ namespace MAP {
                     .c_str( ) );
 #endif
 
-        } else {
+        } else if( p_spriteId != SPR_DOOR_OAM ) {
             getManagedSprite( p_spriteId ).m_pos.translateSprite( p_dx, p_dy );
             IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden
                 = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
