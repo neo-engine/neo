@@ -129,6 +129,12 @@ namespace NAV {
      */
     void takeItemFromPlayer( u16 p_itemId, u16 p_amount = 1 );
 
+    /*
+     * @brief: Shows a message informing the player that they lost the specified item
+     * because the item was used.
+     * (also removes the specified item from the bag)
+     */
+    void useItemFromPlayer( u16 p_itemId, u16 p_amount = 1 );
 
     /*
      * @brief: Prints the given message. An empty message clears the message box.

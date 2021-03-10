@@ -67,6 +67,8 @@ namespace MAP {
     // 7 NAV::init( )
     // 8 Catching tutorial
     // 9 award badge (p1: region, p2: badge)
+    // 10 run choice box
+    // 11 getCurrentDaytime( )
 
     enum opCode : u8 {
         EOP = 0,  // end of program
@@ -134,16 +136,17 @@ namespace MAP {
         FIXR = 92, // Make map object to obtain same pos in map obj arr
         UFXR = 93, // Make map object to obtain same pos in map obj arr
 
-        FNT = 99,  // faint player
-        BTR = 100, // Battle trainer
-        BPK = 101, // Battle pkmn
-        ITM = 102, // Give item
-        TTM = 103, // Take item
-
+        FNT  = 99,  // faint player
+        BTR  = 100, // Battle trainer
+        BPK  = 101, // Battle pkmn
+        ITM  = 102, // Give item
+        TTM  = 103, // Take item
+        UTM  = 104, // Use item
         BTRR = 105, // Battle trainer
         BPKR = 106, // Battle pkmn
         ITMR = 107, // Give item
         TTMR = 108, // Take item
+        UTMR = 109, // Use item
 
         MSC = 113, // play music (temporary)
         RMS = 114, // Reset music
@@ -717,16 +720,20 @@ namespace MAP {
                 ANIMATE_MAP     = false;
                 DRAW_TIME       = false;
                 swiWaitForVBlank( );
-                if( BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                                    SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn,
-                                    currentData( ).m_battlePlat1, currentData( ).m_battlePlat2,
-                                    currentData( ).m_battleBG, getBattlePolicy( true ) )
-                        .start( )
-                    == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+                auto res
+                    = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn,
+                                      currentData( ).m_battlePlat1, currentData( ).m_battlePlat2,
+                                      currentData( ).m_battleBG, getBattlePolicy( true ) )
+                          .start( );
+                if( res == BATTLE::battle::BATTLE_OPPONENT_WON ) {
                     registers[ 0 ] = 0;
                 } else {
                     registers[ 0 ] = 1;
                 }
+
+                if( res == BATTLE::battle::BATTLE_CAPTURE ) { registers[ 1 ] = 1; }
+
                 FADE_TOP_DARK( );
                 draw( playerPrio );
                 _mapSprites.setPriority( _playerSprite,
@@ -746,8 +753,10 @@ namespace MAP {
                 break;
             case ITM: NAV::giveItemToPlayer( parA, parB ); break;
             case TTM: NAV::takeItemFromPlayer( parA, parB ); break;
+            case UTM: NAV::useItemFromPlayer( parA, parB ); break;
             case ITMR: NAV::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case TTMR: NAV::takeItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
+            case UTMR: NAV::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
                 SOUND::playBGM( parA, true );
                 break;
@@ -863,6 +872,10 @@ namespace MAP {
                                                    style( choiceBoxMsgType ), choiceBoxItems );
                     registers[ 1 ]   = choiceBoxPL[ registers[ 0 ] ];
                     NAV::init( );
+                    break;
+                }
+                case 11: { // get current time
+                    registers[ 0 ] = getCurrentDaytime( );
                     break;
                 }
                 default: break;
@@ -1432,7 +1445,7 @@ namespace MAP {
                     continue;
                 }
                 if( m_events[ i ].m_deactivateFlag
-                    && SAVE::SAV.getActiveFile( ).checkFlag( m_events[ i ].m_activateFlag ) ) {
+                    && SAVE::SAV.getActiveFile( ).checkFlag( m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
                 return true;
@@ -1443,17 +1456,17 @@ namespace MAP {
 
     void mapDrawer::runLevelScripts( const mapData& p_data, u16 p_mapX, u16 p_mapY ) {
         for( u8 i = 0; i < p_data.m_eventCount; ++i ) {
+            if( p_data.m_events[ i ].m_trigger != TRIGGER_ON_MAP_ENTER ) { continue; }
+
             if( p_data.m_events[ i ].m_activateFlag
                 && !SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_activateFlag ) ) {
                 continue;
             }
             if( p_data.m_events[ i ].m_deactivateFlag
-                && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_activateFlag ) ) {
+                && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
-            if( p_data.m_events[ i ].m_trigger == TRIGGER_ON_MAP_ENTER ) {
-                runEvent( p_data.m_events[ i ], u8( 0 ), s16( p_mapX ), s16( p_mapY ) );
-            }
+            runEvent( p_data.m_events[ i ], u8( 0 ), s16( p_mapX ), s16( p_mapY ) );
         }
     }
 

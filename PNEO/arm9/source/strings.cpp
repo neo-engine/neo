@@ -1234,4 +1234,6 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
 
     { "Riding the Waves (alt)", "Zu See (var)" },
     { "An Arena for Battles", "Ein Ring f\xfcr K\xe4mpfe" },
+    { "Used %hu times the\nitem %s.", "%hu-mal das Item\n%s eingesetzt." },
+    { "Used %s.", "%s eingesetzt." },
 };
