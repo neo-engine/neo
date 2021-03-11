@@ -19,17 +19,17 @@ script:
   - cd PNEO
   - make NOSOUND=1
   - mv PNEO.nds PNEO_NOSOUND.nds
-  - make NOSOUND=1 FLASHCARD=1
+  - make NOSOUND=1 FLASHCARD=1 rebuild
   - mv PNEO.nds PNEO_NOSOUND_FLASHCARD.nds
   - make DESQUID=1 NOSOUND=1 rebuild
   - mv PNEO.nds PNEO_NOSOUND_DESQUID.nds
-  - make DESQUID=1 NOSOUND=1 FLASHCARD=1
+  - make DESQUID=1 NOSOUND=1 FLASHCARD=1 rebuild
   - mv PNEO.nds PNEO_NOSOUND_DESQUID_FLASHCARD.nds
   - make DESQUID=1 rebuild
   - mv PNEO.nds PNEO_DESQUID.nds
-  - make DESQUID=1 FLASHCARD=1
+  - make DESQUID=1 FLASHCARD=1 rebuild
   - mv PNEO.nds PNEO_DESQUID_FLASHCARD.nds
-  - make FLASHCARD=1
+  - make FLASHCARD=1 rebuild
   - mv PNEO.nds PNEO_FLASHCARD.nds
   - make rebuild
   - docker container stop devkitarm
