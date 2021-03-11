@@ -258,6 +258,7 @@ namespace BAG {
                              true );
 
         initColors( );
+        bgUpdate( );
     }
 
     u16 bagUI::drawPkmnIcons( ) {
