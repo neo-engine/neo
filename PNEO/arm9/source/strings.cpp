@@ -1225,7 +1225,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "%s's protection was broken.", "Der Schutz von %s wurde durchbrochen." },
     { "Handed over %hu times the\nitem %s.", "%hu-mal das Item\n%s \xfc"
                                              "bergeben." },
-    { "Handed over %s.", "%s \xfc"
+    { "Handed over the %s.", "%s \xfc"
                          "bergeben." },
     { "Distortion World", "Zerrwelt" },
     { "Sailing", "Zu Schiff" },
@@ -1235,5 +1235,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Riding the Waves (alt)", "Zu See (var)" },
     { "An Arena for Battles", "Ein Ring f\xfcr K\xe4mpfe" },
     { "Used %hu times the\nitem %s.", "%hu-mal das Item\n%s eingesetzt." },
-    { "Used %s.", "%s eingesetzt." },
+    { "Used the %s.", "%s eingesetzt." },
 };

@@ -2806,6 +2806,8 @@ namespace MAP {
         SOUND::playSoundEffect( SFX_JUMP );
         u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16 nx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + 2 * dir[ p_direction ][ 0 ];
+        u16 ny = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 2 * dir[ p_direction ][ 1 ];
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
             clearFieldAnimation( gx, gy );
@@ -2823,6 +2825,14 @@ namespace MAP {
             _playerIsFast = false;
             _mapSprites.setFrame( _playerSprite, getFrame( p_direction ) );
         }
+
+        bool followlong = false;
+        if( _pkmnFollowsPlayer
+            && std::abs( _followPkmn.m_pos.m_posX - nx ) + std::abs( _followPkmn.m_pos.m_posY - ny )
+                   > 3 ) {
+            followlong = true;
+        }
+
         for( u8 i = 0; i < 32; ++i ) {
             moveCamera( p_direction, true );
             if( i < 6 && i % 2 ) { _mapSprites.moveSprite( _playerSprite, UP, 2 ); }
@@ -2830,13 +2840,13 @@ namespace MAP {
             if( i > 28 && i % 2 ) { _mapSprites.moveSprite( _playerSprite, DOWN, 3 ); }
             if( i % 4 ) swiWaitForVBlank( );
 
-            if( i < 16 ) {
+            if( i < 16 || followlong ) {
                 if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
-                    moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx, { olddir, i },
-                                   false, DOWN, false );
+                    moveMapObject( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx,
+                                   { olddir, u8( i & 15 ) }, false, DOWN, false );
                 } else if( _pkmnFollowsPlayer ) {
-                    moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, i }, false, DOWN,
-                                   false );
+                    moveMapObject( _followPkmn, _playerFollowPkmnSprite, { olddir, u8( i & 15 ) },
+                                   false, DOWN, false );
                 }
             }
         }
