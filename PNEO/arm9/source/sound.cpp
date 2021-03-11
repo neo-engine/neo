@@ -113,6 +113,7 @@ namespace SOUND {
         }
 #else
         (void) p_id;
+        (void) p_force;
 #endif
     }
 
