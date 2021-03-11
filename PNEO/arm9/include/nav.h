@@ -35,8 +35,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "yesNoBox.h"
 
 namespace NAV {
-#define MAXBG    13
-#define START_BG 0
 
     extern const u16 ARR_X_SPR_PAL[ 16 ];
 

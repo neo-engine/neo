@@ -26,6 +26,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
+#include "defines.h"
 
 namespace SAVE {
     enum language { EN, GER };
@@ -44,9 +45,9 @@ namespace SAVE {
 
         constexpr void clear( ) {
             m_EXPShareEnabled = false;
-            m_enableBGM = true;
-            m_enableSFX = true;
-            m_bgIdx  = 0;
+            m_enableBGM       = true;
+            m_enableSFX       = true;
+            m_bgIdx           = DEFAULT_NAV_BG;
             setDifficulty( 3 );
             setTextSpeed( 1 );
         }

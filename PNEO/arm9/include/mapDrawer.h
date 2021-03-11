@@ -53,6 +53,8 @@ namespace MAP {
         s8   _weatherScrollY = 0;
         bool _weatherFollow  = false;
 
+        bool _scriptRunning; // true while a map script is running.
+
         mapData _data[ 2 ][ 2 ];
 
         std::map<position, u8> _tileAnimations;

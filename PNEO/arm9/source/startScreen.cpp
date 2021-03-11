@@ -731,7 +731,7 @@ namespace SAVE {
         SAV.getActiveFile( ).initialize( );
         SAV.getActiveFile( ).m_options.m_language = _currentLanguage;
         SAV.getActiveFile( ).m_gameType           = p_type;
-        SAV.getActiveFile( ).m_options.m_bgIdx    = START_BG;
+        SAV.getActiveFile( ).m_options.m_bgIdx    = DEFAULT_NAV_BG;
 
         if( p_type == SPECIAL ) { return initSpecialEpisode( p_episode ); }
         if( p_type == NORMAL ) { return initSpecialEpisode( -1 ); }

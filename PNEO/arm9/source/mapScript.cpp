@@ -241,6 +241,10 @@ namespace MAP {
             CURRENT_SCRIPT = -1;
             return;
         }
+
+        bool srn       = _scriptRunning;
+        _scriptRunning = true;
+
         u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
         fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
         FS::close( f );
@@ -330,6 +334,7 @@ namespace MAP {
             case REM: playerAttachedToObject = false; break;
             case EOP: {
                 CURRENT_SCRIPT = -1;
+                _scriptRunning = srn;
                 return;
             }
             case GIT: {
@@ -900,6 +905,7 @@ namespace MAP {
             ++pc;
         }
         CURRENT_SCRIPT = -1;
+        _scriptRunning = srn;
     }
 
     void mapDrawer::interact( ) {

@@ -1226,7 +1226,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Handed over %hu times the\nitem %s.", "%hu-mal das Item\n%s \xfc"
                                              "bergeben." },
     { "Handed over the %s.", "%s \xfc"
-                         "bergeben." },
+                             "bergeben." },
     { "Distortion World", "Zerrwelt" },
     { "Sailing", "Zu Schiff" },
 

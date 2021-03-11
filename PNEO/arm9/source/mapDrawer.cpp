@@ -707,7 +707,7 @@ namespace MAP {
         default: break;
         }
 
-        if( p_allowWildPkmn ) {
+        if( p_allowWildPkmn && !_scriptRunning ) {
             bool hadBattle = false;
             // Check for trainer
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
