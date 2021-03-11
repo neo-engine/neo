@@ -36,12 +36,14 @@ _Partially_ implemented features are in _italics_.
         * [x] Wild Pokémon encounter
         * [x] Animated map tiles
         * [x] Player sprite, animated moving, surfing, cycling, and fishing
+        * [x] PKMN following the player
         * [x] Warps
-        * [x] Weather and other overlays (flash, mist, etc)
+        * [x] Weather and other overlays (flash, sandstorm, etc)
     * [x] BGM and SFX using MaxMod
     * [x] A real time clock
         * [x] Overworld changes based on time (map palette akin to DNS)
         * [x] Different wild Pokémon encounters based on time.
+        * [x] Map events based on day time
     * [x] Support for save games
         * [x] Saving the progress to the micro SD (only works on flash cards)
         * [x] Saving the progress to flash memory (only works in emulators)
@@ -96,6 +98,9 @@ Screenshots
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm05.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm07.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm08.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm09.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm10.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm11.png)
 
 ##### Pokémon status screens
 
