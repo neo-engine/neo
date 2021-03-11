@@ -224,8 +224,8 @@ void vblankIRQ( ) {
 }
 
 int main( int, char** p_argv ) {
-    TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
-                   && ( *(u8*) 0x02000402 == 0 ) && ( *(u8*) 0x02000404 == 0 ) );
+    // TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
+    //              && ( *(u8*) 0x02000402 == 0 ) && ( *(u8*) 0x02000404 == 0 ) );
 
     // Init
     powerOn( POWER_ALL_2D );
@@ -237,8 +237,8 @@ int main( int, char** p_argv ) {
     initTimeAndRnd( );
     initSound( );
 
-    keysSetRepeat( 25, 5 );
-    sysSetBusOwners( true, true );
+    // keysSetRepeat( 25, 5 );
+    // sysSetBusOwners( true, true );
 
     MAP::curMap = new MAP::mapDrawer( );
 

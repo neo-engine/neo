@@ -334,10 +334,8 @@ namespace FS {
 
     bool readSave( const char* p_path ) {
 #ifndef FLASHCARD
-        if( CARD::checkCard( ) ) {
-            CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
-            if( SAVE::SAV.isGood( ) ) { return true; }
-        }
+        CARD::readData( 0, reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ) );
+        if( SAVE::SAV.isGood( ) ) { return true; }
 #endif
 
         FILE* f = FS::open( p_path, "PNEO", ".sav", "r" );
@@ -364,11 +362,9 @@ namespace FS {
         SAVE::SAV.getActiveFile( ).m_lastSaveTime     = SAVE::CURRENT_TIME;
 
 #ifndef FLASHCARD
-        if( CARD::checkCard( ) ) {
-            if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
-                                 p_progress ) ) {
-                return true;
-            }
+        if( CARD::writeData( reinterpret_cast<u8*>( &SAVE::SAV ), sizeof( SAVE::saveGame ),
+                             p_progress ) ) {
+            return true;
         }
 #else
         (void) p_progress;
