@@ -39,20 +39,20 @@
 #include "saveOptions.h"
 
 namespace SAVE {
-#ifdef FLASHCARD
-    constexpr u8 MAX_SAVE_FILES = 1;
-#else
+    // #ifdef FLASHCARD
+    //    constexpr u8 MAX_SAVE_FILES = 1;
+    // #else
     constexpr u8 MAX_SAVE_FILES = 3;
-#endif
+    // #endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
-#ifdef FLASHCARD
-    constexpr u8 MAX_BOXES = 2;
-#else
-    constexpr u8 MAX_BOXES      = 35;
-#endif
+    // #ifdef FLASHCARD
+    //     constexpr u8 MAX_BOXES = 2;
+    // #else
+    constexpr u8 MAX_BOXES = 35;
+    // #endif
     constexpr u8 BERRY_SLOTS = 150;
 
     constexpr u16 F_MEGA_EVOLUTION   = 1;
