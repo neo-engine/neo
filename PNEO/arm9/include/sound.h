@@ -290,6 +290,7 @@ namespace SOUND {
         case L_PETALBURG_WOODS:
         case L_JAGGED_PASS: return MOD_CAVE_FORESTS;
         case L_FIERY_PATH:
+        case L_FIERY_DEN:
         case L_CABLE_CAR:
         case L_MT_CHIMNEY: return MOD_MT_CHIMNEY;
         case L_POKEMON_MART: return MOD_POKEMON_MART;

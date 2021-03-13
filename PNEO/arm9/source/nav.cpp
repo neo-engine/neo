@@ -422,6 +422,8 @@ namespace NAV {
         case L_ROCK_SHELTER:
         case L_SHOAL_CAVE:
         case L_RUSTURF_TUNNEL:
+        case L_FIERY_PATH:
+        case L_FIERY_DEN:
         case L_GRANITE_CAVE:
         case L_VICTORY_ROAD:
         case L_VICTORY_ROAD2:

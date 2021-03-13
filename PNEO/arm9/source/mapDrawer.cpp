@@ -1936,6 +1936,7 @@ namespace MAP {
                 } else {
                     if( fastBike > 9 ) goto NEXT_PASS;
                     walkPlayer( p_direction, p_fast );
+                    removeFollowPkmn( );
                     slidePlayer( DOWN );
                     p_direction = DOWN;
                     reinit      = true;
@@ -2295,12 +2296,11 @@ namespace MAP {
         bool hidePlayer = true;
         bool exitCave
             = ( ( oldMapType & CAVE ) && !( oldMapType & INSIDE ) && !( newMapType & CAVE ) );
-        if( exitCave ) {
-            hidePlayer                                 = false;
-            SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } };
-        }
+        if( exitCave ) { SAVE::SAV.getActiveFile( ).m_lastCaveEntry = { 255, { 0, 0, 0 } }; }
 
         if( !( oldMapType & INSIDE ) && ( newMapType & INSIDE ) ) { hidePlayer = false; }
+        if( newMapType & CAVE ) { hidePlayer = false; }
+        if( exitCave && p_type != DOOR && p_type != SLIDING_DOOR ) { hidePlayer = false; }
 
         switch( p_type ) {
         case TELEPORT:

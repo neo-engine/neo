@@ -36,8 +36,8 @@ GAME_ICON       :=  $(CURDIR)/icon.bmp
 export DEV_CODE			:=	01
 export GAME_CODE		:=	ADAJ
 export GAME_TITLE		:=	POKEMON NEO
-export VERSION			:=	9
-export VERSION_NAME		:=	Mystic Gardevoir neo
+export VERSION			:=	10
+export VERSION_NAME		:=	Waiting Suicune neo
 
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
