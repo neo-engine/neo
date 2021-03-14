@@ -101,6 +101,12 @@ Screenshots
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm09.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm10.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm11.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm12.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm13.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm14.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm15.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm16.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm17.png)
 
 ##### Pokémon status screens
 
@@ -124,16 +130,20 @@ Screenshots
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg04.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bg05.png)
 
+##### The PokéDex
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx01.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx02.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx03.png)
+
 ##### Battles
 ###### Wild Pokémon battles
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt01.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt02.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt03.png)
-![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt04.png)
-![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt05.png)
 
 ###### Trainer battles
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt06.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt05.png)
 
 #### Miscellaneous
 
