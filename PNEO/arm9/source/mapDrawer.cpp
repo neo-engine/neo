@@ -2603,16 +2603,21 @@ namespace MAP {
     }
 
     bool mapDrawer::updateFollowPkmn( ) {
+        _followPkmnData = nullptr;
         if( !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) { return false; }
         if( _forceNoFollow ) { return false; }
 
         // only if first pkmn is not ko, it will follow the player.
         if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].canBattle( ) ) { return false; }
 
-        u16  species = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].getSpecies( );
-        bool shiny   = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].isShiny( );
-        //        bool female  = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].isFemale( );
-        u8 forme = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].getForme( );
+        _followPkmnData = &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ];
+
+        if( _followPkmnData == nullptr ) { return false; }
+
+        u16  species = _followPkmnData->getSpecies( );
+        bool shiny   = _followPkmnData->isShiny( );
+        //        bool female  = _followPkmnData->isFemale( );
+        u8 forme = _followPkmnData->getForme( );
 
         if( species > MAX_PKMN ) { return false; }
         if( !canFollowPlayer( species, shiny, forme ) ) { return false; }
@@ -2645,6 +2650,7 @@ namespace MAP {
         if( _pkmnFollowsPlayer ) {
             _mapSprites.destroySprite( _playerFollowPkmnSprite );
             _pkmnFollowsPlayer = false;
+            _followPkmnData    = nullptr;
         }
     }
 

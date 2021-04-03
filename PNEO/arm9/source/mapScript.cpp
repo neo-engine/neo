@@ -908,16 +908,151 @@ namespace MAP {
         _scriptRunning = srn;
     }
 
+    void mapDrawer::interactFollowPkmn( ) {
+        if( _followPkmnData == nullptr ) { return; }
+
+        // rotate pkmn sprite to face player
+        direction d = direction( ( SAVE::SAV.getActiveFile( ).m_player.m_direction + 2 ) % 4 );
+        _mapSprites.setFrameD( _playerFollowPkmnSprite, d );
+
+        // play pkmn cry
+        SOUND::playCry( _followPkmnData->getSpecies( ), _followPkmnData->getForme( ) );
+
+        u8   emotion       = 0;
+        char buffer[ 200 ] = { 0 };
+
+        // first pick a random message type out of:
+        //
+        // 0 - special map location interaction (TODO)
+        // 1  - item found (TODO)
+        // 2 - general message
+        // 3 - special map tile interaction (standing on sand/water/etc) (TODO)
+        // 4 - special pkmn message
+        // 5 - hp / status condition message
+        // 6 - special type interaction (some message specific to the pkmn's type) (TODO)
+        // 7 - special weather interaction (TODO)
+        // 8 - happiness message
+        u8 msgtype = rand( ) % 9;
+
+        switch( msgtype ) {
+        case 0:
+        case 1:
+        case 2:
+        default: {
+            emotion = rand( ) % 12;
+            while( emotion == 10 ) { emotion = rand( ) % 12; } // ignore poison
+            u8 msg = rand( ) % 3;
+            snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( 3 * emotion + msg ),
+                      _followPkmnData->m_boxdata.m_name );
+            break;
+        }
+
+        case 3:
+        case 4:
+        case 5: {
+            u8 msg = 0;
+            if( _followPkmnData->m_statusint ) {
+                if( _followPkmnData->m_status.m_isPoisoned
+                    || _followPkmnData->m_status.m_isBadlyPoisoned ) {
+                    emotion = 10;
+                    msg     = 36;
+                } else if( _followPkmnData->m_status.m_isAsleep ) {
+                    emotion = 1;
+                    msg     = 37;
+                } else if( _followPkmnData->m_status.m_isBurned ) {
+                    emotion = 11;
+                    msg     = 38;
+                } else if( _followPkmnData->m_status.m_isFrozen ) {
+                    emotion = 4;
+                    msg     = 39;
+                } else if( _followPkmnData->m_status.m_isParalyzed ) {
+                    emotion = 11;
+                    msg     = 40;
+                }
+            } else {
+                if( _followPkmnData->m_stats.m_curHP * 8 < _followPkmnData->m_stats.m_maxHP ) {
+                    emotion = 11;
+                    msg     = 41;
+                } else if( _followPkmnData->m_stats.m_curHP * 4
+                           < _followPkmnData->m_stats.m_maxHP ) {
+                    emotion = 11;
+                    msg     = 42;
+                } else if( _followPkmnData->m_stats.m_curHP * 2
+                           < _followPkmnData->m_stats.m_maxHP ) {
+                    emotion = 11;
+                    msg     = 40;
+                } else if( _followPkmnData->m_stats.m_curHP * 4
+                           < _followPkmnData->m_stats.m_maxHP * 3 ) {
+                    emotion = 3;
+                    msg     = 43;
+                } else {
+                    emotion = 7;
+                    msg     = 44;
+                }
+            }
+            snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( msg ),
+                      _followPkmnData->m_boxdata.m_name );
+            break;
+        }
+
+        case 6:
+        case 7:
+        case 8: {
+            u8 msg = 0;
+            // happiness
+            if( _followPkmnData->m_boxdata.m_steps < 60 ) {
+                emotion = 8;
+                msg     = 45;
+            } else if( _followPkmnData->m_boxdata.m_steps < 120 ) {
+                emotion = 1;
+                msg     = 46;
+            } else if( _followPkmnData->m_boxdata.m_steps < 185 ) {
+                emotion = 3;
+                msg     = 47;
+            } else if( _followPkmnData->m_boxdata.m_steps < 250 ) {
+                emotion = 7;
+                msg     = 48;
+            } else {
+                emotion = 6;
+                msg     = 49;
+            }
+            snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( msg ),
+                      _followPkmnData->m_boxdata.m_name );
+            break;
+        }
+        }
+
+        if( emotion ) {
+            // Show the emotion icon
+            _mapSprites.showExclamation( _playerFollowPkmnSprite, 2 * emotion );
+            for( u8 i = 0; i < 15; ++i ) { swiWaitForVBlank( ); }
+            _mapSprites.showExclamation( _playerFollowPkmnSprite, 2 * emotion + 1 );
+            for( u8 i = 0; i < 15; ++i ) { swiWaitForVBlank( ); }
+            _mapSprites.hideExclamation( );
+        }
+
+        // print message
+        printMapMessage( buffer, style( 0 ) );
+    }
+
     void mapDrawer::interact( ) {
         u16  px = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16  py = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         u16  pz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
         auto d  = SAVE::SAV.getActiveFile( ).m_player.m_direction;
+        u16  tx = px + dir[ d ][ 0 ];
+        u16  ty = py + dir[ d ][ 1 ];
+
+        // Check for follow pkmn
+        if( _pkmnFollowsPlayer && _followPkmn.m_pos.m_posX == tx
+            && _followPkmn.m_pos.m_posY == ty ) {
+            interactFollowPkmn( );
+            return;
+        }
+
         // Check for special blocks
 
-        u16 tx     = px + dir[ d ][ 0 ];
-        u16 ty     = py + dir[ d ][ 1 ];
-        u8  behave = at( tx, ty ).m_bottombehave;
+        u8 behave = at( tx, ty ).m_bottombehave;
 
         switch( behave ) {
         case 0x83: { // PC

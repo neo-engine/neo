@@ -274,6 +274,7 @@ int main( int, char** p_argv ) {
     bool stopped = true;
     u8   bmp     = false;
     cooldown     = COOLDOWN_COUNT;
+    u8 heldcnt   = 0;
     loop( ) {
         scanKeys( );
         touchRead( &touch );
@@ -367,6 +368,12 @@ int main( int, char** p_argv ) {
             MAP::direction curDir = MAP::getDir( held );
             scanKeys( );
 
+            if( heldcnt < 5 && stopped ) {
+                if( !heldcnt ) { MAP::curMap->redirectPlayer( curDir, false ); }
+                ++heldcnt;
+                continue;
+            }
+
             stopped = false;
             if( MAP::curMap->canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, curDir,
                                       SAVE::SAV.getActiveFile( ).m_player.m_movement ) ) {
@@ -391,6 +398,7 @@ int main( int, char** p_argv ) {
             MAP::curMap->stopPlayer( );
             stopped = true;
             bmp     = false;
+            heldcnt = 0;
         }
 
         // tamatama play cry of wild pkmn

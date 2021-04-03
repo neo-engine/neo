@@ -919,7 +919,7 @@ namespace MAP {
         snprintf( buffer, 9, "EMO/%hhu", p_emote );
         IO::loadSpriteB( buffer, SPR_EXCLM_OAM, SPR_EXCLM_GFX,
                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x
-                             + ( spr.m_sprite.getData( ).m_width == 32 ? 8 : 0 ),
+                             + ( ( spr.m_sprite.getData( ).m_width - 16 ) >> 1 ),
                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y - 8, 16, 16, false,
                          false, false, OBJPRIORITY_0, false );
         update( );

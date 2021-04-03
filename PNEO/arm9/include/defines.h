@@ -62,6 +62,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define MAPSTRING_LEN   800
 #define BADGENAME_LEN   50
 #define ACHIEVEMENT_LEN 100
+#define PKMNPHRS_LEN    150
 
 #undef RAND_MAX
 #define RAND_MAX 4294967295
@@ -131,6 +132,7 @@ std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );
 
 #define GET_STRING_L( p_stringId, p_language ) STRINGS[ p_stringId ][ p_language ]
 const char* getMapString( u16 p_stringId );
+const char* getPkmnPhrase( u16 p_stringId );
 const char* getBadge( u16 p_badgeId );
 const char* getAchievement( u16 p_badgeId, u8 p_language );
 

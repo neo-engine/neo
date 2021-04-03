@@ -76,6 +76,7 @@ const char MAP_DATA_PATH[] = "nitro:/DATA/MAP_DATA/";
 
 const char STRING_PATH[]      = "nitro:/STRN/STR/";
 const char MAPSTRING_PATH[]   = "nitro:/STRN/MAP/";
+const char PKMNPHRS_PATH[]    = "nitro:/STRN/PHR/";
 const char BADGENAME_PATH[]   = "nitro:/STRN/BDG/";
 const char ACHIEVEMENT_PATH[] = "nitro:/STRN/AVM/";
 
@@ -566,6 +567,16 @@ bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language,
     fclose( f );
 
     return true;
+}
+
+const char* getPkmnPhrase( u16 p_stringId ) {
+    static char st_buffer[ PKMNPHRS_LEN + 10 ];
+
+    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    if( getString( PKMNPHRS_PATH, PKMNPHRS_LEN, p_stringId, CURRENT_LANGUAGE, st_buffer ) ) {
+        return st_buffer;
+    }
+    return "";
 }
 
 const char* getMapString( u16 p_stringId ) {
