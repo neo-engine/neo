@@ -30,6 +30,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <nds.h>
 
+#include "defines.h"
+
 #define MAP_HOENN        10
 #define MAP_METEOR_FALLS 11
 #define MAP_DESERT_RUINS 12
@@ -75,6 +77,11 @@ namespace MAP {
     constexpr u8     OW_MAP_SIZE_X    = 29 * 4;
     constexpr u8     OW_MAP_SIZE_Y    = 16 * 4;
     extern const u16 BANK_10_MAP_LOCATIONS[ OW_MAP_SIZE_Y ][ OW_MAP_SIZE_X ];
+
+    std::string parseLogCmd( const std::string& p_cmd );
+    std::string convertMapString( const std::string& p_text, style p_style );
+    void        printMapMessage( const std::string& p_text, style p_style );
+    void        printMapYNMessage( const std::string& p_text, style p_style );
 
     struct position {
         u16 m_posX; // Global

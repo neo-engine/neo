@@ -476,6 +476,14 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
         ++pos;
     }
 
+    // set pp to correct value
+    for( u8 i = 0; i < 4; ++i ) {
+        if( p_result.m_moves[ i ] ) {
+            MOVE::moveData mdata  = MOVE::getMoveData( p_result.m_moves[ i ] );
+            p_result.m_curPP[ i ] = mdata.m_pp;
+        }
+    }
+
     return true;
 }
 
@@ -605,6 +613,10 @@ void boxPokemon::hatch( ) {
     m_hatchDate[ 0 ] = SAVE::CURRENT_DATE.m_day;
     m_hatchDate[ 1 ] = SAVE::CURRENT_DATE.m_month;
     m_hatchDate[ 2 ] = SAVE::CURRENT_DATE.m_year % 100;
+
+    m_oTId  = SAVE::SAV.getActiveFile( ).m_id;
+    m_oTSid = SAVE::SAV.getActiveFile( ).m_sid;
+    strcpy( m_oT, SAVE::SAV.getActiveFile( ).m_playername );
 }
 
 bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_message,

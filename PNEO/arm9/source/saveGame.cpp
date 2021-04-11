@@ -29,14 +29,17 @@
 #include <nds.h>
 
 #include "abilityNames.h"
+#include "animations.h"
 #include "battleTrainer.h"
 #include "dex.h"
 #include "fs.h"
 #include "item.h"
 #include "itemNames.h"
+#include "mapDrawer.h"
 #include "nav.h"
 #include "saveGame.h"
 #include "screenFade.h"
+#include "sound.h"
 #include "uio.h"
 
 namespace SAVE {
@@ -569,12 +572,33 @@ namespace SAVE {
                     if( hasHatchSpdUp && ac.m_boxdata.m_steps ) ac.m_boxdata.m_steps--;
                     if( !ac.m_boxdata.m_steps ) {
                         ac.hatch( );
+                        MAP::curMap->stopPlayer( );
+                        MAP::printMapMessage( GET_MAP_STRING( 493 ), (style) 0 );
+
+                        bool anm    = ANIMATE_MAP;
+                        ANIMATE_MAP = false;
+                        IO::ANIM::hatchEgg( ac.getSpecies( ), ac.getForme( ), ac.isShiny( ),
+                                            ac.isFemale( ) );
+                        FADE_TOP_DARK( );
+                        FADE_SUB_DARK( );
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        IO::resetScale( true, false );
+                        bgUpdate( );
+
+                        ANIMATE_MAP = anm;
+                        SOUND::restoreVolume( );
+
+                        NAV::init( );
+                        MAP::curMap->draw( );
+
                         break;
                     }
-                } else
+                } else {
                     ac.m_boxdata.m_steps
                         = std::min( 255, ac.m_boxdata.m_steps + 1
                                              + ( ac.m_boxdata.m_heldItem == I_CLEAR_BELL ) );
+                }
             }
 
             // check for eggs

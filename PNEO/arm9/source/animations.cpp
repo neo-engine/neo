@@ -189,6 +189,8 @@ namespace IO::ANIM {
             = loadEggSprite( PKMN_X, PKMN_Y, 0, 0, tileCnt, false, p_endSpecies == PKMN_MANAPHY );
         tileCnt = loadPKMNSprite( p_endSpecies, PKMN_X, PKMN_Y, 4, 1, tileCnt, false, p_shiny,
                                   p_female, false, false, p_endForme );
+        SOUND::playBGM( MOD_EVOLVING );
+
         setFrameVis( 1, true );
         updateOAM( false );
 
@@ -205,6 +207,7 @@ namespace IO::ANIM {
                 for( u8 j = slowfactor * i; j < slowfactor * 8; ++j ) { swiWaitForVBlank( ); }
             }
         }
+        SOUND::playBGMOneshot( MOD_OS_EVOLVED );
         char buffer[ 200 ];
         clearScreen( true, true, true );
         snprintf( buffer, 200, GET_STRING( 389 ), getDisplayName( p_endSpecies ).c_str( ) );
@@ -212,7 +215,10 @@ namespace IO::ANIM {
         setFrameVis( 0, true );
         setFrameVis( 1, false );
         updateOAM( false );
+        for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
         waitForInteract( );
+        SOUND::restartBGM( );
+        SAVE::SAV.getActiveFile( ).registerCaughtPkmn( p_endSpecies );
     }
 
     void openingAnimation( ) {

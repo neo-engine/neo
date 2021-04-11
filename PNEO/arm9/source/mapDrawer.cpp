@@ -2495,13 +2495,12 @@ namespace MAP {
         }
 
         clearFieldAnimation( gx, gy );
+        SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
     void mapDrawer::updatePlayer( ) {
         SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX = _cx;
         SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY = _cy;
-
-        SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
     void mapDrawer::sitDownPlayer( direction p_direction, moveMode p_newMoveMode ) {
@@ -2576,6 +2575,7 @@ namespace MAP {
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
     /*
@@ -2796,6 +2796,7 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
 
+        SAVE::SAV.getActiveFile( ).stepIncrease( );
         _mapSprites.reorderSprites( true );
     }
 
@@ -2819,6 +2820,7 @@ namespace MAP {
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
     void mapDrawer::jumpPlayer( direction p_direction ) {
@@ -2875,6 +2877,7 @@ namespace MAP {
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
     void mapDrawer::stopPlayer( ) {
