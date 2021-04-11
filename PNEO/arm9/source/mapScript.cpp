@@ -34,8 +34,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "choiceBox.h"
 #include "defines.h"
 #include "fs.h"
+#include "locationNames.h"
 #include "mapDrawer.h"
 #include "nav.h"
+#include "partyScreen.h"
 #include "saveGame.h"
 #include "screenFade.h"
 #include "sound.h"
@@ -69,6 +71,8 @@ namespace MAP {
     // 9 award badge (p1: region, p2: badge)
     // 10 run choice box
     // 11 getCurrentDaytime( )
+    // 12 pkmn day care (par: # of day care) (take/hand over pkmn)
+    // 13 pkmn day care (obtain egg)
 
     enum opCode : u8 {
         EOP = 0,  // end of program
@@ -258,7 +262,8 @@ namespace MAP {
         u16              choiceBoxMessage = 0;
         u8               choiceBoxMsgType = 0;
 
-        u16 registers[ 10 ] = { 0 };
+        char buffer[ 200 ]   = { 0 };
+        u16  registers[ 10 ] = { 0 };
 
         u8   pmartCurr = 0;
         bool martSell  = true;
@@ -828,7 +833,7 @@ namespace MAP {
                     break;
                 }
                 case 3: {
-                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).getBadgeCount( par1 );
+                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).getBadgeCount( par2 );
                     break;
                 }
                 case 4: {
@@ -836,14 +841,14 @@ namespace MAP {
                     break;
                 }
                 case 5: {
-                    if( par1 <= 4 ) [[likely]] {
-                        par1++;
-                        registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par1 - 1 ];
+                    if( par2 <= 4 ) [[likely]] {
+                        par2++;
+                        registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par2 - 1 ];
                     } else {
                         registers[ 0 ] = 0;
                         break;
                     }
-                    for( u8 i = par1; i < SAVE::SAV.getActiveFile( ).m_initGameItemCount; ++i ) {
+                    for( u8 i = par2; i < SAVE::SAV.getActiveFile( ).m_initGameItemCount; ++i ) {
                         if( i < 4 ) [[likely]] {
                             SAVE::SAV.getActiveFile( ).m_initGameItems[ i ]
                                 = SAVE::SAV.getActiveFile( ).m_initGameItems[ i + 1 ];
@@ -881,6 +886,321 @@ namespace MAP {
                 }
                 case 11: { // get current time
                     registers[ 0 ] = getCurrentDaytime( );
+                    break;
+                }
+                case 12: {
+                    // day care baa san
+                    boxPokemon* dc1 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 ];
+                    boxPokemon* dc2 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 + 1 ];
+                    boxPokemon* dce = &SAVE::SAV.getActiveFile( ).m_dayCareEgg[ par2 ];
+
+                    u8* dcl1 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ par2 * 2 ];
+                    u8* dcl2 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ par2 * 2 + 1 ];
+
+                    if( dce->getSpecies( ) ) {
+                        // an egg spawned, redirect to jii san
+                        printMapMessage( GET_MAP_STRING( 476 ), (style) 0 );
+                        break;
+                    }
+
+                    if( !dc1->getSpecies( ) && dc2->getSpecies( ) ) {
+                        std::swap( *dc1, *dc2 );
+                        std::swap( *dcl1, *dcl2 );
+                    }
+
+                    u8 depositpkmn = false;
+
+                    if( !dc1->getSpecies( ) ) {
+                        // no pkmn deposited, ask if player wants to deposit a pkmn
+                        if( IO::yesNoBox::YES
+                            == IO::yesNoBox( ).getResult(
+                                convertMapString( GET_MAP_STRING( 477 ), (style) 0 ).c_str( ),
+                                (style) 0 ) ) {
+                            NAV::init( );
+                            depositpkmn = true;
+                        } else {
+                            NAV::init( );
+                            printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
+                            break;
+                        }
+                    } else {
+                        snprintf( buffer, 199, GET_MAP_STRING( 479 ), dc1->m_name );
+                        printMapMessage( buffer, (style) 0 );
+
+                        if( !dc2->getSpecies( ) ) {
+                            // ask if player wants to deposit a second pkmn
+                            if( IO::yesNoBox::YES
+                                == IO::yesNoBox( ).getResult(
+                                    convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
+                                    (style) 0 ) ) {
+                                NAV::init( );
+                                depositpkmn = 2;
+                            } else {
+                                NAV::init( );
+                            }
+                        }
+
+                        if( !depositpkmn ) {
+                            // ask if he player wants to take a pkmn back
+                            printMapMessage( GET_MAP_STRING( 483 ), MSG_NOCLOSE );
+                            loop( ) {
+                                u8 takeback = NAV::chooseDaycarePkmn( par2 );
+                                NAV::init( );
+
+                                if( takeback > 1 ) {
+                                    // player doesn't want to get pkmn back
+                                    printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
+                                    break;
+                                }
+
+                                // check if there is space in the player's team
+                                if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) >= 6 ) {
+                                    printMapMessage( GET_MAP_STRING( 487 ), (style) 0 );
+                                    break;
+                                }
+
+                                pokemon pk   = pokemon( dc1[ takeback ] );
+                                u32     cost = ( pk.m_level - dcl1[ takeback ] + 1 ) * 100;
+                                snprintf( buffer, 199, GET_MAP_STRING( 488 ),
+                                          dc1[ takeback ].m_name, cost );
+
+                                if( IO::yesNoBox::YES
+                                    == IO::yesNoBox( ).getResult(
+                                        convertMapString( buffer, (style) 0 ).c_str( ),
+                                        (style) 0 ) ) {
+                                    NAV::init( );
+                                    // check if the player has enough money
+                                    if( SAVE::SAV.getActiveFile( ).m_money >= cost ) {
+                                        SAVE::SAV.getActiveFile( ).m_money -= cost;
+                                        snprintf( buffer, 199, GET_MAP_STRING( 490 ),
+                                                  dc1[ takeback ].m_name );
+                                        printMapMessage( buffer, (style) 0 );
+
+                                        snprintf( buffer, 199, GET_MAP_STRING( 491 ),
+                                                  dc1[ takeback ].m_name );
+                                        printMapMessage( buffer, (style) 1 );
+
+                                        SAVE::SAV.getActiveFile( ).setTeamPkmn(
+                                            SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &pk );
+
+                                        dc1[ takeback ]  = boxPokemon( );
+                                        dcl1[ takeback ] = 0;
+
+                                        if( !takeback ) {
+                                            std::swap( *dc1, *dc2 );
+                                            std::swap( *dcl1, *dcl2 );
+                                        }
+
+                                        // check if the player wants to take back the other
+                                        // pkmn as well
+                                        if( dc1->getSpecies( ) ) {
+                                            printMapMessage( GET_MAP_STRING( 492 ), MSG_NOCLOSE );
+                                            continue;
+                                        }
+                                        printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                                        break;
+                                    } else {
+                                        printMapMessage( GET_MAP_STRING( 489 ), (style) 0 );
+                                        break;
+                                    }
+                                } else {
+                                    NAV::init( );
+                                    printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    while( depositpkmn && depositpkmn <= 2 ) {
+                        // check if the player has at least 2 pkmn
+
+                        u8 plyerpkmncnt = 0;
+                        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+                            if( !SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->isEgg( ) ) {
+                                plyerpkmncnt++;
+                            }
+                        }
+
+                        if( plyerpkmncnt < 2 ) {
+                            // player has only 1 pkmn
+                            printMapMessage( GET_MAP_STRING( 484 ), (style) 0 );
+                            break;
+                        }
+
+                        // make player select a pkmn
+                        printMapMessage( GET_MAP_STRING( 481 ), (style) 0 );
+
+                        ANIMATE_MAP = false;
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        bgUpdate( );
+
+                        STS::partyScreen sts
+                            = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
+                                                false, false, false, 1, true, true, false );
+
+                        SOUND::dimVolume( );
+
+                        auto res = sts.run( );
+
+                        FADE_TOP_DARK( );
+                        FADE_SUB_DARK( );
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        IO::resetScale( true, false );
+                        bgUpdate( );
+
+                        ANIMATE_MAP = true;
+                        SOUND::restoreVolume( );
+
+                        NAV::init( );
+                        MAP::curMap->draw( );
+
+                        // check if the player has another pkmn that can battle
+
+                        u8 selpkmn = res.getSelectedPkmn( );
+
+                        if( selpkmn >= SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+                            // player aborted
+                            printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                            break;
+                        }
+
+                        plyerpkmncnt = 0;
+                        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+                            if( i == selpkmn ) { continue; }
+                            if( SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->canBattle( ) ) {
+                                plyerpkmncnt++;
+                            }
+                        }
+
+                        if( !plyerpkmncnt ) {
+                            // no remaining pkmn
+                            printMapMessage( GET_MAP_STRING( 485 ), (style) 0 );
+                            break;
+                        }
+
+                        // actually deposit the pkmn
+
+                        if( SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn ) != nullptr )
+                            [[likely]] {
+                            dc1[ depositpkmn - 1 ]
+                                = SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn )->m_boxdata;
+                            dcl1[ depositpkmn - 1 ]
+                                = SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn )->m_level;
+                            SAVE::SAV.getActiveFile( ).setTeamPkmn( selpkmn,
+                                                                    (boxPokemon*) nullptr );
+                            SAVE::SAV.getActiveFile( ).consolidatePkmn( );
+
+                            snprintf( buffer, 199, GET_MAP_STRING( 486 ),
+                                      dc1[ depositpkmn - 1 ].m_name );
+                            printMapMessage( buffer, (style) 0 );
+                        } else {
+                            break;
+                        }
+
+                        if( depositpkmn < 2 ) {
+                            // ask if player wants to deposit a second pkmn
+                            if( IO::yesNoBox::YES
+                                == IO::yesNoBox( ).getResult(
+                                    convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
+                                    (style) 0 ) ) {
+                                NAV::init( );
+                                depositpkmn = 2;
+                            } else {
+                                NAV::init( );
+                                printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+                case 13: {
+                    // day care jii san
+
+                    boxPokemon* dc1 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 ];
+                    boxPokemon* dc2 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 + 1 ];
+                    boxPokemon* dce = &SAVE::SAV.getActiveFile( ).m_dayCareEgg[ par2 ];
+
+                    u8* dcl1 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ par2 * 2 ];
+                    u8* dcl2 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ par2 * 2 + 1 ];
+
+                    if( dce->getSpecies( ) ) {
+                        // an egg spawned
+                        // ask player if they want to obtain the egg
+                        if( IO::yesNoBox::NO
+                            == IO::yesNoBox( ).getResult(
+                                convertMapString( GET_MAP_STRING( 464 ), (style) 0 ).c_str( ),
+                                (style) 0 ) ) {
+                            NAV::init( );
+                            // ask if they really don't want the egg
+                            if( IO::yesNoBox::YES
+                                == IO::yesNoBox( ).getResult(
+                                    convertMapString( GET_MAP_STRING( 465 ), (style) 0 ).c_str( ),
+                                    (style) 0 ) ) {
+                                NAV::init( );
+                                // throw away the egg
+                                *dce = boxPokemon( );
+                                SAVE::SAV.getActiveFile( ).setFlag(
+                                    SAVE::F_HOENN_DAYCARE_EGG + par2, false );
+                                printMapMessage( GET_MAP_STRING( 466 ), (style) 0 );
+                                break;
+                            }
+                        }
+                        NAV::init( );
+                        // hand egg to player
+
+                        // check if they have space for an egg
+                        auto teampkmncnt = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
+                        if( teampkmncnt >= 6 ) {
+                            // player has no space left
+                            printMapMessage( GET_MAP_STRING( 473 ), (style) 0 );
+                            break;
+                        }
+
+                        SOUND::playSoundEffect( SFX_OBTAIN_EGG );
+                        printMapMessage( GET_MAP_STRING( 474 ), (style) 1 );
+                        printMapMessage( GET_MAP_STRING( 475 ), (style) 0 );
+
+                        dce->m_gotPlace = L_DAY_CARE_COUPLE;
+
+                        SAVE::SAV.getActiveFile( ).setTeamPkmn( teampkmncnt, dce );
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_HOENN_DAYCARE_EGG + par2,
+                                                            false );
+                        *dce = boxPokemon( );
+                    } else {
+                        // no egg
+                        if( !dc1->getSpecies( ) && dc2->getSpecies( ) ) {
+                            std::swap( *dc1, *dc2 );
+                            std::swap( *dcl1, *dcl2 );
+                        }
+
+                        if( !dc1->getSpecies( ) ) {
+                            printMapMessage( GET_MAP_STRING( 463 ), (style) 0 );
+                            break;
+                        } else {
+                            if( !dc2->getSpecies( ) ) {
+                                snprintf( buffer, 199, GET_MAP_STRING( 467 ), dc1->m_name );
+                                printMapMessage( buffer, (style) 0 );
+                            } else {
+                                snprintf( buffer, 199, GET_MAP_STRING( 468 ), dc1->m_name,
+                                          dc2->m_name );
+                                printMapMessage( buffer, (style) 0 );
+
+                                u8 comp = dc1->getCompatibility( *dc2 );
+                                printMapMessage( GET_MAP_STRING( 469 + comp ), (style) 0 );
+                            }
+                            break;
+                        }
+                    }
+
                     break;
                 }
                 default: break;
@@ -927,7 +1247,7 @@ namespace MAP {
         // 1  - item found (TODO)
         // 2 - general message
         // 3 - special map tile interaction (standing on sand/water/etc) (TODO)
-        // 4 - special pkmn message
+        // 4 - special pkmn message (TODO)
         // 5 - hp / status condition message
         // 6 - special type interaction (some message specific to the pkmn's type) (TODO)
         // 7 - special weather interaction (TODO)

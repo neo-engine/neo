@@ -843,13 +843,26 @@ namespace MAP {
             || ( dir[ p_direction ][ 0 ] == -1 && _cx % 32 == 31 )
             || ( dir[ p_direction ][ 1 ] == 1 && _cy % 32 == 0 )
             || ( dir[ p_direction ][ 1 ] == -1 && _cy % 32 == 31 ) ) {
+
+            u8 oldts1 = CUR_SLICE.m_tIdx1;
+            u8 oldts2 = CUR_SLICE.m_tIdx2;
+
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             // Update tileset, block and palette data
+
+            u8 newts1 = CUR_SLICE.m_tIdx1;
+            u8 newts2 = CUR_SLICE.m_tIdx2;
+
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
             ANIMATE_MAP = false;
-            dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
+            if( oldts1 != newts1 && oldts2 != newts2 ) {
+                dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
+            } else if( oldts2 != newts2 ) {
+                dmaCopy( &CUR_SLICE.m_tileSet.m_tiles[ MAX_TILES_PER_TILE_SET ],
+                         &tileMemory[ MAX_TILES_PER_TILE_SET * 32 ], MAX_TILES_PER_TILE_SET * 32 );
+            }
 
             // for palettes, the unchanged day-time pal comes first
             u8 currDT = ( getCurrentDaytime( ) + 3 ) % 5;

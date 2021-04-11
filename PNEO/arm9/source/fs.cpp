@@ -773,13 +773,10 @@ bool getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_
 }
 
 u16  LEARNSET_BUFFER[ 700 ];
-void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, u16* p_result ) {
-    FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
-    if( !f ) f = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
-    if( !f ) return;
-
-    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
-    FS::close( f );
+void getLearnMoves( u16 p_pkmnId, u8 p_forme, u16 p_fromLevel, u16 p_toLevel, u16 p_amount,
+                    u16* p_result ) {
+    auto learnset = getLearnset( p_pkmnId, p_forme );
+    if( !learnset ) { return; }
     u16 ptr = 0;
 
     for( u8 i = 0; i < p_amount; ++i ) p_result[ i ] = 0;
@@ -787,9 +784,9 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, 
 
     std::vector<u16> reses;
     for( u16 i = 0; i <= p_toLevel; ++i ) {
-        while( i == LEARNSET_BUFFER[ ptr ] ) {
+        while( i == learnset[ ptr ] ) {
             if( i >= p_fromLevel ) {
-                reses.push_back( LEARNSET_BUFFER[ ++ptr ] );
+                reses.push_back( learnset[ ++ptr ] );
             } else {
                 ++ptr;
             }
@@ -809,19 +806,36 @@ void getLearnMoves( u16 p_pkmnId, u16 p_fromLevel, u16 p_toLevel, u16 p_amount, 
     return;
 }
 
-bool canLearn( u16 p_pkmnId, u16 p_moveId, u16 p_maxLevel ) {
-    FILE* f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
-    if( !f ) return false;
+bool canLearn( const u16* p_learnset, u16 p_moveId, u16 p_maxLevel, u16 p_minLevel ) {
+    if( !p_learnset ) { return false; }
 
-    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
-    FS::close( f );
     u16 ptr = 0;
-
     for( u16 i = 0; i <= p_maxLevel; ++i ) {
-        while( i == LEARNSET_BUFFER[ ptr ] ) {
-            if( p_moveId == LEARNSET_BUFFER[ ++ptr ] ) { return true; }
+        while( i == p_learnset[ ptr ] ) {
+            if( p_moveId == p_learnset[ ++ptr ] && i >= p_minLevel ) { return true; }
             ptr++;
         }
     }
     return false;
+}
+
+bool canLearn( u16 p_pkmnId, u8 p_forme, u16 p_moveId, u16 p_maxLevel, u16 p_minLevel ) {
+    return canLearn( getLearnset( p_pkmnId, p_forme ), p_moveId, p_maxLevel, p_minLevel );
+}
+
+const u16* getLearnset( u16 p_pkmnId, u8 p_forme ) {
+    FILE* f = nullptr;
+    if( !p_forme ) {
+        f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
+    } else {
+        char tmpbuf[ 40 ];
+        snprintf( tmpbuf, 35, "_%hhu.learnset.data", p_forme );
+        f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, tmpbuf );
+    }
+    if( !f ) f = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
+    if( !f ) return nullptr;
+    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
+    FS::close( f );
+
+    return LEARNSET_BUFFER;
 }

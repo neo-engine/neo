@@ -1253,8 +1253,9 @@ namespace BATTLE {
             if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
                 // pkmn was elevated to a new level, check for new moves
 
-                getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerPkmnOrigLevel[ i ] + 1,
-                               _playerTeam[ i ].m_level, 20, MOVE_BUFFER );
+                getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerTeam[ i ].getForme( ),
+                               _playerPkmnOrigLevel[ i ] + 1, _playerTeam[ i ].m_level, 20,
+                               MOVE_BUFFER );
 
                 for( u8 j = 0; j < 20; ++j ) {
                     if( !MOVE_BUFFER[ j ] ) { break; }

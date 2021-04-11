@@ -34,8 +34,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 
 pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
-    pkmnData data       = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
-    m_level             = calcLevel( p_boxPokemon, &data );
+    pkmnData data = getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
+    m_level       = calcLevel( p_boxPokemon, &data );
+    if( m_level == 100 ) { m_boxdata.m_experienceGained = EXP[ 99 ][ data.getExpType( ) ]; }
     m_stats             = calcStats( m_boxdata, m_level, &data );
     m_battleForme       = 0;
     m_battleTimeAbility = 0;
@@ -446,19 +447,19 @@ u8 pokemon::canEvolve( u16 p_item, evolutionMethod p_method, pkmnEvolveData* p_e
                 if( m_level < 30 ) { break; }
 
                 switch( getNature( ) ) {
-                case HARDY:
-                case BRAVE:
-                case ADAMANT:
-                case NAUGHY:
-                case DOCILE:
-                case IMPISH:
-                case LAX:
-                case HASTY:
-                case JOLLY:
-                case NAIVE:
-                case RASH:
-                case SASSY:
-                case QUIRKY:
+                case NATURE_HARDY:
+                case NATURE_BRAVE:
+                case NATURE_ADAMANT:
+                case NATURE_NAUGHY:
+                case NATURE_DOCILE:
+                case NATURE_IMPISH:
+                case NATURE_LAX:
+                case NATURE_HASTY:
+                case NATURE_JOLLY:
+                case NATURE_NAIVE:
+                case NATURE_RASH:
+                case NATURE_SASSY:
+                case NATURE_QUIRKY:
                     if( cur.m_targetForme == 0 ) { return i + 1; }
                     break;
                 default:

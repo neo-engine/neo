@@ -55,11 +55,14 @@ namespace SAVE {
     // #endif
     constexpr u8 BERRY_SLOTS = 150;
 
-    constexpr u16 F_MEGA_EVOLUTION   = 1;
-    constexpr u16 F_NAV_OBTAINED     = 2;
-    constexpr u16 F_DEX_OBTAINED     = 3;
-    constexpr u16 F_NAT_DEX_OBTAINED = 4;
-    constexpr u16 F_RIVAL_APPEARANCE = 5; // set if rival has appearance 1
+    constexpr u16 F_MEGA_EVOLUTION    = 1;
+    constexpr u16 F_NAV_OBTAINED      = 2;
+    constexpr u16 F_DEX_OBTAINED      = 3;
+    constexpr u16 F_NAT_DEX_OBTAINED  = 4;
+    constexpr u16 F_RIVAL_APPEARANCE  = 5; // set if rival has appearance 1
+    constexpr u16 F_HOENN_DAYCARE_EGG = 190;
+    constexpr u16 F_SCND_DAYCARE_EGG  = 191;
+    constexpr u16 F_THRD_DAYCARE_EGG  = 192;
 
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;
@@ -179,16 +182,17 @@ namespace SAVE {
             u16 m_initGameItemCount = 0; // Items accessible during begin game PC check
             u16 m_initGameItems[ 5 ];
 
-            u8  m_objectAttached    = 0; // true if there is a mapobject following the player
-            u8  m_mapObjAttachedIdx = 0; // idx of the map object following the player
-            u16 m_reserved2;
+            u8 m_objectAttached    = 0; // true if there is a mapobject following the player
+            u8 m_mapObjAttachedIdx = 0; // idx of the map object following the player
 
-            u32 m_reserved[ 59 ] = { 0 }; // reserved for future things that need to be stored
+            u8 m_dayCareDepositLevel[ 6 ] = { 0 }; // level of pkmn in day care when deposited
+
+            u32 m_reserved[ 58 ] = { 0 }; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 
-            boxPokemon m_dayCarePkmn[ 6 ]; // currently unused
-            boxPokemon m_dayCareEgg[ 3 ];  // currently unused
+            boxPokemon m_dayCarePkmn[ 6 ] = { boxPokemon( ) };
+            boxPokemon m_dayCareEgg[ 3 ]  = { boxPokemon( ) };
 
             BOX::box m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
 

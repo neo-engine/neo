@@ -170,6 +170,13 @@ namespace NAV {
 
     void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod );
 
+    /*
+     * @brief: Make the player select a pkmn from the (up to 2) currently stored in
+     * daycare p_daycare. Also lists some basic stats and how many levels the pkmn have
+     * grown.
+     */
+    u8 chooseDaycarePkmn( u8 p_daycare );
+
     void showNewLocation( u16 p_newLocation );
     void hideLocation( u8 p_remTime = 0 );
 } // namespace NAV

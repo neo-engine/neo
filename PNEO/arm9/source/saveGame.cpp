@@ -544,6 +544,12 @@ namespace SAVE {
             m_repelSteps--;
             if( !m_repelSteps ) { NAV::printMessage( GET_STRING( 4 ) ); }
         }
+
+        // add exp to day care pkmn
+        for( u8 i = 0; i < 6; ++i ) {
+            if( m_dayCarePkmn[ i ].getSpecies( ) ) { m_dayCarePkmn[ i ].gainExperience( 1 ); }
+        }
+
         if( !m_stepCount ) {
             bool hasHatchSpdUp
                 = m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_OVAL_CHARM );
@@ -569,6 +575,32 @@ namespace SAVE {
                     ac.m_boxdata.m_steps
                         = std::min( 255, ac.m_boxdata.m_steps + 1
                                              + ( ac.m_boxdata.m_heldItem == I_CLEAR_BELL ) );
+            }
+
+            // check for eggs
+            for( u8 i = 0; i < 3; ++i ) {
+                if( m_dayCareEgg[ i ].getSpecies( ) ) {
+                    // egg already exists
+                    continue;
+                }
+                if( !m_dayCarePkmn[ 2 * i ].getSpecies( )
+                    || !m_dayCarePkmn[ 2 * i + 1 ].getSpecies( ) ) { // not enough pkmn to breed
+                    continue;
+                }
+                // check compatibility
+                u32 comp = m_dayCarePkmn[ 2 * i ].getCompatibility( m_dayCarePkmn[ 2 * i + 1 ] );
+                comp *= 20;
+
+                // check for egg charm
+                if( m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_OVAL_CHARM ) ) {
+                    comp = ( comp / 2 ) * 3;
+                }
+
+                if( u32( rand( ) % 100 ) < comp ) {
+                    // create egg
+                    m_dayCarePkmn[ 2 * i ].breed( m_dayCarePkmn[ 2 * i + 1 ], m_dayCareEgg[ i ] );
+                    setFlag( F_HOENN_DAYCARE_EGG + i, 1 );
+                }
             }
         }
     }

@@ -1661,6 +1661,122 @@ namespace NAV {
         return res;
     }
 
+    std::vector<std::pair<IO::inputTarget, u8>> drawDaycareChoice( u8 p_daycare ) {
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        boxPokemon* dcstart  = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 ];
+        u8*         dclstart = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ p_daycare * 2 ];
+
+        FADE_SUB_DARK( );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
+
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 471 ), SAVE::SAV.getActiveFile( ).m_money );
+        IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
+
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        oam[ SPR_X_OAM_SUB ].isHidden = false;
+
+        for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
+        for( u8 i = 0; i < 6; ++i ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
+            }
+            oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
+        }
+
+        for( u8 i = 0; i < 2; ++i ) {
+            for( u8 j = 0; j < 8; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+
+                if( i & 1 ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].x = 130 + 15 * j;
+                } else {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].x = 6 + 15 * j;
+                }
+            }
+
+            if( dcstart[ i ].getSpecies( ) ) {
+                // load pkmn icon
+                IO::loadPKMNIcon(
+                    dcstart[ i ].getSpecies( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y, SPR_ITEM_OAM_SUB( i ),
+                    SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true,
+                    dcstart[ i ].getForme( ), dcstart[ i ].isShiny( ), dcstart[ i ].isFemale( ) );
+
+                // pkmn nick name
+                if( IO::regularFont->stringWidthC( dcstart[ i ].m_name ) <= 85 ) {
+                    IO::regularFont->printStringC(
+                        dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
+                        oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::CENTER );
+                } else {
+                    IO::regularFont->printStringC(
+                        dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 112,
+                        oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::RIGHT );
+                }
+                res.push_back(
+                    std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 120,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                               i ) );
+            } else {
+                res.push_back(
+                    std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 120,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                               IO::choiceBox::DISABLED_CHOICE ) );
+            }
+        }
+
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::EXIT_CHOICE ) );
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                       IO::choiceBox::BACK_CHOICE ) );
+
+        IO::updateOAM( true );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = TRANSPARENCY_COEFF;
+        IO::fadeScreen( IO::fadeType::UNFADE, true, false );
+        bgUpdate( );
+        return res;
+    }
+
+    void selectDaycarePkmn( u8 p_daycare, u8 p_selection ) {
+        boxPokemon* dcstart = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 ];
+        if( p_selection == IO::choiceBox::EXIT_CHOICE
+            || p_selection == IO::choiceBox::BACK_CHOICE ) {
+            // empty!
+        } else {
+            if( p_selection < 2 && dcstart[ p_selection ].getSpecies( ) ) {
+                selectMenuItem( p_selection );
+            }
+        }
+    }
+
+    u8 chooseDaycarePkmn( u8 p_daycare ) {
+        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        return cb.getResult(
+            [ & ]( u8 ) { return drawDaycareChoice( p_daycare ); },
+            [ & ]( u8 p_selection ) { selectDaycarePkmn( p_daycare, p_selection ); } );
+    }
+
     void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod ) {
         std::vector<std::string>    names = std::vector<std::string>( );
         std::vector<std::string>    descr = std::vector<std::string>( );
@@ -1918,7 +2034,10 @@ namespace NAV {
             }
             case 4: {
                 // SPX::runInitialPkmnSelection( );
-                SPX::runCatchingTutorial( );
+                // SPX::runCatchingTutorial( );
+                init( );
+                chooseDaycarePkmn( 0 );
+                init( );
                 break;
             }
             case 5: {

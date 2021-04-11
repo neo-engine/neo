@@ -487,7 +487,8 @@ namespace BAG {
                         IO::regularFont->setColor( 0, 2 );
                         IO::regularFont->printStringC( GET_STRING( 35 ), 45, SECOND_LINE, true,
                                                        IO::font::LEFT, 11 );
-                    } else if( canLearn( _playerTeam[ i ].getSpecies( ), currMv, LEARN_TM ) ) {
+                    } else if( canLearn( _playerTeam[ i ].getSpecies( ),
+                                         _playerTeam[ i ].getForme( ), currMv, LEARN_TM ) ) {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );

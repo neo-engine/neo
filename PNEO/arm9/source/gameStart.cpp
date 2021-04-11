@@ -30,7 +30,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "choiceBox.h"
 #include "defines.h"
 #include "fs.h"
-#include "gen3Parser.h"
 #include "itemNames.h"
 #include "keyboard.h"
 #include "nav.h"
