@@ -227,11 +227,11 @@ namespace SOUND {
         case L_ROUTE_107:
         case L_ROUTE_108:
         case L_ROUTE_109: return MOD_ROUTE_104;
+        case L_ROUTE_117:
         case L_ROUTE_110:
         case L_ROUTE_111:
         case L_ROUTE_112: return MOD_ROUTE_110;
         case L_ROUTE_113: return MOD_ROUTE_113;
-        case L_ROUTE_117:
         case L_ROUTE_118:
         case L_ROUTE_119: return MOD_ROUTE_119;
         case L_ROUTE_120:

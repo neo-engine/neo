@@ -1675,6 +1675,11 @@ namespace NAV {
         BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
         BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
         BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::RGB( 18, 22, 31 );
+        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RGB( 31, 18, 18 );
+        BG_PALETTE_SUB[ IO::BLUE2_IDX ] = IO::RGB( 0, 0, 25 );
+        BG_PALETTE_SUB[ IO::RED2_IDX ]  = IO::RGB( 23, 0, 0 );
+
         IO::regularFont->setColor( 0, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -1696,6 +1701,22 @@ namespace NAV {
             oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
         }
 
+        // compatibility hearts
+        u8 comp = 0;
+        if( dcstart[ 1 ].getSpecies( ) ) { comp = dcstart[ 0 ].getCompatibility( dcstart[ 1 ] ); }
+
+        IO::regularFont->setColor( 0, 2 );
+        for( u8 i = 0; i < 3; ++i ) {
+            if( i < comp ) {
+                IO::regularFont->setColor( IO::RED2_IDX, 1 );
+            } else {
+                IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+            }
+            IO::regularFont->printStringC( "\x01", 127 - 16 + 16 * i, 16, true, IO::font::CENTER );
+        }
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
         for( u8 i = 0; i < 2; ++i ) {
             for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
@@ -1716,15 +1737,96 @@ namespace NAV {
                     dcstart[ i ].getForme( ), dcstart[ i ].isShiny( ), dcstart[ i ].isFemale( ) );
 
                 // pkmn nick name
-                if( IO::regularFont->stringWidthC( dcstart[ i ].m_name ) <= 85 ) {
+                auto strwd = IO::regularFont->stringWidthC( dcstart[ i ].m_name );
+                u16  posx  = 0;
+                if( strwd <= 85 ) {
                     IO::regularFont->printStringC(
                         dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
                         oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::CENTER );
+                    posx = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70 + strwd / 2 + 2;
                 } else {
                     IO::regularFont->printStringC(
-                        dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 112,
+                        dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 102,
                         oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::RIGHT );
+                    posx = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 104;
                 }
+
+                if( dcstart[ i ].getSpecies( ) != PKMN_NIDORAN_F
+                    && dcstart[ i ].getSpecies( ) != PKMN_NIDORAN_M ) {
+                    if( dcstart[ i ].isFemale( ) ) {
+                        IO::regularFont->setColor( IO::RED_IDX, 1 );
+                        IO::regularFont->setColor( IO::RED2_IDX, 2 );
+                        IO::regularFont->printString(
+                            "}", posx, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true );
+                        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                    } else if( !dcstart[ i ].m_isGenderless ) {
+                        IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
+                        IO::regularFont->printString(
+                            "{", posx, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true );
+                        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                    }
+                }
+
+                IO::regularFont->setColor( 0, 2 );
+
+                // level
+                pkmnData data = getPkmnData( dcstart[ i ].getSpecies( ), dcstart[ i ].getForme( ) );
+                u8       lv = calcLevel( dcstart[ i ], &data ), oldlv = dclstart[ i ];
+
+                if( lv - oldlv > 0 ) {
+                    snprintf( buffer, 95, "Lv.%hhu (+%hu)", lv, lv - oldlv );
+                } else {
+                    snprintf( buffer, 95, "Lv.%hhu", lv );
+                }
+                IO::regularFont->printStringC( buffer, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
+                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 16, true,
+                                               IO::font::CENTER );
+
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+                // iv
+                for( u8 j = 0; j < 6; ++j ) {
+                    snprintf( buffer, 49, "%hu", dcstart[ i ].IVget( j ) );
+
+                    if( j && NatMod[ u8( dcstart[ i ].getNature( ) ) ][ j - 1 ] == 9 ) {
+                        IO::regularFont->setColor( IO::BLUE_IDX, 2 );
+                    } else if( j && NatMod[ u8( dcstart[ i ].getNature( ) ) ][ j - 1 ] == 11 ) {
+                        IO::regularFont->setColor( IO::RED_IDX, 2 );
+                    } else {
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                    }
+                    IO::regularFont->printStringC(
+                        buffer, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 36 + 40 * ( j % 3 ),
+                        142 + ( 14 * ( j / 3 ) ), true, IO::font::RIGHT );
+                    IO::regularFont->printStringC( GET_STRING( 684 + j ),
+                                                   oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 4
+                                                       + 40 * ( j % 3 ),
+                                                   142 + ( 14 * ( j / 3 ) ), true, IO::font::LEFT );
+
+                    //    writeLineTop( GET_STRING( 127 + i ), "", i + 1 );
+                }
+
+                // moves
+
+                for( u8 j = 0; j < 4; ++j ) {
+                    if( dcstart[ i ].getMove( j ) ) {
+                        auto mname = MOVE::getMoveName( dcstart[ i ].getMove( j ) );
+                        if( mname.length( ) > 18 ) {
+                            snprintf( buffer, 20, "%s.", mname.c_str( ) );
+                        } else {
+                            snprintf( buffer, 20, "%s", mname.c_str( ) );
+                        }
+                    } else {
+                        snprintf( buffer, 20, GET_STRING( 690 ) );
+                    }
+                    IO::regularFont->printStringC(
+                        buffer, 64 + 128 * i, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 36 + 14 * j,
+                        true, IO::font::CENTER );
+                }
+
                 res.push_back(
                     std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
                                                 oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,

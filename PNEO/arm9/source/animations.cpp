@@ -47,6 +47,16 @@ namespace IO::ANIM {
     }
 
     /*
+     * @brief: Moves pkmn sprites.
+     */
+    void moveFrame( u8 p_frame, s16 p_dx, s16 p_dy ) {
+        for( u8 i = 0; i < 4; ++i ) {
+            OamTop->oamBuffer[ 4 * p_frame + i ].x += p_dx;
+            OamTop->oamBuffer[ 4 * p_frame + i ].y += p_dy;
+        }
+    }
+
+    /*
      * @brief: Waits until the player presses either A or B.
      */
     void waitForInteract( ) {
@@ -184,6 +194,7 @@ namespace IO::ANIM {
         initOAMTable( true );
         // Load both sprites
 
+        fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         u16 tileCnt = 0;
         tileCnt
             = loadEggSprite( PKMN_X, PKMN_Y, 0, 0, tileCnt, false, p_endSpecies == PKMN_MANAPHY );
@@ -193,20 +204,30 @@ namespace IO::ANIM {
 
         setFrameVis( 1, true );
         updateOAM( false );
-
+        IO::fadeScreen( IO::fadeType::UNFADE, true, true );
         u8 slowfactor = 7;
-        for( u8 i = 4; i < 7; ++i ) {
-            for( u8 k = 0; k < 2; ++k ) {
-                setFrameVis( 0, true );
-                setFrameVis( 1, false );
-                updateOAM( false );
-                for( u8 j = 0; j < slowfactor * i; ++j ) { swiWaitForVBlank( ); }
-                setFrameVis( 0, false );
-                setFrameVis( 1, true );
-                updateOAM( false );
-                for( u8 j = slowfactor * i; j < slowfactor * 8; ++j ) { swiWaitForVBlank( ); }
-            }
+
+        for( u8 j = 2; j < 6; ++j ) {
+            for( u8 i = 0; i < 10; ++i ) { swiWaitForVBlank( ); }
+            moveFrame( 0, 2 * j, 0 );
+            updateOAM( false );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            moveFrame( 0, -4 * j, 0 );
+            updateOAM( false );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            moveFrame( 0, 2 * j, 0 );
+            updateOAM( false );
+            for( u8 i = 0; i < slowfactor * j; ++i ) { swiWaitForVBlank( ); }
         }
+
+        fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
+        setFrameVis( 0, true );
+        setFrameVis( 1, false );
+        updateOAM( false );
+        IO::fadeScreen( IO::fadeType::UNFADE, true, true );
+
         SOUND::playBGMOneshot( MOD_OS_EVOLVED );
         char buffer[ 200 ];
         clearScreen( true, true, true );

@@ -1236,4 +1236,15 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "An Arena for Battles", "Ein Ring f\xfcr K\xe4mpfe" },
     { "Used %hu times the\nitem %s.", "%hu-mal das Item\n%s eingesetzt." },
     { "Used the %s.", "%s eingesetzt." },
+    { "HP", "KP" },
+
+    { "ATK", "ANG" },
+    { "DEF", "VER" },
+    { "SAT", "SAN" },
+    { "SDF", "SVE" },
+    { "SPD", "INI" },
+
+    // 690
+
+    { "(none)", "(leer)" },
 };
