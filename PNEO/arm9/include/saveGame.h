@@ -187,7 +187,10 @@ namespace SAVE {
 
             u8 m_dayCareDepositLevel[ 6 ] = { 0 }; // level of pkmn in day care when deposited
 
-            u32 m_reserved[ 58 ] = { 0 }; // reserved for future things that need to be stored
+            u8 m_forcedMovement = 0;
+
+            u32 m_reserved2 : 24;
+            u32 m_reserved[ 57 ] = { 0 }; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 

@@ -266,6 +266,8 @@ namespace MAP {
          * @brief: Checks if the player can get off their bike at the specified position.
          */
         inline bool canGetOffBike( position p_start ) const {
+            if( SAVE::SAV.getActiveFile( ).m_forcedMovement & BIKE ) { return false; }
+
             auto lstblock  = at( p_start.m_posX, p_start.m_posY );
             u8   lstBehave = lstblock.m_bottombehave;
 

@@ -130,6 +130,11 @@ namespace MAP {
         SPL = 41, // show player sprite
         WPL = 42, // walk player (also through walls, etc)
 
+        FMM = 50, // force movement mode (player cannot change move mode themselves)
+        UMM = 51, // unlock movement mode
+        GMM = 52, // write current movement mode to reg 0
+        CMM = 53, // change movement
+
         HPK = 60, // Hide following pkmn
 
         EXM  = 87, // Exclamation mark
@@ -393,6 +398,27 @@ namespace MAP {
                 for( u8 j = 0; j < par3; ++j ) { movePlayer( direction( par2 ) ); }
                 break;
             }
+
+            case CMM: {
+                if( SAVE::SAV.getActiveFile( ).m_player.m_movement != parA ) {
+                    changeMoveMode( moveMode( parA ) );
+                }
+                break;
+            }
+            case FMM: {
+                SAVE::SAV.getActiveFile( ).m_forcedMovement
+                    = SAVE::SAV.getActiveFile( ).m_player.m_movement;
+                break;
+            }
+            case UMM: {
+                SAVE::SAV.getActiveFile( ).m_forcedMovement = 0;
+                break;
+            }
+            case GMM: {
+                registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_player.m_movement;
+                break;
+            }
+
             case MMO: {
                 movement m = { direction( par2 ), 0 };
                 _mapSprites.setFrameD( par1, direction( par2 ) );
