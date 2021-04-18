@@ -137,6 +137,9 @@ namespace MAP {
 
         HPK = 60, // Hide following pkmn
 
+        CMN = 70, // check money >=
+        PMN = 71, // pay money
+
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
         RDR  = 89, // Redraw objects
@@ -659,6 +662,18 @@ namespace MAP {
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) == par2 ) { pc += par3; }
                 break;
 
+            case CMN:
+                if( SAVE::SAV.getActiveFile( ).m_money >= parA ) { pc += parB; }
+                break;
+            case PMN:
+                SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
+                if( SAVE::SAV.getActiveFile( ).m_money >= parA ) {
+                    SAVE::SAV.getActiveFile( ).m_money -= parA;
+                } else {
+                    SAVE::SAV.getActiveFile( ).m_money = 0;
+                }
+                break;
+
             case CMO: registers[ 0 ] = p_mapObject; break;
             case LCKR: {
                 tmpmove = SAVE::SAV.getActiveFile( )
@@ -997,6 +1012,7 @@ namespace MAP {
                                     NAV::init( );
                                     // check if the player has enough money
                                     if( SAVE::SAV.getActiveFile( ).m_money >= cost ) {
+                                        SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
                                         SAVE::SAV.getActiveFile( ).m_money -= cost;
                                         snprintf( buffer, 199, GET_MAP_STRING( 490 ),
                                                   dc1[ takeback ].m_name );
@@ -1233,15 +1249,17 @@ namespace MAP {
                 }
                 break;
             case YNM: {
-                style st = (style) parB;
+                style st        = (style) parB;
+                bool  showMoney = st & MSG_SHOW_MONEY_FLAG;
+                st              = ( style )( st & 127 );
+
                 if( st == MSG_NORMAL ) { st = MSG_NOCLOSE; }
                 if( st == MSG_INFO ) { st = MSG_INFO_NOCLOSE; }
 
                 registers[ 0 ]
                     = IO::yesNoBox::YES
                       == IO::yesNoBox( ).getResult(
-                          convertMapString( GET_MAP_STRING( parA ), (style) parB ).c_str( ),
-                          (style) parB );
+                          convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st, showMoney );
                 NAV::init( );
                 break;
             }

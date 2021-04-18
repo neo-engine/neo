@@ -30,8 +30,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <nds.h>
 
-#include "uio.h"
 #include "defines.h"
+#include "uio.h"
 
 namespace IO {
     /*
@@ -39,25 +39,25 @@ namespace IO {
      */
     class yesNoBox {
       public:
-        static void DEFAULT_TICK( ) { }
+        static void DEFAULT_TICK( ) {
+        }
 
-        enum selection {
-            YES = 0,
-            NO = 1
-        };
+        enum selection { YES = 0, NO = 1 };
 
-        yesNoBox( ) { }
+        yesNoBox( ) {
+        }
         /*
          * @brief: Opens a yesNoBox and returns the player's selection.
          * @param p_drawFunction: Callback used to draw the yesNoBox
          * @param p_selectFunction: Callback used when the player selects a choice.
          */
-        selection getResult( std::function<std::vector<std::pair<inputTarget, selection>>()>
-                             p_drawFunction, std::function<void(selection)> p_selectFunction,
-                             selection p_initialSelection = YES,
-                             std::function<void( )> p_tick = DEFAULT_TICK );
+        selection
+        getResult( std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
+                   std::function<void( selection )> p_selectFunction,
+                   selection                        p_initialSelection = YES,
+                   std::function<void( )>           p_tick             = DEFAULT_TICK );
 
-        selection getResult( const char* p_message, style p_style );
+        selection getResult( const char* p_message, style p_style, bool p_showMoney = false );
     };
 
 } // namespace IO

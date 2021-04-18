@@ -816,7 +816,7 @@ namespace NAV {
     }
 
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
-    printYNMessage( const char* p_message, style p_style, u8 p_selection ) {
+    printYNMessage( const char* p_message, style p_style, u8 p_selection, bool p_showMoney ) {
         if( p_selection != 253 ) { doPrintMessage( p_message, p_style ); }
 
         BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
@@ -875,6 +875,12 @@ namespace NAV {
                                             oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 96,
                                             oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y + 32 ),
                            IO::yesNoBox::NO ) );
+
+            if( p_showMoney ) {
+                char buffer[ 100 ];
+                snprintf( buffer, 99, GET_STRING( 471 ), SAVE::SAV.getActiveFile( ).m_money );
+                IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
+            }
         }
 
         IO::updateOAM( true );
@@ -2096,9 +2102,9 @@ namespace NAV {
                 break;
             case 2: {
                 init( );
-                //                SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5 ) %
-                //                24; SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED,
-                //                true );
+                //                SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5
+                //                ) % 24; SAVE::SAV.getActiveFile( ).setFlag(
+                //                SAVE::F_NAT_DEX_OBTAINED, true );
 
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 9999 );

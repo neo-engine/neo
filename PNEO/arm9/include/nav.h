@@ -144,11 +144,13 @@ namespace NAV {
     }
 
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
-    printYNMessage( const char* p_message, style p_style, u8 p_selection = 255 );
+    printYNMessage( const char* p_message, style p_style, u8 p_selection = 255,
+                    bool p_showMoney = false );
 
     inline std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
-    printYNMessage( const std::string& p_message, style p_style, u8 p_selection = 255 ) {
-        return printYNMessage( p_message.c_str( ), p_style, p_selection );
+    printYNMessage( const std::string& p_message, style p_style, u8 p_selection = 255,
+                    bool p_showMoney = false ) {
+        return printYNMessage( p_message.c_str( ), p_style, p_selection, p_showMoney );
     }
 
     std::vector<std::pair<IO::inputTarget, u8>>

@@ -108,16 +108,17 @@ constexpr u8 DAYTIME_DUSK    = 3;
 constexpr u8 DAYTIME_EVENING = 4;
 
 constexpr u32 TRANSPARENCY_COEFF = 0x0671;
-enum style {
-    MSG_NORMAL       = 0,
-    MSG_INFO         = 1,
-    MSG_NOCLOSE      = 2, // Msgbox stays open, future calls to print append text
-    MSG_INFO_NOCLOSE = 3,
-    MSG_MART_ITEM    = 4, // Message used for items / pokemart
-    MSG_ITEM         = 5, // Message used when player obtains an item
-    MSG_SIGN         = 6,
-    MSG_NORMAL_CONT  = 7,
-    MSG_INFO_CONT    = 8,
+enum style : u8 {
+    MSG_NORMAL          = 0,
+    MSG_INFO            = 1,
+    MSG_NOCLOSE         = 2, // Msgbox stays open, future calls to print append text
+    MSG_INFO_NOCLOSE    = 3,
+    MSG_MART_ITEM       = 4, // Message used for items / pokemart
+    MSG_ITEM            = 5, // Message used when player obtains an item
+    MSG_SIGN            = 6,
+    MSG_NORMAL_CONT     = 7,
+    MSG_INFO_CONT       = 8,
+    MSG_SHOW_MONEY_FLAG = 128, // show the current money
 };
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
