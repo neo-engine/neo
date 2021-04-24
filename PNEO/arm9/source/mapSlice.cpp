@@ -61,6 +61,9 @@ namespace MAP {
             nomap = true;
             // if( !mapF ) return;
             std::memset( p_result->m_blocks, 0, SIZE * SIZE * sizeof( mapBlockAtom ) );
+
+            p_result->m_tIdx1 = 255;
+            p_result->m_tIdx2 = 255;
         }
 
         bool reloadTs = false;
@@ -96,6 +99,8 @@ namespace MAP {
 
             FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
             FS::close( mapF );
+        } else {
+            return;
         }
 
         // Read the first tileset

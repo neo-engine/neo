@@ -109,7 +109,7 @@ namespace MAP {
         mapBlockAtom m_blocks[ SIZE ][ SIZE ]; // [ y ][ x ]
         u8           m_map;
         u16          m_x, m_y;
-        u8           m_tIdx1, m_tIdx2;
+        u8           m_tIdx1 = 255, m_tIdx2 = 255;
     };
     void constructSlice( u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
                          mapSlice p_cache[ 2 ][ 2 ] = 0 );
