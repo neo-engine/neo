@@ -104,7 +104,7 @@ namespace FS {
     }
 
     bool exists( const char* p_path ) {
-        FILE* fd  = fopen( p_path, "r" );
+        FILE* fd  = fopen( p_path, "rm" );
         bool  res = !!fd;
         fclose( fd );
         return res;
@@ -117,7 +117,7 @@ namespace FS {
     }
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
         snprintf( TMP_BUFFER, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
-        FILE* fd  = fopen( TMP_BUFFER, "rb" );
+        FILE* fd  = fopen( TMP_BUFFER, "rbm" );
         bool  res = !!fd;
         fclose( fd );
         return res;

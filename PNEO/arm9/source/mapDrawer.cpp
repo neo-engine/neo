@@ -1640,15 +1640,10 @@ namespace MAP {
 
         // Gather data about the source block
         u8 lstMoveData, lstBehave;
-        if( nx / SIZE != p_start.m_posX / SIZE || ny / SIZE != p_start.m_posY / SIZE ) {
-            lstMoveData = 0;
-            lstBehave   = 0;
-        } else {
-            lstMoveData = atom( p_start.m_posX, p_start.m_posY ).m_movedata;
+        lstMoveData = atom( p_start.m_posX, p_start.m_posY ).m_movedata;
 
-            auto lstblock = at( p_start.m_posX, p_start.m_posY );
-            lstBehave     = lstblock.m_bottombehave;
-        }
+        auto lstblock = at( p_start.m_posX, p_start.m_posY );
+        lstBehave     = lstblock.m_bottombehave;
 
         // Gather data about the destination block
         u8 curMoveData, curBehave;
@@ -1786,6 +1781,7 @@ namespace MAP {
         if( curMoveData == 0x0c && lstMoveData == 4 ) { return true; }
         if( !curMoveData || !lstMoveData ) { return true; }
         if( curMoveData == 0x3c ) { return true; }
+
         return curMoveData % 4 == 0 && curMoveData / 4 == p_start.m_posZ;
     }
     void mapDrawer::movePlayer( direction p_direction, bool p_fast ) {

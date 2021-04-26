@@ -73,6 +73,10 @@ namespace MAP {
     // 11 getCurrentDaytime( )
     // 12 pkmn day care (par: # of day care) (take/hand over pkmn)
     // 13 pkmn day care (obtain egg)
+    // 14 save game
+
+    // battle zone facilities
+    // 0 battle factory
 
     enum opCode : u8 {
         EOP = 0,  // end of program
@@ -177,6 +181,8 @@ namespace MAP {
         MSG = 127, // message
         CBG = 128, // choice box begin
         CIT = 129, // choice item
+
+        BTZ = 130, // battle zone facility script
 
         SBC = 196, // set block
     };
@@ -1243,6 +1249,50 @@ namespace MAP {
                         }
                     }
 
+                    break;
+                }
+                case 14: {
+                    // save game, writes 1 to eval reg if successful
+
+                    IO::yesNoBox yn;
+                    if( par2 == 1
+                        || yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE )
+                               == IO::yesNoBox::YES ) {
+                        NAV::init( );
+                        ANIMATE_MAP = false;
+                        u16 lst     = -1;
+                        if( FS::writeSave( ARGV[ 0 ], [ & ]( u16 p_perc, u16 p_total ) {
+                                u16 stat = p_perc * 18 / p_total;
+                                if( stat != lst ) {
+                                    lst = stat;
+                                    NAV::printMessage( 0, MSG_INFO_NOCLOSE );
+                                    std::string buf2 = "";
+                                    for( u8 i = 0; i < stat; ++i ) {
+                                        buf2 += "\x03";
+                                        if( i % 3 == 2 ) { buf2 += " "; }
+                                    }
+                                    for( u8 i = stat; i < 18; ++i ) {
+                                        buf2 += "\x04";
+                                        if( i % 3 == 2 ) { buf2 += " "; }
+                                    }
+                                    snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
+                                    NAV::printMessage( buffer, MSG_INFO_NOCLOSE, true );
+                                }
+                            } ) ) {
+                            NAV::printMessage( 0, MSG_INFO_NOCLOSE );
+                            SOUND::playSoundEffect( SFX_SAVE );
+                            NAV::printMessage( GET_STRING( 94 ), MSG_INFO );
+                            registers[ 0 ] = 1;
+                        } else {
+                            NAV::printMessage( 0, MSG_INFO_NOCLOSE );
+                            NAV::printMessage( GET_STRING( 95 ), MSG_INFO );
+                            registers[ 0 ] = 0;
+                        }
+                        ANIMATE_MAP = true;
+                    } else {
+                        registers[ 0 ] = 0;
+                        NAV::init( );
+                    }
                     break;
                 }
                 default: break;

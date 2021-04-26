@@ -254,6 +254,7 @@ namespace SOUND {
         case L_ROUTE_123: return MOD_ROUTE_123;
         case L_TRAINERS__SCHOOL: return MOD_TRAINER_SCHOOL;
         case L_NEW_LILYCOVE_CITY: return MOD_NEW_LILYCOVE_CITY;
+        case L_NEW_MAUVILLE: return MOD_NEW_MAUVILLE;
         case L_SAFARI_ZONE: return MOD_SAFARI_ZONE;
         case L_PACIFIDLOG_TOWN:
         case L_LILYCOVE_CITY: return MOD_LILYCOVE_CITY;
@@ -281,8 +282,8 @@ namespace SOUND {
         case L_ROCK_SHELTER:
         case L_DESERT_RUINS: return MOD_SEALED_CHAMBER;
         case L_MT_PYRE: return MOD_MT_PYRE_PEAK;
-        case L_SHOAL_CAVE:
-        case L_CRYSTAL_CAVERN: return MOD_SHOAL_CAVE;
+        case L_SHOAL_CAVE: return MOD_SHOAL_CAVE;
+        case L_CRYSTAL_CAVERN: return MOD_CRYSTAL_CAVERN;
         case L_LILYCOVE_MUSEUM: return MOD_LILYCOVE_MUSEUM;
         case L_OCEANIC_MUSEUM: return MOD_MARINE_SCIENCE_MUSEUM;
         case L_GRANITE_CAVE:
@@ -306,6 +307,7 @@ namespace SOUND {
         case L_PROF_BIRCH_S_LAB: return MOD_PROF_BIRCH_LAB;
         case L_BATTLE_TOWER: return MOD_BATTLE_TOWER;
         case L_BATTLE_PALACE: return MOD_BATTLE_PALACE;
+        case L_BATTLE_FACTORY: return MOD_BATTLE_FACTORY;
         case L_BATTLE_TENT:
         case L_BATTLE_FRONTIER: return MOD_BATTLE_FRONTIER;
         case L_SOOTOPOLIS_CITY: return MOD_SOOTOPOLIS_CITY;

@@ -217,6 +217,7 @@ namespace NAV {
         { 617, MOD_MARINE_SCIENCE_MUSEUM },
         { 631, MOD_ROUTE_110 },
         { 644, MOD_TRICK_HOUSE },
+        { 692, MOD_NEW_MAUVILLE },
         { 669, MOD_VERDANTURF_TOWN },
         { 605, MOD_DESERT },
         { 632, MOD_ROUTE_113 },
@@ -239,12 +240,14 @@ namespace NAV {
         { 601, MOD_CLIFFELTA_CITY },
         { 615, MOD_NEW_LILYCOVE_CITY },
         { 627, MOD_ROUTE_10 },
+        { 693, MOD_CRYSTAL_CAVERN },
         { 638, MOD_SEALED_CHAMBER },
 
         { 589, MOD_BATTLE_FRONTIER },
         { 597, MOD_BATTLE_TOWER },
         { 592, MOD_BATTLE_PALACE },
         { 681, MOD_BATTLE_ARENA },
+        { 691, MOD_BATTLE_FACTORY },
 
         { 623, MOD_POKEMON_CENTER },
         { 625, MOD_POKEMON_MART },

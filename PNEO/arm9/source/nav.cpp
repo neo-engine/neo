@@ -799,8 +799,8 @@ namespace NAV {
         hideMessageBox( );
     }
 
-    void printMessage( const char* p_message, style p_style ) {
-        doPrintMessage( p_message, p_style );
+    void printMessage( const char* p_message, style p_style, bool p_noDelay ) {
+        doPrintMessage( p_message, p_style, 0, 0, p_noDelay );
 
         if( p_style == MSG_NORMAL_CONT || p_style == MSG_INFO_CONT ) {
             waitForInteract( );

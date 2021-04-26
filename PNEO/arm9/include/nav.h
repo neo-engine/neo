@@ -137,10 +137,11 @@ namespace NAV {
     /*
      * @brief: Prints the given message. An empty message clears the message box.
      */
-    void printMessage( const char* p_message, style p_style = MSG_NORMAL );
+    void printMessage( const char* p_message, style p_style = MSG_NORMAL, bool p_noDelay = false );
 
-    inline void printMessage( const std::string& p_message, style p_style = MSG_NORMAL ) {
-        printMessage( p_message.c_str( ), p_style );
+    inline void printMessage( const std::string& p_message, style p_style = MSG_NORMAL,
+                              bool p_noDelay = false ) {
+        printMessage( p_message.c_str( ), p_style, p_noDelay );
     }
 
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>

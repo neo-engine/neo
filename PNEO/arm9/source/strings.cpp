@@ -1247,4 +1247,7 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     // 690
 
     { "(none)", "(leer)" },
+    { "Battle Factory", "Kampffabrik" },
+    { "New Mauville", "Neu Malvenfroh" },
+    { "Crystal Cavern", "Kristallgrotte" },
 };
