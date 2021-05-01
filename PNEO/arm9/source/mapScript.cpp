@@ -1349,7 +1349,44 @@ namespace MAP {
         u8 msgtype = rand( ) % 9;
 
         switch( msgtype ) {
-        case 0:
+        case 0: {
+            u8 msg = 0;
+            switch( getCurrentLocationId( ) ) {
+            case L_FIERY_DEN:
+            case L_FIERY_PATH:
+            case L_MT_PYRE:
+            case L_TEAM_MAGMA_HIDEOUT:
+            case L_SCORCHED_SLAB:
+                if( _followPkmnSpeciesData ) {
+                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == TYPE_FIRE
+                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == TYPE_FIRE ) {
+                        msg     = 50 + ( rand( ) & 1 );
+                        emotion = 2;
+                        break;
+                    }
+                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == TYPE_WATER
+                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == TYPE_WATER ) {
+                        msg     = 52;
+                        emotion = 0;
+                        break;
+                    }
+                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == TYPE_ICE
+                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == TYPE_ICE ) {
+                        msg     = 52 + ( rand( ) & 1 );
+                        emotion = 8;
+                        break;
+                    }
+                }
+            default: break;
+            }
+            if( msg ) {
+                snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( msg ),
+                          _followPkmnData->m_boxdata.m_name );
+                break;
+            }
+
+            [[fallthrough]];
+        }
         case 1:
         case 2:
         default: {

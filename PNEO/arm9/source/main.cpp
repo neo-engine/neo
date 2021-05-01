@@ -342,9 +342,11 @@ int main( int, char** p_argv ) {
                                       mname.c_str( ) );
                             NAV::printMessage( buffer, MSG_NORMAL );
                             NAV::printMessage( 0, MSG_NOCLOSE );
-                            MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ), a.isShiny( ),
-                                                  a.getForme( ) );
                             NAV::init( );
+                            if( i || !MAP::curMap->useFollowPkmn( ) ) {
+                                MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ), a.isShiny( ),
+                                                      a.getForme( ) );
+                            }
                             swiWaitForVBlank( );
 
                             MOVE::use( a.m_boxdata.m_moves[ j ], param );

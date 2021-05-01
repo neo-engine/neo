@@ -1938,6 +1938,7 @@ namespace MAP {
 
             case 0xd0:
                 if( p_direction == DOWN ) {
+                    removeFollowPkmn( );
                     slidePlayer( DOWN );
                     p_direction = DOWN;
                     reinit      = true;
@@ -2612,7 +2613,8 @@ namespace MAP {
     }
 
     bool mapDrawer::updateFollowPkmn( ) {
-        _followPkmnData = nullptr;
+        _followPkmnData        = nullptr;
+        _followPkmnSpeciesData = nullptr;
         if( !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) { return false; }
         if( _forceNoFollow ) { return false; }
 
@@ -2627,6 +2629,7 @@ namespace MAP {
         bool shiny   = _followPkmnData->isShiny( );
         //        bool female  = _followPkmnData->isFemale( );
         u8 forme = _followPkmnData->getForme( );
+        getPkmnData( species, forme, _followPkmnSpeciesData );
 
         if( species > MAX_PKMN ) { return false; }
         if( !canFollowPlayer( species, shiny, forme ) ) { return false; }
@@ -2658,8 +2661,9 @@ namespace MAP {
     void mapDrawer::removeFollowPkmn( ) {
         if( _pkmnFollowsPlayer ) {
             _mapSprites.destroySprite( _playerFollowPkmnSprite );
-            _pkmnFollowsPlayer = false;
-            _followPkmnData    = nullptr;
+            _pkmnFollowsPlayer     = false;
+            _followPkmnData        = nullptr;
+            _followPkmnSpeciesData = nullptr;
         }
     }
 
@@ -3117,6 +3121,27 @@ namespace MAP {
         IO::updateOAM( false );
         changeMoveMode( surfing ? SURF : WALK );
         swiWaitForVBlank( );
+    }
+
+    bool mapDrawer::useFollowPkmn( ) {
+        if( !_pkmnFollowsPlayer || _followPkmnData == nullptr ) { return false; }
+
+        // store direction the player is currently facing
+        direction olddir = SAVE::SAV.getActiveFile( ).m_player.m_direction;
+
+        // make one step in the opposite direction of the last player move, this shoul
+        // make the follow pkmn and the player switch places
+        direction oldplaydir = _lastPlayerMove;
+        walkPlayer( direction( ( _lastPlayerMove + 2 ) % 4 ), false );
+        redirectPlayer( oldplaydir, false );
+
+        // make the pkmn face the player's old direction
+        _mapSprites.setFrameD( _playerFollowPkmnSprite, olddir, false );
+
+        // play cry
+        SOUND::playCry( _followPkmnData->getSpecies( ), _followPkmnData->getForme( ) );
+
+        return true;
     }
 
     void mapDrawer::awardBadge( u8 p_type, u8 p_badge ) {

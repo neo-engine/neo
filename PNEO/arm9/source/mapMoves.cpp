@@ -36,6 +36,32 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 
 namespace MOVE {
+    u16 text( const u16 p_moveId, u8 p_param ) {
+        if( p_param == 1 ) {
+            switch( p_moveId ) {
+            case M_DIVE: return 322;
+            default: return 0;
+            }
+        }
+        switch( p_moveId ) {
+        case M_CUT: return 313;
+        case M_ROCK_SMASH: return 314;
+        case M_WHIRLPOOL: return 315;
+        case M_SURF: return 316;
+        case M_DIVE: return 317;
+        case M_STRENGTH:
+            if( MAP::curMap->strengthEnabled( ) ) {
+                return 558;
+            } else {
+                return 318;
+            }
+        case M_ROCK_CLIMB: return 319;
+        case M_WATERFALL: return 320;
+        case M_HEADBUTT: return 321;
+        default: return 0;
+        }
+    }
+
     bool possible( u16 p_moveId, u8 p_param ) {
         if( p_param == 1 ) {
             switch( p_moveId ) {
@@ -85,6 +111,9 @@ namespace MOVE {
         case M_STRENGTH: {
             // Check for badge 4
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 3 ) ) ) { return false; }
+
+            // Check if strength has already been used
+            if( MAP::curMap->strengthEnabled( ) ) { return false; }
 
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];

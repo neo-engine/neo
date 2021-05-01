@@ -27,13 +27,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <cstring>
 #include <string>
 #include <nds/ndstypes.h>
 #include "battleDefines.h"
-#include "defines.h"
-#include "type.h"
 #include "moveNames.h"
+#include "type.h"
 
 namespace MOVE {
     bool        getMoveName( const u16 p_moveId, const u8 p_language, char* p_out );
@@ -50,48 +48,28 @@ namespace MOVE {
     /*
      * @brief: Returns the text (id) displayed in OW
      */
-    constexpr u16 text( const u16 p_moveId, u8 p_param ) {
-        if( p_param == 1 ) {
-            switch( p_moveId ) {
-                case M_DIVE:
-                    return 322;
-                default:
-                    return 0;
-            }
-        }
-        switch( p_moveId ) {
-            case M_CUT:
-                return 313;
-            case M_ROCK_SMASH:
-                return 314;
-            case M_WHIRLPOOL:
-                return 315;
-            case M_SURF:
-                return 316;
-            case M_DIVE:
-                return 317;
-            case M_STRENGTH:
-                return 318;
-            case M_ROCK_CLIMB:
-                return 319;
-            case M_WATERFALL:
-                return 320;
-            case M_HEADBUTT:
-                return 321;
-            default:
-                return 0;
-        }
-    }
+    u16 text( const u16 p_moveId, u8 p_param );
 
     constexpr bool isFieldMove( u16 p_moveId ) {
         switch( p_moveId ) {
-            case M_CUT: case M_ROCK_SMASH: case M_FLY: case M_FLASH: case M_WHIRLPOOL:
-            case M_SURF: case M_DIVE: case M_DEFOG: case M_STRENGTH: case M_ROCK_CLIMB:
-            case M_WATERFALL: case M_TELEPORT: case M_HEADBUTT: case M_SWEET_SCENT: case M_DIG:
-            case M_HIDDEN_POWER: case M_SECRET_POWER:
-                return true;
-            default:
-                return false;
+        case M_CUT:
+        case M_ROCK_SMASH:
+        case M_FLY:
+        case M_FLASH:
+        case M_WHIRLPOOL:
+        case M_SURF:
+        case M_DIVE:
+        case M_DEFOG:
+        case M_STRENGTH:
+        case M_ROCK_CLIMB:
+        case M_WATERFALL:
+        case M_TELEPORT:
+        case M_HEADBUTT:
+        case M_SWEET_SCENT:
+        case M_DIG:
+        case M_HIDDEN_POWER:
+        case M_SECRET_POWER: return true;
+        default: return false;
         }
     }
 

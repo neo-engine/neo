@@ -72,6 +72,7 @@ namespace MAP {
         mapObject _followPkmn;
         bool      _forceNoFollow  = false;
         pokemon*  _followPkmnData = nullptr;
+        pkmnData* _followPkmnSpeciesData = nullptr;
 
         bool _strengthUsed; // Player has used HM Strength and can move boulders
 
@@ -295,6 +296,10 @@ namespace MAP {
             _strengthUsed = true;
         }
 
+        constexpr bool strengthEnabled( ) const {
+            return _strengthUsed;
+        }
+
         /*
          * @brief: Shows a short animation and destroys the hmobject (breakable rock,
          * small tree) at the specified global position on the current map.
@@ -359,6 +364,13 @@ namespace MAP {
          */
         void awardBadge( u8 p_type, u8 p_badge );
         void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme );
+
+        /*
+         * @brief: Makes the follow pkmn use a hm move.
+         * @returns: true if the animation played, false otherwise (e.g. if the follow
+         * pkmn is hidden)
+         */
+        bool useFollowPkmn( );
 
         /*
          * @brief: Enables the player to buy the specified items using their money.

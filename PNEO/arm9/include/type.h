@@ -30,6 +30,7 @@
 enum type : u8 {
     NORMAL    = 0,
     FIGHT     = 1,
+    FIGHTING  = 1,
     FLYING    = 2,
     POISON    = 3,
     GROUND    = 4,
@@ -42,17 +43,51 @@ enum type : u8 {
     FIRE      = 11,
     GRASS     = 12,
     ELECTRIC  = 13,
+    LIGHTNING = 13,
     PSYCHIC   = 14,
     ICE       = 15,
     DRAGON    = 16,
     DARK      = 17,
-    FAIRY     = 18,
-    FIGHTING  = 1,
-    LIGHTNING = 13,
     DARKNESS  = 17,
+    FAIRY     = 18,
+
+    TYPE_NORMAL    = 0,
+    TYPE_FIGHTING  = 1,
+    TYPE_FLYING    = 2,
+    TYPE_POISON    = 3,
+    TYPE_GROUND    = 4,
+    TYPE_ROCK      = 5,
+    TYPE_BUG       = 6,
+    TYPE_GHOST     = 7,
+    TYPE_STEEL     = 8,
+    TYPE_UNKNOWN   = 9,
+    TYPE_WATER     = 10,
+    TYPE_FIRE      = 11,
+    TYPE_GRASS     = 12,
+    TYPE_LIGHTNING = 13,
+    TYPE_PSYCHIC   = 14,
+    TYPE_ICE       = 15,
+    TYPE_DRAGON    = 16,
+    TYPE_DARKNESS  = 17,
+    TYPE_FAIRY     = 18,
+
 };
 
-enum contestType { NO_CONTEST_TYPE = 0, TOUGH = 1, CLEVER = 2, BEAUTIFUL = 3, COOL = 4, CUTE = 5 };
+enum contestType {
+    NO_CONTEST_TYPE        = 0,
+    TOUGH                  = 1,
+    CLEVER                 = 2,
+    BEAUTIFUL              = 3,
+    COOL                   = 4,
+    CUTE                   = 5,
+
+    CONTEST_TYPE_NONE      = 0,
+    CONTEST_TYPE_TOUGH     = 1,
+    CONTEST_TYPE_CLEVER    = 2,
+    CONTEST_TYPE_BEAUTIFUL = 3,
+    CONTEST_TYPE_COOL      = 4,
+    CONTEST_TYPE_CUTE      = 5
+};
 
 constexpr u8 TypeEffectiveness[ 19 ][ 19 ] = {
     { 100, 100, 100, 100, 100, 50, 100, 0, 50, 75, 100, 100, 100, 100, 100, 100, 100, 100,
