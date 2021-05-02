@@ -70,8 +70,8 @@ namespace MAP {
         u8        _playerFollowPkmnSprite = 255; // id of the pkmn ow sprite that follows the player
         bool      _pkmnFollowsPlayer      = false;
         mapObject _followPkmn;
-        bool      _forceNoFollow  = false;
-        pokemon*  _followPkmnData = nullptr;
+        bool      _forceNoFollow         = false;
+        pokemon*  _followPkmnData        = nullptr;
         pkmnData* _followPkmnSpeciesData = nullptr;
 
         bool _strengthUsed; // Player has used HM Strength and can move boulders
@@ -220,6 +220,8 @@ namespace MAP {
 
         mapDrawer( );
 
+        direction getFollowPkmnDirection( ) const;
+
         inline mapWeather getWeather( ) const {
             return SAVE::SAV.getActiveFile( ).m_currentMapWeather;
         }
@@ -364,6 +366,7 @@ namespace MAP {
          */
         void awardBadge( u8 p_type, u8 p_badge );
         void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme );
+        void showPkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme, bool p_cry );
 
         /*
          * @brief: Makes the follow pkmn use a hm move.

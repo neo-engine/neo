@@ -229,18 +229,34 @@ namespace MOVE {
             return;
         }
         case M_WHIRLPOOL: return;
-        case M_SURF:
-            MAP::curMap->sitDownPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction,
-                                        MAP::SURF );
+        case M_SURF: {
+            MAP::direction d  = SAVE::SAV.getActiveFile( ).m_player.m_direction;
+            MAP::direction fp = MAP::curMap->getFollowPkmnDirection( );
+            MAP::curMap->sitDownPlayer( d, MAP::SURF );
+            if( p_param == 2 ) {
+                // move got used by follow pkmn, make player climb in correct direction
+                d = fp;
+                MAP::curMap->redirectPlayer( d, false );
+                MAP::curMap->walkPlayer( d );
+            }
+
             return;
+        }
         case M_DIVE: return;
         case M_DEFOG: return;
-        case M_ROCK_CLIMB:
-            MAP::curMap->sitDownPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction,
-                                        MAP::ROCK_CLIMB );
-            while( possible( M_ROCK_CLIMB, 0 ) )
-                MAP::curMap->walkPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
-            MAP::curMap->standUpPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
+        case M_ROCK_CLIMB: {
+            MAP::direction d  = SAVE::SAV.getActiveFile( ).m_player.m_direction;
+            MAP::direction fp = MAP::curMap->getFollowPkmnDirection( );
+
+            MAP::curMap->sitDownPlayer( d, MAP::ROCK_CLIMB );
+            if( p_param == 2 ) {
+                // move got used by follow pkmn, make player climb in correct direction
+                d = fp;
+                MAP::curMap->redirectPlayer( d, false );
+            }
+
+            while( possible( M_ROCK_CLIMB, 0 ) ) MAP::curMap->walkPlayer( d );
+            MAP::curMap->standUpPlayer( d );
             if( MAP::curMap
                         ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
@@ -255,14 +271,16 @@ namespace MOVE {
                            ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                            .m_movedata
-                       != 0x0a )
+                       != 0x0a ) {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ
                     = MAP::curMap
                           ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                   SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                           .m_movedata
                       / 4;
+            }
             return;
+        }
         case M_WATERFALL:
             MAP::curMap->disablePkmn( );
             while( possible( M_WATERFALL, 0 ) )

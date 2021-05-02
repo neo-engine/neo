@@ -184,6 +184,8 @@ namespace MAP {
 
         BTZ = 130, // battle zone facility script
 
+        DES = 150, // register pkmn as seen in pkdex
+
         SBC = 196, // set block
     };
 
@@ -314,6 +316,13 @@ namespace MAP {
 #endif
 
             switch( ins ) {
+            case DES: {
+                SAVE::SAV.getActiveFile( ).registerSeenPkmn( parA );
+                showPkmn( parA, false, false, parB, false );
+                changeMoveMode( SAVE::SAV.getActiveFile( ).m_player.m_movement );
+                swiWaitForVBlank( );
+                break;
+            }
             case HPK:
                 removeFollowPkmn( );
                 _forceNoFollow = true;

@@ -2550,6 +2550,7 @@ namespace MAP {
     }
 
     void mapDrawer::slidePlayer( direction p_direction ) {
+        removeFollowPkmn( );
         u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( p_direction == DOWN
@@ -3085,6 +3086,30 @@ namespace MAP {
         PLAYER_IS_FISHING = false;
     }
 
+    void mapDrawer::showPkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme, bool p_cry ) {
+        _mapSprites.setVisibility( _playerSprite, true, false );
+        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
+                         OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
+                         false, OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 64, 96, 64, 64, 0, 0, 0, true, false,
+                         false, OBJPRIORITY_1, false );
+        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
+                         false, OBJPRIORITY_1, false );
+
+        if( p_cry ) { SOUND::playCry( p_pkmIdx, p_forme ); }
+        IO::loadPKMNSpriteB( p_pkmIdx, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false, p_shiny, p_female,
+                             false, false, p_forme );
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 75; ++i ) swiWaitForVBlank( );
+
+        for( u8 i = 0; i < 4; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true;
+            IO::OamTop->oamBuffer[ SPR_PKMN_OAM + i ].isHidden = true;
+        }
+        IO::updateOAM( false );
+    }
+
     void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme ) {
         u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
@@ -3098,29 +3123,17 @@ namespace MAP {
             _mapSprites.drawFrame( _playerSprite, i, false, true );
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
         }
-        _mapSprites.setVisibility( _playerSprite, true, false );
-        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
-                         OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
-                         false, OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 64, 96, 64, 64, 0, 0, 0, true, false,
-                         false, OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
-                         false, OBJPRIORITY_1, false );
 
-        SOUND::playCry( p_pkmIdx, p_forme );
-        IO::loadPKMNSpriteB( p_pkmIdx, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false, p_shiny, p_female,
-                             false, false, p_forme );
-        IO::updateOAM( false );
-        for( u8 i = 0; i < 75; ++i ) swiWaitForVBlank( );
+        showPkmn( p_pkmIdx, p_female, p_shiny, p_forme, true );
 
-        for( u8 i = 0; i < 4; ++i ) {
-            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true;
-            IO::OamTop->oamBuffer[ SPR_PKMN_OAM + i ].isHidden = true;
-        }
-        IO::updateOAM( false );
         changeMoveMode( surfing ? SURF : WALK );
         swiWaitForVBlank( );
+    }
+
+    direction mapDrawer::getFollowPkmnDirection( ) const {
+        if( !_pkmnFollowsPlayer || _followPkmnData == nullptr ) { return UP; }
+
+        return _followPkmn.m_direction;
     }
 
     bool mapDrawer::useFollowPkmn( ) {
@@ -3137,6 +3150,7 @@ namespace MAP {
 
         // make the pkmn face the player's old direction
         _mapSprites.setFrameD( _playerFollowPkmnSprite, olddir, false );
+        _followPkmn.m_direction = olddir;
 
         // play cry
         SOUND::playCry( _followPkmnData->getSpecies( ), _followPkmnData->getForme( ) );

@@ -346,10 +346,12 @@ int main( int, char** p_argv ) {
                             if( i || !MAP::curMap->useFollowPkmn( ) ) {
                                 MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ), a.isShiny( ),
                                                       a.getForme( ) );
+                                swiWaitForVBlank( );
+                                MOVE::use( a.m_boxdata.m_moves[ j ], param );
+                            } else {
+                                swiWaitForVBlank( );
+                                MOVE::use( a.m_boxdata.m_moves[ j ], 2 );
                             }
-                            swiWaitForVBlank( );
-
-                            MOVE::use( a.m_boxdata.m_moves[ j ], param );
                         } else {
                             NAV::printMessage( 0, MSG_NOCLOSE );
                             NAV::init( );
