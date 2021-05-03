@@ -134,6 +134,15 @@ namespace MAP {
         SPL = 41, // show player sprite
         WPL = 42, // walk player (also through walls, etc)
 
+        MINR = 43, // reg[ par3 ] = min( reg[ par1 ], reg[ par2 ] )
+        MAXR = 44, // reg[ par3 ] = max( reg[ par1 ], reg[ par2 ] )
+
+        GVR  = 45, // get value of variable and write it to register parB
+        SVR  = 46, // set value of variable to parB
+        SVRR = 47, // set value of variable to parB
+        SUB  = 48, // reg[ par1 ] -= par2
+        SUBR = 49, // reg[ par1 ] -= reg[ par2 ]
+
         FMM = 50, // force movement mode (player cannot change move mode themselves)
         UMM = 51, // unlock movement mode
         GMM = 52, // write current movement mode to reg 0
@@ -203,6 +212,9 @@ namespace MAP {
         if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp != u16( -1 ) ) {
             SOUND::playCry( tmp );
             return "";
+        }
+        if( sscanf( p_cmd.c_str( ), "VAR:%hu", &tmp ) && tmp != u16( -1 ) ) {
+            return std::to_string( SAVE::SAV.getActiveFile( ).getVar( tmp ) );
         }
         if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
             return getDisplayName( SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
@@ -509,11 +521,13 @@ namespace MAP {
                 if( registers[ par1 ] == par2 ) { pc += par3; }
                 break;
             }
+            case SUB: registers[ par1 ] -= par2; break;
             case ADD: registers[ par1 ] += par2; break;
             case DIV:
                 if( par2 ) { registers[ par1 ] /= par2; }
                 break;
             case ARG: registers[ par1 ] += registers[ par2 ]; break;
+            case SUBR: registers[ par1 ] -= registers[ par2 ]; break;
             case DRG:
                 if( registers[ par2 ] ) { registers[ par1 ] /= registers[ par2 ]; }
                 break;
@@ -676,6 +690,10 @@ namespace MAP {
             case CVR:
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) == par2 ) { pc += par3; }
                 break;
+
+            case GVR: registers[ parA ] = SAVE::SAV.getActiveFile( ).getVar( parB ); break;
+            case SVR: SAVE::SAV.getActiveFile( ).setVar( parA, parB ); break;
+            case SVRR: SAVE::SAV.getActiveFile( ).setVar( parA, registers[ parB ] ); break;
 
             case CMN:
                 if( SAVE::SAV.getActiveFile( ).m_money >= parA ) { pc += parB; }

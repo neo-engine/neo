@@ -356,10 +356,12 @@ namespace MAP {
             SAVE::SAV.getActiveFile( ).m_currentMapWeather = p_newWeather;
             for( auto fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
             initWeather( );
-            if( REG_BLDALPHA ) {
-                REG_BLDCNT = WEATHER_BLEND;
-            } else {
-                REG_BLDCNT = BLEND_NONE;
+            if( ANIMATE_MAP ) {
+                if( REG_BLDALPHA ) {
+                    REG_BLDCNT = WEATHER_BLEND;
+                } else {
+                    REG_BLDCNT = BLEND_NONE;
+                }
             }
         }
     }
@@ -387,27 +389,20 @@ namespace MAP {
                             &_slices[ _curX ][ _curY ], _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
                              _data[ _curX ][ _curY ] );
-            runLevelScripts( _data[ _curX ][ _curY ], mx / SIZE, my / SIZE );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                             my / SIZE, &_slices[ _curX ^ 1 ][ _curY ], _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE, _data[ _curX ^ 1 ][ _curY ] );
-            runLevelScripts( _data[ _curX ^ 1 ][ _curY ], mx / SIZE + currentHalf( mx ),
-                             my / SIZE );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                             my / SIZE + currentHalf( my ), &_slices[ _curX ][ _curY ^ 1 ],
                             _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                              my / SIZE + currentHalf( my ), _data[ _curX ][ _curY ^ 1 ] );
-            runLevelScripts( _data[ _curX ][ _curY ^ 1 ], mx / SIZE,
-                             my / SIZE + currentHalf( my ) );
             constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                             my / SIZE + currentHalf( my ), &_slices[ _curX ^ 1 ][ _curY ^ 1 ],
                             _slices );
             FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
                              my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
-            runLevelScripts( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx / SIZE + currentHalf( mx ),
-                             my / SIZE + currentHalf( my ) );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i - 1, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -459,6 +454,14 @@ namespace MAP {
             if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
                 attachMapObjectToPlayer( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx );
             }
+
+            runLevelScripts( _data[ _curX ][ _curY ], mx / SIZE, my / SIZE );
+            runLevelScripts( _data[ _curX ^ 1 ][ _curY ], mx / SIZE + currentHalf( mx ),
+                             my / SIZE );
+            runLevelScripts( _data[ _curX ][ _curY ^ 1 ], mx / SIZE,
+                             my / SIZE + currentHalf( my ) );
+            runLevelScripts( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx / SIZE + currentHalf( mx ),
+                             my / SIZE + currentHalf( my ) );
         }
 
         _lastrow = NUM_ROWS - 1;
@@ -640,7 +643,7 @@ namespace MAP {
         auto curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         auto cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
-        if( std::abs( curx - p_globX ) > NUM_COLS / 2
+        if( std::abs( curx - p_globX ) >= NUM_COLS / 2
             || std::abs( cury - p_globY ) > NUM_ROWS / 2 ) {
             // A non-visible block got changed, we should not draw it on-screen.
             return;

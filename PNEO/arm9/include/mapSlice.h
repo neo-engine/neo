@@ -82,7 +82,7 @@ namespace MAP {
         u16 m_blockIdx : 12;
     };
 
-    constexpr u8     TILE_ANIMATION_COUNT = 50;
+    constexpr u8     TILE_ANIMATION_COUNT = 60;
     extern animation TILE_ANIMATIONS[ TILE_ANIMATION_COUNT ];
 
     constexpr u8 DOOR_ANIMATION_COUNT = 50;
