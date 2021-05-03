@@ -36,6 +36,22 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmath>
 
 namespace IO {
+    s32 counter::getResult( const char* p_message, style p_style ) {
+        u8 mxdg = 0;
+        for( s32 i = _maxValue; i > 0; i /= 10, mxdg++ ) {}
+
+        return getResult(
+            [ & ]( ) {
+                NAV::printMessage( p_message, p_style );
+                return NAV::drawCounter( _minValue, _maxValue );
+            },
+            [ & ]( s32 p_value, u8 p_selDigit ) {
+                NAV::updateCounterValue( p_value, p_selDigit, mxdg );
+            },
+            [ & ]( s32 p_button ) { NAV::hoverCounterButton( _minValue, _maxValue, p_button ); },
+            _minValue );
+    }
+
     s32
     counter::getResult( std::function<std::vector<std::pair<inputTarget, s32>>( )> p_drawFunction,
                         std::function<void( s32, u8 )>                             p_updateValue,
@@ -50,14 +66,12 @@ namespace IO {
         df /= 10;
 
         auto choices = p_drawFunction( );
-        if( !choices.size( ) ) [[unlikely]] {
-                return 0;
-            }
+        if( !choices.size( ) ) [[unlikely]] { return 0; }
 
         bool back = false, exit = false;
         for( auto i : choices ) {
             if( !i.second ) { back = true; }
-            if( i.second == _minValue - 1 ) { exit = true; }
+            if( i.second == _minValue - 3 ) { exit = true; }
         }
 
         p_updateValue( value, 0 );
@@ -88,7 +102,7 @@ namespace IO {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 cooldown = COOLDOWN_COUNT;
                 p_updateValue( value = 0, dig = 0 );
-                p_hoverButton( value = _minValue - 1 );
+                p_hoverButton( value = _minValue - 3 );
                 break;
             }
             if( GET_KEY_COOLDOWN( KEY_LEFT ) ) { // move to pre digit
@@ -152,9 +166,9 @@ namespace IO {
                         swiWaitForVBlank( );
                     }
                     if( !bad ) {
-                        if( !df2 || df2 == _minValue - 1 ) {
+                        if( !df2 || df2 == _minValue - 3 ) {
                             SOUND::playSoundEffect( SFX_CANCEL );
-                            return df2;
+                            return 0;
                         } else if( df2 == _minValue - 2 ) {
                             SOUND::playSoundEffect( SFX_CHOOSE );
                             return value;
@@ -163,7 +177,7 @@ namespace IO {
                         }
 
                         dig = 0;
-                        for( s32 tmp = df2; tmp > 0; tmp /= 10, ++dig ) {}
+                        for( s32 tmp = std::abs( df2 ); tmp > 0; tmp /= 10, ++dig ) {}
                         dig = mxdg - dig;
 
                         if( df2 > 0 ) {

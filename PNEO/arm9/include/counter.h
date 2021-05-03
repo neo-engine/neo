@@ -60,5 +60,7 @@ namespace IO {
                        std::function<void( s32, u8 )>                             p_updateValue,
                        std::function<void( s32 )> p_hoverButton, s32 p_initialValue = 0,
                        std::function<void( )> p_tick = DEFAULT_TICK );
+
+        s32 getResult( const char* p_message, style p_style );
     };
 } // namespace IO

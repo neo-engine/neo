@@ -164,6 +164,10 @@ namespace NAV {
         return printChoiceMessage( p_message.c_str( ), p_style, p_choices, p_selection );
     }
 
+    std::vector<std::pair<IO::inputTarget, s32>> drawCounter( s32 p_min, s32 p_max );
+    void updateCounterValue( s32 p_newValue, u8 p_selectedDigit, u8 p_numDigs );
+    void hoverCounterButton( s32 p_min, s32 p_max, s32 p_button );
+
     /*
      * @brief: Initializes the bottom screen with the main menu
      */

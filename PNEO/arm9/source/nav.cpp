@@ -1448,7 +1448,7 @@ namespace NAV {
         res.push_back(
             std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
                                         oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
-                       p_min - 1 ) );
+                       p_min - 3 ) );
         res.push_back(
             std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
                                         oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
@@ -1629,7 +1629,8 @@ namespace NAV {
                     updateCounterValue( p_newValue, p_selDig, mdg );
                 },
                 [ & ]( s32 p_hoveredButton ) { hoverCounterButton( 0, mx, p_hoveredButton ); }, 1 );
-            if( !res || res == -1 ) { return res; }
+            if( !res ) { return res; }
+            if( res == -3 ) { return -1; }
         } else {
             res = 1;
         }
@@ -2098,6 +2099,10 @@ namespace NAV {
                 SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_SUPER_ROD, 1 );
                 SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_GO_GOGGLES, 1 );
                 SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_DEVON_SCOPE, 1 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_RED_SHARD, 25 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_BLUE_SHARD, 25 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_YELLOW_SHARD, 25 );
+                SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_GREEN_SHARD, 25 );
                 init( );
                 break;
             case 2: {

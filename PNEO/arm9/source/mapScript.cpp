@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleTrainer.h"
 #include "boxViewer.h"
 #include "choiceBox.h"
+#include "counter.h"
 #include "defines.h"
 #include "fs.h"
 #include "locationNames.h"
@@ -139,7 +140,7 @@ namespace MAP {
 
         GVR  = 45, // get value of variable and write it to register parB
         SVR  = 46, // set value of variable to parB
-        SVRR = 47, // set value of variable to parB
+        SVRR = 47, // set value of variable to reg[ parB ]
         SUB  = 48, // reg[ par1 ] -= par2
         SUBR = 49, // reg[ par1 ] -= reg[ par2 ]
 
@@ -173,25 +174,27 @@ namespace MAP {
         TTMR = 108, // Take item
         UTMR = 109, // Use item
 
-        MSC = 113, // play music (temporary)
-        RMS = 114, // Reset music
-        CRY = 115, // Play cry
-        SFX = 116, // Play sound effect
-        PMO = 117, // Play music oneshot
-        SMC = 118, // Set music
-        SLC = 119, // Set location
-        SWT = 120, // Set weather to parA
-        WAT = 121, // Wait
-        MBG = 122, // Pokemart description begin
-        MIT = 123, // Mart item
+        COUR = 112, // Counter message (make player select number between 0 and reg[ parB ]
+        MSC  = 113, // play music (temporary)
+        RMS  = 114, // Reset music
+        CRY  = 115, // Play cry
+        SFX  = 116, // Play sound effect
+        PMO  = 117, // Play music oneshot
+        SMC  = 118, // Set music
+        SLC  = 119, // Set location
+        SWT  = 120, // Set weather to parA
+        WAT  = 121, // Wait
+        MBG  = 122, // Pokemart description begin
+        MIT  = 123, // Mart item
+        COU  = 124, // Counter message (make player select number between 0 and parB
+        YNM  = 125, // yes no message
+        CLL  = 126, // Call special function
+        MSG  = 127, // message
+        CBG  = 128, // choice box begin
+        CIT  = 129, // choice item
+        BTZ  = 130, // battle zone facility script
 
-        YNM = 125, // yes no message
-        CLL = 126, // Call special function
-        MSG = 127, // message
-        CBG = 128, // choice box begin
-        CIT = 129, // choice item
-
-        BTZ = 130, // battle zone facility script
+        MAP = 140, // redraw current map
 
         DES = 150, // register pkmn as seen in pkdex
 
@@ -521,17 +524,31 @@ namespace MAP {
                 if( registers[ par1 ] == par2 ) { pc += par3; }
                 break;
             }
-            case SUB: registers[ par1 ] -= par2; break;
-            case ADD: registers[ par1 ] += par2; break;
+
+            case MINR: registers[ par3 ] = std::min( registers[ par1 ], registers[ par2 ] ); break;
+            case MAXR: registers[ par3 ] = std::max( registers[ par1 ], registers[ par2 ] ); break;
+
+            case SUB: registers[ parA ] -= parB; break;
+            case ADD: registers[ parA ] += parB; break;
             case DIV:
-                if( par2 ) { registers[ par1 ] /= par2; }
+                if( parB ) { registers[ parA ] /= parB; }
                 break;
-            case ARG: registers[ par1 ] += registers[ par2 ]; break;
+            case ARG: {
+                registers[ par1 ] += registers[ par2 ];
+#ifdef DESQUID_MORE
+                std::string dstr = "";
+                for( u8 q = 0; q < 10; ++q ) { dstr += std::to_string( registers[ q ] ) + " "; }
+                NAV::printMessage( dstr, MSG_INFO );
+
+#endif
+
+                break;
+            }
             case SUBR: registers[ par1 ] -= registers[ par2 ]; break;
             case DRG:
                 if( registers[ par2 ] ) { registers[ par1 ] /= registers[ par2 ]; }
                 break;
-            case SRG: registers[ par1 ] = par2; break;
+            case SRG: registers[ parA ] = parB; break;
             case MRG: registers[ par2 ] = registers[ par1 ]; break;
             case JMP:
                 if( pc + par1 < MAX_SCRIPT_SIZE ) {
@@ -682,7 +699,6 @@ namespace MAP {
                 break;
             case CVRG:
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) > par2 ) { pc += par3; }
-                if( registers[ par1 ] > par2 ) { pc += par3; }
                 break;
             case CVRN:
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) != par2 ) { pc += par3; }
@@ -691,7 +707,7 @@ namespace MAP {
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) == par2 ) { pc += par3; }
                 break;
 
-            case GVR: registers[ parA ] = SAVE::SAV.getActiveFile( ).getVar( parB ); break;
+            case GVR: registers[ parB ] = SAVE::SAV.getActiveFile( ).getVar( parA ); break;
             case SVR: SAVE::SAV.getActiveFile( ).setVar( parA, parB ); break;
             case SVRR: SAVE::SAV.getActiveFile( ).setVar( parA, registers[ parB ] ); break;
 
@@ -744,6 +760,19 @@ namespace MAP {
             }
             case FNT: {
                 faintPlayer( );
+                break;
+            }
+            case MAP: {
+                auto playerPrio = _mapSprites.getPriority( _playerSprite );
+                FADE_TOP_DARK( );
+                ANIMATE_MAP = false;
+                swiWaitForVBlank( );
+
+                NAV::init( );
+                draw( playerPrio );
+                _mapSprites.setPriority( _playerSprite,
+                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
+                ANIMATE_MAP = true;
                 break;
             }
             case BTR: {
@@ -839,7 +868,10 @@ namespace MAP {
             case TTM: NAV::takeItemFromPlayer( parA, parB ); break;
             case UTM: NAV::useItemFromPlayer( parA, parB ); break;
             case ITMR: NAV::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
-            case TTMR: NAV::takeItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
+            case TTMR: {
+                NAV::takeItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] );
+                break;
+            }
             case UTMR: NAV::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
                 SOUND::playBGM( parA, true );
@@ -1325,6 +1357,27 @@ namespace MAP {
                 default: break;
                 }
                 break;
+            case COU: {
+                style st       = MSG_INFO_NOCLOSE;
+                registers[ 0 ] = IO::counter( 0, parB ).getResult(
+                    convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st );
+                NAV::init( );
+                break;
+            }
+            case COUR: {
+                style st = MSG_INFO_NOCLOSE;
+                registers[ 0 ]
+                    = IO::counter( 0, registers[ parB ] )
+                          .getResult( convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st );
+                NAV::init( );
+#ifdef DESQUID_MORE
+                std::string dstr = "";
+                for( u8 q = 0; q < 10; ++q ) { dstr += std::to_string( registers[ q ] ) + " "; }
+                NAV::printMessage( dstr, MSG_INFO );
+#endif
+                break;
+            }
+
             case YNM: {
                 style st        = (style) parB;
                 bool  showMoney = st & MSG_SHOW_MONEY_FLAG;
