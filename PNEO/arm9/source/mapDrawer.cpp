@@ -749,6 +749,26 @@ namespace MAP {
 
                     if( trainerDir != o.second.m_direction ) { continue; }
 
+                    // Check if anything is blocking the path between trainer and player
+                    bool pathblocked = false;
+                    auto stpos       = o.second.m_pos;
+                    for( u8 d = 1;
+                         d < dist( p_globX, p_globY, o.second.m_pos.m_posX, o.second.m_pos.m_posY );
+                         ++d ) {
+                        if( !canMove( stpos, trainerDir, WALK, true ) ) {
+                            pathblocked = true;
+                            break;
+                        }
+                        stpos.m_posX += dir[ trainerDir ][ 0 ];
+                        stpos.m_posY += dir[ trainerDir ][ 1 ];
+                        if( _pkmnFollowsPlayer && stpos.m_posX == _followPkmn.m_pos.m_posX
+                            && stpos.m_posY == _followPkmn.m_pos.m_posY ) {
+                            pathblocked = true;
+                            break;
+                        }
+                    }
+
+                    if( pathblocked ) [[unlikely]] { continue; }
                     // Check for exclamation mark / music change
                     if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
                             o.second.m_event.m_data.m_trainer.m_trainerId ) ) ) [[likely]] {
@@ -1607,7 +1627,14 @@ namespace MAP {
             // Check if any event is occupying the target block
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
-                if( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny ) {
+                if( ( o.second.m_pos.m_posX == nx && o.second.m_pos.m_posY == ny )
+                    || ( o.second.m_currentMovement.m_frame
+                         && o.second.m_pos.m_posX
+                                    + dir[ o.second.m_currentMovement.m_direction ][ 0 ]
+                                == nx
+                         && o.second.m_pos.m_posY
+                                    + dir[ o.second.m_currentMovement.m_direction ][ 1 ]
+                                == ny ) ) {
                     switch( o.second.m_event.m_type ) {
                     case EVENT_HMOBJECT:
                         if( o.second.m_event.m_data.m_hmObject.m_hmType
