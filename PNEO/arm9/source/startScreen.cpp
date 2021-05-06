@@ -247,7 +247,7 @@ namespace SAVE {
         REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
         REG_BLDALPHA_SUB = 0xff | ( 0x06 << 8 );
         bgUpdate( );
-        IO::fadeScreen( IO::CLEAR_DARK_FAST, true, true );
+        IO::fadeScreen( IO::CLEAR_DARK_FAST, true, false );
         IO::initOAMTable( true );
 
         // Sprites
