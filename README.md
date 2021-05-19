@@ -31,22 +31,23 @@ _Partially_ implemented features are in _italics_.
         * [x] Move effects
         * [ ] Move animations
     * [x] A fully working bag
-    * [x] The ability to load maps (for now only GBA-style maps are supported) including
-        * [x] Events
-        * [x] Wild Pokémon encounter
-        * [x] Animated map tiles
+    * [x] A working map engine (for now only GBA-style maps are supported) including
+        * [x] Events, Warps
+        * [x] Wild Pokémon encounters
+        * [x] Pokémon Trainers challenging the player
+        * [x] Animated map tiles, changing tiles based on story progress
         * [x] Player sprite, animated moving, surfing, cycling, and fishing
         * [x] PKMN following the player
-        * [x] Warps
         * [x] Weather and other overlays (flash, sandstorm, etc)
-    * [x] BGM and SFX using MaxMod
+    * [x] BGM and SFX using MaxMod including
+        * [x] An in-game jukebox
     * [x] A real time clock
         * [x] Overworld changes based on time (map palette akin to DNS)
         * [x] Different wild Pokémon encounters based on time.
         * [x] Map events based on day time
-    * [x] Support for save games
-        * [x] Saving the progress to the micro SD (only works on flash cards)
-        * [x] Saving the progress to flash memory (only works in emulators)
+    * [x] Support for (multiple) save games
+        * [x] Saving the progress to the micro SD (works only on flash cards)
+        * [x] Saving the progress to flash memory (works only in emulators)
     * [ ] Support for communication with “the originals”
         * [ ] Playing with / importing a save from a GBA version
         * [ ] Link trading with Gen IV and Gen V games
@@ -54,7 +55,6 @@ _Partially_ implemented features are in _italics_.
     * [x] Dynamic difficulty
         * [x] Wild Pokémon's levels scale with the story progression
         * [x] Adjust the difficulty anytime via the Options.
-    * [x] Support for multiple save files
     * [x] Full support for multiple languages (English, German)
         * [x] Kana are supported font-wise, getting Kana text for story content still requires some work.
 
@@ -107,6 +107,7 @@ Screenshots
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm15.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm16.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm17.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm18.png)
 
 ##### Pokémon status screens
 
