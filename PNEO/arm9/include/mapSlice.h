@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <vector>
 #include <nds/ndstypes.h>
+#include "mapDefines.h"
 
 namespace MAP {
     constexpr u8  MAX_ANIM_PER_TILE_SET   = 32;
@@ -101,16 +102,32 @@ namespace MAP {
         u8  m_movedata : 6;
     };
 
+    struct mapSliceData {
+        u8 m_sizeX = SIZE; // ignored / assumed to be SIZE
+        u32 : 24;
+        u8 m_sizeY = SIZE; // ignored / assumed to be SIZE
+        u32 : 24;
+
+        u8 m_tIdx1 = 0;
+        u32 : 24;
+        u8 m_tIdx2 = 0;
+        u32 : 24;
+
+        u8 m_borderSizeX = 0; // ignored / assumed to be 0
+        u8 m_borderSizeY = 0; // ignored / assumed to be 0
+        u32 : 16;
+
+        mapBlockAtom m_blocks[ SIZE ][ SIZE ] = { { mapBlockAtom( ) } }; // [ y ][ x ]
+    };
+
     struct mapSlice {
         bool         m_loaded = false;
+        u16          m_x = 0, m_y = 0;
         palette      m_pals[ 16 * 5 ];
         tileSet      m_tileSet;
         blockSet     m_blockSet;
-        mapBlockAtom m_blocks[ SIZE ][ SIZE ]; // [ y ][ x ]
-        u8           m_map;
-        u16          m_x, m_y;
-        u8           m_tIdx1 = 255, m_tIdx2 = 255;
+        mapSliceData m_data;
     };
-    void constructSlice( u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
-                         mapSlice p_cache[ 2 ][ 2 ] = 0 );
+    void constructSlice( FILE* p_f, u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
+                         mapData* p_resultData, mapSlice p_cache[ 2 ][ 2 ] = 0 );
 } // namespace MAP

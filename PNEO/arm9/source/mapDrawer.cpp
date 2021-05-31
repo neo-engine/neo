@@ -50,8 +50,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace MAP {
-#define MAP_BORDER 0x3f
-
 #define SPR_PKMN_OAM 100
 #define SPR_CIRC_OAM 104
 
@@ -87,6 +85,15 @@ namespace MAP {
 #define CUR_SLICE _slices[ _curX ][ _curY ]
     constexpr s8 currentHalf( u16 p_pos ) {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
+    }
+
+    mapDrawer::mapDrawer( ) : _curX( 0 ), _curY( 0 ), _playerIsFast( false ) {
+        _mapSprites.init( );
+    }
+
+    void mapDrawer::loadNewBank( u8 p_bank ) {
+        if( _currentBank != nullptr ) { fclose( _currentBank ); }
+        _currentBank = FS::openBank( p_bank );
     }
 
     void mapDrawer::loadMapObject( std::pair<u8, mapObject>& p_mapObject ) {
@@ -154,12 +161,12 @@ namespace MAP {
     const mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-            .m_blocks[ p_y % SIZE ][ p_x % SIZE ];
+            .m_data.m_blocks[ p_y % SIZE ][ p_x % SIZE ];
     }
     const block& mapDrawer::at( u16 p_x, u16 p_y ) const {
         bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
         u16  blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-                           .m_blocks[ p_y % SIZE ][ p_x % SIZE ]
+                           .m_data.m_blocks[ p_y % SIZE ][ p_x % SIZE ]
                            .m_blockidx;
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ].m_blockSet.m_blocks[ blockidx ];
     }
@@ -167,12 +174,12 @@ namespace MAP {
     mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) {
         bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-            .m_blocks[ p_y % SIZE ][ p_x % SIZE ];
+            .m_data.m_blocks[ p_y % SIZE ][ p_x % SIZE ];
     }
     block& mapDrawer::at( u16 p_x, u16 p_y ) {
         bool x = ( p_x / SIZE != CUR_SLICE.m_x ), y = ( p_y / SIZE != CUR_SLICE.m_y );
         u16  blockidx = _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ]
-                           .m_blocks[ p_y % SIZE ][ p_x % SIZE ]
+                           .m_data.m_blocks[ p_y % SIZE ][ p_x % SIZE ]
                            .m_blockidx;
         return _slices[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ].m_blockSet.m_blocks[ blockidx ];
     }
@@ -385,24 +392,19 @@ namespace MAP {
 
             u16 mx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 my = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-            constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
-                            &_slices[ _curX ][ _curY ], _slices );
-            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE, my / SIZE,
-                             _data[ _curX ][ _curY ] );
-            constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                            my / SIZE, &_slices[ _curX ^ 1 ][ _curY ], _slices );
-            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                             my / SIZE, _data[ _curX ^ 1 ][ _curY ] );
-            constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
+            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
+                            my / SIZE, &_slices[ _curX ][ _curY ], &_data[ _curX ][ _curY ],
+                            _slices );
+            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap,
+                            mx / SIZE + currentHalf( mx ), my / SIZE,
+                            &_slices[ _curX ^ 1 ][ _curY ], &_data[ _curX ^ 1 ][ _curY ], _slices );
+            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
                             my / SIZE + currentHalf( my ), &_slices[ _curX ][ _curY ^ 1 ],
+                            &_data[ _curX ][ _curY ^ 1 ], _slices );
+            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap,
+                            mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ),
+                            &_slices[ _curX ^ 1 ][ _curY ^ 1 ], &_data[ _curX ^ 1 ][ _curY ^ 1 ],
                             _slices );
-            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
-                             my / SIZE + currentHalf( my ), _data[ _curX ][ _curY ^ 1 ] );
-            constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                            my / SIZE + currentHalf( my ), &_slices[ _curX ^ 1 ][ _curY ^ 1 ],
-                            _slices );
-            FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE + currentHalf( mx ),
-                             my / SIZE + currentHalf( my ), _data[ _curX ^ 1 ][ _curY ^ 1 ] );
 
             for( u8 i = 1; i < 4; ++i ) {
                 bgInit( i - 1, BgType_Text4bpp, BgSize_T_512x256, 2 * i - 1, 1 );
@@ -668,9 +670,9 @@ namespace MAP {
         case 0x24: {
             // ashen grass
             animateField( p_globX, p_globY, anim );
-            if( CUR_SLICE.m_tIdx2 == 6 ) {
+            if( CUR_SLICE.m_data.m_tIdx2 == 6 ) {
                 setBlock( p_globX, p_globY, 0x206 );
-            } else if( CUR_SLICE.m_tIdx2 == 7 ) {
+            } else if( CUR_SLICE.m_data.m_tIdx2 == 7 ) {
                 setBlock( p_globX, p_globY, 0x212 );
             }
             break;
@@ -867,15 +869,15 @@ namespace MAP {
             || ( dir[ p_direction ][ 1 ] == 1 && _cy % 32 == 0 )
             || ( dir[ p_direction ][ 1 ] == -1 && _cy % 32 == 31 ) ) {
 
-            u8 oldts1 = CUR_SLICE.m_tIdx1;
-            u8 oldts2 = CUR_SLICE.m_tIdx2;
+            u8 oldts1 = CUR_SLICE.m_data.m_tIdx1;
+            u8 oldts2 = CUR_SLICE.m_data.m_tIdx2;
 
             _curX = ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1;
             _curY = ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1;
             // Update tileset, block and palette data
 
-            u8 newts1 = CUR_SLICE.m_tIdx1;
-            u8 newts2 = CUR_SLICE.m_tIdx2;
+            u8 newts1 = CUR_SLICE.m_data.m_tIdx1;
+            u8 newts2 = CUR_SLICE.m_data.m_tIdx2;
 
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
 
@@ -963,13 +965,12 @@ namespace MAP {
         auto mx = CUR_SLICE.m_x + dir[ p_direction ][ 0 ],
              my = CUR_SLICE.m_y + dir[ p_direction ][ 1 ];
 
-        constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
+        constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                         &_slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                                 [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
+                        &_data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
+                              [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
                         _slices );
-        FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
-                         _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
-                              [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ] );
         runLevelScripts( _data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                               [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
                          mx, my );
@@ -978,10 +979,9 @@ namespace MAP {
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         mx = neigh.m_x + dir[ p_direction ][ 0 ];
         my = neigh.m_y + dir[ p_direction ][ 1 ];
-        constructSlice( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
-                        &_slices[ _curX ^ 1 ][ _curY ^ 1 ], _slices );
-        FS::readMapData( SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
-                         _data[ _curX ^ 1 ][ _curY ^ 1 ] );
+        constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
+                        &_slices[ _curX ^ 1 ][ _curY ^ 1 ], &_data[ _curX ^ 1 ][ _curY ^ 1 ],
+                        _slices );
         runLevelScripts( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx, my );
     }
 
@@ -1012,9 +1012,9 @@ namespace MAP {
         u8   ts    = 0;
 
         if( block.m_blockidx < MAX_BLOCKS_PER_TILE_SET ) {
-            ts = CUR_SLICE.m_tIdx1;
+            ts = CUR_SLICE.m_data.m_tIdx1;
         } else {
-            ts = CUR_SLICE.m_tIdx2;
+            ts = CUR_SLICE.m_data.m_tIdx2;
         }
 
         for( u8 i = 0; i < DOOR_ANIMATION_COUNT; ++i ) {
@@ -1090,7 +1090,7 @@ namespace MAP {
         if( !wdata.first ) { return; }
 
         if( wdata.second.m_warp.m_warpType != NO_SPECIAL ) {
-            p_type = wdata.second.m_warp.m_warpType;
+            p_type = (warpType) wdata.second.m_warp.m_warpType;
             if( wdata.second.m_warp.m_warpType == LAST_VISITED ) {
                 tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
             } else {
@@ -1588,7 +1588,7 @@ namespace MAP {
         u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
         for( u8 i = 0; i < TILE_ANIMATION_COUNT; ++i ) {
             if( !TILE_ANIMATIONS[ i ].m_size ) { break; }
-            if( CUR_SLICE.m_tIdx1 == TILE_ANIMATIONS[ i ].m_tileSetIdx ) {
+            if( CUR_SLICE.m_data.m_tIdx1 == TILE_ANIMATIONS[ i ].m_tileSetIdx ) {
                 auto& a = TILE_ANIMATIONS[ i ];
                 if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                     a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
@@ -1596,7 +1596,7 @@ namespace MAP {
                              tileMemory + a.m_tileIdx * 32, sizeof( tile ) * a.m_size );
                 }
             }
-            if( CUR_SLICE.m_tIdx2 == TILE_ANIMATIONS[ i ].m_tileSetIdx ) {
+            if( CUR_SLICE.m_data.m_tIdx2 == TILE_ANIMATIONS[ i ].m_tileSetIdx ) {
                 auto& a = TILE_ANIMATIONS[ i ];
                 if( a.m_speed <= 1 || p_frame % a.m_speed == 0 ) {
                     a.m_acFrame = ( a.m_acFrame + 1 ) % a.m_maxFrame;
@@ -1606,10 +1606,6 @@ namespace MAP {
                 }
             }
         }
-    }
-
-    mapDrawer::mapDrawer( ) : _curX( 0 ), _curY( 0 ), _playerIsFast( false ) {
-        _mapSprites.init( );
     }
 
     // Movement stuff
@@ -1860,18 +1856,6 @@ namespace MAP {
 
         bool reinit = false, moving = true, hadjump = false;
         while( moving ) {
-            if( newMoveData == MAP_BORDER ) {
-                fastBike = false;
-                stopPlayer( direction( ( u8( p_direction ) + 2 ) % 4 ) );
-                swiWaitForVBlank( );
-                swiWaitForVBlank( );
-                swiWaitForVBlank( );
-                swiWaitForVBlank( );
-                stopPlayer( );
-                NAV::printMessage( GET_STRING( 7 ), MSG_INFO );
-                _playerIsFast = false;
-                return;
-            }
             // Check for end of surf, stand up and sit down
             if( lstMoveData == 0x0a
                 && newMoveData != 0x0a ) { // Stand up (only possible for the player)
@@ -2312,13 +2296,13 @@ namespace MAP {
         loadNewBank( p_target.first );
 
         mapData ndata;
-        FS::readMapData( p_target.first, p_target.second.m_posX / SIZE,
-                         p_target.second.m_posY / SIZE, ndata );
-
+        FS::readMapSliceAndData( _currentBank, nullptr, &ndata, p_target.second.m_posX / SIZE,
+                                 p_target.second.m_posY / SIZE );
         u8 newMapType = u8( ndata.m_mapType );
 
         if( checkPos ) {
-            auto curL   = ndata.m_baseLocationId;
+            auto curL = ndata.m_locationIds[ ( p_target.second.m_posY % SIZE ) / 8 ]
+                                           [ ( p_target.second.m_posX % SIZE ) / 8 ];
             auto tmpPos = getOWPosForLocation( curL );
             if( tmpPos != DUMMY_POSITION ) {
                 SAVE::SAV.getActiveFile( ).m_lastOWPos
@@ -2401,7 +2385,7 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_currentMapWeather = DARK_PERMANENT;
             }
         } else {
-            SAVE::SAV.getActiveFile( ).m_currentMapWeather = ndata.m_weather;
+            SAVE::SAV.getActiveFile( ).m_currentMapWeather = (mapWeather) ndata.m_weather;
         }
         if( oldw != SAVE::SAV.getActiveFile( ).m_currentMapWeather ) { initWeather( ); }
 
@@ -3316,48 +3300,7 @@ namespace MAP {
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % SIZE;
 
         const mapData& mdata = currentData( );
-
-        u16 res = mdata.m_baseLocationId;
-        for( u8 i = 0; i < mdata.m_extraLocationCount; ++i ) {
-            if( mdata.m_extraLocations[ i ].m_left <= curx
-                && mdata.m_extraLocations[ i ].m_right >= curx
-                && mdata.m_extraLocations[ i ].m_top <= cury
-                && mdata.m_extraLocations[ i ].m_bottom >= cury ) {
-
-                res = mdata.m_extraLocations[ i ].m_locationId;
-                break;
-            }
-        }
-        return res;
-    }
-    u16 mapDrawer::getCurrentLocationId( u8 p_file ) const {
-        if( SAVE::SAV.m_saveFile[ p_file ].m_currentMap == OW_MAP ) [[likely]] {
-            return BANK_10_MAP_LOCATIONS[ SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY
-                                          / MAP_LOCATION_RES ]
-                                        [ SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX
-                                          / MAP_LOCATION_RES ];
-        }
-
-        u16 curx = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX % SIZE;
-        u16 cury = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY % SIZE;
-        u16 mapx = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posX / SIZE;
-        u16 mapy = SAVE::SAV.m_saveFile[ p_file ].m_player.m_pos.m_posY / SIZE;
-
-        mapData mdata;
-        FS::readMapData( SAVE::SAV.m_saveFile[ p_file ].m_currentMap, mapx, mapy, mdata );
-
-        u16 res = mdata.m_baseLocationId;
-        for( u8 i = 0; i < mdata.m_extraLocationCount; ++i ) {
-            if( mdata.m_extraLocations[ i ].m_left <= curx
-                && mdata.m_extraLocations[ i ].m_right >= curx
-                && mdata.m_extraLocations[ i ].m_top <= cury
-                && mdata.m_extraLocations[ i ].m_bottom >= cury ) {
-
-                res = mdata.m_extraLocations[ i ].m_locationId;
-                break;
-            }
-        }
-        return res;
+        return mdata.m_locationIds[ cury / 8 ][ curx / 8 ];
     }
 
     void mapDrawer::constructAndAddNewMapObjects( MAP::mapData const& p_data, u8 p_mapX,

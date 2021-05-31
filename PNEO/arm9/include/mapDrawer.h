@@ -41,6 +41,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     class mapDrawer {
       private:
+        FILE* _currentBank = nullptr;
+        void  loadNewBank( u8 p_bank );
+
         mapSpriteManager _mapSprites;
 
         ObjPriority _lastPlayerPriority = OBJPRIORITY_1;
@@ -220,6 +223,11 @@ namespace MAP {
 
         mapDrawer( );
 
+        inline ~mapDrawer( ) {
+            if( _currentBank != nullptr ) { fclose( _currentBank ); }
+            _currentBank = nullptr;
+        }
+
         direction getFollowPkmnDirection( ) const;
 
         inline mapWeather getWeather( ) const {
@@ -392,7 +400,6 @@ namespace MAP {
         bool requestWildPkmn( bool p_forceHighGrass = false );
 
         u16 getCurrentLocationId( ) const;
-        u16 getCurrentLocationId( u8 p_file ) const;
     };
     extern mapDrawer* curMap;
 } // namespace MAP

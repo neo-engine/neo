@@ -49,11 +49,11 @@ namespace FS {
     bool   exists( const char* p_path, const char* p_name );
     bool   exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE*  open( const char* p_path, const char* p_name, const char* p_ext = ".raw",
-                 const char* p_mode = "rbm" );
+                 const char* p_mode = "rb" );
     FILE*  open( const char* p_path, u16 p_value, const char* p_ext = ".raw",
-                 const char* p_mode = "rbm" );
+                 const char* p_mode = "rb" );
     FILE*  openSplit( const char* p_path, u16 p_value, const char* p_ext = ".raw",
-                      u16 p_maxValue = 99 * ITEMS_PER_DIR, const char* p_mode = "rbm" );
+                      u16 p_maxValue = 99 * ITEMS_PER_DIR, const char* p_mode = "rb" );
     void   close( FILE* p_file );
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );
@@ -75,12 +75,20 @@ namespace FS {
     bool readPal( FILE* p_file, MAP::palette* p_palette, u8 p_count = 6 );
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
     bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
-    bool readBankData( u8 p_bank, MAP::bankInfo& p_result );
-    bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result );
+
+    FILE* openBank( u8 p_bank );
+
+    bool readMapData( FILE* p_file, MAP::mapData* p_result, bool p_close = true );
+
+    bool readMapSlice( FILE* p_mapFile, MAP::mapSlice* p_result, u16 p_x = 0, u16 p_y = 0,
+                       bool p_close = true );
+
+    u32 readMapSliceAndData( FILE* p_mapFile, MAP::mapSlice* p_slice, MAP::mapData* p_data, u16 p_x,
+                             u16 p_y );
 
     FILE* openScript( u16 p_scriptId );
 
-    u8*  readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
+    u8* readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
     u8* readSFX( u16 p_sfxID, u16& p_len );
 
     // bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );

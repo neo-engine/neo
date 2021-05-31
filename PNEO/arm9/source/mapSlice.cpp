@@ -38,78 +38,79 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace MAP {
-    void constructSlice( u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
-                         mapSlice p_cache[ 2 ][ 2 ] ) {
-        FILE* mapF;
-        char  buffer[ 50 ];
+    void constructSlice( FILE* p_f, u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
+                         mapData* p_resultData, mapSlice p_cache[ 2 ][ 2 ] ) {
+        bool mapExists = true;
+        if( !p_f ) { p_f = FS::openBank( p_map ); }
 
-        if( p_map == 10 ) {
-            snprintf( buffer, 49, "%hhu/%hu/%hu_%hu", p_map, p_y, p_y, p_x );
-            mapF = FS::open( MAP_PATH, buffer, ".map" );
-        } else {
-            snprintf( buffer, 49, "%hhu/%hu_%hu", p_map, p_y, p_x );
-            mapF = FS::open( MAP_PATH, buffer, ".map" );
-        }
-        bool nomap = false;
-        if( !mapF ) {
-#ifdef DESQUID_MORE
-            snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
-            NAV::printMessage( buffer, MSG_INFO );
-            swiWaitForVBlank( );
-#endif
-            // mapF = FS::open( MAP_PATH, "empty", ".map" );
-            nomap = true;
-            // if( !mapF ) return;
-            std::memset( p_result->m_blocks, 0, SIZE * SIZE * sizeof( mapBlockAtom ) );
-
-            p_result->m_tIdx1 = 255;
-            p_result->m_tIdx2 = 255;
-        }
-
-        bool reloadTs = false;
 #ifdef DESQUID
         if( !p_result ) {
             NAV::printMessage( "Bad things happened, aborting", MSG_INFO );
             return;
         }
 #endif
-        if( !p_result->m_loaded ) { reloadTs = !nomap; }
 
-        if( !nomap ) { FS::readNop( mapF, 8 ); }
-        p_result->m_loaded = true;
-        p_result->m_x      = p_x;
-        p_result->m_y      = p_y;
+        if( !p_f ) {
+#ifdef DESQUID
+            char buffer[ 50 ];
+            snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
+            NAV::printMessage( buffer, MSG_INFO );
+            swiWaitForVBlank( );
+#endif
+            mapExists = false;
+            std::memset( p_result->m_data.m_blocks, 0, SIZE * SIZE * sizeof( mapBlockAtom ) );
 
-        u8 tsidx1, tsidx2;
-        if( !nomap ) {
-            FS::read( mapF, &tsidx1, sizeof( u8 ), 1 );
-            FS::readNop( mapF, 3 );
-            FS::read( mapF, &tsidx2, sizeof( u8 ), 1 );
-            FS::readNop( mapF, 3 );
+            p_result->m_data.m_tIdx1 = 255;
+            p_result->m_data.m_tIdx2 = 255;
+        }
 
-            u8 b1, b2;
-            FS::read( mapF, &b1, sizeof( u8 ), 1 );
-            FS::read( mapF, &b2, sizeof( u8 ), 1 );
-            FS::readNop( mapF, 2 );
+        u16  oldts1   = p_result->m_data.m_tIdx1;
+        u16  oldts2   = p_result->m_data.m_tIdx2;
+        bool reloadTs = false;
+        if( !p_result->m_loaded ) { reloadTs = mapExists; }
 
-            if( b1 && b2 ) {
-                FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ),
-                          b1 * b2 ); // Border blocks
-            }
-
-            FS::read( mapF, p_result->m_blocks, sizeof( mapBlockAtom ), SIZE * SIZE );
-            FS::close( mapF );
+        if( mapExists ) {
+            auto res           = FS::readMapSliceAndData( p_f, p_result, p_resultData, p_x, p_y );
+            p_result->m_loaded = !res;
+            /*            char buffer[ 100 ];
+                        snprintf(
+                            buffer, 99,
+                            "Map %d/%d,%d %lu %lu %lu %lu\n%02hhx %02hhx %02hhx %02hhx | %02hhx
+               %02hhx %02hhx %02hhx | %02hhx %02hhx %02hhx %02hhx", p_map, p_y, p_x, res, sizeof(
+               bankInfo ), sizeof( mapSliceData ), sizeof( mapData ), reinterpret_cast<u8*>(
+               p_resultData )[ 0 ], reinterpret_cast<u8*>( p_resultData )[ 1 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 2 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 3 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 4 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 5 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 6 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 7 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 8 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 9 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 10 ],
+                            reinterpret_cast<u8*>( p_resultData )[ 11 ] );
+                        NAV::printMessage( buffer, MSG_INFO );
+                        */
         } else {
             return;
         }
 
+        FILE* mapF;
+
+        u16 tsidx1 = p_result->m_data.m_tIdx1;
+        u16 tsidx2 = p_result->m_data.m_tIdx2;
+
+        p_result->m_data.m_tIdx1 = oldts1;
+        p_result->m_data.m_tIdx2 = oldts2;
+
         // Read the first tileset
-        if( reloadTs || p_result->m_tIdx1 != tsidx1 ) {
+        if( reloadTs || tsidx1 != oldts1 ) {
             bool found = false;
             if( !reloadTs && p_cache ) {
                 for( u8 i = 0; i < 2; ++i )
                     for( u8 j = 0; j < 2; ++j )
-                        if( p_cache[ i ][ j ].m_loaded && p_cache[ i ][ j ].m_tIdx1 == tsidx1 ) {
+                        if( p_cache[ i ][ j ].m_loaded
+                            && p_cache[ i ][ j ].m_data.m_tIdx1 == tsidx1 ) {
                             found = true;
                             memcpy( p_result->m_tileSet.m_tiles,
                                     p_cache[ i ][ j ].m_tileSet.m_tiles,
@@ -138,16 +139,15 @@ namespace MAP {
                 for( u8 i = 0; i < 5; ++i ) { FS::readPal( mapF, p_result->m_pals + i * 16, 8 ); }
                 FS::close( mapF );
             }
-
-            p_result->m_tIdx1 = tsidx1;
         }
         // Read the second tileset
-        if( reloadTs || p_result->m_tIdx2 != tsidx2 ) {
+        if( reloadTs || tsidx2 != oldts2 ) {
             bool found = false;
             if( !reloadTs && p_cache ) {
                 for( u8 i = 0; i < 2; ++i )
                     for( u8 j = 0; j < 2; ++j )
-                        if( p_cache[ i ][ j ].m_loaded && p_cache[ i ][ j ].m_tIdx2 == tsidx2 ) {
+                        if( p_cache[ i ][ j ].m_loaded
+                            && p_cache[ i ][ j ].m_data.m_tIdx2 == tsidx2 ) {
                             found = true;
                             memcpy( p_result->m_tileSet.m_tiles + MAX_TILES_PER_TILE_SET,
                                     p_cache[ i ][ j ].m_tileSet.m_tiles + MAX_TILES_PER_TILE_SET,
@@ -179,7 +179,8 @@ namespace MAP {
                 }
                 FS::close( mapF );
             }
-            p_result->m_tIdx2 = tsidx2;
         }
+        p_result->m_data.m_tIdx1 = tsidx1;
+        p_result->m_data.m_tIdx2 = tsidx2;
     }
 } // namespace MAP

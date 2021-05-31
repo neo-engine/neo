@@ -221,42 +221,40 @@ namespace MAP {
 
     constexpr u8 MAX_EVENTS_PER_SLICE = 64;
     struct mapData {
-        mapType    m_mapType;
-        mapWeather m_weather;
-        u8         m_battleBG;
-        u8         m_battlePlat1;
-        u8         m_battlePlat2;
-        u8         m_surfBattleBG;
-        u8         m_surfBattlePlat1;
-        u8         m_surfBattlePlat2;
+        u8 m_mapType;
+        u8 m_weather;
+        u8 m_battleBG;
+        u8 m_battlePlat1;
 
-        u16 m_baseLocationId;
-        u8  m_extraLocationCount;
-        struct locationData {
-            u8  m_left;
-            u8  m_top;
-            u8  m_right;
-            u8  m_bottom;
-            u16 m_locationId;
-        } m_extraLocations[ 4 ];
+        u8 m_battlePlat2;
+        u8 m_surfBattleBG;
+        u8 m_surfBattlePlat1;
+        u8 m_surfBattlePlat2;
+
         u8 m_pokemonDescrCount;
-        struct wildPkmnData {
-            u16          m_speciesId;
-            u8           m_forme;
-            wildPkmnType m_encounterType;
-            u8           m_slot;
-            u8           m_daytime;
-            u8           m_encounterRate;
-        } m_pokemon[ 30 ];
         u8 m_eventCount;
+        u32 : 16;
+
+        u16 m_locationIds[ 4 ][ 4 ]; // (y, x), 8x8 blocks each
+
+        struct wildPkmnData {
+            u16 m_speciesId;
+            u8  m_forme;
+            u8  m_encounterType;
+
+            u8 m_slot;
+            u8 m_daytime;
+            u8 m_encounterRate;
+        } m_pokemon[ 30 ];
         struct event {
-            u8           m_posX;
-            u8           m_posY;
-            u8           m_posZ;
-            u16          m_activateFlag;
-            u16          m_deactivateFlag;
-            eventType    m_type;
-            eventTrigger m_trigger;
+            u8  m_posX;
+            u8  m_posY;
+            u8  m_posZ;
+            u16 m_activateFlag;
+            u16 m_deactivateFlag;
+            u8  m_type;
+
+            u8 m_trigger;
             union data {
                 struct {
                     u8  m_msgType;
@@ -267,31 +265,35 @@ namespace MAP {
                     u16 m_itemId;
                 } m_item;
                 struct {
-                    u8  m_movementType;
                     u16 m_spriteId;
                     u16 m_trainerId;
-                    u8  m_sight;
+
+                    u8 m_movementType;
+                    u8 m_sight;
                 } m_trainer;
                 struct {
                     u16 m_speciesId;
                     u8  m_level;
                     u8  m_forme; // BIT(6) female; BIT(7) genderless
-                    u8  m_shiny; // BIT(6) hidden ability, BIT(7) fateful
+
+                    u8 m_shiny; // BIT(6) hidden ability, BIT(7) fateful
                 } m_owPkmn;
                 struct {
-                    u8  m_movementType;
                     u16 m_spriteId;
                     u16 m_scriptId;
-                    u8  m_scriptType;
+
+                    u8 m_movementType;
+                    u8 m_scriptType;
                 } m_npc;
                 struct {
-                    warpType m_warpType;
-                    u8       m_bank;
-                    u8       m_mapY;
-                    u8       m_mapX;
-                    u8       m_posX;
-                    u8       m_posY;
-                    u8       m_posZ;
+                    u8 m_warpType;
+                    u8 m_bank;
+                    u8 m_mapX;
+                    u8 m_mapY;
+
+                    u8 m_posX;
+                    u8 m_posY;
+                    u8 m_posZ;
                 } m_warp;
                 struct {
                     u16 m_scriptId;
@@ -313,15 +315,22 @@ namespace MAP {
         bool hasEvent( eventType p_type, u8 p_x, u8 p_y, u8 p_z ) const;
     };
 
-    struct bankInfo {
-        u8  m_bank;
-        u16 m_locationId;
-        u8  m_mapMode; // currently unused, used for different map modes (i.e. 32x32 tiles; large
-                       // maps with connections, etc)
-    };
+    constexpr u8 MAPMODE_DEFAULT   = 0;
+    constexpr u8 MAPMODE_SCATTERED = 1;
+    constexpr u8 MAPMODE_COMBINED  = 2;
 
-    extern bankInfo CURRENT_BANK;
-    void            loadNewBank( u8 p_bank );
+    struct bankInfo {
+        u8 m_sizeX   = 0;
+        u8 m_sizeY   = 0;
+        u8 m_mapMode = 0; // 0: normal maps/data in folder, 1: scattered in subfolders, 2: combined
+                          // (ignored, assumed 2)
+        u8 : 8;
+        u32 : 32;
+
+        constexpr bankInfo( u8 p_sizeX = 0, u8 p_sizeY = 0, u8 p_mapMode = MAPMODE_COMBINED )
+            : m_sizeX( p_sizeX ), m_sizeY( p_sizeY ), m_mapMode( p_mapMode ) {
+        }
+    };
 
     constexpr direction getDir( int p_dir ) {
         if( p_dir & KEY_DOWN ) { return MAP::direction::DOWN; }

@@ -104,7 +104,7 @@ namespace FS {
     }
 
     bool exists( const char* p_path ) {
-        FILE* fd  = fopen( p_path, "rm" );
+        FILE* fd  = fopen( p_path, "rb" );
         bool  res = !!fd;
         fclose( fd );
         return res;
@@ -117,7 +117,7 @@ namespace FS {
     }
     bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
         snprintf( TMP_BUFFER, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
-        FILE* fd  = fopen( TMP_BUFFER, "rbm" );
+        FILE* fd  = fopen( TMP_BUFFER, "rb" );
         bool  res = !!fd;
         fclose( fd );
         return res;
@@ -290,29 +290,59 @@ namespace FS {
         return true;
     }
 
-    bool readBankData( u8 /* p_bank */, MAP::bankInfo& /*p_result*/ ) {
-        return false;
-
-        /*
-        snprintf( TMP_BUFFER_SHORT, 45, "%hhu/%hhu", p_bank, p_bank );
-        FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bnk" );
-        if( !f ) return false;
-        read( f, &p_result.m_locationId, sizeof( u16 ), 1 );
-        close( f );
-        return true;
-        */
+    FILE* openBank( u8 p_bank ) {
+        snprintf( TMP_BUFFER_SHORT, 45, "%hhu", p_bank );
+        FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bank" );
+        if( !f ) { return nullptr; }
+        return f;
     }
 
-    bool readMapData( u8 p_bank, u8 p_mapX, u8 p_mapY, MAP::mapData& p_result ) {
-        snprintf( TMP_BUFFER_SHORT, 45, "%hhu/%hu/%hu_%hu", p_bank, p_mapY, p_mapY, p_mapX );
-        FILE* f = open( MAP_DATA_PATH, TMP_BUFFER_SHORT, ".map.data" );
-        if( !f ) {
-            std::memset( &p_result, 0, sizeof( MAP::mapData ) );
+    bool readMapData( FILE* p_file, MAP::mapData* p_result, bool p_close ) {
+        if( !p_file ) {
+            std::memset( p_result, 0, sizeof( MAP::mapData ) );
             return false;
         }
-        fread( &p_result, sizeof( MAP::mapData ), 1, f );
-        close( f );
+        fread( p_result, sizeof( MAP::mapData ), 1, p_file );
+        if( p_close ) { fclose( p_file ); }
         return true;
+    }
+
+    bool readMapSlice( FILE* p_mapFile, MAP::mapSlice* p_result, u16 p_x, u16 p_y, bool p_close ) {
+        if( p_mapFile == 0 ) return false;
+        p_result->m_x = p_x;
+        p_result->m_y = p_y;
+        read( p_mapFile, &p_result->m_data, sizeof( MAP::mapSliceData ), 1 );
+        if( p_close ) { fclose( p_mapFile ); }
+        return true;
+    }
+
+    u32 readMapSliceAndData( FILE* p_mapFile, MAP::mapSlice* p_slice, MAP::mapData* p_data, u16 p_x,
+                             u16 p_y ) {
+        if( p_mapFile == 0 ) return 1;
+
+        MAP::bankInfo info;
+        if( fseek( p_mapFile, 0, SEEK_SET ) ) { return 2; }
+        fread( &info, sizeof( MAP::bankInfo ), 1, p_mapFile );
+
+        if( fseek( p_mapFile,
+                   sizeof( MAP::bankInfo )
+                       + ( ( info.m_sizeX + 1 ) * p_y + p_x )
+                             * ( sizeof( MAP::mapSliceData ) + sizeof( MAP::mapData ) ),
+                   SEEK_SET ) ) {
+            return 3;
+        }
+
+        if( p_slice == nullptr ) {
+            if( fseek( p_mapFile, sizeof( MAP::mapSliceData ), SEEK_CUR ) ) { return 6; }
+        } else if( !readMapSlice( p_mapFile, p_slice, p_x, p_y, false ) ) {
+            return 4;
+        }
+        if( p_data == nullptr ) {
+            if( fseek( p_mapFile, sizeof( MAP::mapData ), SEEK_CUR ) ) { return 7; }
+        } else if( !readMapData( p_mapFile, p_data, false ) ) {
+            return 5;
+        }
+        return 0;
     }
 
     bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {

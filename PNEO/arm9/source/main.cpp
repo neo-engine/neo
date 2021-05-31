@@ -266,7 +266,6 @@ int main( int, char** p_argv ) {
     NAV::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
 
     MAP::curMap->draw( );
-    MAP::loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
 
     ANIMATE_MAP = true;
 
@@ -299,7 +298,7 @@ int main( int, char** p_argv ) {
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      MAP::CURRENT_BANK.m_bank,
+                      MAP::curMap->currentData( ).m_eventCount,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
                       MAP::curMap
