@@ -361,7 +361,7 @@ namespace MAP {
     void mapDrawer::changeWeather( mapWeather p_newWeather ) {
         if( getWeather( ) != p_newWeather ) {
             SAVE::SAV.getActiveFile( ).m_currentMapWeather = p_newWeather;
-            for( auto fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
+            for( const auto& fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
             initWeather( );
             if( ANIMATE_MAP ) {
                 if( REG_BLDALPHA ) {
@@ -490,9 +490,9 @@ namespace MAP {
         drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority,
                     p_playerHidden ); // Draw the player
 
-        for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
+        for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
-        for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
 
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
@@ -694,7 +694,7 @@ namespace MAP {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         auto curLocId = getCurrentLocationId( );
-        for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
 
         // Check for things that activate upon stepping on a tile
 
@@ -2391,7 +2391,7 @@ namespace MAP {
 
         // hide player, may need to open a door first
         draw( OBJPRIORITY_2, hidePlayer );
-        for( auto fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
+        for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
 
         if( curLocId == L_POKEMON_CENTER && oldMapType != newMapType && p_type == SLIDING_DOOR ) {
@@ -2400,7 +2400,7 @@ namespace MAP {
             SAVE::SAV.getActiveFile( ).m_lastPokeCenter.second.m_posY -= 4;
         }
 
-        for( auto fn : _newLocationCallbacks ) { fn( curLocId ); }
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
 
         auto posx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         auto posy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
@@ -3005,7 +3005,7 @@ namespace MAP {
             if( !change ) { _mapSprites.moveSprite( _playerSprite, UP, 3 ); }
         }
 
-        for( auto fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
+        for( const auto& fn : _newMoveModeCallbacks ) { fn( p_newMode ); }
     }
 
     bool mapDrawer::canFish( position p_start, direction p_direction ) {
@@ -3587,8 +3587,11 @@ namespace MAP {
         videoSetMode( MODE_5_2D );
         bgUpdate( );
 
-        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
-            SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->heal( );
+        auto teamcnt = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
+        for( u8 i = 0; i < teamcnt; ++i ) {
+            auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( i );
+            if( pkmn == nullptr ) [[unlikely]] { continue; }
+            pkmn->heal( );
         }
 
         changeMoveMode( MAP::WALK );

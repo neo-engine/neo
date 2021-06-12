@@ -1369,7 +1369,9 @@ namespace BATTLE {
         u16  ballCatchRate = 2;
 
         auto plpk   = _field.getPkmn( false, 0 );
+        if( plpk == nullptr ) { return false; }
         auto wild   = _field.getPkmn( true, 0 );
+        if( wild == nullptr ) { return false; }
         u16  specId = wild->getSpecies( );
 
         auto p = _field.getPkmnData( true, 0 );
@@ -1861,7 +1863,7 @@ namespace BATTLE {
                 if( !_isWildBattle ) { baseexp = baseexp * 3 / 2; }
                 if( reg.size( ) && share.size( ) ) { baseexp /= 2; }
 
-                for( auto lst : { reg, share } ) {
+                for( const std::vector<u8>& lst : { reg, share } ) {
                     if( lst.size( ) ) {
                         for( auto i : lst ) {
                             // distribute ev

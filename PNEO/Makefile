@@ -7,8 +7,8 @@ endif
 
 include $(DEVKITARM)/ds_rules
 
-GAME_TITLE_JP	    :=	Pok_mon
-GAME_SUBTITLE1_JP	:=  neo Version
+GAME_TITLE_JP	    :=  ポケモン
+GAME_SUBTITLE1_JP	:=  ネオ
 GAME_SUBTITLE2_JP	:=  Homebrew
 
 GAME_TITLE_EN	    :=	Pok_mon

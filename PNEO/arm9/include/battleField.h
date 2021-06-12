@@ -721,8 +721,9 @@ namespace BATTLE {
         inline void moveItem( battleUI* p_ui, bool p_sourceOpp, u8 p_sorceSlot, bool p_targetOpp,
                               u8 p_targetSlot ) {
             auto tg = getPkmn( p_targetOpp, p_targetSlot );
+            if( tg == nullptr ) [[unlikely]] { return; }
             auto sc = getPkmn( p_sourceOpp, p_sorceSlot );
-            if( tg == nullptr || sc == nullptr ) [[unlikely]] { return; }
+            if( sc == nullptr ) [[unlikely]] { return; }
 
             u16 item = sc->getItem( );
             removeItem( p_ui, p_sourceOpp, p_sorceSlot, false );

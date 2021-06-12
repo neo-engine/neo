@@ -1616,19 +1616,21 @@ namespace BATTLE {
     }
 
     void field::megaEvolve( battleUI* p_ui, bool p_opponent, u8 p_slot ) {
-        char buffer[ 100 ];
+        auto pkmn = getPkmn( p_opponent, p_slot );
+        if( pkmn == nullptr ) [[unlikely]] { return; }
 
-        snprintf( buffer, 99, GET_STRING( 307 ),
-                  p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
-                  ITEM::getItemName( getPkmn( p_opponent, p_slot )->getItem( ) ).c_str( ) );
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 307 ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
+                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
         p_ui->log( std::string( buffer ) );
 
-        getPkmn( p_opponent, p_slot )->battleTransform( );
-        p_ui->updatePkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ) );
+        pkmn->battleTransform( );
+        pkmn = getPkmn( p_opponent, p_slot );
+        if( pkmn == nullptr ) [[unlikely]] { return; }
+        p_ui->updatePkmn( p_opponent, p_slot, pkmn );
 
-        snprintf( buffer, 99, GET_STRING( 308 ),
-                  p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
-                  getPkmn( p_opponent, p_slot )->getItem( ) );
+        snprintf( buffer, 99, GET_STRING( 308 ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
+                  pkmn->getItem( ) );
         p_ui->log( std::string( buffer ) );
 
         checkOnSendOut( p_ui, p_opponent, p_slot );
@@ -2788,15 +2790,15 @@ namespace BATTLE {
 
     type field::getMoveType( battleMove p_move ) {
         type moveType = p_move.m_moveData.m_type;
+        auto pkmn     = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        if( pkmn == nullptr ) [[unlikely]] { return UNKNOWN; }
 
         if( p_move.m_param == M_STRUGGLE ) { return NORMAL; }
 
-        if( p_move.m_param == M_HIDDEN_POWER ) [[unlikely]] {
-            moveType = getPkmn( p_move.m_user.first, p_move.m_user.second )->getHPType( );
-        }
+        if( p_move.m_param == M_HIDDEN_POWER ) [[unlikely]] { moveType = pkmn->getHPType( ); }
 
         if( p_move.m_param == M_AURA_WHEEL ) [[unlikely]] {
-            if( getPkmn( p_move.m_user.first, p_move.m_user.second )->getForme( ) == 1 ) {
+            if( pkmn->getForme( ) == 1 ) {
                 moveType = DARK;
             } else {
                 moveType = ELECTRIC;
@@ -2804,7 +2806,7 @@ namespace BATTLE {
         }
 
         if( !suppressesAbilities( ) ) {
-            switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getAbility( ) ) {
+            switch( pkmn->getAbility( ) ) {
             case A_NORMALIZE: moveType = NORMAL; break;
             case A_PIXILATE:
                 if( moveType == NORMAL ) { return FAIRY; }
@@ -2827,7 +2829,7 @@ namespace BATTLE {
 
         if( p_move.m_param == M_JUDGMENT
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) ) [[unlikely]] {
-            switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getItem( ) ) {
+            switch( pkmn->getItem( ) ) {
             case I_FLAME_PLATE: moveType = FIRE; break;
             case I_SPLASH_PLATE: moveType = WATER; break;
             case I_ZAP_PLATE: moveType = ELECTRIC; break;
@@ -2852,7 +2854,7 @@ namespace BATTLE {
 
         if( p_move.m_param == M_MULTI_ATTACK
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) ) [[unlikely]] {
-            switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getItem( ) ) {
+            switch( pkmn->getItem( ) ) {
             case I_FIGHTING_MEMORY: moveType = FIGHT; break;
             case I_FLYING_MEMORY: moveType = FLYING; break;
             case I_POISON_MEMORY: moveType = type::POISON; break;
@@ -2876,7 +2878,7 @@ namespace BATTLE {
 
         if( p_move.m_param == M_TECHNO_BLAST
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) ) [[unlikely]] {
-            switch( getPkmn( p_move.m_user.first, p_move.m_user.second )->getItem( ) ) {
+            switch( pkmn->getItem( ) ) {
             case I_BURN_DRIVE: moveType = FIRE; break;
             case I_DOUSE_DRIVE: moveType = WATER; break;
             case I_CHILL_DRIVE: moveType = ICE; break;
@@ -2937,9 +2939,7 @@ namespace BATTLE {
         bool abilities
             = !suppressesAbilities( ) && !( p_move.m_moveData.m_flags & MOVE::IGNOREABILITY );
 
-        bool wonderguard
-            = abilities
-              && getPkmn( p_target.first, p_target.second )->getAbility( ) == A_WONDER_GUARD;
+        bool wonderguard = abilities && target->getAbility( ) == A_WONDER_GUARD;
 
         type moveType = getMoveType( p_move );
 
@@ -2951,8 +2951,7 @@ namespace BATTLE {
         if( getWeather( ) == HEAVY_RAIN && moveType == FIRE && !suppressesWeather( ) ) { return 0; }
 
         if( ( p_move.m_moveData.m_flags & MOVE::SOUND )
-            && ( getPkmn( p_target.first, p_target.second )->getAbility( ) == A_SOUNDPROOF
-                 || getPkmn( p_target.first, p_target.second )->getAbility( ) == A_CACOPHONY )
+            && ( target->getAbility( ) == A_SOUNDPROOF || target->getAbility( ) == A_CACOPHONY )
             && abilities ) [[unlikely]] {
             return 0;
         }
@@ -2968,6 +2967,9 @@ namespace BATTLE {
 
         bool targetIsGrounded
             = isGrounded( p_target.first, p_target.second, p_move.m_param != M_SUNSTEEL_STRIKE );
+        auto user = getPkmn( p_move.m_user.first, p_move.m_user.second );
+        if( user == nullptr ) [[unlikely]] { return 0; }
+
         for( type t : getTypes( p_target.first, p_target.second ) ) {
             u16 curval = getTypeEffectiveness( moveType, t );
 
@@ -2984,11 +2986,7 @@ namespace BATTLE {
             if( !curval && ( p_move.m_moveData.m_flags & MOVE::IGNOREIMMUNITY ) ) { curval = 100; }
 
             if( t == GHOST && ( moveType == NORMAL || moveType == FIGHT ) ) [[unlikely]] {
-                if( abilities
-                    && getPkmn( p_move.m_user.first, p_move.m_user.second )->getAbility( )
-                           == A_SCRAPPY ) {
-                    continue;
-                }
+                if( abilities && user->getAbility( ) == A_SCRAPPY ) { continue; }
                 if( getVolatileStatus( p_target.first, p_target.second ) & FORESIGHT )
                     [[unlikely]] {
                     continue;
@@ -3538,8 +3536,7 @@ namespace BATTLE {
                 }
                 if( eatitem ) {
                     p_ui->logItem( target, p_target.first );
-                    if( getPkmn( p_target.first, p_target.second )->getAbility( ) != A_RIPEN
-                        || supprAbs ) {
+                    if( target->getAbility( ) != A_RIPEN || supprAbs ) {
                         damage >>= 1;
                     } else {
                         damage >>= 2;
@@ -3724,18 +3721,21 @@ namespace BATTLE {
                 removeLockedMove( opponent, slot );
                 p_ui->showPkmn( opponent, slot );
             } else {
-                p_ui->prepareMove( getPkmn( opponent, slot ), opponent, slot, p_move );
+                auto tg = getPkmn( opponent, slot );
+                if( tg == nullptr ) [[unlikely]] { return; }
+
+                p_ui->prepareMove( tg, opponent, slot, p_move );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
 
                 if( ( p_move.m_param == M_SOLAR_BLADE || p_move.m_param == M_SOLAR_BEAM )
                     && !suppressesWeather( ) && ( _weather == SUN || _weather == HEAVY_SUNSHINE ) )
                     [[unlikely]] {
                     // empty!
-                } else if( canUseItem( opponent, slot )
-                           && getPkmn( opponent, slot )->getItem( ) == I_POWER_HERB ) [[unlikely]] {
-                    p_ui->logItem( getPkmn( opponent, slot ), opponent );
+                } else if( canUseItem( opponent, slot ) && tg->getItem( ) == I_POWER_HERB )
+                    [[unlikely]] {
+                    p_ui->logItem( tg, opponent );
                     snprintf( buffer, 99, GET_STRING( 305 ),
-                              p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
+                              p_ui->getPkmnName( tg, opponent ).c_str( ) );
                     p_ui->log( buffer );
 
                     removeItem( p_ui, opponent, slot );

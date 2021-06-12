@@ -351,7 +351,8 @@ namespace BOX {
             if( p_pokemon != nullptr ) {
                 *getPkmn( p_position ) = p_pokemon->m_boxdata;
             } else {
-                std::memset( getPkmn( p_position ), 0, sizeof( boxPokemon ) );
+                auto pkmn = getPkmn( p_position );
+                if( pkmn != nullptr ) [[likely]] { std::memset( pkmn, 0, sizeof( boxPokemon ) ); }
             }
         } else if( p_position < MAX_PKMN_PER_BOX + 6 ) {
             SAVE::SAV.getActiveFile( ).setTeamPkmn( p_position - MAX_PKMN_PER_BOX, p_pokemon );

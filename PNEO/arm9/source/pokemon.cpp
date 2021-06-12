@@ -390,6 +390,7 @@ u8 pokemon::canEvolve( u16 p_item, evolutionMethod p_method, pkmnEvolveData* p_e
         }
 
         case EVOLUTION_SPECIAL: {
+            auto teamcnt = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
             if( p_method != EVOMETHOD_LEVEL_UP ) { break; }
             switch( getSpecies( ) ) {
             case PKMN_TYROGUE:
@@ -415,19 +416,18 @@ u8 pokemon::canEvolve( u16 p_item, evolutionMethod p_method, pkmnEvolveData* p_e
                 break;
             case PKMN_MANTYKE:
                 // Check for a Remoraid in the party
-                for( u8 q = 0; q < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++q ) {
-                    if( SAVE::SAV.getActiveFile( ).getTeamPkmn( q )->getSpecies( )
-                        == PKMN_REMORAID ) {
-                        return i + 1;
-                    }
+                for( u8 q = 0; q < teamcnt; ++q ) {
+                    const auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( q );
+                    if( pkmn == nullptr ) [[unlikely]] { continue; }
+                    if( pkmn->getSpecies( ) == PKMN_REMORAID ) { return i + 1; }
                 }
                 break;
             case PKMN_PANCHAM:
                 // Check for dark-type pkmn
-                for( u8 q = 0; q < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++q ) {
-                    auto dt
-                        = getPkmnData( SAVE::SAV.getActiveFile( ).getTeamPkmn( q )->getSpecies( ),
-                                       SAVE::SAV.getActiveFile( ).getTeamPkmn( q )->getForme( ) );
+                for( u8 q = 0; q < teamcnt; ++q ) {
+                    const auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( q );
+                    if( pkmn == nullptr ) [[unlikely]] { continue; }
+                    auto dt = getPkmnData( pkmn->getSpecies( ), pkmn->getForme( ) );
                     if( dt.m_baseForme.m_types[ 0 ] == DARK
                         || dt.m_baseForme.m_types[ 1 ] == DARK ) {
                         return i + 1;

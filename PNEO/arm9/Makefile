@@ -38,7 +38,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" $(ARCH) \
 
 ifdef DESQUID
-CFLAGS	+=	-DDESQUID -fanalyzer -Wno-analyzer-null-dereference
+CFLAGS	+=	-DDESQUID -fanalyzer
 endif
 ifdef NOSOUND
 CFLAGS	+=	-DNO_SOUND
