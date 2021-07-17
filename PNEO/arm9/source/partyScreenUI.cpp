@@ -794,7 +794,8 @@ namespace STS {
             } else {
                 if( !_swapping ) {
                     if( !_toSelect ) {
-                        snprintf( BUFFER, 49, GET_STRING( 57 ),
+                        auto fmt = std::string( GET_STRING( 57 ) );
+                        snprintf( BUFFER, 49, fmt.c_str( ),
                                   _team[ p_pos ].isEgg( ) ? GET_STRING( 34 )
                                                           : _team[ p_pos ].m_boxdata.m_name );
                     } else {

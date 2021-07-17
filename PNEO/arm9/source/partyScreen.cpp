@@ -82,11 +82,11 @@ namespace STS {
         }
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
         IO::yesNoBox yn;
-        bool         res = yn.getResult( [&]( ) { return _partyUI->printYNMessage( 0, 254 ); },
-                                 [&]( IO::yesNoBox::selection p_sel ) {
+        bool         res = yn.getResult( [ & ]( ) { return _partyUI->printYNMessage( 0, 254 ); },
+                                 [ & ]( IO::yesNoBox::selection p_sel ) {
                                      _partyUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
                                  },
-                                 IO::yesNoBox::YES, [&]( ) { _partyUI->animate( _frame++ ); } )
+                                 IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( _frame++ ); } )
                    == IO::yesNoBox::YES;
 
         _partyUI->hideYNMessageBox( );
@@ -139,180 +139,182 @@ namespace STS {
         case DESQUID_SPECIES: {
             // Species
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 12, true, MAX_PKMN, 0,
-                 [&]( ) { return _team[ _currentSelection ].getSpecies( ); },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].setSpecies( p_newValue );
-                     if( !_team[ _currentSelection ].m_boxdata.isNicknamed( ) ) {
-                         getDisplayName( p_newValue, _team[ _currentSelection ].m_boxdata.m_name,
-                                         CURRENT_LANGUAGE );
-                     }
-                 },
-                 []( u32 p_value ) { return getDisplayName( p_value ); }} ) );
+                { DESQUID_STRING + 12, true, MAX_PKMN, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].getSpecies( ); },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].setSpecies( p_newValue );
+                      if( !_team[ _currentSelection ].m_boxdata.isNicknamed( ) ) {
+                          getDisplayName( p_newValue, _team[ _currentSelection ].m_boxdata.m_name,
+                                          CURRENT_LANGUAGE );
+                      }
+                  },
+                  []( u32 p_value ) { return getDisplayName( p_value ); } } ) );
             // Forme
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 13, true, 31, 0,
-                 [&]( ) { return _team[ _currentSelection ].getForme( ); },
-                 [&]( u32 p_newValue ) { _team[ _currentSelection ].setForme( p_newValue ); },
-                 [&]( u32 p_value ) {
-                     return getDisplayName( _team[ _currentSelection ].m_boxdata.m_speciesId,
-                                            p_value );
-                 }} ) );
+                { DESQUID_STRING + 13, true, 31, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].getForme( ); },
+                  [ & ]( u32 p_newValue ) { _team[ _currentSelection ].setForme( p_newValue ); },
+                  [ & ]( u32 p_value ) {
+                      return getDisplayName( _team[ _currentSelection ].m_boxdata.m_speciesId,
+                                             p_value );
+                  } } ) );
             // Ability
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 14, true, 3, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.getAbilitySlot( ); },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.setAbility( p_newValue );
-                 },
-                 [&]( u32 ) {
-                     return getAbilityName( _team[ _currentSelection ].m_boxdata.getAbility( ) );
-                 }} ) );
+                { DESQUID_STRING + 14, true, 3, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.getAbilitySlot( ); },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.setAbility( p_newValue );
+                  },
+                  [ & ]( u32 ) {
+                      return getAbilityName( _team[ _currentSelection ].m_boxdata.getAbility( ) );
+                  } } ) );
             // Shininess
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 23, false, 1, 0,
-                 [&]( ) { return _team[ _currentSelection ].isShiny( ); },
-                 [&]( u32 p_newValue ) {
-                     while( p_newValue != _team[ _currentSelection ].isShiny( ) ) {
-                         _team[ _currentSelection ].m_boxdata.m_pid = rand( );
-                     }
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 23, false, 1, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].isShiny( ); },
+                  [ & ]( u32 p_newValue ) {
+                      while( p_newValue != _team[ _currentSelection ].isShiny( ) ) {
+                          _team[ _currentSelection ].m_boxdata.m_pid = rand( );
+                      }
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Level
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 21, false, 100, 1,
-                 [&]( ) { return _team[ _currentSelection ].m_level; },
-                 [&]( u32 p_newValue ) { _team[ _currentSelection ].setLevel( p_newValue ); },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 21, false, 100, 1,
+                  [ & ]( ) { return _team[ _currentSelection ].m_level; },
+                  [ & ]( u32 p_newValue ) { _team[ _currentSelection ].setLevel( p_newValue ); },
+                  []( u32 ) { return ""; } } ) );
             // EXP
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 22, false, 1640000, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_experienceGained; },
-                 [&]( u32 p_newValue ) { _team[ _currentSelection ].setExperience( p_newValue ); },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 22, false, 1640000, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_experienceGained; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].setExperience( p_newValue );
+                  },
+                  []( u32 ) { return ""; } } ) );
             break;
         }
         case DESQUID_STATUS: {
             // Sleep
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 15, false, 7, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_status.m_isAsleep; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_status.m_isAsleep = p_newValue & 7;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 15, false, 7, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_status.m_isAsleep; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_status.m_isAsleep = p_newValue & 7;
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Poison
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 16, false, 1, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_status.m_isPoisoned; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_status.m_isPoisoned = p_newValue & 1;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 16, false, 1, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_status.m_isPoisoned; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_status.m_isPoisoned = p_newValue & 1;
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Burn
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 17, false, 8, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_status.m_isBurned; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_status.m_isBurned = p_newValue & 1;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 17, false, 8, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_status.m_isBurned; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_status.m_isBurned = p_newValue & 1;
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Freeze
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 18, false, 8, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_status.m_isFrozen; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_status.m_isFrozen = p_newValue & 1;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 18, false, 8, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_status.m_isFrozen; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_status.m_isFrozen = p_newValue & 1;
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Paralyzed
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 19, false, 8, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_status.m_isParalyzed; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_status.m_isParalyzed = p_newValue & 1;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 19, false, 8, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_status.m_isParalyzed; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_status.m_isParalyzed = p_newValue & 1;
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Toxic
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 20, false, 8, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_status.m_isBadlyPoisoned; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_status.m_isBadlyPoisoned = p_newValue & 1;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 20, false, 8, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_status.m_isBadlyPoisoned; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_status.m_isBadlyPoisoned = p_newValue & 1;
+                  },
+                  []( u32 ) { return ""; } } ) );
             break;
         }
         case DESQUID_EGG: {
             // Egg
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 24, false, 1, 0,
-                 [&]( ) { return _team[ _currentSelection ].isEgg( ); },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.setIsEgg( p_newValue );
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 24, false, 1, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].isEgg( ); },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.setIsEgg( p_newValue );
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Steps/Happiness
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 25, false, 255, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_steps; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.m_steps = ( p_newValue & 0xFF );
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 25, false, 255, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_steps; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.m_steps = ( p_newValue & 0xFF );
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Got place
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 26, true, 6000, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_gotPlace; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.m_gotPlace = p_newValue & 0xFFFF;
-                 },
-                 []( u32 p_location ) { return FS::getLocation( p_location ); }} ) );
+                { DESQUID_STRING + 26, true, 6000, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_gotPlace; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.m_gotPlace = p_newValue & 0xFFFF;
+                  },
+                  []( u32 p_location ) { return FS::getLocation( p_location ); } } ) );
             // Hatch place
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 27, true, 6000, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_hatchPlace; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.m_hatchPlace = p_newValue & 0xFFFF;
-                 },
-                 []( u32 p_location ) { return FS::getLocation( p_location ); }} ) );
+                { DESQUID_STRING + 27, true, 6000, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_hatchPlace; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.m_hatchPlace = p_newValue & 0xFFFF;
+                  },
+                  []( u32 p_location ) { return FS::getLocation( p_location ); } } ) );
             // Id
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 28, false, 65535, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_oTId; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.m_oTId = p_newValue & 0xFFFF;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 28, false, 65535, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_oTId; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.m_oTId = p_newValue & 0xFFFF;
+                  },
+                  []( u32 ) { return ""; } } ) );
             // S.Id
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 28, false, 65535, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_oTSid; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.m_oTSid = p_newValue & 0xFFFF;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 28, false, 65535, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_oTSid; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.m_oTSid = p_newValue & 0xFFFF;
+                  },
+                  []( u32 ) { return ""; } } ) );
             break;
         }
         case DESQUID_NATURE: {
             // Nature
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 30, true, 24, 0,
-                 [&]( ) { return u8( _team[ _currentSelection ].getNature( ) ); },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.setNature( pkmnNatures( p_newValue ) );
-                 },
-                 []( u32 p_value ) { return std::string( GET_STRING( 187 + p_value ) ); }} ) );
+                { DESQUID_STRING + 30, true, 24, 0,
+                  [ & ]( ) { return u8( _team[ _currentSelection ].getNature( ) ); },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.setNature( pkmnNatures( p_newValue ) );
+                  },
+                  []( u32 p_value ) { return std::string( GET_STRING( 187 + p_value ) ); } } ) );
             for( u8 i = 0; i < 5; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    {u16( DESQUID_STRING + 31 + i ), true, 2, 0,
-                     [&, i]( ) {
-                         return NatMod[ u8( _team[ _currentSelection ].getNature( ) ) ][ i ] - 9;
-                     },
-                     [&, i]( u32 ) { return; },
-                     []( u32 p_value ) {
-                         return ( p_value == 0 ? "--" : ( p_value == 1 ? "   " : "++" ) );
-                     }} ) );
+                    { u16( DESQUID_STRING + 31 + i ), true, 2, 0,
+                      [ &, i ]( ) {
+                          return NatMod[ u8( _team[ _currentSelection ].getNature( ) ) ][ i ] - 9;
+                      },
+                      [ &, i ]( u32 ) { return; },
+                      []( u32 p_value ) {
+                          return ( p_value == 0 ? "--" : ( p_value == 1 ? "   " : "++" ) );
+                      } } ) );
             }
             break;
         }
@@ -320,12 +322,12 @@ namespace STS {
             // IV
             for( u8 i = 0; i < 6; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    {u16( DESQUID_STRING + 36 + i ), true, 31, 0,
-                     [&, i]( ) { return _team[ _currentSelection ].IVget( i ); },
-                     [&, i]( u32 p_newValue ) {
-                         _team[ _currentSelection ].IVset( i, p_newValue & 31 );
-                     },
-                     []( u32 ) { return ""; }} ) );
+                    { u16( DESQUID_STRING + 36 + i ), true, 31, 0,
+                      [ &, i ]( ) { return _team[ _currentSelection ].IVget( i ); },
+                      [ &, i ]( u32 p_newValue ) {
+                          _team[ _currentSelection ].IVset( i, p_newValue & 31 );
+                      },
+                      []( u32 ) { return ""; } } ) );
             }
             break;
         }
@@ -333,12 +335,12 @@ namespace STS {
             // IV
             for( u8 i = 0; i < 6; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    {u16( DESQUID_STRING + 36 + i ), true, 252, 0,
-                     [&, i]( ) { return _team[ _currentSelection ].EVget( i ); },
-                     [&, i]( u32 p_newValue ) {
-                         _team[ _currentSelection ].EVset( i, p_newValue );
-                     },
-                     []( u32 ) { return ""; }} ) );
+                    { u16( DESQUID_STRING + 36 + i ), true, 252, 0,
+                      [ &, i ]( ) { return _team[ _currentSelection ].EVget( i ); },
+                      [ &, i ]( u32 p_newValue ) {
+                          _team[ _currentSelection ].EVset( i, p_newValue );
+                      },
+                      []( u32 ) { return ""; } } ) );
             }
             break;
         }
@@ -346,68 +348,67 @@ namespace STS {
             // Moves
             for( u8 i = 0; i < 4; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    {u16( DESQUID_STRING + 42 ), true, 796, 0,
-                     [&, i]( ) { return _team[ _currentSelection ].m_boxdata.m_moves[ i ]; },
-                     [&, i]( u32 p_newValue ) {
-                         _team[ _currentSelection ].m_boxdata.m_moves[ i ] = p_newValue;
-                         _team[ _currentSelection ].PPupset( i, 0 );
-                     },
-                     []( u32 p_value ) { return MOVE::getMoveName( p_value ); }} ) );
+                    { u16( DESQUID_STRING + 42 ), true, 796, 0,
+                      [ &, i ]( ) { return _team[ _currentSelection ].m_boxdata.m_moves[ i ]; },
+                      [ &, i ]( u32 p_newValue ) {
+                          _team[ _currentSelection ].m_boxdata.m_moves[ i ] = p_newValue;
+                          _team[ _currentSelection ].PPupset( i, 0 );
+                      },
+                      []( u32 p_value ) { return MOVE::getMoveName( p_value ); } } ) );
             }
             // Held Item
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 43, true, 1278, 1,
-                 [&]( ) { return _team[ _currentSelection ].getItem( ); },
-                 [&]( u32 p_newValue ) { _team[ _currentSelection ].giveItem( p_newValue ); },
-                 []( u32 p_value ) { return ITEM::getItemName( p_value ); }} ) );
+                { DESQUID_STRING + 43, true, 1278, 1,
+                  [ & ]( ) { return _team[ _currentSelection ].getItem( ); },
+                  [ & ]( u32 p_newValue ) { _team[ _currentSelection ].giveItem( p_newValue ); },
+                  []( u32 p_value ) { return ITEM::getItemName( p_value ); } } ) );
 
             break;
         }
         case DESQUID_ITEM: {
             // Current HP
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 36, false, 999, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_stats.m_curHP; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_stats.m_curHP = std::min(
-                         u16( p_newValue ), _team[ _currentSelection ].m_stats.m_maxHP );
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 36, false, 999, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_stats.m_curHP; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_stats.m_curHP = std::min(
+                          u16( p_newValue ), _team[ _currentSelection ].m_stats.m_maxHP );
+                  },
+                  []( u32 ) { return ""; } } ) );
             // Moves
             for( u8 i = 0; i < 4; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    {u16( DESQUID_STRING + 44 ), true, 99, 0,
-                     [&, i]( ) { return _team[ _currentSelection ].m_boxdata.m_curPP[ i ]; },
-                     [&, i]( u32 p_newValue ) {
-                         MOVE::moveData mdata = MOVE::getMoveData(
-                             _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
-                         u8   dmx = u8( mdata.m_pp * ( 5 + _team[ _currentSelection ].PPupget( i ) )
-                                      / 5 );
-                         bool boost = !( mdata.m_flags & MOVE::NOPPBOOST );
-                         u8   gmx   = s8( mdata.m_pp * ( 5 + ( boost ? 3 : 0 ) ) / 5 );
-                         p_newValue = std::min( u8( p_newValue ), gmx );
-                         if( p_newValue > dmx ) { _team[ _currentSelection ].PPupset( i, 3 ); }
-                         _team[ _currentSelection ].m_boxdata.m_curPP[ i ] = p_newValue;
-                     },
-                     [&, i]( u32 ) {
-                         return MOVE::getMoveName(
-                             _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
-                     }} ) );
+                    { u16( DESQUID_STRING + 44 ), true, 99, 0,
+                      [ &, i ]( ) { return _team[ _currentSelection ].m_boxdata.m_curPP[ i ]; },
+                      [ &, i ]( u32 p_newValue ) {
+                          MOVE::moveData mdata = MOVE::getMoveData(
+                              _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
+                          u8 dmx = u8( mdata.m_pp * ( 5 + _team[ _currentSelection ].PPupget( i ) )
+                                       / 5 );
+                          bool boost = !( mdata.m_flags & MOVE::NOPPBOOST );
+                          u8   gmx   = s8( mdata.m_pp * ( 5 + ( boost ? 3 : 0 ) ) / 5 );
+                          p_newValue = std::min( u8( p_newValue ), gmx );
+                          if( p_newValue > dmx ) { _team[ _currentSelection ].PPupset( i, 3 ); }
+                          _team[ _currentSelection ].m_boxdata.m_curPP[ i ] = p_newValue;
+                      },
+                      [ &, i ]( u32 ) {
+                          return MOVE::getMoveName(
+                              _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
+                      } } ) );
             }
             // Fateful encounter
             res.push_back( partyScreen::desquidItem(
-                {DESQUID_STRING + 45, false, 1, 0,
-                 [&]( ) { return _team[ _currentSelection ].m_boxdata.m_fateful; },
-                 [&]( u32 p_newValue ) {
-                     _team[ _currentSelection ].m_boxdata.m_fateful = p_newValue;
-                 },
-                 []( u32 ) { return ""; }} ) );
+                { DESQUID_STRING + 45, false, 1, 0,
+                  [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_fateful; },
+                  [ & ]( u32 p_newValue ) {
+                      _team[ _currentSelection ].m_boxdata.m_fateful = p_newValue;
+                  },
+                  []( u32 ) { return ""; } } ) );
 
             break;
         }
 
-        default:
-            break;
+        default: break;
         }
         return res;
     }
@@ -416,7 +417,8 @@ namespace STS {
     do { choices[ selectedLine ].m_counterUpdate( p_newValue ); } while( false );
 
     bool partyScreen::desquidWindow( desquidChoice p_choice ) {
-        snprintf( BUFFER, 49, "%s: %s", GET_STRING( DESQUID_STRING ),
+        auto s1 = std::string( GET_STRING( DESQUID_STRING ) );
+        snprintf( BUFFER, 49, "%s: %s", s1.c_str( ),
                   GET_STRING( getTextForDesquidChoice( p_choice ) ) );
         _partyUI->select( _currentSelection, BUFFER );
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
@@ -477,7 +479,8 @@ namespace STS {
                     SOUND::playSoundEffect( SFX_SAVE );
                     _team[ _currentSelection ].recalculateStats( );
                     editing = false;
-                    snprintf( BUFFER, 49, "%s: %s", GET_STRING( DESQUID_STRING ),
+                    s1      = std::string( GET_STRING( DESQUID_STRING ) );
+                    snprintf( BUFFER, 49, "%s: %s", s1.c_str( ),
                               GET_STRING( getTextForDesquidChoice( p_choice ) ) );
                     _partyUI->select( _currentSelection, BUFFER );
 
@@ -606,18 +609,15 @@ namespace STS {
             std::memset( &_team[ --_teamLength ], 0, sizeof( pokemon ) );
             _partyUI->updateTeamLength( _teamLength );
             return true;
-        case DESQUID_HEAL:
-            _team[ _currentSelection ].heal( );
-            return false;
-        default:
-            break;
+        case DESQUID_HEAL: _team[ _currentSelection ].heal( ); return false;
+        default: break;
         }
         return desquidWindow( p_choice );
     }
 #endif
 
     bool partyScreen::focus( ) {
-        u16 c[ 12 ] = {0};
+        u16 c[ 12 ] = { 0 };
         for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
             c[ i ] = getTextForChoice( _currentChoices[ i ] );
         }
@@ -747,7 +747,7 @@ namespace STS {
 
 #ifdef DESQUID
     bool STS::partyScreen::desquid( u8 p_selectedIdx ) {
-        u16  c[ 12 ] = {0};
+        u16  c[ 12 ] = { 0 };
         auto choices = computeDesquidChoices( );
         _partyUI->drawPartyPkmnSub( p_selectedIdx, true, false );
         _currentChoiceSelection = 0;
@@ -870,7 +870,7 @@ namespace STS {
             computeSelectionChoices( );
             _currentChoiceSelection = 0;
 
-            u16 c[ 6 ] = {0};
+            u16 c[ 6 ] = { 0 };
             for( u8 i = 0; i < std::min( size_t( 6 ), _currentChoices.size( ) ); i++ ) {
                 c[ i ] = getTextForChoice( _currentChoices[ i ] );
             }
@@ -941,7 +941,7 @@ namespace STS {
                 for( u8 i = 0; i < 4; i++ ) {
                     if( _team[ _currentSelection ].m_boxdata.m_moves[ i ]
                         && MOVE::isFieldMove(
-                               _team[ _currentSelection ].m_boxdata.m_moves[ i ] ) ) {
+                            _team[ _currentSelection ].m_boxdata.m_moves[ i ] ) ) {
                         for( u8 j = 0; j < 2; ++j ) {
                             if( MOVE::possible( _team[ _currentSelection ].m_boxdata.m_moves[ i ],
                                                 j ) ) {
@@ -1086,8 +1086,7 @@ namespace STS {
                 computeSelectionChoices( );
             }
             break;
-        default:
-            break;
+        default: break;
         }
         return false;
     }
@@ -1120,7 +1119,7 @@ namespace STS {
     }
 
     u8 partyScreen::handleTouch( bool p_autoSel ) {
-        u16 c[ 12 ] = {0};
+        u16 c[ 12 ] = { 0 };
         for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
             c[ i ] = getTextForChoice( _currentChoices[ i ] );
         }
@@ -1272,7 +1271,7 @@ namespace STS {
                     _swapSelection = 255;
                     computeSelectionChoices( );
                     _partyUI->select( _currentSelection );
-                    u16 c[ 12 ] = {0};
+                    u16 c[ 12 ] = { 0 };
                     for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
                         c[ i ] = getTextForChoice( _currentChoices[ i ] );
                     }

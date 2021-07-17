@@ -788,8 +788,8 @@ namespace NAV {
         }
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
-        snprintf( buffer, 99, GET_STRING( 86 ), iname.c_str( ),
-                  ITEM::getItemChar( data.m_itemType ),
+        auto fmt = std::string( GET_STRING( 86 ) );
+        snprintf( buffer, 99, fmt.c_str( ), iname.c_str( ), ITEM::getItemChar( data.m_itemType ),
                   GET_STRING( 11 + BAG::toBagType( data.m_itemType ) ) );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
         std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );

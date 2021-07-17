@@ -393,11 +393,12 @@ namespace NAV {
 
         IO::updateOAM( p_bottom );
 
+        auto s1 = std::string( GET_STRING( 585 ) );
         if( _currentSong && JBOX_SONG_LIST[ _currentSong ][ 0 ] ) {
-            snprintf( buffer, 99, "%s: %s", GET_STRING( 585 ),
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ),
                       GET_STRING( JBOX_SONG_LIST[ _currentSong ][ 0 ] ) );
         } else {
-            snprintf( buffer, 99, "%s: %s", GET_STRING( 585 ), GET_STRING( 647 ) );
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
         }
         IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
     }
@@ -441,13 +442,14 @@ namespace NAV {
         char buffer[ 100 ];
         SOUND::playCry( PKMN_LUDICOLO );
         _currentSong = p_idx;
+        auto s1      = std::string( GET_STRING( 585 ) );
         if( _currentSong && JBOX_SONG_LIST[ _currentSong ][ 0 ] ) {
             SOUND::setJBoxBGM( JBOX_SONG_LIST[ _currentSong ][ 1 ] );
-            snprintf( buffer, 99, "%s: %s", GET_STRING( 585 ),
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ),
                       GET_STRING( JBOX_SONG_LIST[ _currentSong ][ 0 ] ) );
         } else {
             SOUND::setJBoxBGM( SOUND::JBOX_DISABLED );
-            snprintf( buffer, 99, "%s: %s", GET_STRING( 585 ), GET_STRING( 647 ) );
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
         }
         IO::printRectangle( 45, 10, 200, 30, p_bottom, 0 );
         IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );

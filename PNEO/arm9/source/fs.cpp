@@ -72,13 +72,11 @@ const char BATTLE_STRINGS_PATH[] = "nitro:/DATA/TRNR_STRS/";
 const char BATTLE_TRAINER_PATH[] = "nitro:/DATA/TRNR_DATA/";
 const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/";
 
-const char MAP_DATA_PATH[] = "nitro:/DATA/MAP_DATA/";
-
-const char STRING_PATH[]      = "nitro:/STRN/STR/";
-const char MAPSTRING_PATH[]   = "nitro:/STRN/MAP/";
-const char PKMNPHRS_PATH[]    = "nitro:/STRN/PHR/";
-const char BADGENAME_PATH[]   = "nitro:/STRN/BDG/";
-const char ACHIEVEMENT_PATH[] = "nitro:/STRN/AVM/";
+const char UISTRING_PATH[]    = "nitro:/STRN/UIS/uis";
+const char MAPSTRING_PATH[]   = "nitro:/STRN/MAP/map";
+const char PKMNPHRS_PATH[]    = "nitro:/STRN/PHR/phr";
+const char BADGENAME_PATH[]   = "nitro:/STRN/BDG/bdg";
+const char ACHIEVEMENT_PATH[] = "nitro:/STRN/AVM/avm";
 
 namespace FS {
     char TMP_BUFFER[ 100 ];
@@ -144,6 +142,11 @@ namespace FS {
                       p_ext );
         }
 
+        return fopen( TMP_BUFFER, p_mode );
+    }
+
+    FILE* openBank( const char* p_path, u8 p_lang, const char* p_ext, const char* p_mode ) {
+        snprintf( TMP_BUFFER, 99, "%s.%hhu%s", p_path, p_lang, p_ext );
         return fopen( TMP_BUFFER, p_mode );
     }
 
@@ -645,43 +648,97 @@ bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language,
     return true;
 }
 
-const char* getPkmnPhrase( u16 p_stringId ) {
-    static char st_buffer[ PKMNPHRS_LEN + 10 ];
+bool getString( FILE* p_bankFile, u16 p_maxLen, u16 p_stringId, char* p_out ) {
+    if( !p_bankFile ) { return false; }
+    if( std::fseek( p_bankFile, p_stringId * p_maxLen, SEEK_SET ) ) { return false; }
+    fread( p_out, 1, p_maxLen, p_bankFile );
+    return true;
+}
+
+const char* getUIString( u16 p_stringId, u8 p_language ) {
+    static char  st_buffer[ UISTRING_LEN + 10 ];
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+
+    if( bankfile == nullptr || p_language != lastLang ) {
+        // open the bank file
+        if( bankfile != nullptr ) { fclose( bankfile ); }
+        bankfile = FS::openBank( UISTRING_PATH, p_language, ".strb" );
+        lastLang = p_language;
+    }
 
     // std::memset( st_buffer, 0, sizeof( st_buffer ) );
-    if( getString( PKMNPHRS_PATH, PKMNPHRS_LEN, p_stringId, CURRENT_LANGUAGE, st_buffer ) ) {
-        return st_buffer;
+    if( getString( bankfile, UISTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+    return "(uistring failed)";
+}
+
+const char* getPkmnPhrase( u16 p_stringId ) {
+    static char  st_buffer[ PKMNPHRS_LEN + 10 ];
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+
+    if( bankfile == nullptr || CURRENT_LANGUAGE != lastLang ) {
+        // open the bank file
+        if( bankfile != nullptr ) { fclose( bankfile ); }
+        bankfile = FS::openBank( PKMNPHRS_PATH, CURRENT_LANGUAGE, ".strb" );
+        lastLang = CURRENT_LANGUAGE;
     }
+
+    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    if( getString( bankfile, PKMNPHRS_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "";
 }
 
 const char* getMapString( u16 p_stringId ) {
-    static char st_buffer[ MAPSTRING_LEN + 10 ];
+    static char  st_buffer[ MAPSTRING_LEN + 10 ];
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+
+    if( bankfile == nullptr || CURRENT_LANGUAGE != lastLang ) {
+        // open the bank file
+        if( bankfile != nullptr ) { fclose( bankfile ); }
+        bankfile = FS::openBank( MAPSTRING_PATH, CURRENT_LANGUAGE, ".strb" );
+        lastLang = CURRENT_LANGUAGE;
+    }
+
+    if( bankfile == nullptr ) { return "(bankfile failed)"; }
 
     // std::memset( st_buffer, 0, sizeof( st_buffer ) );
-    if( getString( MAPSTRING_PATH, MAPSTRING_LEN, p_stringId, CURRENT_LANGUAGE, st_buffer ) ) {
-        return st_buffer;
-    }
-    return "";
+    if( getString( bankfile, MAPSTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+    return "(string failed)";
 }
 
 const char* getBadge( u16 p_stringId ) {
-    static char st_buffer[ BADGENAME_LEN + 10 ];
+    static char  st_buffer[ BADGENAME_LEN + 10 ];
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+
+    if( bankfile == nullptr || CURRENT_LANGUAGE != lastLang ) {
+        // open the bank file
+        if( bankfile != nullptr ) { fclose( bankfile ); }
+        bankfile = FS::openBank( BADGENAME_PATH, CURRENT_LANGUAGE, ".strb" );
+        lastLang = CURRENT_LANGUAGE;
+    }
 
     // std::memset( st_buffer, 0, sizeof( st_buffer ) );
-    if( getString( BADGENAME_PATH, BADGENAME_LEN, p_stringId, CURRENT_LANGUAGE, st_buffer ) ) {
-        return st_buffer;
-    }
+    if( getString( bankfile, BADGENAME_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "";
 }
 
 const char* getAchievement( u16 p_stringId, u8 p_language ) {
-    static char st_buffer[ ACHIEVEMENT_LEN + 10 ];
+    static char  st_buffer[ ACHIEVEMENT_LEN + 10 ];
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+
+    if( bankfile == nullptr || p_language != lastLang ) {
+        // open the bank file
+        if( bankfile != nullptr ) { fclose( bankfile ); }
+        bankfile = FS::openBank( ACHIEVEMENT_PATH, p_language, ".strb" );
+        lastLang = p_language;
+    }
 
     // std::memset( st_buffer, 0, sizeof( st_buffer ) );
-    if( getString( ACHIEVEMENT_PATH, ACHIEVEMENT_LEN, p_stringId, p_language, st_buffer ) ) {
-        return st_buffer;
-    }
+    if( getString( bankfile, ACHIEVEMENT_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "";
 }
 

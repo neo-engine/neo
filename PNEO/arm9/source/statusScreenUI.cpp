@@ -984,12 +984,13 @@ namespace STS {
                                            INFO_LINE_SUB( 0 ), true );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
-            IO::regularFont->printStringC( GET_STRING( 365 ),
-                                           INFO_X_SUB + 12
-                                               + IO::regularFont->stringWidthC( GET_STRING(
-                                                   187 + u8( p_pokemon->getNature( ) ) ) )
-                                               + IO::regularFont->stringWidthC( GET_STRING( 364 ) ),
-                                           INFO_LINE_SUB( 0 ), true );
+            auto fmt = std::string( GET_STRING( 365 ) );
+            auto wd1 = IO::regularFont->stringWidthC(
+                GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ) );
+            IO::regularFont->printStringC(
+                fmt.c_str( ),
+                INFO_X_SUB + 12 + wd1 + +IO::regularFont->stringWidthC( GET_STRING( 364 ) ),
+                INFO_LINE_SUB( 0 ), true );
 
             u8 currentLine = 1;
             if( p_pokemon->wasEgg( ) ) {
@@ -1069,7 +1070,8 @@ namespace STS {
                 IO::regularFont->printStringC( GET_STRING( 374 ), INFO_X_SUB + 12,
                                                INFO_LINE_SUB( currentLine ), true );
 
-                snprintf( buffer, 49, GET_STRING( 375 ),
+                fmt = std::string( GET_STRING( 375 ) );
+                snprintf( buffer, 49, fmt.c_str( ),
                           GET_STRING( 242 + p_pokemon->m_boxdata.getTasteStr( ) ) );
                 IO::regularFont->setColor( IO::BLUE2_IDX, 1 );
                 IO::regularFont->setColor( IO::BLUE_IDX, 2 );
@@ -1078,8 +1080,9 @@ namespace STS {
                     INFO_LINE_SUB( currentLine ), true );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
+                fmt = std::string( GET_STRING( 376 ) );
                 IO::regularFont->printStringC(
-                    GET_STRING( 376 ),
+                    fmt.c_str( ),
                     INFO_X_SUB + 12 + IO::regularFont->stringWidthC( GET_STRING( 374 ) )
                         + IO::regularFont->stringWidthC( buffer ),
                     INFO_LINE_SUB( currentLine ), true );

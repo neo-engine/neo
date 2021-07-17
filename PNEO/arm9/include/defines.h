@@ -59,6 +59,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define LOCATION_NAMELENGTH 25
 #define DEXENTRY_NAMELENGTH 200
 
+#define UISTRING_LEN    250
 #define MAPSTRING_LEN   800
 #define BADGENAME_LEN   50
 #define ACHIEVEMENT_LEN 100
@@ -94,12 +95,11 @@ extern bool TWL_CONFIG;
 extern unsigned int   TEMP[ 256 * 256 / 4 ];
 extern unsigned short TEMP_PAL[ 256 ];
 
-constexpr u8  LANGUAGES      = 2;
-constexpr u16 MAX_STRINGS    = 990;
-constexpr u8  NUM_BGS        = 12;
-constexpr u8  MAX_NAV_BG     = 13;
-constexpr u8  DEFAULT_NAV_BG = 5;
-constexpr u8  INITIAL_NAVBG  = DEFAULT_NAV_BG;
+constexpr u8 LANGUAGES      = 2;
+constexpr u8 NUM_BGS        = 12;
+constexpr u8 MAX_NAV_BG     = 13;
+constexpr u8 DEFAULT_NAV_BG = 5;
+constexpr u8 INITIAL_NAVBG  = DEFAULT_NAV_BG;
 
 constexpr u8 DAYTIMES        = 5;
 constexpr u8 DAYTIME_NIGHT   = 0;
@@ -125,14 +125,13 @@ enum style : u8 {
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char*       HP_ICONS[ LANGUAGES ];
 extern const char* const MONTHS[ 12 ][ LANGUAGES ];
-extern const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 
 bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
 std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );
 std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );
 
-#define GET_STRING_L( p_stringId, p_language ) STRINGS[ p_stringId ][ p_language ]
+const char* getUIString( u16 p_stringId, u8 p_language );
 const char* getMapString( u16 p_stringId );
 const char* getPkmnPhrase( u16 p_stringId );
 const char* getBadge( u16 p_badgeId );
@@ -145,7 +144,8 @@ const char* getAchievement( u16 p_badgeId, u8 p_language );
                   ? getBadge( 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) - 1 ) \
                   : nullptr ) )
 
-#define GET_MAP_STRING( p_stringId ) getMapString( p_stringId )
+#define GET_MAP_STRING( p_stringId )           getMapString( p_stringId )
+#define GET_STRING_L( p_stringId, p_language ) getUIString( p_stringId, p_language )
 
 #ifdef DESQUID
 constexpr u16            MAX_DESQUID_STRINGS = 100;
@@ -154,11 +154,11 @@ extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
     ( ( ( p_stringId ) >= DESQUID_STRING )                                             \
           ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ]                        \
           : ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - MAP_STRING ) \
-                                           : STRINGS[ p_stringId ][ CURRENT_LANGUAGE ] ) )
+                                           : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) ) )
 #else
 #define GET_STRING( p_stringId )                                               \
     ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - MAP_STRING ) \
-                                   : STRINGS[ p_stringId ][ CURRENT_LANGUAGE ] )
+                                   : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) )
 #endif
 #define HP_ICON HP_ICONS[ CURRENT_LANGUAGE ]
 

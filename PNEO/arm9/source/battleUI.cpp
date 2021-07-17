@@ -1085,17 +1085,21 @@ namespace BATTLE {
             if( p_intended.getBoost( i ) > 0 ) {
                 auto bt = p_actual.getBoost( i );
                 if( bt == 0 ) {
-                    snprintf( buffer, 99, GET_STRING( 256 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 256 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 } else if( bt == 1 ) {
-                    snprintf( buffer, 99, GET_STRING( 257 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 257 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 } else if( bt == 2 ) {
-                    snprintf( buffer, 99, GET_STRING( 258 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 258 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 } else if( bt >= 3 ) {
-                    snprintf( buffer, 99, GET_STRING( 259 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 259 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 }
                 log( std::string( buffer ) );
             }
@@ -1121,17 +1125,21 @@ namespace BATTLE {
             if( p_intended.getBoost( i ) < 0 ) {
                 auto bt = p_actual.getBoost( i );
                 if( bt == 0 ) {
-                    snprintf( buffer, 99, GET_STRING( 256 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 256 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 } else if( bt == -1 ) {
-                    snprintf( buffer, 99, GET_STRING( 260 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 260 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 } else if( bt == -2 ) {
-                    snprintf( buffer, 99, GET_STRING( 261 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 261 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 } else if( bt <= -3 ) {
-                    snprintf( buffer, 99, GET_STRING( 262 ), pkmnstr.c_str( ),
-                              GET_STRING( 248 + i ), pkmnstr.c_str( ) );
+                    auto fmt = std::string( GET_STRING( 262 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), pkmnstr.c_str( ), GET_STRING( 248 + i ),
+                              pkmnstr.c_str( ) );
                 }
                 log( std::string( buffer ) );
             }

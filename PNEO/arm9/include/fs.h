@@ -54,6 +54,8 @@ namespace FS {
                  const char* p_mode = "rb" );
     FILE*  openSplit( const char* p_path, u16 p_value, const char* p_ext = ".raw",
                       u16 p_maxValue = 99 * ITEMS_PER_DIR, const char* p_mode = "rb" );
+    FILE*  openBank( const char* p_path, u8 p_lang, const char* p_ext = ".strb",
+                     const char* p_mode = "rb" );
     void   close( FILE* p_file );
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );

@@ -328,7 +328,8 @@ int main( int, char** p_argv ) {
                             continue;
                         char buffer[ 100 ];
                         auto mname = MOVE::getMoveName( a.m_boxdata.m_moves[ j ] );
-                        snprintf( buffer, 99, GET_STRING( 3 ),
+                        auto fstr  = std::string( GET_STRING( 3 ) );
+                        snprintf( buffer, 99, fstr.c_str( ),
                                   GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                   mname.c_str( ) );
                         SOUND::playSoundEffect( SFX_CHOOSE );

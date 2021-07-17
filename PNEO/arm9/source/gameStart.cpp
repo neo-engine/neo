@@ -452,9 +452,10 @@ namespace SAVE {
 
         IO::fadeScreen( IO::fadeType::UNFADE, true, true );
 
-        printMBoxTextAndWait( ( GET_STRING( 462 ) + std::string( SAV.getActiveFile( ).m_playername )
-                                + GET_STRING( 463 ) )
-                                  .c_str( ) );
+        auto p1 = std::string( GET_STRING( 462 ) );
+        p1 += std::string( SAV.getActiveFile( ).m_playername );
+        p1 += std::string( GET_STRING( 463 ) );
+        printMBoxTextAndWait( p1.c_str( ) );
 
         for( u8 i = 0; i < 4; ++i ) { printMBoxTextAndWait( GET_STRING( 464 + i ) ); }
 

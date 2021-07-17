@@ -207,9 +207,9 @@ namespace MAP {
         if( p_cmd == "PLAYER" ) { return SAVE::SAV.getActiveFile( ).m_playername; }
         if( p_cmd == "RIVAL" ) {
             if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
-                return GET_STRING( 461 );
+                return std::string( GET_STRING( 461 ) );
             } else {
-                return GET_STRING( 460 );
+                return std::string( GET_STRING( 460 ) );
             }
         }
         if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp != u16( -1 ) ) {
@@ -1381,7 +1381,7 @@ namespace MAP {
             case YNM: {
                 style st        = (style) parB;
                 bool  showMoney = st & MSG_SHOW_MONEY_FLAG;
-                st              = ( style )( st & 127 );
+                st              = (style) ( st & 127 );
 
                 if( st == MSG_NORMAL ) { st = MSG_NOCLOSE; }
                 if( st == MSG_INFO ) { st = MSG_INFO_NOCLOSE; }
