@@ -101,6 +101,7 @@ constexpr u8  MAX_NAV_BG     = 13;
 constexpr u8  DEFAULT_NAV_BG = 5;
 constexpr u8  INITIAL_NAVBG  = DEFAULT_NAV_BG;
 
+constexpr u8 DAYTIMES        = 5;
 constexpr u8 DAYTIME_NIGHT   = 0;
 constexpr u8 DAYTIME_MORNING = 1;
 constexpr u8 DAYTIME_DAY     = 2;

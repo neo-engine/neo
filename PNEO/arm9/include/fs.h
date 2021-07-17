@@ -76,6 +76,9 @@ namespace FS {
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
     bool readBlocks( FILE* p_file, MAP::block* p_blocks, u16 p_startIdx = 0, u16 p_size = 512 );
 
+    bool seekTileSet( FILE* p_file, u8 p_tsIdx );
+
+    FILE* openTileSet( );
     FILE* openBank( u8 p_bank );
 
     bool readMapData( FILE* p_file, MAP::mapData* p_result, bool p_close = true );

@@ -38,10 +38,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace MAP {
-    void constructSlice( FILE* p_f, u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
+    void constructSlice( FILE* p_f, FILE* p_tileset, u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
                          mapData* p_resultData, mapSlice p_cache[ 2 ][ 2 ] ) {
         bool mapExists = true;
         if( !p_f ) { p_f = FS::openBank( p_map ); }
+        if( !p_tileset ) { p_tileset = FS::openTileSet( ); }
 
 #ifdef DESQUID
         if( !p_result ) {
@@ -50,10 +51,10 @@ namespace MAP {
         }
 #endif
 
-        if( !p_f ) {
+        if( !p_f || !p_tileset ) {
 #ifdef DESQUID
             char buffer[ 50 ];
-            snprintf( buffer, 49, "Map %d/%d,%d does not exist.", p_map, p_y, p_x );
+            snprintf( buffer, 49, "Map %d/%d,%d does not exist or TS broken", p_map, p_y, p_x );
             NAV::printMessage( buffer, MSG_INFO );
             swiWaitForVBlank( );
 #endif
@@ -72,30 +73,9 @@ namespace MAP {
         if( mapExists ) {
             auto res           = FS::readMapSliceAndData( p_f, p_result, p_resultData, p_x, p_y );
             p_result->m_loaded = !res;
-            /*            char buffer[ 100 ];
-                        snprintf(
-                            buffer, 99,
-                            "Map %d/%d,%d %lu %lu %lu %lu\n%02hhx %02hhx %02hhx %02hhx | %02hhx
-               %02hhx %02hhx %02hhx | %02hhx %02hhx %02hhx %02hhx", p_map, p_y, p_x, res, sizeof(
-               bankInfo ), sizeof( mapSliceData ), sizeof( mapData ), reinterpret_cast<u8*>(
-               p_resultData )[ 0 ], reinterpret_cast<u8*>( p_resultData )[ 1 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 2 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 3 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 4 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 5 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 6 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 7 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 8 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 9 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 10 ],
-                            reinterpret_cast<u8*>( p_resultData )[ 11 ] );
-                        NAV::printMessage( buffer, MSG_INFO );
-                        */
         } else {
             return;
         }
-
-        FILE* mapF;
 
         u16 tsidx1 = p_result->m_data.m_tIdx1;
         u16 tsidx2 = p_result->m_data.m_tIdx2;
@@ -127,17 +107,13 @@ namespace MAP {
                         }
             }
             if( !found ) {
-                mapF = FS::open( TILESET_PATH, tsidx1, ".ts" );
-                FS::readTiles( mapF, p_result->m_tileSet.m_tiles );
-                FS::close( mapF );
-
-                mapF = FS::open( BLOCKSET_PATH, tsidx1, ".bvd" );
-                FS::readBlocks( mapF, p_result->m_blockSet.m_blocks );
-                FS::close( mapF );
-
-                mapF = FS::open( PALETTE_PATH, tsidx1, ".p2l" );
-                for( u8 i = 0; i < 5; ++i ) { FS::readPal( mapF, p_result->m_pals + i * 16, 8 ); }
-                FS::close( mapF );
+                if( FS::seekTileSet( p_tileset, tsidx1 ) ) {
+                    FS::readTiles( p_tileset, p_result->m_tileSet.m_tiles );
+                    FS::readBlocks( p_tileset, p_result->m_blockSet.m_blocks );
+                    for( u8 i = 0; i < DAYTIMES; ++i ) {
+                        FS::readPal( p_tileset, p_result->m_pals + i * 16, 8 );
+                    }
+                }
             }
         }
         // Read the second tileset
@@ -165,19 +141,13 @@ namespace MAP {
                         }
             }
             if( !found ) {
-                mapF = FS::open( TILESET_PATH, tsidx2, ".ts" );
-                FS::readTiles( mapF, p_result->m_tileSet.m_tiles, 512 );
-                FS::close( mapF );
-
-                mapF = FS::open( BLOCKSET_PATH, tsidx2, ".bvd" );
-                FS::readBlocks( mapF, p_result->m_blockSet.m_blocks, 512 );
-                FS::close( mapF );
-
-                mapF = FS::open( PALETTE_PATH, tsidx2, ".p2l" );
-                for( u8 i = 0; i < 5; ++i ) {
-                    FS::readPal( mapF, p_result->m_pals + 6 + i * 16, 8 );
+                if( FS::seekTileSet( p_tileset, tsidx2 ) ) {
+                    FS::readTiles( p_tileset, p_result->m_tileSet.m_tiles, 512 );
+                    FS::readBlocks( p_tileset, p_result->m_blockSet.m_blocks, 512 );
+                    for( u8 i = 0; i < DAYTIMES; ++i ) {
+                        FS::readPal( p_tileset, p_result->m_pals + 6 + i * 16, 8 );
+                    }
                 }
-                FS::close( mapF );
             }
         }
         p_result->m_data.m_tIdx1 = tsidx1;

@@ -42,6 +42,7 @@ namespace MAP {
     class mapDrawer {
       private:
         FILE* _currentBank = nullptr;
+        FILE* _tileset     = nullptr;
         void  loadNewBank( u8 p_bank );
 
         mapSpriteManager _mapSprites;
@@ -226,6 +227,8 @@ namespace MAP {
         inline ~mapDrawer( ) {
             if( _currentBank != nullptr ) { fclose( _currentBank ); }
             _currentBank = nullptr;
+            if( _tileset != nullptr ) { fclose( _tileset ); }
+            _tileset = nullptr;
         }
 
         direction getFollowPkmnDirection( ) const;

@@ -277,6 +277,26 @@ namespace FS {
 
     bool readBlocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 ) return false;
+
+        /*
+        // read everything into a buffer first - not really faster
+
+        read( p_file, CRY_DATA, 4 + p_size * ( 8 * sizeof( MAP::blockAtom ) + 2 ), 1 );
+        u16 pos = 4;
+
+        for( u16 i = 0; i < p_size; ++i ) {
+            std::memcpy( &( p_tileSet + p_startIdx + i )->m_bottom, CRY_DATA + pos,
+                         4 * sizeof( MAP::blockAtom ) );
+            pos += 4 * sizeof( MAP::blockAtom );
+            std::memcpy( &( p_tileSet + p_startIdx + i )->m_top, CRY_DATA + pos,
+                         4 * sizeof( MAP::blockAtom ) );
+            pos += 4 * sizeof( MAP::blockAtom );
+        }
+        for( u16 i = 0; i < p_size; ++i ) {
+            ( p_tileSet + p_startIdx + i )->m_bottombehave = CRY_DATA[ pos++ ];
+            ( p_tileSet + p_startIdx + i )->m_topbehave    = CRY_DATA[ pos++ ];
+        }
+*/
         readNop( p_file, 4 );
         for( u16 i = 0; i < p_size; ++i ) {
             read( p_file, &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::blockAtom ),
@@ -288,6 +308,32 @@ namespace FS {
             read( p_file, &( p_tileSet + p_startIdx + i )->m_topbehave, sizeof( u8 ), 1 );
         }
         return true;
+    }
+
+    bool seekTileSet( FILE* p_file, u8 p_tsIdx ) {
+        if( !p_file ) { return false; }
+
+        MAP::blockSetBankHeader info;
+        if( fseek( p_file, 0, SEEK_SET ) ) { return 2; }
+        fread( &info, sizeof( MAP::blockSetBankHeader ), 1, p_file );
+
+        if( fseek( p_file,
+                   sizeof( MAP::blockSetBankHeader )
+                       + ( p_tsIdx
+                           * ( ( sizeof( MAP::tile ) * 512 )                        // tiles
+                               + ( 4 + 512 * ( 8 * sizeof( MAP::blockAtom ) + 2 ) ) // blocks
+                               + ( sizeof( u16 ) * 16 * 8 * info.m_dayTimeCount )   // pals
+                               ) ),
+                   SEEK_SET ) ) {
+            return false;
+        }
+        return true;
+    }
+
+    FILE* openTileSet( ) {
+        FILE* f = open( MAP::MAP_PATH, "tileset", ".tsb" );
+        if( !f ) { return nullptr; }
+        return f;
     }
 
     FILE* openBank( u8 p_bank ) {

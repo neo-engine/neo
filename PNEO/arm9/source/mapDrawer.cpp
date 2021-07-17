@@ -392,16 +392,16 @@ namespace MAP {
 
             u16 mx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 my = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
-                            my / SIZE, &_slices[ _curX ][ _curY ], &_data[ _curX ][ _curY ],
-                            _slices );
-            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap,
+            constructSlice( _currentBank, _tileset, SAVE::SAV.getActiveFile( ).m_currentMap,
+                            mx / SIZE, my / SIZE, &_slices[ _curX ][ _curY ],
+                            &_data[ _curX ][ _curY ], _slices );
+            constructSlice( _currentBank, _tileset, SAVE::SAV.getActiveFile( ).m_currentMap,
                             mx / SIZE + currentHalf( mx ), my / SIZE,
                             &_slices[ _curX ^ 1 ][ _curY ], &_data[ _curX ^ 1 ][ _curY ], _slices );
-            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx / SIZE,
-                            my / SIZE + currentHalf( my ), &_slices[ _curX ][ _curY ^ 1 ],
-                            &_data[ _curX ][ _curY ^ 1 ], _slices );
-            constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap,
+            constructSlice( _currentBank, _tileset, SAVE::SAV.getActiveFile( ).m_currentMap,
+                            mx / SIZE, my / SIZE + currentHalf( my ),
+                            &_slices[ _curX ][ _curY ^ 1 ], &_data[ _curX ][ _curY ^ 1 ], _slices );
+            constructSlice( _currentBank, _tileset, SAVE::SAV.getActiveFile( ).m_currentMap,
                             mx / SIZE + currentHalf( mx ), my / SIZE + currentHalf( my ),
                             &_slices[ _curX ^ 1 ][ _curY ^ 1 ], &_data[ _curX ^ 1 ][ _curY ^ 1 ],
                             _slices );
@@ -965,7 +965,7 @@ namespace MAP {
         auto mx = CUR_SLICE.m_x + dir[ p_direction ][ 0 ],
              my = CUR_SLICE.m_y + dir[ p_direction ][ 1 ];
 
-        constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
+        constructSlice( _currentBank, _tileset, SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                         &_slices[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
                                 [ ( 2 + _curY + dir[ p_direction ][ 1 ] ) & 1 ],
                         &_data[ ( 2 + _curX + dir[ p_direction ][ 0 ] ) & 1 ]
@@ -979,7 +979,7 @@ namespace MAP {
                              [ ( _curY + !dir[ p_direction ][ 1 ] ) & 1 ];
         mx = neigh.m_x + dir[ p_direction ][ 0 ];
         my = neigh.m_y + dir[ p_direction ][ 1 ];
-        constructSlice( _currentBank, SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
+        constructSlice( _currentBank, _tileset, SAVE::SAV.getActiveFile( ).m_currentMap, mx, my,
                         &_slices[ _curX ^ 1 ][ _curY ^ 1 ], &_data[ _curX ^ 1 ][ _curY ^ 1 ],
                         _slices );
         runLevelScripts( _data[ _curX ^ 1 ][ _curY ^ 1 ], mx, my );

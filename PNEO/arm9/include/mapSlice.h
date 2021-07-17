@@ -128,6 +128,7 @@ namespace MAP {
         blockSet     m_blockSet;
         mapSliceData m_data;
     };
-    void constructSlice( FILE* p_f, u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
-                         mapData* p_resultData, mapSlice p_cache[ 2 ][ 2 ] = 0 );
+    void constructSlice( FILE* p_bank, FILE* p_tileset, u8 p_map, u16 p_x, u16 p_y,
+                         mapSlice* p_result, mapData* p_resultData,
+                         mapSlice p_cache[ 2 ][ 2 ] = 0 );
 } // namespace MAP

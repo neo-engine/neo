@@ -332,6 +332,13 @@ namespace MAP {
         }
     };
 
+    struct blockSetBankHeader {
+        u8  m_blockSetCount = 0;        // number of block sets
+        u8  m_dayTimeCount  = DAYTIMES; // number of extra daytime palettes per palette
+        u32 m_1 : 16        = 0;
+        u32 m_2 : 32        = 0;
+    };
+
     constexpr direction getDir( int p_dir ) {
         if( p_dir & KEY_DOWN ) { return MAP::direction::DOWN; }
         if( p_dir & KEY_UP ) { return MAP::direction::UP; }
