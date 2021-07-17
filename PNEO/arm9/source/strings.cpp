@@ -1250,4 +1250,5 @@ const char* const STRINGS[ MAX_STRINGS ][ LANGUAGES ] = {
     { "Battle Factory", "Kampffabrik" },
     { "New Mauville", "Neu Malvenfroh" },
     { "Crystal Cavern", "Kristallgrotte" },
+    { "Lovely Coast", "Nette K\xfcste" },
 };

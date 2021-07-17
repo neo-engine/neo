@@ -270,7 +270,7 @@ namespace SOUND {
         case L_MAUVILLE_CITY:
         case L_MOSSDEEP_CITY:
         case L_RUSTBORO_CITY: return MOD_RUSTBORO_CITY;
-        case L_BLOSSAND_TOWN:
+        case L_BLOSSAND_TOWN: return MOD_EX07;
         case L_DEWFORD_TOWN: return MOD_DEWFORD_TOWN;
         case L_SLATEPORT_CITY: return MOD_SLATEPORT_CITY;
         case L_FALLARBOR_TOWN: return MOD_FALLARBOR_TOWN;

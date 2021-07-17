@@ -238,6 +238,7 @@ namespace NAV {
         { 641, MOD_SOOTOPOLIS_CITY },
         { 628, MOD_ROUTE_135 },
         { 601, MOD_CLIFFELTA_CITY },
+        { 694, MOD_EX07 },
         { 615, MOD_NEW_LILYCOVE_CITY },
         { 627, MOD_ROUTE_10 },
         { 693, MOD_CRYSTAL_CAVERN },
