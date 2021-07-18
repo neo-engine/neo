@@ -376,92 +376,6 @@ namespace NAV {
         printMessage( p_message );
     }
 
-    constexpr u8 BGforLocation( u16 p_locId ) {
-        switch( p_locId ) {
-        case L_HIDDEN_LAKE:
-        case L_ROUTE_135:
-        case L_ROUTE_136:
-        case L_EVER_GRANDE_CITY: return 7;
-        case L_MAUVILLE_CITY:
-        case L_PETALBURG_CITY:
-        case L_DEWFORD_TOWN:
-        case L_MOSSDEEP_CITY:
-        case L_BLOSSAND_TOWN: return 3;
-        case L_ROUTE_105:
-        case L_ROUTE_106:
-        case L_ROUTE_107:
-        case L_ROUTE_108:
-        case L_ROUTE_109:
-        case L_ROUTE_122:
-        case L_ROUTE_124:
-        case L_ROUTE_125:
-        case L_ROUTE_126:
-        case L_ROUTE_127:
-        case L_ROUTE_128:
-        case L_ROUTE_129:
-        case L_ROUTE_130:
-        case L_ROUTE_131:
-        case L_ROUTE_132:
-        case L_ROUTE_133:
-        case L_ROUTE_134:
-        case L_ROUTE_137:
-        case L_OCEANIC_MUSEUM:
-        case L_PACIFIDLOG_TOWN: return 2;
-        case L_RUSTBORO_CITY:
-        case L_SLATEPORT_CITY:
-        case L_SOOTOPOLIS_CITY:
-        case L_CLIFFELTA_CITY:
-        case L_LILYCOVE_CITY:
-        case L_NEW_LILYCOVE_CITY: return 6;
-        case L_METEOR_FALLS:
-        case L_SEALED_CHAMBER:
-        case L_ANCIENT_TOMB:
-        case L_ISLAND_CAVE:
-        case L_DESERT_RUINS:
-        case L_FOREST_GROTTO:
-        case L_ROCK_SHELTER:
-        case L_SHOAL_CAVE:
-        case L_RUSTURF_TUNNEL:
-        case L_FIERY_PATH:
-        case L_FIERY_DEN:
-        case L_GRANITE_CAVE:
-        case L_VICTORY_ROAD:
-        case L_VICTORY_ROAD2:
-        case L_VICTORY_ROAD3:
-        case L_CRYSTAL_CAVERN: return 4;
-        case L_POKEMON_MART:
-        case L_POKEMON_CENTER:
-        case L_RUSTBORO_GYM:
-        case L_DEWFORD_GYM:
-        case L_MAUVILLE_GYM:
-        case L_LAVARIDGE_GYM:
-        case L_PETALBURG_GYM:
-        case L_FORTREE_GYM:
-        case L_MOSSDEEP_GYM:
-        case L_SOOTOPOLIS_GYM:
-        case L_LILYCOVE_GYM:
-        case L_PROF_BIRCH_S_LAB:
-        case L_POKEMON_LEAGUE:
-        case L_POKEMON_LEAGUE2:
-        case L_BATTLE_FRONTIER:
-        case L_BATTLE_TENT:
-        case L_BATTLE_TOWER:
-        case L_BATTLE_FACTORY:
-        case L_BATTLE_DOME:
-        case L_BATTLE_PALACE:
-        case L_BATTLE_PIKE:
-        case L_BATTLE_PYRAMID:
-        case L_BATTLE_ARENA:
-        case L_CABLE_CAR:
-        case L_LILYCOVE_MUSEUM: return 1;
-        case L_SAFARI_ZONE:
-        case L_PRETTY_PETAL:
-        case L_FORTREE_CITY:
-        case L_PETALBURG_WOODS: return 5;
-        default: return 0;
-        }
-    }
-
     u16  CURRENT_LOCATION = 0;
     u8   LOCATION_TIMER   = 0;
     void showNewLocation( u16 p_newLocation ) {
@@ -473,8 +387,8 @@ namespace NAV {
         LOCATION_TIMER   = 120;
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        if( BGforLocation( p_newLocation ) == 3 || BGforLocation( p_newLocation ) == 6
-            || BGforLocation( p_newLocation ) == 0 ) {
+        if( FS::frameForLocation( p_newLocation ) == 3 || FS::frameForLocation( p_newLocation ) == 6
+            || FS::frameForLocation( p_newLocation ) == 0 ) {
             IO::regularFont->setColor( 1, 1 );
         } else {
             IO::regularFont->setColor( 3, 1 );
@@ -489,8 +403,8 @@ namespace NAV {
         tileCnt
             = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, 32, TEXT_BUF + 64 * 32,
                                64 * 32 / 2, false, false, false, OBJPRIORITY_0, false );
-        tileCnt = IO::loadLocationBackB( BGforLocation( p_newLocation ), 1, 1, SPR_MSGTEXT_OAM + 2,
-                                         tileCnt, false );
+        tileCnt = IO::loadLocationBackB( FS::frameForLocation( p_newLocation ), 1, 1,
+                                         SPR_MSGTEXT_OAM + 2, tileCnt, false );
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );

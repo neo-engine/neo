@@ -26,6 +26,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "navApp.h"
+#include "bgmTranslation.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDefines.h"
@@ -197,96 +198,6 @@ namespace NAV {
         return false;
     }
 
-    constexpr u16 MAX_JBOX_SONGS = 100;
-
-    constexpr u16 JBOX_SONG_LIST[ MAX_JBOX_SONGS ][ 2 ] = {
-        { 0, 0 },
-        { 586, MOD_LITTLEROOT_TOWN },
-        { 612, MOD_HELP_PROF_BIRCH },
-        { 626, MOD_PROF_BIRCH_LAB },
-        { 629, MOD_ROUTE_101 },
-        { 621, MOD_OLDALE_TOWN },
-        { 622, MOD_PETALBURG_CITY },
-        { 630, MOD_ROUTE_104 },
-        { 600, MOD_CAVE_FORESTS },
-        { 610, MOD_EX03 },
-        { 636, MOD_RUSTBORO_CITY },
-        { 643, MOD_TRAINER_SCHOOL },
-        { 606, MOD_DEWFORD_TOWN },
-        { 640, MOD_SLATEPORT_CITY },
-        { 617, MOD_MARINE_SCIENCE_MUSEUM },
-        { 631, MOD_ROUTE_110 },
-        { 644, MOD_TRICK_HOUSE },
-        { 692, MOD_NEW_MAUVILLE },
-        { 669, MOD_VERDANTURF_TOWN },
-        { 605, MOD_DESERT },
-        { 632, MOD_ROUTE_113 },
-        { 611, MOD_FALLARBOR_TOWN },
-        { 618, MOD_METEOR_FALLS },
-        { 619, MOD_MT_CHIMNEY },
-        { 633, MOD_ROUTE_119 },
-        { 670, MOD_FORTREE_CITY },
-        { 587, MOD_ABANDONED_SHIP },
-        { 634, MOD_ROUTE_120 },
-        { 637, MOD_SAFARI_ZONE },
-        { 614, MOD_LILYCOVE_CITY },
-        { 616, MOD_LILYCOVE_MUSEUM },
-        { 642, MOD_TEAM_AM_HIDEOUT },
-        { 671, MOD_MT_PYRE_PEAK },
-        { 635, MOD_ROUTE_123 },
-        { 639, MOD_SHOAL_CAVE },
-        { 641, MOD_SOOTOPOLIS_CITY },
-        { 628, MOD_ROUTE_135 },
-        { 601, MOD_CLIFFELTA_CITY },
-        { 694, MOD_EX07 },
-        { 615, MOD_NEW_LILYCOVE_CITY },
-        { 627, MOD_ROUTE_10 },
-        { 693, MOD_CRYSTAL_CAVERN },
-        { 638, MOD_SEALED_CHAMBER },
-
-        { 589, MOD_BATTLE_FRONTIER },
-        { 597, MOD_BATTLE_TOWER },
-        { 592, MOD_BATTLE_PALACE },
-        { 681, MOD_BATTLE_ARENA },
-        { 691, MOD_BATTLE_FACTORY },
-
-        { 623, MOD_POKEMON_CENTER },
-        { 625, MOD_POKEMON_MART },
-        { 624, MOD_POKEMON_GYM },
-
-        { 679, MOD_SAILING },
-        { 602, MOD_CYCLING },
-        { 603, MOD_SURFING },
-        { 680, MOD_SURFING_ALT },
-        { 604, MOD_DIVING },
-
-        { 598, MOD_BATTLE_WILD },
-        { 599, MOD_BATTLE_WILD_ALT },
-        { 596, MOD_BATTLE_TRAINER },
-        { 591, MOD_BATTLE_MAY_BRENDAN },
-        { 590, MOD_BATTLE_GYM_LEADER },
-        { 650, MOD_BATTLE_FRONTIER_BRAIN },
-        { 595, MOD_BATTLE_TEAM_AM },
-        { 649, MOD_BATTLE_REGI },
-        { 594, MOD_BATTLE_RAYQUAZA },
-        { 593, MOD_BATTLE_RAIKOU_ENTEI_SUICUNE },
-        { 651, MOD_BATTLE_DIALGA_PALKIA },
-        { 588, MOD_BATTLE_EX01 },
-
-        { 609, MOD_EX02 },
-        { 653, MOD_MT_MOON },
-        { 607, MOD_ECRUTEAK_CITY },
-        { 608, MOD_EX01 },
-        { 613, MOD_LAKE_CAVE },
-        { 645, MOD_UNWAVERING_EMOTIONS },
-        { 648, MOD_EX04 },
-        { 652, MOD_EX05 },
-        { 654, MOD_EX06 },
-        { 678, MOD_DISTORTION_WORLD },
-
-        { 620, MOD_MYSTERY_GIFT },
-    };
-
     void jboxNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::loadSprite( "NV/app02", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
@@ -394,9 +305,8 @@ namespace NAV {
         IO::updateOAM( p_bottom );
 
         auto s1 = std::string( GET_STRING( 585 ) );
-        if( _currentSong && JBOX_SONG_LIST[ _currentSong ][ 0 ] ) {
-            snprintf( buffer, 99, "%s: %s", s1.c_str( ),
-                      GET_STRING( JBOX_SONG_LIST[ _currentSong ][ 0 ] ) );
+        if( _currentSong && BGMIndexForName( _currentSong ) != MOD_NONE ) {
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
         } else {
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
         }
@@ -443,10 +353,9 @@ namespace NAV {
         SOUND::playCry( PKMN_LUDICOLO );
         _currentSong = p_idx;
         auto s1      = std::string( GET_STRING( 585 ) );
-        if( _currentSong && JBOX_SONG_LIST[ _currentSong ][ 0 ] ) {
-            SOUND::setJBoxBGM( JBOX_SONG_LIST[ _currentSong ][ 1 ] );
-            snprintf( buffer, 99, "%s: %s", s1.c_str( ),
-                      GET_STRING( JBOX_SONG_LIST[ _currentSong ][ 0 ] ) );
+        if( _currentSong && BGMIndexForName( _currentSong ) != MOD_NONE ) {
+            SOUND::setJBoxBGM( BGMIndexForName( _currentSong ) );
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
         } else {
             SOUND::setJBoxBGM( SOUND::JBOX_DISABLED );
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
@@ -459,20 +368,19 @@ namespace NAV {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::printRectangle( 45, 30, 200, 180, p_bottom, 0 );
         for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( JBOX_SONG_LIST[ p_startIdx + i ][ 0 ] ) {
+            if( BGMIndexForName( p_startIdx + i ) != MOD_NONE ) {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
 
                 setSongChoiceVis( i, false, p_bottom );
-                IO::regularFont->printStringC( GET_STRING( JBOX_SONG_LIST[ p_startIdx + i ][ 0 ] ),
-                                               oam[ idx ].x + 64, oam[ idx ].y + 2, p_bottom,
-                                               IO::font::CENTER );
+                IO::regularFont->printStringC( FS::getBGMName( p_startIdx + i ).c_str( ), oam[ idx ].x + 64,
+                                               oam[ idx ].y + 2, p_bottom, IO::font::CENTER );
             } else {
                 setSongChoiceVis( i, true, p_bottom );
             }
         }
 
         oam[ SPR_NAV_APP_RSV_SUB + 1 ].isHidden
-            = !JBOX_SONG_LIST[ p_startIdx + SONGS_PER_PAGE ][ 0 ];
+            = BGMIndexForName( p_startIdx + SONGS_PER_PAGE ) == MOD_NONE;
         oam[ SPR_NAV_APP_RSV_SUB ].isHidden = p_startIdx <= SONGS_PER_PAGE;
 
         auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * SONGS_PER_PAGE;
@@ -500,7 +408,7 @@ namespace NAV {
 
         // select song
         for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( JBOX_SONG_LIST[ _currentSelStart + i ][ 0 ] ) {
+            if( BGMIndexForName( _currentSelStart + i ) != MOD_NONE ) {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
                 res.push_back( std::pair( IO::inputTarget( oam[ idx ].x, oam[ idx ].y,
                                                            oam[ idx ].x + 128, oam[ idx ].y + 20 ),
@@ -549,7 +457,7 @@ namespace NAV {
                     if( c.second == EXIT_CHOICE ) {
                         return true;
                     } else if( c.second == FWD_CHOICE ) {
-                        if( JBOX_SONG_LIST[ _currentSelStart + SONGS_PER_PAGE ][ 0 ] ) {
+                        if( BGMIndexForName( _currentSelStart + SONGS_PER_PAGE ) != MOD_NONE ) {
                             SOUND::playCry( PKMN_BELLOSSOM );
                             _currentSelStart += SONGS_PER_PAGE;
                             drawSongList( _currentSelStart, p_bottom );

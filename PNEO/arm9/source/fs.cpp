@@ -38,6 +38,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ability.h"
 #include "battleTrainer.h"
+#include "bgmNames.h"
 #include "defines.h"
 #include "fs.h"
 #include "item.h"
@@ -52,7 +53,6 @@ const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
 
 const char CRY_PATH[]              = "nitro:/SOUND/CRIES/";
 const char SFX_PATH[]              = "nitro:/SOUND/SFX/";
-const char LOCATION_NAME_PATH[]    = "nitro:/DATA/LOC_NAME/";
 const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/";
 const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/";
 const char ITEM_DATA_PATH[]        = "nitro:/DATA/ITEM_DATA/";
@@ -72,16 +72,91 @@ const char BATTLE_STRINGS_PATH[] = "nitro:/DATA/TRNR_STRS/";
 const char BATTLE_TRAINER_PATH[] = "nitro:/DATA/TRNR_DATA/";
 const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/";
 
-const char UISTRING_PATH[]    = "nitro:/STRN/UIS/uis";
-const char MAPSTRING_PATH[]   = "nitro:/STRN/MAP/map";
-const char PKMNPHRS_PATH[]    = "nitro:/STRN/PHR/phr";
-const char BADGENAME_PATH[]   = "nitro:/STRN/BDG/bdg";
-const char ACHIEVEMENT_PATH[] = "nitro:/STRN/AVM/avm";
+const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
+const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/locname";
+const char UISTRING_PATH[]      = "nitro:/STRN/UIS/uis";
+const char MAPSTRING_PATH[]     = "nitro:/STRN/MAP/map";
+const char PKMNPHRS_PATH[]      = "nitro:/STRN/PHR/phr";
+const char BADGENAME_PATH[]     = "nitro:/STRN/BDG/bdg";
+const char ACHIEVEMENT_PATH[]   = "nitro:/STRN/AVM/avm";
+
+const char LOCDATA_PATH[] = "nitro:/DATA/location.datab";
+
+bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out ) {
+    FILE* f = FS::openSplit( p_path, p_stringId, ".str" );
+    if( !f ) return false;
+
+    std::fseek( f, p_language * p_maxLen, SEEK_SET );
+    fread( p_out, 1, p_maxLen, f );
+    fclose( f );
+
+    return true;
+}
+
+bool getString( FILE* p_bankFile, u16 p_maxLen, u16 p_stringId, char* p_out ) {
+    if( !p_bankFile ) { return false; }
+    if( std::fseek( p_bankFile, p_stringId * p_maxLen, SEEK_SET ) ) { return false; }
+    fread( p_out, 1, p_maxLen, p_bankFile );
+    return true;
+}
 
 namespace FS {
     char TMP_BUFFER[ 100 ];
     char TMP_BUFFER_SHORT[ 50 ];
     u8   CRY_DATA[ 22050 * 2 ];
+
+    FILE* LOCATION_DATA_FILE = nullptr;
+    FILE* LOCATION_NAME_FILE = nullptr;
+    FILE* BGM_NAME_FILE      = nullptr;
+
+    struct locationData {
+        u16 m_bgmNameIdx = 0;
+        u8  m_frameType  = 0;
+        u8  m_mugType    = 0;
+    };
+
+    bool checkOrOpen( FILE*& p_f, const char* p_path ) {
+        if( p_f == nullptr ) { p_f = fopen( p_path, "rb" ); }
+        if( p_f == nullptr ) { return false; }
+        return true;
+    }
+
+    u16 BGMforLocation( u16 p_locationId ) {
+        if( !checkOrOpen( LOCATION_DATA_FILE, LOCDATA_PATH ) ) { return BGM_NONE; }
+
+        if( std::fseek( LOCATION_DATA_FILE, p_locationId * 4, SEEK_SET ) ) {
+            return BGM_NONE;
+        }
+
+        auto l = locationData( );
+        fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
+
+        return l.m_bgmNameIdx;
+    }
+
+    u16 frameForLocation( u16 p_locationId ) {
+        if( !checkOrOpen( LOCATION_DATA_FILE, LOCDATA_PATH ) ) { return 0; }
+        if( std::fseek( LOCATION_DATA_FILE, p_locationId * sizeof( locationData ), SEEK_SET ) ) {
+            return 0;
+        }
+
+        auto l = locationData( );
+        fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
+
+        return l.m_frameType;
+    }
+
+    u16 mugForLocation( u16 p_locationId ) {
+        if( !checkOrOpen( LOCATION_DATA_FILE, LOCDATA_PATH ) ) { return 0; }
+        if( std::fseek( LOCATION_DATA_FILE, p_locationId * sizeof( locationData ), SEEK_SET ) ) {
+            return 0;
+        }
+
+        auto l = locationData( );
+        fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
+
+        return l.m_mugType;
+    }
 
     bool SD_ACCESSED = false, SD_READ = false;
     bool SDFound( ) {
@@ -394,20 +469,50 @@ namespace FS {
         return 0;
     }
 
-    bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( LOCATION_NAME_PATH, p_locationId, ".str", 5000 );
-        if( !f ) return false;
+    bool getBGMName( const u16 p_BGMId, const u8 p_language, char* p_out ) {
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
 
-        std::fseek( f, p_language * LOCATION_NAMELENGTH, SEEK_SET );
-        fread( p_out, 1, LOCATION_NAMELENGTH, f );
-        fclose( f );
-        return true;
+        if( bankfile == nullptr || p_language != lastLang ) {
+            // open the bank file
+            if( bankfile != nullptr ) { fclose( bankfile ); }
+            bankfile = FS::openBank( BGM_NAME_PATH, p_language, ".strb" );
+            lastLang = p_language;
+        }
+
+        if( getString( bankfile, BGM_NAMELENGTH, p_BGMId, p_out ) ) { return true; }
+        return false;
+    }
+    std::string getBGMName( const u16 p_BGMId, const u8 p_language ) {
+        char tmpbuf[ BGM_NAMELENGTH ];
+        if( !getBGMName( p_BGMId, p_language, tmpbuf ) ) { return "---"; }
+        return std::string( tmpbuf );
+    }
+
+    std::string getBGMName( const u16 p_BGMId ) {
+        return getBGMName( p_BGMId, CURRENT_LANGUAGE );
+    }
+
+    bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+
+        if( bankfile == nullptr || p_language != lastLang ) {
+            // open the bank file
+            if( bankfile != nullptr ) { fclose( bankfile ); }
+            bankfile = FS::openBank( LOCATION_NAME_PATH, p_language, ".strb" );
+            lastLang = p_language;
+        }
+
+        if( getString( bankfile, LOCATION_NAMELENGTH, p_locationId, p_out ) ) { return true; }
+        return false;
     }
     std::string getLocation( const u16 p_locationId, const u8 p_language ) {
         char tmpbuf[ LOCATION_NAMELENGTH ];
         if( !getLocation( p_locationId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
     }
+
     std::string getLocation( const u16 p_locationId ) {
         return getLocation( p_locationId, CURRENT_LANGUAGE );
     }
@@ -636,24 +741,6 @@ namespace BATTLE {
         return true;
     }
 } // namespace BATTLE
-
-bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out ) {
-    FILE* f = FS::openSplit( p_path, p_stringId, ".str" );
-    if( !f ) return false;
-
-    std::fseek( f, p_language * p_maxLen, SEEK_SET );
-    fread( p_out, 1, p_maxLen, f );
-    fclose( f );
-
-    return true;
-}
-
-bool getString( FILE* p_bankFile, u16 p_maxLen, u16 p_stringId, char* p_out ) {
-    if( !p_bankFile ) { return false; }
-    if( std::fseek( p_bankFile, p_stringId * p_maxLen, SEEK_SET ) ) { return false; }
-    fread( p_out, 1, p_maxLen, p_bankFile );
-    return true;
-}
 
 const char* getUIString( u16 p_stringId, u8 p_language ) {
     static char  st_buffer[ UISTRING_LEN + 10 ];

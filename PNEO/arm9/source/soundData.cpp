@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
+#include "bgmTranslation.h"
 #include "fs.h"
 #include "locationNames.h"
 #include "pokemonNames.h"
@@ -98,7 +99,13 @@ namespace SOUND {
         currentLocation = p_newLocation;
 
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
-        if( currentMoveMode == MAP::WALK ) { playBGM( BGMforLocation( currentLocation ) ); }
+        if( currentMoveMode == MAP::WALK ) {
+            auto nidx = BGMIndexForName( FS::BGMforLocation( currentLocation ) );
+            if( nidx >= 0 ) {
+                playBGM( nidx );
+            } else {
+            }
+        }
     }
 
     void onMovementTypeChange( MAP::moveMode p_newMoveMode ) {
@@ -144,7 +151,7 @@ namespace SOUND {
         case MAP::WALK:
         case MAP::ROCK_CLIMB:
         case MAP::SIT:
-        default: return BGMforLocation( currentLocation );
+        default: return BGMIndexForName( FS::BGMforLocation( currentLocation ) );
         }
     }
 } // namespace SOUND

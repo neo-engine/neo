@@ -96,6 +96,10 @@ namespace FS {
     u8* readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
     u8* readSFX( u16 p_sfxID, u16& p_len );
 
+    u16 frameForLocation( u16 p_locationId );
+    u16 mugForLocation( u16 p_locationId );
+    u16 BGMforLocation( u16 p_locationId );
+
     // bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );
     bool readPictureData( u16* p_layer, const char* p_Path, const char* p_name,
                           u16 p_paletteSize = 512, u32 p_tileCnt = 192 * 256,
@@ -104,6 +108,10 @@ namespace FS {
                           u16 p_palStart, u32 p_tileCnt, bool p_bottom );
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name,
                          const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom = false );
+
+    std::string getBGMName( u16 p_locationId );
+    std::string getBGMName( u16 p_locationId, u8 p_language );
+    bool        getBGMName( u16 p_locationId, u8 p_language, char* p_out );
 
     std::string getLocation( u16 p_locationId );
     std::string getLocation( u16 p_locationId, u8 p_language );

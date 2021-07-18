@@ -978,15 +978,14 @@ namespace STS {
                                            true );
             IO::regularFont->setColor( IO::BLUE2_IDX, 1 );
             IO::regularFont->setColor( IO::BLUE_IDX, 2 );
-            IO::regularFont->printStringC( GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ),
-                                           INFO_X_SUB + 12
-                                               + IO::regularFont->stringWidthC( GET_STRING( 364 ) ),
-                                           INFO_LINE_SUB( 0 ), true );
+            auto nstr = std::string( GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ) );
+            IO::regularFont->printStringC(
+                nstr.c_str( ), INFO_X_SUB + 12 + IO::regularFont->stringWidthC( GET_STRING( 364 ) ),
+                INFO_LINE_SUB( 0 ), true );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
             auto fmt = std::string( GET_STRING( 365 ) );
-            auto wd1 = IO::regularFont->stringWidthC(
-                GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ) );
+            auto wd1 = IO::regularFont->stringWidthC( nstr.c_str( ) );
             IO::regularFont->printStringC(
                 fmt.c_str( ),
                 INFO_X_SUB + 12 + wd1 + +IO::regularFont->stringWidthC( GET_STRING( 364 ) ),

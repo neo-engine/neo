@@ -33,37 +33,38 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 #ifdef DESQUID
-#define DESQUID_STRING ( 1 << 13 )
+constexpr u16 DESQUID_STRING = ( 1 << 13 );
 #endif
 
-#define MAP_STRING ( 1 << 11 )
+constexpr u16 MAP_STRING = ( 1 << 11 );
 
 // Assumes that the Backup is a 512k flash memory
-#define BACKUP_SIZE ( 512 * 1024 )
+constexpr u32 BACKUP_SIZE = ( 512 * 1024 );
 
-#define MAX_ITEMS           1300
-#define MAX_ITEMS_IN_BAG    1280
-#define MAX_ATTACK          830
-#define MAX_MOVE            MAX_ATTACK
-#define MAX_PKMN            898
-#define OTLENGTH            8
-#define SPECIES_NAMELENGTH  30
-#define PKMN_NAMELENGTH     15
-#define ITEM_NAMELENGTH     20
-#define ITEM_DSCRLENGTH     200
-#define MOVE_NAMELENGTH     20
-#define MOVE_DSCRLENGTH     200
-#define ABILITY_NAMELENGTH  20
-#define TCLASS_NAMELENGTH   30
-#define ABILITY_DSCRLENGTH  200
-#define LOCATION_NAMELENGTH 25
-#define DEXENTRY_NAMELENGTH 200
+constexpr u16 MAX_ITEMS           = 1300;
+constexpr u16 MAX_ITEMS_IN_BAG    = 1280;
+constexpr u16 MAX_ATTACK          = 830;
+constexpr u16 MAX_MOVE            = MAX_ATTACK;
+constexpr u16 MAX_PKMN            = 898;
+constexpr u16 OTLENGTH            = 8;
+constexpr u16 SPECIES_NAMELENGTH  = 30;
+constexpr u16 PKMN_NAMELENGTH     = 15;
+constexpr u16 ITEM_NAMELENGTH     = 20;
+constexpr u16 ITEM_DSCRLENGTH     = 200;
+constexpr u16 MOVE_NAMELENGTH     = 20;
+constexpr u16 MOVE_DSCRLENGTH     = 200;
+constexpr u16 ABILITY_NAMELENGTH  = 20;
+constexpr u16 TCLASS_NAMELENGTH   = 30;
+constexpr u16 ABILITY_DSCRLENGTH  = 200;
+constexpr u16 LOCATION_NAMELENGTH = 25;
+constexpr u16 BGM_NAMELENGTH      = 25;
+constexpr u16 DEXENTRY_NAMELENGTH = 200;
 
-#define UISTRING_LEN    250
-#define MAPSTRING_LEN   800
-#define BADGENAME_LEN   50
-#define ACHIEVEMENT_LEN 100
-#define PKMNPHRS_LEN    150
+constexpr u16 UISTRING_LEN    = 250;
+constexpr u16 MAPSTRING_LEN   = 800;
+constexpr u16 BADGENAME_LEN   = 50;
+constexpr u16 ACHIEVEMENT_LEN = 100;
+constexpr u16 PKMNPHRS_LEN    = 150;
 
 #undef RAND_MAX
 #define RAND_MAX 4294967295
@@ -74,7 +75,7 @@ extern GameMod gMod;
 u8 getCurrentDaytime( );
 
 // num frames between button input
-#define COOLDOWN_COUNT 6
+constexpr u8 COOLDOWN_COUNT = 6;
 
 extern bool DRAW_TIME;
 extern bool UPDATE_TIME;
