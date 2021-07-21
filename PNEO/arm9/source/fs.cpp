@@ -46,6 +46,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "move.h"
 #include "nav.h"
 #include "pokemon.h"
+#include "pokemonFormes.h"
 #include "uio.h"
 
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
@@ -53,24 +54,20 @@ const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
 
 const char CRY_PATH[]              = "nitro:/SOUND/CRIES/";
 const char SFX_PATH[]              = "nitro:/SOUND/SFX/";
-const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/";
-const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/";
-const char ITEM_DATA_PATH[]        = "nitro:/DATA/ITEM_DATA/";
-const char ABILITY_NAME_PATH[]     = "nitro:/DATA/ABTY_NAME/";
-const char ABILITY_DSCR_PATH[]     = "nitro:/DATA/ABTY_DSCR/";
-const char MOVE_NAME_PATH[]        = "nitro:/DATA/MOVE_NAME/";
-const char MOVE_DSCR_PATH[]        = "nitro:/DATA/MOVE_DSCR/";
-const char MOVE_DATA_PATH[]        = "nitro:/DATA/MOVE_DATA/";
-const char POKEMON_NAME_PATH[]     = "nitro:/DATA/PKMN_NAME/";
-const char POKEMON_SPECIES_PATH[]  = "nitro:/DATA/PKMN_SPCS/";
-const char POKEMON_DATA_PATH[]     = "nitro:/DATA/PKMN_DATA/";
-const char POKEMON_EVOS_PATH[]     = "nitro:/DATA/PKMN_EVOS/";
-const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/";
-const char PKMN_LEARNSET_PATH[]    = "nitro:/DATA/PKMN_LEARN/";
+const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/itemname";
+const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/itemdscr";
+const char ABILITY_NAME_PATH[]     = "nitro:/DATA/ABTY_NAME/abtyname";
+const char ABILITY_DSCR_PATH[]     = "nitro:/DATA/ABTY_DSCR/abtydscr";
+const char MOVE_NAME_PATH[]        = "nitro:/DATA/MOVE_NAME/movename";
+const char MOVE_DSCR_PATH[]        = "nitro:/DATA/MOVE_DSCR/movedscr";
+const char POKEMON_NAME_PATH[]     = "nitro:/DATA/PKMN_NAME/pkmnname";
+const char FORME_NAME_PATH[]       = "nitro:/DATA/PKMN_NAME/pkmnfname";
+const char POKEMON_SPECIES_PATH[]  = "nitro:/DATA/PKMN_SPCS/pkmnspcs";
+const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/pkmndxtr";
 
 const char BATTLE_STRINGS_PATH[] = "nitro:/DATA/TRNR_STRS/";
 const char BATTLE_TRAINER_PATH[] = "nitro:/DATA/TRNR_DATA/";
-const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/";
+const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/trnrname";
 
 const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
 const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/locname";
@@ -80,7 +77,16 @@ const char PKMNPHRS_PATH[]      = "nitro:/STRN/PHR/phr";
 const char BADGENAME_PATH[]     = "nitro:/STRN/BDG/bdg";
 const char ACHIEVEMENT_PATH[]   = "nitro:/STRN/AVM/avm";
 
-const char LOCDATA_PATH[] = "nitro:/DATA/location.datab";
+const char LOCDATA_PATH[]       = "nitro:/DATA/location.datab";
+const char MOVE_DATA_PATH[]     = "nitro:/DATA/move.datab";
+const char ITEM_DATA_PATH[]     = "nitro:/DATA/item.datab";
+const char POKEMON_DATA_PATH[]  = "nitro:/DATA/pkmn.datab";
+const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/pkmn.learnset.datab";
+const char POKEMON_EVOS_PATH[]  = "nitro:/DATA/pkmn.evolve.datab";
+const char FORME_DATA_PATH[]    = "nitro:/DATA/pkmnf.datab";
+const char FORME_EVOS_PATH[]    = "nitro:/DATA/pkmnf.evolve.datab";
+
+constexpr u16 LEARNSET_SIZE = 400;
 
 bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out ) {
     FILE* f = FS::openSplit( p_path, p_stringId, ".str" );
@@ -106,8 +112,6 @@ namespace FS {
     u8   CRY_DATA[ 22050 * 2 ];
 
     FILE* LOCATION_DATA_FILE = nullptr;
-    FILE* LOCATION_NAME_FILE = nullptr;
-    FILE* BGM_NAME_FILE      = nullptr;
 
     struct locationData {
         u16 m_bgmNameIdx = 0;
@@ -120,13 +124,21 @@ namespace FS {
         if( p_f == nullptr ) { return false; }
         return true;
     }
+    bool checkOrOpen( FILE*& p_f, const char* p_path, u8& p_lastLang, u8 p_language ) {
+        if( p_f == nullptr || p_language != p_lastLang ) {
+            // open the bank file
+            if( p_f != nullptr ) { fclose( p_f ); }
+            p_f        = FS::openBank( p_path, p_language, ".strb" );
+            p_lastLang = p_language;
+        }
+        if( p_f == nullptr ) { return false; }
+        return true;
+    }
 
     u16 BGMforLocation( u16 p_locationId ) {
         if( !checkOrOpen( LOCATION_DATA_FILE, LOCDATA_PATH ) ) { return BGM_NONE; }
 
-        if( std::fseek( LOCATION_DATA_FILE, p_locationId * 4, SEEK_SET ) ) {
-            return BGM_NONE;
-        }
+        if( std::fseek( LOCATION_DATA_FILE, p_locationId * 4, SEEK_SET ) ) { return BGM_NONE; }
 
         auto l = locationData( );
         fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
@@ -174,26 +186,6 @@ namespace FS {
             FC_ACCESSED = true;
         }
         return FC_READ;
-    }
-
-    bool exists( const char* p_path ) {
-        FILE* fd  = fopen( p_path, "rb" );
-        bool  res = !!fd;
-        fclose( fd );
-        return res;
-    }
-    bool exists( const char* p_path, const char* p_name ) {
-        FILE* fd  = open( p_path, p_name );
-        bool  res = !!fd;
-        fclose( fd );
-        return res;
-    }
-    bool exists( const char* p_path, u16 p_pkmnIdx, const char* p_name ) {
-        snprintf( TMP_BUFFER, 99, "%s%d/%d%s.raw", p_path, p_pkmnIdx, p_pkmnIdx, p_name );
-        FILE* fd  = fopen( TMP_BUFFER, "rb" );
-        bool  res = !!fd;
-        fclose( fd );
-        return res;
     }
 
     FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
@@ -472,14 +464,7 @@ namespace FS {
     bool getBGMName( const u16 p_BGMId, const u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-
-        if( bankfile == nullptr || p_language != lastLang ) {
-            // open the bank file
-            if( bankfile != nullptr ) { fclose( bankfile ); }
-            bankfile = FS::openBank( BGM_NAME_PATH, p_language, ".strb" );
-            lastLang = p_language;
-        }
-
+        if( !checkOrOpen( bankfile, BGM_NAME_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, BGM_NAMELENGTH, p_BGMId, p_out ) ) { return true; }
         return false;
     }
@@ -496,14 +481,7 @@ namespace FS {
     bool getLocation( const u16 p_locationId, const u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-
-        if( bankfile == nullptr || p_language != lastLang ) {
-            // open the bank file
-            if( bankfile != nullptr ) { fclose( bankfile ); }
-            bankfile = FS::openBank( LOCATION_NAME_PATH, p_language, ".strb" );
-            lastLang = p_language;
-        }
-
+        if( !checkOrOpen( bankfile, LOCATION_NAME_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, LOCATION_NAMELENGTH, p_locationId, p_out ) ) { return true; }
         return false;
     }
@@ -571,13 +549,11 @@ namespace FS {
 
 namespace ITEM {
     bool getItemName( const u16 p_itemId, const u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( ITEM_NAME_PATH, p_itemId, ".str" );
-        if( !f ) return false;
-
-        std::fseek( f, p_language * ITEM_NAMELENGTH, SEEK_SET );
-        fread( p_out, 1, ITEM_NAMELENGTH, f );
-        fclose( f );
-        return true;
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        if( !FS::checkOrOpen( bankfile, ITEM_NAME_PATH, lastLang, p_language ) ) { return false; }
+        if( getString( bankfile, ITEM_NAMELENGTH, p_itemId, p_out ) ) { return true; }
+        return false;
     }
     std::string getItemName( const u16 p_itemId, const u8 p_language ) {
         char tmpbuf[ ITEM_NAMELENGTH ];
@@ -589,28 +565,17 @@ namespace ITEM {
     }
 
     bool getItemDescr( const u16 p_itemId, const u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( ITEM_DSCR_PATH, p_itemId, ".str" );
-        if( !f ) return false;
-
-        std::fseek( f, p_language * ITEM_DSCRLENGTH, SEEK_SET );
-        fread( p_out, 1, ITEM_DSCRLENGTH, f );
-        fclose( f );
-        return true;
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        if( !FS::checkOrOpen( bankfile, ITEM_DSCR_PATH, lastLang, p_language ) ) { return false; }
+        if( getString( bankfile, ITEM_DSCRLENGTH, p_itemId, p_out ) ) { return true; }
+        return false;
     }
-
     std::string getItemDescr( const u16 p_itemId, const u8 p_language ) {
         char tmpbuf[ ITEM_DSCRLENGTH ];
-        if( !getItemDescr( p_itemId, p_language, tmpbuf ) ) {
-            return "---"
-#ifdef DESQUID
-                   + std::string( " moveid " ) + std::to_string( p_itemId ) + " lang "
-                   + std::to_string( p_language )
-#endif
-                ;
-        }
+        if( !getItemDescr( p_itemId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
     }
-
     std::string getItemDescr( const u16 p_itemId ) {
         return getItemDescr( p_itemId, CURRENT_LANGUAGE );
     }
@@ -622,23 +587,21 @@ namespace ITEM {
         return res;
     }
     bool getItemData( const u16 p_itemId, itemData* p_out ) {
-        FILE* f = FS::openSplit( ITEM_DATA_PATH, p_itemId, ".data" );
-        if( !f ) return false;
-        fread( p_out, sizeof( itemData ), 1, f );
-        fclose( f );
+        static FILE* bankfile = nullptr;
+        if( !FS::checkOrOpen( bankfile, ITEM_DATA_PATH ) ) { return false; }
+        if( std::fseek( bankfile, p_itemId * sizeof( itemData ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( itemData ), 1, bankfile );
         return true;
     }
 } // namespace ITEM
 
 namespace MOVE {
     bool getMoveName( const u16 p_moveId, const u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( MOVE_NAME_PATH, p_moveId, ".str" );
-        if( !f ) return false;
-
-        std::fseek( f, p_language * MOVE_NAMELENGTH, SEEK_SET );
-        fread( p_out, 1, MOVE_NAMELENGTH, f );
-        fclose( f );
-        return true;
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        if( !FS::checkOrOpen( bankfile, MOVE_NAME_PATH, lastLang, p_language ) ) { return false; }
+        if( getString( bankfile, MOVE_NAMELENGTH, p_moveId, p_out ) ) { return true; }
+        return false;
     }
 
     std::string getMoveName( const u16 p_moveId, const u8 p_language ) {
@@ -652,28 +615,17 @@ namespace MOVE {
     }
 
     bool getMoveDescr( const u16 p_moveId, const u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( MOVE_DSCR_PATH, p_moveId, ".str" );
-        if( !f ) return false;
-
-        std::fseek( f, p_language * MOVE_DSCRLENGTH, SEEK_SET );
-        fread( p_out, 1, MOVE_DSCRLENGTH, f );
-        fclose( f );
-        return true;
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        if( !FS::checkOrOpen( bankfile, MOVE_DSCR_PATH, lastLang, p_language ) ) { return false; }
+        if( getString( bankfile, MOVE_DSCRLENGTH, p_moveId, p_out ) ) { return true; }
+        return false;
     }
-
     std::string getMoveDescr( const u16 p_moveId, const u8 p_language ) {
         char tmpbuf[ MOVE_DSCRLENGTH ];
-        if( !getMoveDescr( p_moveId, p_language, tmpbuf ) ) {
-            return "---"
-#ifdef DESQUID
-                   + std::string( " moveid " ) + std::to_string( p_moveId ) + " lang "
-                   + std::to_string( p_language )
-#endif
-                ;
-        }
+        if( !getMoveDescr( p_moveId, p_language, tmpbuf ) ) { return "---"; }
         return std::string( tmpbuf );
     }
-
     std::string getMoveDescr( const u16 p_moveId ) {
         return getMoveDescr( p_moveId, CURRENT_LANGUAGE );
     }
@@ -685,10 +637,10 @@ namespace MOVE {
         return res;
     }
     bool getMoveData( const u16 p_moveId, moveData* p_out ) {
-        FILE* f = FS::openSplit( MOVE_DATA_PATH, p_moveId, ".data" );
-        if( !f ) return false;
-        fread( p_out, sizeof( moveData ), 1, f );
-        fclose( f );
+        static FILE* bankfile = nullptr;
+        if( !FS::checkOrOpen( bankfile, MOVE_DATA_PATH ) ) { return false; }
+        if( std::fseek( bankfile, p_moveId * sizeof( moveData ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( moveData ), 1, bankfile );
         return true;
     }
 } // namespace MOVE
@@ -746,15 +698,7 @@ const char* getUIString( u16 p_stringId, u8 p_language ) {
     static char  st_buffer[ UISTRING_LEN + 10 ];
     static u8    lastLang = -1;
     static FILE* bankfile = nullptr;
-
-    if( bankfile == nullptr || p_language != lastLang ) {
-        // open the bank file
-        if( bankfile != nullptr ) { fclose( bankfile ); }
-        bankfile = FS::openBank( UISTRING_PATH, p_language, ".strb" );
-        lastLang = p_language;
-    }
-
-    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    FS::checkOrOpen( bankfile, UISTRING_PATH, lastLang, p_language );
     if( getString( bankfile, UISTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "(uistring failed)";
 }
@@ -763,15 +707,7 @@ const char* getPkmnPhrase( u16 p_stringId ) {
     static char  st_buffer[ PKMNPHRS_LEN + 10 ];
     static u8    lastLang = -1;
     static FILE* bankfile = nullptr;
-
-    if( bankfile == nullptr || CURRENT_LANGUAGE != lastLang ) {
-        // open the bank file
-        if( bankfile != nullptr ) { fclose( bankfile ); }
-        bankfile = FS::openBank( PKMNPHRS_PATH, CURRENT_LANGUAGE, ".strb" );
-        lastLang = CURRENT_LANGUAGE;
-    }
-
-    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    FS::checkOrOpen( bankfile, PKMNPHRS_PATH, lastLang, CURRENT_LANGUAGE );
     if( getString( bankfile, PKMNPHRS_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "";
 }
@@ -780,17 +716,7 @@ const char* getMapString( u16 p_stringId ) {
     static char  st_buffer[ MAPSTRING_LEN + 10 ];
     static u8    lastLang = -1;
     static FILE* bankfile = nullptr;
-
-    if( bankfile == nullptr || CURRENT_LANGUAGE != lastLang ) {
-        // open the bank file
-        if( bankfile != nullptr ) { fclose( bankfile ); }
-        bankfile = FS::openBank( MAPSTRING_PATH, CURRENT_LANGUAGE, ".strb" );
-        lastLang = CURRENT_LANGUAGE;
-    }
-
-    if( bankfile == nullptr ) { return "(bankfile failed)"; }
-
-    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    FS::checkOrOpen( bankfile, MAPSTRING_PATH, lastLang, CURRENT_LANGUAGE );
     if( getString( bankfile, MAPSTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "(string failed)";
 }
@@ -799,15 +725,7 @@ const char* getBadge( u16 p_stringId ) {
     static char  st_buffer[ BADGENAME_LEN + 10 ];
     static u8    lastLang = -1;
     static FILE* bankfile = nullptr;
-
-    if( bankfile == nullptr || CURRENT_LANGUAGE != lastLang ) {
-        // open the bank file
-        if( bankfile != nullptr ) { fclose( bankfile ); }
-        bankfile = FS::openBank( BADGENAME_PATH, CURRENT_LANGUAGE, ".strb" );
-        lastLang = CURRENT_LANGUAGE;
-    }
-
-    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    FS::checkOrOpen( bankfile, BADGENAME_PATH, lastLang, CURRENT_LANGUAGE );
     if( getString( bankfile, BADGENAME_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "";
 }
@@ -816,21 +734,13 @@ const char* getAchievement( u16 p_stringId, u8 p_language ) {
     static char  st_buffer[ ACHIEVEMENT_LEN + 10 ];
     static u8    lastLang = -1;
     static FILE* bankfile = nullptr;
-
-    if( bankfile == nullptr || p_language != lastLang ) {
-        // open the bank file
-        if( bankfile != nullptr ) { fclose( bankfile ); }
-        bankfile = FS::openBank( ACHIEVEMENT_PATH, p_language, ".strb" );
-        lastLang = p_language;
-    }
-
-    // std::memset( st_buffer, 0, sizeof( st_buffer ) );
+    FS::checkOrOpen( bankfile, ACHIEVEMENT_PATH, lastLang, p_language );
     if( getString( bankfile, ACHIEVEMENT_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
     return "";
 }
 
 std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language ) {
-    char tmpbuf[ p_maxLen + 5 ];
+    char tmpbuf[ p_maxLen + 5 ] = { 0 };
     if( !getString( p_path, p_maxLen, p_stringId, p_language, tmpbuf ) ) { return "---"; }
     return std::string( tmpbuf );
 }
@@ -840,20 +750,32 @@ std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId ) {
 }
 
 bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {
-    return getString( ABILITY_NAME_PATH, ABILITY_NAMELENGTH, p_abilityId, p_language, p_out );
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+    if( !FS::checkOrOpen( bankfile, ABILITY_NAME_PATH, lastLang, p_language ) ) { return false; }
+    if( getString( bankfile, ABILITY_NAMELENGTH, p_abilityId, p_out ) ) { return true; }
+    return false;
 }
 std::string getAbilityName( u16 p_abilityId, u8 p_language ) {
-    return getString( ABILITY_NAME_PATH, ABILITY_NAMELENGTH, p_abilityId, p_language );
+    char st_buffer[ ABILITY_NAMELENGTH + 10 ] = { 0 };
+    getAbilityName( p_abilityId, p_language, st_buffer );
+    return std::string( st_buffer );
 }
 std::string getAbilityName( u16 p_abilityId ) {
     return getAbilityName( p_abilityId, CURRENT_LANGUAGE );
 }
 
 bool getAbilityDescr( u16 p_abilityId, u8 p_language, char* p_out ) {
-    return getString( ABILITY_DSCR_PATH, ABILITY_DSCRLENGTH, p_abilityId, p_language, p_out );
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+    if( !FS::checkOrOpen( bankfile, ABILITY_DSCR_PATH, lastLang, p_language ) ) { return false; }
+    if( getString( bankfile, ABILITY_DSCRLENGTH, p_abilityId, p_out ) ) { return true; }
+    return false;
 }
 std::string getAbilityDescr( u16 p_abilityId, u8 p_language ) {
-    return getString( ABILITY_DSCR_PATH, ABILITY_DSCRLENGTH, p_abilityId, p_language );
+    char st_buffer[ ABILITY_DSCRLENGTH + 10 ] = { 0 };
+    getAbilityDescr( p_abilityId, p_language, st_buffer );
+    return std::string( st_buffer );
 }
 std::string getAbilityDescr( u16 p_abilityId ) {
     return getAbilityDescr( p_abilityId, CURRENT_LANGUAGE );
@@ -870,19 +792,24 @@ std::string getSpeciesName( u16 p_pkmnId, u8 p_forme ) {
 }
 
 bool getSpeciesName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
-    FILE* f;
-    if( p_forme ) {
-        char tmpbuf[ 40 ];
-        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
-        f = FS::openSplit( POKEMON_SPECIES_PATH, p_pkmnId, tmpbuf );
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+    //    static FILE* fbankfile = nullptr;
+    //    auto         id        = -1;
+    (void) p_forme;
+    /*    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+            if( !FS::checkOrOpen( fbankfile, FORME_SPECIES_PATH, lastLang, p_language ) ) {
+                return false;
+            }
+            if( getString( fbankfile, SPECIES_NAMELENGTH, id, p_out ) ) { return true; }
+        } else */
+    {
+        if( !FS::checkOrOpen( bankfile, POKEMON_SPECIES_PATH, lastLang, p_language ) ) {
+            return false;
+        }
+        if( getString( bankfile, SPECIES_NAMELENGTH, p_pkmnId, p_out ) ) { return true; }
     }
-    if( !p_forme || !f ) { f = FS::openSplit( POKEMON_SPECIES_PATH, p_pkmnId, ".str" ); }
-    if( !f ) return false;
-
-    std::fseek( f, p_language * SPECIES_NAMELENGTH, SEEK_SET );
-    assert( SPECIES_NAMELENGTH == fread( p_out, 1, SPECIES_NAMELENGTH, f ) );
-    fclose( f );
-    return true;
+    return false;
 }
 
 std::string getDexEntry( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
@@ -896,19 +823,24 @@ std::string getDexEntry( u16 p_pkmnId, u8 p_forme ) {
 }
 
 bool getDexEntry( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
-    FILE* f;
-    if( p_forme ) {
-        char tmpbuf[ 40 ];
-        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
-        f = FS::openSplit( POKEMON_DEXENTRY_PATH, p_pkmnId, tmpbuf );
+    static u8    lastLang = -1;
+    static FILE* bankfile = nullptr;
+    (void) p_forme;
+    //    static FILE* fbankfile = nullptr;
+    //    auto         id        = -1;
+    /*    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+            if( !FS::checkOrOpen( fbankfile, FORME_DEXENTRY_PATH, lastLang, p_language ) ) {
+                return false;
+            }
+            if( getString( fbankfile, DEXENTRY_NAMELENGTH, id, p_out ) ) { return true; }
+        } else */
+    {
+        if( !FS::checkOrOpen( bankfile, POKEMON_DEXENTRY_PATH, lastLang, p_language ) ) {
+            return false;
+        }
+        if( getString( bankfile, DEXENTRY_NAMELENGTH, p_pkmnId, p_out ) ) { return true; }
     }
-    if( !p_forme || !f ) { f = FS::openSplit( POKEMON_DEXENTRY_PATH, p_pkmnId, ".str" ); }
-    if( !f ) return false;
-
-    std::fseek( f, p_language * DEXENTRY_NAMELENGTH, SEEK_SET );
-    assert( DEXENTRY_NAMELENGTH == fread( p_out, 1, DEXENTRY_NAMELENGTH, f ) );
-    fclose( f );
-    return true;
+    return false;
 }
 
 std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme ) {
@@ -922,22 +854,20 @@ std::string getDisplayName( u16 p_pkmnId, u8 p_forme ) {
 }
 
 bool getDisplayName( u16 p_pkmnId, char* p_out, u8 p_language, u8 p_forme ) {
-    FILE* f;
-    if( p_forme ) {
-        char tmpbuf[ 40 ];
-        snprintf( tmpbuf, 35, "_%hhu.str", p_forme );
-        f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, tmpbuf );
+    static u8    lastLang  = -1;
+    static FILE* bankfile  = nullptr;
+    static FILE* fbankfile = nullptr;
+    auto         id        = -1;
+    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+        if( !FS::checkOrOpen( fbankfile, FORME_NAME_PATH, lastLang, p_language ) ) { return false; }
+        if( getString( fbankfile, FORME_NAMELENGTH, id, p_out ) ) { return true; }
+    } else {
+        if( !FS::checkOrOpen( bankfile, POKEMON_NAME_PATH, lastLang, p_language ) ) {
+            return false;
+        }
+        if( getString( bankfile, PKMN_NAMELENGTH, p_pkmnId, p_out ) ) { return true; }
     }
-    if( !p_forme || !f ) { f = FS::openSplit( POKEMON_NAME_PATH, p_pkmnId, ".str" ); }
-    if( !f ) return false;
-
-    u8 len = PKMN_NAMELENGTH;
-    if( p_forme ) { len = 30; }
-
-    std::fseek( f, p_language * len, SEEK_SET );
-    assert( len == fread( p_out, 1, len, f ) );
-    fclose( f );
-    return true;
+    return false;
 }
 
 pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme ) {
@@ -950,18 +880,17 @@ bool getPkmnData( const u16 p_pkmnId, pkmnData* p_out ) {
     return getPkmnData( p_pkmnId, 0, p_out );
 }
 bool getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out ) {
-    FILE* f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, ".data" );
-    if( !f ) return false;
-    fread( p_out, sizeof( pkmnData ), 1, f );
-    fclose( f );
-
-    if( p_forme ) {
-        char tmpbuf[ 40 ];
-        snprintf( tmpbuf, 35, "_%hhu.data", p_forme );
-        f = FS::openSplit( POKEMON_DATA_PATH, p_pkmnId, tmpbuf );
-        if( !f ) return true;
-        fread( &p_out->m_baseForme, sizeof( pkmnFormeData ), 1, f );
-        fclose( f );
+    static FILE* bankfile  = nullptr;
+    static FILE* bankfilef = nullptr;
+    auto         id        = -1;
+    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+        if( !FS::checkOrOpen( bankfilef, FORME_DATA_PATH ) ) { return false; }
+        if( std::fseek( bankfilef, id * sizeof( pkmnData ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( pkmnData ), 1, bankfilef );
+    } else {
+        if( !FS::checkOrOpen( bankfile, POKEMON_DATA_PATH ) ) { return false; }
+        if( std::fseek( bankfile, p_pkmnId * sizeof( pkmnData ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( pkmnData ), 1, bankfile );
     }
     return true;
 }
@@ -975,24 +904,24 @@ bool getPkmnEvolveData( const u16 p_pkmnId, pkmnEvolveData* p_out ) {
     return getPkmnEvolveData( p_pkmnId, 0, p_out );
 }
 bool getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_out ) {
-    FILE* f;
-    if( p_forme ) {
-        char tmpbuf[ 40 ];
-        snprintf( tmpbuf, 35, "_%hhu.evo.data", p_forme );
-        f = FS::openSplit( POKEMON_EVOS_PATH, p_pkmnId, tmpbuf );
-        if( !f ) return false;
-        fread( p_out, sizeof( pkmnEvolveData ), 1, f );
-        fclose( f );
+    static FILE* bankfile  = nullptr;
+    static FILE* bankfilef = nullptr;
+    auto         id        = -1;
+    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+        if( !FS::checkOrOpen( bankfilef, FORME_EVOS_PATH ) ) { return false; }
+        if( std::fseek( bankfilef, id * sizeof( pkmnEvolveData ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( pkmnEvolveData ), 1, bankfilef );
     } else {
-        f = FS::openSplit( POKEMON_EVOS_PATH, p_pkmnId, ".evo.data" );
-        if( !f ) return false;
-        fread( p_out, sizeof( pkmnEvolveData ), 1, f );
-        fclose( f );
+        if( !FS::checkOrOpen( bankfile, POKEMON_EVOS_PATH ) ) { return false; }
+        if( std::fseek( bankfile, p_pkmnId * sizeof( pkmnEvolveData ), SEEK_SET ) ) {
+            return false;
+        }
+        fread( p_out, sizeof( pkmnEvolveData ), 1, bankfile );
     }
     return true;
 }
 
-u16  LEARNSET_BUFFER[ 700 ];
+u16  LEARNSET_BUFFER[ LEARNSET_SIZE + 10 ];
 void getLearnMoves( u16 p_pkmnId, u8 p_forme, u16 p_fromLevel, u16 p_toLevel, u16 p_amount,
                     u16* p_result ) {
     auto learnset = getLearnset( p_pkmnId, p_forme );
@@ -1038,24 +967,32 @@ bool canLearn( const u16* p_learnset, u16 p_moveId, u16 p_maxLevel, u16 p_minLev
     }
     return false;
 }
-
 bool canLearn( u16 p_pkmnId, u8 p_forme, u16 p_moveId, u16 p_maxLevel, u16 p_minLevel ) {
     return canLearn( getLearnset( p_pkmnId, p_forme ), p_moveId, p_maxLevel, p_minLevel );
 }
 
-const u16* getLearnset( u16 p_pkmnId, u8 p_forme ) {
-    FILE* f = nullptr;
-    if( !p_forme ) {
-        f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, ".learnset.data" );
-    } else {
-        char tmpbuf[ 40 ];
-        snprintf( tmpbuf, 35, "_%hhu.learnset.data", p_forme );
-        f = FS::openSplit( PKMN_LEARNSET_PATH, p_pkmnId, tmpbuf );
+bool getLearnset( u16 p_pkmnId, u8 p_forme, u16* p_out ) {
+    static FILE* bankfile = nullptr;
+    (void) p_forme;
+    //    static FILE* bankfilef = nullptr;
+    //    auto         id        = -1;
+    /*    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+            if( !FS::checkOrOpen( bankfilef, FORME_LEARNSET_PATH ) ) { return false; }
+            if( std::fseek( bankfilef, id * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
+                return false;
+            }
+            fread( p_out, sizeof( u16 ), LEARNSET_SIZE, bankfilef );
+        } else*/
+    {
+        if( !FS::checkOrOpen( bankfile, PKMN_LEARNSET_PATH ) ) { return false; }
+        if( std::fseek( bankfile, p_pkmnId * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
+            return false;
+        }
+        fread( p_out, sizeof( u16 ), LEARNSET_SIZE, bankfile );
     }
-    if( !f ) f = FS::openSplit( PKMN_LEARNSET_PATH, 201, ".learnset.data" );
-    if( !f ) return nullptr;
-    FS::read( f, LEARNSET_BUFFER, sizeof( u16 ), 680 );
-    FS::close( f );
-
-    return LEARNSET_BUFFER;
+    return true;
+}
+const u16* getLearnset( u16 p_pkmnId, u8 p_forme ) {
+    if( getLearnset( p_pkmnId, p_forme, LEARNSET_BUFFER ) ) { return LEARNSET_BUFFER; }
+    return nullptr;
 }

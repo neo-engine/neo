@@ -45,9 +45,6 @@ namespace FS {
     bool SDFound( );
     bool FCFound( );
 
-    bool   exists( const char* p_path );
-    bool   exists( const char* p_path, const char* p_name );
-    bool   exists( const char* p_path, u16 p_pkmnIdx, const char* p_name = "" );
     FILE*  open( const char* p_path, const char* p_name, const char* p_ext = ".raw",
                  const char* p_mode = "rb" );
     FILE*  open( const char* p_path, u16 p_value, const char* p_ext = ".raw",
