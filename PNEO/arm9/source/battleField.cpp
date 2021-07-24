@@ -116,9 +116,8 @@ namespace BATTLE {
         case I_BERRY_JUICE:
             if( lowhptrigger ) {
                 p_ui->logItem( pkmn, p_opponent );
-
-                snprintf( buffer, 99, GET_STRING( 539 ),
-                          p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
+                auto fmt = std::string( GET_STRING( 539 ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                           ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                 p_ui->log( buffer );
                 healPokemon( p_ui, p_opponent, p_pos, pkmn->m_stats.m_maxHP / 4 );
@@ -133,7 +132,8 @@ namespace BATTLE {
                 auto res = addBoosts( p_opponent, p_pos, bs );
                 if( res != boosts( ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 537 ),
+                    auto fmt = std::string( GET_STRING( 537 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -146,8 +146,8 @@ namespace BATTLE {
         case I_MENTAL_HERB:
             if( userVolStat & ATTRACT ) {
                 p_ui->logItem( pkmn, p_opponent );
-                snprintf( buffer, 99, GET_STRING( 537 ),
-                          p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
+                auto fmt = std::string( GET_STRING( 537 ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                           ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                 p_ui->log( buffer );
 
@@ -167,6 +167,7 @@ namespace BATTLE {
             }
 
             bool ripen = !supprAbs && pkmn->getAbility( ) == A_RIPEN;
+            auto fmt   = std::string( GET_STRING( 279 ) );
 
             switch( pkmn->getItem( ) ) {
             case I_NION_BERRY: {
@@ -178,7 +179,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -192,7 +193,7 @@ namespace BATTLE {
             case I_CHERI_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, PARALYSIS ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -205,7 +206,7 @@ namespace BATTLE {
             case I_CHESTO_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, SLEEP ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -219,7 +220,7 @@ namespace BATTLE {
             case I_PECHA_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, POISON ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -233,7 +234,7 @@ namespace BATTLE {
             case I_RAWST_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, BURN ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -247,7 +248,7 @@ namespace BATTLE {
             case I_ASPEAR_BERRY:
                 if( hasStatusCondition( p_opponent, p_pos, FROZEN ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -260,7 +261,7 @@ namespace BATTLE {
             case I_ORAN_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -273,7 +274,8 @@ namespace BATTLE {
             case I_PERSIM_BERRY:
                 if( userVolStat & CONFUSION ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 278 ),
+                    fmt = std::string( GET_STRING( 278 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -286,7 +288,8 @@ namespace BATTLE {
             case I_GARC_BERRY:
                 if( userVolStat & ATTRACT ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 278 ),
+                    fmt = std::string( GET_STRING( 278 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -299,7 +302,7 @@ namespace BATTLE {
             case I_LUM_BERRY:
                 if( pkmn->m_statusint || ( userVolStat & CONFUSION ) ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -313,7 +316,7 @@ namespace BATTLE {
             case I_SITRUS_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -326,7 +329,7 @@ namespace BATTLE {
             case I_FIGY_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -339,7 +342,7 @@ namespace BATTLE {
             case I_WIKI_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -352,7 +355,7 @@ namespace BATTLE {
             case I_MAGO_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -365,7 +368,7 @@ namespace BATTLE {
             case I_AGUAV_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -378,7 +381,7 @@ namespace BATTLE {
             case I_IAPAPA_BERRY:
                 if( lowhptrigger ) {
                     p_ui->logItem( pkmn, p_opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                               ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -396,7 +399,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -415,7 +418,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -434,7 +437,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -453,7 +456,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -472,7 +475,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_opponent, p_pos, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -499,7 +502,7 @@ namespace BATTLE {
                     auto res2 = addBoosts( p_opponent, p_pos, res );
                     if( res2 != boosts( ) ) {
                         p_ui->logItem( pkmn, p_opponent );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -540,6 +543,7 @@ namespace BATTLE {
         }
 
         if( canUseItem( p_target.first, p_target.second ) ) {
+            auto fmt = std::string( GET_STRING( 537 ) );
             switch( target->getItem( ) ) {
             case I_WEAKNESS_POLICY:
                 if( p_effectiveness > 100 && target->canBattle( )
@@ -551,7 +555,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 537 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -571,7 +575,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 537 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -591,7 +595,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 537 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -612,7 +616,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 537 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -632,7 +636,7 @@ namespace BATTLE {
                     auto res = addBoosts( p_target.first, p_target.second, bs );
                     if( res != boosts( ) ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 537 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -644,16 +648,17 @@ namespace BATTLE {
                 }
                 break;
 
-            case I_AIR_BALLOON:
-                snprintf( buffer, 99, GET_STRING( 538 ),
+            case I_AIR_BALLOON: {
+                fmt = std::string( GET_STRING( 538 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( target, p_target.first ).c_str( ) );
                 p_ui->log( buffer );
                 removeItem( p_ui, p_target.first, p_target.second );
                 break;
-
+            }
             case I_EJECT_BUTTON:
                 p_ui->logItem( target, p_target.first );
-                snprintf( buffer, 99, GET_STRING( 537 ),
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( target, p_target.first ).c_str( ),
                           ITEM::getItemName( target->getItem( ) ).c_str( ) );
                 p_ui->log( buffer );
@@ -670,12 +675,13 @@ namespace BATTLE {
             || !_sides[ !p_move.m_user.first ? PLAYER_SIDE : OPPONENT_SIDE ].anyHasAbility(
                 A_UNNERVE ) ) {
             if( canUseItem( p_target.first, p_target.second ) ) {
+                auto fmt = std::string( GET_STRING( 279 ) );
                 switch( target->getItem( ) ) {
                 case I_ENIGMA_BERRY:
                     if( p_effectiveness > 100 && target->canBattle( )
                         && target->m_stats.m_curHP < target->m_stats.m_maxHP ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -696,7 +702,7 @@ namespace BATTLE {
                 case I_JABOCA_BERRY:
                     if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::PHYSICAL ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -726,7 +732,7 @@ namespace BATTLE {
                         auto res = addBoosts( p_target.first, p_target.second, bs );
                         if( res != boosts( ) ) {
                             p_ui->logItem( target, p_target.first );
-                            snprintf( buffer, 99, GET_STRING( 279 ),
+                            snprintf( buffer, 99, fmt.c_str( ),
                                       p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                       ITEM::getItemName( target->getItem( ) ).c_str( ) );
                             p_ui->log( buffer );
@@ -751,7 +757,7 @@ namespace BATTLE {
                         auto res = addBoosts( p_target.first, p_target.second, bs );
                         if( res != boosts( ) ) {
                             p_ui->logItem( target, p_target.first );
-                            snprintf( buffer, 99, GET_STRING( 279 ),
+                            snprintf( buffer, 99, fmt.c_str( ),
                                       p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                       ITEM::getItemName( target->getItem( ) ).c_str( ) );
                             p_ui->log( buffer );
@@ -768,7 +774,7 @@ namespace BATTLE {
                 case I_ROWAP_BERRY:
                     if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::SPECIAL ) {
                         p_ui->logItem( target, p_target.first );
-                        snprintf( buffer, 99, GET_STRING( 279 ),
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
                                   ITEM::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
@@ -1228,9 +1234,9 @@ namespace BATTLE {
 
                 auto volst = getVolatileStatus( i, j );
                 if( volst & NIGHTMARE ) {
+                    auto fmt = std::string( GET_STRING( 536 ) );
                     if( hasStatusCondition( i, j, SLEEP ) ) {
-                        snprintf( buffer, 99, GET_STRING( 536 ),
-                                  p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                        snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
                         p_ui->log( buffer );
                         u16 amount = pkmn->m_stats.m_maxHP / 4;
                         if( !amount ) { amount = 1; }
@@ -1252,8 +1258,8 @@ namespace BATTLE {
                 }
                 if( volst & AQUARING ) {
                     if( !( volst & HEALBLOCK ) ) {
-                        snprintf( buffer, 99, GET_STRING( 535 ),
-                                  p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                        auto fmt = std::string( GET_STRING( 535 ) );
+                        snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
                         p_ui->log( buffer );
                         u16 amount = pkmn->m_stats.m_maxHP / 16;
                         if( !amount ) { amount = 1; }
@@ -1265,8 +1271,8 @@ namespace BATTLE {
                 }
                 if( volst & INGRAIN ) {
                     if( !( volst & HEALBLOCK ) ) {
-                        snprintf( buffer, 99, GET_STRING( 534 ),
-                                  p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                        auto fmt = std::string( GET_STRING( 534 ) );
+                        snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
                         p_ui->log( buffer );
                         u16 amount = pkmn->m_stats.m_maxHP / 16;
                         if( !amount ) { amount = 1; }
@@ -1280,8 +1286,8 @@ namespace BATTLE {
 #ifdef DESQUID_MORE
                     p_ui->log( std::to_string( volst ) );
 #endif
-                    snprintf( buffer, 99, GET_STRING( 533 ),
-                              p_ui->getPkmnName( pkmn, i ).c_str( ) );
+                    auto fmt = std::string( GET_STRING( 533 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
                     p_ui->log( buffer );
                     u16 amount = pkmn->m_stats.m_maxHP / 4;
                     if( !amount ) { amount = 1; }
@@ -1620,7 +1626,8 @@ namespace BATTLE {
         if( pkmn == nullptr ) [[unlikely]] { return; }
 
         char buffer[ 100 ];
-        snprintf( buffer, 99, GET_STRING( 307 ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
+        auto fmt = std::string( GET_STRING( 307 ) );
+        snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                   ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
         p_ui->log( std::string( buffer ) );
 
@@ -1629,7 +1636,8 @@ namespace BATTLE {
         if( pkmn == nullptr ) [[unlikely]] { return; }
         p_ui->updatePkmn( p_opponent, p_slot, pkmn );
 
-        snprintf( buffer, 99, GET_STRING( 308 ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
+        fmt = std::string( GET_STRING( 308 ) );
+        snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
                   pkmn->getItem( ) );
         p_ui->log( std::string( buffer ) );
 
@@ -2414,20 +2422,23 @@ namespace BATTLE {
         auto volst = getVolatileStatus( opponent, slot );
 
         if( p_move.m_param == M_FOCUS_PUNCH && !( volst & FOCUSPUNCH ) ) [[unlikely]] {
-            snprintf( buffer, 99, GET_STRING( 548 ),
+            auto fmt = std::string( GET_STRING( 548 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
             return false;
         }
         if( p_move.m_param == M_SHELL_TRAP && ( volst & SHELLTRAP ) ) [[unlikely]] {
-            snprintf( buffer, 99, GET_STRING( 549 ),
+            auto fmt = std::string( GET_STRING( 536 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
             return false;
         }
 
         if( volst & RECHARGE ) [[unlikely]] {
-            snprintf( buffer, 99, GET_STRING( 276 ),
+            auto fmt = std::string( GET_STRING( 276 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
 
@@ -2437,7 +2448,8 @@ namespace BATTLE {
         }
 
         if( volst & FLINCH ) [[unlikely]] {
-            snprintf( buffer, 99, GET_STRING( 296 ),
+            auto fmt = std::string( GET_STRING( 296 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
             return false;
@@ -2447,7 +2459,8 @@ namespace BATTLE {
             if( p_move.m_moveData.m_type == FIRE || ( p_move.m_moveData.m_flags & MOVE::DEFROST )
                 || ( rand( ) % 100 < 20 ) ) {
                 // user thaws
-                snprintf( buffer, 99, GET_STRING( 298 ),
+                auto fmt = std::string( GET_STRING( 298 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
                 removeStatusCondition( opponent, slot );
@@ -2467,14 +2480,16 @@ namespace BATTLE {
                 if( !( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) ) { return false; }
             } else {
                 removeStatusCondition( opponent, slot );
-                snprintf( buffer, 99, GET_STRING( 300 ),
+                auto fmt = std::string( GET_STRING( 300 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
                 p_ui->updatePkmnStats( opponent, slot, getPkmn( opponent, slot ) );
             }
         } else if( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) {
             if( getPkmn( opponent, slot )->getAbility( ) != A_COMATOSE ) {
-                snprintf( buffer, 99, GET_STRING( 10 ),
+                auto fmt = std::string( GET_STRING( 10 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
                           MOVE::getMoveName( p_move.m_param ).c_str( ) );
                 p_ui->log( buffer );
@@ -2497,7 +2512,8 @@ namespace BATTLE {
                 --curVal;
                 p_ui->animateVolatileStatusCondition( getPkmn( opponent, slot ), opponent, slot,
                                                       CONFUSION );
-                snprintf( buffer, 99, GET_STRING( 293 ),
+                auto fmt = std::string( GET_STRING( 293 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
                 addVolatileStatus( p_ui, opponent, slot, CONFUSION, curVal );
@@ -2508,7 +2524,8 @@ namespace BATTLE {
                     return false;
                 }
             } else {
-                snprintf( buffer, 99, GET_STRING( 294 ),
+                auto fmt = std::string( GET_STRING( 294 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
                 removeVolatileStatus( p_ui, opponent, slot, CONFUSION );
@@ -2527,7 +2544,8 @@ namespace BATTLE {
 
         if( volst & ATTRACT ) [[unlikely]] {
             if( rand( ) % 100 < 50 ) {
-                snprintf( buffer, 99, GET_STRING( 302 ),
+                auto fmt = std::string( GET_STRING( 302 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
                 return false;
@@ -2716,7 +2734,8 @@ namespace BATTLE {
                     || !_sides[ opponent ? PLAYER_SIDE : OPPONENT_SIDE ].anyHasAbility(
                         A_UNNERVE ) ) [[likely]] {
                     p_ui->logItem( getPkmn( opponent, slot ), opponent );
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    auto fmt = std::string( GET_STRING( 279 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
                               ITEM::getItemName( I_LANSAT_BERRY ).c_str( ) );
                     p_ui->log( buffer );
@@ -3029,7 +3048,8 @@ namespace BATTLE {
         u16 effectiveness = getEffectiveness( p_move, p_target );
 
         if( effectiveness == 0 ) {
-            snprintf( buffer, 99, GET_STRING( 284 ),
+            auto fmt = std::string( GET_STRING( 284 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( target, p_target.first, false ).c_str( ) );
             p_ui->log( buffer );
             return false;
@@ -3541,7 +3561,8 @@ namespace BATTLE {
                     } else {
                         damage >>= 2;
                     }
-                    snprintf( buffer, 99, GET_STRING( 279 ),
+                    auto fmt = std::string( GET_STRING( 279 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ),
                               ITEM::getItemName( target->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
@@ -3591,11 +3612,13 @@ namespace BATTLE {
         damagePokemon( p_ui, p_target.first, p_target.second, damage );
 
         if( effectiveness > 100 ) {
-            snprintf( buffer, 99, GET_STRING( 285 ),
+            auto fmt = std::string( GET_STRING( 285 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( target, p_target.first, false ).c_str( ) );
             p_ui->log( buffer );
         } else if( effectiveness < 100 ) {
-            snprintf( buffer, 99, GET_STRING( 286 ),
+            auto fmt = std::string( GET_STRING( 286 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( target, p_target.first, false ).c_str( ) );
             p_ui->log( buffer );
         }
@@ -3619,7 +3642,8 @@ namespace BATTLE {
                 if( user->m_stats.m_curHP < user->m_stats.m_maxHP ) {
                     healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
-                    snprintf( buffer, 99, GET_STRING( 288 ),
+                    auto fmt = std::string( GET_STRING( 288 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
                     p_ui->log( buffer );
                 }
@@ -3632,7 +3656,8 @@ namespace BATTLE {
 
             damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
-            snprintf( buffer, 99, GET_STRING( 287 ),
+            auto fmt = std::string( GET_STRING( 287 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
             p_ui->log( buffer );
         }
@@ -3646,7 +3671,8 @@ namespace BATTLE {
 
                 healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
-                snprintf( buffer, 99, GET_STRING( 533 ),
+                auto fmt = std::string( GET_STRING( 533 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
                 p_ui->log( buffer );
             }
@@ -3659,7 +3685,8 @@ namespace BATTLE {
             damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
                            user->m_stats.m_maxHP / 16 );
 
-            snprintf( buffer, 99, GET_STRING( 306 ),
+            auto fmt = std::string( GET_STRING( 306 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ) );
             p_ui->log( buffer );
         }
@@ -3734,7 +3761,8 @@ namespace BATTLE {
                 } else if( canUseItem( opponent, slot ) && tg->getItem( ) == I_POWER_HERB )
                     [[unlikely]] {
                     p_ui->logItem( tg, opponent );
-                    snprintf( buffer, 99, GET_STRING( 305 ),
+                    auto fmt = std::string( GET_STRING( 305 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( tg, opponent ).c_str( ) );
                     p_ui->log( buffer );
 
@@ -3776,7 +3804,8 @@ namespace BATTLE {
         }
 
         if( !getLockedMoveCount( opponent, slot ) ) { deducePP( opponent, slot, p_move.m_param ); }
-        snprintf( buffer, 99, GET_STRING( 10 ),
+        auto fmt = std::string( GET_STRING( 10 ) );
+        snprintf( buffer, 99, fmt.c_str( ),
                   p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
                   MOVE::getMoveName( p_move.m_param ).c_str( ) );
         p_ui->log( buffer );
@@ -3836,7 +3865,8 @@ namespace BATTLE {
                     [[unlikely]] {
                     protect = true;
                     if( ( p_move.m_moveData.m_flags & MOVE::PROTECT ) ) {
-                        snprintf( buffer, 99, GET_STRING( 674 ),
+                        fmt = std::string( GET_STRING( 674 ) );
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
                                                               p_move.m_target[ i ].second ),
                                                      p_move.m_target[ i ].first )
@@ -3851,7 +3881,8 @@ namespace BATTLE {
                                           p_move.m_target[ i ].second, PROTECT );
                     tgsc = getVolatileStatus( p_move.m_target[ i ].first,
                                               p_move.m_target[ i ].second );
-                    snprintf( buffer, 99, GET_STRING( 675 ),
+                    fmt  = std::string( GET_STRING( 675 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
                                                           p_move.m_target[ i ].second ),
                                                  p_move.m_target[ i ].first )
@@ -3865,7 +3896,8 @@ namespace BATTLE {
 
                     // Check if the move misses
                     if( moveMisses( p_ui, p_move, p_move.m_target[ i ], critical ) ) {
-                        snprintf( buffer, 99, GET_STRING( 280 ),
+                        fmt = std::string( GET_STRING( 280 ) );
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
                                                               p_move.m_target[ i ].second ),
                                                      p_move.m_target[ i ].first )
@@ -3876,8 +3908,9 @@ namespace BATTLE {
                         if( p_move.m_moveData.m_flags & MOVE::CRASHDAMAGE ) {
                             u16 maxHP = getPkmn( opponent, slot )->m_stats.m_maxHP;
                             damagePokemon( p_ui, opponent, slot, maxHP / 2 );
+                            fmt = std::string( GET_STRING( 546 ) );
                             snprintf(
-                                buffer, 99, GET_STRING( 546 ),
+                                buffer, 99, fmt.c_str( ),
                                 p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                             p_ui->log( buffer );
 
@@ -3956,7 +3989,8 @@ namespace BATTLE {
                 if( p_move.m_moveData.m_flags & MOVE::DEFROSTTARGET ) {
                     if( hasStatusCondition( p_move.m_target[ i ].first, p_move.m_target[ i ].second,
                                             FROZEN ) ) {
-                        snprintf( buffer, 99, GET_STRING( 298 ),
+                        fmt = std::string( GET_STRING( 298 ) );
+                        snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
                                                               p_move.m_target[ i ].second ),
                                                      p_move.m_target[ i ].first )
@@ -4033,7 +4067,8 @@ namespace BATTLE {
                     || getPkmn( opponent, slot )->getAbility( ) != A_OWN_TEMPO
                     || ( getTerrain( ) == MISTYTERRAIN && isGrounded( opponent, slot ) )
                     || ( getVolatileStatus( opponent, slot ) & SUBSTITUTE ) ) {
-                    snprintf( buffer, 99, GET_STRING( 277 ),
+                    fmt = std::string( GET_STRING( 277 ) );
+                    snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                     p_ui->log( buffer );
 

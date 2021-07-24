@@ -731,12 +731,13 @@ namespace BATTLE {
 
             // Check for move item effects
 
+            auto fmt = std::string( GET_STRING( 281 ) );
+
             switch( item ) {
             case I_CHILAN_BERRY2: {
                 auto itemname = ITEM::getItemName( item );
-                snprintf( buffer, 99, GET_STRING( 281 ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
+                          itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
                 boosts bt = boosts( );
@@ -747,9 +748,8 @@ namespace BATTLE {
             }
             case I_EGGANT_BERRY: {
                 auto itemname = ITEM::getItemName( item );
-                snprintf( buffer, 99, GET_STRING( 281 ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
+                          itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
                 boosts bt = boosts( );
@@ -760,9 +760,8 @@ namespace BATTLE {
             }
             case I_NUTPEA_BERRY: {
                 auto itemname = ITEM::getItemName( item );
-                snprintf( buffer, 99, GET_STRING( 281 ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
+                          itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
                 boosts bt = boosts( );
@@ -773,9 +772,8 @@ namespace BATTLE {
             }
             case I_STRIB_BERRY: {
                 auto itemname = ITEM::getItemName( item );
-                snprintf( buffer, 99, GET_STRING( 281 ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
+                          itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
                 boosts bt = boosts( );
@@ -786,9 +784,8 @@ namespace BATTLE {
             }
             case I_YAGO_BERRY: {
                 auto itemname = ITEM::getItemName( item );
-                snprintf( buffer, 99, GET_STRING( 281 ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
+                          itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
                 boosts bt = boosts( );
@@ -799,9 +796,8 @@ namespace BATTLE {
             }
             case I_TOPO_BERRY: {
                 auto itemname = ITEM::getItemName( item );
-                snprintf( buffer, 99, GET_STRING( 281 ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
+                          itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
                 addVolatileStatus( p_ui, p_sourceOpp, p_sorceSlot, PROTECT, 1 );
@@ -820,7 +816,8 @@ namespace BATTLE {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].giveItem( p_slot, p_item );
 
             char buffer[ 100 ];
-            snprintf( buffer, 99, GET_STRING( 284 ),
+            auto fmt = std::string( GET_STRING( 284 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
                       ITEM::getItemName( p_item ).c_str( ) );
             p_ui->log( buffer );

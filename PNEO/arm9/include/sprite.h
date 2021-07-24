@@ -126,20 +126,19 @@ namespace IO {
      */
     u16 pkmnSpriteHeight( u16 p_speciesId );
 
-    u16 loadPKMNSprite( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
-                        u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
-                        bool p_shiny = false, bool p_female = false, bool p_flipX = false,
-                        bool p_topOnly = false, u8 p_forme = 0, bool p_blackOverlay = false );
+    u16 loadPKMNSprite( bool p_back, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
+                        u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny,
+                        bool p_female, bool p_flipX, bool p_topOnly, u8 p_forme,
+                        bool p_blackOverlay );
 
     u16 loadPKMNSprite( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                         u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
                         u8 p_forme = 0, bool p_blackOverlay = false );
 
-    u16 loadPKMNSpriteB( const char* p_path, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
-                         u8 p_oamIndex, u16 p_tileCnt, bool p_bottom, bool p_shiny = false,
-                         bool p_female = false, bool p_flipX = false, bool p_topOnly = false,
-                         u8 p_forme = 0 );
+    u16 loadPKMNSpriteB( bool p_back, const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY,
+                         u8 p_oamIndex, u16 p_tileCnt, bool p_bottom, bool p_shiny, bool p_female,
+                         bool p_flipX, bool p_topOnly, u8 p_forme );
 
     u16 loadPKMNSpriteB( const u16 p_pkmnNo, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                          u16 p_tileCnt, bool p_bottom, bool p_shiny = false, bool p_female = false,

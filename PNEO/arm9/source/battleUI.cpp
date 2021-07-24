@@ -1042,22 +1042,22 @@ namespace BATTLE {
 
     std::string battleUI::getPkmnName( pokemon* p_pokemon, bool p_opponent,
                                        bool p_sentenceStart ) const {
-        char buffer[ 50 ];
+        char        buffer[ 50 ];
+        std::string fmt = "%s";
         if( p_opponent && _isWildBattle ) {
             if( p_sentenceStart ) {
-                snprintf( buffer, 49, GET_STRING( 311 ), p_pokemon->m_boxdata.m_name );
+                fmt = std::string( GET_STRING( 311 ) );
             } else {
-                snprintf( buffer, 49, GET_STRING( 309 ), p_pokemon->m_boxdata.m_name );
+                fmt = std::string( GET_STRING( 309 ) );
             }
         } else if( p_opponent ) {
             if( p_sentenceStart ) {
-                snprintf( buffer, 49, GET_STRING( 312 ), p_pokemon->m_boxdata.m_name );
+                fmt = std::string( GET_STRING( 312 ) );
             } else {
-                snprintf( buffer, 49, GET_STRING( 310 ), p_pokemon->m_boxdata.m_name );
+                fmt = std::string( GET_STRING( 310 ) );
             }
-        } else {
-            snprintf( buffer, 49, p_pokemon->m_boxdata.m_name );
         }
+        snprintf( buffer, 49, fmt.c_str( ), p_pokemon->m_boxdata.m_name );
         return std::string( buffer );
     }
 
@@ -1209,24 +1209,28 @@ namespace BATTLE {
 
     void battleUI::logForewarn( pokemon* p_pokemon, bool p_opponent, u16 p_move ) {
         char buffer[ 50 ];
-        snprintf( buffer, 49, GET_STRING( 396 ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
+        auto fmt = std::string( GET_STRING( 396 ) );
+        snprintf( buffer, 49, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
                   MOVE::getMoveName( p_move ).c_str( ) );
         log( std::string( buffer ) );
     }
 
     void battleUI::logAnticipation( pokemon* p_pokemon, bool p_opponent ) {
         char buffer[ 50 ];
-        snprintf( buffer, 49, GET_STRING( 397 ), getPkmnName( p_pokemon, p_opponent ).c_str( ) );
+        auto fmt = std::string( GET_STRING( 397 ) );
+        snprintf( buffer, 49, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ) );
         log( std::string( buffer ) );
     }
 
     void battleUI::logFrisk( pokemon* p_pokemon, bool p_opponent, std::vector<u16> p_itms ) {
         char buffer[ 100 ];
         if( p_itms.size( ) == 1 ) {
-            snprintf( buffer, 99, GET_STRING( 398 ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
+            auto fmt = std::string( GET_STRING( 398 ) );
+            snprintf( buffer, 99, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
                       ITEM::getItemName( p_itms[ 0 ] ).c_str( ) );
         } else if( p_itms.size( ) == 2 ) {
-            snprintf( buffer, 99, GET_STRING( 399 ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
+            auto fmt = std::string( GET_STRING( 399 ) );
+            snprintf( buffer, 99, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
                       ITEM::getItemName( p_itms[ 0 ] ).c_str( ),
                       ITEM::getItemName( p_itms[ 1 ] ).c_str( ) );
         } else {
@@ -1562,12 +1566,12 @@ namespace BATTLE {
         hidePkmn( p_opponent, p_pos );
         hidePkmnStats( p_opponent, p_pos );
 
+        auto fmt = std::string( GET_STRING( 289 ) );
         if( p_pokemon != nullptr ) [[likely]] {
-            snprintf( buffer, 99, GET_STRING( 289 ),
-                      getPkmnName( p_pokemon, p_opponent ).c_str( ) );
+            snprintf( buffer, 99, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ) );
         } else {
 #ifdef DESQUID
-            snprintf( buffer, 99, GET_STRING( 289 ), "[it's a nullptr]" );
+            snprintf( buffer, 99, fmt.c_str( ), "[it's a nullptr]" );
 #endif
         }
         log( std::string( buffer ) );

@@ -352,7 +352,8 @@ namespace BATTLE {
                 for( u8 j = 0; j < 30; ++j ) { swiWaitForVBlank( ); }
                 if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_ITEM ) [[unlikely]] {
                     auto itmnm = ITEM::getItemName( sortedMoves[ i ].m_param );
-                    snprintf( buffer, 99, GET_STRING( 169 ), itmnm.c_str( ),
+                    auto fmt   = std::string( GET_STRING( 169 ) );
+                    snprintf( buffer, 99, fmt.c_str( ), itmnm.c_str( ),
                               _battleUI
                                   .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
                                                                 sortedMoves[ i ].m_user.second ),
@@ -363,39 +364,25 @@ namespace BATTLE {
                 }
 
                 if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE ) [[unlikely]] {
+                    auto pnm = std::string(
+                        _battleUI.getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                                               sortedMoves[ i ].m_user.second ),
+                                               sortedMoves[ i ].m_user.first, false ) );
                     switch( sortedMoves[ i ].m_param ) {
                     case M_SHELL_TRAP:
-                        snprintf(
-                            buffer, 99, GET_STRING( 269 ),
-                            _battleUI
-                                .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                              sortedMoves[ i ].m_user.second ),
-                                              sortedMoves[ i ].m_user.first, false )
-                                .c_str( ) );
+                        snprintf( buffer, 99, GET_STRING( 269 ), pnm.c_str( ) );
                         _battleUI.log( buffer );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
                                                   sortedMoves[ i ].m_user.second, SHELLTRAP, 1 );
                         break;
                     case M_FOCUS_PUNCH:
-                        snprintf(
-                            buffer, 99, GET_STRING( 270 ),
-                            _battleUI
-                                .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                              sortedMoves[ i ].m_user.second ),
-                                              sortedMoves[ i ].m_user.first, false )
-                                .c_str( ) );
+                        snprintf( buffer, 99, GET_STRING( 270 ), pnm.c_str( ) );
                         _battleUI.log( buffer );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
                                                   sortedMoves[ i ].m_user.second, FOCUSPUNCH, 1 );
                         break;
                     case M_BEAK_BLAST:
-                        snprintf(
-                            buffer, 99, GET_STRING( 271 ),
-                            _battleUI
-                                .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                              sortedMoves[ i ].m_user.second ),
-                                              sortedMoves[ i ].m_user.first, false )
-                                .c_str( ) );
+                        snprintf( buffer, 99, GET_STRING( 271 ), pnm.c_str( ) );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
                                                   sortedMoves[ i ].m_user.second, BEAKBLAST, 1 );
                         _battleUI.log( buffer );
@@ -1368,11 +1355,11 @@ namespace BATTLE {
         char buffer[ 100 ];
         u16  ballCatchRate = 2;
 
-        auto plpk   = _field.getPkmn( false, 0 );
+        auto plpk = _field.getPkmn( false, 0 );
         if( plpk == nullptr ) { return false; }
-        auto wild   = _field.getPkmn( true, 0 );
+        auto wild = _field.getPkmn( true, 0 );
         if( wild == nullptr ) { return false; }
-        u16  specId = wild->getSpecies( );
+        u16 specId = wild->getSpecies( );
 
         auto p = _field.getPkmnData( true, 0 );
 
@@ -1746,7 +1733,8 @@ namespace BATTLE {
             [[unlikely]] case I_RIE_BERRY : case I_PERSIM_BERRY : if( volst & CONFUSION ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              CONFUSION );
-                snprintf( buffer, 99, GET_STRING( 294 ),
+                auto fmt = std::string( GET_STRING( 294 ) );
+                snprintf( buffer, 99, fmt.c_str( ),
                           _battleUI.getPkmnName( pkmn, p_target.first ).c_str( ) );
                 _battleUI.log( buffer );
             }
