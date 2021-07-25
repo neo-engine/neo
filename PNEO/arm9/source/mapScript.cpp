@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "bagViewer.h"
 #include "battle.h"
 #include "battleTrainer.h"
+#include "bgmTranslation.h"
 #include "boxViewer.h"
 #include "choiceBox.h"
 #include "counter.h"
@@ -874,7 +875,7 @@ namespace MAP {
             }
             case UTMR: NAV::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
-                SOUND::playBGM( parA, true );
+                SOUND::playBGM( BGMIndexForName( parA ), true );
                 break;
             }
             case RMS: {
@@ -890,7 +891,7 @@ namespace MAP {
                 break;
             }
             case PMO: {
-                SOUND::playBGMOneshot( parA );
+                SOUND::playBGMOneshot( BGMIndexForName( parA ) );
                 for( u16 i = 0; i < parB; ++i ) { swiWaitForVBlank( ); }
                 SOUND::restartBGM( );
                 break;
