@@ -77,16 +77,17 @@ const char PKMNPHRS_PATH[]      = "nitro:/STRN/PHR/phr";
 const char BADGENAME_PATH[]     = "nitro:/STRN/BDG/bdg";
 const char ACHIEVEMENT_PATH[]   = "nitro:/STRN/AVM/avm";
 
-const char LOCDATA_PATH[]       = "nitro:/DATA/location.datab";
-const char MOVE_DATA_PATH[]     = "nitro:/DATA/move.datab";
-const char ITEM_DATA_PATH[]     = "nitro:/DATA/item.datab";
-const char POKEMON_DATA_PATH[]  = "nitro:/DATA/pkmn.datab";
-const char PKMN_LEARNSET_PATH[] = "nitro:/DATA/pkmn.learnset.datab";
-const char POKEMON_EVOS_PATH[]  = "nitro:/DATA/pkmn.evolve.datab";
-const char FORME_DATA_PATH[]    = "nitro:/DATA/pkmnf.datab";
-const char FORME_EVOS_PATH[]    = "nitro:/DATA/pkmnf.evolve.datab";
+const char LOCDATA_PATH[]        = "nitro:/DATA/location.datab";
+const char MOVE_DATA_PATH[]      = "nitro:/DATA/move.datab";
+const char ITEM_DATA_PATH[]      = "nitro:/DATA/item.datab";
+const char POKEMON_DATA_PATH[]   = "nitro:/DATA/pkmn.datab";
+const char PKMN_LEARNSET_PATH[]  = "nitro:/DATA/pkmn.learnset.datab";
+const char POKEMON_EVOS_PATH[]   = "nitro:/DATA/pkmn.evolve.datab";
+const char FORME_DATA_PATH[]     = "nitro:/DATA/pkmnf.datab";
+const char FORME_LEARNSET_PATH[] = "nitro:/DATA/pkmnf.learnset.datab";
+const char FORME_EVOS_PATH[]     = "nitro:/DATA/pkmnf.evolve.datab";
 
-constexpr u16 LEARNSET_SIZE = 400;
+constexpr u16 LEARNSET_SIZE = 2 * 400;
 
 bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out ) {
     FILE* f = FS::openSplit( p_path, p_stringId, ".str" );
@@ -972,18 +973,16 @@ bool canLearn( u16 p_pkmnId, u8 p_forme, u16 p_moveId, u16 p_maxLevel, u16 p_min
 }
 
 bool getLearnset( u16 p_pkmnId, u8 p_forme, u16* p_out ) {
-    static FILE* bankfile = nullptr;
-    (void) p_forme;
-    //    static FILE* bankfilef = nullptr;
-    //    auto         id        = -1;
-    /*    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-            if( !FS::checkOrOpen( bankfilef, FORME_LEARNSET_PATH ) ) { return false; }
-            if( std::fseek( bankfilef, id * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
-                return false;
-            }
-            fread( p_out, sizeof( u16 ), LEARNSET_SIZE, bankfilef );
-        } else*/
-    {
+    static FILE* bankfile  = nullptr;
+    static FILE* bankfilef = nullptr;
+    auto         id        = -1;
+    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
+        if( !FS::checkOrOpen( bankfilef, FORME_LEARNSET_PATH ) ) { return false; }
+        if( std::fseek( bankfilef, id * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
+            return false;
+        }
+        fread( p_out, sizeof( u16 ), LEARNSET_SIZE, bankfilef );
+    } else {
         if( !FS::checkOrOpen( bankfile, PKMN_LEARNSET_PATH ) ) { return false; }
         if( std::fseek( bankfile, p_pkmnId * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
             return false;
