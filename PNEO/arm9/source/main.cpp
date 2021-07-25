@@ -26,7 +26,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <fat.h>
-#include <filesystem.h>
 #include <nds.h>
 
 #include <chrono>
@@ -38,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "defines.h"
+#include "filesystem.h"
 #include "fs.h"
 #include "saveGame.h"
 #include "sound.h"
