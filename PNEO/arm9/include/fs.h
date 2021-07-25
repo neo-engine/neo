@@ -57,6 +57,9 @@ namespace FS {
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count );
 
+    bool checkOrOpen( FILE*& p_f, const char* p_path );
+    bool checkOrOpen( FILE*& p_f, const char* p_path, u8& p_lastLang, u8 p_language );
+
     bool readData( const char* p_path, const char* p_name, unsigned short p_dataCnt,
                    unsigned short* p_data );
     template <typename T1, typename T2>

@@ -40,14 +40,15 @@ unsigned int   TEMP[ 256 * 256 / 4 ] = { 0 };
 unsigned short TEMP_PAL[ 256 ]       = { 0 };
 
 namespace IO {
-    const char* OW_PATH      = "nitro:/PICS/SPRITES/OW/";
-    const char* DOOR_PATH    = "nitro:/PICS/SPRITES/DOOR/";
-    const char* OWP_PATH     = "nitro:/PICS/SPRITES/NPCP/";
-    const char* TRAINER_PATH = "nitro:/PICS/SPRITES/NPC/";
-    const char* BERRY_PATH   = "nitro:/PICS/SPRITES/BERRIES/";
-    const char* TM_PATH      = "nitro:/PICS/SPRITES/TM/";
-    const char* ITEM_PATH    = "nitro:/PICS/SPRITES/ITEMS/";
-    const char* ICON_PATH    = "nitro:/PICS/SPRITES/ICONS/";
+    const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
+    const char* DOOR_PATH      = "nitro:/PICS/SPRITES/DOOR/";
+    const char* OWP_PATH       = "nitro:/PICS/SPRITES/NPCP/";
+    const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
+    const char* BERRY_PATH     = "nitro:/PICS/SPRITES/BERRIES/";
+    const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
+    const char* ITEM_PATH      = "nitro:/PICS/SPRITES/ITEMS/";
+    const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
+    const char* TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/type";
 
     const char* PKMN_ICON_PATH = "nitro:/PICS/SPRITES/icon";
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/frnt";
@@ -440,6 +441,14 @@ namespace IO {
         return f;
     }
 
+    bool seekSpriteData( FILE* p_file, u16 p_idx, u16 p_dataSize = 16 * 32 / 8 ) {
+        if( fseek( p_file, p_idx * ( 16 * sizeof( u16 ) + p_dataSize * sizeof( u32 ) ),
+                   SEEK_SET ) ) {
+            return false;
+        }
+        return true;
+    }
+
     bool loadPKMNSpriteData( FILE* p_files[ 4 ], const char* p_path, const pkmnSpriteInfo& p_pkmn,
                              bool p_blackOverlay, u16 p_dataSize = 96 * 96 / 8 ) {
         FILE* f = nullptr;
@@ -447,10 +456,7 @@ namespace IO {
             if( !( f = checkOrOpenPKMNFile( p_files, p_path, p_pkmn.m_female, p_pkmn.m_shiny ) ) ) {
                 return false;
             }
-            if( fseek( f, p_pkmn.m_pkmnIdx * ( 16 * sizeof( u16 ) + p_dataSize * sizeof( u32 ) ),
-                       SEEK_SET ) ) {
-                return false;
-            }
+            if( !seekSpriteData( f, p_pkmn.m_pkmnIdx, p_dataSize ) ) { return false; }
         } else {
             snprintf( BUFFER, 149, "%s/%d/%d_%hhu%s%s.raw", p_path,
                       p_pkmn.m_pkmnIdx / FS::ITEMS_PER_DIR, p_pkmn.m_pkmnIdx, p_pkmn.m_forme,
@@ -846,18 +852,35 @@ namespace IO {
                           p_bottom );
     }
 
-    u16 loadTypeIcon( type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+    FILE* TYPE_ICON_FILE          = nullptr;
+    u8    LAST_TYPE_ICON_LANGUAGE = 0;
+
+    u16 loadTypeIcon( type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palIdx,
                       u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
-        snprintf( BUFFER, 99, "TP/type_%hhu_%hhu", p_type, p_language );
-        return loadSprite( BUFFER, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, false,
-                           false, false, OBJPRIORITY_0, p_bottom );
+        if( !FS::checkOrOpen( TYPE_ICON_FILE, TYPE_ICON_PATH, LAST_TYPE_ICON_LANGUAGE,
+                              p_language ) ) {
+            return false;
+        }
+        if( !seekSpriteData( TYPE_ICON_FILE, p_type, 16 * 32 / 8 ) ) { return false; }
+        if( !fread( TEMP, 16 * 32 / 8, sizeof( u32 ), TYPE_ICON_FILE ) ) { return false; }
+        if( !fread( TEMP_PAL, 16, sizeof( u16 ), TYPE_ICON_FILE ) ) { return false; }
+
+        return loadSprite( p_oamIdx, p_palIdx, p_tileCnt, p_posX, p_posY, 32, 16, TEMP_PAL, TEMP,
+                           16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadTypeIconB( type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        bool p_bottom, const SAVE::language p_language ) {
-        snprintf( BUFFER, 99, "TP/type_%hhu_%hhu", p_type, p_language );
-        return loadSpriteB( BUFFER, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, false, false,
-                            false, OBJPRIORITY_0, p_bottom );
+        if( !FS::checkOrOpen( TYPE_ICON_FILE, TYPE_ICON_PATH, LAST_TYPE_ICON_LANGUAGE,
+                              p_language ) ) {
+            return false;
+        }
+        if( !seekSpriteData( TYPE_ICON_FILE, p_type, 16 * 32 / 8 ) ) { return false; }
+        if( !fread( TEMP, 16 * 32 / 8, sizeof( u32 ), TYPE_ICON_FILE ) ) { return false; }
+        if( !fread( TEMP_PAL, 16, sizeof( u16 ), TYPE_ICON_FILE ) ) { return false; }
+
+        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, TEMP_PAL, TEMP,
+                            16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadLocationBackB( u8 p_idx, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
