@@ -1587,20 +1587,17 @@ namespace BATTLE {
                                     : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
                                                      : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
 
-        y += IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) );
+        auto pinfo = p_pokemon->getSpriteInfo( );
+        y += IO::pkmnSpriteHeight( pinfo );
 
         if( p_opponent ) {
-            IO::loadPKMNSprite(
-                p_pokemon->getSpecies( ), x, y, SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ),
-                SPR_PKMN_PAL( 2 * ( !p_opponent ) + p_pos ),
-                SPR_PKMN_GFX( 2 * ( !p_opponent ) + p_pos ), false, p_pokemon->isShiny( ),
-                p_pokemon->isFemale( ), false, false, p_pokemon->getForme( ) );
+            IO::loadPKMNSprite( pinfo, x, y, SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ),
+                                SPR_PKMN_PAL( 2 * ( !p_opponent ) + p_pos ),
+                                SPR_PKMN_GFX( 2 * ( !p_opponent ) + p_pos ), false );
         } else {
-            IO::loadPKMNSpriteBack(
-                p_pokemon->getSpecies( ), x, y, SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ),
-                SPR_PKMN_PAL( 2 * ( !p_opponent ) + p_pos ),
-                SPR_PKMN_GFX( 2 * ( !p_opponent ) + p_pos ), false, p_pokemon->isShiny( ),
-                p_pokemon->isFemale( ), false, false, p_pokemon->getForme( ) );
+            IO::loadPKMNSpriteBack( pinfo, x, y, SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ),
+                                    SPR_PKMN_PAL( 2 * ( !p_opponent ) + p_pos ),
+                                    SPR_PKMN_GFX( 2 * ( !p_opponent ) + p_pos ), false );
 
             for( u8 i = 0; i < 4; ++i ) {
                 oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + i ].isRotateScale = true;
@@ -1624,9 +1621,9 @@ namespace BATTLE {
         IO::OamTop->matrixBuffer[ 3 ].vdy = 187 << 2;
 
         u16 sy = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + 0 ].y + 8
-                 - ( IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 2 ),
+                 - ( IO::pkmnSpriteHeight( pinfo ) / 2 ),
             sx = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_pos ) + 0 ].x + 2
-                 - 3 * IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 4;
+                 - 3 * IO::pkmnSpriteHeight( pinfo ) / 4;
         s8 diffx = 80, diffy = 44;
         s8 ske = -23;
         if( !p_opponent ) {
@@ -1682,11 +1679,10 @@ namespace BATTLE {
         REG_BLDALPHA_SUB = 0xff | ( 0x02 << 8 );
         bgUpdate( );
         // Load pkmn sprite
-        IO::loadPKMNSprite( p_pokemon->getSpecies( ), WILD_BATTLE_SPRITE_X_START,
-                            OPP_PLAT_Y + 35 - 96 + IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ),
-                            SPR_PKMN_START_OAM( 0 ), SPR_PKMN_PAL( 0 ), SPR_PKMN_GFX( 0 ), false,
-                            p_pokemon->isShiny( ), p_pokemon->isFemale( ), false, false,
-                            p_pokemon->getForme( ) );
+        pkmnSpriteInfo pinfo = p_pokemon->getSpriteInfo( );
+        IO::loadPKMNSprite( pinfo, WILD_BATTLE_SPRITE_X_START,
+                            OPP_PLAT_Y + 35 - 96 + IO::pkmnSpriteHeight( pinfo ),
+                            SPR_PKMN_START_OAM( 0 ), SPR_PKMN_PAL( 0 ), SPR_PKMN_GFX( 0 ), false );
 
         for( u8 i = 0; i < 4; ++i ) { oam[ SPR_PKMN_START_OAM( 0 ) + i ].priority = OBJPRIORITY_3; }
         u16 emptyPal[ 32 ]                = { 0, 0, 0 };
@@ -1695,10 +1691,8 @@ namespace BATTLE {
         IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1LLU << 9 );
         IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1LLU << 10 );
 
-        u16 sy = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y + 8
-                 - ( IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 2 ),
-            sx = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x + 2
-                 - 3 * IO::pkmnSpriteHeight( p_pokemon->getSpecies( ) ) / 4;
+        u16 sy   = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].y + 8 - ( IO::pkmnSpriteHeight( pinfo ) / 2 ),
+            sx   = oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].x + 2 - 3 * IO::pkmnSpriteHeight( pinfo ) / 4;
         s8 diffx = 80, diffy = 44;
         IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 0 ) + 0, SPR_PKMN_SHADOW_PAL,
                         oam[ SPR_PKMN_START_OAM( 0 ) + 0 ].gfxIndex, sx, sy, 64, 64, emptyPal, 0, 0,
@@ -1936,11 +1930,11 @@ namespace BATTLE {
                                 32, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
 
-            IO::loadPKMNIcon( p_pokemon->getSpecies( ), oam[ SPR_BATTLE_ICON_OAM_SUB ].x,
+            pkmnSpriteInfo pinfo = p_pokemon->getSpriteInfo( );
+            IO::loadPKMNIcon( pinfo, oam[ SPR_BATTLE_ICON_OAM_SUB ].x,
                               oam[ SPR_BATTLE_ICON_OAM_SUB ].y, SPR_BATTLE_ICON_OAM_SUB,
                               SPR_BATTLE_ICON_PAL_SUB, oam[ SPR_BATTLE_ICON_OAM_SUB ].gfxIndex,
-                              true, p_pokemon->getForme( ), p_pokemon->isShiny( ),
-                              p_pokemon->isFemale( ) );
+                              true );
 
             for( u8 i = 0; i < 4; ++i ) {
                 oam[ SPR_TYPE_OAM_SUB( i ) ].isHidden    = true;
@@ -2707,9 +2701,8 @@ namespace BATTLE {
         u16 x = 80;
         u8  y = 48;
 
-        IO::loadPKMNSprite( p_pokemon->getSpecies( ), x, y, SPR_PKMN_START_OAM( 0 ),
-                            SPR_PKMN_PAL( 0 ), SPR_PKMN_GFX( 0 ), false, p_pokemon->isShiny( ),
-                            p_pokemon->isFemale( ), false, false, p_pokemon->getForme( ) );
+        IO::loadPKMNSprite( p_pokemon->getSpriteInfo( ), x, y, SPR_PKMN_START_OAM( 0 ),
+                            SPR_PKMN_PAL( 0 ), SPR_PKMN_GFX( 0 ), false );
     }
 
     void battleUI::handleCapture( pokemon* p_pokemon ) {

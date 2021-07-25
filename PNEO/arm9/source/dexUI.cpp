@@ -533,23 +533,22 @@ namespace DEX {
         IO::updateOAM( true );
     }
 
-    void dexUI::drawPkmnInfo( u16 p_pkmnId, u8 p_page, u8 p_forme, bool p_shiny, bool p_female,
-                              bool p_bottom ) {
+    void dexUI::drawPkmnInfo( const pkmnSpriteInfo& p_pkmn, u8 p_page, bool p_bottom ) {
         auto     oamTop = !p_bottom ? IO::OamTop->oamBuffer : IO::Oam->oamBuffer;
-        pkmnData data   = getPkmnData( p_pkmnId, p_forme );
+        pkmnData data   = getPkmnData( p_pkmn.m_pkmnIdx, p_pkmn.m_forme );
 
-        bool seen   = SAVE::SAV.getActiveFile( ).seen( p_pkmnId );
-        bool caught = SAVE::SAV.getActiveFile( ).caught( p_pkmnId );
+        bool seen   = SAVE::SAV.getActiveFile( ).seen( p_pkmn.m_pkmnIdx );
+        bool caught = SAVE::SAV.getActiveFile( ).caught( p_pkmn.m_pkmnIdx );
 
         char buffer[ 100 ];
 
         if( p_page == 0 ) {
             // load pkmn sprite
-            IO::loadPKMNSprite(
-                ( seen || caught ) ? p_pkmnId : 0, SPR_PKMN_X,
-                SPR_PKMN_Y - 96 + IO::pkmnSpriteHeight( ( seen || caught ) ? p_pkmnId : 0 ),
-                SPR_PKMN_START_OAM, SPR_PKMN_PAL, oamTop[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom,
-                p_shiny, p_female, false, false, seen ? p_forme : 0, seen && !caught );
+            pkmnSpriteInfo pinfo = p_pkmn;
+            if( !seen && !caught ) { pinfo = { 0, 0, false, false, false }; }
+            IO::loadPKMNSprite( pinfo, SPR_PKMN_X, SPR_PKMN_Y - 96 + IO::pkmnSpriteHeight( pinfo ),
+                                SPR_PKMN_START_OAM, SPR_PKMN_PAL,
+                                oamTop[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom, seen && !caught );
 
             // load types
             if( caught ) {
@@ -575,13 +574,14 @@ namespace DEX {
             IO::printRectangle( 20, 32, 235, 192, false, 0 );
             // pkmn name
             if( seen || caught ) {
-                if( !p_forme ) {
-                    IO::regularFont->printStringC( getDisplayName( p_pkmnId, p_forme ).c_str( ),
-                                                   128, 112, p_bottom, IO::font::CENTER );
+                if( !p_pkmn.m_forme ) {
+                    IO::regularFont->printStringC(
+                        getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 112,
+                        p_bottom, IO::font::CENTER );
                 } else {
-                    IO::regularFont->printStringC( getDisplayName( p_pkmnId, p_forme ).c_str( ),
-                                                   SPR_TYPE_X( 0 ) - 4, 112, p_bottom,
-                                                   IO::font::RIGHT );
+                    IO::regularFont->printStringC(
+                        getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                        SPR_TYPE_X( 0 ) - 4, 112, p_bottom, IO::font::RIGHT );
                 }
             } else {
                 IO::regularFont->printStringC( GET_STRING( 581 ), 128, 112, p_bottom,
@@ -589,8 +589,9 @@ namespace DEX {
             }
 
             // dex no
-            snprintf( buffer, 99, "%03hu%c", _mode ? p_pkmnId : getDexNo( p_pkmnId ),
-                      p_forme ? 'a' + p_forme - 1 : 0 );
+            snprintf( buffer, 99, "%03hu%c",
+                      _mode ? p_pkmn.m_pkmnIdx : getDexNo( p_pkmn.m_pkmnIdx ),
+                      p_pkmn.m_forme ? 'a' + p_pkmn.m_forme - 1 : 0 );
             IO::regularFont->printStringC( buffer, 36, 112, p_bottom, IO::font::LEFT );
 
             // pokeball icon if pkmn caught
@@ -609,14 +610,14 @@ namespace DEX {
             IO::regularFont->setColor( 0, 2 );
             if( caught ) {
                 snprintf( buffer, 99, GET_STRING( 582 ),
-                          getSpeciesName( p_pkmnId, p_forme ).c_str( ),
+                          getSpeciesName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
                           data.m_baseForme.m_size / 10.0, data.m_baseForme.m_weight / 10.0 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                 IO::regularFont->printStringC( buffer, 128, 128, p_bottom, IO::font::CENTER );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                IO::regularFont->printBreakingStringC( getDexEntry( p_pkmnId, p_forme ).c_str( ),
-                                                       128, 141, 214, p_bottom, IO::font::CENTER,
-                                                       12 );
+                IO::regularFont->printBreakingStringC(
+                    getDexEntry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 141, 214,
+                    p_bottom, IO::font::CENTER, 12 );
 
                 // base stats
 
@@ -674,10 +675,12 @@ namespace DEX {
         oam[ p_OAMstart + 2 ].y        = p_y;
         oam[ p_OAMstart + 2 ].priority = OBJPRIORITY_3;
 
+        pkmnSpriteInfo pinfo = { p_pkmnIdx, p_pkmnForme, false, false, false };
+
         // pkmn icon
         if( caught ) {
-            IO::loadPKMNIconB( p_pkmnIdx, p_x, p_y + 16, p_OAMstart + 1,
-                               oam[ p_OAMstart + 1 ].gfxIndex, p_bottom, 0, false, false );
+            IO::loadPKMNIconB( pinfo, p_x, p_y + 16, p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex,
+                               p_bottom );
             oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;
             if( p_isHidden ) {
                 oam[ p_OAMstart + 1 ].isRotateScale = false;
@@ -698,9 +701,8 @@ namespace DEX {
             //  oam[ p_OAMstart ].y        = p_y + 6;
             //  oam[ p_OAMstart ].priority = OBJPRIORITY_3;
         } else if( seen ) {
-            IO::loadPKMNIconB( p_pkmnIdx, p_x, p_y + 16, p_OAMstart + 1,
-                               oam[ p_OAMstart + 1 ].gfxIndex, p_bottom, 0, false, false, false, 0,
-                               true );
+            IO::loadPKMNIconB( pinfo, p_x, p_y + 16, p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex,
+                               p_bottom, false, 0, true );
             oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;
             if( p_isHidden ) {
                 oam[ p_OAMstart + 1 ].isRotateScale = false;
@@ -732,8 +734,9 @@ namespace DEX {
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             } else if( _mode && !p_isHidden && ispkmn ) {
-                IO::loadPKMNIconB( 0, p_x, p_y + 16, p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex,
-                                   p_bottom, 0, false, false );
+                pinfo = { 0, 0, false, false, false };
+                IO::loadPKMNIconB( pinfo, p_x, p_y + 16, p_OAMstart + 1,
+                                   oam[ p_OAMstart + 1 ].gfxIndex, p_bottom );
                 oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;
                 if( p_isHidden ) {
                     oam[ p_OAMstart + 1 ].isRotateScale = false;
@@ -940,7 +943,8 @@ namespace DEX {
 
     void dexUI::nationalSelectIndex( u16 p_pkmnIdx, u16 p_pkmnIdxUB, bool p_bottom, u8 p_forme,
                                      bool p_shiny, bool p_female ) {
-        drawPkmnInfo( p_pkmnIdx, 0, p_forme, p_shiny, p_female, !p_bottom );
+        pkmnSpriteInfo pinfo = { p_pkmnIdx, p_forme, p_female, p_shiny, false };
+        drawPkmnInfo( pinfo, 0, !p_bottom );
         if( !_nationalSelectedIdx || _nationalSelectedIdx == p_pkmnIdx ) {
             nationalInitSub( p_pkmnIdx, p_pkmnIdxUB, p_bottom );
         } else if( _nationalSelectedIdx > p_pkmnIdx ) {
@@ -1019,8 +1023,9 @@ namespace DEX {
 
     void dexUI::localSelectPageSlot( u16 p_page, u8 p_slot, u16 p_pageUB, bool p_bottom, u8 p_forme,
                                      bool p_shiny, bool p_female ) {
-        drawPkmnInfo( LOCAL_DEX_PAGES[ p_page ][ p_slot ], 0, p_forme, p_shiny, p_female,
-                      !p_bottom );
+        pkmnSpriteInfo pinfo
+            = { LOCAL_DEX_PAGES[ p_page ][ p_slot ], p_forme, p_female, p_shiny, false };
+        drawPkmnInfo( pinfo, 0, !p_bottom );
         SpriteEntry* oam   = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
         u16          dpage = ( p_page - 1 ) / 4 * 4;
 

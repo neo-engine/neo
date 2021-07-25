@@ -266,14 +266,14 @@ namespace BAG {
         for( u8 i = 0; i < 6; ++i ) {
             auto acPkmn = _playerTeam[ i ];
             if( !acPkmn.getSpecies( ) ) break;
-            if( acPkmn.isEgg( ) )
+            if( acPkmn.isEgg( ) ) {
                 tileCnt = IO::loadEggIcon( 10, 23 + i * 26, SPR_PKMN_START_OAM_SUB + i,
                                            SPR_PKMN_PAL_SUB + i, tileCnt );
-            else
-                tileCnt = IO::loadPKMNIcon( acPkmn.getSpecies( ), 9, 25 + i * 26,
+            } else {
+                tileCnt = IO::loadPKMNIcon( acPkmn.getSpriteInfo( ), 9, 25 + i * 26,
                                             SPR_PKMN_START_OAM_SUB + i, SPR_PKMN_PAL_SUB + i,
-                                            tileCnt, true, acPkmn.getForme( ), acPkmn.isShiny( ),
-                                            acPkmn.isFemale( ) );
+                                            tileCnt, true );
+            }
             IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + i ].priority = OBJPRIORITY_3;
         }
         return tileCnt;

@@ -275,10 +275,9 @@ namespace BOX {
         if( _heldPkmn.getSpecies( ) ) {
             if( !_heldPkmn.isEgg( ) ) {
                 IO::loadPKMNIconB(
-                    _heldPkmn.getSpecies( ), IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x,
+                    _heldPkmn.getSpriteInfo( ), IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].x,
                     IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].y, SPR_PKMN_SEL_OAM_SUB,
-                    IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true,
-                    _heldPkmn.getForme( ), _heldPkmn.isShiny( ), _heldPkmn.isFemale( ), true,
+                    IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true, true,
                     _outlineColor );
                 IO::Oam->oamBuffer[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
             } else {
@@ -328,11 +327,9 @@ namespace BOX {
             if( p_box->m_pokemon[ i ].getSpecies( ) ) {
                 if( !p_box->m_pokemon[ i ].isEgg( ) ) {
                     IO::loadPKMNIconB(
-                        ( *p_box )[ i ].getSpecies( ), oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                        ( *p_box )[ i ].getSpriteInfo( ), oam[ SPR_PKMN_START_OAM_SUB + i ].x,
                         oam[ SPR_PKMN_START_OAM_SUB + i ].y, SPR_PKMN_START_OAM_SUB + i,
-                        oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex, true,
-                        ( *p_box )[ i ].getForme( ), ( *p_box )[ i ].isShiny( ),
-                        ( *p_box )[ i ].isFemale( ) );
+                        oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex, true );
                 } else {
                     IO::loadEggIconB(
                         oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y,
@@ -410,10 +407,9 @@ namespace BOX {
         if( p_pokemon != nullptr && p_pokemon->getSpecies( ) ) {
             if( !p_pokemon->isEgg( ) ) {
                 IO::loadPKMNIconB(
-                    p_pokemon->getSpecies( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
+                    p_pokemon->getSpriteInfo( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
                     oam[ SPR_PKMN_START_OAM_SUB + p_index ].y, SPR_PKMN_SEL_OAM_SUB,
-                    oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true, p_pokemon->getForme( ),
-                    p_pokemon->isShiny( ), p_pokemon->isFemale( ), true, _outlineColor );
+                    oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true, true, _outlineColor );
                 oam[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
             } else {
                 IO::loadEggIconB( oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
@@ -779,10 +775,8 @@ namespace BOX {
 
         // pokemon / shadow
         if( !p_pokemon->isEgg( ) ) {
-            tileCnt = IO::loadPKMNSprite( p_pokemon->getSpecies( ), ANCHOR_X, ANCHOR_Y + 26,
-                                          SPR_PKMN_START_OAM, SPR_PKMN_PAL, tileCnt, false,
-                                          p_pokemon->isShiny( ), p_pokemon->isFemale( ), false,
-                                          false, p_pokemon->getForme( ) );
+            tileCnt = IO::loadPKMNSprite( p_pokemon->getSpriteInfo( ), ANCHOR_X, ANCHOR_Y + 26,
+                                          SPR_PKMN_START_OAM, SPR_PKMN_PAL, tileCnt, false );
         } else {
             tileCnt = IO::loadEggSprite( ANCHOR_X, ANCHOR_Y + 26, SPR_PKMN_START_OAM, SPR_PKMN_PAL,
                                          tileCnt, false, p_pokemon->getSpecies( ) == PKMN_MANAPHY );
@@ -823,10 +817,9 @@ namespace BOX {
         if( p_pokemon != nullptr && p_pokemon->getSpecies( ) ) {
             if( !p_pokemon->isEgg( ) ) {
                 IO::loadPKMNIconB(
-                    p_pokemon->getSpecies( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
+                    p_pokemon->getSpriteInfo( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
                     oam[ SPR_PKMN_START_OAM_SUB + p_index ].y, SPR_PKMN_START_OAM_SUB + p_index,
-                    oam[ SPR_PKMN_START_OAM_SUB + p_index ].gfxIndex, true, p_pokemon->getForme( ),
-                    p_pokemon->isShiny( ), p_pokemon->isFemale( ) );
+                    oam[ SPR_PKMN_START_OAM_SUB + p_index ].gfxIndex, true );
             } else {
                 IO::loadEggIconB( oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
                                   oam[ SPR_PKMN_START_OAM_SUB + p_index ].y,
@@ -875,10 +868,9 @@ namespace BOX {
             _heldPkmn = *p_pokemon;
             if( !_heldPkmn.isEgg( ) ) {
                 IO::loadPKMNIconB(
-                    _heldPkmn.getSpecies( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
+                    _heldPkmn.getSpriteInfo( ), oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
                     oam[ SPR_PKMN_START_OAM_SUB + p_index ].y, SPR_PKMN_SEL_OAM_SUB,
-                    oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true, _heldPkmn.getForme( ),
-                    _heldPkmn.isShiny( ), _heldPkmn.isFemale( ), true, _outlineColor );
+                    oam[ SPR_PKMN_SEL_OAM_SUB ].gfxIndex, true, true, _outlineColor );
                 oam[ SPR_PKMN_SEL_OAM_SUB ].priority = OBJPRIORITY_1;
             } else {
                 IO::loadEggIconB( oam[ SPR_PKMN_START_OAM_SUB + p_index ].x,
@@ -928,13 +920,11 @@ namespace BOX {
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + p_partyLen; ++i ) {
             if( p_party[ i - MAX_PKMN_PER_BOX ].getSpecies( ) ) {
                 if( !p_party[ i - MAX_PKMN_PER_BOX ].isEgg( ) ) {
-                    IO::loadPKMNIconB(
-                        p_party[ i - MAX_PKMN_PER_BOX ].getSpecies( ),
-                        oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y,
-                        SPR_PKMN_START_OAM_SUB + i, oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex,
-                        true, p_party[ i - MAX_PKMN_PER_BOX ].getForme( ),
-                        p_party[ i - MAX_PKMN_PER_BOX ].isShiny( ),
-                        p_party[ i - MAX_PKMN_PER_BOX ].isFemale( ) );
+                    IO::loadPKMNIconB( p_party[ i - MAX_PKMN_PER_BOX ].getSpriteInfo( ),
+                                       oam[ SPR_PKMN_START_OAM_SUB + i ].x,
+                                       oam[ SPR_PKMN_START_OAM_SUB + i ].y,
+                                       SPR_PKMN_START_OAM_SUB + i,
+                                       oam[ SPR_PKMN_START_OAM_SUB + i ].gfxIndex, true );
                 } else {
                     IO::loadEggIconB(
                         oam[ SPR_PKMN_START_OAM_SUB + i ].x, oam[ SPR_PKMN_START_OAM_SUB + i ].y,

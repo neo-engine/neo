@@ -1652,10 +1652,9 @@ namespace NAV {
             if( dcstart[ i ].getSpecies( ) ) {
                 // load pkmn icon
                 IO::loadPKMNIcon(
-                    dcstart[ i ].getSpecies( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                    dcstart[ i ].getSpriteInfo( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y, SPR_ITEM_OAM_SUB( i ),
-                    SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true,
-                    dcstart[ i ].getForme( ), dcstart[ i ].isShiny( ), dcstart[ i ].isFemale( ) );
+                    SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
 
                 // pkmn nick name
                 auto strwd = IO::regularFont->stringWidthC( dcstart[ i ].m_name );

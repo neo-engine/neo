@@ -183,10 +183,8 @@ namespace STS {
 
         // Pkmn Sprite
         if( !p_pokemon->isEgg( ) ) {
-            tileCnt = IO::loadPKMNSprite( p_pokemon->getSpecies( ), 0, 54, SPR_PKMN_START_OAM,
-                                          SPR_PKMN_PAL, tileCnt, p_bottom, p_pokemon->isShiny( ),
-                                          p_pokemon->isFemale( ), false, false,
-                                          p_pokemon->getForme( ) );
+            tileCnt = IO::loadPKMNSprite( p_pokemon->getSpriteInfo( ), 0, 54, SPR_PKMN_START_OAM,
+                                          SPR_PKMN_PAL, tileCnt, p_bottom );
         } else {
             tileCnt = IO::loadEggSprite( 0, 54, SPR_PKMN_START_OAM, SPR_PKMN_PAL, tileCnt, p_bottom,
                                          p_pokemon->getSpecies( ) == PKMN_MANAPHY );

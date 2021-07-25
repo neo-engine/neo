@@ -121,8 +121,7 @@ namespace DEX {
          * @brief: Prints the dex information.
          * @param p_page: 1-general information; 2-forms; 3-habitats
          */
-        void drawPkmnInfo( u16 p_pkmnId, u8 p_page, u8 p_forme = 0, bool p_shiny = false,
-                           bool p_female = false, bool p_bottom = false );
+        void drawPkmnInfo( const pkmnSpriteInfo& p_pkmn, u8 p_page, bool p_bottom = false );
 
         /*
          * @brief: Draws the bottom screen of the national pokedex with the specified pkmn

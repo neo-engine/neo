@@ -111,10 +111,13 @@ namespace IO::ANIM {
         // Load both sprites
 
         u16 tileCnt = 0;
-        tileCnt     = loadPKMNSprite( p_startSpecies, PKMN_X, PKMN_Y, 0, 0, tileCnt, false, p_shiny,
-                                  p_female, false, false, p_startForme );
-        tileCnt     = loadPKMNSprite( p_endSpecies, PKMN_X, PKMN_Y, 4, 1, tileCnt, false, p_shiny,
-                                  p_female, false, false, p_endForme );
+
+        pkmnSpriteInfo pinfoS = { p_startSpecies, p_startForme, p_female, p_shiny, false };
+        pkmnSpriteInfo pinfoE = { p_endSpecies, p_endForme, p_female, p_shiny, false };
+
+        tileCnt = loadPKMNSprite( pinfoS, PKMN_X, PKMN_Y, 0, 0, tileCnt, false );
+        tileCnt = loadPKMNSprite( pinfoE, PKMN_X, PKMN_Y, 4, 1, tileCnt, false );
+
         setFrameVis( 1, true );
         updateOAM( false );
 
@@ -195,11 +198,13 @@ namespace IO::ANIM {
         // Load both sprites
 
         fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
+        pkmnSpriteInfo pinfoE = { p_endSpecies, p_endForme, p_female, p_shiny, false };
+
         u16 tileCnt = 0;
         tileCnt
             = loadEggSprite( PKMN_X, PKMN_Y, 0, 0, tileCnt, false, p_endSpecies == PKMN_MANAPHY );
-        tileCnt = loadPKMNSprite( p_endSpecies, PKMN_X, PKMN_Y, 4, 1, tileCnt, false, p_shiny,
-                                  p_female, false, false, p_endForme );
+
+        tileCnt = loadPKMNSprite( pinfoE, PKMN_X, PKMN_Y, 4, 1, tileCnt, false );
         SOUND::playBGM( MOD_EVOLVING );
 
         setFrameVis( 1, true );

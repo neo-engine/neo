@@ -3112,8 +3112,9 @@ namespace MAP {
                          false, OBJPRIORITY_1, false );
 
         if( p_cry ) { SOUND::playCry( p_pkmIdx, p_forme ); }
-        IO::loadPKMNSpriteB( p_pkmIdx, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false, p_shiny, p_female,
-                             false, false, p_forme );
+
+        pkmnSpriteInfo pinfo = { p_pkmIdx, p_forme, p_female, p_shiny, false };
+        IO::loadPKMNSpriteB( pinfo, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false );
         IO::updateOAM( false );
         for( u8 i = 0; i < 75; ++i ) swiWaitForVBlank( );
 

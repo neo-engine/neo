@@ -124,6 +124,14 @@ enum style : u8 {
     MSG_SHOW_MONEY_FLAG = 128, // show the current money
 };
 
+struct pkmnSpriteInfo {
+    u16 m_pkmnIdx;
+    u8  m_forme;
+    u8  m_female;
+    u8  m_shiny;
+    u8  m_flipX;
+};
+
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char*       HP_ICONS[ LANGUAGES ];
 extern const char* const MONTHS[ 12 ][ LANGUAGES ];

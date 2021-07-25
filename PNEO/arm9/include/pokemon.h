@@ -103,6 +103,10 @@ struct boxPokemon {
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
 
+    inline pkmnSpriteInfo getSpriteInfo( bool p_flipX = false ) {
+        return { getSpecies( ), getForme( ), isFemale( ), isShiny( ), p_flipX };
+    }
+
     /*
      * @brief: Adds the specified amount of exp. Uses a fast, but very basic overflow
      * protection.
@@ -155,7 +159,7 @@ struct boxPokemon {
     u16 getBaseSpecies( ) const;
 
     constexpr pkmnNatures getNature( ) const {
-        return ( pkmnNatures )( m_nature );
+        return (pkmnNatures) ( m_nature );
     }
     bool setNature( pkmnNatures p_newNature );
 
@@ -253,7 +257,7 @@ struct boxPokemon {
             = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 )
                 + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 )
               / 63;
-        return a < 8 ? ( type )( a + 1 ) : type( a + 2 );
+        return a < 8 ? (type) ( a + 1 ) : type( a + 2 );
     }
     constexpr u8 getHPPower( ) const {
         return 30
@@ -364,6 +368,10 @@ struct pokemon {
              const char* p_ot, u8 p_shiny = 0, bool p_hiddenAbility = false,
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
              u8 p_ball = 3, u8 p_pokerus = 0, u8 p_forme = 0 );
+
+    inline pkmnSpriteInfo getSpriteInfo( bool p_flipX = false ) {
+        return m_boxdata.getSpriteInfo( p_flipX );
+    }
 
     /*
      * @brief: Returns whether the given pkmn can still evolve.

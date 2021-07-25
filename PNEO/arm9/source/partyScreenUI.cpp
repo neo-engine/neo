@@ -692,12 +692,11 @@ namespace STS {
                                     false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
                 }
                 IO::updateOAM( p_bottom ); // Shipout fast stuff first
-                IO::loadPKMNIcon(
-                    _team[ p_pos ].m_boxdata.m_speciesId, oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
-                    oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
-                    SPR_PKMN_ICON_PAL( p_pos ), oam[ SPR_PKMN_ICON_OAM( p_pos ) ].gfxIndex,
-                    p_bottom, _team[ p_pos ].getForme( ), _team[ p_pos ].isShiny( ),
-                    _team[ p_pos ].isFemale( ) );
+                IO::loadPKMNIcon( _team[ p_pos ].getSpriteInfo( ),
+                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
+                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
+                                  SPR_PKMN_ICON_PAL( p_pos ),
+                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].gfxIndex, p_bottom );
             }
         }
 
@@ -769,12 +768,11 @@ namespace STS {
                     = !_team[ p_pos ].m_boxdata.getItem( ); // item
 
                 IO::updateOAM( p_bottom ); // Shipout fast stuff first
-                IO::loadPKMNIcon(
-                    _team[ p_pos ].m_boxdata.m_speciesId, oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].x,
-                    oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].y, SPR_PKMN_ICON_OAM_SUB( p_pos ),
-                    SPR_PKMN_ICON_PAL_SUB( p_pos ), oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].gfxIndex,
-                    p_bottom, _team[ p_pos ].getForme( ), _team[ p_pos ].isShiny( ),
-                    _team[ p_pos ].isFemale( ) );
+                IO::loadPKMNIcon( _team[ p_pos ].getSpriteInfo( ),
+                                  oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].x,
+                                  oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].y,
+                                  SPR_PKMN_ICON_OAM_SUB( p_pos ), SPR_PKMN_ICON_PAL_SUB( p_pos ),
+                                  oam[ SPR_PKMN_ICON_OAM_SUB( p_pos ) ].gfxIndex, p_bottom );
             }
         }
 

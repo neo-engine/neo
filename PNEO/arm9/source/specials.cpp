@@ -310,9 +310,7 @@ namespace SPX {
             IO::loadSprite( 7, 1, 0, 128, 64 + 12, 64, 64, 0, 0, 0, true, true, false,
                             OBJPRIORITY_1, false );
 
-            tc = IO::loadPKMNSprite( pkmn[ res ].getSpecies( ), 80, 16 + 12, 0, 0, tc, false,
-                                     pkmn[ res ].isShiny( ), pkmn[ res ].isFemale( ), false, false,
-                                     0 );
+            tc = IO::loadPKMNSprite( pkmn[ res ].getSpriteInfo( ), 80, 16 + 12, 0, 0, tc, false );
 
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
