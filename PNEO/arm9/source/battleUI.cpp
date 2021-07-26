@@ -1763,7 +1763,8 @@ namespace BATTLE {
 
         IO::updateOAM( false );
         char buffer[ 50 ];
-        snprintf( buffer, 49, GET_STRING( 143 ),
+        auto fmt = std::string( GET_STRING( 143 ) );
+        snprintf( buffer, 49, fmt.c_str( ),
                   getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
                   _battleTrainer->m_strings.m_name );
         log( std::string( buffer ) );
@@ -1794,7 +1795,8 @@ namespace BATTLE {
 
         char buffer[ 100 ];
         if( p_opponent ) {
-            snprintf( buffer, 99, GET_STRING( 263 ),
+            auto fmt = std::string( GET_STRING( 263 ) );
+            snprintf( buffer, 99, fmt.c_str( ),
                       getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
                       _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
             log( std::string( buffer ) );

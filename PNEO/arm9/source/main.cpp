@@ -350,7 +350,26 @@ int main( int, char** p_argv ) {
                                 MOVE::use( a.m_boxdata.m_moves[ j ], param );
                             } else {
                                 swiWaitForVBlank( );
+
+                                auto d = MAP::curMap->getFollowPkmnDirection( );
+
+                                if( a.m_boxdata.m_moves[ j ] == M_CUT
+                                    || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {
+                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                                        += MAP::dir[ d ][ 0 ];
+                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                                        += MAP::dir[ d ][ 1 ];
+                                }
+
                                 MOVE::use( a.m_boxdata.m_moves[ j ], 2 );
+
+                                if( a.m_boxdata.m_moves[ j ] == M_CUT
+                                    || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {
+                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                                        -= MAP::dir[ d ][ 0 ];
+                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                                        -= MAP::dir[ d ][ 1 ];
+                                }
                             }
                         } else {
                             NAV::printMessage( 0, MSG_NOCLOSE );

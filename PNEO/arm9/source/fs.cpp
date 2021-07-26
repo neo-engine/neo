@@ -648,13 +648,11 @@ namespace MOVE {
 
 namespace BATTLE {
     bool getTrainerClassName( u16 p_trainerClass, u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( TCLASS_NAME_PATH, p_trainerClass, ".str" );
-        if( !f ) return false;
-
-        std::fseek( f, p_language * TCLASS_NAMELENGTH, SEEK_SET );
-        fread( p_out, 1, TCLASS_NAMELENGTH, f );
-        fclose( f );
-        return true;
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        FS::checkOrOpen( bankfile, TCLASS_NAME_PATH, lastLang, p_language );
+        if( getString( bankfile, TCLASS_NAMELENGTH, p_trainerClass, p_out ) ) { return true; }
+        return false;
     }
 
     std::string getTrainerClassName( u16 p_trainerClass, u8 p_language ) {
