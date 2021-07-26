@@ -46,9 +46,11 @@ namespace IO {
     const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
     const char* BERRY_PATH     = "nitro:/PICS/SPRITES/BERRIES/";
     const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
-    const char* ITEM_PATH      = "nitro:/PICS/SPRITES/ITEMS/";
     const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
     const char* TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/type";
+
+    const char* ITEM_PATH      = "nitro:/PICS/SPRITES/item.icon.rawb";
+    FILE*       ITEM_ICON_FILE = nullptr;
 
     const char* PKMN_ICON_PATH = "nitro:/PICS/SPRITES/icon";
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/frnt";
@@ -795,15 +797,14 @@ namespace IO {
 
     u16 loadItemIcon( u16 p_itemId, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom ) {
-        FILE* f = FS::openSplit( ITEM_PATH, p_itemId, ".raw" );
-        if( !f ) {
+        if( !FS::checkOrOpen( ITEM_ICON_FILE, ITEM_PATH )
+            || !seekSpriteData( ITEM_ICON_FILE, p_itemId, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), ITEM_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), ITEM_ICON_FILE ) ) {
             return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
                                NoItemTiles, NoItemTilesLen, false, false, false,
                                p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
-
-        FS::read( f, TEMP, sizeof( u32 ), 128 );
-        FS::read( f, TEMP_PAL, sizeof( u16 ), 16 );
 
         return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP,
                            512, false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0,
@@ -812,16 +813,14 @@ namespace IO {
 
     u16 loadItemIconB( u16 p_itemId, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        bool p_bottom ) {
-        FILE* f = FS::openSplit( ITEM_PATH, p_itemId, ".raw" );
-        if( !f ) {
+        if( !FS::checkOrOpen( ITEM_ICON_FILE, ITEM_PATH )
+            || !seekSpriteData( ITEM_ICON_FILE, p_itemId, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), ITEM_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), ITEM_ICON_FILE ) ) {
             return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal, NoItemTiles,
                                 NoItemTilesLen, false, false, false,
                                 p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
-
-        FS::read( f, TEMP, sizeof( u32 ), 128 );
-        FS::read( f, TEMP_PAL, sizeof( u16 ), 16 );
-
         return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512, false,
                             false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
     }
