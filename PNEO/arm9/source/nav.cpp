@@ -599,9 +599,11 @@ namespace NAV {
                                                      tileCnt, false );
                     } else if( p_data && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
                         MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
-                        tileCnt
-                            = IO::loadTMIconB( move.m_type, MOVE::isFieldMove( p_data->m_param2 ),
-                                               16, 192 - 40, SPR_MSGTEXT_OAM + 3, tileCnt, false );
+
+                        u8 tmtype = p_data->m_effect;
+                        if( tmtype == 1 && MOVE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
+                        tileCnt = IO::loadTMIconB( move.m_type, tmtype, 16, 192 - 40,
+                                                   SPR_MSGTEXT_OAM + 3, tileCnt, false );
                     }
                 }
                 IO::updateOAM( false );
@@ -1240,11 +1242,15 @@ namespace NAV {
                     SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
             } else {
                 MOVE::moveData move = MOVE::getMoveData( p_data[ p_firstItem + i ].m_param2 );
-                IO::loadTMIcon(
-                    move.m_type, MOVE::isFieldMove( p_data[ p_firstItem + i ].m_param2 ),
-                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
-                    SPR_ITEM_OAM_SUB( i ), SPR_ITEM_PAL_SUB( i ),
-                    oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
+
+                u8 tmtype = p_data[ p_firstItem + i ].m_effect;
+                if( tmtype == 1 && MOVE::isFieldMove( p_data[ p_firstItem + i ].m_param2 ) ) {
+                    tmtype = 0;
+                }
+                IO::loadTMIcon( move.m_type, tmtype, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y, SPR_ITEM_OAM_SUB( i ),
+                                SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex,
+                                true );
             }
 
             if( IO::regularFont->stringWidthC( p_itemNames[ p_firstItem + i ].c_str( ) ) <= 85 ) {
@@ -2021,11 +2027,17 @@ namespace NAV {
             case 2: {
                 init( );
                 //                SAVE::CURRENT_TIME.m_hours = ( SAVE::CURRENT_TIME.m_hours + 5
-                //                ) % 24; SAVE::SAV.getActiveFile( ).setFlag(
-                //                SAVE::F_NAT_DEX_OBTAINED, true );
+                //                ) % 24;
+                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED, true );
 
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 9999 );
+
+                for( u16 i = 0; i < MAX_ITEMS_IN_BAG; ++i ) {
+                    auto data = ITEM::getItemData( i );
+                    SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( data.m_itemType ), i,
+                                                             5 );
+                }
 
                 /*
                 init( );

@@ -202,9 +202,9 @@ namespace IO {
     u16 loadItemIconB( const u16 p_itemId, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                        u16 p_tileCnt, bool p_bottom = true );
 
-    u16 loadTMIcon( type p_type, bool p_hm, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+    u16 loadTMIcon( type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom = true );
-    u16 loadTMIconB( type p_type, bool p_hm, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
+    u16 loadTMIconB( type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                      u16 p_tileCnt, bool p_bottom = true );
 
     u16 loadTypeIcon( type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIndex, u8 p_palCnt,

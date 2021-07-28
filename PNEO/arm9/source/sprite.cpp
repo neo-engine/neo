@@ -45,12 +45,14 @@ namespace IO {
     const char* OWP_PATH       = "nitro:/PICS/SPRITES/NPCP/";
     const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
     const char* BERRY_PATH     = "nitro:/PICS/SPRITES/BERRIES/";
-    const char* TM_PATH        = "nitro:/PICS/SPRITES/TM/";
     const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
     const char* TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/type";
 
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/item.icon.rawb";
     FILE*       ITEM_ICON_FILE = nullptr;
+
+    const char* TM_PATH      = "nitro:/PICS/SPRITES/tmhm.icon.rawb";
+    FILE*       TM_ICON_FILE = nullptr;
 
     const char* PKMN_ICON_PATH = "nitro:/PICS/SPRITES/icon";
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/frnt";
@@ -825,30 +827,34 @@ namespace IO {
                             false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadTMIcon( type p_type, bool p_hm, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
+    u16 loadTMIcon( type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        std::string itemname
-            = ( p_hm ? "VM" : "TM" )
-              + ( std::vector<std::string>{ "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
-                                            "Pflanze", "Geist", "Stahl", "Unbekannt", "Wasser",
-                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
-                                            "Drache", "Unlicht", "Fee" }[ p_type ] );
+        if( !FS::checkOrOpen( TM_ICON_FILE, TM_PATH )
+            || !seekSpriteData( TM_ICON_FILE, 3 * p_type + p_tmtype, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), TM_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), TM_ICON_FILE ) ) {
+            return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
+                               NoItemTiles, NoItemTilesLen, false, false, false,
+                               p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        }
 
-        return loadIcon( TM_PATH, itemname.c_str( ), p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt,
-                         p_bottom );
+        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP,
+                           512, false, false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0,
+                           p_bottom );
     }
 
-    u16 loadTMIconB( type p_type, bool p_hm, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
+    u16 loadTMIconB( type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
                      u16 p_tileCnt, bool p_bottom ) {
-        std::string itemname
-            = ( p_hm ? "VM" : "TM" )
-              + ( std::vector<std::string>{ "Normal", "Kampf", "Flug", "Gift", "Boden", "Gestein",
-                                            "Pflanze", "Geist", "Stahl", "Unbekannt", "Wasser",
-                                            "Feuer", "Pflanze", "Elektro", "Psycho", "Eis",
-                                            "Drache", "Unlicht", "Fee" }[ p_type ] );
-
-        return loadIconB( TM_PATH, itemname.c_str( ), p_posX, p_posY, p_oamIdx, p_tileCnt,
-                          p_bottom );
+        if( !FS::checkOrOpen( TM_ICON_FILE, TM_PATH )
+            || !seekSpriteData( TM_ICON_FILE, 3 * p_type + p_tmtype, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), TM_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), TM_ICON_FILE ) ) {
+            return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal, NoItemTiles,
+                                NoItemTilesLen, false, false, false,
+                                p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        }
+        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512, false,
+                            false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
     }
 
     FILE* TYPE_ICON_FILE          = nullptr;

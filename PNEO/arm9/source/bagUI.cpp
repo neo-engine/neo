@@ -358,8 +358,10 @@ namespace BAG {
 
             descr               = MOVE::getMoveDescr( p_data->m_param2 );
             MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
-            u16 tileCnt = IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data->m_param2 ), 112,
-                                          44, 0, 0, 0, false );
+
+            u8 tmtype = p_data->m_effect;
+            if( tmtype == 1 && MOVE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
+            u16 tileCnt = IO::loadTMIcon( move.m_type, tmtype, 112, 44, 0, 0, 0, false );
 
             display = ITEM::getItemName( p_itemId ) + ": " + MOVE::getMoveName( p_data->m_param2 );
 
@@ -1114,8 +1116,9 @@ namespace BAG {
         } else {
             MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
 
-            IO::loadTMIcon( move.m_type, MOVE::isFieldMove( p_data->m_param2 ), 0, 0,
-                            SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB,
+            u8 tmtype = p_data->m_effect;
+            if( tmtype == 1 && MOVE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
+            IO::loadTMIcon( move.m_type, tmtype, 0, 0, SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB,
                             IO::Oam->oamBuffer[ SPR_TRANSFER_OAM_SUB ].gfxIndex );
         }
 
