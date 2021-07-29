@@ -76,9 +76,11 @@ namespace SOUND {
 
     void playBGM( u16 p_id, bool p_force ) {
 #ifndef NO_SOUND
+        auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( p_force ) { BGMforced = true; }
             if( BGMLoaded && p_id == currentBGM ) { return; }
+            ANIMATE_MAP = false;
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -98,6 +100,7 @@ namespace SOUND {
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
+            ANIMATE_MAP = false;
             setVolume( 0x50 );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -111,6 +114,7 @@ namespace SOUND {
             mmUnload( currentBGM );
             BGMLoaded = false;
         }
+        ANIMATE_MAP = oa;
 #else
         (void) p_id;
         (void) p_force;
@@ -119,8 +123,10 @@ namespace SOUND {
 
     void playBGMOneshot( u16 p_id ) {
 #ifndef NO_SOUND
+        auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( BGMLoaded && p_id == currentBGM ) { return; }
+            ANIMATE_MAP = false;
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -140,6 +146,7 @@ namespace SOUND {
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
+            ANIMATE_MAP = false;
             setVolume( 0x50 );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -153,6 +160,7 @@ namespace SOUND {
             mmUnload( currentBGM );
             BGMLoaded = false;
         }
+        ANIMATE_MAP = oa;
 #else
         (void) p_id;
 #endif

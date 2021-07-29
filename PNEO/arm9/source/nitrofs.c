@@ -23,7 +23,7 @@ static int   nitroFSFstat( struct _reent *r, void *fd, struct stat *st );
 static int   nitroFSstat( struct _reent *r, const char *file, struct stat *st );
 static int   nitroFSChdir( struct _reent *r, const char *name );
 
-static tNDSHeader *__gba_cart_header = (tNDSHeader *) 0x08000000;
+// static tNDSHeader *__gba_cart_header = (tNDSHeader *) 0x08000000;
 
 #define NITRONAMELENMAX 0x80 // max file name is 127 +1 for zero byte
 #define NITROMAXPATHLEN 0x100
@@ -129,6 +129,7 @@ bool nitroFSInit( char **basepath ) {
         }
     }
 
+    /*
     // test for valid nitrofs on gba cart
     if( !nitroInit ) {
         if( memcmp( &__NDSHeader->filenameOffset, &__gba_cart_header->filenameOffset, 16 ) == 0 ) {
@@ -136,6 +137,7 @@ bool nitroFSInit( char **basepath ) {
             nitropath = strdup( "nitro:/" );
         }
     }
+    */
 
     // fallback to direct card reads for desmume
     // TODO: validate nitrofs
@@ -182,10 +184,10 @@ static void nitroSubReadBlock( u32 pos, u8 *ptr, u32 len ) {
 }
 
 //---------------------------------------------------------------------------------
-static int nitroSubReadCard( unsigned int *npos, void *ptr, int len ) {
+static int nitroSubReadCard( unsigned int *npos, void *ptr, u32 len ) {
     //---------------------------------------------------------------------------------
     u8 *ptr_u8    = (u8 *) ptr;
-    int remaining = len;
+    u32 remaining = len;
 
     if( ( *npos ) & 0x1FF ) {
 
@@ -214,7 +216,7 @@ static int nitroSubReadCard( unsigned int *npos, void *ptr, int len ) {
 }
 
 //---------------------------------------------------------------------------------
-static inline int nitroSubRead( unsigned int *npos, void *ptr, int len ) {
+static inline int nitroSubRead( unsigned int *npos, void *ptr, u32 len ) {
     //---------------------------------------------------------------------------------
     if( cardRead ) {
         unsigned int tmpPos = *npos;
@@ -226,8 +228,8 @@ static inline int nitroSubRead( unsigned int *npos, void *ptr, int len ) {
 
         len = read( ndsFileFD, ptr, len );
 
-    } else { // reading from gbarom
-        if( len > 0 ) memcpy( ptr, *npos + (void *) GBAROM, len );
+        //    } else { // reading from gbarom
+        //        if( len > 0 ) memcpy( ptr, *npos + (void *) GBAROM, len );
     }
 
     if( len > 0 ) *npos += len;
@@ -311,7 +313,7 @@ static DIR_ITER *nitroFSDirOpen( struct _reent *r, DIR_ITER *dirState, const cha
 }
 
 //---------------------------------------------------------------------------------
-static int nitroFSDirClose( struct _reent *r, DIR_ITER *dirState ) {
+static int nitroFSDirClose( struct _reent *, DIR_ITER * ) {
     //---------------------------------------------------------------------------------
     return ( 0 );
 }
@@ -321,7 +323,7 @@ const char *syspaths[ 2 ] = { ".", ".." };
 
 // reset dir to start of entry selected by dirStruct->cur_dir_id
 //---------------------------------------------------------------------------------
-static int nitroDirReset( struct _reent *r, DIR_ITER *dirState ) {
+static int nitroDirReset( struct _reent *, DIR_ITER *dirState ) {
     //---------------------------------------------------------------------------------
     struct nitroDIRStruct *dirStruct = (struct nitroDIRStruct *) dirState->dirStruct;
     struct ROM_FNTDir      dirsubtable;
@@ -338,7 +340,7 @@ static int nitroDirReset( struct _reent *r, DIR_ITER *dirState ) {
 }
 
 //---------------------------------------------------------------------------------
-static int nitroFSDirNext( struct _reent *r, DIR_ITER *dirState, char *filename, struct stat *st ) {
+static int nitroFSDirNext( struct _reent *, DIR_ITER *dirState, char *filename, struct stat *st ) {
     //---------------------------------------------------------------------------------
     unsigned char          next;
     struct nitroDIRStruct *dirStruct = (struct nitroDIRStruct *) dirState->dirStruct;
@@ -391,8 +393,7 @@ static int nitroFSDirNext( struct _reent *r, DIR_ITER *dirState, char *filename,
 }
 
 //---------------------------------------------------------------------------------
-static int nitroFSOpen( struct _reent *r, void *fileStruct, const char *path, int flags,
-                        int mode ) {
+static int nitroFSOpen( struct _reent *, void *fileStruct, const char *path, int, int ) {
     //---------------------------------------------------------------------------------
     struct nitroFSStruct *fatStruct = (struct nitroFSStruct *) fileStruct;
     struct nitroDIRStruct dirStruct;
@@ -402,9 +403,9 @@ static int nitroFSOpen( struct _reent *r, void *fileStruct, const char *path, in
     struct stat   st;                    // all these are just used for reading the dir ~_~
     char dirfilename[ NITROMAXPATHLEN ]; // to hold a full path (i tried to avoid using so much
                                          // stack but blah :/)
-    char *filename;                      // to hold filename
-    char *cptr;                          // used to string searching and manipulation
-    cptr     = (char *) path + strlen( path ); // find the end...
+    const char *filename;                // to hold filename
+    const char *cptr;                    // used to string searching and manipulation
+    cptr     = path + strlen( path );    // find the end...
     filename = NULL;
 
     do {
@@ -420,8 +421,8 @@ static int nitroFSOpen( struct _reent *r, void *fileStruct, const char *path, in
     } while( cptr-- != path ); // search till start
 
     if( !filename ) {
-        filename         = (char *) path; // filename = complete path
-        dirfilename[ 0 ] = 0;             // make directory path ""
+        filename         = (const char *) path; // filename = complete path
+        dirfilename[ 0 ] = 0;                   // make directory path ""
     }
 
     if( nitroFSDirOpen( &dre, &dirState, dirfilename ) ) {
@@ -448,13 +449,13 @@ static int nitroFSOpen( struct _reent *r, void *fileStruct, const char *path, in
 }
 
 //---------------------------------------------------------------------------------
-static int nitroFSClose( struct _reent *r, void *fd ) {
+static int nitroFSClose( struct _reent *, void * ) {
     //---------------------------------------------------------------------------------
     return ( 0 );
 }
 
 //---------------------------------------------------------------------------------
-static int nitroFSRead( struct _reent *r, void *fd, char *ptr, size_t len ) {
+static int nitroFSRead( struct _reent *, void *fd, char *ptr, size_t len ) {
     //---------------------------------------------------------------------------------
     struct nitroFSStruct *fatStruct = (struct nitroFSStruct *) fd;
     unsigned int *        npos      = &fatStruct->pos;
@@ -464,7 +465,7 @@ static int nitroFSRead( struct _reent *r, void *fd, char *ptr, size_t len ) {
 }
 
 //---------------------------------------------------------------------------------
-static off_t nitroFSSeek( struct _reent *r, void *fd, off_t pos, int dir ) {
+static off_t nitroFSSeek( struct _reent *, void *fd, off_t pos, int dir ) {
     //---------------------------------------------------------------------------------
     // need check for eof here...
     struct nitroFSStruct *fatStruct = (struct nitroFSStruct *) fd;
@@ -479,7 +480,7 @@ static off_t nitroFSSeek( struct _reent *r, void *fd, off_t pos, int dir ) {
 }
 
 //---------------------------------------------------------------------------------
-static int nitroFSFstat( struct _reent *r, void *fd, struct stat *st ) {
+static int nitroFSFstat( struct _reent *, void *fd, struct stat *st ) {
     //---------------------------------------------------------------------------------
     struct nitroFSStruct *fatStruct = (struct nitroFSStruct *) fd;
     st->st_size                     = fatStruct->end - fatStruct->start;
