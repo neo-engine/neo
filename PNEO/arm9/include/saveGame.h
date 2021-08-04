@@ -189,7 +189,9 @@ namespace SAVE {
 
             u8 m_forcedMovement = 0;
 
-            u32 m_reserved2 : 24;
+            u8 m_currentFlyBank = 0;
+
+            u32 m_reserved2 : 16;
             u32 m_reserved[ 57 ] = { 0 }; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
