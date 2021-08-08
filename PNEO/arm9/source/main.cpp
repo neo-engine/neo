@@ -37,7 +37,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "defines.h"
-#include "filesystem.h"
 #include "fs.h"
 #include "saveGame.h"
 #include "sound.h"
@@ -92,6 +91,8 @@ bool          IN_GAME           = false;
 bool          RTC_BAD           = false;
 
 char** ARGV;
+
+bool nitroFSInit( char** p_basepath = nullptr );
 
 u8 getCurrentDaytime( ) {
     u8 t = SAVE::CURRENT_TIME.m_hours, m = SAVE::CURRENT_DATE.m_month;
