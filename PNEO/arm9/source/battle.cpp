@@ -176,8 +176,8 @@ namespace BATTLE {
 
             // register pkmn for exp
 
-            for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++i ) {
-                for( u8 j = 0; j < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++j ) {
+            for( u8 i = 0; i < getBattlingPKMNCount( _policy.m_mode ); ++i ) {
+                for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
                     auto pk = _field.getPkmn( false, j );
                     if( pk == nullptr ) { continue; }
                     if( pk->canBattle( ) ) { _yieldEXP[ i ].insert( _playerPkmnPerm[ j ] ); }
@@ -216,7 +216,7 @@ namespace BATTLE {
                     break;
                 }
 
-                if( _policy.m_mode == DOUBLE ) {
+                if( _policy.m_mode == DOUBLE || _policy.m_mode == MULTI_OPPONENT ) {
                     if( _field.getPkmn( false, 0 ) == nullptr ) {
                         // There is no first pkmn, so it cannot move.
                         moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
@@ -245,6 +245,7 @@ namespace BATTLE {
 
             // Compute AI's moves
 
+            // Check if player is able to escape from wild battle
             if( _isWildBattle && _opponentRuns && _field.canSwitchOut( true, 0 ) ) {
                 SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
                 snprintf( buffer, 99, GET_STRING( 171 ), _opponentTeam[ 0 ].m_boxdata.m_name );
@@ -256,7 +257,7 @@ namespace BATTLE {
 
             _battleUI.resetLog( );
 
-            for( u8 i = 0; i < ( _policy.m_mode == SINGLE ? 1 : 2 ); ++i ) {
+            for( u8 i = 0; i < getBattlingPKMNCount( _policy.m_mode ); ++i ) {
                 moves[ field::OPPONENT_SIDE ][ i ] = getAIMove( i );
             }
 
@@ -289,7 +290,7 @@ namespace BATTLE {
             // Sort moves
             std::vector<battleMoveSelection> selection = std::vector<battleMoveSelection>( );
             for( u8 i = 0; i < 2; ++i )
-                for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+                for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
                     // Check for pursuit
                     if( moves[ i ][ j ].m_type == ATTACK && moves[ i ][ j ].m_param == M_PURSUIT )
                         [[unlikely]] {
@@ -457,7 +458,7 @@ namespace BATTLE {
         }
 
         for( u8 i = u8( _isWildBattle ); i < 2; ++i )
-            for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
                 if( ( i && _playerTeamSize <= j ) || ( !i && _opponentTeamSize <= j ) ) {
                     _field.setSlot( !i, j, nullptr );
                     continue;
@@ -469,7 +470,7 @@ namespace BATTLE {
         _field.init( &_battleUI );
 
         for( u8 i = 0; i < 2; ++i )
-            for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
                 if( ( i && _playerTeamSize <= j ) || ( !i && _opponentTeamSize <= j ) ) {
                     continue;
                 }
@@ -495,8 +496,8 @@ namespace BATTLE {
             }
         }
 
-        if( _policy.m_mode == DOUBLE ) {
-            // User needs to choose / confirm target (TODO)
+        if( getBattlingPKMNCount( _policy.m_mode ) == 2 ) {
+            // User needs to choose / confirm target
             u8   possibleTargets = 0;
             u8   initialSel      = 0;
             bool hasChoice       = true;
@@ -665,16 +666,16 @@ namespace BATTLE {
         case 1: { // Choose pkmn
             SOUND::playSoundEffect( SFX_CHOOSE );
 
-            STS::partyScreen pt
-                = STS::partyScreen( _playerTeam, _playerTeamSize, false, false, false, 1, false,
-                                    false, false, true, 1 + u8( _policy.m_mode ), p_slot );
+            STS::partyScreen pt = STS::partyScreen(
+                _playerTeam, _playerTeamSize, false, false, false, 1, false, false, false, true,
+                getBattlingPKMNCount( _policy.m_mode ), p_slot );
 
             auto r = pt.run( p_slot );
 
             _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
             for( u8 i2 = 0; i2 < 2; ++i2 )
-                for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                     auto st = _field.getSlotStatus( i2, j2 );
                     if( st == slot::status::NORMAL ) {
                         _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
@@ -728,7 +729,7 @@ namespace BATTLE {
             _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
             for( u8 i2 = 0; i2 < 2; ++i2 )
-                for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                     auto st = _field.getSlotStatus( i2, j2 );
                     if( st == slot::status::NORMAL ) {
                         _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
@@ -783,7 +784,7 @@ namespace BATTLE {
                 _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
                 for( u8 i2 = 0; i2 < 2; ++i2 )
-                    for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                    for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                         auto st = _field.getSlotStatus( i2, j2 );
                         if( st == slot::status::NORMAL ) {
                             _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
@@ -888,7 +889,7 @@ namespace BATTLE {
     }
 
     u8 battle::getNextAIPokemon( ) const {
-        for( u8 i = u8( _policy.m_mode ) + 1; i < _opponentTeamSize; ++i ) {
+        for( u8 i = getBattlingPKMNCount( _policy.m_mode ) + 1; i < _opponentTeamSize; ++i ) {
             if( _opponentTeam[ i ].canBattle( ) ) { return i; }
         }
         return 255;
@@ -1528,7 +1529,7 @@ namespace BATTLE {
 
     void battle::checkAndRefillBattleSpots( slot::status p_checkType ) {
         for( u8 i = 0; i < 2; ++i )
-            for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
                 if( _field.getSlotStatus( i, j ) == p_checkType ) {
                     if( i && !_isWildBattle ) {
                         // AI chooses a next pkmn
@@ -1546,7 +1547,7 @@ namespace BATTLE {
 
                         STS::partyScreen pt = STS::partyScreen(
                             _playerTeam, _playerTeamSize, false, false, false, 1, false, false,
-                            false, false, 1 + u8( _policy.m_mode ), j );
+                            false, false, getBattlingPKMNCount( _policy.m_mode ), j );
 
                         auto res = pt.run( j );
 
@@ -1559,7 +1560,7 @@ namespace BATTLE {
                         _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
                         for( u8 i2 = 0; i2 < 2; ++i2 )
-                            for( u8 j2 = 0; j2 <= u8( _policy.m_mode ); ++j2 ) {
+                            for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                                 if( i == i2 && j == j2 ) { continue; }
                                 _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
                             }
@@ -1817,7 +1818,7 @@ namespace BATTLE {
         if( !_policy.m_distributeEXP ) { return; }
 
         char buffer[ 100 ];
-        for( u8 j = 0; j <= u8( _policy.m_mode ); ++j ) {
+        for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
             if( _field.getSlotStatus( true, j ) == slot::status::FAINTED ) {
                 if( _yieldEXP[ j ].empty( ) ) { continue; } // already distributed
 
@@ -1892,7 +1893,7 @@ namespace BATTLE {
                                     _battleUI.log( buffer );
                                 }
                             }
-                            if( i <= u8( _policy.m_mode ) ) {
+                            if( i < getBattlingPKMNCount( _policy.m_mode ) ) {
                                 // update battleUI
                                 _battleUI.updatePkmnStats( false, i, _field.getPkmn( false, i ),
                                                            true );
