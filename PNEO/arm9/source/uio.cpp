@@ -6,7 +6,7 @@ file        : uio.cpp
 author      : Philip Wellnitz
 description : User IO
 
-Copyright (C) 2012 - 2021
+Copyright (C) 2012 - 2022
 Philip Wellnitz
 
 This file is part of Pokémon neo.

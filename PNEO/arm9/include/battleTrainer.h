@@ -6,7 +6,7 @@ file        : battleTrainer.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2021
+Copyright (C) 2012 - 2022
 Philip Wellnitz
 
 This file is part of Pokémon neo.

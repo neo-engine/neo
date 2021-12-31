@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Functionality for parsing game save files
 
-    Copyright (C) 2012 - 2021
+    Copyright (C) 2012 - 2022
     Philip Wellnitz
 
     This file is part of Pokémon neo.

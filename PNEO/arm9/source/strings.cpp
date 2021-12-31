@@ -6,7 +6,7 @@ file        : strings.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2021
+Copyright (C) 2012 - 2022
 Philip Wellnitz
 
 tHis file is part of Pokémon neo.
