@@ -425,7 +425,7 @@ namespace SPX {
 
             for( u8 i = 0; i < 8; ++i ) {
                 if( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << i ) ) {
-                    tileCnt = IO::loadSprite( ( "ba/b" + std::to_string( i + 1 ) ).c_str( ), i, i,
+                    tileCnt = IO::loadSprite( ( "BA/b" + std::to_string( i + 1 ) ).c_str( ), i, i,
                                               tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
                                               false, false, false, OBJPRIORITY_0, true );
                 }
@@ -444,12 +444,12 @@ namespace SPX {
 
             for( u8 i = 0; i < 7; ++i ) {
                 if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << ( 7 + i ) ) ) {
-                    tileCnt = IO::loadSprite( ( "ba/s" + std::to_string( i + 1 ) + "2" ).c_str( ),
+                    tileCnt = IO::loadSprite( ( "BA/s" + std::to_string( i + 1 ) + "2" ).c_str( ),
                                               i, i, tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
                                               false, false, false, OBJPRIORITY_0, true );
 
                 } else if( SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges & ( 1 << i ) ) {
-                    tileCnt = IO::loadSprite( ( "ba/s" + std::to_string( i + 1 ) + "1" ).c_str( ),
+                    tileCnt = IO::loadSprite( ( "BA/s" + std::to_string( i + 1 ) + "1" ).c_str( ),
                                               i, i, tileCnt, spos[ i ][ 0 ], spos[ i ][ 1 ], 64, 64,
                                               false, false, false, OBJPRIORITY_0, true );
                 }

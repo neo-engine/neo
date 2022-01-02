@@ -1278,7 +1278,7 @@ namespace MAP {
                             ? !( rand( ) & 127 )
                             : !( rand( ) & 2047 );
         bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
-            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+               BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
         if( luckyenc ) {
             SOUND::playBGM( MOD_BATTLE_WILD_ALT );
@@ -3204,13 +3204,13 @@ namespace MAP {
                          false, OBJPRIORITY_1, false );
 
         if( p_type == 0 ) { // Hoenn badge
-            IO::loadSpriteB( ( "ba/b" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
+            IO::loadSpriteB( ( "BA/b" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
                              SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
                              false );
             SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = p_badge;
             SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= ( 1 << ( p_badge - 1 ) );
         } else if( p_type == 1 ) { // Frontier symbol
-            IO::loadSpriteB( ( "ba/s" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
+            IO::loadSpriteB( ( "BA/s" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
                              SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
                              false );
 
