@@ -462,8 +462,8 @@ namespace SAVE {
 
         SAV.getActiveFile( ).m_currentMap = 10;
         SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
-            { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
-            u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
+                { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+                u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
         SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
         IO::clearScreen( true, true, true );
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
@@ -490,23 +490,25 @@ namespace SAVE {
                                           1 - SAV.getActiveFile( ).m_appearance );
             SAV.getActiveFile( ).m_currentMap = 10;
             SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
-                { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
-                u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
+                    { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+                    u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
             SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
 
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
+            SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_POKE_RADAR, 1 );
+            SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_EXP_ALL, 1 );
+            SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_SUPER_ROD, 1 );
             SAV.getActiveFile( ).m_currentMap     = 10;
             SAV.getActiveFile( ).m_registeredItem = I_MACH_BIKE;
             for( u8 i = 10; i; --i ) {
                 SOUND::setVolume( 0x10 * i );
                 swiWaitForVBlank( );
             }
-            SAVE::SAV.getActiveFile( ).m_initGameItemCount  = 4;
+            // at most 4 init game items
+            SAVE::SAV.getActiveFile( ).m_initGameItemCount  = 2;
             SAVE::SAV.getActiveFile( ).m_initGameItems[ 0 ] = I_WISHING_CHARM;
             SAVE::SAV.getActiveFile( ).m_initGameItems[ 1 ] = I_SHINY_CHARM;
-            SAVE::SAV.getActiveFile( ).m_initGameItems[ 2 ] = I_EXP_ALL;
-            SAVE::SAV.getActiveFile( ).m_initGameItems[ 3 ] = I_SUPER_ROD;
 
             return true;
         default: SAV.getActiveFile( ).m_gameType = UNUSED; return false;

@@ -948,13 +948,14 @@ namespace MAP {
                     break;
                 }
                 case 5: {
+                    // At most 4 init game items
                     if( par2 <= 4 ) [[likely]] {
-                        par2++;
-                        registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par2 - 1 ];
+                        registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par2 ];
                     } else {
                         registers[ 0 ] = 0;
                         break;
                     }
+                    // remove first item from list of items yet to be handed out
                     for( u8 i = par2; i < SAVE::SAV.getActiveFile( ).m_initGameItemCount; ++i ) {
                         if( i < 4 ) [[likely]] {
                             SAVE::SAV.getActiveFile( ).m_initGameItems[ i ]
@@ -986,7 +987,7 @@ namespace MAP {
                 case 10: {
                     IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
                     registers[ 0 ]   = cb.getResult( GET_MAP_STRING( choiceBoxMessage ),
-                                                   style( choiceBoxMsgType ), choiceBoxItems );
+                                                     style( choiceBoxMsgType ), choiceBoxItems );
                     registers[ 1 ]   = choiceBoxPL[ registers[ 0 ] ];
                     NAV::init( );
                     break;
@@ -1715,7 +1716,7 @@ namespace MAP {
                                     ? !( rand( ) & 127 )
                                     : !( rand( ) & 2047 );
                 bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
-                    BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+                       BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
                 if( luckyenc ) {
                     SOUND::playBGM( MOD_BATTLE_WILD_ALT );
@@ -1948,7 +1949,7 @@ namespace MAP {
                         // Make player choose berry
                         SOUND::dimVolume( );
                         BAG::bagViewer bv  = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                                                            BAG::bagViewer::CHOOSE_BERRY );
+                                                             BAG::bagViewer::CHOOSE_BERRY );
                         u16            itm = bv.getItem( true );
 
                         FADE_TOP_DARK( );
