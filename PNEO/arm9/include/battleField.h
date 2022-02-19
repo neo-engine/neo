@@ -219,7 +219,7 @@ namespace BATTLE {
         }
 
         constexpr bool setStatusCondition( bool p_opponent, u8 p_slot, u8 p_status,
-                                           u8 p_duration = 255 ) {
+                                           u8 p_duration = 255, bool p_force = false ) {
 
             auto pkmn = getPkmn( p_opponent, p_slot );
             if( pkmn == nullptr ) [[unlikely]] { return false; }
@@ -231,7 +231,7 @@ namespace BATTLE {
             }
 
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setStatusCondition(
-                p_slot, p_status, p_duration );
+                p_slot, p_status, p_duration, p_force );
         }
 
         /*
@@ -666,8 +666,13 @@ namespace BATTLE {
         /*
          * @brief: pokemon uses move with the given moveid. Returns false if the move
          * failed (e.g. due to confusion)
+         * @returns: MOVE_SUCCESS on success, MOVE_FAIL on failure;
+         * MOVE_FAIL_NO_PP if no pp shall be deduced
          */
-        bool useMove( battleUI* p_ui, battleMove p_move );
+        u8                  useMove( battleUI* p_ui, battleMove p_move );
+        static constexpr u8 MOVE_FAIL_NO_PP = 2;
+        static constexpr u8 MOVE_FAIL = 1;
+        static constexpr u8 MOVE_SUCCESS = 0;
 
         /*
          * @brief: Checks whether the pokemon can use an item (from the bag or hold).

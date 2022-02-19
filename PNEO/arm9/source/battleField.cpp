@@ -863,7 +863,7 @@ namespace BATTLE {
                     p_ui->logAbility( pkmn, p_opponent );
                     boosts bt = boosts( );
                     bt.setBoost( ATK, -1 );
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         if( getPkmn( !p_opponent, i ) == nullptr ) { continue; }
                         auto res = addBoosts( !p_opponent, i, bt );
                         p_ui->logBoosts( getPkmn( !p_opponent, i ), !p_opponent, i, bt, res );
@@ -875,7 +875,7 @@ namespace BATTLE {
                     boosts bt = boosts( );
 
                     u16 def = 0, sdef = 0;
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         def += getStat( !p_opponent, i, DEF );
                         sdef += getStat( !p_opponent, i, SDEF );
                     }
@@ -966,7 +966,7 @@ namespace BATTLE {
                 case A_ANTICIPATION: {
                     p_ui->logAbility( pkmn, p_opponent );
                     bool warn = false;
-                    for( u8 i = 0; !warn && i < 2; ++i ) {
+                    for( u8 i = 0; !warn && i < getBattlingPKMNCount( _mode ); ++i ) {
                         auto tmp = getPkmn( !p_opponent, i );
                         if( tmp == nullptr ) { continue; }
                         for( u8 j = 0; j < 4; ++j ) {
@@ -994,7 +994,7 @@ namespace BATTLE {
                 case A_FOREWARN: {
                     p_ui->logAbility( pkmn, p_opponent );
                     std::vector<std::pair<u8, u16>> moves = std::vector<std::pair<u8, u16>>( );
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         auto tmp = getPkmn( !p_opponent, i );
                         if( tmp == nullptr ) { continue; }
                         for( u8 j = 0; j < 4; ++j ) {
@@ -1012,7 +1012,7 @@ namespace BATTLE {
                 case A_FRISK: {
                     std::vector<u16> itms = std::vector<u16>( );
 
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         auto tmp = getPkmn( !p_opponent, i );
                         if( tmp == nullptr ) { continue; }
                         if( tmp->getItem( ) ) { itms.push_back( tmp->getItem( ) ); }
@@ -1026,7 +1026,7 @@ namespace BATTLE {
 
                 case A_SCREEN_CLEANER: {
                     p_ui->logAbility( pkmn, p_opponent );
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         _sides[ i ].removeSideCondition(
                             p_ui, sideCondition( LIGHTSCREEN | REFLECT | AURORAVEIL ) );
                     }
@@ -1112,7 +1112,7 @@ namespace BATTLE {
         bool supprA = suppressesAbilities( );
         if( !supprA ) {
             for( u8 i = 0; i < 2; ++i ) {
-                for( u8 j = 0; j < 2; ++j ) {
+                for( u8 j = 0; j < getBattlingPKMNCount( _mode ); ++j ) {
                     auto pkmn = getPkmn( i, j );
                     if( pkmn == nullptr || supprA ) { continue; }
 
@@ -1228,7 +1228,7 @@ namespace BATTLE {
 
         // volatile status
         for( u8 i = 0; i < 2; ++i ) {
-            for( u8 j = 0; j < 2; ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _mode ); ++j ) {
                 auto pkmn = getPkmn( i, j );
                 if( pkmn == nullptr || supprA ) { continue; }
 
@@ -1304,7 +1304,7 @@ namespace BATTLE {
         // status conditions
 
         for( u8 i = 0; i < 2; ++i ) {
-            for( u8 j = 0; j < 2; ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _mode ); ++j ) {
                 auto pkmn = getPkmn( i, j );
                 if( pkmn == nullptr ) { continue; }
 
@@ -1312,7 +1312,7 @@ namespace BATTLE {
 
                 if( hasStatusCondition( i, j, SLEEP ) && !supprA ) {
                     for( u8 i2 = 0; i2 < 2; ++i2 ) {
-                        for( u8 j2 = 0; j2 < 2; ++j2 ) {
+                        for( u8 j2 = 0; j2 < getBattlingPKMNCount( _mode ); ++j2 ) {
                             if( i2 == i && j2 == j ) { continue; }
                             auto p2 = getPkmn( i2, j2 );
                             if( p2 == nullptr ) { continue; }
@@ -1359,7 +1359,7 @@ namespace BATTLE {
 
         // items TODO: add messages
         for( u8 i = 0; i < 2; ++i ) {
-            for( u8 j = 0; j < 2; ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _mode ); ++j ) {
                 auto pkmn = getPkmn( i, j );
                 if( pkmn == nullptr ) { continue; }
                 if( !canUseItem( i, j ) ) { continue; }
@@ -1429,7 +1429,7 @@ namespace BATTLE {
 
         if( !suppressesAbilities( ) ) {
             for( u8 i = 0; i < 2; ++i ) {
-                for( u8 j = 0; j < 2; ++j ) {
+                for( u8 j = 0; j < getBattlingPKMNCount( _mode ); ++j ) {
                     auto pkmn = getPkmn( i, j );
                     if( pkmn == nullptr ) { continue; }
 
@@ -1487,7 +1487,7 @@ namespace BATTLE {
         bool supprA = suppressesAbilities( );
 
         for( u8 i = 0; i < 2; ++i ) {
-            for( u8 j = 0; j < 2; ++j ) {
+            for( u8 j = 0; j < getBattlingPKMNCount( _mode ); ++j ) {
                 auto pkmn = getPkmn( i, j );
                 if( pkmn == nullptr ) { continue; }
                 auto volst = getVolatileStatus( i, j );
@@ -1799,14 +1799,14 @@ namespace BATTLE {
                     }
                     [[fallthrough]];
                 case MOVE::ALL_FOES:
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         if( getPkmn( !m.m_user.first, i ) != nullptr ) {
                             bm.m_target.push_back( fieldPosition( !m.m_user.first, i ) );
                         }
                     }
                     break;
                 case MOVE::ALL_ALLIES:
-                    for( u8 i = 0; i < 2; ++i ) {
+                    for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         if( getPkmn( m.m_user.first, i ) != nullptr ) {
                             bm.m_target.push_back( fieldPosition( m.m_user.first, i ) );
                         }
@@ -2414,7 +2414,7 @@ namespace BATTLE {
         }
     }
 
-    bool field::useMove( battleUI* p_ui, battleMove p_move ) {
+    u8 field::useMove( battleUI* p_ui, battleMove p_move ) {
         char buffer[ 100 ];
         bool opponent = p_move.m_user.first;
         u8   slot     = p_move.m_user.second;
@@ -2426,14 +2426,14 @@ namespace BATTLE {
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
-            return false;
+            return MOVE_FAIL;
         }
         if( p_move.m_param == M_SHELL_TRAP && ( volst & SHELLTRAP ) ) [[unlikely]] {
             auto fmt = std::string( GET_STRING( 536 ) );
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
-            return false;
+            return MOVE_FAIL;
         }
 
         if( volst & RECHARGE ) [[unlikely]] {
@@ -2444,7 +2444,7 @@ namespace BATTLE {
 
             removeVolatileStatus( p_ui, opponent, slot, RECHARGE );
             removeLockedMove( opponent, slot );
-            return false;
+            return MOVE_FAIL_NO_PP;
         }
 
         if( volst & FLINCH ) [[unlikely]] {
@@ -2452,7 +2452,7 @@ namespace BATTLE {
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
-            return false;
+            return MOVE_FAIL_NO_PP;
         }
 
         if( hasStatusCondition( opponent, slot, FROZEN ) ) [[unlikely]] {
@@ -2467,17 +2467,17 @@ namespace BATTLE {
                 p_ui->updatePkmnStats( opponent, slot, getPkmn( opponent, slot ) );
             } else {
                 p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot, FROZEN );
-                return false;
+                return MOVE_FAIL_NO_PP;
             }
         }
 
         if( u8 slp = hasStatusCondition( opponent, slot, SLEEP ); slp ) {
-            if( --slp ) {
+            if( slp > 1 ) {
                 // pkmn continues to sleep
                 p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot, SLEEP );
-                setStatusCondition( opponent, slot, SLEEP, slp );
-
-                if( !( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) ) { return false; }
+                // force the sleep counter to decrease
+                setStatusCondition( opponent, slot, SLEEP, slp - 1, true );
+                if( !( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) ) { return MOVE_FAIL_NO_PP; }
             } else {
                 removeStatusCondition( opponent, slot );
                 auto fmt = std::string( GET_STRING( 300 ) );
@@ -2494,7 +2494,7 @@ namespace BATTLE {
                           MOVE::getMoveName( p_move.m_param ).c_str( ) );
                 p_ui->log( buffer );
                 p_ui->log( GET_STRING( 304 ) );
-                return false;
+                return MOVE_FAIL;
             }
         }
 
@@ -2502,7 +2502,7 @@ namespace BATTLE {
             if( rand( ) % 100 < 25 ) {
                 p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot,
                                               PARALYSIS );
-                return false;
+                return MOVE_FAIL_NO_PP;
             }
         }
 
@@ -2521,7 +2521,7 @@ namespace BATTLE {
                 if( rand( ) % 300 < 100 ) {
                     confusionSelfDamage( p_ui, opponent, slot );
                     p_ui->log( GET_STRING( 295 ) );
-                    return false;
+                    return MOVE_FAIL_NO_PP;
                 }
             } else {
                 auto fmt = std::string( GET_STRING( 294 ) );
@@ -2534,12 +2534,12 @@ namespace BATTLE {
 
         if( ( volst & HEALBLOCK ) && ( p_move.m_moveData.m_flags & MOVE::HEAL ) ) [[unlikely]] {
             // TODO: this may be wrong
-            return false;
+            return MOVE_FAIL;
         }
 
         if( _pseudoWeatherTimer[ 4 ] && ( p_move.m_moveData.m_flags & MOVE::GRAVITY ) )
             [[unlikely]] {
-            return false;
+            return MOVE_FAIL;
         }
 
         if( volst & ATTRACT ) [[unlikely]] {
@@ -2548,11 +2548,11 @@ namespace BATTLE {
                 snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
-                return false;
+                return MOVE_FAIL_NO_PP;
             }
         }
 
-        return true;
+        return MOVE_SUCCESS;
     }
 
     bool field::moveMisses( battleUI* p_ui, battleMove p_move, fieldPosition p_target,
@@ -3723,9 +3723,12 @@ namespace BATTLE {
         if( getSlotStatus( opponent, slot ) != slot::status::NORMAL ) { return; }
 
         // Check if the move fails
-        if( !useMove( p_ui, p_move ) ) {
+        if( u8 err = useMove( p_ui, p_move ); err != MOVE_SUCCESS ) {
             // Move failed (e.g. due to confusion, sleep etc.
-            deducePP( opponent, slot, p_move.m_param );
+            if( err != MOVE_FAIL_NO_PP ) {
+                // don't reduce pp for asleep or frozen pkmn
+                deducePP( opponent, slot, p_move.m_param );
+            }
 
             if( slotc & MOVECHARGE ) { // Move is already charged
                 removeVolatileStatus(

@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BATTLE {
     void side::age( battleUI* p_ui ) {
+        // TODO: only check for first position in single battle
         for( u8 i = 0; i < 2; ++i ) { _slots[ i ].age( p_ui ); }
 
         for( u8 i = 0; i < MAX_SIDE_CONDITIONS; ++i ) {

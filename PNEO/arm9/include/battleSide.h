@@ -206,8 +206,9 @@ namespace BATTLE {
             return _slots[ p_slot ].addVolatileStatus( p_ui, p_volatileStatus, p_duration );
         }
 
-        constexpr bool setStatusCondition( u8 p_slot, u8 p_status, u8 p_duration = 255 ) {
-            return _slots[ p_slot ].setStatusCondition( p_status, p_duration );
+        constexpr bool setStatusCondition( u8 p_slot, u8 p_status, u8 p_duration = 255,
+                                           bool p_force = false ) {
+            return _slots[ p_slot ].setStatusCondition( p_status, p_duration, p_force );
         }
 
         /*
@@ -414,14 +415,6 @@ namespace BATTLE {
         }
 
         /*
-         * @brief: pokemon uses move with the given moveid. Returns false if the move
-         * failed (e.g. due to confusion)
-         */
-        inline bool useMove( battleUI* p_ui, u8 p_slot, u16 p_moveId ) {
-            return _slots[ p_slot ].useMove( p_ui, p_moveId );
-        }
-
-        /*
          * @brief: Checks whether the pokemon can use an item (from the bag).
          */
         constexpr bool canUseItem( u8 p_slot, bool p_allowAbilities = true ) {
@@ -456,7 +449,6 @@ namespace BATTLE {
         inline u16 getWeight( u8 p_slot, bool p_allowAbilities = true ) {
             return _slots[ p_slot ].getWeight( p_allowAbilities );
         }
-
 
         /*
          * @brief: returns whether the specified pkmn currently touches the ground.

@@ -312,11 +312,12 @@ namespace BATTLE {
             return _boosts;
         }
 
-        constexpr bool setStatusCondition( u8 p_status, u8 p_duration = 255 ) {
+        constexpr bool setStatusCondition( u8 p_status, u8 p_duration = 255,
+                                           bool p_force = false ) {
             auto pkmn = getPkmn( );
             if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return false; }
 
-            if( pkmn->m_statusint ) { return false; }
+            if( !p_force && pkmn->m_statusint ) { return false; }
 
             switch( p_status ) {
             case SLEEP:
@@ -823,12 +824,6 @@ namespace BATTLE {
             if( _pokemon == nullptr ) [[unlikely]] { return NO_OP_SELECTION; }
             return _lockedMove;
         }
-
-        /*
-         * @brief: pokemon uses move with the given moveid. Returns false if the move
-         * failed (e.g. due to confusion)
-         */
-        bool useMove( battleUI* p_ui, u16 p_moveId, MOVE::moveData* p_mdata = nullptr );
 
         /*
          * @brief: Checks whether the pokemon can use a held item.

@@ -889,7 +889,7 @@ namespace BATTLE {
     }
 
     u8 battle::getNextAIPokemon( ) const {
-        for( u8 i = getBattlingPKMNCount( _policy.m_mode ) + 1; i < _opponentTeamSize; ++i ) {
+        for( u8 i = getBattlingPKMNCount( _policy.m_mode ); i < _opponentTeamSize; ++i ) {
             if( _opponentTeam[ i ].canBattle( ) ) { return i; }
         }
         return 255;
@@ -1178,6 +1178,7 @@ namespace BATTLE {
 
         // OPPONENT
         pkmnCnt = 0;
+
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
             if( _opponentTeam[ i ].canBattle( ) ) { pkmnCnt++; }
         }
@@ -1267,16 +1268,16 @@ namespace BATTLE {
 
                                 bool canUse[ 4 ] = { 1, 1, 1, 1 };
                                 u8   rs          = cb.getResult(
-                                    [ & ]( u8 ) {
+                                               [ & ]( u8 ) {
                                         return _battleUI.showAttackSelection( &_playerTeam[ i ],
-                                                                              canUse, false );
-                                    },
-                                    [ & ]( u8 p_selection ) {
+                                                                                         canUse, false );
+                                               },
+                                               [ & ]( u8 p_selection ) {
                                         curSel = p_selection;
                                         _battleUI.showAttackSelection( &_playerTeam[ i ], canUse,
-                                                                       false, curSel, false );
-                                    },
-                                    curSel );
+                                                                                  false, curSel, false );
+                                               },
+                                               curSel );
 
                                 if( rs < 4 ) {
                                     return rs;
