@@ -66,7 +66,7 @@ namespace BATTLE {
         _isWildBattle = false;
         _AILevel      = _opponent.m_data.m_AILevel;
 
-        _field    = field( _policy.m_mode, p_policy.m_weather );
+        _field    = field( _policy.m_mode, false, p_policy.m_weather );
         _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
                               _opponent.m_data.m_battleBG, _policy.m_mode, false );
 
@@ -148,7 +148,7 @@ namespace BATTLE {
         _isWildBattle = true;
 
         // Initialize the field with the wild pkmn
-        _field    = field( _policy.m_mode, p_policy.m_weather, NO_PSEUDO_WEATHER, NO_TERRAIN );
+        _field = field( _policy.m_mode, true, p_policy.m_weather, NO_PSEUDO_WEATHER, NO_TERRAIN );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
                               p_background, _policy.m_mode, true );
 

@@ -67,11 +67,12 @@ seeds / when enter terrain
    */
 
 namespace BATTLE {
-    field::field( battleMode p_battleMode, weather p_initialWeather,
+    field::field( battleMode p_battleMode, bool p_isWildBattle, weather p_initialWeather,
                   pseudoWeather p_initialPseudoWeather, terrain p_initialTerrain ) {
         _mode         = p_battleMode;
         _weather      = p_initialWeather;
         _weatherTimer = u8( -1 ); // Initial weather stays forever
+        _isWildBattle = p_isWildBattle;
 
         std::memset( _pseudoWeatherTimer, 0, sizeof( _pseudoWeatherTimer ) );
         for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
@@ -3984,6 +3985,12 @@ namespace BATTLE {
 
                 if( p_move.m_moveData.m_flags & MOVE::FORCESWITCH ) {
                     // move forces switch out
+                    if( _isWildBattle && p_move.m_target[ i ].first != opponent ) {
+                        // recall opposing pkmn to end battle
+                        recallPokemon( p_ui, OPPONENT_SIDE, 0 );
+                        break;
+                    }
+
                     // TODO: should only work if opponent has > 1 pkmn that can battle
                     recallPokemon( p_ui, p_move.m_target[ i ].first, p_move.m_target[ i ].second );
                     break;

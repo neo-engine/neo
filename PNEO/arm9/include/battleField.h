@@ -65,10 +65,12 @@ namespace BATTLE {
 
         side _sides[ 2 ];
 
+        bool       _isWildBattle;
         battleMode _mode;
 
       public:
-        field( battleMode p_battleMode = SINGLE, weather p_initialWeather = NO_WEATHER,
+        field( battleMode p_battleMode = SINGLE, bool p_isWildBattle = false,
+               weather       p_initialWeather       = NO_WEATHER,
                pseudoWeather p_initialPseudoWeather = NO_PSEUDO_WEATHER,
                terrain       p_initialTerrain       = NO_TERRAIN );
 
@@ -671,8 +673,8 @@ namespace BATTLE {
          */
         u8                  useMove( battleUI* p_ui, battleMove p_move );
         static constexpr u8 MOVE_FAIL_NO_PP = 2;
-        static constexpr u8 MOVE_FAIL = 1;
-        static constexpr u8 MOVE_SUCCESS = 0;
+        static constexpr u8 MOVE_FAIL       = 1;
+        static constexpr u8 MOVE_SUCCESS    = 0;
 
         /*
          * @brief: Checks whether the pokemon can use an item (from the bag or hold).
