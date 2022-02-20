@@ -934,5 +934,5 @@ constexpr int formeIdx( unsigned short p_pkmnIdx, unsigned char p_forme ) {
         case 2: return 266;
         }
     }
-    }
+}
 }
