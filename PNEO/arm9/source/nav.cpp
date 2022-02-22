@@ -640,7 +640,7 @@ namespace NAV {
     void useItemFromPlayer( u16 p_itemId, u16 p_amount ) {
         auto data = ITEM::getItemData( p_itemId );
         auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
-                                           BAG::toBagType( data.m_itemType ), p_itemId ) );
+                                            BAG::toBagType( data.m_itemType ), p_itemId ) );
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
         char buffer[ 100 ];
         auto iname = ITEM::getItemName( p_itemId );
@@ -662,7 +662,7 @@ namespace NAV {
     void takeItemFromPlayer( u16 p_itemId, u16 p_amount ) {
         auto data = ITEM::getItemData( p_itemId );
         auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
-                                           BAG::toBagType( data.m_itemType ), p_itemId ) );
+                                            BAG::toBagType( data.m_itemType ), p_itemId ) );
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
         char buffer[ 100 ];
         auto iname = ITEM::getItemName( p_itemId );
@@ -1573,16 +1573,16 @@ namespace NAV {
         }
         IO::yesNoBox yn;
         auto         conf = yn.getResult(
-            [ & ]( ) {
+                    [ & ]( ) {
                 auto tmpres = printYNMessage( 0, MSG_NORMAL, 253 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->printBreakingStringC( buffer, 40, 22, 256 - 80, true );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 return tmpres;
-            },
-            [ & ]( IO::yesNoBox::selection p_selection ) {
+                    },
+                    [ & ]( IO::yesNoBox::selection p_selection ) {
                 printYNMessage( 0, MSG_NORMAL, p_selection == IO::yesNoBox::NO );
-            } );
+                    } );
         if( conf == IO::yesNoBox::NO ) { return 0; }
         SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
         return res;
@@ -1900,7 +1900,8 @@ namespace NAV {
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
                 if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem, []( const char* ) {} );
+                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem,
+                               []( const char* p_msg ) { printMessage( p_msg ); } );
                     //  updateItems( );
                 } else {
                     printMessage( GET_STRING( 58 ) );
