@@ -41,6 +41,116 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     class mapDrawer {
       private:
+        enum tileBehavior : u8 {
+            BEH_NONE = 0x00,
+
+            BEH_GRASS      = 0x02,
+            BEH_LONG_GRASS = 0x03,
+
+            BEH_SAND_WITH_ENCOUNTER_AND_FISH = 0x06,
+
+            BEH_CAVE_WITH_ENCOUNTER = 0x08,
+
+            BEH_LADDER = 0x0A,
+
+            BEH_WATERFALL = 0x13,
+
+            BEH_SLIDE_ON_ICE = 0x20,
+
+            BEH_GRASS_UNDERWATER = 0x22,
+
+            BEH_GRASS_ASH = 0x24,
+
+            BEH_WARP_TELEPORT = 0x29,
+
+            BEH_BLOCK_RIGHT         = 0x30,
+            BEH_BLOCK_LEFT          = 0x31,
+            BEH_BLOCK_UP            = 0x32,
+            BEH_BLOCK_DOWN          = 0x33,
+            BEH_BLOCK_UP_DOWN_RIGHT = 0x34,
+            BEH_BLOCK_UP_DOWN_LEFT  = 0x35,
+            BEH_BLOCK_DOWN_RIGHT    = 0x36,
+            BEH_BLOCK_DOWN_LEFT     = 0x37,
+            BEH_JUMP_RIGHT          = 0x38,
+            BEH_JUMP_LEFT           = 0x39,
+            BEH_JUMP_UP             = 0x3A,
+            BEH_JUMP_DOWN           = 0x3B,
+
+            BEH_WALK_RIGHT     = 0x40,
+            BEH_WALK_LEFT      = 0x41,
+            BEH_WALK_UP        = 0x42,
+            BEH_WALK_DOWN      = 0x43,
+            BEH_SLIDE_RIGHT    = 0x44,
+            BEH_SLIDE_LEFT     = 0x45,
+            BEH_SLIDE_UP       = 0x46,
+            BEH_SLIDE_DOWN     = 0x47,
+            BEH_SLIDE_CONTINUE = 0x48,
+
+            BEH_RUN_RIGHT = 0x50,
+            BEH_RUN_LEFT  = 0x51,
+            BEH_RUN_UP    = 0x52,
+            BEH_RUN_DOWN  = 0x53,
+
+            BEH_WARP_CAVE_ENTRY    = 0x60,
+            BEH_WARP_NO_SPECIAL    = 0x61,
+            BEH_WARP_ON_WALK_RIGHT = 0x62,
+            BEH_WARP_ON_WALK_LEFT  = 0x63,
+            BEH_WARP_ON_WALK_UP    = 0x64,
+            BEH_WARP_ON_WALK_DOWN  = 0x65,
+            BEH_FALL_THROUGH       = 0x66, // fall through ground
+
+            BEH_WARP_NO_SPECIAL_2 = 0x68,
+            BEH_DOOR              = 0x69,
+
+            BEH_WARP_EMERGE_WATER   = 0x6C,
+            BEH_WARP_ON_WALK_DOWN_2 = 0x6D,
+            BEH_WARP_THEN_WALK_UP   = 0x6E,
+
+            BEH_PACIFIDLOG_LOG_VERTICAL_TOP     = 0x74,
+            BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM  = 0x75,
+            BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT  = 0x76,
+            BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT = 0x77,
+            BEH_FORRTREE_BRIDGE_BIKE_BELOW      = 0x78,
+
+            BEH_WALK_ONLY = 0xA0,
+
+            BEH_BLOCK_UP_DOWN    = 0xC0,
+            BEH_BLOCK_LEFT_RIGHT = 0xC1,
+
+            BEH_MUD_SLIDE
+            = 0xD0, // slide down player unless FASTBIKE_SPEED_NO_TILE_BREAK fast on bike
+
+            BEH_BREAKABLE_TILE                 = 0xD2,
+            BEH_BIKE_BRIDGE_VERTICAL           = 0xD3,
+            BEH_BIKE_BRIDGE_HORIZONTAL         = 0xD4,
+            BEH_BIKE_BRIDGE_VERTICAL_NO_JUMP   = 0xD5,
+            BEH_BIKE_BRIDGE_HORIZONTAL_NO_JUMP = 0xD6,
+            BEH_OBSTACLE                       = 0xD7,
+        };
+        enum moveDataType : u8 {
+            MVD_ANY    = 0x00,
+            MVD_NONE   = 0x01,
+            MVD_SURF   = 0x04,
+            MVD_SIT    = 0x0A,
+            MVD_WALK   = 0x0C,
+            MVD_BRIDGE = 0x3C,
+            MVD_BORDER = 0x3F,
+            // elevated if = 0 mod 4
+            // not passable if = 1 mod 4
+        };
+
+        static constexpr u8 FASTBIKE_SPEED_NO_TILE_BREAK
+            = 9; // min speed with bike to pass over breakable tiles
+
+        static constexpr u8 TBEH_ELEVATE_TOP_LAYER = 0x10;
+
+        static constexpr u16 TS6_ASH_GRASS_BLOCK  = 0x206;
+        static constexpr u16 TS7_ASH_GRASS_BLOCK  = 0x212;
+        static constexpr u16 BREAKABLE_TILE_BLOCK = 0x206;
+
+        static constexpr u8 WARP_TO_LAST_ENTRY     = 0xFF;
+        static constexpr u8 PIKACHU_IS_MIMIKYU_MOD = 0xFF;
+
         FILE* _currentBank = nullptr;
         FILE* _tileset     = nullptr;
         void  loadNewBank( u8 p_bank );
@@ -52,6 +162,7 @@ namespace MAP {
 
         mapSlice _slices[ 2 ][ 2 ]; //[x][y]
         u8       _curX, _curY;      // Current main slice from the _slices array
+#define CUR_SLICE _slices[ _curX ][ _curY ]
 
         s8   _weatherScrollX = 0;
         s8   _weatherScrollY = 0;
@@ -64,6 +175,17 @@ namespace MAP {
         std::map<position, u8> _tileAnimations;
 
         std::set<u16> _fixedMapObjects;
+
+        static constexpr u8 TRACER_CHARGED = 50;
+
+        u8       _tracerCharge         = 0; // steps since last usage, charged if >= TRACER_CHARGED
+        u16      _tracerPositions[ 9 ] = { 0 }; // 9x9 bit field for positions activated by tracer
+        u8       _tracerLucky          = 0;     // bitfield, tracer enc at ring i is lucky enc
+        position _tracerLastPos        = { 0, 0, 0 }; // last pos where tracer successfully used
+        u8       _tracerChain          = 0; // length of current tracer chain; 0 = no chain
+
+        u16 _tracerSpecies = 0; // current tracer pkmn species
+        u8  _tracerForme   = 0; // current tracer pkmn forme
 
         constexpr u16 dist( u16 p_globX1, u16 p_globY1, u16 p_globX2, u16 p_globY2 ) {
             return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
@@ -84,6 +206,57 @@ namespace MAP {
             _lastcol; // Column to be filled when extending the map to the left
 
         u16 _cx, _cy; // Cameras's pos
+
+        bool _playerIsFast = false;
+        s8   _fastBike     = false;
+
+        std::vector<std::function<void( u16 )>> _newLocationCallbacks
+            = std::vector<std::function<void( u16 )>>( ); // Called whenever player makes a step
+        std::vector<std::function<void( u8 )>> _newBankCallbacks
+            = std::vector<std::function<void( u8 )>>( ); // Called when a map bank was loaded
+        std::vector<std::function<void( moveMode )>> _newMoveModeCallbacks
+            = std::vector<std::function<void( moveMode )>>( ); // Called when the player's moveMode
+                                                               // changed
+        std::vector<std::function<void( mapWeather )>> _newWeatherCallbacks
+            = std::vector<std::function<void( mapWeather )>>( ); // Called when the map weather
+                                                                 // changed, flash
+                                                                 // excluded
+
+        /*
+         * @brief: Resets any existing chain.
+         */
+        void resetTracerChain( );
+
+        /*
+         * @brief: Initializes a new tracer chain.
+         */
+        void startTracerChain( );
+
+        static constexpr u8 NO_TRACER_PKMN = 255;
+        /*
+         * @brief: Returns the index of the tracer pkmn at the specified position.
+         * @returns: NO_TRACER_PKMN if no pkmn at the specified position, otherwise index
+         * 0 to 3
+         */
+        u8 getTracerPkmn( u16 p_globX, u16 p_globY );
+
+        /*
+         * @brief: Updates chain parameters when player as player takes a step in the
+         * specified direction
+         * @returns: true iff the chain continues.
+         */
+        bool updateTracerChain( direction p_dir );
+
+        /*
+         * @brief: Tries to continue the current tracer chain.
+         * @returns: true on success.
+         */
+        bool continueTracerChain( );
+
+        /*
+         * @brief: Shows rustling grass according to the current tracer state
+         */
+        void animateTracer( );
 
         /*
          * @brief: Updates the pkmn species etc following the player. Returns false on
@@ -147,20 +320,6 @@ namespace MAP {
         void constructAndAddNewMapObjects( const mapData& p_data, u8 p_mapX, u8 p_mapY );
 
         void loadMapObject( std::pair<u8, mapObject>& p_mapObject );
-
-        bool _playerIsFast;
-
-        std::vector<std::function<void( u16 )>> _newLocationCallbacks
-            = std::vector<std::function<void( u16 )>>( ); // Called whenever player makes a step
-        std::vector<std::function<void( u8 )>> _newBankCallbacks
-            = std::vector<std::function<void( u8 )>>( ); // Called when a map bank was loaded
-        std::vector<std::function<void( moveMode )>> _newMoveModeCallbacks
-            = std::vector<std::function<void( moveMode )>>( ); // Called when the player's moveMode
-                                                               // changed
-        std::vector<std::function<void( mapWeather )>> _newWeatherCallbacks
-            = std::vector<std::function<void( mapWeather )>>( ); // Called when the map weather
-                                                                 // changed, flash
-                                                                 // excluded
 
         void updatePlayer( );
 
@@ -231,6 +390,37 @@ namespace MAP {
             _tileset = nullptr;
         }
 
+        /*
+         * @brief: Returns if the tracer is charged.
+         */
+        inline bool tracerCharged( ) const {
+            return _tracerCharge >= TRACER_CHARGED;
+        }
+
+        /*
+         * @brief: Returns if tracer could be used at given pos (if it is additionally
+         * charged.)
+         */
+        bool tracerUsable( position p_position ) const {
+            if( currentData( ).m_mapType & MAP::INSIDE ) { return false; }
+
+            auto lstblock  = at( p_position.m_posX, p_position.m_posY );
+            u8   lstBehave = lstblock.m_bottombehave;
+
+            switch( lstBehave ) {
+                // Grass
+            case BEH_GRASS:
+            case BEH_GRASS_UNDERWATER:
+            case BEH_GRASS_ASH: return true;
+            default: return false;
+            }
+        }
+
+        /*
+         * @brief: Starts the tracer.
+         */
+        void useTracer( position p_position );
+
         direction getFollowPkmnDirection( ) const;
 
         inline mapWeather getWeather( ) const {
@@ -258,18 +448,13 @@ namespace MAP {
             u8   lstBehave = lstblock.m_bottombehave;
 
             switch( lstBehave ) {
-                // Long grass
-            case 0x03:
-                // ladder
-            case 0x0a:
-                //
-            case 0x74:
-            case 0x75:
-            case 0x76:
-            case 0x77:
-                return false;
-                // bridge in forrtree
-            case 0x78: return p_start.m_posZ <= 3;
+            case BEH_LONG_GRASS:
+            case BEH_LADDER:
+            case BEH_PACIFIDLOG_LOG_VERTICAL_TOP:
+            case BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM:
+            case BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT:
+            case BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT: return false;
+            case BEH_FORRTREE_BRIDGE_BIKE_BELOW: return p_start.m_posZ <= 3;
             default: break;
             }
 
@@ -286,10 +471,10 @@ namespace MAP {
             u8   lstBehave = lstblock.m_bottombehave;
 
             switch( lstBehave ) {
-            case 0xd3:
-            case 0xd4:
-            case 0xd5:
-            case 0xd6: return false;
+            case BEH_BIKE_BRIDGE_VERTICAL:
+            case BEH_BIKE_BRIDGE_HORIZONTAL:
+            case BEH_BIKE_BRIDGE_VERTICAL_NO_JUMP:
+            case BEH_BIKE_BRIDGE_HORIZONTAL_NO_JUMP: return false;
             default: break;
             }
 

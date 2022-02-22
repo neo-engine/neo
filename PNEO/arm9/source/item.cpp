@@ -118,7 +118,7 @@ namespace ITEM {
                 && p_pokemon.m_stats.m_curHP < p_pokemon.m_stats.m_maxHP ) {
                 p_pokemon.m_stats.m_curHP
                     = std::min( p_pokemon.m_stats.m_maxHP,
-                                ( u16 )( p_pokemon.m_stats.m_curHP + item.m_param1 ) );
+                                (u16) ( p_pokemon.m_stats.m_curHP + item.m_param1 ) );
                 p_pokemon.m_stats.m_curHP = (u16) std::min(
                     (u32) p_pokemon.m_stats.m_maxHP,
                     p_pokemon.m_stats.m_curHP
@@ -132,11 +132,11 @@ namespace ITEM {
                 && p_pokemon.m_stats.m_curHP < p_pokemon.m_stats.m_maxHP ) {
                 p_pokemon.m_stats.m_curHP
                     = std::min( p_pokemon.m_stats.m_maxHP,
-                                ( u16 )( p_pokemon.m_stats.m_curHP + item.m_param1 ) );
+                                (u16) ( p_pokemon.m_stats.m_curHP + item.m_param1 ) );
                 p_pokemon.m_stats.m_curHP
                     = std::min( p_pokemon.m_stats.m_maxHP,
-                                ( u16 )( p_pokemon.m_stats.m_curHP
-                                         + ( item.m_param2 * p_pokemon.m_stats.m_maxHP / 100 ) ) );
+                                (u16) ( p_pokemon.m_stats.m_curHP
+                                        + ( item.m_param2 * p_pokemon.m_stats.m_maxHP / 100 ) ) );
                 change = true;
             }
             if( p_pokemon.m_statusint ) {
@@ -197,7 +197,7 @@ namespace ITEM {
                     u8& tmp = p_pokemon.m_boxdata.m_curPP[ i ];
                     u8  mx  = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
                     change |= tmp < mx;
-                    tmp = std::min( mx, ( u8 )( tmp + item.m_param1 + item.m_param2 * mx / 100 ) );
+                    tmp = std::min( mx, (u8) ( tmp + item.m_param1 + item.m_param2 * mx / 100 ) );
                 }
             }
             return change;
@@ -211,7 +211,7 @@ namespace ITEM {
             }
             p_pokemon.m_boxdata.m_effortValues[ item.m_param1 ] = std::min(
                 (u8) item.m_param3,
-                ( u8 )( p_pokemon.m_boxdata.m_effortValues[ item.m_param1 ] + item.m_param2 ) );
+                (u8) ( p_pokemon.m_boxdata.m_effortValues[ item.m_param1 ] + item.m_param2 ) );
             p_pokemon.recalculateStats( );
             return true;
         }
@@ -235,10 +235,10 @@ namespace ITEM {
                     u8  oldmx = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
 
                     p_pokemon.PPupset(
-                        i, std::min( (u8) item.m_param2, ( u8 )( ppup + item.m_param1 ) ) );
+                        i, std::min( (u8) item.m_param2, (u8) ( ppup + item.m_param1 ) ) );
                     u8 mx = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
 
-                    tmp    = std::min( mx, ( u8 )( mx - oldmx + tmp ) );
+                    tmp    = std::min( mx, (u8) ( mx - oldmx + tmp ) );
                     change = true;
                 }
             }
@@ -289,6 +289,7 @@ namespace ITEM {
         return change;
     }
 
+    static constexpr u16 NO_TRACER_CHARGE = 695;
     bool use( const u16 p_itemId, std::function<void( const char* )> p_message, bool p_dryRun ) {
         char buffer[ 50 ];
         if( !p_dryRun ) {
@@ -297,6 +298,24 @@ namespace ITEM {
             }
         }
         switch( p_itemId ) {
+        case I_POKE_RADAR: {
+            bool tracerUsable
+                = MAP::curMap->tracerUsable( SAVE::SAV.getActiveFile( ).m_player.m_pos );
+            bool tracerCharged = MAP::curMap->tracerCharged( );
+            if( !p_dryRun ) {
+                if( !tracerCharged ) {
+                    p_message( GET_STRING( NO_TRACER_CHARGE ) );
+                    return false;
+                }
+                if( !tracerUsable ) {
+                    return false;
+                }
+                MAP::curMap->changeMoveMode( MAP::WALK );
+                MAP::curMap->useTracer( SAVE::SAV.getActiveFile( ).m_player.m_pos );
+                return true;
+            }
+            return tracerUsable;
+        }
         case I_REPEL:
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
@@ -439,6 +458,8 @@ namespace ITEM {
 
     bool isUsable( const u16 p_itemId ) {
         switch( p_itemId ) {
+        case I_POKE_RADAR:
+            return MAP::curMap->tracerUsable( SAVE::SAV.getActiveFile( ).m_player.m_pos );
         case I_REPEL:
         case I_SUPER_REPEL:
         case I_MAX_REPEL:
@@ -484,8 +505,6 @@ namespace ITEM {
         case I_SUPER_ROD:
             return MAP::curMap->canFish( SAVE::SAV.getActiveFile( ).m_player.m_pos,
                                          SAVE::SAV.getActiveFile( ).m_player.m_direction );
-        case I_POKE_RADAR:
-            // TODO
         case I_VS_SEEKER:
             // TODO
         case I_VS_RECORDER:

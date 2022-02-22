@@ -105,6 +105,17 @@ namespace MAP {
 
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
 
+    constexpr direction movement2Direction( u8 p_move ) {
+        switch( p_move ) {
+        case 0: return UP;
+        case 1: return DOWN;
+        case 2: return RIGHT;
+        case 3: return LEFT;
+
+        default: return DOWN;
+        }
+    }
+
     struct movement {
         direction m_direction;
         u8        m_frame;
@@ -139,6 +150,9 @@ namespace MAP {
         WALK_AROUND_SQUARE      = 23, // randomly walks around in a 3x3 square
         WALK_CONT_FOLLOW_OBJECT = 24, // walks along the edge of an object, touching w/ right hand
     };
+
+    direction getRandomLookDirection( moveMode p_movement );
+
     enum eventType : u8 {
         EVENT_NONE        = 0,
         EVENT_MESSAGE     = 1,
@@ -347,4 +361,6 @@ namespace MAP {
         return MAP::direction::RIGHT;
     }
 
+    constexpr auto WEATHER_BLEND = BLEND_ALPHA | BLEND_SRC_BG3 | BLEND_DST_BG0 | BLEND_DST_BG2
+                                   | BLEND_DST_BG1 | BLEND_DST_SPRITE;
 } // namespace MAP

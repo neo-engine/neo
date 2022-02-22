@@ -2144,4 +2144,76 @@ namespace MAP {
         }
     }
 
+    std::pair<bool, mapData::event::data> mapDrawer::getWarpData( u16 p_globX, u16 p_globY,
+                                                                  u8 p_z ) {
+        auto data = currentData( p_globX, p_globY );
+        p_globX %= SIZE;
+        p_globY %= SIZE;
+
+        for( u8 i = 0; i < data.m_eventCount; ++i ) {
+            if( data.m_events[ i ].m_type == EVENT_WARP && data.m_events[ i ].m_posX == p_globX
+                && data.m_events[ i ].m_posY == p_globY && data.m_events[ i ].m_posZ == p_z ) {
+                if( data.m_events[ i ].m_activateFlag
+                    && !SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                if( data.m_events[ i ].m_deactivateFlag
+                    && SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_deactivateFlag ) ) {
+                    continue;
+                }
+
+                return { true, data.m_events[ i ].m_data };
+            }
+        }
+        return { false, mapData::event::data( ) };
+    }
+
+    void mapDrawer::handleWarp( warpType p_type, warpPos p_source ) {
+        warpPos tg;
+        u16     curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16     cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16     curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+
+        auto wdata = getWarpData( curx, cury, curz );
+        curx %= SIZE;
+        cury %= SIZE;
+        if( !wdata.first ) { return; }
+
+        if( wdata.second.m_warp.m_warpType != NO_SPECIAL ) {
+            p_type = (warpType) wdata.second.m_warp.m_warpType;
+            if( wdata.second.m_warp.m_warpType == LAST_VISITED ) {
+                tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+            } else {
+                tg = warpPos(
+                    wdata.second.m_warp.m_bank,
+                    position( wdata.second.m_warp.m_mapX * SIZE + wdata.second.m_warp.m_posX,
+                              wdata.second.m_warp.m_mapY * SIZE + wdata.second.m_warp.m_posY,
+                              +wdata.second.m_warp.m_posZ ) );
+            }
+        }
+
+        if( tg.first == WARP_TO_LAST_ENTRY ) tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+        if( !tg.first && !tg.second.m_posY && !tg.second.m_posZ && !tg.second.m_posX ) return;
+
+        SAVE::SAV.getActiveFile( ).m_lastWarp = p_source;
+        warpPlayer( p_type, tg );
+    }
+
+    void mapDrawer::handleWarp( warpType p_type ) {
+        warpPos current = warpPos{ SAVE::SAV.getActiveFile( ).m_currentMap,
+                                   SAVE::SAV.getActiveFile( ).m_player.m_pos };
+        if( p_type == LAST_VISITED ) {
+            warpPos target = SAVE::SAV.getActiveFile( ).m_lastWarp;
+            if( !target.first && !target.second.m_posX && !target.second.m_posY
+                && !target.second.m_posZ )
+                return;
+            SAVE::SAV.getActiveFile( ).m_lastWarp = current;
+
+            warpPlayer( p_type, target );
+        } else {
+            handleWarp( p_type, current );
+        }
+    }
 } // namespace MAP
