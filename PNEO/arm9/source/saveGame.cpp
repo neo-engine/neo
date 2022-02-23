@@ -635,7 +635,7 @@ namespace SAVE {
             if( !m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
             mxlv = std::max( mxlv, s16( m_pkmnTeam[ i ].m_level ) );
         }
-        if( !mxlv || m_repelSteps ) return 0;
+        if( !mxlv ) return 0;
         mxlv = std::min( s16( 93 ), s16( mxlv + 6 ) );
         mxlv = std::min( s16( 5 * getBadgeCount( ) + 8 ), s16( mxlv + 0 ) );
 

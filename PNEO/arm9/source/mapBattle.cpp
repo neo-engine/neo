@@ -43,7 +43,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-#define DESQUID_LOG( _ ) \
+// #define DESQUID_LOG( _ ) \
     {}
 
 namespace MAP {
@@ -59,16 +59,29 @@ namespace MAP {
         u8 moveData = atom( p_globX, p_globY ).m_movedata;
         u8 behave   = at( p_globX, p_globY ).m_bottombehave;
 
-        if( SAVE::SAV.getActiveFile( ).m_repelSteps ) return;
+        if( _tracerChain && !tracerUsable( { p_globX, p_globY, 0 } ) ) {
+            resetTracerChain( true );
+        } else if( _tracerChain ) {
+            u8 tracerSlot = getTracerPkmn( p_globX, p_globY );
+
+            // tracer bypasses repel
+            if( tracerSlot != NO_TRACER_PKMN ) {
+                handleTracerPkmn( tracerSlot );
+                return;
+            }
+        }
+
+        if( SAVE::SAV.getActiveFile( ).m_repelSteps ) { return; }
         // handle Pkmn stuff
-        if( moveData == MVD_SURF && behave != BEH_WATERFALL )
+        if( moveData == MVD_SURF && behave != BEH_WATERFALL ) {
             handleWildPkmn( WATER );
-        else if( behave == BEH_GRASS || behave == BEH_GRASS_ASH || behave == BEH_GRASS_UNDERWATER
-                 || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
-                 || behave == BEH_CAVE_WITH_ENCOUNTER )
+        } else if( behave == BEH_GRASS || behave == BEH_GRASS_ASH || behave == BEH_GRASS_UNDERWATER
+                   || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
+                   || behave == BEH_CAVE_WITH_ENCOUNTER ) {
             handleWildPkmn( GRASS );
-        else if( behave == BEH_LONG_GRASS )
+        } else if( behave == BEH_LONG_GRASS ) {
             handleWildPkmn( HIGH_GRASS );
+        }
         //        else if( currentData( ).m_mapType & CAVE )
         //            handleWildPkmn( GRASS );
     }
@@ -212,14 +225,10 @@ namespace MAP {
                                       platform, plat2, battleBack, getBattlePolicy( true ) )
                           .start( );
 
-        // check if a tracer chain needs to be continued
         if( _tracerChain ) {
             if( ( result != BATTLE::battle::BATTLE_PLAYER_WON
-                  && result != BATTLE::battle::BATTLE_CAPTURE )
-                || !continueTracerChain( ) ) {
-                // chain breaks if player does not defeat or capture
-                // or if no new tracer spots can be generated.
-                resetTracerChain( true );
+                  && result != BATTLE::battle::BATTLE_CAPTURE ) ) {
+                resetTracerChain( );
             }
         }
 
@@ -237,6 +246,13 @@ namespace MAP {
         ANIMATE_MAP = true;
         DRAW_TIME   = true;
 
+        // check if a tracer chain needs to be continued
+        if( _tracerChain ) {
+            if( !continueTracerChain( ) ) {
+                // chain breaks if no new tracer spots can be generated.
+                resetTracerChain( true );
+            }
+        }
         return true;
     }
 
@@ -244,6 +260,7 @@ namespace MAP {
         if( !_tracerSpecies ) { return false; }
         u16 rn
             = rand( ) % ( 512 + 3 * SAVE::SAV.getActiveFile( ).m_options.m_encounterRateModifier );
+        rn %= 40;
         u8 level = getWildPkmnLevel( rn );
 
         bool luckyenc = tracerSlotLucky( p_tracerSlot );
@@ -381,13 +398,20 @@ namespace MAP {
 
         // compute tracer slot
         u16 slot = dist( p_globX, p_globY, _tracerLastPos.m_posX, _tracerLastPos.m_posY );
+
+#ifdef DESQUID_MORE
+        char buffer[ 100 ];
+        sprintf( buffer,
+                 "checking %hx for %hx: %hx;"
+                 "\nslot %hu = d( (%hx, %hx) - (%hx, %hx) )",
+                 _tracerPositions[ TRACER_AREA ], ( 1 << TRACER_AREA ),
+                 _tracerPositions[ TRACER_AREA ] & ( 1 << TRACER_AREA ), slot, p_globX, p_globY,
+                 _tracerLastPos.m_posX, _tracerLastPos.m_posY );
+        DESQUID_LOG( buffer );
+#endif
         if( slot > TRACER_AREA ) { return NO_TRACER_PKMN; }
 
-        // check if position actually contains a pkmn
-        u16 px = TRACER_AREA + _tracerLastPos.m_posX - p_globX;
-        u16 py = TRACER_AREA + _tracerLastPos.m_posY - p_globY;
-
-        if( _tracerPositions[ py ] & ( 1 << px ) ) { return slot; }
+        if( _tracerPositions[ TRACER_AREA ] & ( 1 << TRACER_AREA ) ) { return slot; }
         return NO_TRACER_PKMN;
     }
 
@@ -402,25 +426,25 @@ namespace MAP {
         // rotate the tracer positions
 
         switch( p_dir ) {
-        case UP: {
-            for( u8 i = 1; i < 2 * TRACER_AREA + 1; ++i ) {
-                _tracerPositions[ i ] = _tracerPositions[ i - 1 ];
-            }
-            _tracerPositions[ 0 ] = 0;
-            break;
-        }
         case DOWN: {
-            for( u8 i = 2 * TRACER_AREA + 1; i; --i ) {
+            for( u8 i = 1; i < 2 * TRACER_AREA + 1; ++i ) {
                 _tracerPositions[ i - 1 ] = _tracerPositions[ i ];
             }
             _tracerPositions[ 2 * TRACER_AREA ] = 0;
             break;
         }
-        case LEFT: {
-            for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) { _tracerPositions[ i ] >>= 1; }
+        case UP: {
+            for( u8 i = 2 * TRACER_AREA; i; --i ) {
+                _tracerPositions[ i ] = _tracerPositions[ i - 1 ];
+            }
+            _tracerPositions[ 0 ] = 0;
             break;
         }
         case RIGHT: {
+            for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) { _tracerPositions[ i ] >>= 1; }
+            break;
+        }
+        case LEFT: {
             for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) { _tracerPositions[ i ] <<= 1; }
             break;
         }
@@ -429,20 +453,27 @@ namespace MAP {
 
         // check if any position remains
         u16 active = 0;
-        for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) { active |= _tracerPositions[ i ]; }
+        for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) {
+            active |= _tracerPositions[ i ];
+#ifdef DESQUID_MORE
+            char buffer[ 100 ];
+            sprintf( buffer, "line %hhu: %hx", i, _tracerPositions[ i ] );
+            DESQUID_LOG( buffer );
+#endif
+        }
         return !!active;
     }
 
     bool mapDrawer::continueTracerChain( ) {
-        DESQUID_LOG( "continueTracerChain" );
-
         // store current position
         std::memset( _tracerPositions, 0, sizeof( _tracerPositions ) );
         _tracerLastPos    = SAVE::SAV.getActiveFile( ).m_player.m_pos;
         _tracerLuckyShiny = 0;
-        _tracerLastPos    = { 0, 0, 0 };
 
         ++_tracerChain;
+#ifdef DESQUID
+        if( keysHeld( ) & KEY_R ) { _tracerChain = 39; }
+#endif
         if( _tracerChain > 40 ) { _tracerChain = 39; }
 
         u8 luckyMod    = SAVE::SAV.getActiveFile( ).m_bag.count(
@@ -458,13 +489,13 @@ namespace MAP {
         bool spotFound = false;
 
         for( u8 d = 1; d <= TRACER_AREA; ++d ) {
-            s8 rx = d * ( ( rand( ) % 3 ) - 1 );
-            s8 ry = d * ( ( rand( ) % 3 ) - 1 );
+            s8 rx = d * ( s8( rand( ) % 3 ) - 1 );
+            s8 ry = d * ( s8( rand( ) % 3 ) - 1 );
 
             if( !rx && !ry ) { continue; }
 
             u16 nx = _tracerLastPos.m_posX + rx;
-            u16 ny = _tracerLastPos.m_posX + ry;
+            u16 ny = _tracerLastPos.m_posY + ry;
 
             // check if a pkmn can spawn at position ( nx, ny )
             if( !tracerUsable( { nx, ny, 0 } ) ) { continue; }
@@ -479,7 +510,13 @@ namespace MAP {
                 setTracerSlotShiny( d );
             }
 
-            _tracerPositions[ ny + TRACER_AREA ] |= ( 1 << ( nx + TRACER_AREA ) );
+            _tracerPositions[ ry + TRACER_AREA ] |= ( 1 << ( rx + TRACER_AREA ) );
+#ifdef DESQUID_MORE
+            char buffer[ 100 ];
+            sprintf( buffer, "ch %hu tpos %hhi %hhi %hx", _tracerChain, rx, ry,
+                     _tracerPositions[ ry + TRACER_AREA ] );
+            DESQUID_LOG( buffer );
+#endif
         }
 
         if( !spotFound ) {
@@ -491,8 +528,6 @@ namespace MAP {
     }
 
     void mapDrawer::useTracer( ) {
-        DESQUID_LOG( "useTracer" );
-
         resetTracerChain( );
         _tracerCharge = 0;
         if( startTracerChain( ) && continueTracerChain( ) ) {

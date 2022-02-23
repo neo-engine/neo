@@ -1298,11 +1298,11 @@ namespace MAP {
         if( !_pkmnFollowsPlayer && !SAVE::SAV.getActiveFile( ).m_objectAttached ) {
             clearFieldAnimation( gx, gy );
         }
+
+        if( !updateTracerChain( p_direction ) ) { resetTracerChain( true ); }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
-
-        updateTracerChain( p_direction );
         SAVE::SAV.getActiveFile( ).stepIncrease( );
         _mapSprites.reorderSprites( true );
     }
@@ -1381,10 +1381,10 @@ namespace MAP {
 
         _mapSprites.drawFrame( _playerSprite, getFrame( p_direction ) );
         clearFieldAnimation( gx, gy );
+        if( !updateTracerChain( p_direction ) ) { resetTracerChain( true ); }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
-        updateTracerChain( p_direction );
         SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
