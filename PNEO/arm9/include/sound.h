@@ -215,6 +215,11 @@ namespace SOUND {
     void setJBoxBGM( u16 p_id );
     u16  getJBoxBGM( );
 
+    /*
+     * @brief: Starts/Stops the special poketore music
+     */
+    void setTracerStatus( bool p_active, bool p_silent = false );
+
     void onWeatherChange( MAP::mapWeather p_newWeather );
     void onLocationChange( u16 p_newLocatonId );
     void onMovementTypeChange( MAP::moveMode p_newMoveMode );

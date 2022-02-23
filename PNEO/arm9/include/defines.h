@@ -33,6 +33,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 #ifdef DESQUID
+#define DESQUID_LOG( p_msg ) NAV::printMessage( p_msg )
+#else
+#define DESQUID_LOG( p_msg ) \
+    {}
+#endif
+
+#ifdef DESQUID
 constexpr u16 DESQUID_STRING = ( 1 << 13 );
 #endif
 

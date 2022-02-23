@@ -1302,6 +1302,7 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
 
+        updateTracerChain( p_direction );
         SAVE::SAV.getActiveFile( ).stepIncrease( );
         _mapSprites.reorderSprites( true );
     }
@@ -1383,6 +1384,7 @@ namespace MAP {
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        updateTracerChain( p_direction );
         SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
@@ -1453,6 +1455,7 @@ namespace MAP {
         bool surfing = false;
         u8   ydif    = 0;
         SAVE::SAV.getActiveFile( ).m_player.m_movement = p_newMode;
+
         switch( p_newMode ) {
         case WALK: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic; break;
         case SURF:
@@ -1460,22 +1463,26 @@ namespace MAP {
             removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
             surfing                                      = true;
+            resetTracerChain( true );
             break;
         case BIKE:
         case MACH_BIKE:
             removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1;
+            resetTracerChain( );
             break;
         case ACRO_BIKE:
             //    SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 2;
             //    TODO
             removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 1;
+            resetTracerChain( );
             break;
         case SIT:
             removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
             ydif                                         = 2;
+            resetTracerChain( );
             break;
         default: break;
         }

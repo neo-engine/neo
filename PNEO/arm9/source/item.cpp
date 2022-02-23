@@ -305,16 +305,14 @@ namespace ITEM {
             if( !p_dryRun ) {
                 if( !tracerCharged ) {
                     p_message( GET_STRING( NO_TRACER_CHARGE ) );
-                    return false;
+                    return true;
                 }
-                if( !tracerUsable ) {
-                    return false;
-                }
+                if( !tracerUsable ) { return true; }
                 MAP::curMap->changeMoveMode( MAP::WALK );
-                MAP::curMap->useTracer( SAVE::SAV.getActiveFile( ).m_player.m_pos );
-                return true;
+                MAP::curMap->useTracer( );
+                return false;
             }
-            return tracerUsable;
+            return !tracerUsable;
         }
         case I_REPEL:
             if( !p_dryRun ) {

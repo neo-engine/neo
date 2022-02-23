@@ -40,6 +40,8 @@ namespace SOUND {
 
     u16 currentJBoxBGM = JBOX_DISABLED;
 
+    bool tracerActive = false;
+
     u16 LAST_CRY = -1;
 
     void playCry( u16 p_pokemonId, u8 p_formeId, bool ) {
@@ -93,12 +95,17 @@ namespace SOUND {
         }
     }
 
+    void setTracerStatus( bool p_active, bool p_silent ) {
+        tracerActive = p_active;
+        if( !p_silent ) { restartBGM( ); }
+    }
+
     void onLocationChange( u16 p_newLocation ) {
         if( currentLocation == p_newLocation ) { return; }
 
         currentLocation = p_newLocation;
 
-        if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
+        if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
         if( currentMoveMode == MAP::WALK ) {
             auto nidx = BGMIndexForName( FS::BGMforLocation( currentLocation ) );
             if( nidx >= 0 ) {
@@ -112,7 +119,7 @@ namespace SOUND {
         if( currentMoveMode == p_newMoveMode ) { return; }
 
         currentMoveMode = p_newMoveMode;
-        if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
+        if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
         playBGM( BGMforWeather( currentWeather ) );
     }
 
@@ -120,13 +127,15 @@ namespace SOUND {
         if( currentWeather == p_newWeather ) { return; }
 
         currentWeather = p_newWeather;
-        if( currentJBoxBGM != JBOX_DISABLED || BGMforced ) { return; }
+        if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
         playBGM( BGMforWeather( currentWeather ) );
     }
 
     void restartBGM( ) {
         BGMforced = false;
-        if( currentJBoxBGM != JBOX_DISABLED ) {
+        if( tracerActive ) {
+            playBGM( MOD_POKE_RADAR );
+        } else if( currentJBoxBGM != JBOX_DISABLED ) {
             playBGM( currentJBoxBGM );
         } else {
             playBGM( BGMforWeather( currentWeather ) );

@@ -194,9 +194,11 @@ namespace MAP {
         OLD_ROD,
         GOOD_ROD,
         SUPER_ROD,
-        HEADBUTT,
+        HEADBUTT, // unused
         ROCK_SMASH,
-        SWEET_SCENT,
+        SWEET_SCENT, // unused
+        POKE_TORE,
+        SWARM,
     };
     enum mapWeather : u16 {
         NOTHING         = 0, // Inside

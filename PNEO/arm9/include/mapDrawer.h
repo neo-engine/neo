@@ -176,19 +176,40 @@ namespace MAP {
 
         std::set<u16> _fixedMapObjects;
 
+#ifdef DESQUID
+        static constexpr u8 TRACER_CHARGED = 1;
+#else
         static constexpr u8 TRACER_CHARGED = 50;
+#endif
+        static constexpr u8 TRACER_AREA = 4;
 
-        u8       _tracerCharge         = 0; // steps since last usage, charged if >= TRACER_CHARGED
-        u16      _tracerPositions[ 9 ] = { 0 }; // 9x9 bit field for positions activated by tracer
-        u8       _tracerLucky          = 0;     // bitfield, tracer enc at ring i is lucky enc
-        position _tracerLastPos        = { 0, 0, 0 }; // last pos where tracer successfully used
-        u8       _tracerChain          = 0; // length of current tracer chain; 0 = no chain
+        u8  _tracerCharge = 0; // steps since last usage, charged if >= TRACER_CHARGED
+        u16 _tracerPositions[ 2 * TRACER_AREA + 1 ]
+            = { 0 };                    // 9x9 bit field for positions activated by tracer
+        u8       _tracerLuckyShiny = 0; // bitfield, tracer enc at ring i is lucky/shiny enc
+        position _tracerLastPos    = { 0, 0, 0 }; // last pos where tracer successfully used
+        u8       _tracerChain      = 0;           // length of current tracer chain; 0 = no chain
 
         u16 _tracerSpecies = 0; // current tracer pkmn species
         u8  _tracerForme   = 0; // current tracer pkmn forme
 
         constexpr u16 dist( u16 p_globX1, u16 p_globY1, u16 p_globX2, u16 p_globY2 ) {
             return std::max( std::abs( p_globX1 - p_globX2 ), std::abs( p_globY1 - p_globY2 ) );
+        }
+
+        constexpr bool tracerSlotShiny( u8 p_tracerSlot ) const {
+            return ( _tracerLuckyShiny & ( 1 << p_tracerSlot ) ) == ( 1 << p_tracerSlot );
+        }
+        constexpr bool tracerSlotLucky( u8 p_tracerSlot ) const {
+            return ( _tracerLuckyShiny & ( 1 << ( TRACER_AREA + p_tracerSlot ) ) )
+                   == ( 1 << ( TRACER_AREA + p_tracerSlot ) );
+        }
+
+        inline void setTracerSlotShiny( u8 p_tracerSlot ) {
+            _tracerLuckyShiny |= ( 1 << p_tracerSlot );
+        }
+        inline void setTracerSlotLucky( u8 p_tracerSlot ) {
+            _tracerLuckyShiny |= ( 1 << ( TRACER_AREA + p_tracerSlot ) );
         }
 
         u8        _playerSprite           = 255; // id of the player sprite
@@ -223,14 +244,29 @@ namespace MAP {
                                                                  // excluded
 
         /*
-         * @brief: Resets any existing chain.
+         * @brief: Plays the wild pkmn battle intro and changes the bgm.
          */
-        void resetTracerChain( );
+        void prepareBattleWildPkmn( wildPkmnType p_type, u16 p_pkmnId, bool p_luckyEnc );
 
         /*
-         * @brief: Initializes a new tracer chain.
+         * @brief: Runs a wild pkmn battle against WILD_PKMN
          */
-        void startTracerChain( );
+        bool battleWildPkmn( wildPkmnType p_type );
+
+        u8 getWildPkmnLevel( u16 p_rnd );
+
+        bool getWildPkmnSpecies( wildPkmnType p_type, u16& p_pkmnId, u8& p_pkmnForme );
+
+        /*
+         * @brief: Resets any existing chain.
+         */
+        void resetTracerChain( bool p_updateMusic = false );
+
+        /*
+         * @brief: Initializes a new tracer chain: Computes pkmn/forme to use for the
+         * chain
+         */
+        bool startTracerChain( );
 
         static constexpr u8 NO_TRACER_PKMN = 255;
         /*
@@ -358,6 +394,8 @@ namespace MAP {
         void handleWarp( warpType p_type, warpPos p_source );
         void handleWarp( warpType p_type );
 
+        bool handleTracerPkmn( u8 p_tracerSlot );
+
         void handleWildPkmn( u16 p_globX, u16 p_globY );
         bool handleWildPkmn( wildPkmnType p_type, bool p_forceEncounter = false );
 
@@ -417,9 +455,9 @@ namespace MAP {
         }
 
         /*
-         * @brief: Starts the tracer.
+         * @brief: Starts the poketore.
          */
-        void useTracer( position p_position );
+        void useTracer( );
 
         direction getFollowPkmnDirection( ) const;
 
@@ -590,4 +628,5 @@ namespace MAP {
         u16 getCurrentLocationId( ) const;
     };
     extern mapDrawer* curMap;
+    extern pokemon    WILD_PKMN;
 } // namespace MAP
