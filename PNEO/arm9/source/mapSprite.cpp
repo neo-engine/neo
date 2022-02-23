@@ -199,14 +199,16 @@ namespace MAP {
 
     void mapSpriteManager::init( ) {
         // pre load item, hm sprites
-        _itemBallData  = mapSpriteData( 256 | 249 );
-        _hmBallData    = mapSpriteData( 256 | 250 );
-        _strengthData  = mapSpriteData( 256 | 251 );
-        _rockSmashData = mapSpriteData( 256 | 252 );
-        _cutData       = mapSpriteData( 256 | 253 );
-        _grassData     = mapSpriteData( 256 | 254 );
-        _longGrassData = mapSpriteData( 256 | 255 );
+        _itemBallData   = mapSpriteData( 256 | 249 );
+        _hmBallData     = mapSpriteData( 256 | 250 );
+        _strengthData   = mapSpriteData( 256 | 251 );
+        _rockSmashData  = mapSpriteData( 256 | 252 );
+        _cutData        = mapSpriteData( 256 | 253 );
+        _grassData      = mapSpriteData( 256 | 254 );
+        _shinyGrassData = mapSpriteData( 256 | 254 );
+        _longGrassData  = mapSpriteData( 256 | 255 );
 
+        _shinyGrassData.updatePalette( 3 );
         _grassData.updatePalette( 3 );
         _longGrassData.updatePalette( 3 );
 
@@ -311,6 +313,9 @@ namespace MAP {
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
+            case SPR_GRASS_SHINY: {
+                return _shinyGrassData;
+            }
             case SPR_GRASS: {
                 return _grassData;
             }
@@ -336,10 +341,16 @@ namespace MAP {
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
+            case SPR_GRASS_SHINY: {
+                return _shinyGrassData;
+            }
             case SPR_GRASS: {
                 return _grassData;
             }
-            case SPR_LONG_GRASS: return _longGrassData; [[unlikely]] default : break;
+            case SPR_LONG_GRASS: {
+                return _longGrassData;
+            }
+                [[unlikely]] default : break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -582,6 +593,14 @@ namespace MAP {
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
 
+        case SPR_GRASS_SHINY:
+            _shinyGrassData.updatePalette( 1 );
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _shinyGrassData,
+                          p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
+            return SPR_MAPTILE_OAM( nextfree );
         case SPR_GRASS:
             _grassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),

@@ -43,9 +43,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sprite.h"
 #include "uio.h"
 
-// #define DESQUID_LOG( _ ) \
-    {}
-
 namespace MAP {
     void mapDrawer::disablePkmn( s16 p_steps ) {
         SAVE::SAV.getActiveFile( ).m_repelSteps = p_steps;
@@ -251,6 +248,8 @@ namespace MAP {
             if( !continueTracerChain( ) ) {
                 // chain breaks if no new tracer spots can be generated.
                 resetTracerChain( true );
+            } else {
+                animateTracer( );
             }
         }
         return true;
@@ -472,6 +471,8 @@ namespace MAP {
 
         ++_tracerChain;
 #ifdef DESQUID
+        // This is purely to test if long chains generaty shiny pkmn. definitely only to
+        // test. definitely!
         if( keysHeld( ) & KEY_R ) { _tracerChain = 39; }
 #endif
         if( _tracerChain > 40 ) { _tracerChain = 39; }
@@ -503,6 +504,8 @@ namespace MAP {
             spotFound = true;
 
             u16 shiny = rand( );
+
+            if( _tracerChain >= 39 && d == TRACER_AREA ) { shiny = 0; }
 
             if( !( _tracerChain % luckyMod ) ) {
                 setTracerSlotLucky( d );

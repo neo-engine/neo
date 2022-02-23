@@ -53,12 +53,13 @@ namespace MAP {
         }
     }
 
-    u8 mapDrawer::getTileAnimation( u16 p_globX, u16 p_globY ) {
+    u8 mapDrawer::getTileAnimation( u16 p_globX, u16 p_globY, bool p_shiny ) {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         switch( behave ) {
         case BEH_GRASS:
-        case BEH_GRASS_ASH: return mapSpriteManager::SPR_GRASS;
+        case BEH_GRASS_ASH:
+            return p_shiny ? mapSpriteManager::SPR_GRASS_SHINY : mapSpriteManager::SPR_GRASS;
         case BEH_LONG_GRASS: return mapSpriteManager::SPR_LONG_GRASS;
         default: return 0;
         }
@@ -403,6 +404,55 @@ namespace MAP {
     }
 
     void mapDrawer::animateTracer( ) {
-        // TODO
+        u16 sx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - TRACER_AREA;
+        u16 sy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - TRACER_AREA;
+
+        u16 ta  = getTileAnimation( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY );
+        u16 tas = getTileAnimation( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true );
+
+        u8 sid[ TRACER_AREA ] = { }, scnt = 0;
+        std::memset( sid, 255, sizeof( sid ) );
+
+        for( u8 i = 0; i < 32; ++i ) {
+            scnt = 0;
+            for( u16 y = 0; y < 2 * TRACER_AREA + 1; ++y ) {
+                for( u16 x = 0; x < 2 * TRACER_AREA + 1; ++x ) {
+                    if( _tracerPositions[ y ] & ( 1 << x ) ) {
+                        u16 nx   = sx + x;
+                        u16 ny   = sy + y;
+                        u8  slot = dist( x, y, TRACER_AREA, TRACER_AREA );
+                        if( !slot || slot > TRACER_AREA ) { continue; }
+                        bool shiny = tracerSlotShiny( slot );
+
+                        if( ta && i == 0 ) {
+                            sid[ scnt ] = animateField( nx, ny, shiny ? tas : ta, 0 );
+                        }
+
+                        if( shiny ) {
+                            if( ta && sid[ scnt ] < 255 && ( i == 3 || i == 12 || i == 25 ) ) {
+                                animateField( nx, ny, sid[ scnt ], 2 );
+                            }
+                            if( ta && sid[ scnt ] < 255 && ( i == 7 || i == 18 || i == 31 ) ) {
+                                animateField( nx, ny, sid[ scnt ], 3 );
+                            }
+                        } else {
+                            if( ta && sid[ scnt ] < 255 && ( i == 5 || i == 21 ) ) {
+                                animateField( nx, ny, sid[ scnt ], 2 );
+                            }
+                            if( ta && sid[ scnt ] < 255 && ( i == 12 || i == 28 ) ) {
+                                animateField( nx, ny, sid[ scnt ], 3 );
+                            }
+                        }
+
+                        if( i == 31 ) { _mapSprites.destroySprite( sid[ scnt ] ); }
+                        ++scnt;
+                    }
+                }
+            }
+            if( i & 3 ) { swiWaitForVBlank( ); }
+            swiWaitForVBlank( );
+        }
     }
 } // namespace MAP

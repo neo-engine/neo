@@ -207,6 +207,7 @@ namespace MAP {
         static constexpr u8 TILE_ANIM_START = 100;
         static constexpr u8 SPR_GRASS       = 100;
         static constexpr u8 SPR_LONG_GRASS  = 101;
+        static constexpr u8 SPR_GRASS_SHINY = 102;
 
         enum spriteType {
             SPTYPE_NONE       = 0,
@@ -244,13 +245,14 @@ namespace MAP {
         std::pair<bool, managedSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32
         std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32
 
-        mapSpriteData _itemBallData;  // 16x16
-        mapSpriteData _hmBallData;    // 16x16
-        mapSpriteData _strengthData;  // 16x16
-        mapSpriteData _rockSmashData; // 16x16
-        mapSpriteData _cutData;       // 16x16
-        mapSpriteData _grassData;     // 2x16x16
-        mapSpriteData _longGrassData; // 2x16x16
+        mapSpriteData _itemBallData;   // 16x16
+        mapSpriteData _hmBallData;     // 16x16
+        mapSpriteData _strengthData;   // 16x16
+        mapSpriteData _rockSmashData;  // 16x16
+        mapSpriteData _cutData;        // 16x16
+        mapSpriteData _grassData;      // 2x16x16
+        mapSpriteData _shinyGrassData; // 2x16x16
+        mapSpriteData _longGrassData;  // 2x16x16
 
         managedSprite _doorAnimation; // 32x16
 

@@ -198,17 +198,21 @@ namespace MAP {
         }
 
         constexpr bool tracerSlotShiny( u8 p_tracerSlot ) const {
+            p_tracerSlot--;
             return ( _tracerLuckyShiny & ( 1 << p_tracerSlot ) ) == ( 1 << p_tracerSlot );
         }
         constexpr bool tracerSlotLucky( u8 p_tracerSlot ) const {
+            p_tracerSlot--;
             return ( _tracerLuckyShiny & ( 1 << ( TRACER_AREA + p_tracerSlot ) ) )
                    == ( 1 << ( TRACER_AREA + p_tracerSlot ) );
         }
 
         inline void setTracerSlotShiny( u8 p_tracerSlot ) {
+            p_tracerSlot--;
             _tracerLuckyShiny |= ( 1 << p_tracerSlot );
         }
         inline void setTracerSlotLucky( u8 p_tracerSlot ) {
+            p_tracerSlot--;
             _tracerLuckyShiny |= ( 1 << ( TRACER_AREA + p_tracerSlot ) );
         }
 
@@ -340,8 +344,9 @@ namespace MAP {
         /*
          * @brief: Returns the identifier of a tile animation of the specified position or
          * 0 if the specified position lacks any tile animations.
+         * @param p_shiny: special oam_id for poketore shiny grass
          */
-        u8 getTileAnimation( u16 p_globX, u16 p_globY );
+        u8 getTileAnimation( u16 p_globX, u16 p_globY, bool p_shiny = false );
 
         /*
          * @brief: Clears permanent tile animations from the specified field
