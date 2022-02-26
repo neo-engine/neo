@@ -431,10 +431,13 @@ namespace MAP {
                         }
 
                         if( shiny ) {
-                            if( ta && sid[ scnt ] < 255 && ( i == 3 || i == 12 || i == 25 ) ) {
+                            if( ta && sid[ scnt ] < 255 && ( i == 2 || i == 12 || i == 25 ) ) {
+                                animateField( nx, ny, sid[ scnt ], 1 );
+                            }
+                            if( ta && sid[ scnt ] < 255 && ( i == 5 || i == 15 || i == 28 ) ) {
                                 animateField( nx, ny, sid[ scnt ], 2 );
                             }
-                            if( ta && sid[ scnt ] < 255 && ( i == 7 || i == 18 || i == 31 ) ) {
+                            if( ta && sid[ scnt ] < 255 && ( i == 8 || i == 18 || i == 31 ) ) {
                                 animateField( nx, ny, sid[ scnt ], 3 );
                             }
                         } else {

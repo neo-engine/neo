@@ -594,7 +594,7 @@ namespace MAP {
             return SPR_HM_OAM( nextfree );
 
         case SPR_GRASS_SHINY:
-            _shinyGrassData.updatePalette( 1 );
+            _shinyGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _shinyGrassData,
