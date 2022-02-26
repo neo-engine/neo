@@ -473,6 +473,13 @@ namespace IO {
         if( !fread( TEMP_PAL, 16, sizeof( u16 ), f ) ) { return false; }
         if( !fread( TEMP, p_dataSize, sizeof( u32 ), f ) ) { return false; }
 
+        // small color variation for pkmn of the same species
+        for( u8 i = 1; i < 16; ++i ) {
+            auto pid = p_pkmn.m_pid >> ( i / 2 );
+            auto r = !!( pid & 0b1 ), g = !!( pid & 0b10 ), b = !!( pid & 0b1000 );
+            TEMP_PAL[ i ] ^= ( g << 10 ) | ( b << 5 ) | r;
+        }
+
         if( p_pkmn.m_pkmnIdx == PKMN_SPINDA && !strcmp( p_path, PKMN_PATH ) ) [[unlikely]] {
             // create spinda spots; ensure that spots are in the top-left 64x64 corner
             constexpr u8  SPOT_COUNT         = 4;
