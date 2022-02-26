@@ -473,8 +473,44 @@ namespace IO {
         if( !fread( TEMP_PAL, 16, sizeof( u16 ), f ) ) { return false; }
         if( !fread( TEMP, p_dataSize, sizeof( u32 ), f ) ) { return false; }
 
-        if( p_pkmn.m_pkmnIdx == PKMN_SPINDA ) {
-            // create spinda spots
+        if( p_pkmn.m_pkmnIdx == PKMN_SPINDA && !strcmp( p_path, PKMN_PATH ) ) [[unlikely]] {
+            // create spinda spots; ensure that spots are in the top-left 64x64 corner
+            constexpr u8  SPOT_COUNT         = 4;
+            constexpr u8  SPOT_SIZE          = 8;
+            constexpr u8  SPOT_BG_COLOR      = 2;
+            constexpr u8  SPOT_COLOR         = 7;
+            constexpr u8  SPOT_BG_COLOR_SHDW = 5;
+            constexpr u8  SPOT_COLOR_SHDW    = 8;
+            constexpr u8  SX[ SPOT_COUNT ]   = { 35 - 8 - 6, 55 - 8 - 6, 37 - 8 - 6, 49 - 8 - 6 };
+            constexpr u8  SY[ SPOT_COUNT ]   = { 29 - 8 - 6, 29 - 8 - 6, 45 - 8 - 6, 46 - 8 - 6 };
+            constexpr u16 DOT_PATTERN[ SPOT_SIZE ]
+                = { 0x3c, 0x7e, 0xff, 0xff, 0xff, 0xff, 0x7e, 0x3c };
+
+            for( u8 i = 0; i < SPOT_COUNT; ++i ) {
+                u8 dx = ( p_pkmn.m_pid >> ( 2 * i ) ) & 0xF;
+                u8 dy = ( p_pkmn.m_pid >> ( 2 * i + 1 ) ) & 0xF;
+
+                for( u8 x = 0; x < SPOT_SIZE; ++x ) {
+                    for( u8 y = 0; y < SPOT_SIZE; ++y ) {
+                        if( !( DOT_PATTERN[ y ] & ( 1 << x ) ) ) { continue; }
+                        // check if pixel has spinda bg color; if so, recolor to spot
+                        // color
+
+                        u8 nx    = SX[ i ] + dx + x;
+                        u8 tilex = nx >> 3, nxm8 = nx & 7;
+                        u8 ny    = SY[ i ] + dy + y;
+                        u8 tiley = ny >> 3, nym8 = ny & 7;
+
+                        u16 pos = 64 * tiley + 8 * tilex + nym8;
+
+                        u32 px = TEMP[ pos ];
+                        u8  cl = ( px >> ( nxm8 * 4 ) ) & 0xF;
+                        if( cl == SPOT_BG_COLOR ) { cl = SPOT_COLOR; }
+                        if( cl == SPOT_BG_COLOR_SHDW ) { cl = SPOT_COLOR_SHDW; }
+                        TEMP[ pos ] = ( px & ~( 0xF << ( nxm8 * 4 ) ) ) | ( cl << ( nxm8 * 4 ) );
+                    }
+                }
+            }
         }
 
         if( p_blackOverlay ) { std::memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) ); }
@@ -594,7 +630,7 @@ namespace IO {
 
     u16 loadEggSprite( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
                        bool p_bottom, bool p_manaphy ) {
-        pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false };
+        pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false, DEFAULT_SPRITE_PID };
         return loadPKMNSprite( pinfo, p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt, p_bottom );
     }
 
@@ -658,13 +694,13 @@ namespace IO {
 
     u16 loadEggIcon( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
                      bool p_bottom, bool p_manaphy ) {
-        pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false };
+        pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false, DEFAULT_SPRITE_PID };
         return loadPKMNIcon( pinfo, p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt, p_bottom );
     }
 
     u16 loadEggIconB( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
                       bool p_manaphy, bool p_outline, u16 p_outlineColor ) {
-        pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false };
+        pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false, DEFAULT_SPRITE_PID };
         return loadPKMNIconB( pinfo, p_posX, p_posY, p_oamIdx, p_tileCnt, p_bottom, p_outline,
                               p_outlineColor );
     }
