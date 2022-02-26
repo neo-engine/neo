@@ -577,8 +577,7 @@ namespace SAVE {
 
                         bool anm    = ANIMATE_MAP;
                         ANIMATE_MAP = false;
-                        IO::ANIM::hatchEgg( ac.getSpecies( ), ac.getForme( ), ac.isShiny( ),
-                                            ac.isFemale( ) );
+                        IO::ANIM::hatchEgg( ac.getSpriteInfo( ) );
                         FADE_TOP_DARK( );
                         FADE_SUB_DARK( );
                         IO::clearScreen( false );

@@ -345,8 +345,7 @@ int main( int, char** p_argv ) {
                             NAV::printMessage( 0, MSG_NOCLOSE );
                             NAV::init( );
                             if( i || !MAP::curMap->useFollowPkmn( ) ) {
-                                MAP::curMap->usePkmn( a.getSpecies( ), a.isFemale( ), a.isShiny( ),
-                                                      a.getForme( ) );
+                                MAP::curMap->usePkmn( a.getSpriteInfo( ) );
                                 swiWaitForVBlank( );
                                 MOVE::use( a.m_boxdata.m_moves[ j ], param );
                             } else {

@@ -322,7 +322,7 @@ namespace MAP {
         }
     }
 
-    void mapDrawer::showPkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme, bool p_cry ) {
+    void mapDrawer::showPkmn( const pkmnSpriteInfo& p_pkmn, bool p_cry ) {
         _mapSprites.setVisibility( _playerSprite, true, false );
         IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
                          OBJPRIORITY_1, false );
@@ -333,10 +333,9 @@ namespace MAP {
         IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
                          false, OBJPRIORITY_1, false );
 
-        if( p_cry ) { SOUND::playCry( p_pkmIdx, p_forme ); }
+        if( p_cry ) { SOUND::playCry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ); }
 
-        pkmnSpriteInfo pinfo = { p_pkmIdx, p_forme, p_female, p_shiny, false };
-        IO::loadPKMNSpriteB( pinfo, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false );
+        IO::loadPKMNSpriteB( p_pkmn, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false );
         IO::updateOAM( false );
         for( u8 i = 0; i < 75; ++i ) swiWaitForVBlank( );
 
@@ -347,7 +346,7 @@ namespace MAP {
         IO::updateOAM( false );
     }
 
-    void mapDrawer::usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme ) {
+    void mapDrawer::usePkmn( const pkmnSpriteInfo& p_pkmn ) {
         u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
         bool surfing = ( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF );
@@ -361,7 +360,7 @@ namespace MAP {
             for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
         }
 
-        showPkmn( p_pkmIdx, p_female, p_shiny, p_forme, true );
+        showPkmn( p_pkmn, true );
 
         changeMoveMode( surfing ? SURF : WALK );
         swiWaitForVBlank( );

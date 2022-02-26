@@ -473,6 +473,10 @@ namespace IO {
         if( !fread( TEMP_PAL, 16, sizeof( u16 ), f ) ) { return false; }
         if( !fread( TEMP, p_dataSize, sizeof( u32 ), f ) ) { return false; }
 
+        if( p_pkmn.m_pkmnIdx == PKMN_SPINDA ) {
+            // create spinda spots
+        }
+
         if( p_blackOverlay ) { std::memset( TEMP_PAL, 0, sizeof( TEMP_PAL ) ); }
 
         if( p_pkmn.m_forme && f ) { fclose( f ); }

@@ -290,9 +290,9 @@ namespace DEX {
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
 
         _backChoice     = { IO::touchInputTarget( IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].x,
-                                              IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y,
-                                              IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].x + 32,
-                                              IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y + 32 ),
+                                                  IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y,
+                                                  IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].x + 32,
+                                                  IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y + 32 ),
                         0 };
         _touchPositions = std::vector<std::pair<IO::touchInputTarget, u16>>( );
     }
@@ -675,7 +675,7 @@ namespace DEX {
         oam[ p_OAMstart + 2 ].y        = p_y;
         oam[ p_OAMstart + 2 ].priority = OBJPRIORITY_3;
 
-        pkmnSpriteInfo pinfo = { p_pkmnIdx, p_pkmnForme, false, false, false };
+        pkmnSpriteInfo pinfo = { p_pkmnIdx, p_pkmnForme, false, false, false, DEFAULT_SPRITE_PID };
 
         // pkmn icon
         if( caught ) {
@@ -943,7 +943,7 @@ namespace DEX {
 
     void dexUI::nationalSelectIndex( u16 p_pkmnIdx, u16 p_pkmnIdxUB, bool p_bottom, u8 p_forme,
                                      bool p_shiny, bool p_female ) {
-        pkmnSpriteInfo pinfo = { p_pkmnIdx, p_forme, p_female, p_shiny, false };
+        pkmnSpriteInfo pinfo = { p_pkmnIdx, p_forme, p_female, p_shiny, false, DEFAULT_SPRITE_PID };
         drawPkmnInfo( pinfo, 0, !p_bottom );
         if( !_nationalSelectedIdx || _nationalSelectedIdx == p_pkmnIdx ) {
             nationalInitSub( p_pkmnIdx, p_pkmnIdxUB, p_bottom );
@@ -1023,8 +1023,12 @@ namespace DEX {
 
     void dexUI::localSelectPageSlot( u16 p_page, u8 p_slot, u16 p_pageUB, bool p_bottom, u8 p_forme,
                                      bool p_shiny, bool p_female ) {
-        pkmnSpriteInfo pinfo
-            = { LOCAL_DEX_PAGES[ p_page ][ p_slot ], p_forme, p_female, p_shiny, false };
+        pkmnSpriteInfo pinfo = { LOCAL_DEX_PAGES[ p_page ][ p_slot ],
+                                 p_forme,
+                                 p_female,
+                                 p_shiny,
+                                 false,
+                                 DEFAULT_SPRITE_PID };
         drawPkmnInfo( pinfo, 0, !p_bottom );
         SpriteEntry* oam   = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
         u16          dpage = ( p_page - 1 ) / 4 * 4;

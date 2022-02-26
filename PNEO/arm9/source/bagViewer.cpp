@@ -189,8 +189,8 @@ namespace BAG {
     u8 bagViewer::chooseMove( const boxPokemon* p_pokemon, u16 p_extraMove ) {
         IO::choiceBox cb  = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
         auto          res = cb.getResult(
-            [ & ]( u8 ) { return _bagUI->drawMoveChoice( p_pokemon, p_extraMove ); },
-            [ & ]( u8 p_selection ) { _bagUI->selectMoveChoice( p_selection ); } );
+                     [ & ]( u8 ) { return _bagUI->drawMoveChoice( p_pokemon, p_extraMove ); },
+                     [ & ]( u8 p_selection ) { _bagUI->selectMoveChoice( p_selection ); } );
         _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                              _currSelectedIdx );
 
@@ -270,7 +270,7 @@ namespace BAG {
                     u8  newfm = p_pokemon.getForme( );
 
                     IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm, p_pokemon.isShiny( ),
-                                          p_pokemon.isFemale( ), false );
+                                          p_pokemon.isFemale( ), p_pokemon.getPid( ), false );
                     initUI( );
                 }
                 return _context == BATTLE || _context == WILD_BATTLE;
@@ -294,7 +294,7 @@ namespace BAG {
                 u8  newfm = p_pokemon.getForme( );
 
                 IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm, p_pokemon.isShiny( ),
-                                      p_pokemon.isFemale( ), false );
+                                      p_pokemon.isFemale( ), p_pokemon.getPid( ), false );
 
                 auto lstBg = SAVE::SAV.getActiveFile( ).m_lstBag;
                 SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) lstBg, p_itemId, 1 );
@@ -346,13 +346,13 @@ namespace BAG {
             if( ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
                 IO::choiceBox cb2    = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
                 auto          tgpkmn = cb2.getResult(
-                    [ & ]( u8 ) {
+                             [ & ]( u8 ) {
                         _bagUI->drawPkmnChoice( );
                         auto tmp = _bagUI->getPkmnInputTarget( );
                         tmp.push_back( _bagUI->getButtonInputTarget( IO::choiceBox::BACK_CHOICE ) );
                         return tmp;
-                    },
-                    [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
+                             },
+                             [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
                 _bagUI->undrawPkmnChoice( );
 
                 if( tgpkmn == IO::choiceBox::BACK_CHOICE ) { return false; }
@@ -406,7 +406,7 @@ namespace BAG {
                     for( bool done = false; !done; ) {
                         _currentViewStart = ( _currentViewStart + curBgsz - 1 ) % curBgsz;
                         auto ci           = SAVE::SAV.getActiveFile( ).m_bag( (bag::bagType) curBg,
-                                                                    _currentViewStart );
+                                                                              _currentViewStart );
                         done              = isAllowed( ci.first );
                         SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ]
                             = ( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBg ] + curBgsz - 1 )
@@ -431,7 +431,7 @@ namespace BAG {
                     _currentViewStart = ( _currentViewStart + 1 ) % curBgsz;
                     for( bool done = false; !done; ) {
                         auto ci         = SAVE::SAV.getActiveFile( ).m_bag( (bag::bagType) curBg,
-                                                                    _currentViewEnd );
+                                                                            _currentViewEnd );
                         done            = isAllowed( ci.first );
                         _currentViewEnd = ( _currentViewEnd + 1 ) % curBgsz;
                         if( done ) {
@@ -918,13 +918,13 @@ namespace BAG {
 
             IO::choiceBox cb2 = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
             tgpkmn            = cb2.getResult(
-                [ & ]( u8 ) {
+                           [ & ]( u8 ) {
                     _bagUI->drawPkmnChoice( );
                     auto tmp = _bagUI->getPkmnInputTarget( );
                     tmp.push_back( _bagUI->getButtonInputTarget( IO::choiceBox::BACK_CHOICE ) );
                     return tmp;
-                },
-                [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
+                           },
+                           [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
             _bagUI->undrawPkmnChoice( );
 
             if( tgpkmn == IO::choiceBox::BACK_CHOICE ) { return 0; }

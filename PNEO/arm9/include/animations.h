@@ -36,13 +36,13 @@ namespace IO::ANIM {
      * screen.
      */
     bool evolvePkmn( u16 p_startSpecies, u8 p_startForme, u16 p_endSpecies, u8 p_endForme,
-                     bool p_shiny, bool p_female, bool p_allowAbort = true );
+                     bool p_shiny, bool p_female, u32 p_pid, bool p_allowAbort = true );
 
     /*
      * @brief: Plays the egg hatch animation. Destroys everything that was on the
      * screen.
      */
-    void hatchEgg( u16 p_endSpecies, u8 p_endForme, bool p_shiny, bool p_female );
+    void hatchEgg( const pkmnSpriteInfo& p_pkmn );
 
     /*
      * @brief: Plays the opening animation.

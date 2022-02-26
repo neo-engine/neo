@@ -137,7 +137,10 @@ struct pkmnSpriteInfo {
     u8  m_female;
     u8  m_shiny;
     u8  m_flipX;
+    u32 m_pid; // used for spinda and pkmn recolor
 };
+
+constexpr u32 DEFAULT_SPRITE_PID = 0x88888888;
 
 extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
 extern const char*       HP_ICONS[ LANGUAGES ];

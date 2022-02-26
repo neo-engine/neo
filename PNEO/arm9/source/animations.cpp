@@ -85,7 +85,7 @@ namespace IO::ANIM {
     }
 
     bool evolvePkmn( u16 p_startSpecies, u8 p_startForme, u16 p_endSpecies, u8 p_endForme,
-                     bool p_shiny, bool p_female, bool p_allowAbort ) {
+                     bool p_shiny, bool p_female, u32 p_pid, bool p_allowAbort ) {
         vramSetup( );
         swiWaitForVBlank( );
         clearScreen( true, true, true );
@@ -112,8 +112,8 @@ namespace IO::ANIM {
 
         u16 tileCnt = 0;
 
-        pkmnSpriteInfo pinfoS = { p_startSpecies, p_startForme, p_female, p_shiny, false };
-        pkmnSpriteInfo pinfoE = { p_endSpecies, p_endForme, p_female, p_shiny, false };
+        pkmnSpriteInfo pinfoS = { p_startSpecies, p_startForme, p_female, p_shiny, false, p_pid };
+        pkmnSpriteInfo pinfoE = { p_endSpecies, p_endForme, p_female, p_shiny, false, p_pid };
 
         tileCnt = loadPKMNSprite( pinfoS, PKMN_X, PKMN_Y, 0, 0, tileCnt, false );
         tileCnt = loadPKMNSprite( pinfoE, PKMN_X, PKMN_Y, 4, 1, tileCnt, false );
@@ -178,7 +178,7 @@ namespace IO::ANIM {
         }
     }
 
-    void hatchEgg( u16 p_endSpecies, u8 p_endForme, bool p_shiny, bool p_female ) {
+    void hatchEgg( const pkmnSpriteInfo& p_pkmn ) {
         vramSetup( );
         swiWaitForVBlank( );
         clearScreen( true, true, true );
@@ -198,13 +198,12 @@ namespace IO::ANIM {
         // Load both sprites
 
         fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
-        pkmnSpriteInfo pinfoE = { p_endSpecies, p_endForme, p_female, p_shiny, false };
 
         u16 tileCnt = 0;
-        tileCnt
-            = loadEggSprite( PKMN_X, PKMN_Y, 0, 0, tileCnt, false, p_endSpecies == PKMN_MANAPHY );
+        tileCnt     = loadEggSprite( PKMN_X, PKMN_Y, 0, 0, tileCnt, false,
+                                     p_pkmn.m_pkmnIdx == PKMN_MANAPHY );
 
-        tileCnt = loadPKMNSprite( pinfoE, PKMN_X, PKMN_Y, 4, 1, tileCnt, false );
+        tileCnt = loadPKMNSprite( p_pkmn, PKMN_X, PKMN_Y, 4, 1, tileCnt, false );
         SOUND::playBGM( MOD_EVOLVING );
 
         setFrameVis( 1, true );
@@ -236,7 +235,7 @@ namespace IO::ANIM {
         SOUND::playBGMOneshot( MOD_OS_EVOLVED );
         char buffer[ 200 ];
         clearScreen( true, true, true );
-        snprintf( buffer, 200, GET_STRING( 389 ), getDisplayName( p_endSpecies ).c_str( ) );
+        snprintf( buffer, 200, GET_STRING( 389 ), getDisplayName( p_pkmn.m_pkmnIdx ).c_str( ) );
         regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
         setFrameVis( 0, true );
         setFrameVis( 1, false );
@@ -244,7 +243,7 @@ namespace IO::ANIM {
         for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
         waitForInteract( );
         SOUND::restartBGM( );
-        SAVE::SAV.getActiveFile( ).registerCaughtPkmn( p_endSpecies );
+        SAVE::SAV.getActiveFile( ).registerCaughtPkmn( p_pkmn.m_pkmnIdx );
     }
 
     void openingAnimation( ) {

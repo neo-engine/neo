@@ -104,7 +104,11 @@ struct boxPokemon {
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
 
     inline pkmnSpriteInfo getSpriteInfo( bool p_flipX = false ) {
-        return { getSpecies( ), getForme( ), isFemale( ), isShiny( ), p_flipX };
+        return { getSpecies( ), getForme( ), isFemale( ), isShiny( ), p_flipX, getPid( ) };
+    }
+
+    constexpr u32 getPid( ) const {
+        return m_pid;
     }
 
     /*
@@ -429,6 +433,11 @@ struct pokemon {
     constexpr u16 getSpecies( ) const {
         return m_boxdata.getSpecies( );
     }
+
+    constexpr u32 getPid( ) const {
+        return m_boxdata.getPid( );
+    }
+
     inline void setSpecies( u16 p_newSpecies ) {
         m_boxdata.setSpecies( p_newSpecies );
         recalculateStats( );

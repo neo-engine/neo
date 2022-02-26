@@ -334,7 +334,7 @@ namespace MAP {
             switch( ins ) {
             case DES: {
                 SAVE::SAV.getActiveFile( ).registerSeenPkmn( parA );
-                showPkmn( parA, false, false, parB, false );
+                showPkmn( { parA, parB, false, false, false, DEFAULT_SPRITE_PID }, false );
                 changeMoveMode( SAVE::SAV.getActiveFile( ).m_player.m_movement );
                 swiWaitForVBlank( );
                 break;

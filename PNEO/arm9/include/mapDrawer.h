@@ -604,8 +604,8 @@ namespace MAP {
          * :param p_badge: Badge to award (1-8 or 11/12 - 71/72)
          */
         void awardBadge( u8 p_type, u8 p_badge );
-        void usePkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme );
-        void showPkmn( u16 p_pkmIdx, bool p_female, bool p_shiny, u8 p_forme, bool p_cry );
+        void usePkmn( const pkmnSpriteInfo& p_pkmn );
+        void showPkmn( const pkmnSpriteInfo& p_pkmn, bool p_cry );
 
         /*
          * @brief: Makes the follow pkmn use a hm move.

@@ -1320,9 +1320,9 @@ namespace BATTLE {
                     u16 newsp = edata.m_evolutions[ ev - 1 ].m_target;
                     u8  newfm = edata.m_evolutions[ ev - 1 ].m_targetForme;
 
-                    if( IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm,
-                                              _playerTeam[ i ].isShiny( ),
-                                              _playerTeam[ i ].isFemale( ), true ) ) {
+                    if( IO::ANIM::evolvePkmn(
+                            oldsp, oldfm, newsp, newfm, _playerTeam[ i ].isShiny( ),
+                            _playerTeam[ i ].isFemale( ), _playerTeam[ i ].getPid( ), true ) ) {
                         _playerTeam[ i ].evolve( );
                     }
                 }

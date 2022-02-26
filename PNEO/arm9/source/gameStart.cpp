@@ -252,7 +252,8 @@ namespace SAVE {
         IO::Oam->oamBuffer[ 22 ].isHidden      = true;
         IO::Oam->oamBuffer[ 22 ].isRotateScale = false;
 
-        pkmnSpriteInfo pinfo = { PKMN_LOTAD, 0, false, !( rand( ) & 31 ), false };
+        pkmnSpriteInfo pinfo
+            = { PKMN_LOTAD, 0, false, !( rand( ) & 31 ), false, DEFAULT_SPRITE_PID };
         IO::loadPKMNSprite( pinfo, 40, 36, 23, 3, tileCnt, true );
         for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
         SOUND::playCry( PKMN_LOTAD );
