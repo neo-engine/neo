@@ -141,6 +141,9 @@ Screenshots
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt01.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt02.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt07.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt08.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt09.png)
 
 ###### Trainer battles
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt06.png)
