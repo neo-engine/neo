@@ -96,6 +96,7 @@ namespace SOUND {
     }
 
     void setTracerStatus( bool p_active, bool p_silent ) {
+        if( !tracerActive && !p_active ) { return; }
         tracerActive = p_active;
         if( !p_silent ) { restartBGM( ); }
     }

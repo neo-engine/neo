@@ -203,6 +203,11 @@ namespace SAVE {
         m_startDate = m_lastSaveDate = m_lastAchievementDate = { 0, 0, 0 };
         m_lastSaveTime = m_playTime = { 0, 0, 0 };
         m_lastSaveLocation          = 0;
+
+        m_lastPokeCenter = { 255, { 0, 0, 0 } };
+        m_lastCaveEntry  = { 255, { 0, 0, 0 } };
+        m_lastOWPos      = { 255, { 0, 0, 0 } };
+
         m_HOENN_Badges = m_FRONTIER_Badges = m_KANTO_Badges = m_JOHTO_Badges = m_RESERVED_Badges
             = m_lastAchievementEvent                                         = 0;
 
@@ -212,10 +217,16 @@ namespace SAVE {
             = m_lstDex                                                               = 0;
         std::memset( m_lstViewedItem, 0, sizeof( m_lstViewedItem ) );
 
+        m_lstLocalDexPage = m_lstLocalDexSlot = 0;
+
         m_mapObjectCount = 0;
         m_playerPriority = OBJPRIORITY_1;
 
         m_options.clear( );
+
+        m_currentFlyBank = m_forcedMovement = m_mapObjAttachedIdx = m_objectAttached = 0;
+
+        m_currentMapWeather = (MAP::mapWeather) 0;
 
         m_registeredItem = m_lstBag = m_lstUsedItem = m_repelSteps = 0;
         std::memset( m_pkmnTeam, 0, sizeof( m_pkmnTeam ) );
@@ -233,10 +244,14 @@ namespace SAVE {
 
         std::memset( &m_bag, 0, sizeof( BAG::bag ) );
 
+        std::memset( m_dayCarePkmn, 0, sizeof( m_dayCarePkmn ) );
+        std::memset( m_dayCareEgg, 0, sizeof( m_dayCareEgg ) );
         std::memset( m_storedPokemon, 0, sizeof( m_storedPokemon ) );
 
         std::memset( m_caughtPkmn, 0, sizeof( m_caughtPkmn ) );
         std::memset( m_seenPkmn, 0, sizeof( m_seenPkmn ) );
+        std::memset( m_shinyPkmn, 0, sizeof( m_shinyPkmn ) );
+        std::memset( m_unusedPkmn, 0, sizeof( m_unusedPkmn ) );
     }
     void saveGame::playerInfo::initialize( ) {
         clear( );
