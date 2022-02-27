@@ -38,6 +38,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "item.h"
 #include "saveGame.h"
 #include "screenFade.h"
+#include "strings.h"
 #include "yesNoBox.h"
 
 // Sprites
@@ -295,7 +296,7 @@ namespace BAG {
             IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
 
             if( p_data->m_itemType & ITEM::ITEMTYPE_BERRY ) {
-                display = std::string( GET_STRING( 575 ) )
+                display = std::string( GET_STRING( STR_UI_BAG_NUMBER ) )
                           + std::to_string( ITEM::itemToBerry( p_itemId ) ) + ": "
                           + ITEM::getItemName( p_itemId );
             } else {
@@ -365,28 +366,30 @@ namespace BAG {
 
             display = ITEM::getItemName( p_itemId ) + ": " + MOVE::getMoveName( p_data->m_param2 );
 
-            IO::regularFont->printStringC( GET_STRING( 29 ), 56, 147, false, IO::font::RIGHT );
+            IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_TYPE ), 56, 147, false,
+                                           IO::font::RIGHT );
             tileCnt
                 = IO::loadTypeIcon( move.m_type, 62, 146, 1, 1, tileCnt, false, CURRENT_LANGUAGE );
 
-            IO::regularFont->printStringC( GET_STRING( 30 ), 146, 147, false, IO::font::RIGHT );
+            IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_CATEGORY ), 146, 147, false,
+                                           IO::font::RIGHT );
             IO::loadDamageCategoryIcon( move.m_category, 152, 146, 2, 2, tileCnt, false );
 
-            snprintf( buffer, 99, "%s  %2d", GET_STRING( 31 ), move.m_pp );
+            snprintf( buffer, 99, "%s  %2d", GET_STRING( STR_UI_BAG_PP ), move.m_pp );
             IO::regularFont->printStringC( buffer, 225, 147, false, IO::font::RIGHT );
 
             IO::regularFont->setColor( IO::RED_IDX, 1 );
 
             // power / acc
             if( move.m_basePower ) {
-                snprintf( buffer, 24, GET_STRING( 390 ), move.m_basePower );
+                snprintf( buffer, 24, GET_STRING( STR_UI_BAG_POWER ), move.m_basePower );
                 IO::regularFont->printStringC( buffer, 80, 166, false, IO::font::CENTER );
             }
 
             if( move.m_accuracy > 0 && move.m_accuracy <= 100 ) {
-                snprintf( buffer, 24, GET_STRING( 391 ), move.m_accuracy );
+                snprintf( buffer, 24, GET_STRING( STR_UI_BAG_ACCURACY ), move.m_accuracy );
             } else {
-                snprintf( buffer, 24, GET_STRING( 392 ) );
+                snprintf( buffer, 24, GET_STRING( STR_UI_BAG_ACCURACY_NO_MISS ) );
             }
             IO::regularFont->setColor( IO::BLUE_IDX, 1 );
             if( move.m_basePower ) {
@@ -456,7 +459,8 @@ namespace BAG {
             if( _playerTeam[ i ].isEgg( ) ) {
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-                IO::regularFont->printStringC( GET_STRING( 34 ), 45, SINGLE_LINE, true );
+                IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_PARTY_EGG ), 45, SINGLE_LINE,
+                                               true );
             } else {
                 if( p_data == nullptr ) {
                     IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45,
@@ -467,7 +471,8 @@ namespace BAG {
                         IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 45,
                                                        SECOND_LINE, true );
                     } else
-                        IO::regularFont->printStringC( GET_STRING( 42 ), 45, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_PARTY_NO_ITEM ), 45,
+                                                       SECOND_LINE, true );
 
                     continue;
                 }
@@ -487,19 +492,20 @@ namespace BAG {
                         || currMv == _playerTeam[ i ].getMove( 3 ) ) {
                         IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 35 ), 45, SECOND_LINE, true,
-                                                       IO::font::LEFT, 11 );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_ALREADY_LEARNED ), 45,
+                                                       SECOND_LINE, true, IO::font::LEFT, 11 );
                     } else if( canLearn( _playerTeam[ i ].getSpecies( ),
                                          _playerTeam[ i ].getForme( ), currMv, LEARN_TM ) ) {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 36 ), 45, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_LEARN_POSSIBLE ), 45,
+                                                       SECOND_LINE, true );
                     } else {
                         IO::regularFont->setColor( IO::RED_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 37 ), 45, SECOND_LINE, true,
-                                                       IO::font::LEFT, 11 );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_LEARN_NOT_POSSIBLE ),
+                                                       45, SECOND_LINE, true, IO::font::LEFT, 11 );
                     }
                 } else if( p_itemId && ( p_data->m_itemType & 15 ) == ITEM::ITEMTYPE_MEDICINE ) {
                     IO::smallFont->setColor( 0, 0 );
@@ -519,12 +525,13 @@ namespace BAG {
                         BG_PALETTE_SUB[ IO::COLOR_IDX ] = IO::GREEN;
                         IO::regularFont->setColor( IO::COLOR_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 40 ), 45, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_POSSIBLE ), 45,
+                                                       SECOND_LINE, true );
                     } else {
                         IO::regularFont->setColor( IO::RED_IDX, 1 );
                         IO::regularFont->setColor( 0, 2 );
-                        IO::regularFont->printStringC( GET_STRING( 41 ), 45, SECOND_LINE, true,
-                                                       IO::font::LEFT, 11 );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_NOT_POSSIBLE ), 45,
+                                                       SECOND_LINE, true, IO::font::LEFT, 11 );
                     }
                 } else {
                     IO::regularFont->setColor( 0, 2 );
@@ -533,7 +540,8 @@ namespace BAG {
                         IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 45,
                                                        SECOND_LINE, true );
                     } else
-                        IO::regularFont->printStringC( GET_STRING( 42 ), 45, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_PARTY_NO_ITEM ), 45,
+                                                       SECOND_LINE, true );
                 }
             }
         }
@@ -623,7 +631,8 @@ namespace BAG {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->printStringC( GET_STRING( 11 + p_page ), 128, 4, false, IO::font::CENTER );
+        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_PAGE_NAME_START + p_page ), 128, 4,
+                                       false, IO::font::CENTER );
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
@@ -638,7 +647,8 @@ namespace BAG {
         IO::updateOAM( true );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->printStringC( GET_STRING( 166 ), 67, 5, true, IO::font::CENTER );
+        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_CHOOSE_PKMN ), 67, 5, true,
+                                       IO::font::CENTER );
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
     }
@@ -731,7 +741,7 @@ namespace BAG {
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
+                GET_STRING( STR_UI_YES ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8, p_bottom, IO::font::CENTER );
 
             res.push_back(
@@ -746,7 +756,7 @@ namespace BAG {
                                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
+                GET_STRING( STR_UI_NO ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, p_bottom, IO::font::CENTER );
 
             res.push_back(
@@ -800,7 +810,8 @@ namespace BAG {
             bool found = false;
             for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) {
                 if( _itemCache[ i ].first == p_item ) {
-                    snprintf( buffer, 99, GET_STRING( 57 ), _itemCache[ i ].second.c_str( ) );
+                    snprintf( buffer, 99, GET_STRING( STR_UI_BAG_ASK_ITEM_ACTION ),
+                              _itemCache[ i ].second.c_str( ) );
                     found = true;
                     break;
                 }
@@ -808,7 +819,7 @@ namespace BAG {
             if( !found ) {
                 for( u8 i = 0; i < 6; ++i ) {
                     if( _teamItemCache[ i ].first == p_item ) {
-                        snprintf( buffer, 99, GET_STRING( 57 ),
+                        snprintf( buffer, 99, GET_STRING( STR_UI_BAG_ASK_ITEM_ACTION ),
                                   _teamItemCache[ i ].second.c_str( ) );
                         found = true;
                         break;
@@ -816,10 +827,12 @@ namespace BAG {
                 }
             }
             if( !found ) [[unlikely]] {
-                snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
+                snprintf( buffer, 99, GET_STRING( STR_UI_BAG_ASK_ITEM_ACTION ),
+                          ITEM::getItemName( p_item ).c_str( ) );
             }
         } else {
-            snprintf( buffer, 99, GET_STRING( 57 ), ITEM::getItemName( p_item ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( STR_UI_BAG_ASK_ITEM_ACTION ),
+                      ITEM::getItemName( p_item ).c_str( ) );
         }
 
         IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y,
@@ -883,8 +896,8 @@ namespace BAG {
         IO::printRectangle( oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y,
                             256 - oam[ SPR_MSG_BOX_OAM_SUB ].x, oam[ SPR_MSG_BOX_OAM_SUB ].y + 31,
                             true, 0 );
-        IO::regularFont->printStringC( GET_STRING( 49 ), 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8,
-                                       true, IO::font::CENTER );
+        IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_CHOOSE_MOVE ), 128,
+                                       oam[ SPR_MSG_BOX_OAM_SUB ].y + 8, true, IO::font::CENTER );
 
         for( u8 i = 0; i < 4 + !!p_extraMove; ++i ) {
             if( i < 4 && !p_pokemon->getMove( i ) ) { break; }
@@ -988,7 +1001,8 @@ namespace BAG {
             }
         } else {
             for( u8 i = 0; i < MAX_ITEMS_PER_PAGE; ++i ) { drawItemSub( 0, nullptr, i ); }
-            IO::regularFont->printStringC( GET_STRING( 43 ), 182, 89, true, IO::font::CENTER );
+            IO::regularFont->printStringC( GET_STRING( STR_UI_BAG_EMPTY ), 182, 89, true,
+                                           IO::font::CENTER );
             IO::updateOAM( false );
         }
         IO::updateOAM( true );

@@ -33,6 +33,7 @@
 #include "screenFade.h"
 #include "sound.h"
 #include "sprite.h"
+#include "strings.h"
 #include "uio.h"
 
 namespace IO::ANIM {
@@ -102,7 +103,8 @@ namespace IO::ANIM {
         BG_PALETTE[ BLACK_IDX ] = BLACK;
 
         char buffer[ 200 ];
-        snprintf( buffer, 200, GET_STRING( 51 ), getDisplayName( p_startSpecies ).c_str( ) );
+        snprintf( buffer, 200, GET_STRING( STR_ANIM_EVOLUTION_START ),
+                  getDisplayName( p_startSpecies ).c_str( ) );
         regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
 
         initOAMTable( false );
@@ -156,7 +158,8 @@ namespace IO::ANIM {
             SOUND::playCry( p_startSpecies );
             for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
             clearScreen( true, true, true );
-            regularFont->printStringC( GET_STRING( 388 ), 127, 136, false, font::CENTER );
+            regularFont->printStringC( GET_STRING( STR_ANIM_EVOLUTION_ABORTED ), 127, 136, false,
+                                       font::CENTER );
             waitForInteract( );
             SOUND::restartBGM( );
             return false;
@@ -168,7 +171,8 @@ namespace IO::ANIM {
             SOUND::playCry( p_endSpecies );
             clearScreen( true, true, true );
             for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
-            snprintf( buffer, 200, GET_STRING( 52 ), getDisplayName( p_startSpecies ).c_str( ),
+            snprintf( buffer, 200, GET_STRING( STR_ANIM_EVOLUTION_COMPLETE ),
+                      getDisplayName( p_startSpecies ).c_str( ),
                       getDisplayName( p_endSpecies ).c_str( ) );
             regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
             waitForInteract( );
@@ -235,7 +239,8 @@ namespace IO::ANIM {
         SOUND::playBGMOneshot( MOD_OS_EVOLVED );
         char buffer[ 200 ];
         clearScreen( true, true, true );
-        snprintf( buffer, 200, GET_STRING( 389 ), getDisplayName( p_pkmn.m_pkmnIdx ).c_str( ) );
+        snprintf( buffer, 200, GET_STRING( STR_ANIM_EGG_HATCH ),
+                  getDisplayName( p_pkmn.m_pkmnIdx ).c_str( ) );
         regularFont->printStringC( buffer, 127, 136, false, font::CENTER );
         setFrameVis( 0, true );
         setFrameVis( 1, false );
