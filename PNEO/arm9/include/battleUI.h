@@ -261,8 +261,15 @@ namespace BATTLE {
          * @brief: Shows the attack selection for the given pkmn.
          */
         std::vector<std::pair<IO::inputTarget, u8>>
+        showAttackSelection( boxPokemon* p_pokemon, bool p_canUseMove[ 4 ],
+                             bool p_showMegaEvolution, u8 p_highlightedButton = -1,
+                             bool p_megaButtonActive = false );
+        inline std::vector<std::pair<IO::inputTarget, u8>>
         showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ], bool p_showMegaEvolution,
-                             u8 p_highlightedButton = -1, bool p_megaButtonActive = false );
+                             u8 p_highlightedButton = -1, bool p_megaButtonActive = false ) {
+            return showAttackSelection( &p_pokemon->m_boxdata, p_canUseMove, p_showMegaEvolution,
+                                        p_highlightedButton, p_megaButtonActive );
+        }
 
         /*
          * @brief: Shows the target selection for the specified choices.

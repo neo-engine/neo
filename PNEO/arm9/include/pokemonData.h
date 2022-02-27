@@ -233,7 +233,7 @@ struct pkmnEvolveData {
     u16           m_evolutionCount;
     u16           m_preEvolution;
     u32           m_baseEvolution; // (forme << 16) | (speciesidx)
-    pkmnEvolution m_evolutions[ 8 ];
+    pkmnEvolution m_evolutions[ 10 ];
 };
 
 std::string getSpeciesName( u16 p_pkmnId, u8 p_language, u8 p_forme );

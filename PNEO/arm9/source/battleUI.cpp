@@ -306,8 +306,8 @@ namespace BATTLE {
                 = IO::OamTop->oamBuffer[ SPR_HPBAR_OAM + i ].x + ( ( i < 2 ) ? -8 : 34 + 82 );
             u16 anchory = IO::OamTop->oamBuffer[ SPR_HPBAR_OAM + i ].y + 4;
             tileCnt     = IO::loadSprite( SPR_STATUS_ICON_OAM( i ), SPR_STATUS_ICON_PAL, tileCnt,
-                                      anchorx, anchory, 8, 8, 0, 0, 8 * 8 / 2, false, false, true,
-                                      OBJPRIORITY_0, false, OBJMODE_NORMAL );
+                                          anchorx, anchory, 8, 8, 0, 0, 8 * 8 / 2, false, false, true,
+                                          OBJPRIORITY_0, false, OBJMODE_NORMAL );
             IO::loadSprite( SPR_SHINY_ICON_OAM( i ), SPR_SHINY_ICON_PAL,
                             IO::OamTop->oamBuffer[ SPR_SHINY_ICON_OAM( 0 ) ].gfxIndex, anchorx,
                             anchory + 8, 8, 8, 0, 0, 0, false, false, true, OBJPRIORITY_0, false,
@@ -2278,7 +2278,7 @@ namespace BATTLE {
     }
 
     std::vector<std::pair<IO::inputTarget, u8>>
-    battleUI::showAttackSelection( pokemon* p_pokemon, bool p_canUseMove[ 4 ],
+    battleUI::showAttackSelection( boxPokemon* p_pokemon, bool p_canUseMove[ 4 ],
                                    bool p_showMegaEvolution, u8 p_highlightedButton,
                                    bool p_megaButtonActive ) {
         (void) p_megaButtonActive;
@@ -2416,9 +2416,8 @@ namespace BATTLE {
                                                oam[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true,
                                                IO::font::CENTER );
 
-                snprintf(
-                    buffer, 49, GET_STRING( 377 ), p_pokemon->m_boxdata.m_curPP[ i ],
-                    s8( mdatas[ i ].m_pp * ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
+                snprintf( buffer, 49, GET_STRING( 377 ), p_pokemon->m_curPP[ i ],
+                          s8( mdatas[ i ].m_pp * ( ( 5 + p_pokemon->PPupget( i ) ) / 5.0 ) ) );
                 IO::smallFont->printStringC( buffer, oam[ SPR_MOVE_OAM_SUB( i ) ].x + 84,
                                              oam[ SPR_MOVE_OAM_SUB( i ) ].y + 13, true,
                                              IO::font::RIGHT );

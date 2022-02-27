@@ -1261,7 +1261,7 @@ namespace BATTLE {
                                 _battleUI.printTopMessage( p_message, true );
                                 for( u8 g = 0; g < 100; ++g ) swiWaitForVBlank( );
                             },
-                            [ & ]( boxPokemon*, u16 ) -> u8 {
+                            [ & ]( boxPokemon* p_pkmn, u16 ) -> u8 {
                                 IO::choiceBox cb = IO::choiceBox(
                                     IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
                                 u8 curSel = 0;
@@ -1269,13 +1269,13 @@ namespace BATTLE {
                                 bool canUse[ 4 ] = { 1, 1, 1, 1 };
                                 u8   rs          = cb.getResult(
                                                [ & ]( u8 ) {
-                                        return _battleUI.showAttackSelection( &_playerTeam[ i ],
-                                                                                         canUse, false );
+                                        return _battleUI.showAttackSelection( p_pkmn, canUse,
+                                                                                         false );
                                                },
                                                [ & ]( u8 p_selection ) {
                                         curSel = p_selection;
-                                        _battleUI.showAttackSelection( &_playerTeam[ i ], canUse,
-                                                                                  false, curSel, false );
+                                        _battleUI.showAttackSelection( p_pkmn, canUse, false,
+                                                                                  curSel, false );
                                                },
                                                curSel );
 
@@ -1312,8 +1312,8 @@ namespace BATTLE {
                                                 _playerTeam[ i ].getForme( ) );
 
                 u8 ev = 0;
-                if( ( ev = _playerTeam[ i ].getItem( ) != I_EVERSTONE
-                           && _playerTeam[ i ].canEvolve( 0, EVOMETHOD_LEVEL_UP, &edata ) ) ) {
+                if( _playerTeam[ i ].getItem( ) != I_EVERSTONE
+                    && ( ev = _playerTeam[ i ].canEvolve( 0, EVOMETHOD_LEVEL_UP, &edata ) ) ) {
 
                     u16 oldsp = _playerTeam[ i ].getSpecies( );
                     u8  oldfm = _playerTeam[ i ].getForme( );
