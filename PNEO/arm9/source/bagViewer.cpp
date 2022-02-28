@@ -85,10 +85,10 @@ namespace BAG {
                     _view.push_back( std::pair( ci, idata ) );
                 }
                 _currentViewEnd = ( _currentViewEnd + 1 ) % sz;
-            }
-            if( _currentViewEnd == _currentViewStart ) {
-                // bag contains less than MAX_ITEMS_PER_PAGE items.
-                break;
+                if( _currentViewEnd == _currentViewStart ) {
+                    // bag contains less than MAX_ITEMS_PER_PAGE items.
+                    return;
+                }
             }
         }
     }
