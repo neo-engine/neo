@@ -1184,6 +1184,10 @@ namespace NAV {
                     const std::vector<std::string>&         p_itemNames,
                     const std::vector<ITEM::itemData>& p_data, u8 p_paymentMethod,
                     u8 p_firstItem ) {
+
+        auto num_items
+            = std::min( p_data.size( ), std::min( p_itemNames.size( ), p_offeredItems.size( ) ) );
+
         std::vector<std::pair<IO::inputTarget, u8>> res
             = std::vector<std::pair<IO::inputTarget, u8>>( );
 
@@ -1223,8 +1227,7 @@ namespace NAV {
             oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
         }
 
-        for( u8 i = 0; i < std::min( u32( 6 ), u32( p_offeredItems.size( ) - p_firstItem ) );
-             i++ ) {
+        for( u8 i = 0; i < std::min( u32( 6 ), u32( num_items - p_firstItem ) ); i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
 
@@ -1303,7 +1306,7 @@ namespace NAV {
 
         // next page
         oam[ SPR_PAGE_BG_OAM_SUB + 2 ].isHidden = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].isHidden = false;
-        bool nextpg = size_t( p_firstItem + 6 ) < p_offeredItems.size( );
+        bool nextpg                             = size_t( p_firstItem + 6 ) < num_items;
         oam[ SPR_PAGE_BG_OAM_SUB + 5 ].isHidden = !nextpg;
         if( nextpg ) {
             res.push_back( { IO::inputTarget( oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x,
@@ -1314,8 +1317,7 @@ namespace NAV {
         }
 
         // page no
-        snprintf( buffer, 90, "%i / %i", p_firstItem / 6 + 1,
-                  ( p_offeredItems.size( ) - 1 ) / 6 + 1 );
+        snprintf( buffer, 90, "%i / %i", p_firstItem / 6 + 1, ( num_items - 1 ) / 6 + 1 );
         IO::regularFont->printStringC( buffer, 128, oam[ SPR_PAGE_BG_OAM_SUB ].y + 8, true,
                                        IO::font::CENTER );
 
