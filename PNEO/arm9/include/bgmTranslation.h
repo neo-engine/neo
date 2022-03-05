@@ -115,5 +115,6 @@ constexpr int BGMIndexForName( unsigned p_name ) {
    case BGM_DISTORTION_WORLD: return MOD_DISTORTION_WORLD;
    case BGM_EX06: return MOD_EX06;
    case BGM_POKE_RADAR: return MOD_POKE_RADAR;
+   case BGM_GHOST_GIRL: return MOD_GHOST_GIRL;
    }
 }
