@@ -2029,7 +2029,7 @@ namespace BATTLE {
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
-                IO::loadSprite( "bt/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
+                IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
