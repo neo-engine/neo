@@ -149,10 +149,13 @@ namespace IO {
             oam->matrixBuffer[ i ].vdy = 1 << 8;
         }
 
-        if( p_bottom )
+        if( p_bottom ) {
+            // This is bad style, but fast.
             memset( SPRITE_GFX_SUB, 0, 1024 );
-        else
+        } else {
+            // This is bad style, but fast.
             memset( SPRITE_GFX, 0, 1024 );
+        }
         updateOAM( p_bottom );
     }
 
@@ -460,7 +463,10 @@ namespace IO {
             if( !( f = checkOrOpenPKMNFile( p_files, p_path, p_pkmn.m_female, p_pkmn.m_shiny ) ) ) {
                 return false;
             }
-            if( !seekSpriteData( f, p_pkmn.m_pkmnIdx, p_dataSize ) ) { return false; }
+            if( !seekSpriteData( f, p_pkmn.m_pkmnIdx, p_dataSize ) ) {
+                if( f ) { fclose( f ); }
+                return false;
+            }
         } else {
             snprintf( BUFFER, 149, "%s/%d/%d_%hhu%s%s.raw", p_path,
                       p_pkmn.m_pkmnIdx / FS::ITEMS_PER_DIR, p_pkmn.m_pkmnIdx, p_pkmn.m_forme,

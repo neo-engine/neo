@@ -31,6 +31,9 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
 			-Wfloat-equal -Wformat=1 -Wlogical-op\
+			-Wno-analyzer-possible-null-dereference\
+			-Wno-analyzer-possible-null-argument\
+			-Wno-array-bounds -Wno-analyzer-null-dereference\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\
@@ -49,7 +52,7 @@ endif
 
 
 CFLAGS	+=	$(INCLUDE) -DARM9
-CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++2a -Wno-multichar
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++23 -Wno-multichar
 
 ASFLAGS	:=	-g $(ARCH) -march=armv5te -mtune=arm946e-s
 

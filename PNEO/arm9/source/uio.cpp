@@ -44,10 +44,10 @@ namespace IO {
         = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
     ConsoleFont *consoleFont = new ConsoleFont( );
 
-    OAMTable * Oam = new OAMTable( );
+    OAMTable  *Oam = new OAMTable( );
     SpriteInfo spriteInfo[ SPRITE_COUNT ];
 
-    OAMTable * OamTop = new OAMTable( );
+    OAMTable  *OamTop = new OAMTable( );
     SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
     u8 TEXTSPEED = 50;
@@ -61,7 +61,7 @@ namespace IO {
 
     void initVideo( bool p_noFade ) {
         vramSetBankA( VRAM_A_MAIN_BG_0x06000000 );
-//        vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
+        //        vramSetBankB( VRAM_B_MAIN_BG_0x06020000 );
 
         vramSetBankB( VRAM_B_MAIN_SPRITE );
 

@@ -1827,7 +1827,7 @@ namespace BATTLE {
 #ifdef DESQUID_MORE
                 std::string lmsg = "Distributing EXP to ";
 #endif
-                std::vector<u8> reg, share;
+                std::vector<u8> reg = std::vector<u8>( ), share = std::vector<u8>( );
                 for( u8 q2 = 0; q2 < _playerTeamSize; ++q2 ) {
                     if( _yieldEXP[ j ].count( _playerPkmnPerm[ q2 ] )
                         && _playerTeam[ q2 ].canBattle( ) ) {
