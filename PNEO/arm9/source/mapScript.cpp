@@ -62,23 +62,23 @@ namespace MAP {
 #define PARAMB( p_ins )  ( ( p_ins ) & ( 0xFFF ) )
 
     // special functions
-    // 1 heal entire team
-    // 2 run constructed poke mart
-    // 3 get badge count (param1: region [0: Hoenn, 1: battle frontier])
-    // 4 get init game item count
-    // 5 get (and remove) init game item par1
-    // 6 Initial pkmn selection
-    // 7 NAV::init( )
-    // 8 Catching tutorial
-    // 9 award badge (p1: region, p2: badge)
-    // 10 run choice box
-    // 11 getCurrentDaytime( )
-    // 12 pkmn day care (par: # of day care) (take/hand over pkmn)
-    // 13 pkmn day care (obtain egg)
-    // 14 save game
+    constexpr u8 CLL_HEAL_ENTIRE_TEAM     = 1;
+    constexpr u8 CLL_RUN_POKE_MART        = 2;
+    constexpr u8 CLL_GET_BADGE_COUNT      = 3; // (param1: region [0: Hoenn, 1: battle frontier])
+    constexpr u8 CLL_INIT_GAME_ITEM_COUNT = 4;
+    constexpr u8 CLL_GET_AND_REMOVE_INIT_GAME_ITEM = 5;
+    constexpr u8 CLL_RUN_INITIAL_PKMN_SELECTION    = 6;
+    constexpr u8 CLL_NAV_INIT                      = 7; // NAV::init( )
+    constexpr u8 CLL_RUN_CATCHING_TUTORIAL         = 8;
+    constexpr u8 CLL_AWARD_BADGE                   = 9; // (p1: region, p2: badge)
+    constexpr u8 CLL_RUN_CHOICE_BOX                = 10;
+    constexpr u8 CLL_GET_CURRENT_DAYTIME           = 11; // getCurrentDaytime( )
+    constexpr u8 CLL_DAYCARE_BAA_SAN = 12; // (par: # of day care) (take/hand over pkmn)
+    constexpr u8 CLL_DAYCARE_JII_SAN = 13; // (obtain egg)
+    constexpr u8 CLL_SAVE_GAME       = 14;
 
     // battle zone facilities
-    // 0 battle factory
+    constexpr u8 BTZ_BATTLE_FACTORY = 0;
 
     enum opCode : u8 {
         EOP = 0,  // end of program
@@ -921,6 +921,20 @@ namespace MAP {
                 choiceBoxPL.push_back( parB );
                 break;
 
+            case BTZ: {
+                // par 1: battle facility
+                // par 2: ruleset (max level, num pkmn, battle mode, num battles, fixed
+                // encounters, etc); each
+                // ruleset has a corresponding set of possible teams/pkmn to pick from
+                switch( par1 ) {
+                case BTZ_BATTLE_FACTORY: {
+                    runBattleFactory( FACILITY_RULE_SETS[ par2 ] );
+                    break;
+                }
+                }
+                break;
+            }
+
             case MBG:
                 pmartCurr = par1;
                 martSell  = par2;
@@ -929,25 +943,26 @@ namespace MAP {
             case MIT: martItems.push_back( { parA, parB } ); break;
             case CLL:
                 switch( par1 ) {
-                case 1: { // heal pkmn team
+
+                case CLL_HEAL_ENTIRE_TEAM: { // heal pkmn team
                     for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
                         SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->heal( );
                     }
                     break;
                 }
-                case 2: { // run pokemart
+                case CLL_RUN_POKE_MART: { // run pokemart
                     runPokeMart( martItems, 0, martSell, pmartCurr );
                     break;
                 }
-                case 3: {
+                case CLL_GET_BADGE_COUNT: {
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).getBadgeCount( par2 );
                     break;
                 }
-                case 4: {
+                case CLL_INIT_GAME_ITEM_COUNT: {
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItemCount;
                     break;
                 }
-                case 5: {
+                case CLL_GET_AND_REMOVE_INIT_GAME_ITEM: {
                     // At most 4 init game items
                     if( par2 <= 4 ) [[likely]] {
                         registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_initGameItems[ par2 ];
@@ -967,24 +982,24 @@ namespace MAP {
                     SAVE::SAV.getActiveFile( ).m_initGameItemCount--;
                     break;
                 }
-                case 6: {
+                case CLL_RUN_INITIAL_PKMN_SELECTION: {
                     // init pkmn
                     SPX::runInitialPkmnSelection( );
                     break;
                 }
-                case 7: {
+                case CLL_NAV_INIT: {
                     NAV::init( );
                     break;
                 }
-                case 8: {
+                case CLL_RUN_CATCHING_TUTORIAL: {
                     SPX::runCatchingTutorial( );
                     break;
                 }
-                case 9: {
+                case CLL_AWARD_BADGE: {
                     awardBadge( par2, par3 );
                     break;
                 }
-                case 10: {
+                case CLL_RUN_CHOICE_BOX: {
                     IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
                     registers[ 0 ]   = cb.getResult( GET_MAP_STRING( choiceBoxMessage ),
                                                      style( choiceBoxMsgType ), choiceBoxItems );
@@ -992,11 +1007,11 @@ namespace MAP {
                     NAV::init( );
                     break;
                 }
-                case 11: { // get current time
+                case CLL_GET_CURRENT_DAYTIME: { // get current time
                     registers[ 0 ] = getCurrentDaytime( );
                     break;
                 }
-                case 12: {
+                case CLL_DAYCARE_BAA_SAN: {
                     // day care baa san
                     boxPokemon* dc1 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 ];
                     boxPokemon* dc2 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 + 1 ];
@@ -1231,7 +1246,7 @@ namespace MAP {
 
                     break;
                 }
-                case 13: {
+                case CLL_DAYCARE_JII_SAN: {
                     // day care jii san
 
                     boxPokemon* dc1 = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ par2 * 2 ];
@@ -1312,7 +1327,7 @@ namespace MAP {
 
                     break;
                 }
-                case 14: {
+                case CLL_SAVE_GAME: {
                     // save game, writes 1 to eval reg if successful
 
                     IO::yesNoBox yn;
@@ -1695,8 +1710,9 @@ namespace MAP {
         }
         case EVENT_OW_PKMN: {
             if( !SAVE::SAV.getActiveFile( ).checkFlag( p_event.m_deactivateFlag ) ) {
-                ANIMATE_MAP  = false;
-                DRAW_TIME    = false;
+                ANIMATE_MAP = false;
+                DRAW_TIME   = false;
+                resetTracerChain( true );
                 u16  pkmnIdx = p_event.m_data.m_owPkmn.m_speciesId;
                 u8   level   = p_event.m_data.m_owPkmn.m_level;
                 u8   forme   = p_event.m_data.m_owPkmn.m_forme & ( ~( ( 1 << 6 ) | ( 1 << 7 ) ) );
@@ -1718,59 +1734,24 @@ namespace MAP {
                 bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
                        BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
-                if( luckyenc ) {
-                    SOUND::playBGM( MOD_BATTLE_WILD_ALT );
-                } else {
-                    SOUND::playBGM( SOUND::BGMforWildBattle( pkmnIdx ) );
-                }
+                wildPkmnType btType
+                    = SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ? WATER : GRASS;
 
-                IO::fadeScreen( IO::BATTLE );
-                IO::BG_PAL( true )[ 0 ] = 0;
-                IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
-                dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-                dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+                prepareBattleWildPkmn( btType, pkmnIdx, luckyenc );
 
-                auto wildPkmn = pokemon( pkmnIdx, level, forme, 0,
-                                         shiny ? shiny : ( luckyenc ? 255 : ( charm ? 3 : 0 ) ),
-                                         hiddenab || luckyenc, false, 0, 0, fateful || luckyenc );
+                WILD_PKMN = pokemon( pkmnIdx, level, forme, 0,
+                                     shiny ? shiny : ( luckyenc ? 255 : ( charm ? 3 : 0 ) ),
+                                     hiddenab || luckyenc, false, 0, 0, fateful || luckyenc );
 
-                u8 platform = 0, plat2 = 0, battleBack = 0;
-
-                if( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ) {
-                    battleBack = currentData( ).m_surfBattleBG;
-                    platform   = currentData( ).m_surfBattlePlat1;
-                    plat2      = currentData( ).m_surfBattlePlat2;
-                } else {
-                    battleBack = currentData( ).m_battleBG;
-                    platform   = currentData( ).m_battlePlat1;
-                    plat2      = currentData( ).m_battlePlat2;
-                }
-
-                auto playerPrio = _mapSprites.getPriority( _playerSprite );
-                swiWaitForVBlank( );
-                auto battleres
-                    = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                                      SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn,
-                                      platform, plat2, battleBack, getBattlePolicy( true ) )
-                          .start( );
+                SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, 1 );
+                auto battleres = battleWildPkmn( btType );
                 if( battleres == BATTLE::battle::BATTLE_OPPONENT_WON ) {
-                    faintPlayer( );
+                    SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, 0 );
                     return;
                 }
-                SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, 1 );
-                SOUND::restartBGM( );
-                FADE_TOP_DARK( );
-                draw( playerPrio );
-
-                _mapSprites.setPriority( _playerSprite,
-                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
-                NAV::init( );
-
-                ANIMATE_MAP = true;
-                DRAW_TIME   = true;
                 if( battleres != BATTLE::battle::BATTLE_CAPTURE ) {
                     char buffer[ 100 ];
-                    snprintf( buffer, 99, GET_STRING( 672 ), wildPkmn.m_boxdata.m_name );
+                    snprintf( buffer, 99, GET_STRING( 672 ), WILD_PKMN.m_boxdata.m_name );
                     printMapMessage( std::string( buffer ), MSG_NORMAL );
                 }
             }

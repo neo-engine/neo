@@ -64,12 +64,35 @@ namespace SAVE {
     constexpr u16 F_SCND_DAYCARE_EGG  = 191;
     constexpr u16 F_THRD_DAYCARE_EGG  = 192;
 
+    constexpr u16 F_SLATEPORT_BATTLE_TENT_STREAK_ONGOING = 194;
+    constexpr u16 F_BATTLE_FACTORY_50_STREAK_ONGOING     = 221;
+    constexpr u16 F_BATTLE_FACTORY_100_STREAK_ONGOING    = 222;
+
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;
     }
 
-    constexpr u8 V_INITIAL_PKMN_CHOICE = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
-    constexpr u8 V_NUM_FAINTED         = 1; // how often the player fainted
+    constexpr u8 V_INITIAL_PKMN_CHOICE          = 0; // 1: TREECKO, 2: TORCHIC, 3: MUDKIP, 0: NONE
+    constexpr u8 V_NUM_FAINTED                  = 1; // how often the player fainted
+    constexpr u8 V_SLATEPORT_BATTLE_TENT_STREAK = 2;
+    constexpr u8 V_UNUSED_BATTLE_TENT_STREAK_1  = 3;
+    constexpr u8 V_UNUSED_BATTLE_TENT_STREAK_2  = 4;
+    constexpr u8 V_BATTLE_FACTORY_50_STREAK     = 20;
+    constexpr u8 V_BATTLE_FACTORY_100_STREAK    = 21;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_1_50_STREAK         = 22;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_1_100_STREAK        = 23;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_2_50_STREAK         = 24;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_2_100_STREAK        = 25;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_3_50_STREAK         = 26;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_3_100_STREAK        = 27;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_4_50_STREAK         = 28;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_4_100_STREAK        = 29;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_5_50_STREAK         = 30;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_5_100_STREAK        = 31;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_6_50_STREAK         = 32;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_6_100_STREAK        = 33;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_6_50_DOUBLE_STREAK  = 34;
+    constexpr u8 V_UNUSED_BATTLE_FACILITY_6_100_DOUBLE_STREAK = 35;
 
     extern const char* EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
 

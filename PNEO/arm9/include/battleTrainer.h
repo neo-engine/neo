@@ -71,6 +71,9 @@ namespace BATTLE {
     battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );
     bool          getBattleTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
 
+    bool getBattleFacilityTrainer( u16 p_battleTrainerId, u8 p_language, battleTrainer* p_out );
+    bool getBattleFacilityTrainerTeam( u8 p_rulesId, u16 p_battleTrainerId, battleTrainer* p_out );
+
     constexpr bool isDoubleBattleTrainerClass( u16 p_trainerClass ) {
         switch( p_trainerClass ) {
         case TC_ACE_DUO:

@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "battle.h"
+#include "mapBattleFacilityDefines.h"
 #include "mapDefines.h"
 #include "mapObject.h"
 #include "mapSlice.h"
@@ -255,7 +256,7 @@ namespace MAP {
         /*
          * @brief: Runs a wild pkmn battle against WILD_PKMN
          */
-        bool battleWildPkmn( wildPkmnType p_type );
+        BATTLE::battle::battleEndReason battleWildPkmn( wildPkmnType p_type );
 
         u8 getWildPkmnLevel( u16 p_rnd );
 
@@ -415,6 +416,12 @@ namespace MAP {
          * Called "level script" for historic reasons.
          */
         void runLevelScripts( const mapData& p_data, u16 p_mapX, u16 p_mapY );
+
+        /*
+         * @brief: Runs a battle factory challenge, starting at the player standing in the
+         * waiting room. Hands out any prizes
+         */
+        void runBattleFactory( const ruleSet& p_rules );
 
       public:
         const block&        at( u16 p_x, u16 p_y ) const;

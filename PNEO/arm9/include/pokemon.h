@@ -47,6 +47,14 @@ struct trainerPokemon {
     u8  m_iv[ 6 ];
     u8  m_shiny;
     u8  m_nature;
+
+    constexpr u16 getSpecies( ) const {
+        return m_speciesId;
+    }
+
+    constexpr u16 getItem( ) const {
+        return m_heldItem;
+    }
 };
 
 struct boxPokemon {

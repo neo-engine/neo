@@ -545,7 +545,7 @@ namespace DEX {
         if( p_page == 0 ) {
             // load pkmn sprite
             pkmnSpriteInfo pinfo = p_pkmn;
-            if( !seen && !caught ) { pinfo = { 0, 0, false, false, false }; }
+            if( !seen && !caught ) { pinfo = { 0, 0, false, false, false, DEFAULT_SPRITE_PID }; }
             IO::loadPKMNSprite( pinfo, SPR_PKMN_X, SPR_PKMN_Y - 96 + IO::pkmnSpriteHeight( pinfo ),
                                 SPR_PKMN_START_OAM, SPR_PKMN_PAL,
                                 oamTop[ SPR_PKMN_START_OAM ].gfxIndex, p_bottom, seen && !caught );
@@ -734,7 +734,7 @@ namespace DEX {
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             } else if( _mode && !p_isHidden && ispkmn ) {
-                pinfo = { 0, 0, false, false, false };
+                pinfo = { 0, 0, false, false, false, DEFAULT_SPRITE_PID };
                 IO::loadPKMNIconB( pinfo, p_x, p_y + 16, p_OAMstart + 1,
                                    oam[ p_OAMstart + 1 ].gfxIndex, p_bottom );
                 oam[ p_OAMstart + 1 ].priority = OBJPRIORITY_3;

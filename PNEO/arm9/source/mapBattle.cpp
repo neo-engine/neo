@@ -194,7 +194,7 @@ namespace MAP {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
     }
 
-    bool mapDrawer::battleWildPkmn( wildPkmnType p_type ) {
+    BATTLE::battle::battleEndReason mapDrawer::battleWildPkmn( wildPkmnType p_type ) {
         u8 platform = 0, plat2 = 0;
         u8 battleBack = p_type == WATER ? currentData( ).m_surfBattleBG : currentData( ).m_battleBG;
         switch( p_type ) {
@@ -231,7 +231,7 @@ namespace MAP {
 
         if( result == BATTLE::battle::BATTLE_OPPONENT_WON ) {
             faintPlayer( );
-            return true;
+            return result;
         }
         SOUND::restartBGM( );
         FADE_TOP_DARK( );
@@ -252,7 +252,7 @@ namespace MAP {
                 animateTracer( );
             }
         }
-        return true;
+        return result;
     }
 
     bool mapDrawer::handleTracerPkmn( u8 p_tracerSlot ) {
@@ -268,7 +268,8 @@ namespace MAP {
         prepareBattleWildPkmn( POKE_TORE, _tracerSpecies, luckyenc );
         WILD_PKMN = pokemon( _tracerSpecies, level, _tracerForme, 0, 2 * shiny, luckyenc, false, 0,
                              0, luckyenc );
-        return battleWildPkmn( POKE_TORE );
+        battleWildPkmn( POKE_TORE );
+        return true;
     }
 
     bool mapDrawer::handleWildPkmn( wildPkmnType p_type, bool p_forceEncounter ) {
@@ -309,17 +310,19 @@ namespace MAP {
         prepareBattleWildPkmn( p_type, pkmnId, luckyenc );
         WILD_PKMN = pokemon( pkmnId, level, pkmnForme, 0, luckyenc ? 255 : ( charm ? 3 : 0 ),
                              luckyenc, false, 0, 0, luckyenc );
-        return battleWildPkmn( p_type );
+        battleWildPkmn( p_type );
+        return true;
     }
 
     BATTLE::battlePolicy mapDrawer::getBattlePolicy( bool p_isWildBattle, BATTLE::battleMode p_mode,
                                                      bool p_distributeEXP ) {
-        BATTLE::battlePolicy res = p_isWildBattle
-                                       ? BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY )
-                                       : BATTLE::battlePolicy( BATTLE::DEFAULT_TRAINER_POLICY );
+        BATTLE::battlePolicy res
+            = p_isWildBattle
+                  ? BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY )
+                  : ( p_distributeEXP ? BATTLE::battlePolicy( BATTLE::DEFAULT_TRAINER_POLICY )
+                                      : BATTLE::battlePolicy( BATTLE::FACILITY_TRAINER_POLICY ) );
 
         res.m_mode               = p_mode;
-        res.m_distributeEXP      = p_distributeEXP;
         res.m_allowMegaEvolution = SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION );
 
         res.m_weather = BATTLE::weather::NO_WEATHER;

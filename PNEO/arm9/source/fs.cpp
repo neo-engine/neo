@@ -65,9 +65,11 @@ const char FORME_NAME_PATH[]       = "nitro:/DATA/PKMN_NAME/pkmnfname";
 const char POKEMON_SPECIES_PATH[]  = "nitro:/DATA/PKMN_SPCS/pkmnspcs";
 const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/pkmndxtr";
 
-const char BATTLE_STRINGS_PATH[] = "nitro:/DATA/TRNR_STRS/";
-const char BATTLE_TRAINER_PATH[] = "nitro:/DATA/TRNR_DATA/";
-const char TCLASS_NAME_PATH[]    = "nitro:/DATA/TRNR_NAME/trnrname";
+const char BATTLE_STRINGS_PATH[]          = "nitro:/DATA/TRNR_STRS/";
+const char BATTLE_TRAINER_PATH[]          = "nitro:/DATA/TRNR_DATA/";
+const char BATTLE_FACILITY_STRINGS_PATH[] = "nitro:/DATA/BFTR_STRS/";
+const char BATTLE_FACILITY_PKMN_PATH[]    = "nitro:/DATA/BFTR_PKMN/";
+const char TCLASS_NAME_PATH[]             = "nitro:/DATA/TRNR_NAME/trnrname";
 
 const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
 const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/locname";
@@ -692,6 +694,61 @@ namespace BATTLE {
         return true;
     }
 } // namespace BATTLE
+
+namespace MAP {
+    bool loadBattleFacilityTrainerStrings( u8 p_trainerClass, u8 p_trainer,
+                                           BATTLE::battleTrainer* p_out ) {
+        FILE* f = FS::openSplit(
+            BATTLE_FACILITY_STRINGS_PATH, TRAINERS_PER_CLASS * p_trainerClass + p_trainer,
+            ( "_" + std::to_string( 1 + CURRENT_LANGUAGE ) + ".trnr.str" ).c_str( ) );
+        if( !f ) return false;
+        fread( &p_out->m_strings, sizeof( BATTLE::trainerStrings ), 1, f );
+        fclose( f );
+        return true;
+    }
+
+    bool loadBattleFacilityPkmn( u16 p_species, u8 p_variant, u8 p_level, u16 p_streak,
+                                 trainerPokemon* p_out ) {
+        u16 streak = p_streak >= IV_MAX_STREAK ? IV_MAX_STREAK - 1 : p_streak;
+        u8  iv     = IV_FOR_STREAK[ streak ];
+
+        // TODO: actually load these pkmn from ROM
+        p_out->m_speciesId  = p_species;
+        p_out->m_forme      = 0;
+        p_out->m_ability    = 0;
+        p_out->m_heldItem   = 0;
+        p_out->m_moves[ 0 ] = 1;
+        p_out->m_moves[ 1 ] = 0;
+        p_out->m_moves[ 2 ] = 0;
+        p_out->m_moves[ 3 ] = 0;
+        p_out->m_ev[ 0 ]    = 0;
+        p_out->m_ev[ 1 ]    = 0;
+        p_out->m_ev[ 2 ]    = 0;
+        p_out->m_ev[ 3 ]    = 0;
+        p_out->m_ev[ 4 ]    = 0;
+        p_out->m_ev[ 5 ]    = 0;
+        p_out->m_shiny      = 0;
+        p_out->m_nature     = 0;
+
+        // adjust pkmn to given parameters
+        p_out->m_level   = p_level;
+        p_out->m_iv[ 0 ] = p_out->m_iv[ 1 ] = p_out->m_iv[ 2 ] = iv;
+        p_out->m_iv[ 3 ] = p_out->m_iv[ 4 ] = p_out->m_iv[ 5 ] = iv;
+
+        return true;
+    }
+
+    bool loadBattleFacilityTrainerTeam( const ruleSet& p_rules, u8 p_trainerClass, u8 p_team,
+                                        u16 p_streak, BATTLE::battleTrainer* p_out ) {
+        (void) p_rules;
+        (void) p_trainerClass;
+        (void) p_team;
+        (void) p_streak;
+        (void) p_out;
+        // TODO
+        return false;
+    }
+}; // namespace MAP
 
 const char* getUIString( u16 p_stringId, u8 p_language ) {
     static char  st_buffer[ UISTRING_LEN + 10 ];
