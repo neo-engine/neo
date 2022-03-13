@@ -26,7 +26,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <string>
+#ifdef MMOD
 #include <maxmod9.h>
+#else
+#include "sseq.h"
+#endif
 
 #include "defines.h"
 #include "fs.h"
@@ -37,9 +41,13 @@ const char SOUND_PATH[] = "nitro:/SOUND/";
 
 void initSound( ) {
 #ifndef NO_SOUND
+#ifdef MMOD
     std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
     mmInitDefault( const_cast<char*>( path.c_str( ) ) );
     mmLockChannels( BIT( 0 ) | BIT( 1 ) );
+#else
+    SOUND::SSEQ::installSoundSys( );
+#endif
 #endif
 }
 
@@ -57,7 +65,11 @@ namespace SOUND {
 
     void setVolume( u16 p_newValue ) {
 #ifndef NO_SOUND
+#ifdef MMOD
         mmSetModuleVolume( p_newValue );
+#else
+        // TODO
+#endif
 #else
         (void) p_newValue;
 #endif
@@ -76,6 +88,7 @@ namespace SOUND {
 
     void playBGM( u16 p_id, bool p_force ) {
 #ifndef NO_SOUND
+#ifdef MMOD
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( p_force ) { BGMforced = true; }
@@ -116,6 +129,9 @@ namespace SOUND {
         }
         ANIMATE_MAP = oa;
 #else
+        // TODO
+#endif
+#else
         (void) p_id;
         (void) p_force;
 #endif
@@ -123,6 +139,7 @@ namespace SOUND {
 
     void playBGMOneshot( u16 p_id ) {
 #ifndef NO_SOUND
+#ifdef MMOD
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( BGMLoaded && p_id == currentBGM ) { return; }
@@ -162,18 +179,25 @@ namespace SOUND {
         }
         ANIMATE_MAP = oa;
 #else
+        // TODO
+#endif
+#else
         (void) p_id;
 #endif
     }
 
     void stopBGM( ) {
 #ifndef NO_SOUND
+#ifdef MMOD
         if( BGMLoaded ) {
             mmStop( );
             swiWaitForVBlank( );
             mmUnload( currentBGM );
             BGMLoaded = false;
         }
+#else
+        // TODO
+#endif
 #endif
     }
 

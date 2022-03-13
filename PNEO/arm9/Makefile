@@ -16,7 +16,7 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 BUILD		:=	build
 SOURCES		:=	source
-INCLUDES	:=	include
+INCLUDES	:=	include ../common
 DATA		:=
 GRAPHICS	:=	data
 
@@ -46,6 +46,9 @@ endif
 ifdef NOSOUND
 CFLAGS	+=	-DNO_SOUND
 endif
+ifdef MMOD
+CFLAGS	+=	-DMMOD
+endif
 ifdef FLASHCARD
 CFLAGS	+=	-DFLASHCARD
 endif
@@ -61,7 +64,12 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
+
+ifdef MMOD
 LIBS	:=	-lfat -lmm9 -lnds9
+else
+LIBS	:=	-lfat -lnds9
+endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

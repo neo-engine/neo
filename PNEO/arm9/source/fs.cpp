@@ -49,6 +49,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemonFormes.h"
 #include "uio.h"
 
+#ifndef MMOD
+#include "sseq.h"
+#endif
+
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
 const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
 
@@ -98,6 +102,7 @@ bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language,
     std::fseek( f, p_language * p_maxLen, SEEK_SET );
     fread( p_out, 1, p_maxLen, f );
     fclose( f );
+    DC_FlushRange( p_out, p_maxLen );
 
     return true;
 }
@@ -106,6 +111,7 @@ bool getString( FILE* p_bankFile, u16 p_maxLen, u16 p_stringId, char* p_out ) {
     if( !p_bankFile ) { return false; }
     if( std::fseek( p_bankFile, p_stringId * p_maxLen, SEEK_SET ) ) { return false; }
     fread( p_out, 1, p_maxLen, p_bankFile );
+    DC_FlushRange( p_out, p_maxLen );
     return true;
 }
 
@@ -146,6 +152,8 @@ namespace FS {
         auto l = locationData( );
         fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
 
+        DC_FlushRange( &l, sizeof( locationData ) );
+
         return l.m_bgmNameIdx;
     }
 
@@ -157,6 +165,8 @@ namespace FS {
 
         auto l = locationData( );
         fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
+
+        DC_FlushRange( &l, sizeof( locationData ) );
 
         return l.m_frameType;
     }
@@ -170,6 +180,7 @@ namespace FS {
         auto l = locationData( );
         fread( &l, sizeof( locationData ), 1, LOCATION_DATA_FILE );
 
+        DC_FlushRange( &l, sizeof( locationData ) );
         return l.m_mugType;
     }
 
@@ -225,7 +236,9 @@ namespace FS {
     }
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count ) {
         if( !p_stream ) return 0;
-        return fread( p_buffer, p_size, p_count, p_stream );
+        auto res = fread( p_buffer, p_size, p_count, p_stream );
+        DC_FlushRange( p_buffer, p_size * p_count );
+        return res;
     }
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count ) {
         if( !p_stream ) return 0;
@@ -749,6 +762,28 @@ namespace MAP {
         return false;
     }
 }; // namespace MAP
+
+namespace SOUND::SSEQ {
+    bool loadSequenceData( sequenceData* p_data, FILE* p_f ) {
+        if( !p_f ) { return false; }
+        fseek( p_f, 0, SEEK_END );
+        p_data->m_size = ftell( p_f );
+        rewind( p_f );
+        p_data->m_data = malloc( p_data->m_size );
+        if( !p_data->m_data ) { return false; }
+        fread( p_data->m_data, 1, p_data->m_size, p_f );
+        DC_FlushRange( p_data->m_data, p_data->m_size );
+        return true;
+    }
+
+    bool loadSequenceData( sequenceData* p_data, const char* p_fname ) {
+        FILE* f   = fopen( p_fname, "rb" );
+        auto  res = loadSequenceData( p_data, f );
+        fclose( f );
+        return res;
+    }
+
+} // namespace SOUND::SSEQ
 
 const char* getUIString( u16 p_stringId, u8 p_language ) {
     static char  st_buffer[ UISTRING_LEN + 10 ];
