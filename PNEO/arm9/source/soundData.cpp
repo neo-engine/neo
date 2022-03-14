@@ -38,7 +38,7 @@ namespace SOUND {
     MAP::moveMode   currentMoveMode = MAP::WALK;
     MAP::mapWeather currentWeather  = MAP::REGULAR;
 
-    u16 currentJBoxBGM = JBOX_DISABLED;
+    s16 currentJBoxBGM = JBOX_DISABLED;
 
     bool tracerActive = false;
 
@@ -80,11 +80,11 @@ namespace SOUND {
 #endif
     }
 
-    u16 getJBoxBGM( ) {
+    s16 getJBoxBGM( ) {
         return currentJBoxBGM;
     }
 
-    void setJBoxBGM( u16 p_id ) {
+    void setJBoxBGM( s16 p_id ) {
         if( p_id != currentJBoxBGM ) {
             if( p_id != JBOX_DISABLED ) {
                 playBGM( p_id );
@@ -137,14 +137,14 @@ namespace SOUND {
         }
     }
 
-    u16 BGMforWeather( MAP::mapWeather p_weather ) {
+    s16 BGMforWeather( MAP::mapWeather p_weather ) {
         switch( p_weather ) {
         case MAP::SANDSTORM: return BGM_DESERT;
         default: return BGMforMoveMode( currentMoveMode );
         }
     }
 
-    u16 BGMforMoveMode( MAP::moveMode p_moveMode ) {
+    s16 BGMforMoveMode( MAP::moveMode p_moveMode ) {
         switch( p_moveMode ) {
         case MAP::DIVE: return BGM_DIVING;
         case MAP::SURF: return BGM_SURFING;

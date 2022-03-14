@@ -26,6 +26,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <string>
+
+#include <cstdio>
+
 #ifndef NO_SOUND
 #ifdef MMOD
 #include <maxmod9.h>
@@ -40,13 +43,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "saveGame.h"
 #include "sound.h"
 
-const char SOUND_PATH[] = "nitro:/SOUND/";
+#ifndef NO_SOUND
+#ifdef MMOD
+char SOUND_PATH[ 50 ] = { };
+#endif
+#endif
 
 void initSound( ) {
 #ifndef NO_SOUND
 #ifdef MMOD
-    std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
-    mmInitDefault( const_cast<char*>( path.c_str( ) ) );
+    snprintf( SOUND_PATH, 50, "nitro:/SOUND/sound.msl" );
+    mmInitDefault( SOUND_PATH );
     mmLockChannels( BIT( 0 ) | BIT( 1 ) );
 #else
     SOUND::SSEQ::installSoundSys( );
@@ -56,7 +63,7 @@ void initSound( ) {
 
 namespace SOUND {
     bool BGMLoaded  = false;
-    u16  currentBGM = 0;
+    s16  currentBGM = 0;
 
     bool BGMforced = false; // While the bgm is forced, no music changes via map/movemode change
 
@@ -89,7 +96,7 @@ namespace SOUND {
 #endif
     }
 
-    void playBGM( u16 p_id, bool p_force ) {
+    void playBGM( s16 p_id, bool p_force ) {
 #ifndef NO_SOUND
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
@@ -98,6 +105,7 @@ namespace SOUND {
             ANIMATE_MAP = false;
 #ifdef MMOD
             auto mmId = BGMIndexForName( p_id );
+            printf( "p_id %i got %i, BGMLoaded: %i", p_id, mmId, BGMLoaded );
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -113,6 +121,7 @@ namespace SOUND {
             }
             restoreVolume( );
             if( mmId != MOD_NONE ) {
+                printf( "mmLoad\nmmStart" );
                 mmLoad( mmId );
                 mmStart( mmId, MM_PLAY_LOOP );
             }
@@ -149,7 +158,7 @@ namespace SOUND {
 #endif
     }
 
-    void playBGMOneshot( u16 p_id ) {
+    void playBGMOneshot( s16 p_id ) {
 #ifndef NO_SOUND
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {

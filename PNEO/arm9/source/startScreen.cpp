@@ -40,8 +40,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "uio.h"
 #include "yesNoBox.h"
 
-#ifdef DESQUID_MORE
 // BEGIN TEST
+#ifdef DESQUID_MORE
 #include "animations.h"
 #include "bagViewer.h"
 #include "battle.h"
@@ -53,8 +53,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "partyScreen.h"
 #include "specials.h"
 #include "statusScreen.h"
-// END TEST
 #endif
+
+#include "bgmTranslation.h"
+// END TEST
 
 namespace SAVE {
 
@@ -149,8 +151,6 @@ namespace SAVE {
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );
 
-        //       SOUND::playBGM( BGM_SURFING );
-
         //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
         //        2 ),
         // BATTLE::battle bt
@@ -167,11 +167,15 @@ namespace SAVE {
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
 
-        // BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
+        SOUND::playBGM( BGM_SURFING );
+        printf( "%i %i\n", BGM_SURFING, BGMIndexForName( BGM_SURFING ) );
 
+        // BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
+/*
         printf( "Free Software, PW 2012 - 2022\n"
                 "                             \n"
                 "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
+
 
         if( gMod == DEVELOPER )
             printf( "   " __DATE__ " " __TIME__ " v%hhu.%hhu-dev\n", VERSION / 10, VERSION % 10 );
@@ -184,7 +188,7 @@ namespace SAVE {
         else if( gMod == FCARD )
             printf( " " __DATE__ " " __TIME__ " v%hhu.%hhu-flash\n", VERSION / 10, VERSION % 10 );
         printf( "%32s", VERSION_NAME );
-
+*/
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );
         consoleSelect( &IO::Top );
         u8 frame = 0;

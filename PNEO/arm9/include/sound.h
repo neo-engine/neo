@@ -40,10 +40,10 @@
 void initSound( );
 
 namespace SOUND {
-    constexpr u16 JBOX_DISABLED = u16( -1 );
+    constexpr s16 JBOX_DISABLED = s16( -1 );
 
     extern bool BGMforced;
-    extern u16  currentBGM;
+    extern s16  currentBGM;
 
     /*
      * @brief: Initializes sound effects for battles (NOP).
@@ -59,13 +59,13 @@ namespace SOUND {
      * @brief: Sets the specified bgm.
      * @param p_id: BGM name from bgmNames.h (BGM_<NAME>)
      */
-    void playBGM( u16 p_id, bool p_force = false );
+    void playBGM( s16 p_id, bool p_force = false );
 
     /*
      * @brief: Plays the specified bgm once (non.looped)
      * @param p_id: BGM name from bgmNames.h (BGM_<NAME>)
      */
-    void playBGMOneshot( u16 p_id );
+    void playBGMOneshot( s16 p_id );
 
     /*
      * @brief: Plays the specified sound effect..
@@ -79,10 +79,10 @@ namespace SOUND {
     void dimVolume( );
     void restoreVolume( );
 
-    u16 BGMforWeather( MAP::mapWeather p_weather );
-    u16 BGMforMoveMode( MAP::moveMode p_moveMode );
+    s16 BGMforWeather( MAP::mapWeather p_weather );
+    s16 BGMforMoveMode( MAP::moveMode p_moveMode );
 
-    constexpr u16 BGMforTrainerEncounter( u16 p_trainerClassId ) {
+    constexpr s16 BGMforTrainerEncounter( u16 p_trainerClassId ) {
 #ifdef NO_SOUND
         (void) p_trainerClassId;
         return 0;
@@ -138,7 +138,7 @@ namespace SOUND {
 #endif
     }
 
-    constexpr u16 BGMforTrainerBattle( u16 p_trainerClassId ) {
+    constexpr s16 BGMforTrainerBattle( u16 p_trainerClassId ) {
 #ifdef NO_SOUND
         (void) p_trainerClassId;
         return 0;
@@ -161,7 +161,7 @@ namespace SOUND {
 #endif
     }
 
-    constexpr u16 BGMforTrainerWin( u16 p_trainerClassId ) {
+    constexpr s16 BGMforTrainerWin( u16 p_trainerClassId ) {
 #ifdef NO_SOUND
         (void) p_trainerClassId;
         return 0;
@@ -181,7 +181,7 @@ namespace SOUND {
 #endif
     }
 
-    constexpr u16 BGMforWildBattle( u16 p_pokemonId ) {
+    constexpr s16 BGMforWildBattle( u16 p_pokemonId ) {
 #ifdef NO_SOUND
         (void) p_pokemonId;
         return 0;
@@ -208,8 +208,8 @@ namespace SOUND {
 #endif
     }
 
-    void setJBoxBGM( u16 p_id );
-    u16  getJBoxBGM( );
+    void setJBoxBGM( s16 p_id );
+    s16  getJBoxBGM( );
 
     /*
      * @brief: Starts/Stops the special poketore music

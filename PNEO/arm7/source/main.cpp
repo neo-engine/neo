@@ -77,24 +77,37 @@ void powerButtonCB( ) {
 }
 
 void soundInit( ) {
+#ifndef MMOD
     powerOn( POWER_SOUND );
     REG_SOUNDCNT = SOUND_ENABLE;
     writePowerManagement( PM_CONTROL_REG, ( readPowerManagement( PM_CONTROL_REG ) & ~PM_SOUND_MUTE )
                                               | PM_SOUND_AMP );
     REG_MASTER_VOLUME = 127;
+#else
+    dmaFillWords( 0, (void*) 0x04000400, 0x100 );
+
+    REG_SOUNDCNT |= SOUND_ENABLE;
+    writePowerManagement( PM_CONTROL_REG, ( readPowerManagement( PM_CONTROL_REG ) & ~PM_SOUND_MUTE )
+                                              | PM_SOUND_AMP );
+    powerOn( POWER_SOUND );
+#endif
 }
 
 int main( ) {
+#ifdef MMOD
+    soundInit( );
+#endif
     readUserSettings( );
+    ledBlink( 0 );
 
     irqInit( );
     // Start the RTC tracking IRQ
     initClockIRQ( );
     fifoInit( );
     touchInit( );
+#ifndef MMOD
     soundInit( );
-
-    // ledBlink( 0 );
+#endif
 
 #ifdef MMOD
     mmInstall( FIFO_MAXMOD );
@@ -116,7 +129,9 @@ int main( ) {
 
     setPowerButtonCB( powerButtonCB );
 
+#ifndef MMOD
     u32 fadeCounter = 0;
+#endif
 
     // Keep the ARM7 mostly idle
     while( !exitflag ) {
