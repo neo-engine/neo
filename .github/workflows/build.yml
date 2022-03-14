@@ -1,0 +1,32 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: docker pull devkitpro/devkitarm
+    - run: docker run -p 4000:80 --name devkitarm devkitpro/devkitarm || true
+    - run: mkdir -p /opt/devkitpro
+    - run: docker cp devkitarm:/opt/devkitpro /opt || true
+    - run: docker cp devkitarm:/opt/devkitpro/tools /opt/devkitpro || true
+    - run: PATH=/opt/devkitpro/tools/bin:$PATH
+    - run: cd PNEO
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sound: [ "", "NOSOUND=1", "MMOD=1"]
+        flashcard: [ "", "FLASHCARD=1" ]
+        desquid: [ "", "DESQUID=1" ]
+    steps:
+    - run: make {{matrix.sound}} {{matrix.flashcard}} {{matrix.desquid}} rebuild
+    - uses: actions/upload-artifact@v3.0.0
+      with:
+        name: "{{matrix.sound}}.{{matrix.flshcard}}.{{matrix.desquid}}"
+        path: PNEO.nds
+
+
