@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef NO_SOUND
-
 #define SFX_BATTLE_ABILITY       0
 #define SFX_BATTLE_BALLDROP      1
 #define SFX_BATTLE_BALLSHAKE     2
@@ -46,5 +44,3 @@
 #define SFX_OBTAIN_TM            41
 #define SFX_BUY_SUCCESSFUL       42
 #define SFX_CAPTURE_SUCCESSFUL   43
-
-#endif

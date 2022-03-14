@@ -28,14 +28,12 @@
 #pragma once
 
 #include <nds/ndstypes.h>
+#include "bgmNames.h"
 #include "locationNames.h"
 #include "mapDefines.h"
 #include "pokemonNames.h"
-#include "trainerClassNames.h"
-#ifndef NO_SOUND
-#include "bgmNames.h"
 #include "sfxNames.h"
-#endif
+#include "trainerClassNames.h"
 
 void initSound( );
 
