@@ -13,13 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: docker pull devkitpro/devkitarm
-    - run: docker run -p 4000:80 --name devkitarm devkitpro/devkitarm || true
-    - run: mkdir -p /opt/devkitpro
-    - run: docker cp devkitarm:/opt/devkitpro /opt || true
-    - run: docker cp devkitarm:/opt/devkitpro/tools /opt/devkitpro || true
-    - run: PATH=/opt/devkitpro/tools/bin:$PATH
-    - run: cd PNEO
-    - run: make ${{matrix.sound}} ${{matrix.flashcard}} ${{matrix.desquid}}
+           docker run -p 4000:80 --name devkitarm devkitpro/devkitarm || true
+           mkdir -p /opt/devkitpro
+           docker cp devkitarm:/opt/devkitpro /opt || true
+           docker cp devkitarm:/opt/devkitpro/tools /opt/devkitpro || true
+           PATH=/opt/devkitpro/tools/bin:$PATH
+           cd PNEO
+           make ${{matrix.sound}} ${{matrix.flashcard}} ${{matrix.desquid}}
     - uses: actions/upload-artifact@v3.0.0
       with:
         name: "${{matrix.sound}}.${{matrix.flshcard}}.${{matrix.desquid}}"
