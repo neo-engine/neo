@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battleSlot.h"
 #include "battleTrainer.h"
 #include "battleUI.h"
+#include "bgmNames.h"
 #include "choiceBox.h"
 #include "dex.h"
 #include "partyScreen.h"
@@ -1195,7 +1196,7 @@ namespace BATTLE {
         char buffer[ 100 ];
         if( p_battleEndReason == BATTLE_OPPONENT_WON ) { SOUND::setVolume( 0 ); }
         if( _isWildBattle && p_battleEndReason != BATTLE_RUN ) {
-            if( p_battleEndReason != BATTLE_OPPONENT_WON ) { SOUND::playBGM( MOD_VICTORY_WILD ); }
+            if( p_battleEndReason != BATTLE_OPPONENT_WON ) { SOUND::playBGM( BGM_VICTORY_WILD ); }
             if( p_battleEndReason == BATTLE_CAPTURE ) {
                 handleCapture( );
             } else {

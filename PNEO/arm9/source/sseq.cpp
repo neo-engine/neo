@@ -7,13 +7,12 @@
 #ifndef MMOD
 
 namespace SOUND::SSEQ {
-
     static void sndsysMsgHandler( int, void * );
     static void returnMsgHandler( int, void * );
 
     constexpr u16   MAX_MESSAGE_POINTER = 1536;
-    volatile u8     MESSAGE_DATA[ MAX_MESSAGE_POINTER ];
-    volatile u32    MESSAGE_POINTER = 0;
+    u8              MESSAGE_DATA[ MAX_MESSAGE_POINTER ];
+    u32             MESSAGE_POINTER = 0;
     soundSysMessage CURRENT_SEQUENCE;
     u32             CURRENT_SEQUENCE_OFFSET[ 6 ] = { 0, 0, 0, 0, 0, 0 };
     u32             CURRENT_SEQUENCE_SIZE[ 6 ]

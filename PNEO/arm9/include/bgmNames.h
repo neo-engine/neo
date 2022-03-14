@@ -1,4 +1,5 @@
 #pragma once
+
 #define BGM_NONE 0
 #define BGM_LITTLEROOT_TOWN 1
 #define BGM_OLDALE_TOWN 2
@@ -108,3 +109,5 @@
 #define BGM_EX06 106
 #define BGM_POKE_RADAR 107
 #define BGM_GHOST_GIRL 108
+
+#define MAX_BGM 108

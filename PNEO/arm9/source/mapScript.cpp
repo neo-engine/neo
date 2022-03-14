@@ -875,7 +875,7 @@ namespace MAP {
             }
             case UTMR: NAV::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
-                SOUND::playBGM( BGMIndexForName( parA ), true );
+                if( parA <= MAX_BGM ) { SOUND::playBGM( parA, true ); }
                 break;
             }
             case RMS: {
@@ -891,7 +891,7 @@ namespace MAP {
                 break;
             }
             case PMO: {
-                SOUND::playBGMOneshot( BGMIndexForName( parA ) );
+                if( parA <= MAX_BGM ) { SOUND::playBGMOneshot( parA ); }
                 for( u16 i = 0; i < parB; ++i ) { swiWaitForVBlank( ); }
                 SOUND::restartBGM( );
                 break;

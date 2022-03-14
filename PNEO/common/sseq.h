@@ -179,6 +179,9 @@ namespace SOUND::SSEQ {
         u16 m_freq;
         u8  m_modType, m_modSpeed, m_modDepth, m_modRange;
         u16 m_modDelay, m_modDelayCnt, m_modCounter;
+        u8  m_note, m_patch;
+        u32 m_sweepLen, m_sweepCnt;
+        s16 m_sweepPitch;
 
         soundReg m_reg;
     };

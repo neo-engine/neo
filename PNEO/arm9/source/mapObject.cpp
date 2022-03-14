@@ -410,9 +410,9 @@ namespace MAP {
         }
 
         if( p_type == 0 ) {
-            SOUND::playBGMOneshot( MOD_OS_BADGE );
+            SOUND::playBGMOneshot( BGM_OS_BADGE );
         } else if( p_type == 1 ) {
-            SOUND::playBGMOneshot( MOD_OS_SYMBOL );
+            SOUND::playBGMOneshot( BGM_OS_SYMBOL );
         }
 
         IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,

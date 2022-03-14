@@ -26,10 +26,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <string>
+#ifndef NO_SOUND
 #ifdef MMOD
 #include <maxmod9.h>
 #else
 #include "sseq.h"
+#endif
+#include "bgmTranslation.h"
 #endif
 
 #include "defines.h"
@@ -88,12 +91,13 @@ namespace SOUND {
 
     void playBGM( u16 p_id, bool p_force ) {
 #ifndef NO_SOUND
-#ifdef MMOD
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( p_force ) { BGMforced = true; }
             if( BGMLoaded && p_id == currentBGM ) { return; }
             ANIMATE_MAP = false;
+#ifdef MMOD
+            auto mmId = BGMIndexForName( p_id );
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -108,12 +112,18 @@ namespace SOUND {
                 mmUnload( currentBGM );
             }
             restoreVolume( );
-            mmLoad( p_id );
-            mmStart( p_id, MM_PLAY_LOOP );
+            if( mmId != MOD_NONE ) {
+                mmLoad( mmId );
+                mmStart( mmId, MM_PLAY_LOOP );
+            }
+#else
+            // TODO
+#endif
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
             ANIMATE_MAP = false;
+#ifdef MMOD
             setVolume( 0x50 );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -124,13 +134,15 @@ namespace SOUND {
             swiWaitForVBlank( );
             mmStop( );
             swiWaitForVBlank( );
-            mmUnload( currentBGM );
+
+            auto mmId = BGMIndexForName( currentBGM );
+            if( mmId != MOD_NONE ) { mmUnload( mmId ); }
+#else
+            // TODO
+#endif
             BGMLoaded = false;
         }
         ANIMATE_MAP = oa;
-#else
-        // TODO
-#endif
 #else
         (void) p_id;
         (void) p_force;
@@ -139,11 +151,12 @@ namespace SOUND {
 
     void playBGMOneshot( u16 p_id ) {
 #ifndef NO_SOUND
-#ifdef MMOD
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( BGMLoaded && p_id == currentBGM ) { return; }
             ANIMATE_MAP = false;
+#ifdef MMOD
+            auto mmId = BGMIndexForName( p_id );
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -158,12 +171,18 @@ namespace SOUND {
                 mmUnload( currentBGM );
             }
             restoreVolume( );
-            mmLoad( p_id );
-            mmStart( p_id, MM_PLAY_ONCE );
+            if( mmId != MOD_NONE ) {
+                mmLoad( mmId );
+                mmStart( mmId, MM_PLAY_ONCE );
+            }
+#else
+            // TODO
+#endif
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
             ANIMATE_MAP = false;
+#ifdef MMOD
             setVolume( 0x50 );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -174,13 +193,15 @@ namespace SOUND {
             swiWaitForVBlank( );
             mmStop( );
             swiWaitForVBlank( );
-            mmUnload( currentBGM );
+
+            auto mmId = BGMIndexForName( currentBGM );
+            if( mmId != MOD_NONE ) { mmUnload( mmId ); }
+#else
+            // TODO
+#endif
             BGMLoaded = false;
         }
         ANIMATE_MAP = oa;
-#else
-        // TODO
-#endif
 #else
         (void) p_id;
 #endif
@@ -188,16 +209,17 @@ namespace SOUND {
 
     void stopBGM( ) {
 #ifndef NO_SOUND
-#ifdef MMOD
         if( BGMLoaded ) {
+#ifdef MMOD
+            auto mmId = BGMIndexForName( currentBGM );
             mmStop( );
             swiWaitForVBlank( );
-            mmUnload( currentBGM );
+            if( mmId != MOD_NONE ) { mmUnload( mmId ); }
+#else
+            // TODO
+#endif
             BGMLoaded = false;
         }
-#else
-        // TODO
-#endif
 #endif
     }
 

@@ -179,7 +179,7 @@ namespace MAP {
         ANIMATE_MAP = false;
         DRAW_TIME   = false;
         if( p_luckyEnc ) {
-            SOUND::playBGM( MOD_BATTLE_WILD_ALT );
+            SOUND::playBGM( BGM_BATTLE_WILD_ALT );
         } else {
             SOUND::playBGM( SOUND::BGMforWildBattle( p_pkmnId ) );
         }

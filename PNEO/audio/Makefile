@@ -24,6 +24,7 @@ soundbank:	$(WAVFILES) $(MODFILES)
 
 clean	:
 	@echo cleaning sound
+	@touch soundbank
 	@rm soundbank
 	@rm -rf $(OUT)/sound.msl
 	@rm -rf $(HEADER_OUT)/soundbank.h

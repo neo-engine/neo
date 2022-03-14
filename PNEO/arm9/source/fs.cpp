@@ -763,6 +763,7 @@ namespace MAP {
     }
 }; // namespace MAP
 
+#ifndef MMOD
 namespace SOUND::SSEQ {
     bool loadSequenceData( sequenceData* p_data, FILE* p_f ) {
         if( !p_f ) { return false; }
@@ -784,6 +785,7 @@ namespace SOUND::SSEQ {
     }
 
 } // namespace SOUND::SSEQ
+#endif
 
 const char* getUIString( u16 p_stringId, u8 p_language ) {
     static char  st_buffer[ UISTRING_LEN + 10 ];

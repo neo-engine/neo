@@ -27,7 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "bgmTranslation.h"
+#include "bgmNames.h"
 #include "fs.h"
 #include "locationNames.h"
 #include "pokemonNames.h"
@@ -107,13 +107,7 @@ namespace SOUND {
         currentLocation = p_newLocation;
 
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
-        if( currentMoveMode == MAP::WALK ) {
-            auto nidx = BGMIndexForName( FS::BGMforLocation( currentLocation ) );
-            if( nidx >= 0 ) {
-                playBGM( nidx );
-            } else {
-            }
-        }
+        if( currentMoveMode == MAP::WALK ) { playBGM( FS::BGMforLocation( currentLocation ) ); }
     }
 
     void onMovementTypeChange( MAP::moveMode p_newMoveMode ) {
@@ -135,7 +129,7 @@ namespace SOUND {
     void restartBGM( ) {
         BGMforced = false;
         if( tracerActive ) {
-            playBGM( MOD_POKE_RADAR );
+            playBGM( BGM_POKE_RADAR );
         } else if( currentJBoxBGM != JBOX_DISABLED ) {
             playBGM( currentJBoxBGM );
         } else {
@@ -145,23 +139,23 @@ namespace SOUND {
 
     u16 BGMforWeather( MAP::mapWeather p_weather ) {
         switch( p_weather ) {
-        case MAP::SANDSTORM: return MOD_DESERT;
+        case MAP::SANDSTORM: return BGM_DESERT;
         default: return BGMforMoveMode( currentMoveMode );
         }
     }
 
     u16 BGMforMoveMode( MAP::moveMode p_moveMode ) {
         switch( p_moveMode ) {
-        case MAP::DIVE: return MOD_DIVING;
-        case MAP::SURF: return MOD_SURFING;
+        case MAP::DIVE: return BGM_DIVING;
+        case MAP::SURF: return BGM_SURFING;
         case MAP::BIKE:
         case MAP::ACRO_BIKE:
         case MAP::MACH_BIKE:
-        case MAP::BIKE_JUMP: return MOD_CYCLING;
+        case MAP::BIKE_JUMP: return BGM_CYCLING;
         case MAP::WALK:
         case MAP::ROCK_CLIMB:
         case MAP::SIT:
-        default: return BGMIndexForName( FS::BGMforLocation( currentLocation ) );
+        default: return FS::BGMforLocation( currentLocation );
         }
     }
 } // namespace SOUND

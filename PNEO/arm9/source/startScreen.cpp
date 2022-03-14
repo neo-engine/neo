@@ -149,7 +149,7 @@ namespace SAVE {
         //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
         //        ).getTeamPkmn( 1 ) ); psts.run( );
 
-        //       SOUND::playBGM( MOD_SURFING );
+        //       SOUND::playBGM( BGM_SURFING );
 
         //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
         //        2 ),

@@ -132,7 +132,7 @@ namespace SAVE {
         printTextAndWait( GET_STRING( 441 ) );
 
         IO::clearScreen( true, true, true );
-        SOUND::playBGM( MOD_ROUTE_123 );
+        SOUND::playBGM( BGM_ROUTE_123 );
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "intro", 240 * 2, 256 * 192,
                              true );
@@ -480,7 +480,7 @@ namespace SAVE {
             return initNewGame( );
         }
 
-        SOUND::playBGM( MOD_ROUTE_123 );
+        SOUND::playBGM( BGM_ROUTE_123 );
         printEpisodeInfo( p_episode );
 
         switch( p_episode ) {

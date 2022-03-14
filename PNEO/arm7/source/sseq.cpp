@@ -37,17 +37,22 @@ namespace SOUND::SSEQ {
     };
 
     struct trackState {
+        static constexpr u8 CLLSTCK_LIMIT = 3;
+
         s32      m_count;
         s32      m_pos;
-        s32      m_ret;
         s32      m_priority;
         u16      m_patch;
         u16      m_waitmode;
         playInfo m_playInfo;
         s32      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
         s32      m_loopcount, m_looppos;
+        s32      m_ret[ CLLSTCK_LIMIT ];
+        u8       m_retpos;
         s32      m_trackEnded;
         s32      m_trackLooped;
+        u8       m_portakey, m_portatime;
+        s16      m_sweepPitch;
     };
 
     s32          TRACK_CNT         = 0;
@@ -59,6 +64,7 @@ namespace SOUND::SSEQ {
     volatile s32 SEQ_BPM           = 0;
 
     void trackTick( s32 n );
+    void updateSequencePortamento( adsrState* p_state, trackState* p_track );
 
     // This function was obtained through disassembly of Ns32y's sound driver
     u16 adjustFreq( u16 p_baseFreq, s32 p_pitch ) {
@@ -256,7 +262,12 @@ namespace SOUND::SSEQ {
         chstat->m_priority    = p_priority;
         chstat->m_count       = p_duration;
         chstat->m_track       = p_track;
-        chstat->m_state       = adsrState::ADSR_START;
+        chstat->m_note        = p_note;
+        chstat->m_patch       = p_instr;
+        updateSequencePortamento( chstat, pTrack );
+        pTrack->m_portakey = p_note | ( pTrack->m_portakey & 0x80 );
+
+        chstat->m_state = adsrState::ADSR_START;
 
         return channel;
     }
@@ -429,6 +440,27 @@ namespace SOUND::SSEQ {
         }
     }
 
+    void updateSequencePortamento( adsrState* p_state, trackState* p_track ) {
+        p_state->m_sweepPitch = p_track->m_sweepPitch;
+        if( p_track->m_portakey & 0x80 ) {
+            p_state->m_sweepLen = 0;
+            p_state->m_sweepCnt = 0;
+            return;
+        }
+
+        int diff = ( (int) p_track->m_portakey - (int) p_state->m_note ) << 22;
+        p_state->m_sweepPitch += diff >> 16;
+
+        if( p_track->m_portatime == 0 ) {
+            p_state->m_sweepLen = ( p_state->m_count * 240 + SEQ_BPM - 1 ) / SEQ_BPM;
+        } else {
+            u32 sq_time         = p_track->m_portatime * p_track->m_portatime;
+            int abs_sp          = p_state->m_sweepPitch;
+            abs_sp              = abs_sp < 0 ? -abs_sp : abs_sp;
+            p_state->m_sweepLen = ( abs_sp * sq_time ) >> 11;
+        }
+    }
+
     void trackTick( s32 p_trackId ) {
         returnMessage msg;
         trackState*   track = TRACKS + p_trackId;
@@ -477,9 +509,10 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_CALL: {
-                    s32 dest     = SEQ_READ24( track->m_pos );
-                    track->m_ret = track->m_pos + 3;
-                    track->m_pos = dest;
+                    s32 dest                        = SEQ_READ24( track->m_pos );
+                    track->m_ret[ track->m_retpos ] = track->m_pos + 3;
+                    track->m_pos                    = dest;
+                    if( track->m_retpos + 1 < trackState::CLLSTCK_LIMIT ) { track->m_retpos++; }
                     break;
                 }
                 case SC_RANDOM: {
@@ -519,7 +552,8 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_RET: {
-                    track->m_pos = track->m_ret;
+                    track->m_pos = track->m_ret[ track->m_retpos ];
+                    if( track->m_retpos > 0 ) { --track->m_retpos; }
                     break;
                 }
                 case SC_PAN: {
@@ -541,11 +575,24 @@ namespace SOUND::SSEQ {
                 }
                 case SC_TRANSPOSE:
                 case SC_TIE:
-                case SC_PORTAMENTO:
-                case SC_PORTAMENTO_TOGGLE:
-                case SC_PORTAMENTO_TIME:
                 case SC_PRINT_VAR: {
                     // TODO
+                    track->m_pos++;
+                    break;
+                }
+                case SC_PORTAMENTO: {
+                    track->m_portakey = SEQ_READ8( track->m_pos );
+                    track->m_pos++;
+                    break;
+                }
+                case SC_PORTAMENTO_TOGGLE: {
+                    track->m_portakey &= ~0x80;
+                    track->m_portakey |= ( !SEQ_READ8( track->m_pos ) ) << 7;
+                    track->m_pos++;
+                    break;
+                }
+                case SC_PORTAMENTO_TIME: {
+                    track->m_portatime = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
@@ -644,7 +691,7 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_SWEEP_PITCH: {
-                    // TODO
+                    track->m_sweepPitch = SEQ_READ16( track->m_pos );
                     track->m_pos += 2;
                     break;
                 }

@@ -123,7 +123,7 @@ namespace IO::ANIM {
         setFrameVis( 1, true );
         updateOAM( false );
 
-        SOUND::playBGM( MOD_EVOLVING );
+        SOUND::playBGM( BGM_EVOLVING );
         // Main Animation
         for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
 
@@ -164,7 +164,7 @@ namespace IO::ANIM {
             SOUND::restartBGM( );
             return false;
         } else {
-            SOUND::playBGMOneshot( MOD_OS_EVOLVED );
+            SOUND::playBGMOneshot( BGM_OS_EVOLVED );
             setFrameVis( 0, true );
             setFrameVis( 1, false );
             updateOAM( false );
@@ -208,7 +208,7 @@ namespace IO::ANIM {
                                      p_pkmn.m_pkmnIdx == PKMN_MANAPHY );
 
         tileCnt = loadPKMNSprite( p_pkmn, PKMN_X, PKMN_Y, 4, 1, tileCnt, false );
-        SOUND::playBGM( MOD_EVOLVING );
+        SOUND::playBGM( BGM_EVOLVING );
 
         setFrameVis( 1, true );
         updateOAM( false );
@@ -236,7 +236,7 @@ namespace IO::ANIM {
         updateOAM( false );
         IO::fadeScreen( IO::fadeType::UNFADE, true, true );
 
-        SOUND::playBGMOneshot( MOD_OS_EVOLVED );
+        SOUND::playBGMOneshot( BGM_OS_EVOLVED );
         char buffer[ 200 ];
         clearScreen( true, true, true );
         snprintf( buffer, 200, GET_STRING( STR_ANIM_EGG_HATCH ),

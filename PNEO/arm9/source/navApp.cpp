@@ -33,7 +33,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "nav.h"
 #include "pokemonNames.h"
 #include "sound.h"
-#include "soundbank.h"
 #include "sprite.h"
 #include "uio.h"
 
@@ -305,7 +304,7 @@ namespace NAV {
         IO::updateOAM( p_bottom );
 
         auto s1 = std::string( GET_STRING( 585 ) );
-        if( _currentSong && BGMIndexForName( _currentSong ) != MOD_NONE ) {
+        if( _currentSong && _currentSong <= MAX_BGM ) {
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
         } else {
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
@@ -353,8 +352,8 @@ namespace NAV {
         SOUND::playCry( PKMN_LUDICOLO );
         _currentSong = p_idx;
         auto s1      = std::string( GET_STRING( 585 ) );
-        if( _currentSong && BGMIndexForName( _currentSong ) != MOD_NONE ) {
-            SOUND::setJBoxBGM( BGMIndexForName( _currentSong ) );
+        if( _currentSong && _currentSong != BGM_NONE ) {
+            SOUND::setJBoxBGM( _currentSong );
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
         } else {
             SOUND::setJBoxBGM( SOUND::JBOX_DISABLED );
@@ -368,20 +367,20 @@ namespace NAV {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::printRectangle( 45, 30, 200, 180, p_bottom, 0 );
         for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( BGMIndexForName( p_startIdx + i ) != MOD_NONE ) {
+            if( p_startIdx + i <= MAX_BGM ) {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
 
                 setSongChoiceVis( i, false, p_bottom );
-                IO::regularFont->printStringC( FS::getBGMName( p_startIdx + i ).c_str( ), oam[ idx ].x + 64,
-                                               oam[ idx ].y + 2, p_bottom, IO::font::CENTER );
+                IO::regularFont->printStringC( FS::getBGMName( p_startIdx + i ).c_str( ),
+                                               oam[ idx ].x + 64, oam[ idx ].y + 2, p_bottom,
+                                               IO::font::CENTER );
             } else {
                 setSongChoiceVis( i, true, p_bottom );
             }
         }
 
-        oam[ SPR_NAV_APP_RSV_SUB + 1 ].isHidden
-            = BGMIndexForName( p_startIdx + SONGS_PER_PAGE ) == MOD_NONE;
-        oam[ SPR_NAV_APP_RSV_SUB ].isHidden = p_startIdx <= SONGS_PER_PAGE;
+        oam[ SPR_NAV_APP_RSV_SUB + 1 ].isHidden = p_startIdx + SONGS_PER_PAGE > MAX_BGM;
+        oam[ SPR_NAV_APP_RSV_SUB ].isHidden     = p_startIdx <= SONGS_PER_PAGE;
 
         auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * SONGS_PER_PAGE;
         IO::regularFont->printStringC( GET_STRING( 646 ), oam[ idx ].x + 64, oam[ idx ].y + 2,
@@ -408,7 +407,7 @@ namespace NAV {
 
         // select song
         for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( BGMIndexForName( _currentSelStart + i ) != MOD_NONE ) {
+            if( _currentSelStart + i <= MAX_BGM ) {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
                 res.push_back( std::pair( IO::inputTarget( oam[ idx ].x, oam[ idx ].y,
                                                            oam[ idx ].x + 128, oam[ idx ].y + 20 ),
@@ -457,7 +456,7 @@ namespace NAV {
                     if( c.second == EXIT_CHOICE ) {
                         return true;
                     } else if( c.second == FWD_CHOICE ) {
-                        if( BGMIndexForName( _currentSelStart + SONGS_PER_PAGE ) != MOD_NONE ) {
+                        if( _currentSelStart + SONGS_PER_PAGE <= MAX_BGM ) {
                             SOUND::playCry( PKMN_BELLOSSOM );
                             _currentSelStart += SONGS_PER_PAGE;
                             drawSongList( _currentSelStart, p_bottom );
