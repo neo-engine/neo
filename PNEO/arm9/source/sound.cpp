@@ -117,7 +117,8 @@ namespace SOUND {
                 swiWaitForVBlank( );
                 mmStop( );
                 swiWaitForVBlank( );
-                mmUnload( currentBGM );
+                auto oldmmId = BGMIndexForName( currentBGM );
+                if( oldmmId != MOD_NONE ) { mmUnload( oldmmId ); }
             }
             restoreVolume( );
             if( mmId != MOD_NONE ) {
@@ -177,7 +178,8 @@ namespace SOUND {
                 swiWaitForVBlank( );
                 mmStop( );
                 swiWaitForVBlank( );
-                mmUnload( currentBGM );
+                auto oldmmId = BGMIndexForName( currentBGM );
+                if( oldmmId != MOD_NONE ) { mmUnload( oldmmId ); }
             }
             restoreVolume( );
             if( mmId != MOD_NONE ) {
