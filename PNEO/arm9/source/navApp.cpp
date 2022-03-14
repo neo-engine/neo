@@ -26,7 +26,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "navApp.h"
-#include "bgmTranslation.h"
 #include "defines.h"
 #include "fs.h"
 #include "mapDefines.h"
@@ -352,7 +351,7 @@ namespace NAV {
         SOUND::playCry( PKMN_LUDICOLO );
         _currentSong = p_idx;
         auto s1      = std::string( GET_STRING( 585 ) );
-        if( _currentSong && _currentSong != BGM_NONE ) {
+        if( _currentSong && _currentSong <= MAX_BGM ) {
             SOUND::setJBoxBGM( _currentSong );
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
         } else {

@@ -30,7 +30,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "bagViewer.h"
 #include "battle.h"
 #include "battleTrainer.h"
-#include "bgmTranslation.h"
 #include "boxViewer.h"
 #include "choiceBox.h"
 #include "counter.h"
