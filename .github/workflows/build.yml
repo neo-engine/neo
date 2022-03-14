@@ -23,10 +23,10 @@ jobs:
         flashcard: [ "", "FLASHCARD=1" ]
         desquid: [ "", "DESQUID=1" ]
     steps:
-    - run: make {{matrix.sound}} {{matrix.flashcard}} {{matrix.desquid}} rebuild
+    - run: make ${{matrix.sound}} ${{matrix.flashcard}} ${{matrix.desquid}} rebuild
     - uses: actions/upload-artifact@v3.0.0
       with:
-        name: "{{matrix.sound}}.{{matrix.flshcard}}.{{matrix.desquid}}"
+        name: "${{matrix.sound}}.${{matrix.flshcard}}.${{matrix.desquid}}"
         path: PNEO.nds
 
 
