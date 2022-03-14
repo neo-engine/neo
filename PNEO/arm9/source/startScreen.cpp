@@ -54,8 +54,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "specials.h"
 #include "statusScreen.h"
 #endif
-
-#include "bgmTranslation.h"
 // END TEST
 
 namespace SAVE {
@@ -167,15 +165,11 @@ namespace SAVE {
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
 
-        SOUND::playBGM( BGM_SURFING );
-        printf( "%i %i\n", BGM_SURFING, BGMIndexForName( BGM_SURFING ) );
-
         // BG_PALETTE[ 3 ] = BG_PALETTE_SUB[ 3 ] = RGB15( 0, 0, 0 );
-/*
+
         printf( "Free Software, PW 2012 - 2022\n"
                 "                             \n"
                 "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" );
-
 
         if( gMod == DEVELOPER )
             printf( "   " __DATE__ " " __TIME__ " v%hhu.%hhu-dev\n", VERSION / 10, VERSION % 10 );
@@ -188,7 +182,7 @@ namespace SAVE {
         else if( gMod == FCARD )
             printf( " " __DATE__ " " __TIME__ " v%hhu.%hhu-flash\n", VERSION / 10, VERSION % 10 );
         printf( "%32s", VERSION_NAME );
-*/
+
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );
         consoleSelect( &IO::Top );
         u8 frame = 0;

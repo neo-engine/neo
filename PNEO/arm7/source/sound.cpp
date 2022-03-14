@@ -6,6 +6,7 @@
 
 #include "sseq.h"
 
+#ifndef NO_SOUND
 #ifndef MMOD
 namespace SOUND::SSEQ {
     static void soundTimer( );
@@ -243,4 +244,5 @@ namespace SOUND::SSEQ {
     }
 } // namespace SOUND::SSEQ
 
+#endif
 #endif

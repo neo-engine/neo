@@ -3,6 +3,7 @@
 #include <nds.h>
 #include "sseq.h"
 
+#ifndef NO_SOUND
 #ifndef MMOD
 namespace SOUND::SSEQ {
     // info about the sample
@@ -710,4 +711,5 @@ namespace SOUND::SSEQ {
         }
     }
 } // namespace SOUND::SSEQ
+#endif
 #endif

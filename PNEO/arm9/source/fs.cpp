@@ -49,8 +49,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemonFormes.h"
 #include "uio.h"
 
+#ifndef NO_SOUND
 #ifndef MMOD
 #include "sseq.h"
+#endif
 #endif
 
 const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
@@ -763,6 +765,7 @@ namespace MAP {
     }
 }; // namespace MAP
 
+#ifndef NO_SOUND
 #ifndef MMOD
 namespace SOUND::SSEQ {
     bool loadSequenceData( sequenceData* p_data, FILE* p_f ) {
@@ -785,6 +788,7 @@ namespace SOUND::SSEQ {
     }
 
 } // namespace SOUND::SSEQ
+#endif
 #endif
 
 const char* getUIString( u16 p_stringId, u8 p_language ) {

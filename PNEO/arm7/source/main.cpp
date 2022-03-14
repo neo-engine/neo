@@ -56,10 +56,12 @@ distribution.
 ---------------------------------------------------------------------------------*/
 #include <dswifi7.h>
 #include <nds.h>
+#ifndef NOSOUND
 #ifdef MMOD
 #include <maxmod7.h>
 #else
 #include "sseq.h"
+#endif
 #endif
 
 volatile bool exitflag = false;
@@ -77,26 +79,14 @@ void powerButtonCB( ) {
 }
 
 void soundInit( ) {
-#ifndef MMOD
     powerOn( POWER_SOUND );
     REG_SOUNDCNT = SOUND_ENABLE;
     writePowerManagement( PM_CONTROL_REG, ( readPowerManagement( PM_CONTROL_REG ) & ~PM_SOUND_MUTE )
                                               | PM_SOUND_AMP );
     REG_MASTER_VOLUME = 127;
-#else
-    dmaFillWords( 0, (void*) 0x04000400, 0x100 );
-
-    REG_SOUNDCNT |= SOUND_ENABLE;
-    writePowerManagement( PM_CONTROL_REG, ( readPowerManagement( PM_CONTROL_REG ) & ~PM_SOUND_MUTE )
-                                              | PM_SOUND_AMP );
-    powerOn( POWER_SOUND );
-#endif
 }
 
 int main( ) {
-#ifdef MMOD
-    soundInit( );
-#endif
     readUserSettings( );
     ledBlink( 0 );
 
@@ -105,14 +95,14 @@ int main( ) {
     initClockIRQ( );
     fifoInit( );
     touchInit( );
-#ifndef MMOD
     soundInit( );
-#endif
 
+#ifndef NO_SOUND
 #ifdef MMOD
     mmInstall( FIFO_MAXMOD );
 #else
     SOUND::SSEQ::installSoundSys( );
+#endif
 #endif
 
     SetYtrigger( 80 );
@@ -129,8 +119,10 @@ int main( ) {
 
     setPowerButtonCB( powerButtonCB );
 
+#ifndef NO_SOUND
 #ifndef MMOD
     u32 fadeCounter = 0;
+#endif
 #endif
 
     // Keep the ARM7 mostly idle
@@ -140,6 +132,7 @@ int main( ) {
         }
 
         swiWaitForVBlank( );
+#ifndef NO_SOUND
 #ifndef MMOD
         if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADING ) {
             if( fadeCounter < 24 ) {
@@ -150,6 +143,7 @@ int main( ) {
                 if( !SOUND::SSEQ::ADSR_MASTER_VOLUME ) { SOUND::SSEQ::stopSequence( ); }
             }
         }
+#endif
 #endif
     }
     return 0;

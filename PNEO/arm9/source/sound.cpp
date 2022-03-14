@@ -25,9 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string>
-
 #include <cstdio>
+#include <string>
 
 #ifndef NO_SOUND
 #ifdef MMOD
@@ -105,7 +104,6 @@ namespace SOUND {
             ANIMATE_MAP = false;
 #ifdef MMOD
             auto mmId = BGMIndexForName( p_id );
-            printf( "p_id %i got %i, BGMLoaded: %i", p_id, mmId, BGMLoaded );
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -122,7 +120,6 @@ namespace SOUND {
             }
             restoreVolume( );
             if( mmId != MOD_NONE ) {
-                printf( "mmLoad\nmmStart" );
                 mmLoad( mmId );
                 mmStart( mmId, MM_PLAY_LOOP );
             }

@@ -31,6 +31,19 @@ CFLAGS	:=	-g -Wall -O3 -D_FORTIFY_SOURCE=1 -ffast-math -fgcse-sm -fgcse-las -fgc
 			-mcpu=arm7tdmi -mtune=arm7tdmi -fomit-frame-pointer\
 			$(ARCH)
 
+ifdef DESQUID
+CFLAGS	+=	-DDESQUID -fanalyzer
+endif
+ifdef NOSOUND
+CFLAGS	+=	-DNO_SOUND
+endif
+ifdef MMOD
+CFLAGS	+=	-DMMOD
+endif
+ifdef FLASHCARD
+CFLAGS	+=	-DFLASHCARD
+endif
+
 CFLAGS	+=	$(INCLUDE) -DARM7
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -fno-rtti
 
