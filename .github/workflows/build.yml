@@ -12,17 +12,18 @@ jobs:
         desquid: [ "", "DESQUID=1" ]
     steps:
     - uses: actions/checkout@v2
-    - run: docker pull devkitpro/devkitarm;
-           docker run -p 4000:80 --name devkitarm devkitpro/devkitarm || true;
-           mkdir -p /opt/devkitpro;
-           docker cp devkitarm:/opt/devkitpro /opt || true;
-           docker cp devkitarm:/opt/devkitpro/tools /opt/devkitpro || true;
-           PATH=/opt/devkitpro/tools/bin:$PATH;
-           cd PNEO;
-           make ${{matrix.sound}} ${{matrix.flashcard}} ${{matrix.desquid}};
+    - run: |
+        docker pull devkitpro/devkitarm
+        docker run -p 4000:80 --name devkitarm devkitpro/devkitarm || true
+        mkdir -p /opt/devkitpro
+        docker cp devkitarm:/opt/devkitpro /opt || true
+        docker cp devkitarm:/opt/devkitpro/tools /opt/devkitpro || true
+        PATH=/opt/devkitpro/tools/bin:$PATH
+        cd PNEO
+        make ${{matrix.sound}} ${{matrix.flashcard}} ${{matrix.desquid}}
     - uses: actions/upload-artifact@v3.0.0
       with:
         name: "${{matrix.sound}}.${{matrix.flshcard}}.${{matrix.desquid}}"
-        path: PNEO.nds
+        path: PNEO/PNEO.nds
 
 
