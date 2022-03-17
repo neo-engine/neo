@@ -25,11 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "yesNoBox.h"
+#include "io/yesNoBox.h"
 #include "defines.h"
-#include "nav.h"
-#include "sound.h"
-#include "uio.h"
+#include "io/uio.h"
+#include "nav/nav.h"
+#include "sound/sound.h"
 
 namespace IO {
     yesNoBox::selection yesNoBox::getResult( const char* p_message, style p_style,

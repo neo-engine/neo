@@ -32,15 +32,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef MMOD
 #include <maxmod9.h>
 #else
-#include "sseq.h"
+#include "sound/sseq.h"
 #endif
-#include "bgmTranslation.h"
+#include "gen/bgmTranslation.h"
 #endif
 
 #include "defines.h"
-#include "fs.h"
-#include "saveGame.h"
-#include "sound.h"
+#include "fs/fs.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 #ifndef NO_SOUND
 #ifdef MMOD

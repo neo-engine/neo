@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "mapDefines.h"
+#include "map/mapDefines.h"
 
 namespace MAP {
     const u16 BANK_10_MAP_LOCATIONS[ 16 * 4 ][ 29 * 4 ] = {

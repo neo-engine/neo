@@ -27,15 +27,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "ability.h"
-#include "boxUI.h"
-#include "defines.h"
-#include "fs.h"
-#include "locationNames.h"
+#include "battle/ability.h"
+#include "box/boxUI.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "gen/locationNames.h"
+#include "gen/pokemonNames.h"
+#include "io/screenFade.h"
+#include "io/uio.h"
 #include "pokemon.h"
-#include "pokemonNames.h"
-#include "screenFade.h"
-#include "uio.h"
 
 #include "NoPkmn.h"
 namespace BOX {
@@ -587,7 +587,7 @@ namespace BOX {
         if( !p_pokemon->isEgg( ) ) {
             oam[ SPR_CHOICE_START_OAM + 5 ].isHidden = false;
 
-            pkmnData data = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
+            pkmnData data = FS::getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
             // Type icon
             for( u8 i = 0; i < 2; ++i ) {
                 tileCnt = IO::loadTypeIcon( data.m_baseForme.m_types[ i ], INFO_X + 128 - 62 + 34,
@@ -603,7 +603,7 @@ namespace BOX {
                                   !p_pokemon->isShiny( ), OBJPRIORITY_0, false, OBJMODE_NORMAL );
 
             // Pokéball Icon
-            tileCnt = IO::loadItemIcon( ITEM::ballToItem( p_pokemon->m_boxdata.m_ball ),
+            tileCnt = IO::loadItemIcon( BAG::ballToItem( p_pokemon->m_boxdata.m_ball ),
                                         ANCHOR_X - 4, ANCHOR_Y, SPR_BALL_ICON_OAM,
                                         SPR_BALL_ICON_PAL, tileCnt, false );
 
@@ -645,7 +645,7 @@ namespace BOX {
             }
 
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
-            writeLineTop( getDisplayName( p_pokemon->getSpecies( ) ).c_str( ), 0 );
+            writeLineTop( FS::getDisplayName( p_pokemon->getSpecies( ) ).c_str( ), 0 );
 
             IO::regularFont->setColor( 0, 2 );
             char buffer[ 50 ];
@@ -678,7 +678,7 @@ namespace BOX {
             IO::regularFont->printStringC( GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ),
                                            INFO_X + 144 - 12, INFO_Y + 27 + 30, false,
                                            IO::font::RIGHT );
-            IO::regularFont->printStringC( getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
+            IO::regularFont->printStringC( FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
                                            INFO_X + 144 - 12, INFO_Y + 27 + 60, false,
                                            IO::font::RIGHT );
 
@@ -687,7 +687,7 @@ namespace BOX {
                 IO::regularFont->printStringC( GET_STRING( 362 ), INFO_X + 12, INFO_Y + 27 + 75,
                                                false );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
-                IO::regularFont->printStringC( ITEM::getItemName( p_pokemon->getItem( ) ).c_str( ),
+                IO::regularFont->printStringC( FS::getItemName( p_pokemon->getItem( ) ).c_str( ),
                                                INFO_X + 144 - 12, INFO_Y + 27 + 90, false,
                                                IO::font::RIGHT );
             }
@@ -696,8 +696,8 @@ namespace BOX {
             for( u8 i = 0; i < 4; ++i ) {
                 if( p_pokemon->m_boxdata.m_moves[ i ] ) {
                     IO::regularFont->printStringC(
-                        MOVE::getMoveName( p_pokemon->m_boxdata.m_moves[ i ] ).c_str( ),
-                        ANCHOR_X + 2, ANCHOR_Y + 123 + 15 * i, false );
+                        FS::getMoveName( p_pokemon->m_boxdata.m_moves[ i ] ).c_str( ), ANCHOR_X + 2,
+                        ANCHOR_Y + 123 + 15 * i, false );
                 }
             }
         } else {

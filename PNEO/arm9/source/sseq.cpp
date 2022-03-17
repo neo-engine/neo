@@ -4,8 +4,8 @@
 
 #include <nds.h>
 
-#include "defines.h"
-#include "sseq.h"
+#include "fs/data.h"
+#include "sound/sseq.h"
 
 namespace SOUND::SSEQ {
     static void sndsysMsgHandler( int, void * );
@@ -106,12 +106,12 @@ namespace SOUND::SSEQ {
         freeSequence( );
         CURRENT_SEQUENCE.m_message = SNDSYS_PLAYSEQ;
 
-        loadSequenceData( &CURRENT_SEQUENCE.m_seq, seqFile );
-        loadSequenceData( &CURRENT_SEQUENCE.m_bnk, bnkFile );
-        loadSequenceData( CURRENT_SEQUENCE.m_war + 0, war1 );
-        loadSequenceData( CURRENT_SEQUENCE.m_war + 1, war2 );
-        loadSequenceData( CURRENT_SEQUENCE.m_war + 2, war3 );
-        loadSequenceData( CURRENT_SEQUENCE.m_war + 3, war4 );
+        FS::loadSequenceData( &CURRENT_SEQUENCE.m_seq, seqFile );
+        FS::loadSequenceData( &CURRENT_SEQUENCE.m_bnk, bnkFile );
+        FS::loadSequenceData( CURRENT_SEQUENCE.m_war + 0, war1 );
+        FS::loadSequenceData( CURRENT_SEQUENCE.m_war + 1, war2 );
+        FS::loadSequenceData( CURRENT_SEQUENCE.m_war + 2, war3 );
+        FS::loadSequenceData( CURRENT_SEQUENCE.m_war + 3, war4 );
 
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
     }

@@ -25,10 +25,10 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "statusScreen.h"
+#include "sts/statusScreen.h"
 #include "defines.h"
-#include "sound.h"
-#include "uio.h"
+#include "io/uio.h"
+#include "sound/sound.h"
 
 namespace STS {
     statusScreen::statusScreen( pokemon* p_pokemon, bool p_allowKeyUp, bool p_allowKeyDown,

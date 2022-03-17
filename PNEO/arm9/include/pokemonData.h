@@ -31,10 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 #include <nds.h>
-#include "type.h"
-
-#undef RAND_MAX
-#define RAND_MAX 4294967295
+#include "battle/type.h"
 
 enum pkmnLevelUpType {
     LEVELUP_TYPE_MEDIUM_FAST = 0,
@@ -149,7 +146,7 @@ enum pkmnNatures {
 };
 
 struct pkmnFormeData {
-    type           m_types[ 2 ];
+    BATTLE::type   m_types[ 2 ];
     u16            m_abilities[ 4 ]; // abilities
     u8             m_bases[ 6 ];     // base values (hp, atk, def, satk, sdef, spd)
     u16            m_expYield;
@@ -235,36 +232,6 @@ struct pkmnEvolveData {
     u32           m_baseEvolution; // (forme << 16) | (speciesidx)
     pkmnEvolution m_evolutions[ 10 ];
 };
-
-std::string getSpeciesName( u16 p_pkmnId, u8 p_language, u8 p_forme );
-std::string getSpeciesName( u16 p_pkmnId, u8 p_forme = 0 );
-bool        getSpeciesName( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
-
-std::string getDexEntry( u16 p_pkmnId, u8 p_language, u8 p_forme );
-std::string getDexEntry( u16 p_pkmnId, u8 p_forme = 0 );
-bool        getDexEntry( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
-
-std::string getDisplayName( u16 p_pkmnId, u8 p_language, u8 p_forme );
-std::string getDisplayName( u16 p_pkmnId, u8 p_forme = 0 );
-bool        getDisplayName( u16 p_pkmnId, char* p_name, u8 p_language, u8 p_forme = 0 );
-
-pkmnData getPkmnData( const u16 p_pkmnId, const u8 p_forme = 0 );
-bool     getPkmnData( const u16 p_pkmnId, pkmnData* p_out );
-bool     getPkmnData( const u16 p_pkmnId, const u8 p_forme, pkmnData* p_out );
-
-pkmnEvolveData getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme = 0 );
-bool           getPkmnEvolveData( const u16 p_pkmnId, pkmnEvolveData* p_out );
-bool           getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_out );
-
-const u16 LEARN_TM    = 200;
-const u16 LEARN_TUTOR = 201;
-const u16 LEARN_EGG   = 202;
-
-void       getLearnMoves( u16 p_pkmnId, u8 p_forme, u16 p_fromLevel, u16 p_toLevel, u16 p_num,
-                          u16* p_res );
-bool       canLearn( u16 p_pkmnId, u8 p_forme, u16 p_moveId, u16 p_maxLevel, u16 p_minLevel = 0 );
-bool       canLearn( const u16* p_learnset, u16 p_moveId, u16 p_maxLevel, u16 p_minLevel = 0 );
-const u16* getLearnset( u16 p_pkmnId, u8 p_forme );
 
 constexpr u8 NatMod[ 25 ][ 5 ] = {
     { 10, 10, 10, 10, 10 }, { 11, 9, 10, 10, 10 }, { 11, 10, 10, 10, 9 },  { 11, 10, 9, 10, 10 },

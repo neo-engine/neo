@@ -29,10 +29,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdio>
 #include <initializer_list>
 
-#include "fs.h"
-#include "pokemonNames.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/fs.h"
+#include "gen/pokemonNames.h"
+#include "io/sprite.h"
+#include "io/uio.h"
 
 #include "NoItem.h"
 
@@ -880,8 +880,8 @@ namespace IO {
                             false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadTMIcon( type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                    u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadTMIcon( BATTLE::type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY,
+                    u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         if( !FS::checkOrOpen( TM_ICON_FILE, TM_PATH )
             || !seekSpriteData( TM_ICON_FILE, 3 * p_type + p_tmtype, 32 * 32 / 8 )
             || !fread( TEMP_PAL, 16, sizeof( u16 ), TM_ICON_FILE )
@@ -896,8 +896,8 @@ namespace IO {
                            p_bottom );
     }
 
-    u16 loadTMIconB( type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                     u16 p_tileCnt, bool p_bottom ) {
+    u16 loadTMIconB( BATTLE::type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY,
+                     u8 p_oamIdx, u16 p_tileCnt, bool p_bottom ) {
         if( !FS::checkOrOpen( TM_ICON_FILE, TM_PATH )
             || !seekSpriteData( TM_ICON_FILE, 3 * p_type + p_tmtype, 32 * 32 / 8 )
             || !fread( TEMP_PAL, 16, sizeof( u16 ), TM_ICON_FILE )
@@ -913,8 +913,8 @@ namespace IO {
     FILE* TYPE_ICON_FILE          = nullptr;
     u8    LAST_TYPE_ICON_LANGUAGE = 0;
 
-    u16 loadTypeIcon( type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palIdx,
-                      u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
+    u16 loadTypeIcon( BATTLE::type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
+                      u8 p_palIdx, u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
         if( !FS::checkOrOpen( TYPE_ICON_FILE, TYPE_ICON_PATH, LAST_TYPE_ICON_LANGUAGE,
                               p_language ) ) {
             return false;
@@ -927,8 +927,8 @@ namespace IO {
                            16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadTypeIconB( type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
-                       bool p_bottom, const SAVE::language p_language ) {
+    u16 loadTypeIconB( BATTLE::type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
+                       u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
         if( !FS::checkOrOpen( TYPE_ICON_FILE, TYPE_ICON_PATH, LAST_TYPE_ICON_LANGUAGE,
                               p_language ) ) {
             return false;
@@ -994,7 +994,7 @@ namespace IO {
         return p_tileCnt + ( 32 * 16 ) / BYTES_PER_16_COLOR_TILE;
     }
 
-    u16 loadDamageCategoryIcon( MOVE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
+    u16 loadDamageCategoryIcon( BATTLE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
                                 u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 30 ];
         snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
@@ -1002,7 +1002,7 @@ namespace IO {
                            false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadDamageCategoryIconB( MOVE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
+    u16 loadDamageCategoryIconB( BATTLE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
                                  u8 p_oamIdx, u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 30 ];
         snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );

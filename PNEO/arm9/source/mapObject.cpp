@@ -27,19 +27,19 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "abilityNames.h"
-#include "bagViewer.h"
-#include "choiceBox.h"
+#include "bag/bagViewer.h"
 #include "defines.h"
-#include "fs.h"
-#include "gameStart.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/fs.h"
+#include "gen/abilityNames.h"
+#include "io/choiceBox.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace MAP {
 #define SPR_PKMN_OAM 100
@@ -284,7 +284,7 @@ namespace MAP {
         bool shiny   = _followPkmnData->isShiny( );
         //        bool female  = _followPkmnData->isFemale( );
         u8 forme = _followPkmnData->getForme( );
-        getPkmnData( species, forme, _followPkmnSpeciesData );
+        FS::getPkmnData( species, forme, _followPkmnSpeciesData );
 
         if( species > MAX_PKMN ) { return false; }
         if( !canFollowPlayer( species, shiny, forme ) ) { return false; }

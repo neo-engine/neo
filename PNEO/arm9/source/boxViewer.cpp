@@ -25,18 +25,16 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "boxViewer.h"
-#include "bagViewer.h"
-#include "boxUI.h"
-#include "defines.h"
-#include "keyboard.h"
-#include "uio.h"
-
-#include "sound.h"
-
-#include "saveGame.h"
-#include "statusScreen.h"
-#include "statusScreenUI.h"
+#include "box/boxViewer.h"
+#include "bag/bagViewer.h"
+#include "box/boxUI.h"
+#include "fs/data.h"
+#include "io/keyboard.h"
+#include "io/uio.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
+#include "sts/statusScreen.h"
+#include "sts/statusScreenUI.h"
 
 namespace BOX {
     // #define THRESHOLD 20
@@ -678,14 +676,13 @@ namespace BOX {
                 }
                 case boxUI::BUTTON_PKMN_GIVE_ITEM: {
                     BAG::bagViewer bv  = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
-                                                        BAG::bagViewer::GIVE_TO_PKMN );
+                                                         BAG::bagViewer::GIVE_TO_PKMN );
                     u16            itm = bv.getItem( );
                     if( itm ) {
                         if( curSel.getItem( ) ) {
                             auto curItm = curSel.getItem( );
                             SAVE::SAV.getActiveFile( ).m_bag.insert(
-                                BAG::toBagType( ITEM::getItemData( curItm ).m_itemType ), curItm,
-                                1 );
+                                BAG::toBagType( FS::getItemData( curItm ).m_itemType ), curItm, 1 );
                         }
                         tmp = getPkmn( _selectedIdx );
                         if( tmp != nullptr ) { tmp->giveItem( itm ); }
@@ -700,7 +697,7 @@ namespace BOX {
                     if( tmp != nullptr ) {
                         u16 acI = tmp->takeItem( );
                         SAVE::SAV.getActiveFile( ).m_bag.insert(
-                            BAG::toBagType( ITEM::getItemData( acI ).m_itemType ), acI, 1 );
+                            BAG::toBagType( FS::getItemData( acI ).m_itemType ), acI, 1 );
 
                         _boxUI.updatePkmn( getPkmn( _selectedIdx ), _selectedIdx );
                         _boxUI.selectPkmn( nullptr, 0 );

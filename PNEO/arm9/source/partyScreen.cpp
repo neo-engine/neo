@@ -25,17 +25,18 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "partyScreen.h"
-#include "bagViewer.h"
-#include "item.h"
-#include "saveGame.h"
-#include "sound.h"
-#include "statusScreen.h"
-#include "yesNoBox.h"
+#include "sts/partyScreen.h"
+#include "bag/bagViewer.h"
+#include "bag/item.h"
+#include "io/yesNoBox.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
+#include "sts/statusScreen.h"
 
 #ifdef DESQUID
-#include "ability.h"
-#include "fs.h"
+#include "battle/ability.h"
+#include "fs/data.h"
+#include "fs/fs.h"
 #endif
 
 namespace STS {
@@ -83,10 +84,10 @@ namespace STS {
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
         IO::yesNoBox yn;
         bool         res = yn.getResult( [ & ]( ) { return _partyUI->printYNMessage( 0, 254 ); },
-                                 [ & ]( IO::yesNoBox::selection p_sel ) {
+                                         [ & ]( IO::yesNoBox::selection p_sel ) {
                                      _partyUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
-                                 },
-                                 IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( _frame++ ); } )
+                                         },
+                                         IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( _frame++ ); } )
                    == IO::yesNoBox::YES;
 
         _partyUI->hideYNMessageBox( );
@@ -99,8 +100,8 @@ namespace STS {
         bool secondPage         = p_choice >= 6;
         _currentChoiceSelection = p_choice;
         _ranges                 = _partyUI->drawPartyPkmnChoice(
-            _currentSelection, 0, std::min( 6, p_numChoices - ( 6 * secondPage ) ),
-            !secondPage && p_numChoices > 6, secondPage, p_choice % 6 );
+                            _currentSelection, 0, std::min( 6, p_numChoices - ( 6 * secondPage ) ),
+                            !secondPage && p_numChoices > 6, secondPage, p_choice % 6 );
     }
 
 #ifdef DESQUID
@@ -139,38 +140,40 @@ namespace STS {
         case DESQUID_SPECIES: {
             // Species
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 12, true, MAX_PKMN, 0,
+                { FS::DESQUID_STRING + 12, true, MAX_PKMN, 0,
                   [ & ]( ) { return _team[ _currentSelection ].getSpecies( ); },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].setSpecies( p_newValue );
                       if( !_team[ _currentSelection ].m_boxdata.isNicknamed( ) ) {
-                          getDisplayName( p_newValue, _team[ _currentSelection ].m_boxdata.m_name,
-                                          CURRENT_LANGUAGE );
+                          FS::getDisplayName( p_newValue,
+                                              _team[ _currentSelection ].m_boxdata.m_name,
+                                              CURRENT_LANGUAGE );
                       }
                   },
-                  []( u32 p_value ) { return getDisplayName( p_value ); } } ) );
+                  []( u32 p_value ) { return FS::getDisplayName( p_value ); } } ) );
             // Forme
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 13, true, 31, 0,
+                { FS::DESQUID_STRING + 13, true, 31, 0,
                   [ & ]( ) { return _team[ _currentSelection ].getForme( ); },
                   [ & ]( u32 p_newValue ) { _team[ _currentSelection ].setForme( p_newValue ); },
                   [ & ]( u32 p_value ) {
-                      return getDisplayName( _team[ _currentSelection ].m_boxdata.m_speciesId,
-                                             p_value );
+                      return FS::getDisplayName( _team[ _currentSelection ].m_boxdata.m_speciesId,
+                                                 p_value );
                   } } ) );
             // Ability
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 14, true, 3, 0,
+                { FS::DESQUID_STRING + 14, true, 3, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.getAbilitySlot( ); },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.setAbility( p_newValue );
                   },
                   [ & ]( u32 ) {
-                      return getAbilityName( _team[ _currentSelection ].m_boxdata.getAbility( ) );
+                      return FS::getAbilityName(
+                          _team[ _currentSelection ].m_boxdata.getAbility( ) );
                   } } ) );
             // Shininess
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 23, false, 1, 0,
+                { FS::DESQUID_STRING + 23, false, 1, 0,
                   [ & ]( ) { return _team[ _currentSelection ].isShiny( ); },
                   [ & ]( u32 p_newValue ) {
                       while( p_newValue != _team[ _currentSelection ].isShiny( ) ) {
@@ -180,13 +183,13 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Level
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 21, false, 100, 1,
+                { FS::DESQUID_STRING + 21, false, 100, 1,
                   [ & ]( ) { return _team[ _currentSelection ].m_level; },
                   [ & ]( u32 p_newValue ) { _team[ _currentSelection ].setLevel( p_newValue ); },
                   []( u32 ) { return ""; } } ) );
             // EXP
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 22, false, 1640000, 0,
+                { FS::DESQUID_STRING + 22, false, 1640000, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_experienceGained; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].setExperience( p_newValue );
@@ -197,7 +200,7 @@ namespace STS {
         case DESQUID_STATUS: {
             // Sleep
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 15, false, 7, 0,
+                { FS::DESQUID_STRING + 15, false, 7, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_status.m_isAsleep; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_status.m_isAsleep = p_newValue & 7;
@@ -205,7 +208,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Poison
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 16, false, 1, 0,
+                { FS::DESQUID_STRING + 16, false, 1, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_status.m_isPoisoned; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_status.m_isPoisoned = p_newValue & 1;
@@ -213,7 +216,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Burn
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 17, false, 8, 0,
+                { FS::DESQUID_STRING + 17, false, 8, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_status.m_isBurned; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_status.m_isBurned = p_newValue & 1;
@@ -221,7 +224,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Freeze
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 18, false, 8, 0,
+                { FS::DESQUID_STRING + 18, false, 8, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_status.m_isFrozen; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_status.m_isFrozen = p_newValue & 1;
@@ -229,7 +232,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Paralyzed
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 19, false, 8, 0,
+                { FS::DESQUID_STRING + 19, false, 8, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_status.m_isParalyzed; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_status.m_isParalyzed = p_newValue & 1;
@@ -237,7 +240,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Toxic
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 20, false, 8, 0,
+                { FS::DESQUID_STRING + 20, false, 8, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_status.m_isBadlyPoisoned; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_status.m_isBadlyPoisoned = p_newValue & 1;
@@ -248,7 +251,7 @@ namespace STS {
         case DESQUID_EGG: {
             // Egg
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 24, false, 1, 0,
+                { FS::DESQUID_STRING + 24, false, 1, 0,
                   [ & ]( ) { return _team[ _currentSelection ].isEgg( ); },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.setIsEgg( p_newValue );
@@ -256,7 +259,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Steps/Happiness
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 25, false, 255, 0,
+                { FS::DESQUID_STRING + 25, false, 255, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_steps; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.m_steps = ( p_newValue & 0xFF );
@@ -264,7 +267,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // Got place
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 26, true, 6000, 0,
+                { FS::DESQUID_STRING + 26, true, 6000, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_gotPlace; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.m_gotPlace = p_newValue & 0xFFFF;
@@ -272,7 +275,7 @@ namespace STS {
                   []( u32 p_location ) { return FS::getLocation( p_location ); } } ) );
             // Hatch place
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 27, true, 6000, 0,
+                { FS::DESQUID_STRING + 27, true, 6000, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_hatchPlace; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.m_hatchPlace = p_newValue & 0xFFFF;
@@ -280,7 +283,7 @@ namespace STS {
                   []( u32 p_location ) { return FS::getLocation( p_location ); } } ) );
             // Id
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 28, false, 65535, 0,
+                { FS::DESQUID_STRING + 28, false, 65535, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_oTId; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.m_oTId = p_newValue & 0xFFFF;
@@ -288,7 +291,7 @@ namespace STS {
                   []( u32 ) { return ""; } } ) );
             // S.Id
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 28, false, 65535, 0,
+                { FS::DESQUID_STRING + 28, false, 65535, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_oTSid; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.m_oTSid = p_newValue & 0xFFFF;
@@ -299,7 +302,7 @@ namespace STS {
         case DESQUID_NATURE: {
             // Nature
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 30, true, 24, 0,
+                { FS::DESQUID_STRING + 30, true, 24, 0,
                   [ & ]( ) { return u8( _team[ _currentSelection ].getNature( ) ); },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.setNature( pkmnNatures( p_newValue ) );
@@ -307,7 +310,7 @@ namespace STS {
                   []( u32 p_value ) { return std::string( GET_STRING( 187 + p_value ) ); } } ) );
             for( u8 i = 0; i < 5; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    { u16( DESQUID_STRING + 31 + i ), true, 2, 0,
+                    { u16( FS::DESQUID_STRING + 31 + i ), true, 2, 0,
                       [ &, i ]( ) {
                           return NatMod[ u8( _team[ _currentSelection ].getNature( ) ) ][ i ] - 9;
                       },
@@ -322,7 +325,7 @@ namespace STS {
             // IV
             for( u8 i = 0; i < 6; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    { u16( DESQUID_STRING + 36 + i ), true, 31, 0,
+                    { u16( FS::DESQUID_STRING + 36 + i ), true, 31, 0,
                       [ &, i ]( ) { return _team[ _currentSelection ].IVget( i ); },
                       [ &, i ]( u32 p_newValue ) {
                           _team[ _currentSelection ].IVset( i, p_newValue & 31 );
@@ -335,7 +338,7 @@ namespace STS {
             // IV
             for( u8 i = 0; i < 6; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    { u16( DESQUID_STRING + 36 + i ), true, 252, 0,
+                    { u16( FS::DESQUID_STRING + 36 + i ), true, 252, 0,
                       [ &, i ]( ) { return _team[ _currentSelection ].EVget( i ); },
                       [ &, i ]( u32 p_newValue ) {
                           _team[ _currentSelection ].EVset( i, p_newValue );
@@ -348,27 +351,27 @@ namespace STS {
             // Moves
             for( u8 i = 0; i < 4; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    { u16( DESQUID_STRING + 42 ), true, 796, 0,
+                    { u16( FS::DESQUID_STRING + 42 ), true, 796, 0,
                       [ &, i ]( ) { return _team[ _currentSelection ].m_boxdata.m_moves[ i ]; },
                       [ &, i ]( u32 p_newValue ) {
                           _team[ _currentSelection ].m_boxdata.m_moves[ i ] = p_newValue;
                           _team[ _currentSelection ].PPupset( i, 0 );
                       },
-                      []( u32 p_value ) { return MOVE::getMoveName( p_value ); } } ) );
+                      []( u32 p_value ) { return FS::getMoveName( p_value ); } } ) );
             }
             // Held Item
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 43, true, 1278, 1,
+                { FS::DESQUID_STRING + 43, true, 1278, 1,
                   [ & ]( ) { return _team[ _currentSelection ].getItem( ); },
                   [ & ]( u32 p_newValue ) { _team[ _currentSelection ].giveItem( p_newValue ); },
-                  []( u32 p_value ) { return ITEM::getItemName( p_value ); } } ) );
+                  []( u32 p_value ) { return FS::getItemName( p_value ); } } ) );
 
             break;
         }
         case DESQUID_ITEM: {
             // Current HP
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 36, false, 999, 0,
+                { FS::DESQUID_STRING + 36, false, 999, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_stats.m_curHP; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_stats.m_curHP = std::min(
@@ -378,27 +381,27 @@ namespace STS {
             // Moves
             for( u8 i = 0; i < 4; ++i ) {
                 res.push_back( partyScreen::desquidItem(
-                    { u16( DESQUID_STRING + 44 ), true, 99, 0,
+                    { u16( FS::DESQUID_STRING + 44 ), true, 99, 0,
                       [ &, i ]( ) { return _team[ _currentSelection ].m_boxdata.m_curPP[ i ]; },
                       [ &, i ]( u32 p_newValue ) {
-                          MOVE::moveData mdata = MOVE::getMoveData(
+                          BATTLE::moveData mdata = FS::getMoveData(
                               _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
                           u8 dmx = u8( mdata.m_pp * ( 5 + _team[ _currentSelection ].PPupget( i ) )
                                        / 5 );
-                          bool boost = !( mdata.m_flags & MOVE::NOPPBOOST );
+                          bool boost = !( mdata.m_flags & BATTLE::MF_NOPPBOOST );
                           u8   gmx   = s8( mdata.m_pp * ( 5 + ( boost ? 3 : 0 ) ) / 5 );
                           p_newValue = std::min( u8( p_newValue ), gmx );
                           if( p_newValue > dmx ) { _team[ _currentSelection ].PPupset( i, 3 ); }
                           _team[ _currentSelection ].m_boxdata.m_curPP[ i ] = p_newValue;
                       },
                       [ &, i ]( u32 ) {
-                          return MOVE::getMoveName(
+                          return FS::getMoveName(
                               _team[ _currentSelection ].m_boxdata.m_moves[ i ] );
                       } } ) );
             }
             // Fateful encounter
             res.push_back( partyScreen::desquidItem(
-                { DESQUID_STRING + 45, false, 1, 0,
+                { FS::DESQUID_STRING + 45, false, 1, 0,
                   [ & ]( ) { return _team[ _currentSelection ].m_boxdata.m_fateful; },
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.m_fateful = p_newValue;
@@ -417,13 +420,14 @@ namespace STS {
     do { choices[ selectedLine ].m_counterUpdate( p_newValue ); } while( false );
 
     bool partyScreen::desquidWindow( desquidChoice p_choice ) {
-        auto s1 = std::string( GET_STRING( DESQUID_STRING ) );
+        auto s1 = std::string( GET_STRING( FS::DESQUID_STRING ) );
         snprintf( BUFFER, 49, "%s: %s", s1.c_str( ),
                   GET_STRING( getTextForDesquidChoice( p_choice ) ) );
         _partyUI->select( _currentSelection, BUFFER );
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
         swiWaitForVBlank( );
-        //_partyUI->drawPartyPkmnSub( _currentSelection, true, false, GET_STRING( DESQUID_STRING )
+        //_partyUI->drawPartyPkmnSub( _currentSelection, true, false, GET_STRING( FS::DESQUID_STRING
+        //)
         //);
         _partyUI->showDesquidWindow( );
 
@@ -479,7 +483,7 @@ namespace STS {
                     SOUND::playSoundEffect( SFX_SAVE );
                     _team[ _currentSelection ].recalculateStats( );
                     editing = false;
-                    s1      = std::string( GET_STRING( DESQUID_STRING ) );
+                    s1      = std::string( GET_STRING( FS::DESQUID_STRING ) );
                     snprintf( BUFFER, 49, "%s: %s", s1.c_str( ),
                               GET_STRING( getTextForDesquidChoice( p_choice ) ) );
                     _partyUI->select( _currentSelection, BUFFER );
@@ -940,11 +944,11 @@ namespace STS {
             if( _allowMoveSelection && !_team[ _currentSelection ].isEgg( ) ) {
                 for( u8 i = 0; i < 4; i++ ) {
                     if( _team[ _currentSelection ].m_boxdata.m_moves[ i ]
-                        && MOVE::isFieldMove(
+                        && BATTLE::isFieldMove(
                             _team[ _currentSelection ].m_boxdata.m_moves[ i ] ) ) {
                         for( u8 j = 0; j < 2; ++j ) {
-                            if( MOVE::possible( _team[ _currentSelection ].m_boxdata.m_moves[ i ],
-                                                j ) ) {
+                            if( BATTLE::possible( _team[ _currentSelection ].m_boxdata.m_moves[ i ],
+                                                  j ) ) {
                                 _currentChoices.push_back( choice( FIELD_MOVE_1 + i ) );
                                 break;
                             }
@@ -1013,12 +1017,12 @@ namespace STS {
                 if( _team[ _currentSelection ].getItem( ) ) {
                     auto curItm = _team[ _currentSelection ].getItem( );
                     SAVE::SAV.getActiveFile( ).m_bag.insert(
-                        BAG::toBagType( ITEM::getItemData( curItm ).m_itemType ), curItm, 1 );
+                        BAG::toBagType( FS::getItemData( curItm ).m_itemType ), curItm, 1 );
                 }
                 _partyUI->select( _currentSelection );
                 _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
-                sprintf( BUFFER, GET_STRING( 334 ), ITEM::getItemName( itm ).c_str( ),
+                sprintf( BUFFER, GET_STRING( 334 ), FS::getItemName( itm ).c_str( ),
                          _team[ _currentSelection ].m_boxdata.m_name );
                 _partyUI->printMessage( BUFFER, itm );
                 waitForInteract( );
@@ -1034,11 +1038,11 @@ namespace STS {
             _partyUI->select( _currentSelection );
             _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
-            sprintf( BUFFER, GET_STRING( 101 ), ITEM::getItemName( acI ).c_str( ),
+            sprintf( BUFFER, GET_STRING( 101 ), FS::getItemName( acI ).c_str( ),
                      _team[ _currentSelection ].m_boxdata.m_name );
             _partyUI->printMessage( BUFFER, acI );
             SAVE::SAV.getActiveFile( ).m_bag.insert(
-                BAG::toBagType( ITEM::getItemData( acI ).m_itemType ), acI, 1 );
+                BAG::toBagType( FS::getItemData( acI ).m_itemType ), acI, 1 );
             waitForInteract( );
             _partyUI->hideMessageBox( );
             computeSelectionChoices( );

@@ -1,7 +1,8 @@
 // Based on SSEQ Player by "RocketRobz" (https://github.com/RocketRobz/SSEQPlayer)
 #include <cstring>
 #include <nds.h>
-#include "sseq.h"
+
+#include "sound/sseq.h"
 
 #ifndef NO_SOUND
 #ifndef MMOD

@@ -28,34 +28,34 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <vector>
 
-#include "bagViewer.h"
-#include "battle.h"
-#include "battleTrainer.h"
-#include "boxViewer.h"
-#include "choiceBox.h"
-#include "counter.h"
+#include "bag/bagViewer.h"
+#include "bag/item.h"
+#include "battle/battle.h"
+#include "battle/battleTrainer.h"
+#include "box/boxViewer.h"
 #include "defines.h"
-#include "dex.h"
-#include "fs.h"
-#include "item.h"
-#include "itemNames.h"
-#include "keyboard.h"
-#include "locationNames.h"
-#include "mapDrawer.h"
-#include "mapObject.h"
-#include "mapSlice.h"
-#include "moveNames.h"
-#include "nav.h"
-#include "navApp.h"
-#include "partyScreen.h"
+#include "dex/dex.h"
+#include "fs/fs.h"
+#include "gen/itemNames.h"
+#include "gen/locationNames.h"
+#include "gen/moveNames.h"
+#include "io/choiceBox.h"
+#include "io/counter.h"
+#include "io/keyboard.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
+#include "map/mapDrawer.h"
+#include "map/mapObject.h"
+#include "map/mapSlice.h"
+#include "nav/nav.h"
+#include "nav/navApp.h"
 #include "pokemon.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "specials.h"
-#include "sprite.h"
-#include "statusScreen.h"
-#include "uio.h"
-#include "yesNoBox.h"
+#include "sound/sound.h"
+#include "spx/specials.h"
+#include "sts/partyScreen.h"
+#include "sts/statusScreen.h"
 
 namespace NAV {
 
@@ -429,7 +429,7 @@ namespace NAV {
     }
 
     void doPrintMessage( const char* p_message, style p_style, u16 p_item = 0,
-                         const ITEM::itemData* p_data = 0, bool p_noDelay = false ) {
+                         const BAG::itemData* p_data = 0, bool p_noDelay = false ) {
         IO::regularFont->setColor( 4, 3 );
         IO::regularFont->setColor( 5, 4 );
         u16 x = 12, y = 192 - 40, hg = 32;
@@ -594,14 +594,14 @@ namespace NAV {
                                                hg, TEXT_BUF + 3 * 64 * hg, 64 * hg / 2, false,
                                                false, false, OBJPRIORITY_0, false );
                 } else if( !cpos ) {
-                    if( !p_data || p_data->m_itemType != ITEM::ITEMTYPE_TM ) {
+                    if( !p_data || p_data->m_itemType != BAG::ITEMTYPE_TM ) {
                         tileCnt = IO::loadItemIconB( p_item, 16, 192 - 40, SPR_MSGTEXT_OAM + 3,
                                                      tileCnt, false );
-                    } else if( p_data && p_data->m_itemType == ITEM::ITEMTYPE_TM ) {
-                        MOVE::moveData move = MOVE::getMoveData( p_data->m_param2 );
+                    } else if( p_data && p_data->m_itemType == BAG::ITEMTYPE_TM ) {
+                        BATTLE::moveData move = FS::getMoveData( p_data->m_param2 );
 
                         u8 tmtype = p_data->m_effect;
-                        if( tmtype == 1 && MOVE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
+                        if( tmtype == 1 && BATTLE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
                         tileCnt = IO::loadTMIconB( move.m_type, tmtype, 16, 192 - 40,
                                                    SPR_MSGTEXT_OAM + 3, tileCnt, false );
                     }
@@ -638,15 +638,15 @@ namespace NAV {
     }
 
     void useItemFromPlayer( u16 p_itemId, u16 p_amount ) {
-        auto data = ITEM::getItemData( p_itemId );
+        auto data = FS::getItemData( p_itemId );
         auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
                                             BAG::toBagType( data.m_itemType ), p_itemId ) );
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
         char buffer[ 100 ];
-        auto iname = ITEM::getItemName( p_itemId );
+        auto iname = FS::getItemName( p_itemId );
 
-        if( data.m_itemType == ITEM::ITEMTYPE_TM ) {
-            iname += " " + MOVE::getMoveName( data.m_param2 );
+        if( data.m_itemType == BAG::ITEMTYPE_TM ) {
+            iname += " " + FS::getMoveName( data.m_param2 );
         }
 
         if( cnt > 1 ) {
@@ -660,15 +660,15 @@ namespace NAV {
     }
 
     void takeItemFromPlayer( u16 p_itemId, u16 p_amount ) {
-        auto data = ITEM::getItemData( p_itemId );
+        auto data = FS::getItemData( p_itemId );
         auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
                                             BAG::toBagType( data.m_itemType ), p_itemId ) );
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
         char buffer[ 100 ];
-        auto iname = ITEM::getItemName( p_itemId );
+        auto iname = FS::getItemName( p_itemId );
 
-        if( data.m_itemType == ITEM::ITEMTYPE_TM ) {
-            iname += " " + MOVE::getMoveName( data.m_param2 );
+        if( data.m_itemType == BAG::ITEMTYPE_TM ) {
+            iname += " " + FS::getMoveName( data.m_param2 );
         }
 
         if( cnt > 1 ) {
@@ -682,14 +682,14 @@ namespace NAV {
     }
 
     void giveItemToPlayer( u16 p_itemId, u16 p_amount ) {
-        auto data = ITEM::getItemData( p_itemId );
+        auto data = FS::getItemData( p_itemId );
         SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( data.m_itemType ), p_itemId,
                                                  p_amount );
         char buffer[ 100 ];
-        auto iname = ITEM::getItemName( p_itemId );
+        auto iname = FS::getItemName( p_itemId );
 
-        if( data.m_itemType == ITEM::ITEMTYPE_TM ) {
-            iname += " " + MOVE::getMoveName( data.m_param2 );
+        if( data.m_itemType == BAG::ITEMTYPE_TM ) {
+            iname += " " + FS::getMoveName( data.m_param2 );
         }
 
         if( p_amount > 1 ) {
@@ -698,14 +698,14 @@ namespace NAV {
             snprintf( buffer, 99, GET_STRING( 564 ), iname.c_str( ) );
         }
         switch( data.m_itemType ) {
-        case ITEM::ITEMTYPE_KEYITEM: SOUND::playSoundEffect( SFX_OBTAIN_KEY_ITEM ); break;
-        case ITEM::ITEMTYPE_TM: SOUND::playSoundEffect( SFX_OBTAIN_TM ); break;
+        case BAG::ITEMTYPE_KEYITEM: SOUND::playSoundEffect( SFX_OBTAIN_KEY_ITEM ); break;
+        case BAG::ITEMTYPE_TM: SOUND::playSoundEffect( SFX_OBTAIN_TM ); break;
         default: SOUND::playSoundEffect( SFX_OBTAIN_ITEM ); break;
         }
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
         auto fmt = std::string( GET_STRING( 86 ) );
-        snprintf( buffer, 99, fmt.c_str( ), iname.c_str( ), ITEM::getItemChar( data.m_itemType ),
+        snprintf( buffer, 99, fmt.c_str( ), iname.c_str( ), BAG::getItemChar( data.m_itemType ),
                   GET_STRING( 11 + BAG::toBagType( data.m_itemType ) ) );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
         std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
@@ -933,8 +933,8 @@ namespace NAV {
             MAP::curMap->draw( );
             if( res.m_selectedMove ) {
                 for( u8 j = 0; j < 2; ++j ) {
-                    if( MOVE::possible( res.m_selectedMove, j ) ) {
-                        MOVE::use( res.m_selectedMove, j );
+                    if( BATTLE::possible( res.m_selectedMove, j ) ) {
+                        BATTLE::use( res.m_selectedMove, j );
                         break;
                     }
                 }
@@ -988,7 +988,7 @@ namespace NAV {
             SOUND::restoreVolume( );
             init( );
 
-            if( res ) { ITEM::use( res, _printMessage ); }
+            if( res ) { BAG::use( res, _printMessage ); }
             return;
         }
         case VIEW_ID: {
@@ -1182,8 +1182,7 @@ namespace NAV {
     std::vector<std::pair<IO::inputTarget, u8>>
     drawItemChoice( const std::vector<std::pair<u16, u32>>& p_offeredItems,
                     const std::vector<std::string>&         p_itemNames,
-                    const std::vector<ITEM::itemData>& p_data, u8 p_paymentMethod,
-                    u8 p_firstItem ) {
+                    const std::vector<BAG::itemData>& p_data, u8 p_paymentMethod, u8 p_firstItem ) {
 
         auto num_items
             = std::min( p_data.size( ), std::min( p_itemNames.size( ), p_offeredItems.size( ) ) );
@@ -1238,16 +1237,16 @@ namespace NAV {
                 }
             }
 
-            if( p_data[ p_firstItem + i ].m_itemType != ITEM::ITEMTYPE_TM ) {
+            if( p_data[ p_firstItem + i ].m_itemType != BAG::ITEMTYPE_TM ) {
                 IO::loadItemIcon(
                     p_offeredItems[ p_firstItem + i ].first, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y, SPR_ITEM_OAM_SUB( i ),
                     SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
             } else {
-                MOVE::moveData move = MOVE::getMoveData( p_data[ p_firstItem + i ].m_param2 );
+                BATTLE::moveData move = FS::getMoveData( p_data[ p_firstItem + i ].m_param2 );
 
                 u8 tmtype = p_data[ p_firstItem + i ].m_effect;
-                if( tmtype == 1 && MOVE::isFieldMove( p_data[ p_firstItem + i ].m_param2 ) ) {
+                if( tmtype == 1 && BATTLE::isFieldMove( p_data[ p_firstItem + i ].m_param2 ) ) {
                     tmtype = 0;
                 }
                 IO::loadTMIcon( move.m_type, tmtype, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
@@ -1329,7 +1328,7 @@ namespace NAV {
         return res;
     }
 
-    void selectItem( std::pair<u16, u32> p_item, const ITEM::itemData& p_itemData,
+    void selectItem( std::pair<u16, u32> p_item, const BAG::itemData& p_itemData,
                      const std::string& p_descr, u8 p_selection ) {
         if( p_selection == IO::choiceBox::PREV_PAGE_CHOICE ) {
             selectMenuItem( p_selection );
@@ -1479,7 +1478,7 @@ namespace NAV {
         IO::updateOAM( true );
     }
 
-    s32 getItemCount( std::pair<u16, u32> p_item, const ITEM::itemData& p_itemData,
+    s32 getItemCount( std::pair<u16, u32> p_item, const BAG::itemData& p_itemData,
                       const std::string& p_name, u8 p_paymentMethod ) {
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
@@ -1701,8 +1700,9 @@ namespace NAV {
                 IO::regularFont->setColor( 0, 2 );
 
                 // level
-                pkmnData data = getPkmnData( dcstart[ i ].getSpecies( ), dcstart[ i ].getForme( ) );
-                u8       lv = calcLevel( dcstart[ i ], &data ), oldlv = dclstart[ i ];
+                pkmnData data
+                    = FS::getPkmnData( dcstart[ i ].getSpecies( ), dcstart[ i ].getForme( ) );
+                u8 lv = calcLevel( dcstart[ i ], &data ), oldlv = dclstart[ i ];
 
                 if( lv - oldlv > 0 ) {
                     snprintf( buffer, 95, "Lv.%hhu (+%hu)", lv, lv - oldlv );
@@ -1741,7 +1741,7 @@ namespace NAV {
 
                 for( u8 j = 0; j < 4; ++j ) {
                     if( dcstart[ i ].getMove( j ) ) {
-                        auto mname = MOVE::getMoveName( dcstart[ i ].getMove( j ) );
+                        auto mname = FS::getMoveName( dcstart[ i ].getMove( j ) );
                         if( mname.length( ) > 18 ) {
                             snprintf( buffer, 20, "%s.", mname.c_str( ) );
                         } else {
@@ -1808,18 +1808,18 @@ namespace NAV {
     }
 
     void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod ) {
-        std::vector<std::string>    names = std::vector<std::string>( );
-        std::vector<std::string>    descr = std::vector<std::string>( );
-        std::vector<ITEM::itemData> data  = std::vector<ITEM::itemData>( );
+        std::vector<std::string>   names = std::vector<std::string>( );
+        std::vector<std::string>   descr = std::vector<std::string>( );
+        std::vector<BAG::itemData> data  = std::vector<BAG::itemData>( );
 
         for( auto i : p_offeredItems ) {
-            data.push_back( ITEM::getItemData( i.first ) );
-            auto nm = ITEM::getItemName( i.first );
-            if( data.back( ).m_itemType == ITEM::ITEMTYPE_TM ) {
-                nm += ": " + MOVE::getMoveName( data.back( ).m_param2 );
-                descr.push_back( MOVE::getMoveDescr( data.back( ).m_param2 ) );
+            data.push_back( FS::getItemData( i.first ) );
+            auto nm = FS::getItemName( i.first );
+            if( data.back( ).m_itemType == BAG::ITEMTYPE_TM ) {
+                nm += ": " + FS::getMoveName( data.back( ).m_param2 );
+                descr.push_back( FS::getMoveDescr( data.back( ).m_param2 ) );
             } else {
-                descr.push_back( ITEM::getItemDescr( i.first ) );
+                descr.push_back( FS::getItemDescr( i.first ) );
             }
             names.push_back( nm );
         }
@@ -1901,9 +1901,9 @@ namespace NAV {
             // registered item
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
-                if( ITEM::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
-                    ITEM::use( SAVE::SAV.getActiveFile( ).m_registeredItem,
-                               []( const char* p_msg ) { printMessage( p_msg ); } );
+                if( BAG::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                    BAG::use( SAVE::SAV.getActiveFile( ).m_registeredItem,
+                              []( const char* p_msg ) { printMessage( p_msg ); } );
                     //  updateItems( );
                 } else {
                     printMessage( GET_STRING( 58 ) );
@@ -1955,11 +1955,12 @@ namespace NAV {
 #ifdef DESQUID
         if( pressed & KEY_SELECT ) {
             std::vector<u16> choices
-                = { DESQUID_STRING + 46, DESQUID_STRING + 47, DESQUID_STRING + 48,
-                    DESQUID_STRING + 50, DESQUID_STRING + 51, DESQUID_STRING + 52 };
+                = { FS::DESQUID_STRING + 46, FS::DESQUID_STRING + 47, FS::DESQUID_STRING + 48,
+                    FS::DESQUID_STRING + 50, FS::DESQUID_STRING + 51, FS::DESQUID_STRING + 52 };
 
             IO::choiceBox test = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-            switch( test.getResult( GET_STRING( DESQUID_STRING + 49 ), MSG_NOCLOSE, choices ) ) {
+            switch(
+                test.getResult( GET_STRING( FS::DESQUID_STRING + 49 ), MSG_NOCLOSE, choices ) ) {
             case 0: {
                 memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
                         sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
@@ -2037,7 +2038,7 @@ namespace NAV {
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 9999 );
 
                 for( u16 i = 0; i < MAX_ITEMS_IN_BAG; ++i ) {
-                    auto data = ITEM::getItemData( i );
+                    auto data = FS::getItemData( i );
                     SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::toBagType( data.m_itemType ), i,
                                                              5 );
                 }

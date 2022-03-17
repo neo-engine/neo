@@ -27,13 +27,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "battleDefines.h"
-#include "itemNames.h"
-#include "mapDrawer.h"
-#include "move.h"
+#include "battle/battleDefines.h"
+#include "battle/move.h"
+#include "fs/data.h"
+#include "gen/itemNames.h"
+#include "gen/pokemonNames.h"
+#include "map/mapDrawer.h"
 #include "pokemon.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
+#include "save/saveGame.h"
 
 boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 p_shiny,
                         bool p_hiddenAbility, bool p_isEgg, u8 p_ball, u8 p_pokerus,
@@ -51,7 +52,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
                         u8 p_pokerus, u8 p_forme, pkmnData* p_data ) {
     pkmnData data;
     if( p_data == nullptr ) {
-        data = getPkmnData( p_pkmnId, p_forme );
+        data = FS::getPkmnData( p_pkmnId, p_forme );
     } else {
         data = *p_data;
     }
@@ -71,7 +72,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
             m_pid       = rand( );
             m_shinyType = 1;
         }
-        if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+        if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                     I_SHINY_CHARM ) ) {
             for( u8 i = 0; i < p_shiny - 2 && !isShiny( ); ++i ) {
                 m_pid       = rand( );
@@ -114,11 +115,11 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     if( p_moves ) {
         memcpy( m_moves, p_moves, sizeof( m_moves ) );
     } else {
-        getLearnMoves( p_pkmnId, p_forme, 0, p_level, 4, m_moves );
+        FS::getLearnMoves( p_pkmnId, p_forme, 0, p_level, 4, m_moves );
     }
     for( u8 i = 0; i < 4; ++i ) {
-        MOVE::moveData mdata = MOVE::getMoveData( m_moves[ i ] );
-        m_curPP[ i ]         = mdata.m_pp;
+        BATTLE::moveData mdata = FS::getMoveData( m_moves[ i ] );
+        m_curPP[ i ]           = mdata.m_pp;
     }
 
     for( u8 i = 0; i < 6; ++i ) IVset( i, rand( ) & 31 );
@@ -140,7 +141,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         strcpy( m_name, p_name );
         setIsNicknamed( true );
     } else {
-        getDisplayName( p_pkmnId, m_name, CURRENT_LANGUAGE );
+        FS::getDisplayName( p_pkmnId, m_name, CURRENT_LANGUAGE );
         setIsNicknamed( false );
     }
     m_hometown = 4;
@@ -165,13 +166,13 @@ bool boxPokemon::gainExperience( u32 p_amount ) {
 }
 
 bool boxPokemon::isFullyEvolved( ) const {
-    auto edata = getPkmnEvolveData( getSpecies( ), getForme( ) );
+    auto edata = FS::getPkmnEvolveData( getSpecies( ), getForme( ) );
     return !!edata.m_evolutionCount;
 }
 
 u8 boxPokemon::getCompatibility( const boxPokemon& p_other ) const {
-    auto data1 = getPkmnData( getSpecies( ), getForme( ) );
-    auto data2 = getPkmnData( p_other.getSpecies( ), p_other.getForme( ) );
+    auto data1 = FS::getPkmnData( getSpecies( ), getForme( ) );
+    auto data2 = FS::getPkmnData( p_other.getSpecies( ), p_other.getForme( ) );
 
     if( data1.getEggType( 0 ) == EGG_TYPE_UNDISCOVERED
         || data1.getEggType( 1 ) == EGG_TYPE_UNDISCOVERED
@@ -220,7 +221,7 @@ u8 boxPokemon::getCompatibility( const boxPokemon& p_other ) const {
 }
 
 u16 boxPokemon::getBaseSpecies( ) const {
-    auto edata = getPkmnEvolveData( getSpecies( ), getForme( ) );
+    auto edata = FS::getPkmnEvolveData( getSpecies( ), getForme( ) );
     if( edata.m_baseEvolution ) { return edata.m_baseEvolution; }
     return ( getForme( ) << 16 ) | getSpecies( );
 }
@@ -341,10 +342,10 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
 
     // compute the pball the egg should be caught in
     u8 pball = mom.getBall( );
-    if( ITEM::ballToItem( pball ) == I_CHERISH_BALL || ITEM::ballToItem( pball ) == I_MASTER_BALL
-        || ITEM::ballToItem( pball ) == I_PREMIER_BALL ) [[unlikely]] {
+    if( BAG::ballToItem( pball ) == I_CHERISH_BALL || BAG::ballToItem( pball ) == I_MASTER_BALL
+        || BAG::ballToItem( pball ) == I_PREMIER_BALL ) [[unlikely]] {
         // these balls can't be inherited
-        pball = ITEM::itemToBall( I_POKE_BALL );
+        pball = BAG::itemToBall( I_POKE_BALL );
     }
 
     p_result = boxPokemon( species, 1, forme, 0, 0, hiddenA, true, pball );
@@ -429,12 +430,12 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
         moves.insert( M_VOLT_TACKLE );
     }
 
-    auto learnset = getLearnset( p_result.getSpecies( ), p_result.getForme( ) );
+    auto learnset = FS::getLearnset( p_result.getSpecies( ), p_result.getForme( ) );
 
     // check for egg moves
     for( u8 i = 0; i < 4 && moveslot < 4; ++i ) {
         if( !mom.m_moves[ i ] ) { break; }
-        if( canLearn( learnset, mom.m_moves[ i ], LEARN_EGG, LEARN_EGG )
+        if( FS::canLearn( learnset, mom.m_moves[ i ], FS::LEARN_EGG, FS::LEARN_EGG )
             && !moves.count( mom.m_moves[ i ] ) ) {
             p_result.m_moves[ moveslot++ ] = mom.m_moves[ i ];
             moves.insert( mom.m_moves[ i ] );
@@ -442,7 +443,7 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
     }
     for( u8 i = 0; i < 4 && moveslot < 4; ++i ) {
         if( !dad.m_moves[ i ] ) { break; }
-        if( canLearn( learnset, dad.m_moves[ i ], LEARN_EGG, LEARN_EGG )
+        if( FS::canLearn( learnset, dad.m_moves[ i ], FS::LEARN_EGG, FS::LEARN_EGG )
             && !moves.count( dad.m_moves[ i ] ) ) {
             p_result.m_moves[ moveslot++ ] = dad.m_moves[ i ];
             moves.insert( dad.m_moves[ i ] );
@@ -456,7 +457,7 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
         for( u8 ii = 0; ii < 4; ++ii ) {
             if( !mom.m_moves[ ii ] ) { break; }
             if( mom.m_moves[ ii ] == dad.m_moves[ i ] ) {
-                if( canLearn( learnset, dad.m_moves[ i ], LEARN_TUTOR )
+                if( FS::canLearn( learnset, dad.m_moves[ i ], FS::LEARN_TUTOR )
                     && !moves.count( dad.m_moves[ i ] ) ) {
                     p_result.m_moves[ moveslot++ ] = dad.m_moves[ i ];
                     moves.insert( dad.m_moves[ i ] );
@@ -479,8 +480,8 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
     // set pp to correct value
     for( u8 i = 0; i < 4; ++i ) {
         if( p_result.m_moves[ i ] ) {
-            MOVE::moveData mdata  = MOVE::getMoveData( p_result.m_moves[ i ] );
-            p_result.m_curPP[ i ] = mdata.m_pp;
+            BATTLE::moveData mdata = FS::getMoveData( p_result.m_moves[ i ] );
+            p_result.m_curPP[ i ]  = mdata.m_pp;
         }
     }
 
@@ -499,7 +500,7 @@ void boxPokemon::setSpecies( u16 p_newSpecies, pkmnData* p_data ) {
     setForme( 0 );
     pkmnData data;
     if( p_data == nullptr ) {
-        data = getPkmnData( getSpecies( ), getForme( ) );
+        data = FS::getPkmnData( getSpecies( ), getForme( ) );
     } else {
         data = *p_data;
     }
@@ -523,7 +524,7 @@ void boxPokemon::setSpecies( u16 p_newSpecies, pkmnData* p_data ) {
 void boxPokemon::setAbility( u8 p_newAbilitySlot, pkmnData* p_data ) {
     pkmnData data;
     if( p_data == nullptr ) {
-        data = getPkmnData( getSpecies( ), getForme( ) );
+        data = FS::getPkmnData( getSpecies( ), getForme( ) );
     } else {
         data = *p_data;
     }
@@ -625,11 +626,11 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
     char buffer[ 100 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        snprintf( buffer, 99, GET_STRING( 102 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( 102 ), m_name, FS::getMoveName( p_move ).c_str( ) );
         p_message( buffer );
         return false;
-    } else if( canLearn( getSpecies( ), getForme( ), p_move, LEARN_TM ) ) {
-        auto mdata    = MOVE::getMoveData( p_move );
+    } else if( FS::canLearn( getSpecies( ), getForme( ), p_move, FS::LEARN_TM ) ) {
+        auto mdata    = FS::getMoveData( p_move );
         bool freeSpot = false;
         for( u8 i = 0; i < 4; ++i )
             if( !m_moves[ i ] ) {
@@ -637,22 +638,22 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                 m_curPP[ i ] = mdata.m_pp;
 
                 snprintf( buffer, 99, GET_STRING( 103 ), m_name,
-                          MOVE::getMoveName( p_move ).c_str( ) );
+                          FS::getMoveName( p_move ).c_str( ) );
                 p_message( buffer );
                 freeSpot = true;
                 break;
             }
         if( !freeSpot ) {
-            snprintf( buffer, 99, GET_STRING( 139 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 139 ), m_name, FS::getMoveName( p_move ).c_str( ) );
             p_message( buffer );
             snprintf( buffer, 99, GET_STRING( 104 ), m_name );
             if( p_yesNoMessage( buffer ) ) {
                 loop( ) {
                     u8 res = p_getMove( this, p_move );
                     if( res < 4 ) {
-                        if( MOVE::isFieldMove( m_moves[ res ] ) ) {
+                        if( BATTLE::isFieldMove( m_moves[ res ] ) ) {
                             snprintf( buffer, 99, GET_STRING( 106 ), m_name,
-                                      MOVE::getMoveName( m_moves[ res ] ).c_str( ) );
+                                      FS::getMoveName( m_moves[ res ] ).c_str( ) );
                             p_message( buffer );
                             snprintf( buffer, 99, GET_STRING( 104 ), m_name );
                             p_message( buffer );
@@ -666,12 +667,12 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                     break;
                 }
             }
-            snprintf( buffer, 99, GET_STRING( 403 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 403 ), m_name, FS::getMoveName( p_move ).c_str( ) );
             p_message( buffer );
             return false;
         }
     } else {
-        snprintf( buffer, 99, GET_STRING( 107 ), m_name, MOVE::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( 107 ), m_name, FS::getMoveName( p_move ).c_str( ) );
         p_message( buffer );
         return false;
     }

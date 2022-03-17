@@ -25,11 +25,12 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "mapSprite.h"
-#include "fs.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "uio.h"
+#include "map/mapSprite.h"
+#include "fs/fs.h"
+#include "io/uio.h"
+#include "map/mapSlice.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
 
 #define SPR_MAPTILE_OAM( p_idx )   ( 0 + ( p_idx ) )
 #define SPR_SMALL_NPC_OAM( p_idx ) ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) + ( p_idx ) )

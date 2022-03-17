@@ -25,25 +25,23 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "bag/bagViewer.h"
+#include "battle/battle.h"
+#include "battle/battleDefines.h"
+#include "battle/battleTrainer.h"
 #include "defines.h"
-#include "fs.h"
-#include "mapDrawer.h"
-#include "sprite.h"
-#include "saveGame.h"
-
-#include "abilityNames.h"
-#include "bagViewer.h"
-#include "battle.h"
-#include "battleDefines.h"
-#include "battleTrainer.h"
-#include "choiceBox.h"
-#include "gameStart.h"
-#include "nav.h"
-#include "pokemonNames.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "uio.h"
-
+#include "fs/fs.h"
+#include "gen/abilityNames.h"
+#include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace MAP {
     void mapDrawer::initWeather( ) {
@@ -97,7 +95,7 @@ namespace MAP {
             break;
         case SANDSTORM: {
             bool goggles = SAVE::SAV.getActiveFile( ).m_bag.count(
-                BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_GO_GOGGLES );
+                BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_GO_GOGGLES );
 
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             bgWrapOn( IO::bg3 );
@@ -161,4 +159,4 @@ namespace MAP {
             }
         }
     }
-}
+} // namespace MAP

@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "mapSlice.h"
+#include "map/mapSlice.h"
 
 namespace MAP {
     // tiles generated from *.png (using pal0)  via sprite2raw $i 32 0 0 0 0xa8a3 0x7fff

@@ -26,16 +26,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "defines.h"
-#include "locationNames.h"
-#include "mapDrawer.h"
-#include "mapSlice.h"
-#include "mapSprite.h"
-#include "moveNames.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "uio.h"
+#include "gen/locationNames.h"
+#include "gen/moveNames.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "map/mapSlice.h"
+#include "map/mapSprite.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
 
-namespace MOVE {
+namespace BATTLE {
     u16 text( const u16 p_moveId, u8 p_param ) {
         if( p_param == 1 ) {
             switch( p_moveId ) {
@@ -303,4 +303,4 @@ namespace MOVE {
         default: return;
         }
     }
-} // namespace MOVE
+} // namespace BATTLE

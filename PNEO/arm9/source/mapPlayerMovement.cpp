@@ -27,21 +27,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "abilityNames.h"
-#include "bagViewer.h"
-#include "battle.h"
-#include "battleDefines.h"
-#include "battleTrainer.h"
+#include "bag/bagViewer.h"
+#include "battle/battle.h"
+#include "battle/battleDefines.h"
+#include "battle/battleTrainer.h"
 #include "defines.h"
-#include "fs.h"
-#include "gameStart.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/fs.h"
+#include "gen/abilityNames.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace MAP {
     void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn,
@@ -56,7 +56,7 @@ namespace MAP {
 
         switch( behave ) {
         case BEH_GRASS_ASH: { // Add ash to the soot bag
-            if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+            if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                         I_SOOT_SACK ) ) {
                 SAVE::SAV.getActiveFile( ).m_ashCount++;
                 if( SAVE::SAV.getActiveFile( ).m_ashCount > 999'999'999 ) {
@@ -131,8 +131,8 @@ namespace MAP {
                     if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED(
                             o.second.m_event.m_data.m_trainer.m_trainerId ) ) ) [[likely]] {
                         // player did not defeat the trainer yet
-                        auto tr = BATTLE::getBattleTrainer(
-                            o.second.m_event.m_data.m_trainer.m_trainerId );
+                        auto tr
+                            = FS::getBattleTrainer( o.second.m_event.m_data.m_trainer.m_trainerId );
 
                         // Check if the battle would be a double battle; if so and if the
                         // player has only a single pkmn, the battle is optional

@@ -60,7 +60,7 @@ distribution.
 #ifdef MMOD
 #include <maxmod7.h>
 #else
-#include "sseq.h"
+#include "sound/sseq.h"
 #endif
 #endif
 

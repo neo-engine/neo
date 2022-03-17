@@ -28,18 +28,16 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <vector>
 
-#include "berry.h"
-#include "item.h"
-#include "move.h"
-#include "moveNames.h"
-#include "pokemonNames.h"
+#include "bag/item.h"
+#include "battle/move.h"
+#include "gen/moveNames.h"
+#include "gen/pokemonNames.h"
+#include "io/uio.h"
+#include "map/mapDefines.h"
+#include "map/mapDrawer.h"
+#include "save/saveGame.h"
 
-#include "mapDefines.h"
-#include "mapDrawer.h"
-#include "saveGame.h"
-#include "uio.h"
-
-namespace ITEM {
+namespace BAG {
     bool use( const u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
               std::function<u8( u8 )> p_callback, bool p_inbattle ) {
         if( p_pokemon.isEgg( ) || !p_pokemon.m_boxdata.m_speciesId ) { return false; }
@@ -191,7 +189,7 @@ namespace ITEM {
                 mv = p_callback( item.m_param3 );
             }
             for( u8 i = 0; i < 4; ++i ) {
-                MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
+                BATTLE::moveData mdata = FS::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
 
                 if( ( mv & ( 1 << i ) ) && p_pokemon.m_boxdata.m_moves[ i ] ) {
                     u8& tmp = p_pokemon.m_boxdata.m_curPP[ i ];
@@ -228,9 +226,11 @@ namespace ITEM {
             }
             for( u8 i = 0; i < 4; ++i ) {
                 if( ( mv & ( 1 << i ) ) && p_pokemon.m_boxdata.m_moves[ i ] ) {
-                    MOVE::moveData mdata = MOVE::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
-                    u8             ppup  = p_pokemon.PPupget( i );
-                    if( ppup >= item.m_param2 || ( mdata.m_flags & MOVE::NOPPBOOST ) ) { continue; }
+                    BATTLE::moveData mdata = FS::getMoveData( p_pokemon.m_boxdata.m_moves[ i ] );
+                    u8               ppup  = p_pokemon.PPupget( i );
+                    if( ppup >= item.m_param2 || ( mdata.m_flags & BATTLE::MF_NOPPBOOST ) ) {
+                        continue;
+                    }
                     u8& tmp   = p_pokemon.m_boxdata.m_curPP[ i ];
                     u8  oldmx = s8( mdata.m_pp * ( 5 + p_pokemon.PPupget( i ) ) / 5 );
 
@@ -364,10 +364,10 @@ namespace ITEM {
             }
             return true;
         case I_ESCAPE_ROPE:
-            if( !p_dryRun ) MOVE::use( M_DIG, 0 );
+            if( !p_dryRun ) BATTLE::use( M_DIG, 0 );
             return false;
         case I_HONEY:
-            if( !p_dryRun ) MOVE::use( M_SWEET_SCENT, 0 );
+            if( !p_dryRun ) BATTLE::use( M_SWEET_SCENT, 0 );
             return false;
         case I_BIKE2:
         case I_BIKE:
@@ -465,8 +465,8 @@ namespace ITEM {
         case I_COIN_CASE:
         case I_POINT_CARD:
         case I_SOOT_SACK: return true;
-        case I_ESCAPE_ROPE: return MOVE::possible( M_DIG, 0 );
-        case I_HONEY: return MOVE::possible( M_SWEET_SCENT, 0 );
+        case I_ESCAPE_ROPE: return BATTLE::possible( M_DIG, 0 );
+        case I_HONEY: return BATTLE::possible( M_SWEET_SCENT, 0 );
         case I_BIKE2:
         case I_BIKE:
             if( !MAP::curMap->canBike( SAVE::SAV.getActiveFile( ).m_player.m_pos ) ) {
@@ -533,4 +533,4 @@ namespace ITEM {
         }
         return false;
     }
-} // namespace ITEM
+} // namespace BAG

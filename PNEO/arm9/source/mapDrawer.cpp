@@ -27,22 +27,22 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "defines.h"
-#include "fs.h"
-#include "gameStart.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sprite.h"
-#include "uio.h"
-
 #ifdef DESQUID_MORE
 #include <cassert>
 #endif
 
+#include "defines.h"
+#include "fs/fs.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/saveGame.h"
+
 namespace MAP {
-    mapDrawer* curMap = nullptr;
+    mapDrawer*   curMap = nullptr;
     constexpr s8 currentHalf( u16 p_pos ) {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
     }

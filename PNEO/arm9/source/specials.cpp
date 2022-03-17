@@ -28,20 +28,20 @@
 #include <vector>
 #include <nds.h>
 
-#include "choiceBox.h"
 #include "defines.h"
-#include "fs.h"
-#include "mapDrawer.h"
-#include "nav.h"
+#include "fs/fs.h"
+#include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
 #include "pokemon.h"
 #include "pokemonData.h"
-#include "pokemonNames.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "specials.h"
-#include "sprite.h"
-#include "uio.h"
-#include "yesNoBox.h"
+#include "sound/sound.h"
+#include "spx/specials.h"
 
 namespace SPX {
     void runCatchingTutorial( ) {
@@ -77,7 +77,7 @@ namespace SPX {
         zigzagoon.EVset( 1, 0 );
 
         BATTLE::battlePolicy policy = BATTLE::battlePolicy( BATTLE::DEFAULT_WILD_POLICY );
-        policy.m_mode               = BATTLE::battleMode::MOCK;
+        policy.m_mode               = BATTLE::BM_MOCK;
 
         BATTLE::battle( &zigzagoon, 1, ralts, platform, plat2, battleBack, policy ).start( );
         SOUND::restartBGM( );
@@ -230,21 +230,21 @@ namespace SPX {
 
             if( frame % 8 == 2 ) {
                 tileCnt = IO::loadSprite(
-                    "UI/sb1", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                    false, false, OBJPRIORITY_0, true );
+                     "UI/sb1", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                     IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
+                     false, false, OBJPRIORITY_0, true );
             }
             if( frame % 4 == 0 ) {
                 tileCnt = IO::loadSprite(
-                    "UI/sb2", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                    false, false, OBJPRIORITY_0, true );
+                     "UI/sb2", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                     IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
+                     false, false, OBJPRIORITY_0, true );
             }
             if( frame % 8 == 6 ) {
                 tileCnt = IO::loadSprite(
-                    "UI/sb3", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                    false, false, OBJPRIORITY_0, true );
+                     "UI/sb3", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                     IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
+                     false, false, OBJPRIORITY_0, true );
             }
 
             if( frame % 16 == 0 ) {
@@ -328,9 +328,10 @@ namespace SPX {
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
 
             char buffer[ 100 ];
-            snprintf( buffer, 99, GET_STRING( 437 ),
-                      getSpeciesName( pkmn[ res ].getSpecies( ), pkmn[ res ].getForme( ) ).c_str( ),
-                      pkmn[ res ].m_boxdata.m_name );
+            snprintf(
+                buffer, 99, GET_STRING( 437 ),
+                FS::getSpeciesName( pkmn[ res ].getSpecies( ), pkmn[ res ].getForme( ) ).c_str( ),
+                pkmn[ res ].m_boxdata.m_name );
 
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
             IO::regularFont->printStringC( buffer, 12, 192 - 40, false );

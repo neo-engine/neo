@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <nds.h>
 
-#include "sseq.h"
+#include "sound/sseq.h"
 
 #ifndef NO_SOUND
 #ifndef MMOD

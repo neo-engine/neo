@@ -28,13 +28,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "defines.h"
-#include "fs.h"
-#include "saveGame.h"
-#include "saveOptions.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/data.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "save/saveGame.h"
+#include "save/saveOptions.h"
+#include "sound/sound.h"
 
 namespace SAVE {
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 0 + 10 * ( p_pos ) )
@@ -113,7 +113,7 @@ namespace SAVE {
         IO::boldFont->setColor( IO::BLUE_IDX, 2 );
         IO::boldFont->setColor( IO::BLUE2_IDX, 1 );
         IO::boldFont->printStringC(
-            LANGUAGE_NAMES[ CURRENT_LANGUAGE ], oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 158,
+            FS::LANGUAGE_NAMES[ CURRENT_LANGUAGE ], oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 158,
             oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y, true, IO::font::CENTER );
 
         // bgm

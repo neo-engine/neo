@@ -25,15 +25,15 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "navApp.h"
-#include "defines.h"
-#include "fs.h"
-#include "mapDefines.h"
-#include "nav.h"
-#include "pokemonNames.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "nav/navApp.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "gen/pokemonNames.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDefines.h"
+#include "nav/nav.h"
+#include "sound/sound.h"
 
 namespace NAV {
 

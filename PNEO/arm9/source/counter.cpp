@@ -25,15 +25,15 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "counter.h"
-#include "defines.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "sound.h"
-#include "uio.h"
-
 #include <algorithm>
 #include <cmath>
+
+#include "defines.h"
+#include "io/counter.h"
+#include "io/uio.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace IO {
     s32 counter::getResult( const char* p_message, style p_style ) {

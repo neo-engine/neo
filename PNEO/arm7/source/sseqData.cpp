@@ -4,7 +4,7 @@
 
 #include <nds.h>
 
-#include "sseq.h"
+#include "sound/sseq.h"
 
 namespace SOUND::SSEQ {
     // The pitch table from the swiGetPitchTable function, but is bugged if DSi BIOS is set, and

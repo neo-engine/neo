@@ -25,21 +25,21 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gameStart.h"
-#include "bag.h"
-#include "choiceBox.h"
-#include "defines.h"
-#include "fs.h"
-#include "itemNames.h"
-#include "keyboard.h"
-#include "nav.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "startScreen.h"
-#include "uio.h"
-#include "yesNoBox.h"
+#include "save/gameStart.h"
+#include "bag/bag.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "gen/itemNames.h"
+#include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
+#include "io/keyboard.h"
+#include "io/screenFade.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
+#include "save/startScreen.h"
+#include "sound/sound.h"
 
 namespace SAVE {
     constexpr u16 EP_INTRO_TEXT_START[] = { 111 };

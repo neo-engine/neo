@@ -26,7 +26,8 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "defines.h"
-#include "saveGame.h"
+#include "fs/data.h"
+#include "save/saveGame.h"
 
 // ae \xe4
 // e´ \xe9
@@ -46,93 +47,95 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 // '' [129]
 // ´´ \"
 
-const char* SAVE::EPISODE_NAMES[ MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ]
-    = { { "Dev's Heaven", "Dev's Heaven" } };
+namespace FS {
+    const char* EPISODE_NAMES[ SAVE::MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ]
+        = { { "Dev's Heaven", "Dev's Heaven" } };
 
-const char* LANGUAGE_NAMES[ LANGUAGES ] = { "English", "Deutsch" };
+    const char* LANGUAGE_NAMES[ LANGUAGES ] = { "English", "Deutsch" };
 
-const char* HP_ICONS[ LANGUAGES ] = { "\xd", "\xe" };
+    const char* HP_ICONS[ LANGUAGES ] = { "\xd", "\xe" };
 
 #ifdef DESQUID
-const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
-    { "Desquid" },
-    { "Basic Data" },
-    { "Status" },
-    { "Egg Status" },
-    { "Nature" },
+    const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
+        { "Desquid" },
+        { "Basic Data" },
+        { "Status" },
+        { "Egg Status" },
+        { "Nature" },
 
-    { "HP/PP" },
-    { "Moves/Item" },
-    { "IV" },
-    { "EV" },
-    { "Duplicate" },
+        { "HP/PP" },
+        { "Moves/Item" },
+        { "IV" },
+        { "EV" },
+        { "Duplicate" },
 
-    // 10
+        // 10
 
-    { "Delete" },
-    { "Heal" },
-    { "Species: %s" },
-    { "Forme: %s" },
-    { "Ability: %s" },
+        { "Delete" },
+        { "Heal" },
+        { "Species: %s" },
+        { "Forme: %s" },
+        { "Ability: %s" },
 
-    { "Sleep" },
-    { "Poison" },
-    { "Burn" },
-    { "Freeze" },
-    { "Paralyzed" },
+        { "Sleep" },
+        { "Poison" },
+        { "Burn" },
+        { "Freeze" },
+        { "Paralyzed" },
 
-    // 20
+        // 20
 
-    { "Toxic" },
-    { "Level" },
-    { "EXP" },
-    { "Shininess" },
-    { "Is Egg?" },
+        { "Toxic" },
+        { "Level" },
+        { "EXP" },
+        { "Shininess" },
+        { "Is Egg?" },
 
-    { "Steps/Happiness" },
-    { "Obt. at %s" },
-    { "Hatd at %s" },
-    { "OT Id" },
-    { "OT SId" },
+        { "Steps/Happiness" },
+        { "Obt. at %s" },
+        { "Hatd at %s" },
+        { "OT Id" },
+        { "OT SId" },
 
-    // 30
+        // 30
 
-    { "Nature: %s" },
-    { "%2s Attack" },
-    { "%2s Defense" },
-    { "%2s Special Atk" },
-    { "%2s Special Def" },
+        { "Nature: %s" },
+        { "%2s Attack" },
+        { "%2s Defense" },
+        { "%2s Special Atk" },
+        { "%2s Special Def" },
 
-    { "%2s Speed" },
-    { "HP" },
-    { "Attack" },
-    { "Defense" },
-    { "Special Attack" },
+        { "%2s Speed" },
+        { "HP" },
+        { "Attack" },
+        { "Defense" },
+        { "Special Attack" },
 
-    // 40
+        // 40
 
-    { "Special Defense" },
-    { "Speed" },
-    { "%s" },
-    { "Held: %s" },
-    { "PP(%s)" },
+        { "Special Defense" },
+        { "Speed" },
+        { "%s" },
+        { "Held: %s" },
+        { "PP(%s)" },
 
-    { "Fateful Enc." },
-    { "PKMN Spawn" },
-    { "Item Spawn" },
-    { "View Boxes" },
-    { "Tokens of god-being|" },
+        { "Fateful Enc." },
+        { "PKMN Spawn" },
+        { "Item Spawn" },
+        { "View Boxes" },
+        { "Tokens of god-being|" },
 
-    // 50
+        // 50
 
-    { "RND Badge" },
-    { "Init PKMN" },
-    { "Pok\xe9Mart" },
-};
+        { "RND Badge" },
+        { "Init PKMN" },
+        { "Pok\xe9Mart" },
+    };
 
 #endif
 
-const char* const MONTHS[ 12 ][ LANGUAGES ]
-    = { { "Jan.", "Jan." }, { "Feb.", "Feb." }, { "Mar.", "M\xe4r." }, { "Apr.", "Apr." },
-        { "May", "Mai" },   { "June", "Juni" }, { "July", "Juli" },    { "Aug.", "Aug." },
-        { "Sep.", "Sep." }, { "Oct.", "Okt." }, { "Nov.", "Nov." },    { "Dec.", "Dez." } };
+    const char* const MONTHS[ 12 ][ LANGUAGES ]
+        = { { "Jan.", "Jan." }, { "Feb.", "Feb." }, { "Mar.", "M\xe4r." }, { "Apr.", "Apr." },
+            { "May", "Mai" },   { "June", "Juni" }, { "July", "Juli" },    { "Aug.", "Aug." },
+            { "Sep.", "Sep." }, { "Oct.", "Okt." }, { "Nov.", "Nov." },    { "Dec.", "Dez." } };
+} // namespace FS

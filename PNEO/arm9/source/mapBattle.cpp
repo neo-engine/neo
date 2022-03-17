@@ -27,21 +27,21 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "bagViewer.h"
-#include "battle.h"
-#include "battleDefines.h"
-#include "battleTrainer.h"
+#include "bag/bagViewer.h"
+#include "battle/battle.h"
+#include "battle/battleDefines.h"
+#include "battle/battleTrainer.h"
 #include "defines.h"
-#include "fs.h"
-#include "gameStart.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/fs.h"
+#include "gen/pokemonNames.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace MAP {
     void mapDrawer::disablePkmn( s16 p_steps ) {
@@ -300,11 +300,11 @@ namespace MAP {
         if( !getWildPkmnSpecies( p_type, pkmnId, pkmnForme ) ) { return false; }
 
         bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
-                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
+                            BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
                             ? !( rand( ) & 127 )
                             : !( rand( ) & 2047 );
         bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
-               BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+               BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
         resetTracerChain( );
         prepareBattleWildPkmn( p_type, pkmnId, luckyenc );
@@ -325,17 +325,17 @@ namespace MAP {
         res.m_mode               = p_mode;
         res.m_allowMegaEvolution = SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION );
 
-        res.m_weather = BATTLE::weather::NO_WEATHER;
+        res.m_weather = BATTLE::WE_NONE;
         switch( getWeather( ) ) {
-        case SUNNY: res.m_weather = BATTLE::weather::SUN; break;
+        case SUNNY: res.m_weather = BATTLE::WE_SUN; break;
         case RAINY:
-        case THUNDERSTORM: res.m_weather = BATTLE::weather::RAIN; break;
+        case THUNDERSTORM: res.m_weather = BATTLE::WE_RAIN; break;
         case SNOW:
-        case BLIZZARD: res.m_weather = BATTLE::weather::HAIL; break;
-        case SANDSTORM: res.m_weather = BATTLE::weather::SANDSTORM; break;
-        case FOG: res.m_weather = BATTLE::weather::FOG; break;
-        case HEAVY_SUNLIGHT: res.m_weather = BATTLE::weather::HEAVY_SUNSHINE; break;
-        case HEAVY_RAIN: res.m_weather = BATTLE::weather::HEAVY_RAIN; break;
+        case BLIZZARD: res.m_weather = BATTLE::WE_HAIL; break;
+        case SANDSTORM: res.m_weather = BATTLE::WE_SANDSTORM; break;
+        case FOG: res.m_weather = BATTLE::WE_FOG; break;
+        case HEAVY_SUNLIGHT: res.m_weather = BATTLE::WE_HEAVY_SUNSHINE; break;
+        case HEAVY_RAIN: res.m_weather = BATTLE::WE_HEAVY_RAIN; break;
         default: break;
         }
 
@@ -481,11 +481,11 @@ namespace MAP {
         if( _tracerChain > 40 ) { _tracerChain = 39; }
 
         u8 luckyMod    = SAVE::SAV.getActiveFile( ).m_bag.count(
-                             BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
+                             BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
                              ? 5
                              : 10;
         u8 shinyFactor = 75;
-        if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ),
+        if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                     I_SHINY_CHARM ) ) {
             shinyFactor = 125;
         }

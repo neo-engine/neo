@@ -27,20 +27,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "abilityNames.h"
-#include "bagViewer.h"
-#include "choiceBox.h"
+#include "bag/bagViewer.h"
 #include "defines.h"
-#include "fs.h"
-#include "gameStart.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/fs.h"
+#include "gen/abilityNames.h"
+#include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace MAP {
     void mapDrawer::clearFieldAnimation( u16 p_globX, u16 p_globY ) {

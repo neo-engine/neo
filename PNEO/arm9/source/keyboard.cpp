@@ -30,12 +30,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <nds.h>
 
-#include "defines.h"
-#include "fs.h"
-#include "keyboard.h"
-#include "nav.h"
-#include "sound.h"
-#include "uio.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "io/keyboard.h"
+#include "io/uio.h"
+#include "nav/nav.h"
+#include "sound/sound.h"
 
 #include "key.h"
 
@@ -110,8 +110,7 @@ namespace IO {
             }
 
             switch( c ) {
-            case '\n':
-                return guardEmptyString( res );
+            case '\n': return guardEmptyString( res );
             case '\b':
                 if( pos ) {
                     clearChar( --pos );
@@ -269,8 +268,7 @@ namespace IO {
 
     u8 keyboard::maxPages( ) const {
         switch( CURRENT_LANGUAGE ) {
-        default:
-            return 2;
+        default: return 2;
         }
     }
 

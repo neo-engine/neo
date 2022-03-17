@@ -27,11 +27,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "bgmNames.h"
-#include "fs.h"
-#include "locationNames.h"
-#include "pokemonNames.h"
-#include "sound.h"
+#include "fs/data.h"
+#include "gen/bgmNames.h"
+#include "gen/locationNames.h"
+#include "gen/pokemonNames.h"
+#include "sound/sound.h"
 
 namespace SOUND {
     u16             currentLocation = 0;

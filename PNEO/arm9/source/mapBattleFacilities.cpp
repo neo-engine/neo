@@ -25,10 +25,10 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "fs.h"
-#include "mapBattleFacilityDefines.h"
-#include "mapDrawer.h"
-#include "trainerClassNames.h"
+#include "fs/fs.h"
+#include "gen/trainerClassNames.h"
+#include "map/mapBattleFacilityDefines.h"
+#include "map/mapDrawer.h"
 
 namespace MAP {
     constexpr u8 RSID_SINGLE_LV50  = 0;
@@ -38,11 +38,11 @@ namespace MAP {
     constexpr u8 RSID_DOUBLE_LV100 = 4;
 
     const ruleSet FACILITY_RULE_SETS[ NUM_RULESETS ] = {
-        { RSID_SINGLE_LV50, 50, 3, true, 7, BATTLE::battleMode::SINGLE },
-        { RSID_SINGLE_LV100, 100, 3, true, 7, BATTLE::battleMode::SINGLE },
-        { RSID_SINGLE_LV30, 30, 3, false, 3, BATTLE::battleMode::SINGLE },  // battle tents
-        { RSID_DOUBLE_LV50, 50, 3, true, 7, BATTLE::battleMode::DOUBLE },   // battle tower
-        { RSID_DOUBLE_LV100, 100, 3, true, 7, BATTLE::battleMode::DOUBLE }, // battle tower
+        { RSID_SINGLE_LV50, 50, 3, true, 7, BATTLE::BM_SINGLE },
+        { RSID_SINGLE_LV100, 100, 3, true, 7, BATTLE::BM_SINGLE },
+        { RSID_SINGLE_LV30, 30, 3, false, 3, BATTLE::BM_SINGLE },  // battle tents
+        { RSID_DOUBLE_LV50, 50, 3, true, 7, BATTLE::BM_DOUBLE },   // battle tower
+        { RSID_DOUBLE_LV100, 100, 3, true, 7, BATTLE::BM_DOUBLE }, // battle tower
     };
 
     constexpr u8 SPECIAL_BATTLE_1 = 21;
@@ -106,12 +106,12 @@ namespace MAP {
         u8 tclass = rand( ) % BATTLE_FACILITY_NUM_TRAINER_CLASSES;
 
         // load strings for a random trainer of the chosen trainer class
-        if( !loadBattleFacilityTrainerStrings( tclass, rand( ) % TRAINERS_PER_CLASS,
-                                               &NEXT_OPPONENT ) ) {
+        if( !FS::loadBattleFacilityTrainerStrings( tclass, rand( ) % TRAINERS_PER_CLASS,
+                                                   &NEXT_OPPONENT ) ) {
             return false;
         }
 
-        NEXT_OPPONENT.m_data.m_numPokemon = p_rules.m_battleMode == BATTLE::SINGLE ? 3 : 4;
+        NEXT_OPPONENT.m_data.m_numPokemon = p_rules.m_battleMode == BATTLE::BM_SINGLE ? 3 : 4;
         if( p_randomTeam ) {
             // choose random pkmn
             for( u8 i = 0; i < NEXT_OPPONENT.m_data.m_numPokemon; ++i ) {
@@ -124,8 +124,8 @@ namespace MAP {
 
                     if( variant == NO_VARIANT ) { continue; }
 
-                    if( !loadBattleFacilityPkmn( species, variant, p_rules.m_level, p_streak,
-                                                 &NEXT_OPPONENT.m_data.m_pokemon[ i ] ) ) {
+                    if( !FS::loadBattleFacilityPkmn( species, variant, p_rules.m_level, p_streak,
+                                                     &NEXT_OPPONENT.m_data.m_pokemon[ i ] ) ) {
                         species = 0;
                         continue;
                     }
@@ -143,8 +143,8 @@ namespace MAP {
             }
         } else {
             // load team
-            if( !loadBattleFacilityTrainerTeam( p_rules, tclass, rand( ) % TEAMS_PER_CLASS,
-                                                p_streak, &NEXT_OPPONENT ) ) {
+            if( !FS::loadBattleFacilityTrainerTeam( p_rules, tclass, rand( ) % TEAMS_PER_CLASS,
+                                                    p_streak, &NEXT_OPPONENT ) ) {
                 return false;
             }
         }

@@ -27,13 +27,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cmath>
 
-#include "choiceBox.h"
 #include "defines.h"
-#include "dex.h"
-#include "dexUI.h"
-#include "saveGame.h"
-#include "sound.h"
-#include "uio.h"
+#include "dex/dex.h"
+#include "dex/dexUI.h"
+#include "io/choiceBox.h"
+#include "io/uio.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace DEX {
     u16 getFirstPkmnInNatDex( ) {

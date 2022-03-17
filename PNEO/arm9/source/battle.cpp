@@ -27,26 +27,24 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include "defines.h"
-
-#include "animations.h"
-#include "battle.h"
-#include "battleField.h"
-#include "battleSide.h"
-#include "battleSlot.h"
-#include "battleTrainer.h"
-#include "battleUI.h"
-#include "bgmNames.h"
-#include "choiceBox.h"
-#include "dex.h"
-#include "partyScreen.h"
-#include "saveGame.h"
-#include "uio.h"
-#include "yesNoBox.h"
-
-#include "bagViewer.h"
+#include "bag/bagViewer.h"
+#include "battle/battle.h"
+#include "battle/battleField.h"
+#include "battle/battleSide.h"
+#include "battle/battleSlot.h"
+#include "battle/battleTrainer.h"
+#include "battle/battleUI.h"
+#include "dex/dex.h"
+#include "fs/data.h"
+#include "gen/bgmNames.h"
+#include "io/animations.h"
+#include "io/choiceBox.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
 #include "pokemon.h"
-#include "sound.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
+#include "sts/partyScreen.h"
 
 namespace BATTLE {
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponentId,
@@ -58,8 +56,8 @@ namespace BATTLE {
 
         _policy = p_policy;
 
-        if( _policy.m_mode == MOCK ) {
-            _policy.m_mode = SINGLE;
+        if( _policy.m_mode == BM_MOCK ) {
+            _policy.m_mode = BM_SINGLE;
             _isMockBattle  = true;
         } else {
             _isMockBattle = false;
@@ -125,7 +123,7 @@ namespace BATTLE {
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
                     battlePolicy p_policy )
-        : battle( p_playerTeam, p_playerTeamSize, getBattleTrainer( p_opponentId ), p_policy ) {
+        : battle( p_playerTeam, p_playerTeamSize, FS::getBattleTrainer( p_opponentId ), p_policy ) {
     }
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform,
@@ -139,8 +137,8 @@ namespace BATTLE {
         _opponentTeamSize  = 1;
 
         _policy = p_policy;
-        if( _policy.m_mode == MOCK ) {
-            _policy.m_mode = SINGLE;
+        if( _policy.m_mode == BM_MOCK ) {
+            _policy.m_mode = BM_SINGLE;
             _isMockBattle  = true;
         } else {
             _isMockBattle = false;
@@ -149,7 +147,7 @@ namespace BATTLE {
         _isWildBattle = true;
 
         // Initialize the field with the wild pkmn
-        _field = field( _policy.m_mode, true, p_policy.m_weather, NO_PSEUDO_WEATHER, NO_TERRAIN );
+        _field    = field( _policy.m_mode, true, p_policy.m_weather, PW_NONE, TR_NONE );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
                               p_background, _policy.m_mode, true );
 
@@ -195,29 +193,29 @@ namespace BATTLE {
 
                 if( _field.getPkmn( false, 0 ) == nullptr ) {
                     // There is no first pkmn, so it cannot move.
-                    moves[ field::PLAYER_SIDE ][ 0 ].m_type = NO_OP_NO_CANCEL;
+                    moves[ field::PLAYER_SIDE ][ 0 ].m_type = MT_NO_OP_NO_CANCEL;
                 }
 
-                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type != NO_OP_NO_CANCEL ) {
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type != MT_NO_OP_NO_CANCEL ) {
                     // Compute player's first pokemon's move
                     moves[ field::PLAYER_SIDE ][ 0 ]
                         = getMoveSelection( 0, _policy.m_allowMegaEvolution );
                 }
 
-                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == RUN ) {
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == MT_RUN ) {
                     moves[ field::PLAYER_SIDE ][ 0 ] = NO_OP_SELECTION;
                     moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
                     playerWillRun                    = true;
                     break;
                 }
-                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == CAPTURE ) {
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == MT_CAPTURE ) {
                     playerWillCatch                  = moves[ field::PLAYER_SIDE ][ 0 ].m_param;
                     moves[ field::PLAYER_SIDE ][ 0 ] = NO_OP_SELECTION;
                     moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
                     break;
                 }
 
-                if( _policy.m_mode == DOUBLE || _policy.m_mode == MULTI_OPPONENT ) {
+                if( _policy.m_mode == BM_DOUBLE || _policy.m_mode == BM_MULTI_OPPONENT ) {
                     if( _field.getPkmn( false, 0 ) == nullptr ) {
                         // There is no first pkmn, so it cannot move.
                         moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
@@ -228,14 +226,14 @@ namespace BATTLE {
                     }
 
                     // Player wishes to start over
-                    if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == CANCEL ) { continue; }
+                    if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == MT_CANCEL ) { continue; }
 
-                    if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == RUN ) {
+                    if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == MT_RUN ) {
                         moves[ field::PLAYER_SIDE ][ 0 ] = NO_OP_SELECTION;
                         moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
                         playerWillRun                    = true;
                     }
-                    if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == CAPTURE ) {
+                    if( moves[ field::PLAYER_SIDE ][ 1 ].m_type == MT_CAPTURE ) {
                         playerWillCatch                  = moves[ field::PLAYER_SIDE ][ 1 ].m_param;
                         moves[ field::PLAYER_SIDE ][ 0 ] = NO_OP_SELECTION;
                         moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
@@ -263,12 +261,12 @@ namespace BATTLE {
             }
 
             if( ( playerWillRun && playerRuns( ) )
-                || ( moves[ field::PLAYER_SIDE ][ 0 ].m_type == USE_ITEM
+                || ( moves[ field::PLAYER_SIDE ][ 0 ].m_type == MT_USE_ITEM
                      && ( moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_POKE_DOLL
                           || moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_FLUFFY_TAIL
                           || moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_POKE_TOY ) ) )
                 [[likely]] {
-                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == USE_ITEM ) {
+                if( moves[ field::PLAYER_SIDE ][ 0 ].m_type == MT_USE_ITEM ) {
                     SAVE::SAV.getActiveFile( ).m_bag.erase(
                         BAG::bag::ITEMS, moves[ field::PLAYER_SIDE ][ 0 ].m_param, 1 );
                 }
@@ -293,17 +291,17 @@ namespace BATTLE {
             for( u8 i = 0; i < 2; ++i )
                 for( u8 j = 0; j < getBattlingPKMNCount( _policy.m_mode ); ++j ) {
                     // Check for pursuit
-                    if( moves[ i ][ j ].m_type == ATTACK && moves[ i ][ j ].m_param == M_PURSUIT )
-                        [[unlikely]] {
+                    if( moves[ i ][ j ].m_type == MT_ATTACK
+                        && moves[ i ][ j ].m_param == M_PURSUIT ) [[unlikely]] {
                         if( moves[ moves[ i ][ j ].m_target.first ]
                                  [ moves[ i ][ j ].m_target.second ]
                                      .m_type
-                            == SWITCH ) [[unlikely]] {
-                            moves[ i ][ j ].m_type = SWITCH_PURSUIT;
+                            == MT_SWITCH ) [[unlikely]] {
+                            moves[ i ][ j ].m_type = MT_SWITCH_PURSUIT;
                         }
                     }
-                    if( moves[ i ][ j ].m_type == NO_OP_NO_CANCEL ) {
-                        moves[ i ][ j ].m_type = NO_OP;
+                    if( moves[ i ][ j ].m_type == MT_NO_OP_NO_CANCEL ) {
+                        moves[ i ][ j ].m_type = MT_NO_OP;
                     }
                     selection.push_back( moves[ i ][ j ] );
                 }
@@ -313,7 +311,7 @@ namespace BATTLE {
                 _battleUI.log( "Move sel " + std::to_string( i )
                                + " tp: " + std::to_string( u16( selection[ i ].m_type ) )
                                + " param: " + std::to_string( selection[ i ].m_param ) + " "
-                               + MOVE::getMoveName( selection[ i ].m_param )
+                               + FS::getMoveName( selection[ i ].m_param )
                                + " user: " + std::to_string( selection[ i ].m_user.first ) + ", "
                                + std::to_string( selection[ i ].m_user.second )
                                + " tg: " + std::to_string( selection[ i ].m_target.first ) + ", "
@@ -343,7 +341,7 @@ namespace BATTLE {
 #endif
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
-                if( sortedMoves[ i ].m_megaEvolve && sortedMoves[ i ].m_type == ATTACK ) {
+                if( sortedMoves[ i ].m_megaEvolve && sortedMoves[ i ].m_type == MT_ATTACK ) {
                     megaEvolve( sortedMoves[ i ].m_user );
                 } else {
                     sortedMoves[ i ].m_megaEvolve = false;
@@ -352,8 +350,8 @@ namespace BATTLE {
 
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
                 for( u8 j = 0; j < 30; ++j ) { swiWaitForVBlank( ); }
-                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_ITEM ) [[unlikely]] {
-                    auto itmnm = ITEM::getItemName( sortedMoves[ i ].m_param );
+                if( sortedMoves[ i ].m_type == MT_MESSAGE_ITEM ) [[unlikely]] {
+                    auto itmnm = FS::getItemName( sortedMoves[ i ].m_param );
                     auto fmt   = std::string( GET_STRING( 169 ) );
                     snprintf( buffer, 99, fmt.c_str( ), itmnm.c_str( ),
                               _battleUI
@@ -365,7 +363,7 @@ namespace BATTLE {
                     _battleUI.log( std::string( buffer ) );
                 }
 
-                if( sortedMoves[ i ].m_type == battleMoveType::MESSAGE_MOVE ) [[unlikely]] {
+                if( sortedMoves[ i ].m_type == MT_MESSAGE_MOVE ) [[unlikely]] {
                     auto pnm = std::string(
                         _battleUI.getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
                                                                sortedMoves[ i ].m_user.second ),
@@ -375,25 +373,26 @@ namespace BATTLE {
                         snprintf( buffer, 99, GET_STRING( 269 ), pnm.c_str( ) );
                         _battleUI.log( buffer );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
-                                                  sortedMoves[ i ].m_user.second, SHELLTRAP, 1 );
+                                                  sortedMoves[ i ].m_user.second, VS_SHELLTRAP, 1 );
                         break;
                     case M_FOCUS_PUNCH:
                         snprintf( buffer, 99, GET_STRING( 270 ), pnm.c_str( ) );
                         _battleUI.log( buffer );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
-                                                  sortedMoves[ i ].m_user.second, FOCUSPUNCH, 1 );
+                                                  sortedMoves[ i ].m_user.second, VS_FOCUSPUNCH,
+                                                  1 );
                         break;
                     case M_BEAK_BLAST:
                         snprintf( buffer, 99, GET_STRING( 271 ), pnm.c_str( ) );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
-                                                  sortedMoves[ i ].m_user.second, BEAKBLAST, 1 );
+                                                  sortedMoves[ i ].m_user.second, VS_BEAKBLAST, 1 );
                         _battleUI.log( buffer );
                         break;
                     default: break;
                     }
                 }
 
-                if( sortedMoves[ i ].m_type == battleMoveType::ATTACK ) [[likely]] {
+                if( sortedMoves[ i ].m_type == MT_ATTACK ) [[likely]] {
                     std::vector<battleMove> targets    = std::vector<battleMove>( );
                     std::vector<battleMove> targetedBy = std::vector<battleMove>( );
 
@@ -410,11 +409,11 @@ namespace BATTLE {
                     checkAndRefillBattleSpots( slot::status::RECALLED );
                 }
 
-                if( sortedMoves[ i ].m_type == battleMoveType::SWITCH ) {
+                if( sortedMoves[ i ].m_type == MT_SWITCH ) {
                     switchPokemon( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
                 }
 
-                if( sortedMoves[ i ].m_type == battleMoveType::USE_ITEM ) {
+                if( sortedMoves[ i ].m_type == MT_USE_ITEM ) {
                     useItem( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
                 }
 
@@ -481,18 +480,18 @@ namespace BATTLE {
 
     battleMoveSelection battle::chooseTarget( const battleMoveSelection& p_move ) {
         auto res       = p_move;
-        res.m_moveData = MOVE::getMoveData( res.m_param );
+        res.m_moveData = FS::getMoveData( res.m_param );
 
-        if( _policy.m_mode == SINGLE ) {
+        if( _policy.m_mode == BM_SINGLE ) {
             switch( res.m_moveData.m_target ) {
-            case MOVE::ANY:
-            case MOVE::ANY_FOE:
-            case MOVE::ALL_FOES_AND_ALLY:
-            case MOVE::ALL_FOES:
-            case MOVE::RANDOM: res.m_target = { true, 0 }; return res;
-            case MOVE::SELF:
-            case MOVE::ALLY_OR_SELF:
-            case MOVE::ALL_ALLIES: res.m_target = { false, 0 }; return res;
+            case TG_ANY:
+            case TG_ANY_FOE:
+            case TG_ALL_FOES_AND_ALLY:
+            case TG_ALL_FOES:
+            case TG_RANDOM: res.m_target = { true, 0 }; return res;
+            case TG_SELF:
+            case TG_ALLY_OR_SELF:
+            case TG_ALL_ALLIES: res.m_target = { false, 0 }; return res;
             default: res.m_target = { 255, 255 }; return res;
             }
         }
@@ -513,40 +512,40 @@ namespace BATTLE {
                                 : 0;
             if( !opp2 ) { initialSel++; }
             switch( res.m_moveData.m_target ) {
-            case MOVE::ANY: possibleTargets |= opp1 | opp2 | ally; break;
-            case MOVE::ANY_FOE: possibleTargets |= opp1 | opp2; break;
-            case MOVE::ALLY_OR_SELF: possibleTargets |= self | ally; break;
-            case MOVE::ALLY:
+            case TG_ANY: possibleTargets |= opp1 | opp2 | ally; break;
+            case TG_ANY_FOE: possibleTargets |= opp1 | opp2; break;
+            case TG_ALLY_OR_SELF: possibleTargets |= self | ally; break;
+            case TG_ALLY:
                 initialSel   = ( 2 + !p_move.m_user.second );
                 res.m_target = { false, !p_move.m_user.second };
                 possibleTargets |= ally;
                 hasChoice = false;
                 break;
-            case MOVE::RANDOM: res.m_target = { true, rand( ) % 2 }; [[fallthrough]];
-            case MOVE::SCRIPTED:
-            case MOVE::NO_TARGET:
-            case MOVE::SELF:
+            case TG_RANDOM: res.m_target = { true, rand( ) % 2 }; [[fallthrough]];
+            case TG_SCRIPTED:
+            case TG_NONE:
+            case TG_SELF:
                 initialSel = ( 2 + p_move.m_user.second );
                 possibleTargets |= self;
                 hasChoice = false;
                 break;
-            case MOVE::ALL_FOES: res.m_target = { true, 0 }; [[fallthrough]];
-            case MOVE::FOE_SIDE:
+            case TG_ALL_FOES: res.m_target = { true, 0 }; [[fallthrough]];
+            case TG_FOE_SIDE:
                 possibleTargets |= opp1 | opp2;
                 hasChoice = false;
                 break;
-            case MOVE::FIELD:
+            case TG_FIELD:
                 possibleTargets |= opp1 | opp2 | ally | self;
                 hasChoice = false;
                 break;
-            case MOVE::ALL_FOES_AND_ALLY:
+            case TG_ALL_FOES_AND_ALLY:
                 res.m_target = { true, 0 };
                 possibleTargets |= opp1 | opp2 | ally;
                 hasChoice = false;
                 break;
-            case MOVE::ALL_ALLIES: res.m_target = { false, 0 }; [[fallthrough]];
-            case MOVE::ALLY_SIDE:
-            case MOVE::ALLY_TEAM:
+            case TG_ALL_ALLIES: res.m_target = { false, 0 }; [[fallthrough]];
+            case TG_ALLY_SIDE:
+            case TG_ALLY_TEAM:
                 possibleTargets |= self | ally;
                 hasChoice = false;
                 break;
@@ -572,10 +571,10 @@ namespace BATTLE {
                 return res;
             }
             // cancel selection
-            res.m_type = CANCEL;
+            res.m_type = MT_CANCEL;
             return res;
         }
-        res.m_type   = CANCEL;
+        res.m_type   = MT_CANCEL;
         res.m_target = { 255, 255 };
         return res;
     }
@@ -583,7 +582,7 @@ namespace BATTLE {
     battleMoveSelection battle::chooseAttack( u8 p_slot, bool p_allowMegaEvolution ) {
         battleMoveSelection res = NO_OP_SELECTION;
         res.m_user              = { field::PLAYER_SIDE, p_slot };
-        res.m_type              = ATTACK;
+        res.m_type              = MT_ATTACK;
 
         bool mega = _field.canMegaEvolve( false, p_slot ) && p_allowMegaEvolution;
 
@@ -631,7 +630,7 @@ namespace BATTLE {
                 curSel );
 
             if( rs == IO::choiceBox::BACK_CHOICE || rs == 4 ) {
-                res.m_type = CANCEL;
+                res.m_type = MT_CANCEL;
                 return res;
             }
             if( rs < 4 ) {
@@ -640,7 +639,7 @@ namespace BATTLE {
                     res.m_param = _field.getPkmn( false, p_slot )->getMove( curSel );
                     auto tmp    = chooseTarget( res );
 
-                    if( tmp.m_type != CANCEL ) {
+                    if( tmp.m_type != MT_CANCEL ) {
                         _lastMoveChoice = curSel;
                         return tmp;
                     } else {
@@ -662,7 +661,7 @@ namespace BATTLE {
         case 0: // Choose attack
             SOUND::playSoundEffect( SFX_CHOOSE );
             res = chooseAttack( p_slot, p_allowMegaEvolution );
-            if( res.m_type != CANCEL ) { return res; }
+            if( res.m_type != MT_CANCEL ) { return res; }
             break;
         case 1: { // Choose pkmn
             SOUND::playSoundEffect( SFX_CHOOSE );
@@ -684,7 +683,7 @@ namespace BATTLE {
                 }
 
             if( r.getSelectedPkmn( ) < 255 ) {
-                res.m_type  = SWITCH;
+                res.m_type  = MT_SWITCH;
                 res.m_param = r.getSelectedPkmn( );
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
                 return res;
@@ -694,10 +693,10 @@ namespace BATTLE {
         case 2: // Run / Cancel
             if( _isWildBattle ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                res.m_type = RUN;
+                res.m_type = MT_RUN;
             } else if( p_slot ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
-                res.m_type = CANCEL;
+                res.m_type = MT_CANCEL;
             } else {
                 cooldown = COOLDOWN_COUNT;
                 break;
@@ -711,18 +710,18 @@ namespace BATTLE {
             u16 itm = bv.getItem( );
 
             if( itm ) {
-                auto idata = ITEM::getItemData( itm );
+                auto idata = FS::getItemData( itm );
 
-                if( idata.m_itemType == ITEM::ITEMTYPE_POKEBALL ) {
+                if( idata.m_itemType == BAG::ITEMTYPE_POKEBALL ) {
                     // Player throws a ball
-                    res.m_type  = CAPTURE;
+                    res.m_type  = MT_CAPTURE;
                     res.m_param = itm;
                 } else if( ( idata.m_itemType & 15 ) == 2 ) {
                     // Already used
-                    res.m_type  = NO_OP_NO_CANCEL;
+                    res.m_type  = MT_NO_OP_NO_CANCEL;
                     res.m_param = 0;
                 } else {
-                    res.m_type  = USE_ITEM;
+                    res.m_type  = MT_USE_ITEM;
                     res.m_param = itm;
                 }
             }
@@ -745,7 +744,7 @@ namespace BATTLE {
         }
         default: break;
         }
-        res.m_type = CANCEL;
+        res.m_type = MT_CANCEL;
         return res;
     }
 
@@ -779,7 +778,7 @@ namespace BATTLE {
 
                 BAG::bagViewer bv = BAG::bagViewer( _playerTeam, BAG::bagViewer::MOCK_BATTLE );
                 bv.getItem( );
-                res.m_type  = CAPTURE;
+                res.m_type  = MT_CAPTURE;
                 res.m_param = I_POKE_BALL;
 
                 _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
@@ -823,7 +822,7 @@ namespace BATTLE {
                     }
                     if( !bad ) {
                         res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
-                        if( res.m_type != CANCEL ) { return res; }
+                        if( res.m_type != MT_CANCEL ) { return res; }
                         _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
                         _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot,
                                                      curSel );
@@ -833,12 +832,12 @@ namespace BATTLE {
 
             if( p_slot && ( pressed & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
-                res.m_type = CANCEL;
+                res.m_type = MT_CANCEL;
                 return res;
             }
             if( pressed & KEY_A ) {
                 res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
-                if( res.m_type != CANCEL ) { return res; }
+                if( res.m_type != MT_CANCEL ) { return res; }
 
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot );
                 _battleUI.showMoveSelection( _field.getPkmn( false, p_slot ), p_slot, curSel );
@@ -917,7 +916,7 @@ namespace BATTLE {
             case I_MAX_POTION:
             case I_FULL_RESTORE:
                 if( pkmn->m_stats.m_curHP * 5 < pkmn->m_stats.m_maxHP ) {
-                    res.m_type  = USE_ITEM;
+                    res.m_type  = MT_USE_ITEM;
                     res.m_param = _opponent.m_data.m_items[ i ];
                     return res;
                 }
@@ -925,7 +924,7 @@ namespace BATTLE {
             case I_HEAL_POWDER:
             case I_FULL_HEAL:
                 if( pkmn->m_statusint ) {
-                    res.m_type  = USE_ITEM;
+                    res.m_type  = MT_USE_ITEM;
                     res.m_param = _opponent.m_data.m_items[ i ];
                     return res;
                 }
@@ -936,7 +935,7 @@ namespace BATTLE {
             case I_X_ACCURACY:
             case I_X_SP_ATK:
             case I_X_SP_DEF:
-                res.m_type  = USE_ITEM;
+                res.m_type  = MT_USE_ITEM;
                 res.m_param = _opponent.m_data.m_items[ i ];
                 return res;
             default: break;
@@ -947,7 +946,7 @@ namespace BATTLE {
         if( _AILevel >= 6 ) {
             if( pkmn->canBattleTransform( ) ) { res.m_megaEvolve = true; }
         }
-        res.m_type = ATTACK;
+        res.m_type = MT_ATTACK;
         bool canUse[ 4 ], str = false;
         for( u8 i = 0; i < 4; ++i ) {
             canUse[ i ] = _field.canSelectMove( true, p_slot, i );
@@ -969,10 +968,10 @@ namespace BATTLE {
                 }
                 // Choose a target
                 // Pick a random target
-                auto mdata     = MOVE::getMoveData( res.m_param );
+                auto mdata     = FS::getMoveData( res.m_param );
                 res.m_moveData = mdata;
-                auto tg        = mdata.m_pressureTarget != MOVE::NO_TARGET ? mdata.m_pressureTarget
-                                                                           : mdata.m_target;
+                auto tg
+                    = mdata.m_pressureTarget != TG_NONE ? mdata.m_pressureTarget : mdata.m_target;
 
                 bool canTarget[ 4 ];
                 for( u8 i = 0; i < 4; ++i ) {
@@ -981,14 +980,14 @@ namespace BATTLE {
                 u8 ctg = rand( ) % 2;
 
                 switch( tg ) {
-                case MOVE::RANDOM:
-                case MOVE::ANY_FOE:
-                    [[likely]] case MOVE::ANY : while( !canTarget[ 2 + ctg ] ) {
+                case TG_RANDOM:
+                case TG_ANY_FOE:
+                    [[likely]] case TG_ANY : while( !canTarget[ 2 + ctg ] ) {
                         ctg = rand( ) & 1;
                     }
                     res.m_target = fieldPosition( false, ctg );
                     break;
-                case MOVE::ALLY_OR_SELF:
+                case TG_ALLY_OR_SELF:
                     while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
                     res.m_target = fieldPosition( true, ctg );
                     break;
@@ -1015,9 +1014,9 @@ namespace BATTLE {
                     continue;
                 }
                 bmove[ i ].m_param    = pkmn->getMove( i );
-                bmove[ i ].m_moveData = MOVE::getMoveData( pkmn->getMove( i ) );
+                bmove[ i ].m_moveData = FS::getMoveData( pkmn->getMove( i ) );
                 // TODO: do this properly for double battles
-                auto tg = bmove[ i ].m_moveData.m_pressureTarget != MOVE::NO_TARGET
+                auto tg = bmove[ i ].m_moveData.m_pressureTarget != TG_NONE
                               ? bmove[ i ].m_moveData.m_pressureTarget
                               : bmove[ i ].m_moveData.m_target;
 
@@ -1036,9 +1035,9 @@ namespace BATTLE {
                 u8 ctg = rand( ) % 2;
 
                 switch( tg ) {
-                case MOVE::RANDOM:
-                case MOVE::ANY_FOE:
-                    [[likely]] case MOVE::ANY : if( !canTarget[ 2 ] && !canTarget[ 3 ] ) {
+                case TG_RANDOM:
+                case TG_ANY_FOE:
+                    [[likely]] case TG_ANY : if( !canTarget[ 2 ] && !canTarget[ 3 ] ) {
                         ctg = 0;
                     }
                     else {
@@ -1046,11 +1045,11 @@ namespace BATTLE {
                     }
                     bmove[ i ].m_target = { fieldPosition( false, ctg ) };
                     break;
-                case MOVE::ALLY_OR_SELF:
+                case TG_ALLY_OR_SELF:
                     while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
                     bmove[ i ].m_target = { fieldPosition( true, ctg ) };
                     break;
-                case MOVE::SELF:
+                case TG_SELF:
                     bmove[ i ].m_target = { fieldPosition( true, p_slot ) };
                     break;
                     [[unlikely]] default : bmove[ i ].m_target = { fieldPosition( false, 0 ) };
@@ -1060,10 +1059,10 @@ namespace BATTLE {
                 auto target = _field.getPkmn( bmove[ i ].m_target[ 0 ].first,
                                               bmove[ i ].m_target[ 0 ].second );
 
-                if( _AILevel < 4 && bmove[ i ].m_moveData.m_category == MOVE::STATUS ) {
+                if( _AILevel < 4 && bmove[ i ].m_moveData.m_category == MH_STATUS ) {
                     // Bad trainers don't want to use status moves
                     score[ i ] -= 5;
-                } else if( bmove[ i ].m_moveData.m_category == MOVE::STATUS ) {
+                } else if( bmove[ i ].m_moveData.m_category == MH_STATUS ) {
                     if( _AILevel > 2 && bmove[ i ].m_moveData.m_weather != _field.getWeather( ) ) {
                         if( _AILevel > 4 && _field.suppressesWeather( ) ) {
                             score[ i ] = 1;
@@ -1097,14 +1096,14 @@ namespace BATTLE {
                 if( _AILevel > 4 && _field.hasType( true, p_slot, bmove[ i ].m_moveData.m_type ) ) {
                     score[ i ] += _AILevel / 2;
                 }
-                if( bmove[ i ].m_moveData.m_category == MOVE::PHYSICAL ) {
+                if( bmove[ i ].m_moveData.m_category == MH_PHYSICAL ) {
                     if( _AILevel > 3
                         && _field.getStat( true, p_slot, ATK )
                                > _field.getStat( true, p_slot, SATK ) ) {
                         score[ i ] += _AILevel / 2;
                     }
                 }
-                if( bmove[ i ].m_moveData.m_category == MOVE::SPECIAL ) {
+                if( bmove[ i ].m_moveData.m_category == MH_SPECIAL ) {
                     if( _AILevel > 3
                         && _field.getStat( true, p_slot, SATK )
                                > _field.getStat( true, p_slot, ATK ) ) {
@@ -1138,7 +1137,7 @@ namespace BATTLE {
 
             // TODO: switch pkmn if mx score is too low
 
-            res.m_type     = ATTACK;
+            res.m_type     = MT_ATTACK;
             res.m_target   = bmove[ idx ].m_target[ 0 ];
             res.m_param    = bmove[ idx ].m_param;
             res.m_moveData = bmove[ idx ].m_moveData;
@@ -1243,9 +1242,9 @@ namespace BATTLE {
             if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
                 // pkmn was elevated to a new level, check for new moves
 
-                getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerTeam[ i ].getForme( ),
-                               _playerPkmnOrigLevel[ i ] + 1, _playerTeam[ i ].m_level, 20,
-                               MOVE_BUFFER );
+                FS::getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerTeam[ i ].getForme( ),
+                                   _playerPkmnOrigLevel[ i ] + 1, _playerTeam[ i ].m_level, 20,
+                                   MOVE_BUFFER );
 
                 for( u8 j = 0; j < 20; ++j ) {
                     if( !MOVE_BUFFER[ j ] ) { break; }
@@ -1309,8 +1308,8 @@ namespace BATTLE {
             if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
                 // Check for evolution
 
-                auto edata = getPkmnEvolveData( _playerTeam[ i ].getSpecies( ),
-                                                _playerTeam[ i ].getForme( ) );
+                auto edata = FS::getPkmnEvolveData( _playerTeam[ i ].getSpecies( ),
+                                                    _playerTeam[ i ].getForme( ) );
 
                 u8 ev = 0;
                 if( _playerTeam[ i ].getItem( ) != I_EVERSTONE
@@ -1399,10 +1398,9 @@ namespace BATTLE {
         case I_TIMER_BALL: ballCatchRate = std::min( _round + 10 / 5, 8 ); break;
         case I_NEST_BALL: ballCatchRate = std::max( ( 40 - wild->m_level ) / 5, 2 ); break;
         case I_NET_BALL:
-            if( p.m_baseForme.m_types[ 0 ] == type::BUG || p.m_baseForme.m_types[ 1 ] == type::BUG
-                || p.m_baseForme.m_types[ 0 ] == type::WATER
-                || p.m_baseForme.m_types[ 1 ] == type::WATER )
+            if( _field.hasType( false, 0, TYPE_BUG ) || _field.hasType( false, 0, TYPE_WATER ) ) {
                 ballCatchRate = 6;
+            }
             break;
         case I_DIVE_BALL:
             if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::moveMode::DIVE )
@@ -1413,7 +1411,7 @@ namespace BATTLE {
             if( _round < 2 ) ballCatchRate = 10;
             break;
         case I_DUSK_BALL:
-            if( MOVE::possible( M_DIG, 0 ) || getCurrentDaytime( ) == DAYTIME_EVENING
+            if( possible( M_DIG, 0 ) || getCurrentDaytime( ) == DAYTIME_EVENING
                 || getCurrentDaytime( ) == DAYTIME_NIGHT )
                 ballCatchRate = 7;
             break;
@@ -1465,7 +1463,7 @@ namespace BATTLE {
         for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
         if( succ == 4 ) {
-            wild->m_boxdata.m_ball = ITEM::itemToBall( p_pokeball );
+            wild->m_boxdata.m_ball = BAG::itemToBall( p_pokeball );
             if( p_pokeball == I_FRIEND_BALL ) { wild->m_boxdata.m_steps = 200; }
             if( p_pokeball == I_HEAL_BALL ) { wild->heal( ); }
             return true;
@@ -1487,7 +1485,7 @@ namespace BATTLE {
         char buffer[ 100 ];
         if( !( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ spid / 8 ] & ( 1LLU << ( spid % 8 ) ) ) ) {
             SAVE::SAV.getActiveFile( ).registerCaughtPkmn( spid );
-            snprintf( buffer, 99, GET_STRING( 174 ), getDisplayName( spid ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( 174 ), FS::getDisplayName( spid ).c_str( ) );
             _battleUI.log( buffer );
 
             for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
@@ -1596,7 +1594,7 @@ namespace BATTLE {
     }
 
     void battle::useItem( fieldPosition p_target, u16 p_item ) {
-        auto idata = ITEM::getItemData( p_item );
+        auto idata = FS::getItemData( p_item );
         char buffer[ 100 ];
         auto pkmn = _field.getPkmn( p_target.first, p_target.second );
 
@@ -1616,12 +1614,12 @@ namespace BATTLE {
             }
 
             snprintf( buffer, 99, GET_STRING( 551 ),
-                      getTrainerClassName( _opponent.getClass( ) ).c_str( ),
-                      _opponent.m_strings.m_name, ITEM::getItemName( p_item ).c_str( ) );
+                      FS::getTrainerClassName( _opponent.getClass( ) ).c_str( ),
+                      _opponent.m_strings.m_name, FS::getItemName( p_item ).c_str( ) );
             _battleUI.log( buffer );
         } else {
             // player item
-            snprintf( buffer, 99, GET_STRING( 50 ), ITEM::getItemName( p_item ) );
+            snprintf( buffer, 99, GET_STRING( 50 ), FS::getItemName( p_item ) );
             _battleUI.log( buffer );
         }
 
@@ -1720,22 +1718,22 @@ namespace BATTLE {
             break;
 
         case I_GUARD_SPEC:
-            if( !_field.addSideCondition( &_battleUI, p_target.first, MIST, 5 ) ) {
+            if( !_field.addSideCondition( &_battleUI, p_target.first, SC_MIST, 5 ) ) {
                 _battleUI.log( GET_STRING( 171 ) );
             }
             break;
         case I_DIRE_HIT:
-            if( !_field.addVolatileStatus( &_battleUI, p_target.first, p_target.second, FOCUSENERGY,
-                                           255 ) ) {
+            if( !_field.addVolatileStatus( &_battleUI, p_target.first, p_target.second,
+                                           VS_FOCUSENERGY, 255 ) ) {
                 _battleUI.log( GET_STRING( 171 ) );
             }
             break;
         case I_YELLOW_FLUTE:
             remitem = false;
             [[fallthrough]];
-            [[unlikely]] case I_RIE_BERRY : case I_PERSIM_BERRY : if( volst & CONFUSION ) {
+            [[unlikely]] case I_RIE_BERRY : case I_PERSIM_BERRY : if( volst & VS_CONFUSION ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
-                                             CONFUSION );
+                                             VS_CONFUSION );
                 auto fmt = std::string( GET_STRING( 294 ) );
                 snprintf( buffer, 99, fmt.c_str( ),
                           _battleUI.getPkmnName( pkmn, p_target.first ).c_str( ) );
@@ -1749,8 +1747,9 @@ namespace BATTLE {
         case I_RED_FLUTE:
             remitem = false;
             [[fallthrough]];
-            [[unlikely]] case I_GARC_BERRY : if( volst & ATTRACT ) {
-                _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second, ATTRACT );
+            [[unlikely]] case I_GARC_BERRY : if( volst & VS_ATTRACT ) {
+                _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
+                                             VS_ATTRACT );
             }
             else {
                 _battleUI.log( GET_STRING( 171 ) );

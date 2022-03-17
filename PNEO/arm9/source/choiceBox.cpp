@@ -25,15 +25,15 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "choiceBox.h"
-#include "defines.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "sound.h"
-#include "uio.h"
-
 #include <algorithm>
 #include <cmath>
+
+#include "defines.h"
+#include "io/choiceBox.h"
+#include "io/uio.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace IO {
 
@@ -65,9 +65,7 @@ namespace IO {
         std::function<void( )> p_tick, u8 p_initialPage ) {
         u8   page    = p_initialPage;
         auto choices = p_drawFunction( page );
-        if( !choices.size( ) ) [[unlikely]] {
-                return BACK_CHOICE;
-            }
+        if( !choices.size( ) ) [[unlikely]] { return BACK_CHOICE; }
 
         auto sel = p_initialSelection;
         p_selectFunction( sel );
