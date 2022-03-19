@@ -122,16 +122,11 @@ namespace FS {
           : ( ( p_stringId ) >= FS::MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
                                                : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) ) )
 #else
-#define GET_STRING( p_stringId )                                                   \
-    ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
-                                   : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) )
+#define GET_STRING( p_stringId )                                                       \
+    ( ( p_stringId ) >= FS::MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
+                                       : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) )
 #endif
 #define HP_ICON FS::HP_ICONS[ CURRENT_LANGUAGE ]
-
-#define NO_DATA         GET_STRING( 0 )
-#define FARAWAY_PLACE   GET_STRING( 1 )
-#define UNKNOWN_SPECIES GET_STRING( 2 )
-#define POKE_NAV        GET_STRING( 8 )
 
     bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );

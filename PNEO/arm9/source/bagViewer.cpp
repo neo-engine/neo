@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/itemNames.h"
 #include "io/animations.h"
 #include "io/choiceBox.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
 #include "save/saveGame.h"
@@ -247,7 +248,8 @@ namespace BAG {
                     }
                     return 0;
                 } ) ) {
-                snprintf( buffer, 99, GET_STRING( 50 ), FS::getItemName( p_itemId ).c_str( ) );
+                snprintf( buffer, 99, GET_STRING( IO::STR_UI_BAG_ITEM_USED ),
+                          FS::getItemName( p_itemId ).c_str( ) );
                 _bagUI->printMessage( buffer );
                 waitForInteract( );
 
@@ -275,7 +277,7 @@ namespace BAG {
                 }
                 return _context == BATTLE || _context == WILD_BATTLE;
             }
-            _bagUI->printMessage( GET_STRING( 53 ) );
+            _bagUI->printMessage( GET_STRING( IO::STR_UI_BAG_ITEM_WASTED ) );
             waitForInteract( );
             return false;
         }
@@ -283,7 +285,7 @@ namespace BAG {
         if( p_data->m_itemType == ITEMTYPE_EVOLUTION ) {
             // Use the item on the PKMN
             if( !p_pokemon.canEvolve( p_itemId, EVOMETHOD_ITEM ) ) {
-                _bagUI->printMessage( GET_STRING( 53 ) );
+                _bagUI->printMessage( GET_STRING( IO::STR_UI_BAG_ITEM_WASTED ) );
                 waitForInteract( );
                 return false;
             } else {
@@ -318,7 +320,8 @@ namespace BAG {
         if( p_pokemon.getItem( ) ) {
             IO::yesNoBox yn;
             char         buffer[ 100 ];
-            snprintf( buffer, 99, GET_STRING( 54 ), p_pokemon.m_boxdata.m_name );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_BAG_PKMN_CARRIES_ITEM ),
+                      p_pokemon.m_boxdata.m_name );
             if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer, 254 ); },
                               [ & ]( IO::yesNoBox::selection p_sel ) {
                                   _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
@@ -368,7 +371,8 @@ namespace BAG {
 
         IO::yesNoBox yn;
         char         buffer[ 100 ];
-        snprintf( buffer, 99, GET_STRING( 56 ), FS::getItemName( p_targetItem ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( IO::STR_UI_BAG_CHOOSE_ITEM ),
+                  FS::getItemName( p_targetItem ).c_str( ) );
 
         if( _context == MOCK_BATTLE ) {
             // Just wait a couple of frames and return
@@ -569,11 +573,14 @@ namespace BAG {
                              || data.m_itemType == ITEMTYPE_FORMECHANGE
                              || data.m_itemType == ITEMTYPE_EVOLUTION ) {
                         const char* choices[ 5 ]
-                            = {GET_STRING( 44 ), GET_STRING( 45 ), GET_STRING( 46 ),
-                               GET_STRING( 47 ), GET_STRING( 48 )};
+                            = {GET_STRING( IO::STR_UI_BAG_ITEM_GIVE ),
+                            GET_STRING( IO::STR_UI_BAG_ITEM_APPLY ),
+                            GET_STRING( IO::STR_UI_BAG_ITEM_REGISTER ),
+                               GET_STRING( IO::STR_UI_BAG_ITEM_USE ),
+                               GET_STRING( IO::STR_UI_BAG_ITEM_TOSS )};
                         IO::choiceBox cb( 2, choices, 0, true );
                         char          buffer[ 100 ];
-                        snprintf( buffer, 99, GET_STRING( 57 ),
+                        snprintf( buffer, 99, GET_STRING( IO::STR_UI_BAG_ASK_ITEM_ACTION ),
                                   FS::getItemName( _ranges[ start ].second.m_item,
                                                      )
                                       .c_str( ) );
@@ -814,7 +821,7 @@ namespace BAG {
             _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                                  _currSelectedIdx );
             if( !idata.m_sellPrice ) { // item cannot be sold
-                _bagUI->printMessage( GET_STRING( 482 ) );
+                _bagUI->printMessage( GET_STRING( IO::STR_UI_BAG_CANNOT_BUY_ITEM ) );
                 waitForInteract( );
                 return 0;
             }
@@ -828,7 +835,7 @@ namespace BAG {
             }
 
             u32 sellprice = cnt * idata.m_sellPrice;
-            snprintf( buffer, 99, GET_STRING( 484 ), sellprice );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_BAG_WILL_BUY_ITEM_FOR ), sellprice );
 
             IO::yesNoBox yn;
             if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer, 254 ); },
@@ -859,10 +866,14 @@ namespace BAG {
             _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                                  _currSelectedIdx );
             IO::yesNoBox yn;
-            if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( GET_STRING( 485 ), 254 ); },
-                              [ & ]( IO::yesNoBox::selection p_sel ) {
-                                  _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
-                              } )
+            if( yn.getResult(
+                    [ & ]( ) {
+                        return _bagUI->printYNMessage(
+                            GET_STRING( IO::STR_UI_BAG_ITEM_TOSS_CONFIRM ), 254 );
+                    },
+                    [ & ]( IO::yesNoBox::selection p_sel ) {
+                        _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
+                    } )
                 == IO::yesNoBox::NO ) {
                 return 0;
             }

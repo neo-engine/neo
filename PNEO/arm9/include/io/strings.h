@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 namespace IO {
+
     // UI strings
 
     constexpr u16 STR_ANIM_EVOLUTION_START    = 51;
@@ -61,5 +62,18 @@ namespace IO {
     constexpr u16 STR_UI_BAG_ASK_ITEM_ACTION    = 57;
     constexpr u16 STR_UI_BAG_CHOOSE_MOVE        = 49;
     constexpr u16 STR_UI_BAG_EMPTY              = 43;
+    constexpr u16 STR_UI_BAG_ITEM_USED          = 51;
+    constexpr u16 STR_UI_BAG_ITEM_WASTED        = 53;
+    constexpr u16 STR_UI_BAG_PKMN_CARRIES_ITEM  = 54;
+    constexpr u16 STR_UI_BAG_CHOOSE_ITEM        = 56;
+    constexpr u16 STR_UI_BAG_ITEM_GIVE          = 44;
+    constexpr u16 STR_UI_BAG_ITEM_APPLY         = 45;
+    constexpr u16 STR_UI_BAG_ITEM_REGISTER      = 46;
+    constexpr u16 STR_UI_BAG_ITEM_USE           = 47;
+    constexpr u16 STR_UI_BAG_ITEM_TOSS          = 48;
+    constexpr u16 STR_UI_BAG_ITEM_SELL          = 483;
+    constexpr u16 STR_UI_BAG_CANNOT_BUY_ITEM    = 482;
+    constexpr u16 STR_UI_BAG_WILL_BUY_ITEM_FOR  = 484;
+    constexpr u16 STR_UI_BAG_ITEM_TOSS_CONFIRM  = 485;
 
 } // namespace IO
