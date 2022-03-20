@@ -124,7 +124,7 @@ namespace SOUND {
                 mmStart( mmId, MM_PLAY_LOOP );
             }
 #else
-            // TODO
+            SSEQ::playSequence( p_id % 25 );
 #endif
             BGMLoaded  = true;
             currentBGM = p_id;
@@ -145,7 +145,7 @@ namespace SOUND {
             auto mmId = BGMIndexForName( currentBGM );
             if( mmId != MOD_NONE ) { mmUnload( mmId ); }
 #else
-            // TODO
+            SSEQ::stopSequence( );
 #endif
             BGMLoaded = false;
         }

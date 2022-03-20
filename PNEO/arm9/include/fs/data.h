@@ -234,8 +234,10 @@ namespace FS {
 
 #ifndef NO_SOUND
 #ifndef MMOD
-    bool loadSequenceDataF( SOUND::SSEQ::sequenceData* p_data, FILE* p_f );
-    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, const char* p_fname );
+    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f );
+    bool loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId );
+    bool loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId );
+    bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId );
 #endif
 #endif
 

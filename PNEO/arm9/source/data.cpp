@@ -59,8 +59,16 @@ namespace FS {
     const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
     const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
 
-    const char CRY_PATH[]              = "nitro:/SOUND/CRIES/";
-    const char SFX_PATH[]              = "nitro:/SOUND/SFX/";
+#ifndef NO_SOUND
+    const char CRY_PATH[] = "nitro:/SOUND/CRIES/";
+    const char SFX_PATH[] = "nitro:/SOUND/SFX/";
+#ifndef MMOD
+    const char SSEQ_PATH[] = "nitro:/SOUND/BGM/SSEQ/";
+    const char SBNK_PATH[] = "nitro:/SOUND/BGM/SBNK/";
+    const char SWAR_PATH[] = "nitro:/SOUND/BGM/SWAR/";
+#endif
+#endif
+
     const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/itemname";
     const char ITEM_DSCR_PATH[]        = "nitro:/DATA/ITEM_DSCR/itemdscr";
     const char ABILITY_NAME_PATH[]     = "nitro:/DATA/ABTY_NAME/abtyname";
@@ -99,7 +107,7 @@ namespace FS {
     constexpr u16 LEARNSET_SIZE = 2 * 400;
 
     bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out ) {
-        FILE* f = FS::openSplit( p_path, p_stringId, ".str" );
+        FILE* f = openSplit( p_path, p_stringId, ".str" );
         if( !f ) return false;
 
         std::fseek( f, p_language * p_maxLen, SEEK_SET );
@@ -219,9 +227,9 @@ namespace FS {
 
         if( p_forme ) {
             snprintf( TMP_BUFFER_SHORT, 49, "_%hhu.raw", p_forme );
-            f = FS::openSplit( CRY_PATH, p_pkmnIdx, ".raw", MAX_PKMN );
+            f = openSplit( CRY_PATH, p_pkmnIdx, ".raw", MAX_PKMN );
         }
-        if( !p_forme || !f ) { f = FS::openSplit( CRY_PATH, p_pkmnIdx, ".raw", MAX_PKMN ); }
+        if( !p_forme || !f ) { f = openSplit( CRY_PATH, p_pkmnIdx, ".raw", MAX_PKMN ); }
         if( !f ) { return nullptr; }
 
         std::memset( CRY_DATA, 0, sizeof( CRY_DATA ) );
@@ -230,7 +238,7 @@ namespace FS {
     }
 
     u8* readSFX( u16 p_sfxIdx, u16& p_len ) {
-        FILE* f = FS::openSplit( SFX_PATH, p_sfxIdx, ".raw", 400 );
+        FILE* f = openSplit( SFX_PATH, p_sfxIdx, ".raw", 400 );
         if( !f ) { return nullptr; }
 
         std::memset( CRY_DATA, 0, sizeof( CRY_DATA ) );
@@ -422,7 +430,7 @@ namespace FS {
     bool getItemName( const u16 p_itemId, const u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, ITEM_NAME_PATH, lastLang, p_language ) ) { return false; }
+        if( !checkOrOpen( bankfile, ITEM_NAME_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, ITEM_NAMELENGTH, p_itemId, p_out ) ) { return true; }
         return false;
     }
@@ -438,7 +446,7 @@ namespace FS {
     bool getItemDescr( const u16 p_itemId, const u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, ITEM_DSCR_PATH, lastLang, p_language ) ) { return false; }
+        if( !checkOrOpen( bankfile, ITEM_DSCR_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, ITEM_DSCRLENGTH, p_itemId, p_out ) ) { return true; }
         return false;
     }
@@ -459,7 +467,7 @@ namespace FS {
     }
     bool getItemData( const u16 p_itemId, BAG::itemData* p_out ) {
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, ITEM_DATA_PATH ) ) { return false; }
+        if( !checkOrOpen( bankfile, ITEM_DATA_PATH ) ) { return false; }
         if( std::fseek( bankfile, p_itemId * sizeof( BAG::itemData ), SEEK_SET ) ) { return false; }
         fread( p_out, sizeof( BAG::itemData ), 1, bankfile );
         return true;
@@ -468,7 +476,7 @@ namespace FS {
     bool getMoveName( const u16 p_moveId, const u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, MOVE_NAME_PATH, lastLang, p_language ) ) { return false; }
+        if( !checkOrOpen( bankfile, MOVE_NAME_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, MOVE_NAMELENGTH, p_moveId, p_out ) ) { return true; }
         return false;
     }
@@ -486,7 +494,7 @@ namespace FS {
     bool getMoveDescr( const u16 p_moveId, const u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, MOVE_DSCR_PATH, lastLang, p_language ) ) { return false; }
+        if( !checkOrOpen( bankfile, MOVE_DSCR_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, MOVE_DSCRLENGTH, p_moveId, p_out ) ) { return true; }
         return false;
     }
@@ -507,7 +515,7 @@ namespace FS {
     }
     bool getMoveData( const u16 p_moveId, BATTLE::moveData* p_out ) {
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, MOVE_DATA_PATH ) ) { return false; }
+        if( !checkOrOpen( bankfile, MOVE_DATA_PATH ) ) { return false; }
         if( std::fseek( bankfile, p_moveId * sizeof( BATTLE::moveData ), SEEK_SET ) ) {
             return false;
         }
@@ -518,7 +526,7 @@ namespace FS {
     bool getTrainerClassName( u16 p_trainerClass, u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        FS::checkOrOpen( bankfile, TCLASS_NAME_PATH, lastLang, p_language );
+        checkOrOpen( bankfile, TCLASS_NAME_PATH, lastLang, p_language );
         if( getString( bankfile, TCLASS_NAMELENGTH, p_trainerClass, p_out ) ) { return true; }
         return false;
     }
@@ -547,13 +555,12 @@ namespace FS {
     }
 
     bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, BATTLE::battleTrainer* p_out ) {
-        FILE* f
-            = FS::openSplit( BATTLE_STRINGS_PATH, p_battleTrainerId,
+        FILE* f = openSplit( BATTLE_STRINGS_PATH, p_battleTrainerId,
                              ( "_" + std::to_string( 1 + p_language ) + ".trnr.str" ).c_str( ) );
         if( !f ) return false;
         fread( &p_out->m_strings, sizeof( BATTLE::trainerStrings ), 1, f );
         fclose( f );
-        f = FS::openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId, ".trnr.data" );
+        f = openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId, ".trnr.data" );
         if( !f ) return false;
         fread( &p_out->m_data, sizeof( BATTLE::trainerData ), 1, f );
         fclose( f );
@@ -562,7 +569,7 @@ namespace FS {
 
     bool loadBattleFacilityTrainerStrings( u8 p_trainerClass, u8 p_trainer,
                                            BATTLE::battleTrainer* p_out ) {
-        FILE* f = FS::openSplit(
+        FILE* f = openSplit(
             BATTLE_FACILITY_STRINGS_PATH, MAP::TRAINERS_PER_CLASS * p_trainerClass + p_trainer,
             ( "_" + std::to_string( 1 + CURRENT_LANGUAGE ) + ".trnr.str" ).c_str( ) );
         if( !f ) return false;
@@ -615,7 +622,7 @@ namespace FS {
 
 #ifndef NO_SOUND
 #ifndef MMOD
-    bool loadSequenceDataF( SOUND::SSEQ::sequenceData* p_data, FILE* p_f ) {
+    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f ) {
         if( !p_f ) { return false; }
         fseek( p_f, 0, SEEK_END );
         p_data->m_size = ftell( p_f );
@@ -627,13 +634,26 @@ namespace FS {
         return true;
     }
 
-    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, const char* p_fname ) {
-        FILE* f   = fopen( p_fname, "rb" );
-        auto  res = loadSequenceDataF( p_data, f );
+    bool loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId ) {
+        FILE* f   = open( SSEQ_PATH, p_sseqId, ".sseq", "rb" );
+        auto  res = loadSequenceData( p_data, f );
         fclose( f );
         return res;
     }
 
+    bool loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId ) {
+        FILE* f   = open( SBNK_PATH, p_sbnkId, ".sbnk", "rb" );
+        auto  res = loadSequenceData( p_data, f );
+        fclose( f );
+        return res;
+    }
+
+    bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId ) {
+        FILE* f   = open( SWAR_PATH, p_swarId, ".swar", "rb" );
+        auto  res = loadSequenceData( p_data, f );
+        fclose( f );
+        return res;
+    }
 #endif
 #endif
 
@@ -641,7 +661,7 @@ namespace FS {
         static char  st_buffer[ UISTRING_LEN + 10 ];
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        FS::checkOrOpen( bankfile, UISTRING_PATH, lastLang, p_language );
+        checkOrOpen( bankfile, UISTRING_PATH, lastLang, p_language );
         if( getString( bankfile, UISTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "(uistring failed)";
     }
@@ -650,7 +670,7 @@ namespace FS {
         static char  st_buffer[ PKMNPHRS_LEN + 10 ];
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        FS::checkOrOpen( bankfile, PKMNPHRS_PATH, lastLang, CURRENT_LANGUAGE );
+        checkOrOpen( bankfile, PKMNPHRS_PATH, lastLang, CURRENT_LANGUAGE );
         if( getString( bankfile, PKMNPHRS_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "";
     }
@@ -659,7 +679,7 @@ namespace FS {
         static char  st_buffer[ MAPSTRING_LEN + 10 ];
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        FS::checkOrOpen( bankfile, MAPSTRING_PATH, lastLang, CURRENT_LANGUAGE );
+        checkOrOpen( bankfile, MAPSTRING_PATH, lastLang, CURRENT_LANGUAGE );
         if( getString( bankfile, MAPSTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "(string failed)";
     }
@@ -668,7 +688,7 @@ namespace FS {
         static char  st_buffer[ BADGENAME_LEN + 10 ];
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        FS::checkOrOpen( bankfile, BADGENAME_PATH, lastLang, CURRENT_LANGUAGE );
+        checkOrOpen( bankfile, BADGENAME_PATH, lastLang, CURRENT_LANGUAGE );
         if( getString( bankfile, BADGENAME_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "";
     }
@@ -677,7 +697,7 @@ namespace FS {
         static char  st_buffer[ ACHIEVEMENT_LEN + 10 ];
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        FS::checkOrOpen( bankfile, ACHIEVEMENT_PATH, lastLang, p_language );
+        checkOrOpen( bankfile, ACHIEVEMENT_PATH, lastLang, p_language );
         if( getString( bankfile, ACHIEVEMENT_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "";
     }
@@ -695,9 +715,7 @@ namespace FS {
     bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, ABILITY_NAME_PATH, lastLang, p_language ) ) {
-            return false;
-        }
+        if( !checkOrOpen( bankfile, ABILITY_NAME_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, ABILITY_NAMELENGTH, p_abilityId, p_out ) ) { return true; }
         return false;
     }
@@ -713,9 +731,7 @@ namespace FS {
     bool getAbilityDescr( u16 p_abilityId, u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
-        if( !FS::checkOrOpen( bankfile, ABILITY_DSCR_PATH, lastLang, p_language ) ) {
-            return false;
-        }
+        if( !checkOrOpen( bankfile, ABILITY_DSCR_PATH, lastLang, p_language ) ) { return false; }
         if( getString( bankfile, ABILITY_DSCRLENGTH, p_abilityId, p_out ) ) { return true; }
         return false;
     }
@@ -745,13 +761,13 @@ namespace FS {
         //    auto         id        = -1;
         (void) p_forme;
         /*    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-                if( !FS::checkOrOpen( fbankfile, FORME_SPECIES_PATH, lastLang, p_language ) ) {
+                if( !checkOrOpen( fbankfile, FORME_SPECIES_PATH, lastLang, p_language ) ) {
                     return false;
                 }
                 if( getString( fbankfile, SPECIES_NAMELENGTH, id, p_out ) ) { return true; }
             } else */
         {
-            if( !FS::checkOrOpen( bankfile, POKEMON_SPECIES_PATH, lastLang, p_language ) ) {
+            if( !checkOrOpen( bankfile, POKEMON_SPECIES_PATH, lastLang, p_language ) ) {
                 return false;
             }
             if( getString( bankfile, SPECIES_NAMELENGTH, p_pkmnId, p_out ) ) { return true; }
@@ -776,13 +792,13 @@ namespace FS {
         //    static FILE* fbankfile = nullptr;
         //    auto         id        = -1;
         /*    if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-                if( !FS::checkOrOpen( fbankfile, FORME_DEXENTRY_PATH, lastLang, p_language ) ) {
+                if( !checkOrOpen( fbankfile, FORME_DEXENTRY_PATH, lastLang, p_language ) ) {
                     return false;
                 }
                 if( getString( fbankfile, DEXENTRY_NAMELENGTH, id, p_out ) ) { return true; }
             } else */
         {
-            if( !FS::checkOrOpen( bankfile, POKEMON_DEXENTRY_PATH, lastLang, p_language ) ) {
+            if( !checkOrOpen( bankfile, POKEMON_DEXENTRY_PATH, lastLang, p_language ) ) {
                 return false;
             }
             if( getString( bankfile, DEXENTRY_NAMELENGTH, p_pkmnId, p_out ) ) { return true; }
@@ -806,12 +822,10 @@ namespace FS {
         static FILE* fbankfile = nullptr;
         auto         id        = -1;
         if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-            if( !FS::checkOrOpen( fbankfile, FORME_NAME_PATH, lastLang, p_language ) ) {
-                return false;
-            }
+            if( !checkOrOpen( fbankfile, FORME_NAME_PATH, lastLang, p_language ) ) { return false; }
             if( getString( fbankfile, FORME_NAMELENGTH, id, p_out ) ) { return true; }
         } else {
-            if( !FS::checkOrOpen( bankfile, POKEMON_NAME_PATH, lastLang, p_language ) ) {
+            if( !checkOrOpen( bankfile, POKEMON_NAME_PATH, lastLang, p_language ) ) {
                 return false;
             }
             if( getString( bankfile, PKMN_NAMELENGTH, p_pkmnId, p_out ) ) { return true; }
@@ -833,11 +847,11 @@ namespace FS {
         static FILE* bankfilef = nullptr;
         auto         id        = -1;
         if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-            if( !FS::checkOrOpen( bankfilef, FORME_DATA_PATH ) ) { return false; }
+            if( !checkOrOpen( bankfilef, FORME_DATA_PATH ) ) { return false; }
             if( std::fseek( bankfilef, id * sizeof( pkmnData ), SEEK_SET ) ) { return false; }
             fread( p_out, sizeof( pkmnData ), 1, bankfilef );
         } else {
-            if( !FS::checkOrOpen( bankfile, POKEMON_DATA_PATH ) ) { return false; }
+            if( !checkOrOpen( bankfile, POKEMON_DATA_PATH ) ) { return false; }
             if( std::fseek( bankfile, p_pkmnId * sizeof( pkmnData ), SEEK_SET ) ) { return false; }
             fread( p_out, sizeof( pkmnData ), 1, bankfile );
         }
@@ -857,11 +871,11 @@ namespace FS {
         static FILE* bankfilef = nullptr;
         auto         id        = -1;
         if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-            if( !FS::checkOrOpen( bankfilef, FORME_EVOS_PATH ) ) { return false; }
+            if( !checkOrOpen( bankfilef, FORME_EVOS_PATH ) ) { return false; }
             if( std::fseek( bankfilef, id * sizeof( pkmnEvolveData ), SEEK_SET ) ) { return false; }
             fread( p_out, sizeof( pkmnEvolveData ), 1, bankfilef );
         } else {
-            if( !FS::checkOrOpen( bankfile, POKEMON_EVOS_PATH ) ) { return false; }
+            if( !checkOrOpen( bankfile, POKEMON_EVOS_PATH ) ) { return false; }
             if( std::fseek( bankfile, p_pkmnId * sizeof( pkmnEvolveData ), SEEK_SET ) ) {
                 return false;
             }
@@ -925,13 +939,13 @@ namespace FS {
         static FILE* bankfilef = nullptr;
         auto         id        = -1;
         if( p_forme && ( id = formeIdx( p_pkmnId, p_forme ) ) != -1 ) {
-            if( !FS::checkOrOpen( bankfilef, FORME_LEARNSET_PATH ) ) { return false; }
+            if( !checkOrOpen( bankfilef, FORME_LEARNSET_PATH ) ) { return false; }
             if( std::fseek( bankfilef, id * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
                 return false;
             }
             fread( p_out, sizeof( u16 ), LEARNSET_SIZE, bankfilef );
         } else {
-            if( !FS::checkOrOpen( bankfile, PKMN_LEARNSET_PATH ) ) { return false; }
+            if( !checkOrOpen( bankfile, PKMN_LEARNSET_PATH ) ) { return false; }
             if( std::fseek( bankfile, p_pkmnId * LEARNSET_SIZE * sizeof( u16 ), SEEK_SET ) ) {
                 return false;
             }

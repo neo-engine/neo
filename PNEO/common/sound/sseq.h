@@ -231,15 +231,7 @@ namespace SOUND::SSEQ {
     */
     extern soundSysMessage CURRENT_SEQUENCE;
 
-    /*
-    void playSeqNDS( const char *ndsFile, const u32 SSEQOffset, const u32 SSEQSize,
-                     const u32 BANKOffset, const u32 BANKSize, const u32 WAVEARC1Offset,
-                     const u32 WAVEARC1Size, const u32 WAVEARC2Offset, const u32 WAVEARC2Size,
-                     const u32 WAVEARC3Offset, const u32 WAVEARC3Size, const u32 WAVEARC4Offset,
-                     const u32 WAVEARC4Size );
-                     */
-    void playSequence( const char *, const char *, const char *, const char *, const char *,
-                       const char * );
+    void playSequence( u16 );
     void stopSequence( );
 
 #endif
