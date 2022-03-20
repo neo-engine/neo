@@ -8,6 +8,8 @@
 #include "sound/sseq.h"
 #include "sound/sseqData.h"
 
+#include "nav/nav.h"
+
 namespace SOUND::SSEQ {
     static void sndsysMsgHandler( int, void * );
     static void returnMsgHandler( int, void * );
@@ -58,35 +60,6 @@ namespace SOUND::SSEQ {
         freeSequenceData( CURRENT_SEQUENCE.m_war + 3 );
     }
 
-    /* The following code must be rethought: */
-
-    /*
-    int PlaySmp(sndreg_t* smp, int a, int d, int s, int r, int vol, int vel, int
-    pan)
-    {
-            soundSysMessage msg;
-            msg.msg = SNDSYS_PLAY;
-            msg.sndreg = *smp;
-            msg.a = (u8) a;
-            msg.d = (u8) d;
-            msg.s = (u8) s;
-            msg.r = (u8) r;
-            msg.vol = (u8) vol;
-            msg.vel = (u8) vel;
-            msg.pan = (s8) pan;
-            fifoSendDatamsg(FIFO_SNDSYS, sizeof(msg), (u8*) &msg);
-            return (int) fifoGetRetValue(FIFO_SNDSYS);
-    }
-
-    void StopSmp(int handle)
-    {
-            soundSysMessage msg;
-            msg.msg = SNDSYS_STOP;
-            msg.ch = handle;
-            fifoSendDatamsg(FIFO_SNDSYS, sizeof(msg), (u8*) &msg);
-    }
-    */
-
     void playSequence( u16 p_seqId ) {
         stopSequence( );
         freeSequence( );
@@ -94,10 +67,16 @@ namespace SOUND::SSEQ {
 
         auto &seq = SSEQ_LIST[ p_seqId ];
 
-        FS::loadSoundSequence( &CURRENT_SEQUENCE.m_seq, seq.m_sseqId );
-        !FS::loadSoundBank( &CURRENT_SEQUENCE.m_bnk, seq.m_bank );
+        if( !FS::loadSoundSequence( &CURRENT_SEQUENCE.m_seq, seq.m_sseqId ) ) {
+            DESQUID_LOG( "meh 1:/" );
+        }
+        if( !FS::loadSoundBank( &CURRENT_SEQUENCE.m_bnk, seq.m_bank ) ) {
+            DESQUID_LOG( "meh 2:/" );
+        }
         for( u8 i = 0; i < seq.m_sampleCnt; ++i ) {
-            FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ] );
+            if( !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ] ) ) {
+                DESQUID_LOG( std::to_string( p_seqId ) + " " + std::to_string( i ) + " meh 3:/" );
+            }
         }
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
     }

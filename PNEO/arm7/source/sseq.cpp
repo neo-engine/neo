@@ -41,94 +41,57 @@ namespace SOUND::SSEQ {
     struct trackState {
         static constexpr u8 CLLSTCK_LIMIT = 3;
 
-        s32      m_count;
-        s32      m_pos;
-        s32      m_priority;
+        int      m_count;
+        int      m_pos;
+        int      m_priority;
         u16      m_patch;
         u16      m_waitmode;
         playInfo m_playInfo;
-        s32      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
-        s32      m_loopcount, m_looppos;
-        s32      m_ret[ CLLSTCK_LIMIT ];
+        int      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
+        int      m_loopcount, m_looppos;
+        int      m_ret[ CLLSTCK_LIMIT ];
         u8       m_retpos;
-        s32      m_trackEnded;
-        s32      m_trackLooped;
+        int      m_trackEnded;
+        int      m_trackLooped;
         u8       m_portakey, m_portatime;
         s16      m_sweepPitch;
     };
 
-    s32          TRACK_CNT         = 0;
+    int          TRACK_CNT         = 0;
     u8*          SEQUENCE_DATA     = NULL;
     void*        SEQUENCE_BANK     = NULL;
     void*        SEQUENCE_WAR[ 4 ] = { NULL, NULL, NULL, NULL };
     trackState   TRACKS[ NUM_CHANNEL ];
-    s32          MESSAGE_SEND_FLAG = 0;
-    volatile s32 SEQ_BPM           = 0;
+    int          MESSAGE_SEND_FLAG = 0;
+    volatile int SEQ_BPM           = 0;
 
-    void trackTick( s32 n );
+    void trackTick( int p_n );
     void updateSequencePortamento( adsrState* p_state, trackState* p_track );
 
-    // This function was obtained through disassembly of Ns32y's sound driver
-    u16 adjustFreq( u16 p_baseFreq, s32 p_pitch ) {
-        s32 shift = 0;
-        p_pitch   = -p_pitch;
-        while( p_pitch < 0 ) {
-            shift--;
-            p_pitch += PITCH_TABLE_SIZE;
-        }
-        while( p_pitch >= PITCH_TABLE_SIZE ) {
-            shift++;
-            p_pitch -= PITCH_TABLE_SIZE;
-        }
-
-        u64 freq = (u64) p_baseFreq * ( (u32) PITCH_TABLE[ p_pitch ] + 0x10000 );
-        shift -= 16;
-        if( shift <= 0 ) {
-            freq >>= -shift;
-        } else if( shift < 32 ) {
-            if( freq & ( ( ~0ULL ) << ( 32 - shift ) ) ) { return 0xFFFF; }
-            freq <<= shift;
-        } else {
-            return 0x10;
-        }
-        if( freq < 0x10 ) { return 0x10; }
-        if( freq > 0xFFFF ) { return 0xFFFF; }
-        return (u16) freq;
-    }
-
-    static inline u16 adjustFreq( u16 p_baseFreq, s32 p_noteN, s32 p_baseN ) {
-        return adjustFreq( p_baseFreq, ( p_noteN - p_baseN ) * 64 );
-    }
-
-    static inline u16 adjustPitchBend( u16 p_baseFreq, s32 p_pitchb, s32 p_pitchr ) {
-        if( !p_pitchb ) { return p_baseFreq; }
-        return adjustFreq( p_baseFreq, ( p_pitchb * p_pitchr ) >> 1 );
-    }
-
-#define SOUND_FORMAT( p_a ) ( ( (s32) ( p_a ) ) << 29 )
+#define SOUND_FORMAT( p_a ) ( ( (int) ( p_a ) ) << 29 )
 #define SOUND_LOOP( p_a )   ( ( p_a ) ? SOUND_REPEAT : SOUND_ONE_SHOT )
 #define GETSAMP( p_a )      ( (void*) ( (char*) ( p_a ) + sizeof( sampleInfo ) ) )
 
-    sampleInfo* getWav( void* p_war, s32 p_id ) {
-        return (sampleInfo*) ( s32( p_war ) + ( (s32*) ( s32( p_war ) + 60 ) )[ p_id ] );
+    sampleInfo* getWav( void* p_war, int p_id ) {
+        return (sampleInfo*) ( int( p_war ) + ( (int*) ( int( p_war ) + 60 ) )[ p_id ] );
     }
 
-    u32 getInstr( void* p_bnk, s32 p_id ) {
-        return *(u32*) ( s32( p_bnk ) + 60 + 4 * p_id );
+    u32 getInstr( void* p_bnk, int p_id ) {
+        return *(u32*) ( int( p_bnk ) + 60 + 4 * p_id );
     }
 
 #define INST_TYPE( p_a ) ( 0xFF & ( p_a ) )
 #define INST_OFF( p_a )  ( ( p_a ) >> 8 )
 
-#define GETINSTDATA( p_bnk, p_a ) ( (u8*) ( (s32) ( p_bnk ) + (s32) INST_OFF( p_a ) ) )
+#define GETINSTDATA( p_bnk, p_a ) ( (u8*) ( (int) ( p_bnk ) + (int) INST_OFF( p_a ) ) )
 
-    s32 nextFreeChannel( s32 p_priority, u8 p_chStart = 0, u8 p_chEnd = NUM_CHANNEL ) {
+    int nextFreeChannel( int p_priority, u8 p_chStart = 0, u8 p_chEnd = NUM_CHANNEL ) {
         for( u8 i = p_chStart; i < p_chEnd; ++i ) {
             if( !SCHANNEL_ACTIVE( i ) && ADSR_CHANNEL[ i ].m_state != adsrState::ADSR_START ) {
                 return i;
             }
         }
-        s32 j = -1, ampl = 1;
+        int j = -1, ampl = 1;
         for( u8 i = p_chStart; i < p_chEnd; ++i ) {
             if( ADSR_CHANNEL[ i ].m_state == adsrState::ADSR_RELEASE
                 && ADSR_CHANNEL[ i ].m_ampl < ampl ) {
@@ -145,12 +108,12 @@ namespace SOUND::SSEQ {
         return -1;
     }
 
-    s32 nextFreeToneChannel( s32 p_priority ) {
+    int nextFreeToneChannel( int p_priority ) {
         return nextFreeChannel( p_priority, TONE_CHANNEL_START,
                                 TONE_CHANNEL_START + TONE_CHANNEL_NUM );
     }
 
-    s32 nextFreeNoiseChannel( s32 p_priority ) {
+    int nextFreeNoiseChannel( int p_priority ) {
         return nextFreeChannel( p_priority, NOISE_CHANNEL_START,
                                 NOISE_CHANNEL_START + NOISE_CHANNEL_NUM );
     }
@@ -158,10 +121,10 @@ namespace SOUND::SSEQ {
     /*
      * @brief: plays the specified note on a free channel.
      */
-    s32 playNote( void* p_bnk, void** p_war, s32 p_instr, s32 p_note, s32 p_priority,
-                  playInfo* p_playInfo, s32 p_duration, s32 p_track ) {
-        s32 isPsg   = 0;
-        s32 channel = nextFreeChannel( p_priority );
+    int playNote( void* p_bnk, void** p_war, int p_instr, int p_note, int p_priority,
+                  playInfo* p_playInfo, int p_duration, int p_track ) {
+        int isPsg   = 0;
+        int channel = nextFreeChannel( p_priority );
         if( channel < 0 ) { return -1; }
 
         adsrState* chstat = ADSR_CHANNEL + channel;
@@ -170,7 +133,7 @@ namespace SOUND::SSEQ {
         u8*         insdata = GETINSTDATA( p_bnk, inst );
         noteDef*    notedef = NULL;
         sampleInfo* wavinfo = NULL;
-        s32         fRecord = INST_TYPE( inst );
+        int         fRecord = INST_TYPE( inst );
     _ReadRecord:
         if( fRecord == 0 ) {
             return -1;
@@ -201,8 +164,8 @@ namespace SOUND::SSEQ {
                 = adjustPitchBend( chstat->m_freq, p_playInfo->m_pitchb, p_playInfo->m_pitchr );
         } else if( fRecord == 16 ) {
             if( ( insdata[ 0 ] <= p_note ) && ( p_note <= insdata[ 1 ] ) ) {
-                s32 rn     = p_note - insdata[ 0 ];
-                s32 offset = 2 + rn * ( 2 + sizeof( noteDef ) );
+                int rn     = p_note - insdata[ 0 ];
+                int offset = 2 + rn * ( 2 + sizeof( noteDef ) );
                 fRecord    = insdata[ offset ];
                 insdata += offset + 2;
                 goto _ReadRecord;
@@ -216,7 +179,7 @@ namespace SOUND::SSEQ {
             }
             if( reg == 8 ) { return -1; }
 
-            s32 offset = 8 + reg * ( 2 + sizeof( noteDef ) );
+            int offset = 8 + reg * ( 2 + sizeof( noteDef ) );
             fRecord    = insdata[ offset ];
             insdata += offset + 2;
             goto _ReadRecord;
@@ -266,8 +229,8 @@ namespace SOUND::SSEQ {
         chstat->m_track       = p_track;
         chstat->m_note        = p_note;
         chstat->m_patch       = p_instr;
-        updateSequencePortamento( chstat, pTrack );
-        pTrack->m_portakey = p_note | ( pTrack->m_portakey & 0x80 );
+        //        updateSequencePortamento( chstat, pTrack );
+        //        pTrack->m_portakey = p_note | ( pTrack->m_portakey & 0x80 );
 
         chstat->m_state = adsrState::ADSR_START;
 
@@ -285,7 +248,7 @@ namespace SOUND::SSEQ {
     ( (u32) SEQUENCE_DATA[ ( p_pos ) ] | ( (u32) SEQUENCE_DATA[ ( p_pos ) + 1 ] << 8 ) \
       | ( (u32) SEQUENCE_DATA[ ( p_pos ) + 2 ] << 16 ) )
 
-    static inline void prepareTrack( s32 p_track, s32 p_pos ) {
+    static inline void prepareTrack( int p_track, int p_pos ) {
         std::memset( TRACKS + p_track, 0, sizeof( trackState ) );
         TRACKS[ p_track ].m_pos                 = p_pos;
         TRACKS[ p_track ].m_playInfo.m_vol      = 64;
@@ -324,11 +287,11 @@ namespace SOUND::SSEQ {
         SEQUENCE_DATA = (u8*) p_sequence->m_data + ( (u32*) p_sequence->m_data )[ 6 ];
         TRACK_CNT     = 1;
 
-        s32 pos = 0;
+        int pos = 0;
 
-        if( *SEQUENCE_DATA == 0xFE ) {
+        if( *SEQUENCE_DATA == SC_EXTRA_TRACKS ) {
             // Prepare extra TRACKS
-            for( pos = 3; SEQ_READ8( pos ) == 0x93; TRACK_CNT++, pos += 3 ) {
+            for( pos = 3; SEQ_READ8( pos ) == SC_OPEN_TRACK; TRACK_CNT++, pos += 3 ) {
                 pos += 2;
                 prepareTrack( TRACK_CNT, SEQ_READ24( pos ) );
             }
@@ -357,8 +320,8 @@ namespace SOUND::SSEQ {
     }
 
     void seq_tick( ) {
-        s32 looped_twice = 0;
-        s32 ended        = 0;
+        int looped_twice = 0;
+        int ended        = 0;
 
         // Handle p_note durations
         for( u8 i = 0; i < NUM_CHANNEL; ++i ) {
@@ -400,10 +363,10 @@ namespace SOUND::SSEQ {
         }
     }
 
-    s32 readValue( s32* p_pos ) {
-        s32 v = 0;
+    int readValue( int* p_pos ) {
+        int v = 0;
         for( ;; ) {
-            s32 data = SEQ_READ8( *p_pos );
+            int data = SEQ_READ8( *p_pos );
             ( *p_pos )++;
             v = ( v << 7 ) | ( data & 0x7F );
             if( !( data & 0x80 ) ) break;
@@ -411,7 +374,7 @@ namespace SOUND::SSEQ {
         return v;
     }
 
-    void updateSequenceNote( s32 p_track, playInfo* p_info ) {
+    void updateSequenceNote( int p_track, playInfo* p_info ) {
         for( u8 i = 0; i < NUM_CHANNEL; i++ ) {
             adsrState* chstat = ADSR_CHANNEL + i;
             if( chstat->m_track != p_track ) continue;
@@ -421,7 +384,7 @@ namespace SOUND::SSEQ {
         }
     }
 
-    void updateSequencePitchBend( s32 p_track, playInfo* p_info ) {
+    void updateSequencePitchBend( int p_track, playInfo* p_info ) {
         for( u8 i = 0; i < NUM_CHANNEL; i++ ) {
             adsrState* chstat = ADSR_CHANNEL + i;
             if( chstat->m_track != p_track ) { continue; }
@@ -430,7 +393,7 @@ namespace SOUND::SSEQ {
         }
     }
 
-    void updateSequenceModulation( s32 p_track, playInfo* p_info, s32 what ) {
+    void updateSequenceModulation( int p_track, playInfo* p_info, int what ) {
         for( u8 i = 0; i < NUM_CHANNEL; i++ ) {
             adsrState* chstat = ADSR_CHANNEL + i;
             if( chstat->m_track != p_track ) { continue; }
@@ -443,27 +406,28 @@ namespace SOUND::SSEQ {
     }
 
     void updateSequencePortamento( adsrState* p_state, trackState* p_track ) {
-        p_state->m_sweepPitch = p_track->m_sweepPitch;
-        if( p_track->m_portakey & 0x80 ) {
-            p_state->m_sweepLen = 0;
-            p_state->m_sweepCnt = 0;
-            return;
-        }
+        /*    p_state->m_sweepPitch = p_track->m_sweepPitch;
+            if( p_track->m_portakey & 0x80 ) {
+                p_state->m_sweepLen = 0;
+                p_state->m_sweepCnt = 0;
+                return;
+            }
 
-        int diff = ( (int) p_track->m_portakey - (int) p_state->m_note ) << 22;
-        p_state->m_sweepPitch += diff >> 16;
+            int diff = ( (int) p_track->m_portakey - (int) p_state->m_note ) << 22;
+            p_state->m_sweepPitch += diff >> 16;
 
-        if( p_track->m_portatime == 0 ) {
-            p_state->m_sweepLen = ( p_state->m_count * 240 + SEQ_BPM - 1 ) / SEQ_BPM;
-        } else {
-            u32 sq_time         = p_track->m_portatime * p_track->m_portatime;
-            int abs_sp          = p_state->m_sweepPitch;
-            abs_sp              = abs_sp < 0 ? -abs_sp : abs_sp;
-            p_state->m_sweepLen = ( abs_sp * sq_time ) >> 11;
-        }
+            if( p_track->m_portatime == 0 ) {
+                p_state->m_sweepLen = ( p_state->m_count * 240 + SEQ_BPM - 1 ) / SEQ_BPM;
+            } else {
+                u32 sq_time         = p_track->m_portatime * p_track->m_portatime;
+                int abs_sp          = p_state->m_sweepPitch;
+                abs_sp              = abs_sp < 0 ? -abs_sp : abs_sp;
+                p_state->m_sweepLen = ( abs_sp * sq_time ) >> 11;
+            }
+            */
     }
 
-    void trackTick( s32 p_trackId ) {
+    void trackTick( int p_trackId ) {
         returnMessage msg;
         trackState*   track = TRACKS + p_trackId;
 
@@ -485,11 +449,11 @@ namespace SOUND::SSEQ {
                 // p_note-ON
                 u8 vel = SEQ_READ8( track->m_pos );
                 track->m_pos++;
-                s32 len = readValue( &track->m_pos );
-                if( track->m_waitmode ) track->m_count = len;
+                int len = readValue( &track->m_pos );
+                if( track->m_waitmode ) { track->m_count = len; }
 
                 track->m_playInfo.m_vel = vel;
-                s32 handle = playNote( SEQUENCE_BANK, SEQUENCE_WAR, track->m_patch, cmd,
+                int handle = playNote( SEQUENCE_BANK, SEQUENCE_WAR, track->m_patch, cmd,
                                        track->m_priority, &track->m_playInfo, len, p_trackId );
                 if( handle < 0 ) { continue; }
             } else
@@ -511,7 +475,7 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_CALL: {
-                    s32 dest                        = SEQ_READ24( track->m_pos );
+                    int dest                        = SEQ_READ24( track->m_pos );
                     track->m_ret[ track->m_retpos ] = track->m_pos + 3;
                     track->m_pos                    = dest;
                     if( track->m_retpos + 1 < trackState::CLLSTCK_LIMIT ) { track->m_retpos++; }
@@ -525,7 +489,7 @@ namespace SOUND::SSEQ {
                 }
                 case SC_UNKNOWN_1: {
                     // TODO
-                    s32 t = SEQ_READ8( track->m_pos );
+                    int t = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     if( t >= 0xB0 && t <= 0xBD ) track->m_pos++;
                     track->m_pos++;
@@ -583,23 +547,22 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_PORTAMENTO: {
-                    track->m_portakey = SEQ_READ8( track->m_pos );
+                    //          track->m_portakey = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO_TOGGLE: {
-                    track->m_portakey &= ~0x80;
-                    track->m_portakey |= ( !SEQ_READ8( track->m_pos ) ) << 7;
+                    //         track->m_portakey &= ~0x80;
+                    //         track->m_portakey |= ( !SEQ_READ8( track->m_pos ) ) << 7;
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO_TIME: {
-                    track->m_portatime = SEQ_READ8( track->m_pos );
+                    //          track->m_portatime = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_PITCH_BEND: {
-
                     track->m_playInfo.m_pitchb = (s8) SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequencePitchBend( p_trackId, &track->m_playInfo );
@@ -673,7 +636,7 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_LOOP_END: {
-                    s32 shouldRepeat = 1;
+                    int shouldRepeat = 1;
                     if( track->m_loopcount > 0 ) shouldRepeat = --track->m_loopcount;
                     if( shouldRepeat ) track->m_pos = track->m_looppos;
                     if( ( shouldRepeat == 1 ) && ( track->m_loopcount == 0 ) )
@@ -693,7 +656,7 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_SWEEP_PITCH: {
-                    track->m_sweepPitch = SEQ_READ16( track->m_pos );
+                    // track->m_sweepPitch = SEQ_READ16( track->m_pos );
                     track->m_pos += 2;
                     break;
                 }

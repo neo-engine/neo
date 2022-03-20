@@ -14,9 +14,9 @@ namespace SOUND::SSEQ {
     static void adsrTickChannel( u8 );
     static void adsrTick( );
 
-    volatile s32 SEQ_STATUS = STATUS_STOPPED;
-    volatile s32 CUR_BPM;
-    volatile s32 CUR_VOL;
+    volatile int SEQ_STATUS = STATUS_STOPPED;
+    volatile int CUR_BPM;
+    volatile int CUR_VOL;
 
     void installSoundSys( ) {
         // Install timer
@@ -30,17 +30,20 @@ namespace SOUND::SSEQ {
     }
 
     static void soundTimer( ) {
-        static volatile s32 v = 0;
+        static volatile int v = 0;
 
         adsrTick( );
 
-        while( v > 240 ) v -= 240, seq_tick( );
+        while( v > 240 ) {
+            v -= 240;
+            seq_tick( );
+        }
         v += SEQ_BPM;
     }
 
     adsrState ADSR_CHANNEL[ NUM_CHANNEL ];
 
-    volatile s32 ADSR_MASTER_VOLUME = 127;
+    volatile int ADSR_MASTER_VOLUME = 127;
 
     static inline void adsrTick( ) {
         for( u8 i = 0; i < NUM_CHANNEL; ++i ) { adsrTickChannel( i ); }
@@ -81,7 +84,7 @@ namespace SOUND::SSEQ {
             break;
         case adsrState::ADSR_RELEASE:
             chstat->m_ampl -= chstat->m_releaseRate;
-            if( s32( chstat->m_ampl ) <= -s32( ADSR_THRESHOLD ) ) {
+            if( int( chstat->m_ampl ) <= -int( ADSR_THRESHOLD ) ) {
                 //__adsr_release:
                 chstat->m_state = adsrState::ADSR_NONE;
                 // chstat->m_reg.CR = 0;
@@ -94,8 +97,8 @@ namespace SOUND::SSEQ {
         }
 
         // Update the modulation params
-        s32 modParam = 0;
-        s32 modType  = chstat->m_modType;
+        int modParam = 0;
+        int modType  = chstat->m_modType;
 
         if( chstat->m_modDelayCnt < chstat->m_modDelay ) {
             chstat->m_modDelayCnt++;
@@ -117,7 +120,7 @@ namespace SOUND::SSEQ {
 #define CONV_VOL( p_a )     ( convertSustain( p_a ) >> 7 )
 #define SOUND_VOLDIV( p_n ) ( ( p_n ) << 8 )
 
-        s32 totalvol = CONV_VOL( ADSR_MASTER_VOLUME );
+        int totalvol = CONV_VOL( ADSR_MASTER_VOLUME );
         totalvol += CONV_VOL( chstat->m_vol );
         totalvol += CONV_VOL( chstat->m_expr );
         totalvol += CONV_VOL( chstat->m_vel );
@@ -126,12 +129,12 @@ namespace SOUND::SSEQ {
             totalvol += modParam;
             if( totalvol > 0 ) { totalvol = 0; }
         }
-        totalvol += 723;
+        totalvol += ADSR_K_AMP2VOL;
         if( totalvol < 0 ) { totalvol = 0; }
 
         u32 res = swiGetVolumeTable( totalvol );
 
-        s32 pan = (s32) chstat->m_pan + (s32) chstat->m_pan2 - 64;
+        int pan = (int) chstat->m_pan + (int) chstat->m_pan2 - 64;
         if( modType == 2 ) { pan += modParam; }
         if( pan < 0 ) { pan = 0; }
         if( pan > 127 ) { pan = 127; }
@@ -139,11 +142,11 @@ namespace SOUND::SSEQ {
         u32 cr = SCHANNEL_CR( p_channel )
                  & ~( SOUND_VOL( 0x7F ) | SOUND_VOLDIV( 3 ) | SOUND_PAN( 0x7F ) );
         cr |= SOUND_VOL( res ) | SOUND_PAN( pan );
-        if( totalvol < ( -240 + 723 ) ) {
+        if( totalvol < ( -240 + ADSR_K_AMP2VOL ) ) {
             cr |= SOUND_VOLDIV( 3 );
-        } else if( totalvol < ( -120 + 723 ) ) {
+        } else if( totalvol < ( -120 + ADSR_K_AMP2VOL ) ) {
             cr |= SOUND_VOLDIV( 2 );
-        } else if( totalvol < ( -60 + 723 ) ) {
+        } else if( totalvol < ( -60 + ADSR_K_AMP2VOL ) ) {
             cr |= SOUND_VOLDIV( 1 );
         }
 
@@ -155,14 +158,14 @@ namespace SOUND::SSEQ {
 
     // Adapted from VGMTrans
 
-    u8 convertAttack( u8 p_attack ) {
+    int convertAttack( int p_attack ) {
         const u8 lookup[] = { 0x00, 0x01, 0x05, 0x0E, 0x1A, 0x26, 0x33, 0x3F, 0x49, 0x54,
                               0x5C, 0x64, 0x6D, 0x74, 0x7B, 0x7F, 0x84, 0x89, 0x8F };
 
         return ( p_attack >= 0x6D ) ? lookup[ 0x7F - p_attack ] : ( 0xFF - p_attack );
     }
 
-    u16 convertFall( u8 p_fall ) {
+    int convertFall( int p_fall ) {
         if( p_fall == 0x7F ) {
             return 0xFFFF;
         } else if( p_fall == 0x7E ) {
@@ -174,7 +177,7 @@ namespace SOUND::SSEQ {
         }
     }
 
-    u16 convertSustain( u8 p_sustain ) {
+    int convertSustain( int p_sustain ) {
         const u16 lookup[] = {
             0xFD2D, 0xFD2E, 0xFD2F, 0xFD75, 0xFDA7, 0xFDCE, 0xFDEE, 0xFE09, 0xFE20, 0xFE34, 0xFE46,
             0xFE57, 0xFE66, 0xFE74, 0xFE81, 0xFE8D, 0xFE98, 0xFEA3, 0xFEAD, 0xFEB6, 0xFEBF, 0xFEC7,
@@ -189,10 +192,10 @@ namespace SOUND::SSEQ {
             0xFFE7, 0xFFE9, 0xFFEA, 0xFFEC, 0xFFED, 0xFFEF, 0xFFF0, 0xFFF2, 0xFFF3, 0xFFF5, 0xFFF6,
             0xFFF8, 0xFFF9, 0xFFFA, 0xFFFC, 0xFFFD, 0xFFFF, 0x0000 };
 
-        return ( p_sustain == 0x7F ) ? 0 : -( ( 0x10000 - (s32) lookup[ p_sustain ] ) << 7 );
+        return ( p_sustain == 0x7F ) ? 0 : -( ( 0x10000 - (int) lookup[ p_sustain ] ) << 7 );
     }
 
-    s8 getSoundSine( u8 p_arg ) {
+    int getSoundSine( int p_arg ) {
         constexpr u8 lut_size = 32;
         const s8     lookup[]
             = { 0,  6,  12,  19,  25,  31,  37,  43,  49,  54,  60,  65,  71,  76,  81,  85, 90,

@@ -21,27 +21,29 @@ namespace SOUND::SSEQ {
         SC_REST         = 0x80,
         SC_PATCH_CHANGE = 0x81,
 
-        SC_JUMP = 0x94,
-        SC_CALL = 0x95,
+        SC_OPEN_TRACK = 0x93,
+        SC_JUMP       = 0x94,
+        SC_CALL       = 0x95,
 
         SC_RANDOM    = 0xA0,
-        SC_UNKNOWN_1 = 0xA1,
+        SC_UNKNOWN_1 = 0xA1, // basic arithmetic
         SC_IF        = 0xA2,
 
-        SC_UNKNOWN_2  = 0xB0,
-        SC_UNKNOWN_3  = 0xB1,
-        SC_UNKNOWN_4  = 0xB2,
-        SC_UNKNOWN_5  = 0xB3,
-        SC_UNKNOWN_6  = 0xB4,
-        SC_UNKNOWN_7  = 0xB5,
-        SC_UNKNOWN_8  = 0xB6,
-        SC_UNKNOWN_9  = 0xB7,
-        SC_UNKNOWN_10 = 0xB8,
-        SC_UNKNOWN_11 = 0xB9,
-        SC_UNKNOWN_12 = 0xBA,
-        SC_UNKNOWN_13 = 0xBB,
-        SC_UNKNOWN_14 = 0xBC,
-        SC_UNKNOWN_15 = 0xBD,
+        // basic arithmetic block
+        SC_UNKNOWN_2  = 0xB0, // =
+        SC_UNKNOWN_3  = 0xB1, // +=
+        SC_UNKNOWN_4  = 0xB2, // -=
+        SC_UNKNOWN_5  = 0xB3, // *=
+        SC_UNKNOWN_6  = 0xB4, // /=
+        SC_UNKNOWN_7  = 0xB5, // [Shift]
+        SC_UNKNOWN_8  = 0xB6, // [Rand]
+        SC_UNKNOWN_9  = 0xB7, // ""
+        SC_UNKNOWN_10 = 0xB8, // ==
+        SC_UNKNOWN_11 = 0xB9, // >=
+        SC_UNKNOWN_12 = 0xBA, // >
+        SC_UNKNOWN_13 = 0xBB, // <=
+        SC_UNKNOWN_14 = 0xBC, // <
+        SC_UNKNOWN_15 = 0xBD, // !=
 
         SC_PAN               = 0xC0,
         SC_VOL               = 0xC1,
@@ -72,9 +74,10 @@ namespace SOUND::SSEQ {
 
         SC_SWEEP_PITCH = 0xE3,
 
-        SC_LOOP_END = 0xFC,
-        SC_RET      = 0xFD,
-        SC_END      = 0xFF,
+        SC_LOOP_END     = 0xFC,
+        SC_RET          = 0xFD,
+        SC_EXTRA_TRACKS = 0xFE,
+        SC_END          = 0xFF,
     };
 
     enum messageType : u16 {
@@ -115,7 +118,7 @@ namespace SOUND::SSEQ {
                     u8 m_pan;
                     u8 m_padding;
             };
-            s32 m_ch;
+            int m_ch;
             */
             struct {
                 sequenceData m_seq;
@@ -149,11 +152,11 @@ namespace SOUND::SSEQ {
 
 #define SCHANNEL_ACTIVE( ch ) ( SCHANNEL_CR( ch ) & SCHANNEL_ENABLE )
 
-    constexpr u16 ADSR_K_AMP2VOL = 723;
-    constexpr u32 ADSR_THRESHOLD = ADSR_K_AMP2VOL * 128;
+    constexpr int ADSR_K_AMP2VOL = 723;
+    constexpr int ADSR_THRESHOLD = ADSR_K_AMP2VOL * 128;
 
     struct adsrState {
-        enum adsrStateType : s32 {
+        enum adsrStateType : int {
             ADSR_NONE = 0,
             ADSR_START,
             ADSR_ATTACK,
@@ -164,19 +167,19 @@ namespace SOUND::SSEQ {
 
         adsrStateType m_state;
 
-        s32 m_vol;
-        s32 m_vel;
-        s32 m_expr;
-        s32 m_pan;
-        s32 m_pan2;
-        s32 m_ampl;
-        s32 m_attackRate;
-        s32 m_decayRate;
-        s32 m_sustainRate;
-        s32 m_releaseRate;
-        s32 m_priority;
-        s32 m_count;
-        s32 m_track;
+        int m_vol;
+        int m_vel;
+        int m_expr;
+        int m_pan;
+        int m_pan2;
+        int m_ampl;
+        int m_attackRate;
+        int m_decayRate;
+        int m_sustainRate;
+        int m_releaseRate;
+        int m_priority;
+        int m_count;
+        int m_track;
         u16 m_freq;
         u8  m_modType, m_modSpeed, m_modDepth, m_modRange;
         u16 m_modDelay, m_modDelayCnt, m_modCounter;
@@ -189,46 +192,78 @@ namespace SOUND::SSEQ {
 
     extern adsrState ADSR_CHANNEL[ NUM_CHANNEL ];
 
-    volatile extern s32 SEQ_BPM;
-    volatile extern s32 SEQ_STATUS;
+    volatile extern int SEQ_BPM;
+    volatile extern int SEQ_STATUS;
 
-    volatile extern s32 ADSR_MASTER_VOLUME;
+    volatile extern int ADSR_MASTER_VOLUME;
 
     void seq_tick( );
 
     void playSequence( sequenceData *p_seq, sequenceData *p_bnk, sequenceData *p_war );
     void stopSequence( );
 
-    inline s32 nextFreeChannelInRange( u8 p_chStart, u8 p_chEnd ) {
+    inline s8 nextFreeChannelInRange( u8 p_chStart, u8 p_chEnd ) {
         for( u8 i = p_chStart; i < p_chEnd; ++i ) {
             if( !SCHANNEL_ACTIVE( i ) ) { return i; }
         }
         return -1;
     }
-    inline s32 nextFreeChannel( ) {
+    inline s8 nextFreeChannel( ) {
         return nextFreeChannelInRange( 0, NUM_CHANNEL );
     }
-    inline s32 nextFreeToneChannel( ) {
+    inline s8 nextFreeToneChannel( ) {
         return nextFreeChannelInRange( TONE_CHANNEL_START, TONE_CHANNEL_START + TONE_CHANNEL_NUM );
     }
-    inline s32 nextFreeNoiseChannel( ) {
+    inline s8 nextFreeNoiseChannel( ) {
         return nextFreeChannelInRange( NOISE_CHANNEL_START,
                                        NOISE_CHANNEL_START + NOISE_CHANNEL_NUM );
     }
 
-    u8  convertAttack( u8 p_attack );
-    u16 convertFall( u8 p_fall );
-    u16 convertSustain( u8 p_sustain );
-    u16 adjustFreq( u16 p_basefreq, s32 p_pitch );
-    s8  getSoundSine( u8 p_arg );
+    int convertAttack( int p_attack );
+    int convertFall( int p_fall );
+    int convertSustain( int p_sustain );
+    int getSoundSine( int p_arg );
+
+    // This function was obtained through disassembly of Ninty's sound driver
+    constexpr u16 adjustFreq( u16 p_baseFreq, int p_pitch ) {
+        int shift = 0;
+        p_pitch   = -p_pitch;
+        while( p_pitch < 0 ) {
+            shift--;
+            p_pitch += PITCH_TABLE_SIZE;
+        }
+        while( p_pitch >= PITCH_TABLE_SIZE ) {
+            shift++;
+            p_pitch -= PITCH_TABLE_SIZE;
+        }
+
+        u64 freq = (u64) p_baseFreq * ( (u32) PITCH_TABLE[ p_pitch ] + 0x10000 );
+        shift -= 16;
+        if( shift <= 0 ) {
+            freq >>= -shift;
+        } else if( shift < 32 ) {
+            if( freq & ( ( ~0ULL ) << ( 32 - shift ) ) ) { return 0xFFFF; }
+            freq <<= shift;
+        } else {
+            return 0x10;
+        }
+        if( freq < 0x10 ) { return 0x10; }
+        if( freq > 0xFFFF ) { return 0xFFFF; }
+        return (u16) freq;
+    }
+
+    constexpr u16 adjustFreq( u16 p_baseFreq, int p_noteN, int p_baseN ) {
+        return adjustFreq( p_baseFreq, ( p_noteN - p_baseN ) * 64 );
+    }
+
+    constexpr u16 adjustPitchBend( u16 p_baseFreq, int p_pitchb, int p_pitchr ) {
+        if( !p_pitchb ) { return p_baseFreq; }
+        return adjustFreq( p_baseFreq, ( p_pitchb * p_pitchr ) >> 1 );
+    }
 
 #endif
 
 #ifdef ARM9
-    /*
-    int PlaySmp(sndreg_t* smp, int a, int d, int s, int r, int vol, int vel, int
-    pan); void StopSmp(int handle);
-    */
     extern soundSysMessage CURRENT_SEQUENCE;
 
     void playSequence( u16 );
