@@ -74,6 +74,9 @@ namespace NAV {
     char TEXT_CACHE_1[ 256 ]  = { 0 }; // top line
     char TEXT_CACHE_2[ 256 ]  = { 0 }; // bottom line
 
+    constexpr u8 SPRITES_PER_CB_WINDOW = 8;
+    constexpr u8 NUM_CB_CHOICES        = 6;
+
     const u16 ARR_X_SPR_PAL[ 16 ] = {
         0x7FFF, 0x5A6E, 0x6F2D, 0x564A, // arrow_up
         0x001F, 0x0011, 0x18CE          // x_16_16
@@ -286,16 +289,16 @@ namespace NAV {
                                 42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
                                 p_bottom, OBJMODE_BLENDED );
             }
-            for( u8 j = 2; j < 7; j++ ) {
+            for( u8 j = 2; j < SPRITES_PER_CB_WINDOW - 1; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 29 + j * 11,
                                 42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
                                 p_bottom, OBJMODE_BLENDED );
             }
-            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
-                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 29 + 5 * 16, 42 + i * 36,
-                            16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, p_bottom,
-                            OBJMODE_BLENDED );
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + SPRITES_PER_CB_WINDOW - 1,
+                            SPR_BOX_PAL_SUB, oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
+                            29 + 5 * 16, 42 + i * 36, 16, 32, 0, 0, 0, true, true, true,
+                            OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         }
 
         for( u8 i = 0; i < 3; i++ ) {
@@ -303,22 +306,24 @@ namespace NAV {
             IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131, 42 + i * 36, 16, 32,
                             0, 0, 0, false, false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-            for( u8 j = 1; j < 7; j++ ) {
+            for( u8 j = 1; j < SPRITES_PER_CB_WINDOW - 1; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex, 131 + j * 11,
                                 42 + i * 36, 16, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3,
                                 p_bottom, OBJMODE_BLENDED );
             }
-            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + 7, SPR_BOX_PAL_SUB,
-                            oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex, 131 + 5 * 16,
-                            42 + i * 36, 16, 32, 0, 0, 0, true, true, true, OBJPRIORITY_3, p_bottom,
-                            OBJMODE_BLENDED );
+            IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + SPRITES_PER_CB_WINDOW - 1,
+                            SPR_BOX_PAL_SUB, oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].gfxIndex,
+                            131 + 5 * 16, 42 + i * 36, 16, 32, 0, 0, 0, true, true, true,
+                            OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         }
 
-        oam[ SPR_PAGE_BG_OAM_SUB ]     = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ];
-        oam[ SPR_PAGE_BG_OAM_SUB + 1 ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 7 ];
+        oam[ SPR_PAGE_BG_OAM_SUB ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ];
+        oam[ SPR_PAGE_BG_OAM_SUB + 1 ]
+            = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + SPRITES_PER_CB_WINDOW - 1 ];
         oam[ SPR_PAGE_BG_OAM_SUB + 2 ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ];
-        oam[ SPR_PAGE_BG_OAM_SUB + 3 ] = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + 7 ];
+        oam[ SPR_PAGE_BG_OAM_SUB + 3 ]
+            = oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + SPRITES_PER_CB_WINDOW - 1 ];
 
         oam[ SPR_PAGE_BG_OAM_SUB ].isHidden           = oam[ SPR_PAGE_BG_OAM_SUB + 1 ].isHidden
             = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].isHidden = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].isHidden
@@ -752,15 +757,15 @@ namespace NAV {
         auto& oam = IO::Oam->oamBuffer;
 
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
-        for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; i++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( ( i & 1 ) == ( p_selection & 1 ) ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
             }
         }
         for( u8 i = 2; i < 4; i++ ) {
-            for( u8 j = 0; j < 8; j++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
             }
         }
@@ -825,8 +830,8 @@ namespace NAV {
 
         auto& oam = IO::Oam->oamBuffer;
 
-        for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; i++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
             }
@@ -841,7 +846,7 @@ namespace NAV {
             for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
 
             for( u8 i = 0; i < p_choices.size( ); i++ ) {
-                for( u8 j = 0; j < 8; j++ ) {
+                for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
                 }
 
@@ -912,7 +917,7 @@ namespace NAV {
             bgUpdate( );
 
             u8 teamSize = 0;
-            for( ; teamSize < 6; ++teamSize ) {
+            for( ; teamSize < SAVE::NUM_PARTY_SLOTS; ++teamSize ) {
                 if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamSize ].m_boxdata.m_speciesId ) {
                     break;
                 }
@@ -1104,8 +1109,8 @@ namespace NAV {
 
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
         oam[ SPR_X_OAM_SUB ].isHidden = false;
-        for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; i++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
             }
 
@@ -1158,8 +1163,8 @@ namespace NAV {
     void selectMenuItem( u8 p_selection ) {
         auto& oam = IO::Oam->oamBuffer;
 
-        for( u8 i = 0; i < 6; i++ ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; i++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
                     = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
             }
@@ -1227,16 +1232,17 @@ namespace NAV {
         oam[ SPR_X_OAM_SUB ].isHidden = false;
 
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
-        for( u8 i = 0; i < 6; ++i ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; ++i ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
             }
             oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
         }
 
-        for( u8 i = 0; i < std::min( u32( 6 ), u32( num_items - p_firstItem ) ); i++ ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < std::min( u32( NUM_CB_CHOICES ), u32( num_items - p_firstItem ) );
+             i++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
 
                 if( i & 1 ) {
@@ -1314,7 +1320,7 @@ namespace NAV {
 
         // next page
         oam[ SPR_PAGE_BG_OAM_SUB + 2 ].isHidden = oam[ SPR_PAGE_BG_OAM_SUB + 3 ].isHidden = false;
-        bool nextpg                             = size_t( p_firstItem + 6 ) < num_items;
+        bool nextpg = size_t( p_firstItem + NUM_CB_CHOICES ) < num_items;
         oam[ SPR_PAGE_BG_OAM_SUB + 5 ].isHidden = !nextpg;
         if( nextpg ) {
             res.push_back( { IO::inputTarget( oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x,
@@ -1325,7 +1331,8 @@ namespace NAV {
         }
 
         // page no
-        snprintf( buffer, 90, "%i / %i", p_firstItem / 6 + 1, ( num_items - 1 ) / 6 + 1 );
+        snprintf( buffer, 90, "%i / %i", p_firstItem / NUM_CB_CHOICES + 1,
+                  ( num_items - 1 ) / NUM_CB_CHOICES + 1 );
         IO::regularFont->printStringC( buffer, 128, oam[ SPR_PAGE_BG_OAM_SUB ].y + 8, true,
                                        IO::font::CENTER );
 
@@ -1355,7 +1362,7 @@ namespace NAV {
                           BAG::toBagType( p_itemData.m_itemType ), p_item.first ) );
             IO::regularFont->printStringC( buffer, 254, 2, true, IO::font::RIGHT );
 
-            selectMenuItem( p_selection % 6 );
+            selectMenuItem( p_selection % NUM_CB_CHOICES );
             doPrintMessage( p_descr.c_str( ), MSG_MART_ITEM, p_item.first, &p_itemData );
         }
     }
@@ -1367,8 +1374,8 @@ namespace NAV {
         auto& oam = IO::Oam->oamBuffer;
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
 
-        for( u8 i = 0; i < 6; ++i ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; ++i ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
             }
@@ -1394,14 +1401,14 @@ namespace NAV {
         dd /= 10;
 
         // counter box
-        for( u8 j = 0; j < 8; j++ ) {
+        for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + j ].isHidden = false;
             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + j ].x        = 78 + 12 * j;
             oam[ SPR_CHOICE_START_OAM_SUB( 0 ) + j ].y        = 88;
         }
 
         // confirm
-        for( u8 j = 0; j < 8; j++ ) {
+        for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
             oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].isHidden = false;
             oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].x        = 92 + 8 * j;
             oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].y        = 140;
@@ -1478,11 +1485,11 @@ namespace NAV {
         auto& oam = IO::Oam->oamBuffer;
 
         if( p_button == p_min - 2 ) {
-            for( u8 j = 0; j < 8; j++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].palette = SPR_BOX_SEL_PAL_SUB;
             }
         } else {
-            for( u8 j = 0; j < 8; j++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( 1 ) + j ].palette = SPR_BOX_PAL_SUB;
             }
         }
@@ -1638,8 +1645,8 @@ namespace NAV {
         oam[ SPR_X_OAM_SUB ].isHidden = false;
 
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
-        for( u8 i = 0; i < 6; ++i ) {
-            for( u8 j = 0; j < 8; j++ ) {
+        for( u8 i = 0; i < NUM_CB_CHOICES; ++i ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = true;
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
             }
@@ -1663,7 +1670,7 @@ namespace NAV {
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         for( u8 i = 0; i < 2; ++i ) {
-            for( u8 j = 0; j < 8; j++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
 
                 if( i & 1 ) {
@@ -1849,12 +1856,13 @@ namespace NAV {
                 [ & ]( u8 p_page ) {
                     curPg = p_page;
                     return drawItemChoice( p_offeredItems, names, data, p_paymentMethod,
-                                           6 * p_page );
+                                           NUM_CB_CHOICES * p_page );
                 },
                 [ & ]( u8 p_selection ) {
-                    selectItem( p_offeredItems[ 6 * curPg + p_selection ],
-                                data[ 6 * curPg + p_selection ], descr[ 6 * curPg + p_selection ],
-                                6 * curPg + p_selection );
+                    selectItem( p_offeredItems[ NUM_CB_CHOICES * curPg + p_selection ],
+                                data[ NUM_CB_CHOICES * curPg + p_selection ],
+                                descr[ NUM_CB_CHOICES * curPg + p_selection ],
+                                NUM_CB_CHOICES * curPg + p_selection );
                 },
                 oldsel, IO::choiceBox::DEFAULT_TICK, curPg );
 
@@ -1867,7 +1875,7 @@ namespace NAV {
                 break;
             }
 
-            curItm += 6 * curPg;
+            curItm += NUM_CB_CHOICES * curPg;
 
             // Make player choose how many of the chosen item they want to buy
 
