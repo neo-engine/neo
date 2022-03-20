@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <maxmod9.h>
 #else
 #include "sound/sseq.h"
+#include "sound/sseqData.h"
 #endif
 #include "gen/bgmTranslation.h"
 #endif
@@ -124,7 +125,8 @@ namespace SOUND {
                 mmStart( mmId, MM_PLAY_LOOP );
             }
 #else
-            SSEQ::playSequence( p_id % 25 );
+            auto sseqId = SSEQ::BGMIndexForName( p_id );
+            if( sseqId != SSEQ::SSEQ_NONE ) { SSEQ::playSequence( sseqId ); }
 #endif
             BGMLoaded  = true;
             currentBGM = p_id;
@@ -184,7 +186,9 @@ namespace SOUND {
                 mmStart( mmId, MM_PLAY_ONCE );
             }
 #else
-            // TODO
+            // looping is done via sseq commands; no need for different code here
+            auto sseqId = SSEQ::BGMIndexForName( p_id );
+            if( sseqId != SSEQ::SSEQ_NONE ) { SSEQ::playSequence( sseqId ); }
 #endif
             BGMLoaded  = true;
             currentBGM = p_id;
@@ -205,7 +209,7 @@ namespace SOUND {
             auto mmId = BGMIndexForName( currentBGM );
             if( mmId != MOD_NONE ) { mmUnload( mmId ); }
 #else
-            // TODO
+            SSEQ::stopSequence( );
 #endif
             BGMLoaded = false;
         }
@@ -224,7 +228,7 @@ namespace SOUND {
             swiWaitForVBlank( );
             if( mmId != MOD_NONE ) { mmUnload( mmId ); }
 #else
-            // TODO
+            SSEQ::stopSequence( );
 #endif
             BGMLoaded = false;
         }

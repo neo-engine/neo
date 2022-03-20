@@ -109,5 +109,8 @@
 #define BGM_EX06 106
 #define BGM_POKE_RADAR 107
 #define BGM_GHOST_GIRL 108
+#define BGM_UNOVA_GATE 109
+#define BGM_ETERNA_FOREST 110
+#define BGM_SPRING_PATH 111
 
-#define MAX_BGM 108
+#define MAX_BGM 111

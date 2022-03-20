@@ -80,11 +80,13 @@ namespace SOUND::SSEQ {
         SC_END          = 0xFF,
     };
 
-    enum messageType : u16 {
-        /*SNDSYS_PLAY = 1, SNDSYS_STOP,*/ SNDSYS_PLAYSEQ,
+    enum messageType : int {
+        SNDSYS_PLAYSEQ,
         SNDSYS_STOPSEQ,
         SNDSYS_FADESEQ,
-        SNDSYS_PAUSESEQ
+        SNDSYS_PAUSESEQ,
+        SNDSYS_PLAY_SAMPLE,
+        SNDSYS_STOP_SAMPLE,
     };
 
     enum { STATUS_PLAYING, STATUS_STOPPED, STATUS_FADING, STATUS_PAUSED };
@@ -99,27 +101,24 @@ namespace SOUND::SSEQ {
 
     struct sequenceData {
         void *m_data;
-        u32   m_size;
+        int   m_size;
     };
 
     struct soundSysMessage {
         messageType m_message;
         union {
-            /*
-            struct
-            {
-                    soundReg m_sndreg;
-                    u8 m_attackRate,
-                    u8 m_d;
-                    u8 m_s;
-                    u8 m_r;
-                    u8 m_vol;
-                    u8 m_vel;
-                    u8 m_pan;
-                    u8 m_padding;
+            struct {
+                soundReg m_sndreg;
+                u8       m_attackRate;
+                u8       m_decayRate;
+                u8       m_sustainRate;
+                u8       m_releaseRate;
+                u8       m_volume;
+                u8       m_vel;
+                u8       m_pan;
+                u8       m_padding;
             };
-            int m_ch;
-            */
+            int m_channel;
             struct {
                 sequenceData m_seq;
                 sequenceData m_bnk;
@@ -142,6 +141,7 @@ namespace SOUND::SSEQ {
         return fifoRetValue( p_ch );
     }
 
+    constexpr u8 NUM_BLOCKED_CHANNEL = 0;
     constexpr u8 NUM_CHANNEL         = 16;
     constexpr u8 TONE_CHANNEL_START  = 8;
     constexpr u8 TONE_CHANNEL_NUM    = 6;
@@ -209,7 +209,7 @@ namespace SOUND::SSEQ {
         return -1;
     }
     inline s8 nextFreeChannel( ) {
-        return nextFreeChannelInRange( 0, NUM_CHANNEL );
+        return nextFreeChannelInRange( NUM_BLOCKED_CHANNEL, NUM_CHANNEL );
     }
     inline s8 nextFreeToneChannel( ) {
         return nextFreeChannelInRange( TONE_CHANNEL_START, TONE_CHANNEL_START + TONE_CHANNEL_NUM );

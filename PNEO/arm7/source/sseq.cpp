@@ -39,8 +39,6 @@ namespace SOUND::SSEQ {
     };
 
     struct trackState {
-        static constexpr u8 CLLSTCK_LIMIT = 3;
-
         int      m_count;
         int      m_pos;
         int      m_priority;
@@ -49,8 +47,7 @@ namespace SOUND::SSEQ {
         playInfo m_playInfo;
         int      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
         int      m_loopcount, m_looppos;
-        int      m_ret[ CLLSTCK_LIMIT ];
-        u8       m_retpos;
+        int      m_ret;
         int      m_trackEnded;
         int      m_trackLooped;
         u8       m_portakey, m_portatime;
@@ -86,13 +83,13 @@ namespace SOUND::SSEQ {
 #define GETINSTDATA( p_bnk, p_a ) ( (u8*) ( (int) ( p_bnk ) + (int) INST_OFF( p_a ) ) )
 
     int nextFreeChannel( int p_priority, u8 p_chStart = 0, u8 p_chEnd = NUM_CHANNEL ) {
-        for( u8 i = p_chStart; i < p_chEnd; ++i ) {
+        for( int i = p_chStart; i < p_chEnd; ++i ) {
             if( !SCHANNEL_ACTIVE( i ) && ADSR_CHANNEL[ i ].m_state != adsrState::ADSR_START ) {
                 return i;
             }
         }
         int j = -1, ampl = 1;
-        for( u8 i = p_chStart; i < p_chEnd; ++i ) {
+        for( int i = p_chStart; i < p_chEnd; ++i ) {
             if( ADSR_CHANNEL[ i ].m_state == adsrState::ADSR_RELEASE
                 && ADSR_CHANNEL[ i ].m_ampl < ampl ) {
                 ampl = ADSR_CHANNEL[ i ].m_ampl;
@@ -102,7 +99,7 @@ namespace SOUND::SSEQ {
 
         if( j != -1 ) { return j; }
 
-        for( u8 i = p_chStart; i < p_chEnd; ++i ) {
+        for( int i = p_chStart; i < p_chEnd; ++i ) {
             if( ADSR_CHANNEL[ i ].m_priority < p_priority ) { return i; }
         }
         return -1;
@@ -173,7 +170,7 @@ namespace SOUND::SSEQ {
                 return -1;
             }
         } else if( fRecord == 17 ) {
-            u8 reg;
+            int reg;
             for( reg = 0; reg < 8; reg++ ) {
                 if( p_note <= insdata[ reg ] ) { break; }
             }
@@ -393,38 +390,37 @@ namespace SOUND::SSEQ {
         }
     }
 
-    void updateSequenceModulation( int p_track, playInfo* p_info, int what ) {
+    void updateSequenceModulation( int p_track, playInfo* p_info, int p_target ) {
         for( u8 i = 0; i < NUM_CHANNEL; i++ ) {
             adsrState* chstat = ADSR_CHANNEL + i;
             if( chstat->m_track != p_track ) { continue; }
-            if( what & BIT( 0 ) ) { chstat->m_modDepth = p_info->m_modDepth; }
-            if( what & BIT( 1 ) ) { chstat->m_modSpeed = p_info->m_modSpeed; }
-            if( what & BIT( 2 ) ) { chstat->m_modType = p_info->m_modType; }
-            if( what & BIT( 3 ) ) { chstat->m_modRange = p_info->m_modRange; }
-            if( what & BIT( 4 ) ) { chstat->m_modDelay = p_info->m_modDelay; }
+            if( p_target & BIT( 0 ) ) { chstat->m_modDepth = p_info->m_modDepth; }
+            if( p_target & BIT( 1 ) ) { chstat->m_modSpeed = p_info->m_modSpeed; }
+            if( p_target & BIT( 2 ) ) { chstat->m_modType = p_info->m_modType; }
+            if( p_target & BIT( 3 ) ) { chstat->m_modRange = p_info->m_modRange; }
+            if( p_target & BIT( 4 ) ) { chstat->m_modDelay = p_info->m_modDelay; }
         }
     }
 
     void updateSequencePortamento( adsrState* p_state, trackState* p_track ) {
-        /*    p_state->m_sweepPitch = p_track->m_sweepPitch;
-            if( p_track->m_portakey & 0x80 ) {
-                p_state->m_sweepLen = 0;
-                p_state->m_sweepCnt = 0;
-                return;
-            }
+        p_state->m_sweepPitch = p_track->m_sweepPitch;
+        if( p_track->m_portakey & 0x80 ) {
+            p_state->m_sweepLen = 0;
+            p_state->m_sweepCnt = 0;
+            return;
+        }
 
-            int diff = ( (int) p_track->m_portakey - (int) p_state->m_note ) << 22;
-            p_state->m_sweepPitch += diff >> 16;
+        int diff = ( (int) p_track->m_portakey - (int) p_state->m_note ) << 22;
+        p_state->m_sweepPitch += diff >> 16;
 
-            if( p_track->m_portatime == 0 ) {
-                p_state->m_sweepLen = ( p_state->m_count * 240 + SEQ_BPM - 1 ) / SEQ_BPM;
-            } else {
-                u32 sq_time         = p_track->m_portatime * p_track->m_portatime;
-                int abs_sp          = p_state->m_sweepPitch;
-                abs_sp              = abs_sp < 0 ? -abs_sp : abs_sp;
-                p_state->m_sweepLen = ( abs_sp * sq_time ) >> 11;
-            }
-            */
+        if( p_track->m_portatime == 0 ) {
+            p_state->m_sweepLen = ( p_state->m_count * 240 + SEQ_BPM - 1 ) / SEQ_BPM;
+        } else {
+            u32 sq_time         = p_track->m_portatime * p_track->m_portatime;
+            int abs_sp          = p_state->m_sweepPitch;
+            abs_sp              = abs_sp < 0 ? -abs_sp : abs_sp;
+            p_state->m_sweepLen = ( abs_sp * sq_time ) >> 11;
+        }
     }
 
     void trackTick( int p_trackId ) {
@@ -475,10 +471,9 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_CALL: {
-                    int dest                        = SEQ_READ24( track->m_pos );
-                    track->m_ret[ track->m_retpos ] = track->m_pos + 3;
-                    track->m_pos                    = dest;
-                    if( track->m_retpos + 1 < trackState::CLLSTCK_LIMIT ) { track->m_retpos++; }
+                    int dest     = SEQ_READ24( track->m_pos );
+                    track->m_ret = track->m_pos + 3;
+                    track->m_pos = dest;
                     break;
                 }
                 case SC_RANDOM: {
@@ -518,8 +513,7 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_RET: {
-                    track->m_pos = track->m_ret[ track->m_retpos ];
-                    if( track->m_retpos > 0 ) { --track->m_retpos; }
+                    track->m_pos = track->m_ret;
                     break;
                 }
                 case SC_PAN: {
@@ -547,18 +541,18 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_PORTAMENTO: {
-                    //          track->m_portakey = SEQ_READ8( track->m_pos );
+                    track->m_portakey = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO_TOGGLE: {
-                    //         track->m_portakey &= ~0x80;
-                    //         track->m_portakey |= ( !SEQ_READ8( track->m_pos ) ) << 7;
+                    track->m_portakey &= ~0x80;
+                    track->m_portakey |= ( !SEQ_READ8( track->m_pos ) ) << 7;
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO_TIME: {
-                    //          track->m_portatime = SEQ_READ8( track->m_pos );
+                    track->m_portatime = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
@@ -656,7 +650,7 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_SWEEP_PITCH: {
-                    // track->m_sweepPitch = SEQ_READ16( track->m_pos );
+                    track->m_sweepPitch = SEQ_READ16( track->m_pos );
                     track->m_pos += 2;
                     break;
                 }

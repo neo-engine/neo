@@ -11,12 +11,14 @@
 namespace SOUND::SSEQ {
     static void soundTimer( );
     static void soundSysMessageHandler( int, void* );
-    static void adsrTickChannel( u8 );
+    static void adsrTickChannel( int );
     static void adsrTick( );
 
     volatile int SEQ_STATUS = STATUS_STOPPED;
     volatile int CUR_BPM;
     volatile int CUR_VOL;
+
+    constexpr int MAX_BPM = 240;
 
     void installSoundSys( ) {
         // Install timer
@@ -26,7 +28,7 @@ namespace SOUND::SSEQ {
         fifoSetDatamsgHandler( FIFO_SNDSYS, soundSysMessageHandler, 0 );
 
         // Clear track-channel assignments
-        for( u8 i = 0; i < NUM_CHANNEL; ++i ) { ADSR_CHANNEL[ i ].m_track = -1; }
+        for( u8 i = NUM_BLOCKED_CHANNEL; i < NUM_CHANNEL; ++i ) { ADSR_CHANNEL[ i ].m_track = -1; }
     }
 
     static void soundTimer( ) {
@@ -34,8 +36,8 @@ namespace SOUND::SSEQ {
 
         adsrTick( );
 
-        while( v > 240 ) {
-            v -= 240;
+        while( v > MAX_BPM ) {
+            v -= MAX_BPM;
             seq_tick( );
         }
         v += SEQ_BPM;
@@ -46,10 +48,10 @@ namespace SOUND::SSEQ {
     volatile int ADSR_MASTER_VOLUME = 127;
 
     static inline void adsrTick( ) {
-        for( u8 i = 0; i < NUM_CHANNEL; ++i ) { adsrTickChannel( i ); }
+        for( auto i = NUM_BLOCKED_CHANNEL; i < NUM_CHANNEL; ++i ) { adsrTickChannel( i ); }
     }
 
-    static void adsrTickChannel( u8 p_channel ) {
+    static void adsrTickChannel( int p_channel ) {
         adsrState* chstat = ADSR_CHANNEL + p_channel;
         switch( chstat->m_state ) {
         default:
@@ -84,8 +86,7 @@ namespace SOUND::SSEQ {
             break;
         case adsrState::ADSR_RELEASE:
             chstat->m_ampl -= chstat->m_releaseRate;
-            if( int( chstat->m_ampl ) <= -int( ADSR_THRESHOLD ) ) {
-                //__adsr_release:
+            if( chstat->m_ampl <= -ADSR_THRESHOLD ) {
                 chstat->m_state = adsrState::ADSR_NONE;
                 // chstat->m_reg.CR = 0;
                 chstat->m_count          = 0;
@@ -131,6 +132,7 @@ namespace SOUND::SSEQ {
         }
         totalvol += ADSR_K_AMP2VOL;
         if( totalvol < 0 ) { totalvol = 0; }
+        if( totalvol > ADSR_K_AMP2VOL ) { totalvol = ADSR_K_AMP2VOL; }
 
         u32 res = swiGetVolumeTable( totalvol );
 
@@ -212,6 +214,31 @@ namespace SOUND::SSEQ {
         fifoGetDatamsg( FIFO_SNDSYS, p_length, (u8*) &msg );
 
         switch( msg.m_message ) {
+        case SNDSYS_PLAY_SAMPLE: {
+            int ch = nextFreeChannel( );
+            if( ch >= 0 ) {
+                auto chstat = ADSR_CHANNEL + ch;
+
+                chstat->m_reg         = msg.m_sndreg;
+                chstat->m_attackRate  = convertAttack( msg.m_attackRate );
+                chstat->m_decayRate   = convertFall( msg.m_decayRate );
+                chstat->m_sustainRate = convertSustain( msg.m_sustainRate );
+                chstat->m_releaseRate = convertFall( msg.m_releaseRate );
+                chstat->m_vol         = msg.m_volume;
+                chstat->m_vel         = msg.m_vel;
+                chstat->m_expr        = 0x7F;
+                chstat->m_pan         = msg.m_pan;
+                chstat->m_state       = adsrState::ADSR_START;
+            }
+
+            fifoSendValue32( FIFO_SNDSYS, (u32) ch );
+            return;
+        }
+        case SNDSYS_STOP_SAMPLE: {
+            auto chstat     = ADSR_CHANNEL + msg.m_channel;
+            chstat->m_state = adsrState::ADSR_RELEASE;
+            return;
+        }
         case SNDSYS_PAUSESEQ: {
             if( SEQ_STATUS == STATUS_PLAYING ) {
                 CUR_BPM            = SEQ_BPM;

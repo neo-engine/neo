@@ -55,7 +55,6 @@ namespace SOUND {
             }
 
             if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
-
             LAST_CRY = soundPlaySample( cry, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
         }
 #else
@@ -72,7 +71,6 @@ namespace SOUND {
             if( sfx == nullptr ) { return; }
 
             if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
-
             LAST_CRY = soundPlaySample( sfx, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
         }
 #else
