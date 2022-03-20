@@ -46,6 +46,8 @@ namespace SAVE {
     // #endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
+    constexpr u8 NUM_PARTY_SLOTS = 6;
+
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
     // #ifdef FLASHCARD
@@ -181,7 +183,7 @@ namespace SAVE {
             u16         m_lstUsedItem;    // Most recently used bag item
             s16         m_repelSteps;     // Steps remaining of the currently active repel
             saveOptions m_options;        // Various options and settings
-            pokemon     m_pkmnTeam[ 6 ];
+            pokemon     m_pkmnTeam[ NUM_PARTY_SLOTS ];
             u16         m_vars[ 256 ];  // variables to be set by map scripts etc.
             u16         m_flags[ 256 ]; // flags tracking the progress of the player's adventure
 
@@ -416,7 +418,7 @@ namespace SAVE {
              */
             constexpr u8 countAlivePkmn( ) const {
                 u8 res = 0;
-                for( u8 i = 0; i < 6; ++i ) { res += m_pkmnTeam[ i ].canBattle( ); }
+                for( u8 i = 0; i < NUM_PARTY_SLOTS; ++i ) { res += m_pkmnTeam[ i ].canBattle( ); }
                 return res;
             }
 

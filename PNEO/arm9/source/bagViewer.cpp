@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/itemNames.h"
 #include "io/animations.h"
 #include "io/choiceBox.h"
+#include "io/counter.h"
 #include "io/strings.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
@@ -830,8 +831,29 @@ namespace BAG {
 
             if( cnt > 1 ) {
                 // make player choose how many items they want to sell
+                u8 mdg = 0;
+                for( auto tmp = cnt; tmp > 0; tmp /= 10, ++mdg ) {}
 
-                // TODO
+                IO::counter c = IO::counter( 0, cnt );
+
+                auto sellCnt = c.getResult(
+                    [ & ]( ) {
+                        return _bagUI->drawCounter( IO::STR_UI_BAG_ITEM_SELL_ASK_QTY, 0, cnt );
+                    },
+                    [ & ]( u32 p_newValue, u8 p_selDigit ) {
+                        _bagUI->updateCounter( p_newValue, p_selDigit, mdg );
+                    },
+                    [ & ]( s32 p_hoveredButton ) {
+                        _bagUI->hoverCounterButton( 0, cnt, p_hoveredButton );
+                    },
+                    1 );
+                _bagUI->destroyCounter( );
+                if( sellCnt <= 0 ) { return 0; } // player doesn't want to toss item after all
+
+                _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
+                                     _currSelectedIdx );
+
+                cnt = sellCnt;
             }
 
             u32 sellprice = cnt * idata.m_sellPrice;
@@ -865,6 +887,36 @@ namespace BAG {
         case TOSS_ITEM: {
             _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                                  _currSelectedIdx );
+
+            auto numItems
+                = SAVE::SAV.getActiveFile( ).m_bag.count( (bag::bagType) curBag, targetItem );
+
+            auto tossCnt = numItems;
+
+            if( numItems > 1 ) {
+                u8 mdg = 0;
+                for( auto tmp = numItems; tmp > 0; tmp /= 10, ++mdg ) {}
+
+                IO::counter c = IO::counter( 0, numItems );
+
+                tossCnt = c.getResult(
+                    [ & ]( ) {
+                        return _bagUI->drawCounter( IO::STR_UI_BAG_ITEM_TOSS_ASK_QTY, 0, numItems );
+                    },
+                    [ & ]( u32 p_newValue, u8 p_selDigit ) {
+                        _bagUI->updateCounter( p_newValue, p_selDigit, mdg );
+                    },
+                    [ & ]( s32 p_hoveredButton ) {
+                        _bagUI->hoverCounterButton( 0, numItems, p_hoveredButton );
+                    },
+                    1 );
+                _bagUI->destroyCounter( );
+                if( tossCnt <= 0 ) { return 0; } // player doesn't want to toss item after all
+
+                _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
+                                     _currSelectedIdx );
+            }
+
             IO::yesNoBox yn;
             if( yn.getResult(
                     [ & ]( ) {
@@ -878,7 +930,7 @@ namespace BAG {
                 return 0;
             }
 
-            SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem );
+            SAVE::SAV.getActiveFile( ).m_bag.erase( (bag::bagType) curBag, targetItem, tossCnt );
             curBagSize = SAVE::SAV.getActiveFile( ).m_bag.size( (bag::bagType) curBag );
             if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] == curBagSize ) {
                 if( SAVE::SAV.getActiveFile( ).m_lstViewedItem[ curBag ] > 0 ) {

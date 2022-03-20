@@ -44,6 +44,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/keyboard.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
 #include "map/mapDrawer.h"
@@ -113,7 +114,7 @@ namespace NAV {
 
     void animateMB( u8 p_frame ) {
         if( ( p_frame & 15 ) == 0 ) {
-            SpriteEntry* oam                = IO::OamTop->oamBuffer;
+            auto& oam                       = IO::OamTop->oamBuffer;
             oam[ SPR_MSGCONT_OAM ].isHidden = !oam[ SPR_MSGCONT_OAM ].isHidden;
             IO::updateOAM( false );
         }
@@ -149,7 +150,7 @@ namespace NAV {
     }
 
     void redraw( bool p_bottom = true ) {
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        auto& oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
 
         auto ptr  = !p_bottom ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
         auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
@@ -199,7 +200,7 @@ namespace NAV {
         IO::smallFont->setColor( 0, 0 );
         IO::smallFont->setColor( IO::WHITE_IDX, 1 );
         IO::smallFont->setColor( IO::GRAY_IDX, 2 );
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        auto& oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
 
         auto ptr  = !p_bottom ? bgGetGfxPtr( IO::bg2 ) : bgGetGfxPtr( IO::bg2sub );
         auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
@@ -650,9 +651,9 @@ namespace NAV {
         }
 
         if( cnt > 1 ) {
-            snprintf( buffer, 99, GET_STRING( 682 ), cnt, iname.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_USED_ITEM_X_TIMES ), cnt, iname.c_str( ) );
         } else {
-            snprintf( buffer, 99, GET_STRING( 683 ), iname.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_USED_ITEM ), iname.c_str( ) );
         }
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
@@ -672,9 +673,10 @@ namespace NAV {
         }
 
         if( cnt > 1 ) {
-            snprintf( buffer, 99, GET_STRING( 676 ), cnt, iname.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_HANDED_OVER_ITEM_X_TIMES ), cnt,
+                      iname.c_str( ) );
         } else {
-            snprintf( buffer, 99, GET_STRING( 677 ), iname.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_HANDED_OVER_ITEM ), iname.c_str( ) );
         }
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
@@ -693,9 +695,10 @@ namespace NAV {
         }
 
         if( p_amount > 1 ) {
-            snprintf( buffer, 99, GET_STRING( 563 ), p_amount, iname.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_OBTAINED_ITEM_X_TIMES ), p_amount,
+                      iname.c_str( ) );
         } else {
-            snprintf( buffer, 99, GET_STRING( 564 ), iname.c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_OBTAINED_ITEM ), iname.c_str( ) );
         }
         switch( data.m_itemType ) {
         case BAG::ITEMTYPE_KEYITEM: SOUND::playSoundEffect( SFX_OBTAIN_KEY_ITEM ); break;
@@ -704,9 +707,10 @@ namespace NAV {
         }
         doPrintMessage( buffer, MSG_ITEM, p_itemId, &data );
         waitForInteract( );
-        auto fmt = std::string( GET_STRING( 86 ) );
-        snprintf( buffer, 99, fmt.c_str( ), iname.c_str( ), BAG::getItemChar( data.m_itemType ),
-                  GET_STRING( 11 + BAG::toBagType( data.m_itemType ) ) );
+        auto fmt = std::string( GET_STRING( IO::STR_UI_PUT_ITEM_INTO_BAG ) );
+        snprintf(
+            buffer, 99, fmt.c_str( ), iname.c_str( ), BAG::getItemChar( data.m_itemType ),
+            GET_STRING( IO::STR_UI_BAG_PAGE_NAME_START + BAG::toBagType( data.m_itemType ) ) );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
         std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
         std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
@@ -745,7 +749,7 @@ namespace NAV {
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> res
             = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
         for( u8 i = 0; i < 6; i++ ) {
@@ -771,7 +775,7 @@ namespace NAV {
             for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
 
             IO::regularFont->printString(
-                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 48,
+                GET_STRING( IO::STR_UI_YES ), oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y + 8, true, IO::font::CENTER );
 
             res.push_back(
@@ -782,7 +786,7 @@ namespace NAV {
                            IO::yesNoBox::YES ) );
 
             IO::regularFont->printString(
-                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 48,
+                GET_STRING( IO::STR_UI_NO ), oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y + 8, true, IO::font::CENTER );
 
             res.push_back(
@@ -794,7 +798,8 @@ namespace NAV {
 
             if( p_showMoney ) {
                 char buffer[ 100 ];
-                snprintf( buffer, 99, GET_STRING( 471 ), SAVE::SAV.getActiveFile( ).m_money );
+                snprintf( buffer, 99, GET_STRING( IO::STR_UI_MONEY ),
+                          SAVE::SAV.getActiveFile( ).m_money );
                 IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
             }
         }
@@ -818,7 +823,7 @@ namespace NAV {
         std::vector<std::pair<IO::inputTarget, u8>> res
             = std::vector<std::pair<IO::inputTarget, u8>>( );
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
@@ -859,8 +864,8 @@ namespace NAV {
     }
 
     std::vector<std::pair<IO::inputTarget, menuOption>> getTouchPositions( bool p_bottom = true ) {
-        auto         res = std::vector<std::pair<IO::inputTarget, menuOption>>( );
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+        auto  res = std::vector<std::pair<IO::inputTarget, menuOption>>( );
+        auto& oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
 
         for( u8 i = 0; i < 6; ++i ) {
             if( !oam[ SPR_MENU_OAM_SUB( i ) ].isHidden ) {
@@ -1015,7 +1020,8 @@ namespace NAV {
         }
         case SAVE: {
             IO::yesNoBox yn;
-            if( yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE ) == IO::yesNoBox::YES ) {
+            if( yn.getResult( GET_STRING( IO::STR_UI_WOULD_YOU_LIKE_TO_SAVE ), MSG_INFO_NOCLOSE )
+                == IO::yesNoBox::YES ) {
                 init( );
                 ANIMATE_MAP = false;
                 u16 lst     = -1;
@@ -1034,16 +1040,17 @@ namespace NAV {
                                 buf2 += "\x04";
                                 if( i % 3 == 2 ) { buf2 += " "; }
                             }
-                            snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
+                            snprintf( buffer, 99, GET_STRING( IO::STR_UI_SAVING_A_LOT_OF_DATA ),
+                                      buf2.c_str( ) );
                             doPrintMessage( buffer, MSG_INFO_NOCLOSE, 0, 0, true );
                         }
                     } ) ) {
                     printMessage( 0, MSG_INFO_NOCLOSE );
                     SOUND::playSoundEffect( SFX_SAVE );
-                    printMessage( GET_STRING( 94 ), MSG_INFO );
+                    printMessage( GET_STRING( IO::STR_UI_SAVING_COMPLETE ), MSG_INFO );
                 } else {
                     printMessage( 0, MSG_INFO_NOCLOSE );
-                    printMessage( GET_STRING( 95 ), MSG_INFO );
+                    printMessage( GET_STRING( IO::STR_UI_SAVING_FAILED ), MSG_INFO );
                 }
                 ANIMATE_MAP = true;
             } else {
@@ -1091,7 +1098,7 @@ namespace NAV {
         std::vector<std::pair<IO::inputTarget, u8>> res
             = std::vector<std::pair<IO::inputTarget, u8>>( );
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
 
@@ -1103,12 +1110,13 @@ namespace NAV {
             }
 
             if( !oam[ SPR_MENU_OAM_SUB( i ) ].isHidden ) {
-                if( i != 3 ) {
-                    IO::regularFont->printString(
-                        GET_STRING( 413 + i ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48 + 13,
-                        oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
-                } else {
+                if( i == IO::STR_UI_MENU_ITEM_TRAINER_ID - IO::STR_UI_MENU_ITEM_NAME_START ) {
                     IO::regularFont->printString( SAVE::SAV.getActiveFile( ).m_playername,
+                                                  oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48 + 13,
+                                                  oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true,
+                                                  IO::font::CENTER );
+                } else {
+                    IO::regularFont->printString( GET_STRING( IO::STR_UI_MENU_ITEM_NAME_START + i ),
                                                   oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48 + 13,
                                                   oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true,
                                                   IO::font::CENTER );
@@ -1148,7 +1156,7 @@ namespace NAV {
     }
 
     void selectMenuItem( u8 p_selection ) {
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         for( u8 i = 0; i < 6; i++ ) {
             for( u8 j = 0; j < 8; j++ ) {
@@ -1203,17 +1211,18 @@ namespace NAV {
 
         char buffer[ 100 ];
         if( p_paymentMethod < 3 ) {
-            snprintf( buffer, 99, GET_STRING( 471 + p_paymentMethod ),
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_MONEYTYPE_START + p_paymentMethod ),
                       p_paymentMethod == 0
                           ? SAVE::SAV.getActiveFile( ).m_money
                           : ( p_paymentMethod == 1 ? SAVE::SAV.getActiveFile( ).m_battlePoints
                                                    : SAVE::SAV.getActiveFile( ).m_coins ) );
         } else if( p_paymentMethod == 3 ) {
-            snprintf( buffer, 99, GET_STRING( 554 ), SAVE::SAV.getActiveFile( ).m_ashCount );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_MONEYTYPE_ASH ),
+                      SAVE::SAV.getActiveFile( ).m_ashCount );
         }
         IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         oam[ SPR_X_OAM_SUB ].isHidden = false;
 
@@ -1341,7 +1350,7 @@ namespace NAV {
             IO::printRectangle( 128, 0, 255, 40, true, 0 );
 
             char buffer[ 100 ];
-            snprintf( buffer, 99, GET_STRING( 474 ),
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_ITEMCOUNT_IN_BAG ),
                       SAVE::SAV.getActiveFile( ).m_bag.count(
                           BAG::toBagType( p_itemData.m_itemType ), p_item.first ) );
             IO::regularFont->printStringC( buffer, 254, 2, true, IO::font::RIGHT );
@@ -1355,7 +1364,7 @@ namespace NAV {
         std::vector<std::pair<IO::inputTarget, s32>> res
             = std::vector<std::pair<IO::inputTarget, s32>>( );
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
 
         for( u8 i = 0; i < 6; ++i ) {
@@ -1366,17 +1375,19 @@ namespace NAV {
             oam[ SPR_ITEM_OAM_SUB( i ) ].isHidden = true;
         }
 
+        // Exit
         res.push_back(
             std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
                                         oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
                        p_min - 3 ) );
+        // cancel
         res.push_back(
             std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
                                         oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
                        0 ) );
 
         s32 mx = p_max, dd = 1;
-        if( -p_min > p_max ) { mx = p_max; }
+        if( -p_min > p_max ) { mx = -p_min; }
 
         u8 digs = 0;
         for( auto i = mx; i > 0; i /= 10, ++digs, dd *= 10 ) {}
@@ -1422,7 +1433,7 @@ namespace NAV {
         }
 
         IO::regularFont->printString(
-            GET_STRING( 323 ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 36,
+            GET_STRING( IO::STR_UI_SELECT ), oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 36,
             oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, true, IO::font::CENTER );
 
         res.push_back( std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x,
@@ -1436,7 +1447,7 @@ namespace NAV {
     }
 
     void updateCounterValue( s32 p_newValue, u8 p_selectedDigit, u8 p_numDigs ) {
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         IO::printRectangle( oam[ SPR_ARROW_UP_OAM_SUB( 0 ) ].x,
                             oam[ SPR_ARROW_UP_OAM_SUB( 0 ) ].y + 12,
@@ -1464,7 +1475,7 @@ namespace NAV {
 
     void hoverCounterButton( s32 p_min, s32 p_max, s32 p_button ) {
         (void) p_max;
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         if( p_button == p_min - 2 ) {
             for( u8 j = 0; j < 8; j++ ) {
@@ -1481,7 +1492,7 @@ namespace NAV {
     s32 getItemCount( std::pair<u16, u32> p_item, const BAG::itemData& p_itemData,
                       const std::string& p_name, u8 p_paymentMethod ) {
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
         IO::printRectangle( 0, 40, 255, 192, true, 0 );
 
         // Compute max amount of the selected item the player can buy
@@ -1520,17 +1531,19 @@ namespace NAV {
 
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             if( p_paymentMethod < 3 ) {
-                IO::regularFont->printBreakingStringC( GET_STRING( 479 + p_paymentMethod ), 40, 38,
-                                                       256 - 80, true );
+                IO::regularFont->printBreakingStringC(
+                    GET_STRING( IO::STR_UI_NOT_ENOUGH_MONEYTYPE_START + p_paymentMethod ), 40, 38,
+                    256 - 80, true );
             } else if( p_paymentMethod == 3 ) {
-                IO::regularFont->printBreakingStringC( GET_STRING( 555 ), 40, 38, 256 - 80, true );
+                IO::regularFont->printBreakingStringC(
+                    GET_STRING( IO::STR_UI_NOT_ENOUGH_MONEYTYPE_ASH ), 40, 38, 256 - 80, true );
             }
 
             waitForInteract( );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             return res;
         } else if( mx > 0 ) {
-            snprintf( buffer, 100, GET_STRING( 475 ), p_name.c_str( ) );
+            snprintf( buffer, 100, GET_STRING( IO::STR_UI_MART_CLERK_HOW_MANY ), p_name.c_str( ) );
 
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
@@ -1568,9 +1581,12 @@ namespace NAV {
         u32 cost = res * p_item.second;
 
         if( p_paymentMethod < 3 ) {
-            snprintf( buffer, 99, GET_STRING( 476 + p_paymentMethod ), p_name.c_str( ), res, cost );
+            snprintf( buffer, 99,
+                      GET_STRING( IO::STR_UI_MART_CLERK_TOTAL_MONEYTYPE_START + p_paymentMethod ),
+                      p_name.c_str( ), res, cost );
         } else if( p_paymentMethod == 3 ) {
-            snprintf( buffer, 99, GET_STRING( 556 ), p_name.c_str( ), cost );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_MART_CLERK_TOTAL_MONEYTYPE_ASH ),
+                      p_name.c_str( ), cost );
         }
         IO::yesNoBox yn;
         auto         conf = yn.getResult(
@@ -1613,10 +1629,11 @@ namespace NAV {
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         char buffer[ 100 ];
-        snprintf( buffer, 99, GET_STRING( 471 ), SAVE::SAV.getActiveFile( ).m_money );
+        snprintf( buffer, 99, GET_STRING( IO::STR_UI_MONEYTYPE_MONEY ),
+                  SAVE::SAV.getActiveFile( ).m_money );
         IO::regularFont->printStringC( buffer, 2, 2, true, IO::font::LEFT );
 
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         oam[ SPR_X_OAM_SUB ].isHidden = false;
 
@@ -1729,12 +1746,10 @@ namespace NAV {
                     IO::regularFont->printStringC(
                         buffer, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 36 + 40 * ( j % 3 ),
                         142 + ( 14 * ( j / 3 ) ), true, IO::font::RIGHT );
-                    IO::regularFont->printStringC( GET_STRING( 684 + j ),
+                    IO::regularFont->printStringC( GET_STRING( IO::STR_UI_PKMN_STAT_START + j ),
                                                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 4
                                                        + 40 * ( j % 3 ),
                                                    142 + ( 14 * ( j / 3 ) ), true, IO::font::LEFT );
-
-                    //    writeLineTop( GET_STRING( 127 + i ), "", i + 1 );
                 }
 
                 // moves
@@ -1748,7 +1763,7 @@ namespace NAV {
                             snprintf( buffer, 20, "%s", mname.c_str( ) );
                         }
                     } else {
-                        snprintf( buffer, 20, GET_STRING( 690 ) );
+                        snprintf( buffer, 20, GET_STRING( IO::STR_UI_NONE ) );
                     }
                     IO::regularFont->printStringC(
                         buffer, 64 + 128 * i, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 36 + 14 * j,
@@ -1885,7 +1900,7 @@ namespace NAV {
     }
 
     void handleInput( const char* p_path ) {
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        auto& oam = IO::Oam->oamBuffer;
 
         if( CUR_NAV_APP != nullptr ) {
             if( CUR_NAV_APP->tick( true ) ) {
@@ -1906,10 +1921,10 @@ namespace NAV {
                               []( const char* p_msg ) { printMessage( p_msg ); } );
                     //  updateItems( );
                 } else {
-                    printMessage( GET_STRING( 58 ) );
+                    printMessage( GET_STRING( IO::STR_UI_CANNOT_USE_FIELD_ITEM ) );
                 }
             } else {
-                printMessage( GET_STRING( 98 ) );
+                printMessage( GET_STRING( IO::STR_UI_CAN_REGISTER_ITEM_TO_Y ) );
             }
             return;
         }

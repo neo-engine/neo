@@ -51,7 +51,7 @@ namespace IO {
         /*
          * @brief: Opens a counter and returns the player's selection.
          * @param p_drawFunction: Callback used to draw the counter. (the special value
-         * 0 is used for the BACK button, _minValue - 1 for the EXIT button and _minValue
+         * 0 is used for the BACK button, _minValue - 3 for the EXIT button and _minValue
          * - 2 for the CONFIRM button)
          * @param p_updateValue: Callback used when the selected value changes.
          * @returns: A value between _minValue and _maxValue (both inclusive)

@@ -88,6 +88,30 @@ namespace BAG {
         void selectItem( u8 p_idx, std::pair<u16, u16> p_item, const itemData* p_data );
 
         /*
+         * @brief: Draws a counter with the specified message. Moves spirtes for choice
+         * box item 0
+         */
+        std::vector<std::pair<IO::inputTarget, s32>> drawCounter( u16 p_message, s32 p_min,
+                                                                  s32 p_max );
+
+        /*
+         * @brief: Updates the value and/or selected digit of a couter that is currently being
+         * shown.
+         */
+        void updateCounter( s32 p_newValue, u8 p_selectedDigit, u8 p_numDigs );
+
+        /*
+         * @brief: Highlights the button a user is currently hovering over.
+         */
+        void hoverCounterButton( s32 p_min, s32 p_max, s32 p_button );
+
+        /*
+         * @brief: Restores any changes done to sprite positions done by drawing a
+         * counter.
+         */
+        void destroyCounter( );
+
+        /*
          * @brief: Draws a choiceBox for the specified item.
          */
         std::vector<std::pair<IO::inputTarget, u8>> drawChoice( u16 p_item, const itemData* p_data,
