@@ -47,15 +47,22 @@ namespace SOUND {
     void playCry( u16 p_pokemonId, u8 p_formeId, bool ) {
 #ifndef NO_SOUND
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableSFX ) {
-            u16 len;
+            u32 len;
             u8* cry = FS::readCry( p_pokemonId, p_formeId, len );
             if( cry == nullptr ) {
                 if( p_pokemonId != 1 ) { playCry( 1 ); }
                 return;
             }
-
+#ifdef MMOD
+            len <<= 1;
             if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
             LAST_CRY = soundPlaySample( cry, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
+#else
+            if( LAST_CRY != u16( -1 ) ) { SSEQ::stopSample( LAST_CRY ); }
+            auto sInfo = SSEQ::sampleInfo{ SSEQ::sampleInfo::WT_PCM8, false, 22050, 760, 0, len };
+            auto pInfo = SSEQ::playInfo{ 127, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0 };
+            LAST_CRY   = SSEQ::playSample( cry, sInfo, pInfo );
+#endif
         }
 #else
         (void) p_pokemonId;
@@ -70,8 +77,16 @@ namespace SOUND {
             u8* sfx = FS::readSFX( p_id, len );
             if( sfx == nullptr ) { return; }
 
+#ifdef MMOD
+            len <<= 1;
             if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
             LAST_CRY = soundPlaySample( sfx, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
+#else
+            if( LAST_CRY != u16( -1 ) ) { SSEQ::stopSample( LAST_CRY ); }
+            auto sInfo = SSEQ::sampleInfo{ SSEQ::sampleInfo::WT_PCM8, false, 22050, 760, 0, len };
+            auto pInfo = SSEQ::playInfo{ 127, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0 };
+            LAST_CRY   = SSEQ::playSample( sfx, sInfo, pInfo );
+#endif
         }
 #else
         (void) p_id;

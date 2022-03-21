@@ -55,6 +55,7 @@ namespace SOUND::SSEQ {
         adsrState* chstat = ADSR_CHANNEL + p_channel;
         switch( chstat->m_state ) {
         default:
+        case adsrState::ADSR_LOCKED:
         case adsrState::ADSR_NONE: return;
         case adsrState::ADSR_SUSTAIN:
             if( !SCHANNEL_ACTIVE( p_channel ) ) {
@@ -214,31 +215,69 @@ namespace SOUND::SSEQ {
         fifoGetDatamsg( FIFO_SNDSYS, p_length, (u8*) &msg );
 
         switch( msg.m_message ) {
-        case SNDSYS_PLAY_SAMPLE: {
-            int ch = nextFreeChannel( );
-            if( ch >= 0 ) {
-                auto chstat = ADSR_CHANNEL + ch;
+        case SNDSYS_VOLUME: {
+            ADSR_MASTER_VOLUME = msg.m_volume & 0x7F;
+            return;
+        }
 
-                chstat->m_reg         = msg.m_sndreg;
-                chstat->m_attackRate  = convertAttack( msg.m_attackRate );
-                chstat->m_decayRate   = convertFall( msg.m_decayRate );
-                chstat->m_sustainRate = convertSustain( msg.m_sustainRate );
-                chstat->m_releaseRate = convertFall( msg.m_releaseRate );
-                chstat->m_vol         = msg.m_volume;
-                chstat->m_vel         = msg.m_vel;
-                chstat->m_expr        = 0x7F;
-                chstat->m_pan         = msg.m_pan;
-                chstat->m_state       = adsrState::ADSR_START;
+        case SNDSYS_PLAY_SAMPLE: {
+            int ch = nextFreeChannel( 0x40 );
+            if( ch >= 0 ) {
+                // TODO: just a dirty hack right now, needs to be integrated properly later
+
+                auto chstat     = ADSR_CHANNEL + ch;
+                chstat->m_state = adsrState::ADSR_LOCKED;
+
+                auto& sInfo = msg.m_sampleInfo;
+                auto& pInfo = msg.m_playInfo;
+
+                SCHANNEL_SOURCE( ch )       = (u32) msg.m_sample.m_data;
+                SCHANNEL_REPEAT_POINT( ch ) = sInfo.m_loopOffset;
+                SCHANNEL_LENGTH( ch )       = sInfo.m_nonLoopLen;
+                SCHANNEL_TIMER( ch )        = SOUND_FREQ( sInfo.m_sampleRate );
+                SCHANNEL_CR( ch )           = SCHANNEL_ENABLE | SOUND_VOL( pInfo.m_vol )
+                                    | SOUND_PAN( pInfo.m_pan ) | SOUND_FORMAT( sInfo.m_waveType )
+                                    | SOUND_LOOP( sInfo.m_loop );
+
+                /*
+                chstat->m_reg.m_cr = SOUND_FORMAT( sInfo.m_waveType ) | SOUND_LOOP( sInfo.m_loop )
+                                     | SCHANNEL_ENABLE;
+                chstat->m_reg.m_source = (u32) msg.m_sample.m_data;
+                chstat->m_freq         = sInfo.m_sampleRate;
+                chstat->m_reg.m_timer  = -SOUND_FREQ( sInfo.m_sampleRate );
+
+                chstat->m_reg.m_repeatPoint = sInfo.m_loopOffset;
+                chstat->m_reg.m_length      = sInfo.m_nonLoopLen;
+
+                chstat->m_vol         = pInfo.m_vol;
+                chstat->m_vel         = pInfo.m_vel;
+                chstat->m_expr        = pInfo.m_expr;
+                chstat->m_pan         = pInfo.m_pan;
+                chstat->m_modType     = pInfo.m_modType;
+                chstat->m_modDepth    = pInfo.m_modDepth;
+                chstat->m_modRange    = pInfo.m_modRange;
+                chstat->m_modSpeed    = pInfo.m_modSpeed;
+                chstat->m_modDelay    = pInfo.m_modDelay;
+                chstat->m_modDelayCnt = 0;
+                chstat->m_modCounter  = 0;
+                chstat->m_attackRate  = 0;
+                chstat->m_decayRate   = 0;
+                chstat->m_sustainRate = 0;
+                chstat->m_releaseRate = 0;
+                chstat->m_priority    = 64;
+                */
             }
 
             fifoSendValue32( FIFO_SNDSYS, (u32) ch );
             return;
         }
+
         case SNDSYS_STOP_SAMPLE: {
             auto chstat     = ADSR_CHANNEL + msg.m_channel;
             chstat->m_state = adsrState::ADSR_RELEASE;
             return;
         }
+
         case SNDSYS_PAUSESEQ: {
             if( SEQ_STATUS == STATUS_PLAYING ) {
                 CUR_BPM            = SEQ_BPM;

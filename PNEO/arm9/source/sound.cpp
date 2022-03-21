@@ -78,7 +78,7 @@ namespace SOUND {
 #ifdef MMOD
         mmSetModuleVolume( p_newValue );
 #else
-        // TODO
+        SSEQ::setMasterVolume( p_newValue >> 1 );
 #endif
 #else
         (void) p_newValue;
@@ -87,12 +87,12 @@ namespace SOUND {
 
     void dimVolume( ) {
 #ifndef NO_SOUND
-        setVolume( 0x50 );
+        setVolume( 0x7F );
 #endif
     }
     void restoreVolume( ) {
 #ifndef NO_SOUND
-        setVolume( 0x100 );
+        setVolume( 0xFF );
 #endif
     }
 

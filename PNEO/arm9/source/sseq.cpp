@@ -68,14 +68,16 @@ namespace SOUND::SSEQ {
         auto &seq = SSEQ_LIST[ p_seqId ];
 
         if( !FS::loadSoundSequence( &CURRENT_SEQUENCE.m_seq, seq.m_sseqId ) ) {
-            DESQUID_LOG( "meh 1:/" );
+            DESQUID_LOG( std::string( "Sound sequence " ) + std::to_string( p_seqId )
+                         + " failed." );
         }
         if( !FS::loadSoundBank( &CURRENT_SEQUENCE.m_bnk, seq.m_bank ) ) {
-            DESQUID_LOG( "meh 2:/" );
+            DESQUID_LOG( std::string( "Sound bank " ) + std::to_string( p_seqId ) + " failed." );
         }
         for( u8 i = 0; i < seq.m_sampleCnt; ++i ) {
             if( !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ] ) ) {
-                DESQUID_LOG( std::to_string( p_seqId ) + " " + std::to_string( i ) + " meh 3:/" );
+                DESQUID_LOG( std::to_string( p_seqId ) + ": swar " + std::to_string( i )
+                             + " failed." );
             }
         }
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
@@ -93,9 +95,34 @@ namespace SOUND::SSEQ {
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
     }
 
+    void setMasterVolume( u8 p_volume ) {
+        soundSysMessage msg;
+        msg.m_message = SNDSYS_VOLUME;
+        msg.m_volume  = p_volume;
+        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
+    }
+
     void fadeSequence( ) {
         soundSysMessage msg;
         msg.m_message = SNDSYS_FADESEQ;
+        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
+    }
+
+    int playSample( void *p_data, const sampleInfo &p_sampleInfo, const playInfo &p_playInfo ) {
+        soundSysMessage msg;
+        msg.m_message    = SNDSYS_PLAY_SAMPLE;
+        msg.m_sample     = sequenceData{ p_data, p_sampleInfo.m_nonLoopLen };
+        msg.m_sampleInfo = p_sampleInfo;
+        msg.m_playInfo   = p_playInfo;
+
+        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
+        return (int) fifoGetRetValue( FIFO_SNDSYS );
+    }
+
+    void stopSample( int p_handle ) {
+        soundSysMessage msg;
+        msg.m_message = SNDSYS_STOP_SAMPLE;
+        msg.m_channel = p_handle;
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
     }
 

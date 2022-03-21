@@ -70,7 +70,7 @@ namespace FS {
 
     FILE* openScript( u16 p_scriptId );
 
-    u8* readCry( u16 p_pkmnIdx, u8 p_forme, u16& p_len );
+    u8* readCry( u16 p_pkmnIdx, u8 p_forme, u32& p_len );
     u8* readSFX( u16 p_sfxID, u16& p_len );
 
     u16 frameForLocation( u16 p_locationId );

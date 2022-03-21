@@ -7,53 +7,6 @@
 #ifndef NO_SOUND
 #ifndef MMOD
 namespace SOUND::SSEQ {
-    // info about the sample
-    struct sampleInfo {
-        enum waveType : u8 {
-            WT_PCM8  = 0,
-            WT_PCM16 = 1,
-            WT_ADPCM = 2,
-        };
-
-        waveType m_waveType;
-        u8       m_loop;      // Loop flag = TRUE|FALSE
-        u16      m_ampleRate; // Sampling Rate
-        u16 m_time; // (ARM7_CLOCK / nSampleRate) [ARM7_CLOCK: 33.513982MHz / 2 = 1.6756991 E +7]
-        u16 m_loopOffset; // Loop Offset (expressed in words (32-bits))
-        u32 m_nonLoopLen; // Non Loop Length (expressed in words (32-bits))
-    };
-
-    struct playInfo {
-        u8  m_vol, m_vel, m_expr, m_pan, m_pitchr;
-        s8  m_pitchb;
-        u8  m_modType, m_modSpeed, m_modDepth, m_modRange;
-        u16 m_modDelay;
-    };
-
-    struct noteDef {
-        u16 m_wavid;
-        u16 m_warid;
-        u8  m_tnote;
-        u8  m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
-        u8  m_pan;
-    };
-
-    struct trackState {
-        int      m_count;
-        int      m_pos;
-        int      m_priority;
-        u16      m_patch;
-        u16      m_waitmode;
-        playInfo m_playInfo;
-        int      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
-        int      m_loopcount, m_looppos;
-        int      m_ret;
-        int      m_trackEnded;
-        int      m_trackLooped;
-        u8       m_portakey, m_portatime;
-        s16      m_sweepPitch;
-    };
-
     int          TRACK_CNT         = 0;
     u8*          SEQUENCE_DATA     = NULL;
     void*        SEQUENCE_BANK     = NULL;
@@ -62,57 +15,12 @@ namespace SOUND::SSEQ {
     int          MESSAGE_SEND_FLAG = 0;
     volatile int SEQ_BPM           = 0;
 
-    void trackTick( int p_n );
-    void updateSequencePortamento( adsrState* p_state, trackState* p_track );
-
-#define SOUND_FORMAT( p_a ) ( ( (int) ( p_a ) ) << 29 )
-#define SOUND_LOOP( p_a )   ( ( p_a ) ? SOUND_REPEAT : SOUND_ONE_SHOT )
-#define GETSAMP( p_a )      ( (void*) ( (char*) ( p_a ) + sizeof( sampleInfo ) ) )
-
     sampleInfo* getWav( void* p_war, int p_id ) {
         return (sampleInfo*) ( int( p_war ) + ( (int*) ( int( p_war ) + 60 ) )[ p_id ] );
     }
 
     u32 getInstr( void* p_bnk, int p_id ) {
         return *(u32*) ( int( p_bnk ) + 60 + 4 * p_id );
-    }
-
-#define INST_TYPE( p_a ) ( 0xFF & ( p_a ) )
-#define INST_OFF( p_a )  ( ( p_a ) >> 8 )
-
-#define GETINSTDATA( p_bnk, p_a ) ( (u8*) ( (int) ( p_bnk ) + (int) INST_OFF( p_a ) ) )
-
-    int nextFreeChannel( int p_priority, u8 p_chStart = 0, u8 p_chEnd = NUM_CHANNEL ) {
-        for( int i = p_chStart; i < p_chEnd; ++i ) {
-            if( !SCHANNEL_ACTIVE( i ) && ADSR_CHANNEL[ i ].m_state != adsrState::ADSR_START ) {
-                return i;
-            }
-        }
-        int j = -1, ampl = 1;
-        for( int i = p_chStart; i < p_chEnd; ++i ) {
-            if( ADSR_CHANNEL[ i ].m_state == adsrState::ADSR_RELEASE
-                && ADSR_CHANNEL[ i ].m_ampl < ampl ) {
-                ampl = ADSR_CHANNEL[ i ].m_ampl;
-                j    = i;
-            }
-        }
-
-        if( j != -1 ) { return j; }
-
-        for( int i = p_chStart; i < p_chEnd; ++i ) {
-            if( ADSR_CHANNEL[ i ].m_priority < p_priority ) { return i; }
-        }
-        return -1;
-    }
-
-    int nextFreeToneChannel( int p_priority ) {
-        return nextFreeChannel( p_priority, TONE_CHANNEL_START,
-                                TONE_CHANNEL_START + TONE_CHANNEL_NUM );
-    }
-
-    int nextFreeNoiseChannel( int p_priority ) {
-        return nextFreeChannel( p_priority, NOISE_CHANNEL_START,
-                                NOISE_CHANNEL_START + NOISE_CHANNEL_NUM );
     }
 
     /*
@@ -226,8 +134,8 @@ namespace SOUND::SSEQ {
         chstat->m_track       = p_track;
         chstat->m_note        = p_note;
         chstat->m_patch       = p_instr;
-        //        updateSequencePortamento( chstat, pTrack );
-        //        pTrack->m_portakey = p_note | ( pTrack->m_portakey & 0x80 );
+        updateSequencePortamento( chstat, pTrack );
+        pTrack->m_portakey = p_note | ( pTrack->m_portakey & 0x80 );
 
         chstat->m_state = adsrState::ADSR_START;
 

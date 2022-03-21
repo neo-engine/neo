@@ -15,6 +15,28 @@ namespace SOUND::SSEQ {
 
     void installSoundSys( );
 
+    struct sampleInfo {
+        enum waveType : u8 {
+            WT_PCM8  = 0,
+            WT_PCM16 = 1,
+            WT_ADPCM = 2,
+        };
+
+        waveType m_waveType;
+        u8       m_loop;       // Loop flag = TRUE|FALSE
+        u16      m_sampleRate; // Sampling Rate
+        u16 m_time; // (ARM7_CLOCK / nSampleRate) [ARM7_CLOCK: 33.513982MHz / 2 = 1.6756991 E +7]
+        u16 m_loopOffset; // Loop Offset (expressed in words (32-bits))
+        u32 m_nonLoopLen; // Non Loop Length (expressed in words (32-bits))
+    };
+
+    struct playInfo {
+        u8  m_vol, m_vel, m_expr, m_pan, m_pitchr;
+        s8  m_pitchb;
+        u8  m_modType, m_modSpeed, m_modDepth, m_modRange;
+        u16 m_modDelay;
+    };
+
     enum soundCommandType : u8 {
         SC_COMMAND_RANGE_START = 0x80,
 
@@ -87,6 +109,7 @@ namespace SOUND::SSEQ {
         SNDSYS_PAUSESEQ,
         SNDSYS_PLAY_SAMPLE,
         SNDSYS_STOP_SAMPLE,
+        SNDSYS_VOLUME,
     };
 
     enum { STATUS_PLAYING, STATUS_STOPPED, STATUS_FADING, STATUS_PAUSED };
@@ -100,25 +123,20 @@ namespace SOUND::SSEQ {
     };
 
     struct sequenceData {
-        void *m_data;
-        int   m_size;
+        void  *m_data;
+        size_t m_size;
     };
 
     struct soundSysMessage {
         messageType m_message;
         union {
             struct {
-                soundReg m_sndreg;
-                u8       m_attackRate;
-                u8       m_decayRate;
-                u8       m_sustainRate;
-                u8       m_releaseRate;
-                u8       m_volume;
-                u8       m_vel;
-                u8       m_pan;
-                u8       m_padding;
+                sequenceData m_sample;
+                sampleInfo   m_sampleInfo;
+                playInfo     m_playInfo;
             };
             int m_channel;
+            u8  m_volume;
             struct {
                 sequenceData m_seq;
                 sequenceData m_bnk;
@@ -152,8 +170,39 @@ namespace SOUND::SSEQ {
 
 #define SCHANNEL_ACTIVE( ch ) ( SCHANNEL_CR( ch ) & SCHANNEL_ENABLE )
 
+#define SOUND_FORMAT( p_a )       ( ( (int) ( p_a ) ) << 29 )
+#define SOUND_LOOP( p_a )         ( ( p_a ) ? SOUND_REPEAT : SOUND_ONE_SHOT )
+#define GETSAMP( p_a )            ( (void *) ( (char *) ( p_a ) + sizeof( sampleInfo ) ) )
+#define INST_TYPE( p_a )          ( 0xFF & ( p_a ) )
+#define INST_OFF( p_a )           ( ( p_a ) >> 8 )
+#define GETINSTDATA( p_bnk, p_a ) ( (u8 *) ( (int) ( p_bnk ) + (int) INST_OFF( p_a ) ) )
+
     constexpr int ADSR_K_AMP2VOL = 723;
     constexpr int ADSR_THRESHOLD = ADSR_K_AMP2VOL * 128;
+
+    struct noteDef {
+        u16 m_wavid;
+        u16 m_warid;
+        u8  m_tnote;
+        u8  m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
+        u8  m_pan;
+    };
+
+    struct trackState {
+        int      m_count;
+        int      m_pos;
+        int      m_priority;
+        u16      m_patch;
+        u16      m_waitmode;
+        playInfo m_playInfo;
+        int      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
+        int      m_loopcount, m_looppos;
+        int      m_ret;
+        int      m_trackEnded;
+        int      m_trackLooped;
+        u8       m_portakey, m_portatime;
+        s16      m_sweepPitch;
+    };
 
     struct adsrState {
         enum adsrStateType : int {
@@ -162,7 +211,8 @@ namespace SOUND::SSEQ {
             ADSR_ATTACK,
             ADSR_DECAY,
             ADSR_SUSTAIN,
-            ADSR_RELEASE
+            ADSR_RELEASE,
+            ADSR_LOCKED, // for sample playback
         };
 
         adsrStateType m_state;
@@ -198,25 +248,44 @@ namespace SOUND::SSEQ {
     volatile extern int ADSR_MASTER_VOLUME;
 
     void seq_tick( );
+    void trackTick( int p_n );
+    void updateSequencePortamento( adsrState *p_state, trackState *p_track );
 
     void playSequence( sequenceData *p_seq, sequenceData *p_bnk, sequenceData *p_war );
     void stopSequence( );
 
-    inline s8 nextFreeChannelInRange( u8 p_chStart, u8 p_chEnd ) {
+    inline s8 nextFreeChannel( int p_priority = 0, u8 p_chStart = 0, u8 p_chEnd = NUM_CHANNEL ) {
         for( u8 i = p_chStart; i < p_chEnd; ++i ) {
-            if( !SCHANNEL_ACTIVE( i ) ) { return i; }
+            if( !SCHANNEL_ACTIVE( i ) && ADSR_CHANNEL[ i ].m_state != adsrState::ADSR_START ) {
+                return i;
+            }
+        }
+        u8  j    = -1;
+        int ampl = 1;
+        for( u8 i = p_chStart; i < p_chEnd; ++i ) {
+            if( ADSR_CHANNEL[ i ].m_state == adsrState::ADSR_RELEASE
+                && ADSR_CHANNEL[ i ].m_ampl < ampl ) {
+                ampl = ADSR_CHANNEL[ i ].m_ampl;
+                j    = i;
+            }
+        }
+
+        if( j != -1 ) { return j; }
+
+        for( u8 i = p_chStart; i < p_chEnd; ++i ) {
+            if( ADSR_CHANNEL[ i ].m_priority < p_priority ) { return i; }
         }
         return -1;
     }
-    inline s8 nextFreeChannel( ) {
-        return nextFreeChannelInRange( NUM_BLOCKED_CHANNEL, NUM_CHANNEL );
+
+    inline s8 nextFreeToneChannel( int p_priority = 0 ) {
+        return nextFreeChannel( p_priority, TONE_CHANNEL_START,
+                                TONE_CHANNEL_START + TONE_CHANNEL_NUM );
     }
-    inline s8 nextFreeToneChannel( ) {
-        return nextFreeChannelInRange( TONE_CHANNEL_START, TONE_CHANNEL_START + TONE_CHANNEL_NUM );
-    }
-    inline s8 nextFreeNoiseChannel( ) {
-        return nextFreeChannelInRange( NOISE_CHANNEL_START,
-                                       NOISE_CHANNEL_START + NOISE_CHANNEL_NUM );
+
+    inline s8 nextFreeNoiseChannel( int p_priority = 0 ) {
+        return nextFreeChannel( p_priority, NOISE_CHANNEL_START,
+                                NOISE_CHANNEL_START + NOISE_CHANNEL_NUM );
     }
 
     int convertAttack( int p_attack );
@@ -266,9 +335,13 @@ namespace SOUND::SSEQ {
 #ifdef ARM9
     extern soundSysMessage CURRENT_SEQUENCE;
 
+    int  playSample( void *p_data, const sampleInfo &p_sampleInfo, const playInfo &p_playInfo );
+    void stopSample( int p_handle );
+
     void playSequence( u16 );
     void stopSequence( );
 
+    void setMasterVolume( u8 p_volume );
 #endif
 } // namespace SOUND::SSEQ
 
