@@ -35,7 +35,7 @@ export DEV_CODE			:=	01
 export GAME_CODE		:=	ADAJ
 export GAME_TITLE		:=	POKEMON NEO
 export VERSION			:=	10
-export VERSION_NAME		:=	Waiting Suicune neo
+export VERSION_NAME		:=	Mimicking Mimikyu
 
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
