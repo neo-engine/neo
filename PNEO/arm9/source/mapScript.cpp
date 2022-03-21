@@ -27,25 +27,24 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
-#include "bagViewer.h"
-#include "battle.h"
-#include "battleTrainer.h"
-#include "bgmTranslation.h"
-#include "boxViewer.h"
-#include "choiceBox.h"
-#include "counter.h"
+#include "bag/bagViewer.h"
+#include "battle/battle.h"
+#include "battle/battleTrainer.h"
+#include "box/boxViewer.h"
 #include "defines.h"
-#include "fs.h"
-#include "locationNames.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "partyScreen.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "specials.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/fs.h"
+#include "gen/locationNames.h"
+#include "io/choiceBox.h"
+#include "io/counter.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
+#include "spx/specials.h"
+#include "sts/partyScreen.h"
 
 namespace MAP {
 #define MAX_SCRIPT_SIZE 128
@@ -221,7 +220,8 @@ namespace MAP {
             return std::to_string( SAVE::SAV.getActiveFile( ).getVar( tmp ) );
         }
         if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
-            return getDisplayName( SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
+            return FS::getDisplayName(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
         }
         return std::string( "[" ) + p_cmd + "]";
     }
@@ -382,7 +382,7 @@ namespace MAP {
                 return;
             }
             case GIT: {
-                auto idata     = ITEM::getItemData( parA );
+                auto idata     = FS::getItemData( parA );
                 registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_bag.count(
                     BAG::toBagType( idata.m_itemType ), parA );
                 break;
@@ -786,7 +786,7 @@ namespace MAP {
                 auto policy     = parB == 1 && SAVE::SAV.getActiveFile( ).countAlivePkmn( ) > 1
                                       ? BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY
                                       : BATTLE::DEFAULT_TRAINER_POLICY;
-                auto tr         = BATTLE::getBattleTrainer( parA );
+                auto tr         = FS::getBattleTrainer( parA );
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
                 SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
@@ -875,7 +875,7 @@ namespace MAP {
             }
             case UTMR: NAV::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
-                SOUND::playBGM( BGMIndexForName( parA ), true );
+                if( parA <= MAX_BGM ) { SOUND::playBGM( parA, true ); }
                 break;
             }
             case RMS: {
@@ -891,7 +891,7 @@ namespace MAP {
                 break;
             }
             case PMO: {
-                SOUND::playBGMOneshot( BGMIndexForName( parA ) );
+                if( parA <= MAX_BGM ) { SOUND::playBGMOneshot( parA ); }
                 for( u16 i = 0; i < parB; ++i ) { swiWaitForVBlank( ); }
                 SOUND::restartBGM( );
                 break;
@@ -917,7 +917,7 @@ namespace MAP {
                 choiceBoxMsgType = parB;
                 break;
             case CIT:
-                choiceBoxItems.push_back( parA + MAP_STRING );
+                choiceBoxItems.push_back( parA + FS::MAP_STRING );
                 choiceBoxPL.push_back( parB );
                 break;
 
@@ -1455,20 +1455,21 @@ namespace MAP {
             case L_TEAM_MAGMA_HIDEOUT:
             case L_SCORCHED_SLAB:
                 if( _followPkmnSpeciesData ) {
-                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == TYPE_FIRE
-                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == TYPE_FIRE ) {
+                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == BATTLE::TYPE_FIRE
+                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == BATTLE::TYPE_FIRE ) {
                         msg     = 50 + ( rand( ) & 1 );
                         emotion = 2;
                         break;
                     }
-                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == TYPE_WATER
-                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == TYPE_WATER ) {
+                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == BATTLE::TYPE_WATER
+                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ]
+                               == BATTLE::TYPE_WATER ) {
                         msg     = 52;
                         emotion = 0;
                         break;
                     }
-                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == TYPE_ICE
-                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == TYPE_ICE ) {
+                    if( _followPkmnSpeciesData->m_baseForme.m_types[ 0 ] == BATTLE::TYPE_ICE
+                        || _followPkmnSpeciesData->m_baseForme.m_types[ 1 ] == BATTLE::TYPE_ICE ) {
                         msg     = 52 + ( rand( ) & 1 );
                         emotion = 8;
                         break;
@@ -1477,7 +1478,7 @@ namespace MAP {
             default: break;
             }
             if( msg ) {
-                snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( msg ),
+                snprintf( buffer, PKMNPHRS_LEN, FS::getPkmnPhrase( msg ),
                           _followPkmnData->m_boxdata.m_name );
                 break;
             }
@@ -1490,7 +1491,7 @@ namespace MAP {
             emotion = rand( ) % 12;
             while( emotion == 10 ) { emotion = rand( ) % 12; } // ignore poison
             u8 msg = rand( ) % 3;
-            snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( 3 * emotion + msg ),
+            snprintf( buffer, PKMNPHRS_LEN, FS::getPkmnPhrase( 3 * emotion + msg ),
                       _followPkmnData->m_boxdata.m_name );
             break;
         }
@@ -1538,7 +1539,7 @@ namespace MAP {
                     msg     = 44;
                 }
             }
-            snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( msg ),
+            snprintf( buffer, PKMNPHRS_LEN, FS::getPkmnPhrase( msg ),
                       _followPkmnData->m_boxdata.m_name );
             break;
         }
@@ -1564,7 +1565,7 @@ namespace MAP {
                 emotion = 6;
                 msg     = 49;
             }
-            snprintf( buffer, PKMNPHRS_LEN, getPkmnPhrase( msg ),
+            snprintf( buffer, PKMNPHRS_LEN, FS::getPkmnPhrase( msg ),
                       _followPkmnData->m_boxdata.m_name );
             break;
         }
@@ -1728,11 +1729,11 @@ namespace MAP {
                 swiWaitForVBlank( );
 
                 bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
-                                    BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
+                                    BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
                                     ? !( rand( ) & 127 )
                                     : !( rand( ) & 2047 );
                 bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
-                       BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+                       BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
                 wildPkmnType btType
                     = SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ? WATER : GRASS;
@@ -1758,7 +1759,7 @@ namespace MAP {
             break;
         }
         case EVENT_TRAINER: {
-            auto tr = BATTLE::getBattleTrainer( p_event.m_data.m_trainer.m_trainerId );
+            auto tr = FS::getBattleTrainer( p_event.m_data.m_trainer.m_trainerId );
             if( !SAVE::SAV.getActiveFile( ).checkFlag(
                     SAVE::F_TRAINER_BATTLED( p_event.m_data.m_trainer.m_trainerId ) ) ) {
                 // player did not defeat the trainer yet
@@ -1953,8 +1954,7 @@ namespace MAP {
                         ANIMATE_MAP = true;
                         SOUND::restoreVolume( );
                         char buffer[ 100 ];
-                        snprintf( buffer, 99, GET_STRING( 572 ),
-                                  ITEM::getItemName( itm ).c_str( ) );
+                        snprintf( buffer, 99, GET_STRING( 572 ), FS::getItemName( itm ).c_str( ) );
                         NAV::printMessage( buffer, MSG_INFO );
                     } else {
                         NAV::init( );
@@ -2015,11 +2015,11 @@ namespace MAP {
                 case 2:
                 case 3:
                     snprintf( buffer, 99, GET_STRING( 565 + stage ),
-                              ITEM::getItemName( ITEM::berryToItem( berryType ) ).c_str( ) );
+                              FS::getItemName( BAG::berryToItem( berryType ) ).c_str( ) );
                     break;
                 case 4:
                     snprintf( buffer, 99, GET_STRING( 569 ),
-                              ITEM::getItemName( ITEM::berryToItem( berryType ) ).c_str( ), yield );
+                              FS::getItemName( BAG::berryToItem( berryType ) ).c_str( ), yield );
                     break;
                 default: continue;
                 }
@@ -2029,7 +2029,7 @@ namespace MAP {
                     if( IO::yesNoBox( ).getResult( GET_STRING( 570 ), MSG_INFO_NOCLOSE )
                         == IO::yesNoBox::YES ) {
                         NAV::init( );
-                        NAV::giveItemToPlayer( ITEM::berryToItem( berryType ), yield );
+                        NAV::giveItemToPlayer( BAG::berryToItem( berryType ), yield );
                         SAVE::SAV.getActiveFile( ).harvestBerry(
                             o.second.m_event.m_data.m_berryTree.m_treeIdx );
                         _mapSprites.destroySprite( o.first );
@@ -2041,13 +2041,13 @@ namespace MAP {
                     // Ask player if they want to water the berry
                     // (only if they have a watering can, though)
                     if( SAVE::SAV.getActiveFile( ).m_bag.count(
-                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SPRAYDUCK )
+                            BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SPRAYDUCK )
                         + SAVE::SAV.getActiveFile( ).m_bag.count(
-                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SPRINKLOTAD )
+                            BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SPRINKLOTAD )
                         + SAVE::SAV.getActiveFile( ).m_bag.count(
-                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_WAILMER_PAIL )
+                            BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WAILMER_PAIL )
                         + SAVE::SAV.getActiveFile( ).m_bag.count(
-                            BAG::toBagType( ITEM::ITEMTYPE_KEYITEM ), I_SQUIRT_BOTTLE ) ) {
+                            BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SQUIRT_BOTTLE ) ) {
 
                         if( IO::yesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
                             == IO::yesNoBox::YES ) {
@@ -2080,8 +2080,7 @@ namespace MAP {
                         o.second.m_event.m_data.m_trainer.m_trainerId ) ) ) {
                     // player did not defeat the trainer yet
                     showExclamationAboveMapObject( i );
-                    auto tr
-                        = BATTLE::getBattleTrainer( o.second.m_event.m_data.m_trainer.m_trainerId );
+                    auto tr = FS::getBattleTrainer( o.second.m_event.m_data.m_trainer.m_trainerId );
                     SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
                 }
             }

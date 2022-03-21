@@ -27,34 +27,18 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds/system.h>
 
-#include "choiceBox.h"
 #include "defines.h"
-#include "fs.h"
-#include "gameStart.h"
-#include "mapDrawer.h"
-#include "nav.h"
-#include "pokemonNames.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "startScreen.h"
-#include "uio.h"
-#include "yesNoBox.h"
-
-#ifdef DESQUID_MORE
-// BEGIN TEST
-#include "animations.h"
-#include "bagViewer.h"
-#include "battle.h"
-#include "boxViewer.h"
-#include "dex.h"
-#include "itemNames.h"
-#include "keyboard.h"
-#include "moveNames.h"
-#include "partyScreen.h"
-#include "specials.h"
-#include "statusScreen.h"
-// END TEST
-#endif
+#include "fs/fs.h"
+#include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
+#include "io/screenFade.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
+#include "map/mapDrawer.h"
+#include "nav/nav.h"
+#include "save/gameStart.h"
+#include "save/startScreen.h"
+#include "sound/sound.h"
 
 namespace SAVE {
 
@@ -109,60 +93,6 @@ namespace SAVE {
         IO::boldFont->setColor( 0, 0 );
         IO::boldFont->setColor( IO::WHITE_IDX, 1 );
         IO::boldFont->setColor( IO::BLACK_IDX, 2 );
-
-#ifdef DESQUID_MORE
-        // BEGIN TEST
-
-        // pokemon testTeam[ 6 ];
-        // for( u16 i = 0; i < 6; i++ ) {
-        // testTeam[ i ] = pokemon( rand( ) % MAX_PKMN + 1, 100 );
-        //   testTeam[ i ] = pokemon( PKMN_XERNEAS, 100 );
-        //            testTeam[ i ].m_stats.m_curHP = testTeam[ i ].m_stats.m_maxHP * i / 6;
-        //     SAVE::SAV.getActiveFile( ).storePkmn( pokemon( 1 + ( 3 * i ) % MAX_PKMN,
-        //                                                    1 + rand( ) % 100, 0, 0, i, rand(
-        //                                                    ) % 2, 3 * i == 490, rand( ) % 20
-        //                                                    ) );
-        //            testTeam[ i ].m_boxdata.m_experienceGained += 3500;
-        // testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_SURF;
-        //            testTeam[ i ].m_boxdata.m_moves[ 3 ] = M_TOXIC;
-        // testTeam[ i ].m_boxdata.m_moves[ 0 ] = M_BOUNCE;
-        //           testTeam[ i ].m_boxdata.m_moves[ 1 ] = M_DIVE;
-        //           testTeam[ i ].m_boxdata.m_heldItem   = I_GYARADOSITE;
-        //  testTeam[ i ].m_boxdata.m_heldItem = I_SITRUS_BERRY;
-        // }
-        //        BAG::bagViewer
-        //        btv = BAG::bagViewer( testTeam );
-        //        btv.run( );
-        //        btv = BAG::bagViewer( testTeam, BAG::bagViewer::BATTLE );
-        //        btv.run( );
-        //        btv = BAG::bagViewer( testTeam, BAG::bagViewer::WILD_BATTLE );
-        //        btv.run( );
-        //       btv = BAG::bagViewer( testTeam, BAG::bagViewer::GIVE_TO_PKMN );
-        //       btv.run( );
-
-        //    BOX::boxViewer bxv;
-        //  bxv.run( );
-
-        // STS::partyScreen sts = STS::partyScreen( testTeam, 5, false, true, true, 2, true );
-        // sts.run( );
-
-        //        STS::statusScreen psts = STS::statusScreen( SAVE::SAV.getActiveFile(
-        //        ).getTeamPkmn( 1 ) ); psts.run( );
-
-        //       SOUND::playBGM( MOD_SURFING );
-
-        //        BATTLE::battle bt = BATTLE::battle( testTeam, 6, pokemon( PKMN_MIENFOO, 100, 0, 0,
-        //        2 ),
-        // BATTLE::battle bt
-        //   = BATTLE::battle( testTeam, 6, 23, BATTLE::DEFAULT_DOUBLE_TRAINER_POLICY );
-
-        //       bt.start( );
-
-        DEX::dex dx = DEX::dex( );
-        dx.run( );
-
-        // END TEST
-#endif
 
         consoleSetWindow( &IO::Bottom, 0, 0, 32, 24 );
         consoleSelect( &IO::Bottom );
@@ -415,8 +345,9 @@ namespace SAVE {
         for( u8 c = 0; c < episodes.size( ); ++c ) {
             res.push_back( std::pair( IO::inputTarget( 28, cury, 236, cury + 20 ), c ) );
             if( episodes[ c ] != IO::choiceBox::BACK_CHOICE ) {
-                IO::regularFont->printStringC( EPISODE_NAMES[ episodes[ c ] ][ _currentLanguage ],
-                                               128, cury + 2, true, IO::font::CENTER );
+                IO::regularFont->printStringC(
+                    FS::EPISODE_NAMES[ episodes[ c ] ][ _currentLanguage ], 128, cury + 2, true,
+                    IO::font::CENTER );
             } else {
                 IO::regularFont->printStringC( GET_STRING_L( 330, _currentLanguage ), 128, cury + 2,
                                                true, IO::font::CENTER );
@@ -656,7 +587,7 @@ namespace SAVE {
                                             oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 95,
                                             oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 31, true, 0 );
                         IO::regularFont->printString(
-                            LANGUAGE_NAMES[ i ], oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                            FS::LANGUAGE_NAMES[ i ], oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                             oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
 
                         res.push_back( std::pair(

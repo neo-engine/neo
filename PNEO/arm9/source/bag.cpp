@@ -28,11 +28,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <nds.h>
 
-#include "bag.h"
-#include "item.h"
-#include "itemNames.h"
+#include "bag/bag.h"
+#include "bag/item.h"
+#include "gen/itemNames.h"
 #include "pokemon.h"
-#include "saveGame.h"
+#include "save/saveGame.h"
 
 namespace BAG {
 
@@ -218,10 +218,8 @@ namespace BAG {
         if( p_bagType == BERRIES ) {
             std::sort( &_items[ _startIdx[ p_bagType ] ], &_items[ _nextFree[ p_bagType ] ],
                        []( std::pair<u16, u16> p_left, std::pair<u16, u16> p_right ) {
-                           if( ITEM::itemToBerry( p_left.first )
-                               != ITEM::itemToBerry( p_right.first ) ) {
-                               return ITEM::itemToBerry( p_left.first )
-                                      < ITEM::itemToBerry( p_right.first );
+                           if( itemToBerry( p_left.first ) != itemToBerry( p_right.first ) ) {
+                               return itemToBerry( p_left.first ) < itemToBerry( p_right.first );
                            }
                            return p_left.first < p_right.first;
                        } );

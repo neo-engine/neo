@@ -25,27 +25,45 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
 #include <string>
+
+#ifndef NO_SOUND
+#ifdef MMOD
 #include <maxmod9.h>
+#else
+#include "sound/sseq.h"
+#include "sound/sseqData.h"
+#endif
+#include "gen/bgmTranslation.h"
+#endif
 
 #include "defines.h"
-#include "fs.h"
-#include "saveGame.h"
-#include "sound.h"
+#include "fs/fs.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
-const char SOUND_PATH[] = "nitro:/SOUND/";
+#ifndef NO_SOUND
+#ifdef MMOD
+char SOUND_PATH[ 50 ] = { };
+#endif
+#endif
 
 void initSound( ) {
 #ifndef NO_SOUND
-    std::string path = ( std::string( SOUND_PATH ) + "sound.msl" );
-    mmInitDefault( const_cast<char*>( path.c_str( ) ) );
+#ifdef MMOD
+    snprintf( SOUND_PATH, 50, "nitro:/SOUND/sound.msl" );
+    mmInitDefault( SOUND_PATH );
     mmLockChannels( BIT( 0 ) | BIT( 1 ) );
+#else
+    SOUND::SSEQ::installSoundSys( );
+#endif
 #endif
 }
 
 namespace SOUND {
     bool BGMLoaded  = false;
-    u16  currentBGM = 0;
+    s16  currentBGM = 0;
 
     bool BGMforced = false; // While the bgm is forced, no music changes via map/movemode change
 
@@ -57,7 +75,11 @@ namespace SOUND {
 
     void setVolume( u16 p_newValue ) {
 #ifndef NO_SOUND
+#ifdef MMOD
         mmSetModuleVolume( p_newValue );
+#else
+        SSEQ::setMasterVolume( p_newValue >> 1 );
+#endif
 #else
         (void) p_newValue;
 #endif
@@ -65,22 +87,24 @@ namespace SOUND {
 
     void dimVolume( ) {
 #ifndef NO_SOUND
-        setVolume( 0x50 );
+        setVolume( 0x7F );
 #endif
     }
     void restoreVolume( ) {
 #ifndef NO_SOUND
-        setVolume( 0x100 );
+        setVolume( 0xFF );
 #endif
     }
 
-    void playBGM( u16 p_id, bool p_force ) {
+    void playBGM( s16 p_id, bool p_force ) {
 #ifndef NO_SOUND
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( p_force ) { BGMforced = true; }
             if( BGMLoaded && p_id == currentBGM ) { return; }
             ANIMATE_MAP = false;
+#ifdef MMOD
+            auto mmId = BGMIndexForName( p_id );
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -92,15 +116,23 @@ namespace SOUND {
                 swiWaitForVBlank( );
                 mmStop( );
                 swiWaitForVBlank( );
-                mmUnload( currentBGM );
+                auto oldmmId = BGMIndexForName( currentBGM );
+                if( oldmmId != MOD_NONE ) { mmUnload( oldmmId ); }
             }
             restoreVolume( );
-            mmLoad( p_id );
-            mmStart( p_id, MM_PLAY_LOOP );
+            if( mmId != MOD_NONE ) {
+                mmLoad( mmId );
+                mmStart( mmId, MM_PLAY_LOOP );
+            }
+#else
+            auto sseqId = SSEQ::BGMIndexForName( p_id );
+            if( sseqId != SSEQ::SSEQ_NONE ) { SSEQ::playSequence( sseqId ); }
+#endif
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
             ANIMATE_MAP = false;
+#ifdef MMOD
             setVolume( 0x50 );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -111,7 +143,12 @@ namespace SOUND {
             swiWaitForVBlank( );
             mmStop( );
             swiWaitForVBlank( );
-            mmUnload( currentBGM );
+
+            auto mmId = BGMIndexForName( currentBGM );
+            if( mmId != MOD_NONE ) { mmUnload( mmId ); }
+#else
+            SSEQ::stopSequence( );
+#endif
             BGMLoaded = false;
         }
         ANIMATE_MAP = oa;
@@ -121,12 +158,14 @@ namespace SOUND {
 #endif
     }
 
-    void playBGMOneshot( u16 p_id ) {
+    void playBGMOneshot( s16 p_id ) {
 #ifndef NO_SOUND
         auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( BGMLoaded && p_id == currentBGM ) { return; }
             ANIMATE_MAP = false;
+#ifdef MMOD
+            auto mmId = BGMIndexForName( p_id );
             if( BGMLoaded ) {
                 setVolume( 0x50 );
                 swiWaitForVBlank( );
@@ -138,15 +177,24 @@ namespace SOUND {
                 swiWaitForVBlank( );
                 mmStop( );
                 swiWaitForVBlank( );
-                mmUnload( currentBGM );
+                auto oldmmId = BGMIndexForName( currentBGM );
+                if( oldmmId != MOD_NONE ) { mmUnload( oldmmId ); }
             }
             restoreVolume( );
-            mmLoad( p_id );
-            mmStart( p_id, MM_PLAY_ONCE );
+            if( mmId != MOD_NONE ) {
+                mmLoad( mmId );
+                mmStart( mmId, MM_PLAY_ONCE );
+            }
+#else
+            // looping is done via sseq commands; no need for different code here
+            auto sseqId = SSEQ::BGMIndexForName( p_id );
+            if( sseqId != SSEQ::SSEQ_NONE ) { SSEQ::playSequence( sseqId ); }
+#endif
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
             ANIMATE_MAP = false;
+#ifdef MMOD
             setVolume( 0x50 );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
@@ -157,7 +205,12 @@ namespace SOUND {
             swiWaitForVBlank( );
             mmStop( );
             swiWaitForVBlank( );
-            mmUnload( currentBGM );
+
+            auto mmId = BGMIndexForName( currentBGM );
+            if( mmId != MOD_NONE ) { mmUnload( mmId ); }
+#else
+            SSEQ::stopSequence( );
+#endif
             BGMLoaded = false;
         }
         ANIMATE_MAP = oa;
@@ -169,9 +222,14 @@ namespace SOUND {
     void stopBGM( ) {
 #ifndef NO_SOUND
         if( BGMLoaded ) {
+#ifdef MMOD
+            auto mmId = BGMIndexForName( currentBGM );
             mmStop( );
             swiWaitForVBlank( );
-            mmUnload( currentBGM );
+            if( mmId != MOD_NONE ) { mmUnload( mmId ); }
+#else
+            SSEQ::stopSequence( );
+#endif
             BGMLoaded = false;
         }
 #endif

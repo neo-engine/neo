@@ -30,11 +30,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include <type_traits>
 
-#include "ability.h"
+#include "battle/ability.h"
 #include "defines.h"
-#include "itemNames.h"
+#include "gen/itemNames.h"
+#include "gen/pokemonNames.h"
 #include "pokemonData.h"
-#include "pokemonNames.h"
 
 struct trainerPokemon {
     u16 m_speciesId;
@@ -264,12 +264,12 @@ struct boxPokemon {
         return res;
     }
 
-    constexpr type getHPType( ) const {
+    constexpr BATTLE::type getHPType( ) const {
         int a
             = ( ( IVget( 0 ) & 1 ) + 2 * ( IVget( 1 ) & 1 ) + 4 * ( IVget( 2 ) & 1 )
                 + 8 * ( IVget( 3 ) & 1 ) + 16 * ( IVget( 4 ) & 1 ) + 32 * ( IVget( 5 ) & 1 ) * 15 )
               / 63;
-        return a < 8 ? (type) ( a + 1 ) : type( a + 2 );
+        return a < 8 ? ( BATTLE::type )( a + 1 ) : BATTLE::type( a + 2 );
     }
     constexpr u8 getHPPower( ) const {
         return 30
@@ -459,7 +459,7 @@ struct pokemon {
         }
     }
     inline bool setBattleTimeAbility( u16 p_ability ) {
-        if( !allowsReplace( getAbility( ) ) ) { return false; }
+        if( !BATTLE::allowsReplace( getAbility( ) ) ) { return false; }
         m_battleTimeAbility = p_ability;
         return true;
     }
@@ -502,7 +502,7 @@ struct pokemon {
     constexpr u16 getItem( ) const {
         return m_boxdata.getItem( );
     }
-    constexpr type getHPType( ) const {
+    constexpr BATTLE::type getHPType( ) const {
         return m_boxdata.getHPType( );
     }
     constexpr u8 getHPPower( ) const {

@@ -27,7 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "font.h"
+#include "io/font.h"
 
 namespace IO {
     namespace BOLD_FONT {

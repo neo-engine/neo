@@ -1,6 +1,4 @@
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 .SUFFIXES:
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM)
 endif
@@ -43,17 +41,13 @@ export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 export NDSTOOL		:=  $(CURDIR)/tools/ndstool/ndstool
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 #main targets
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 all: $(TARGET).nds
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ifneq ($(strip $(NITRO_FILES)),)
 _ADDFILES	:=	-d $(NITRO_FILES)
 endif
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ifdef FLASHCARD
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
@@ -71,25 +65,26 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 	padbin 0x8000000 $(TARGET).nds
 endif
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 arm7/$(TARGET).elf: FORCE
 	$(MAKE) -C arm7
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#arm9 / $( TARGET ).elf : FORCE soundbank ndstool
+ifdef MMOD
+arm9/$(TARGET).elf: FORCE $(_ADDFILES)/SOUND/sound.msl ndstool
+else
 arm9/$(TARGET).elf: FORCE ndstool
+endif
 	$(MAKE) -C arm9
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-soundbank:
+
+$(_ADDFILES)/SOUND/sound.msl:
+	$(MAKE) -C audio clean
 	$(MAKE) -C audio
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 ndstool:
 	$(MAKE) -C tools/ndstool
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 clean:
+	$(MAKE) -C audio clean
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean

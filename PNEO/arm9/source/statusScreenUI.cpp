@@ -25,24 +25,20 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "statusScreenUI.h"
-#include "ability.h"
+#include "sts/statusScreenUI.h"
+#include "battle/ability.h"
 #include "defines.h"
-#include "font.h"
-#include "fs.h"
-#include "locationNames.h"
-#include "pokemonNames.h"
-#include "screenFade.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "gen/locationNames.h"
+#include "gen/pokemonNames.h"
+#include "io/font.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "sound/sound.h"
 
 #include "NoItem.h"
-// #include "backarrow.h"
-// #include "hpbar.h"
-// #include "movebox1.h"
-// #include "movebox2.h"
-// #include "movebox3.h"
 
 namespace STS {
     // top screen sprites
@@ -237,7 +233,7 @@ namespace STS {
         }
 
         // Pokéball Icon
-        tileCnt = IO::loadItemIcon( ITEM::ballToItem( p_pokemon->m_boxdata.m_ball ), -4, 28,
+        tileCnt = IO::loadItemIcon( BAG::ballToItem( p_pokemon->m_boxdata.m_ball ), -4, 28,
                                     SPR_BALL_ICON_OAM, SPR_BALL_ICON_PAL, tileCnt, p_bottom );
 
         // Name box
@@ -497,7 +493,7 @@ namespace STS {
 
         // type icons
         for( u8 i = 0; i < 4; ++i ) {
-            type t;
+            BATTLE::type t;
             if( p_pokemon->getMove( i ) != M_HIDDEN_POWER ) {
                 t = _moves[ i ].m_type;
             } else {
@@ -632,7 +628,7 @@ namespace STS {
             // Item
             if( p_pokemon->getItem( ) ) {
                 IO::regularFont->printString( GET_STRING( 362 ), 8, 166, p_bottom );
-                IO::regularFont->printStringC( ITEM::getItemName( p_pokemon->getItem( ) ).c_str( ),
+                IO::regularFont->printStringC( FS::getItemName( p_pokemon->getItem( ) ).c_str( ),
                                                16, 178, p_bottom );
             }
         } else {
@@ -753,10 +749,10 @@ namespace STS {
         bgSetPriority( IO::bg2sub, 2 );
         IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
         bgSetPriority( IO::bg3sub, 3 );
-        _data = getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
+        _data = FS::getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
         for( u8 i = 0; i < 4; ++i ) {
             if( p_pokemon->getMove( i ) ) {
-                _moves[ i ] = MOVE::getMoveData( p_pokemon->getMove( i ) );
+                _moves[ i ] = FS::getMoveData( p_pokemon->getMove( i ) );
             }
         }
 
@@ -918,8 +914,8 @@ namespace STS {
                               p_pokemon->isShiny( ) ? IO::RED2_IDX : IO::BLACK_IDX );
             }
             // Species Name
-            writeLineTop( GET_STRING( 338 ), getDisplayName( p_pokemon->getSpecies( ) ).c_str( ),
-                          1 );
+            writeLineTop( GET_STRING( 338 ),
+                          FS::getDisplayName( p_pokemon->getSpecies( ) ).c_str( ), 1 );
             // Type
             writeLineTop( GET_STRING( 29 ), 0, 2, IO::WHITE_IDX, IO::BLACK_IDX );
             oam[ SPR_TYPE_OAM( 1 ) ].isHidden = false;
@@ -1214,14 +1210,14 @@ namespace STS {
                                            true, IO::font::RIGHT );
 
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-            auto aname = getAbilityName( p_pokemon->getAbility( ) );
+            auto aname = FS::getAbilityName( p_pokemon->getAbility( ) );
             IO::regularFont->printStringC( aname.c_str( ), INFO_X_SUB - 5, INFO_Y_SUB + 3, true );
 
             // Ability description
 
             IO::regularFont->printBreakingStringC(
-                getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ), INFO_X_SUB, INFO_Y_SUB + 18,
-                188, true, IO::font::LEFT, 13 );
+                FS::getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ), INFO_X_SUB,
+                INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
 
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
@@ -1237,7 +1233,7 @@ namespace STS {
                     oamSub[ SPR_MOVE_OAM_SUB( i ) + j ].isHidden = false;
                 }
 
-                auto mname = MOVE::getMoveName( p_pokemon->getMove( i ) );
+                auto mname = FS::getMoveName( p_pokemon->getMove( i ) );
                 if( mname.length( ) > 18 ) {
                     snprintf( buffer, 20, "%s.", mname.c_str( ) );
                 } else {
@@ -1439,7 +1435,7 @@ namespace STS {
 
                 // Move descr
                 IO::regularFont->printBreakingStringC(
-                    MOVE::getMoveDescr( p_pokemon->getMove( p_detailsPage ) ).c_str( ),
+                    FS::getMoveDescr( p_pokemon->getMove( p_detailsPage ) ).c_str( ),
                     INFO_X_SUB - 8, INFO_Y_SUB + 3 - 2, 200, true, IO::font::LEFT, 13 );
 
                 // power / acc
@@ -1468,13 +1464,13 @@ namespace STS {
                                                true, IO::font::RIGHT );
 
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                auto aname = getAbilityName( p_pokemon->getAbility( ) );
+                auto aname = FS::getAbilityName( p_pokemon->getAbility( ) );
                 IO::regularFont->printStringC( aname.c_str( ), INFO_X_SUB - 5, INFO_Y_SUB + 3,
                                                true );
 
                 // Ability description
                 IO::regularFont->printBreakingStringC(
-                    getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ), INFO_X_SUB,
+                    FS::getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ), INFO_X_SUB,
                     INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );

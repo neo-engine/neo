@@ -28,13 +28,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <map>
 #include <string>
-#include "mapSlice.h"
-#include "defines.h"
-#include "fs.h"
-#include "nav.h"
+
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "map/mapSlice.h"
+#include "nav/nav.h"
 
 #ifdef DESQUID
-#include "uio.h"
+#include "io/uio.h"
 #endif
 
 namespace MAP {

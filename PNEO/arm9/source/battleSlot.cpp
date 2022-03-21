@@ -25,11 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "battleSlot.h"
-#include "battle.h"
-#include "battleField.h"
-#include "battleSide.h"
-#include "battleUI.h"
+#include "battle/battleSlot.h"
+#include "battle/battle.h"
+#include "battle/battleField.h"
+#include "battle/battleSide.h"
+#include "battle/battleUI.h"
 #include "defines.h"
 
 namespace BATTLE {

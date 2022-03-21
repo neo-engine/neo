@@ -27,7 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "font.h"
+#include "io/font.h"
 
 namespace IO {
     namespace REGULAR_FONT {
@@ -284,7 +284,6 @@ namespace IO {
                 p_val = 478;
                 return;
             }
-
 
             if( p_val == '$' ) {
                 p_val = 117;

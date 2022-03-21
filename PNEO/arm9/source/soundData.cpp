@@ -27,18 +27,18 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include "bgmTranslation.h"
-#include "fs.h"
-#include "locationNames.h"
-#include "pokemonNames.h"
-#include "sound.h"
+#include "fs/data.h"
+#include "gen/bgmNames.h"
+#include "gen/locationNames.h"
+#include "gen/pokemonNames.h"
+#include "sound/sound.h"
 
 namespace SOUND {
     u16             currentLocation = 0;
     MAP::moveMode   currentMoveMode = MAP::WALK;
     MAP::mapWeather currentWeather  = MAP::REGULAR;
 
-    u16 currentJBoxBGM = JBOX_DISABLED;
+    s16 currentJBoxBGM = JBOX_DISABLED;
 
     bool tracerActive = false;
 
@@ -47,16 +47,22 @@ namespace SOUND {
     void playCry( u16 p_pokemonId, u8 p_formeId, bool ) {
 #ifndef NO_SOUND
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableSFX ) {
-            u16 len;
+            u32 len;
             u8* cry = FS::readCry( p_pokemonId, p_formeId, len );
             if( cry == nullptr ) {
                 if( p_pokemonId != 1 ) { playCry( 1 ); }
                 return;
             }
-
+#ifdef MMOD
+            len <<= 1;
             if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
-
             LAST_CRY = soundPlaySample( cry, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
+#else
+            if( LAST_CRY != u16( -1 ) ) { SSEQ::stopSample( LAST_CRY ); }
+            auto sInfo = SSEQ::sampleInfo{ SSEQ::sampleInfo::WT_PCM8, false, 22050, 760, 0, len };
+            auto pInfo = SSEQ::playInfo{ 127, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0 };
+            LAST_CRY   = SSEQ::playSample( cry, sInfo, pInfo );
+#endif
         }
 #else
         (void) p_pokemonId;
@@ -71,20 +77,27 @@ namespace SOUND {
             u8* sfx = FS::readSFX( p_id, len );
             if( sfx == nullptr ) { return; }
 
+#ifdef MMOD
+            len <<= 1;
             if( LAST_CRY != u16( -1 ) ) { soundKill( LAST_CRY ); }
-
             LAST_CRY = soundPlaySample( sfx, SoundFormat_8Bit, len, 22050, 127, 64, false, 0 );
+#else
+            if( LAST_CRY != u16( -1 ) ) { SSEQ::stopSample( LAST_CRY ); }
+            auto sInfo = SSEQ::sampleInfo{ SSEQ::sampleInfo::WT_PCM8, false, 22050, 760, 0, len };
+            auto pInfo = SSEQ::playInfo{ 127, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0 };
+            LAST_CRY   = SSEQ::playSample( sfx, sInfo, pInfo );
+#endif
         }
 #else
         (void) p_id;
 #endif
     }
 
-    u16 getJBoxBGM( ) {
+    s16 getJBoxBGM( ) {
         return currentJBoxBGM;
     }
 
-    void setJBoxBGM( u16 p_id ) {
+    void setJBoxBGM( s16 p_id ) {
         if( p_id != currentJBoxBGM ) {
             if( p_id != JBOX_DISABLED ) {
                 playBGM( p_id );
@@ -107,13 +120,7 @@ namespace SOUND {
         currentLocation = p_newLocation;
 
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
-        if( currentMoveMode == MAP::WALK ) {
-            auto nidx = BGMIndexForName( FS::BGMforLocation( currentLocation ) );
-            if( nidx >= 0 ) {
-                playBGM( nidx );
-            } else {
-            }
-        }
+        if( currentMoveMode == MAP::WALK ) { playBGM( FS::BGMforLocation( currentLocation ) ); }
     }
 
     void onMovementTypeChange( MAP::moveMode p_newMoveMode ) {
@@ -135,7 +142,7 @@ namespace SOUND {
     void restartBGM( ) {
         BGMforced = false;
         if( tracerActive ) {
-            playBGM( MOD_POKE_RADAR );
+            playBGM( BGM_POKE_RADAR );
         } else if( currentJBoxBGM != JBOX_DISABLED ) {
             playBGM( currentJBoxBGM );
         } else {
@@ -143,25 +150,25 @@ namespace SOUND {
         }
     }
 
-    u16 BGMforWeather( MAP::mapWeather p_weather ) {
+    s16 BGMforWeather( MAP::mapWeather p_weather ) {
         switch( p_weather ) {
-        case MAP::SANDSTORM: return MOD_DESERT;
+        case MAP::SANDSTORM: return BGM_DESERT;
         default: return BGMforMoveMode( currentMoveMode );
         }
     }
 
-    u16 BGMforMoveMode( MAP::moveMode p_moveMode ) {
+    s16 BGMforMoveMode( MAP::moveMode p_moveMode ) {
         switch( p_moveMode ) {
-        case MAP::DIVE: return MOD_DIVING;
-        case MAP::SURF: return MOD_SURFING;
+        case MAP::DIVE: return BGM_DIVING;
+        case MAP::SURF: return BGM_SURFING;
         case MAP::BIKE:
         case MAP::ACRO_BIKE:
         case MAP::MACH_BIKE:
-        case MAP::BIKE_JUMP: return MOD_CYCLING;
+        case MAP::BIKE_JUMP: return BGM_CYCLING;
         case MAP::WALK:
         case MAP::ROCK_CLIMB:
         case MAP::SIT:
-        default: return BGMIndexForName( FS::BGMforLocation( currentLocation ) );
+        default: return FS::BGMforLocation( currentLocation );
         }
     }
 } // namespace SOUND

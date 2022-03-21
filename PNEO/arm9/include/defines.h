@@ -39,12 +39,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     {}
 #endif
 
-#ifdef DESQUID
-constexpr u16 DESQUID_STRING = ( 1 << 13 );
-#endif
-
-constexpr u16 MAP_STRING = ( 1 << 11 );
-
 // Assumes that the Backup is a 512k flash memory
 constexpr u32 BACKUP_SIZE = ( 512 * 1024 );
 
@@ -141,51 +135,6 @@ struct pkmnSpriteInfo {
 };
 
 constexpr u32 DEFAULT_SPRITE_PID = 0x88888888;
-
-extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
-extern const char*       HP_ICONS[ LANGUAGES ];
-extern const char* const MONTHS[ 12 ][ LANGUAGES ];
-#define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
-
-bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
-std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );
-std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );
-
-const char* getUIString( u16 p_stringId, u8 p_language );
-const char* getMapString( u16 p_stringId );
-const char* getPkmnPhrase( u16 p_stringId );
-const char* getBadge( u16 p_badgeId );
-const char* getAchievement( u16 p_badgeId, u8 p_language );
-
-#define getBadgeName( p_type, p_badge )                                                     \
-    ( ( ( p_type ) == 0 )                                                                   \
-          ? getBadge( (p_badge) -1 )                                                        \
-          : ( ( p_type ) == 1                                                               \
-                  ? getBadge( 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) - 1 ) \
-                  : nullptr ) )
-
-#define GET_MAP_STRING( p_stringId )           getMapString( p_stringId )
-#define GET_STRING_L( p_stringId, p_language ) getUIString( p_stringId, p_language )
-
-#ifdef DESQUID
-constexpr u16            MAX_DESQUID_STRINGS = 100;
-extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
-#define GET_STRING( p_stringId )                                                       \
-    ( ( ( p_stringId ) >= DESQUID_STRING )                                             \
-          ? DESQUID_STRINGS[ p_stringId - DESQUID_STRING ][ 0 ]                        \
-          : ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - MAP_STRING ) \
-                                           : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) ) )
-#else
-#define GET_STRING( p_stringId )                                               \
-    ( ( p_stringId ) >= MAP_STRING ? GET_MAP_STRING( p_stringId - MAP_STRING ) \
-                                   : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) )
-#endif
-#define HP_ICON HP_ICONS[ CURRENT_LANGUAGE ]
-
-#define NO_DATA         GET_STRING( 0 )
-#define FARAWAY_PLACE   GET_STRING( 1 )
-#define UNKNOWN_SPECIES GET_STRING( 2 )
-#define POKE_NAV        GET_STRING( 8 )
 
 #define loop( )     while( 1 )
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )

@@ -27,27 +27,26 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstdio>
 
-#include "ability.h"
-#include "bagViewer.h"
-#include "battle.h"
-#include "battleTrainer.h"
-#include "battleUI.h"
-#include "choiceBox.h"
+#include "bag/bagViewer.h"
+#include "bag/item.h"
+#include "battle/ability.h"
+#include "battle/battle.h"
+#include "battle/battleTrainer.h"
+#include "battle/battleUI.h"
+#include "battle/move.h"
 #include "defines.h"
-#include "fs.h"
-#include "item.h"
-#include "keyboard.h"
-#include "move.h"
-#include "moveNames.h"
+#include "fs/fs.h"
+#include "gen/moveNames.h"
+#include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
+#include "io/keyboard.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
 #include "pokemon.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
-#include "sound.h"
-#include "sprite.h"
-#include "uio.h"
-#include "yesNoBox.h"
-
-#include "screenFade.h"
+#include "save/saveGame.h"
+#include "sound/sound.h"
 
 namespace BATTLE {
 
@@ -168,15 +167,15 @@ namespace BATTLE {
                                   OWN_2_HP_X + 8, OWN_2_HP_Y + 8, 16, 16, false, false, true,
                                   OBJPRIORITY_0, false );
 
-        for( u8 i = 1 + ( _mode == DOUBLE ); i < 6; ++i ) {
+        for( u8 i = 1 + ( _mode == BM_DOUBLE ); i < 6; ++i ) {
             IO::loadSprite( SPR_STATUS_BALL_OAM( i ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
-                            4 + 16 * ( i - 1 - ( _mode == DOUBLE ) ), -2, 16, 16, 0, 0, 0, false,
+                            4 + 16 * ( i - 1 - ( _mode == BM_DOUBLE ) ), -2, 16, 16, 0, 0, 0, false,
                             false, true, OBJPRIORITY_0, false );
             IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + i ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
                             156 + 16 * i, 181, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_0,
                             false );
         }
-        if( _mode == SINGLE ) {
+        if( _mode == BM_SINGLE ) {
             IO::loadSprite( SPR_STATUS_BALL_OAM( 6 ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
                             OWN_2_HP_X + 8, OWN_2_HP_Y + 8, 16, 16, 0, 0, 0, false, false, true,
                             OBJPRIORITY_0, false );
@@ -226,7 +225,7 @@ namespace BATTLE {
                                   false, OBJMODE_BLENDED );
 
         // player
-        if( _mode == DOUBLE ) {
+        if( _mode == BM_DOUBLE ) {
             IO::loadSprite( SPR_HPBAR_OAM + 2, SPR_HPBAR_PAL + 1, tileCnt, OWN_1_HP_X, OWN_1_HP_Y,
                             32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
@@ -486,7 +485,7 @@ namespace BATTLE {
 
         // type icons
         for( u8 i = 0; i < 4; ++i ) {
-            tileCnt = IO::loadTypeIcon( UNKNOWN, oam[ SPR_MOVE_OAM_SUB( i ) + 1 ].x,
+            tileCnt = IO::loadTypeIcon( TYPE_UNKNOWN, oam[ SPR_MOVE_OAM_SUB( i ) + 1 ].x,
                                         oam[ SPR_MOVE_OAM_SUB( i ) ].y - 8, SPR_TYPE_OAM_SUB( i ),
                                         SPR_TYPE_PAL_SUB( i ), tileCnt, true, CURRENT_LANGUAGE );
             oam[ SPR_TYPE_OAM_SUB( i ) ].isHidden = true;
@@ -495,7 +494,7 @@ namespace BATTLE {
         // damage cat icons
         for( u8 i = 0; i < 4; ++i ) {
             tileCnt
-                = IO::loadTypeIcon( UNKNOWN, oam[ SPR_MOVE_OAM_SUB( i ) + 1 ].x + 32,
+                = IO::loadTypeIcon( TYPE_UNKNOWN, oam[ SPR_MOVE_OAM_SUB( i ) + 1 ].x + 32,
                                     oam[ SPR_MOVE_OAM_SUB( i ) ].y - 8, SPR_DMG_CAT_OAM_SUB( i ),
                                     SPR_DMG_CAT_PAL_SUB( i ), tileCnt, true, CURRENT_LANGUAGE );
             oam[ SPR_DMG_CAT_OAM_SUB( i ) ].isHidden = true;
@@ -558,12 +557,14 @@ namespace BATTLE {
     }
 
     void battleUI::animateBallRelease( bool p_opponent, u8 p_pos, u8 p_ballId ) const {
-        u16 x = ( _mode == SINGLE ) ? ( p_opponent ? PKMN_OPP_1_X_SINGLE : PKMN_OWN_1_X_SINGLE )
-                                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_X : PKMN_OPP_1_X )
-                                                     : ( p_pos ? PKMN_OWN_2_X : PKMN_OWN_1_X ) ) );
-        u16 y = ( _mode == SINGLE ) ? ( p_opponent ? PKMN_OPP_1_Y_SINGLE : PKMN_OWN_1_Y_SINGLE )
-                                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
-                                                     : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
+        u16 x = ( _mode == BM_SINGLE )
+                    ? ( p_opponent ? PKMN_OPP_1_X_SINGLE : PKMN_OWN_1_X_SINGLE )
+                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_X : PKMN_OPP_1_X )
+                                     : ( p_pos ? PKMN_OWN_2_X : PKMN_OWN_1_X ) ) );
+        u16 y = ( _mode == BM_SINGLE )
+                    ? ( p_opponent ? PKMN_OPP_1_Y_SINGLE : PKMN_OWN_1_Y_SINGLE )
+                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
+                                     : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
 
         x += 24;
         y += 48;
@@ -952,7 +953,7 @@ namespace BATTLE {
 
     void battleUI::redrawBattleBG( ) {
         u16 bg = getTODBattleBG( _background );
-        if( _currentTerrain != NO_TERRAIN ) { bg = 1000 + u8( _currentTerrain ); }
+        if( _currentTerrain != TR_NONE ) { bg = 1000 + u8( _currentTerrain ); }
 
         FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/BATTLE_BACK/",
                              std::to_string( bg ).c_str( ), 480, 49152 );
@@ -1160,8 +1161,7 @@ namespace BATTLE {
 
         char buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 393 ), p_pokemon->m_boxdata.m_name,
-                  ITEM::getItemName( p_pokemon->getItem( ) ).c_str( ),
-                  p_pokemon->m_boxdata.m_name );
+                  FS::getItemName( p_pokemon->getItem( ) ).c_str( ), p_pokemon->m_boxdata.m_name );
 
         IO::regularFont->printStringC( buffer, 128 + ( p_opponent ? 18 : -32 ),
                                        oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1, false,
@@ -1189,7 +1189,7 @@ namespace BATTLE {
 
         char buffer[ 100 ];
         snprintf( buffer, 99, GET_STRING( 393 ), p_pokemon->m_boxdata.m_name,
-                  getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
+                  FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
                   p_pokemon->m_boxdata.m_name );
 
         IO::regularFont->printStringC( buffer, 128 + ( p_opponent ? 18 : -32 ),
@@ -1211,7 +1211,7 @@ namespace BATTLE {
         char buffer[ 50 ];
         auto fmt = std::string( GET_STRING( 396 ) );
         snprintf( buffer, 49, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
-                  MOVE::getMoveName( p_move ).c_str( ) );
+                  FS::getMoveName( p_move ).c_str( ) );
         log( std::string( buffer ) );
     }
 
@@ -1227,12 +1227,12 @@ namespace BATTLE {
         if( p_itms.size( ) == 1 ) {
             auto fmt = std::string( GET_STRING( 398 ) );
             snprintf( buffer, 99, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
-                      ITEM::getItemName( p_itms[ 0 ] ).c_str( ) );
+                      FS::getItemName( p_itms[ 0 ] ).c_str( ) );
         } else if( p_itms.size( ) == 2 ) {
             auto fmt = std::string( GET_STRING( 399 ) );
             snprintf( buffer, 99, fmt.c_str( ), getPkmnName( p_pokemon, p_opponent ).c_str( ),
-                      ITEM::getItemName( p_itms[ 0 ] ).c_str( ),
-                      ITEM::getItemName( p_itms[ 1 ] ).c_str( ) );
+                      FS::getItemName( p_itms[ 0 ] ).c_str( ),
+                      FS::getItemName( p_itms[ 1 ] ).c_str( ) );
         } else {
             return;
         }
@@ -1252,7 +1252,7 @@ namespace BATTLE {
         IO::smallFont->setColor( 250, 1 );
         IO::smallFont->setColor( 251, 2 );
         // show/hide hp bar
-        bool disabled = p_pokemon == nullptr || ( p_pos && _mode != DOUBLE );
+        bool disabled = p_pokemon == nullptr || ( p_pos && _mode != BM_DOUBLE );
         oam[ SPR_HPBAR_OAM + 2 * ( !p_opponent ) + p_pos ].isHidden = disabled;
         if( p_redraw ) {
             // clear relevant part of the screen
@@ -1262,7 +1262,7 @@ namespace BATTLE {
                           32 * 256 );
         }
 
-        if( !p_pos || _mode == DOUBLE ) {
+        if( !p_pos || _mode == BM_DOUBLE ) {
             if( !p_opponent ) {
                 if( p_pokemon == nullptr ) {
                     IO::loadSprite( SPR_STATUS_BALL_OAM( 6 + p_pos ), SPR_STATUS_BALL_PAL,
@@ -1322,7 +1322,7 @@ namespace BATTLE {
             }
         }
 
-        if( p_pokemon != nullptr && ( !p_pos || _mode == DOUBLE ) ) {
+        if( p_pokemon != nullptr && ( !p_pos || _mode == BM_DOUBLE ) ) {
             // pkmn name
             u16 namewd = IO::regularFont->stringWidth( p_pokemon->m_boxdata.m_name );
             if( namewd > 60 ) {
@@ -1580,12 +1580,14 @@ namespace BATTLE {
     void battleUI::loadPkmnSprite( bool p_opponent, u8 p_pos, pokemon* p_pokemon ) {
         SpriteEntry* oam = IO::OamTop->oamBuffer;
 
-        u16 x = ( _mode == SINGLE ) ? ( p_opponent ? PKMN_OPP_1_X_SINGLE : PKMN_OWN_1_X_SINGLE )
-                                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_X : PKMN_OPP_1_X )
-                                                     : ( p_pos ? PKMN_OWN_2_X : PKMN_OWN_1_X ) ) );
-        u16 y = ( _mode == SINGLE ) ? ( p_opponent ? PKMN_OPP_1_Y_SINGLE : PKMN_OWN_1_Y_SINGLE )
-                                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
-                                                     : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
+        u16 x = ( _mode == BM_SINGLE )
+                    ? ( p_opponent ? PKMN_OPP_1_X_SINGLE : PKMN_OWN_1_X_SINGLE )
+                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_X : PKMN_OPP_1_X )
+                                     : ( p_pos ? PKMN_OWN_2_X : PKMN_OWN_1_X ) ) );
+        u16 y = ( _mode == BM_SINGLE )
+                    ? ( p_opponent ? PKMN_OPP_1_Y_SINGLE : PKMN_OWN_1_Y_SINGLE )
+                    : ( ( p_opponent ? ( p_pos ? PKMN_OPP_2_Y : PKMN_OPP_1_Y )
+                                     : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y ) ) );
 
         auto pinfo = p_pokemon->getSpriteInfo( );
         y += IO::pkmnSpriteHeight( pinfo );
@@ -1765,7 +1767,7 @@ namespace BATTLE {
         char buffer[ 50 ];
         auto fmt = std::string( GET_STRING( 143 ) );
         snprintf( buffer, 49, fmt.c_str( ),
-                  getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
+                  FS::getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
                   _battleTrainer->m_strings.m_name );
         log( std::string( buffer ) );
 
@@ -1797,7 +1799,7 @@ namespace BATTLE {
         if( p_opponent ) {
             auto fmt = std::string( GET_STRING( 263 ) );
             snprintf( buffer, 99, fmt.c_str( ),
-                      getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
+                      FS::getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
                       _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
             log( std::string( buffer ) );
         } else {
@@ -1827,7 +1829,7 @@ namespace BATTLE {
         if( p_opponent && _battleTrainer != nullptr ) {
             // TODO
             //            snprintf( buffer, 99, GET_STRING( 274 + p_forced ),
-            //                    getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
+            //                    FS::getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
             //                    _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
             //            log( std::string( buffer ) );
         } else {
@@ -2068,10 +2070,10 @@ namespace BATTLE {
     }
 
     void battleUI::animateCapturePkmn( u16 p_pokeball, u8 p_ticks ) {
-        animateBallThrow( 0, ITEM::itemToBall( p_pokeball ) );
+        animateBallThrow( 0, BAG::itemToBall( p_pokeball ) );
         char buffer[ 50 ];
-        snprintf( buffer, 49, "PB/%hhu/%hhu_", ITEM::itemToBall( p_pokeball ),
-                  ITEM::itemToBall( p_pokeball ) );
+        snprintf( buffer, 49, "PB/%hhu/%hhu_", BAG::itemToBall( p_pokeball ),
+                  BAG::itemToBall( p_pokeball ) );
 
         u16 x = IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].x;
         u16 y = IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y;
@@ -2163,9 +2165,9 @@ namespace BATTLE {
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].palette = SPR_PKMN_SHADOW_PAL;
         IO::updateOAM( false );
         for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
-        SOUND::playBGMOneshot( MOD_OS_PKMN_CAPTURE );
+        SOUND::playBGMOneshot( BGM_OS_PKMN_CAPTURE );
         for( int i = 0; i < 150; ++i ) swiWaitForVBlank( );
-        SOUND::playBGM( MOD_VICTORY_WILD );
+        SOUND::playBGM( BGM_VICTORY_WILD );
         return;
 
     BREAK:
@@ -2187,16 +2189,16 @@ namespace BATTLE {
         char buffer[ 100 ];
 
         switch( p_status ) {
-        case CONFUSION: snprintf( buffer, 99, GET_STRING( 661 ), pkmnstr.c_str( ) ); break;
-        case LASERFOCUS: snprintf( buffer, 99, GET_STRING( 662 ), pkmnstr.c_str( ) ); break;
-        case MAGNETRISE: snprintf( buffer, 99, GET_STRING( 663 ), pkmnstr.c_str( ) ); break;
-        case AQUARING: snprintf( buffer, 99, GET_STRING( 664 ), pkmnstr.c_str( ) ); break;
-        case FOCUSENERGY: snprintf( buffer, 99, GET_STRING( 665 ), pkmnstr.c_str( ) ); break;
-        case INGRAIN: snprintf( buffer, 99, GET_STRING( 666 ), pkmnstr.c_str( ) ); break;
-        case FORESIGHT:
-        case MIRACLEEYE: snprintf( buffer, 99, GET_STRING( 667 ), pkmnstr.c_str( ) ); break;
-        case LEECHSEED: snprintf( buffer, 99, GET_STRING( 668 ), pkmnstr.c_str( ) ); break;
-        case PROTECT: snprintf( buffer, 99, GET_STRING( 674 ), pkmnstr.c_str( ) ); break;
+        case VS_CONFUSION: snprintf( buffer, 99, GET_STRING( 661 ), pkmnstr.c_str( ) ); break;
+        case VS_LASERFOCUS: snprintf( buffer, 99, GET_STRING( 662 ), pkmnstr.c_str( ) ); break;
+        case VS_MAGNETRISE: snprintf( buffer, 99, GET_STRING( 663 ), pkmnstr.c_str( ) ); break;
+        case VS_AQUARING: snprintf( buffer, 99, GET_STRING( 664 ), pkmnstr.c_str( ) ); break;
+        case VS_FOCUSENERGY: snprintf( buffer, 99, GET_STRING( 665 ), pkmnstr.c_str( ) ); break;
+        case VS_INGRAIN: snprintf( buffer, 99, GET_STRING( 666 ), pkmnstr.c_str( ) ); break;
+        case VS_FORESIGHT:
+        case VS_MIRACLEEYE: snprintf( buffer, 99, GET_STRING( 667 ), pkmnstr.c_str( ) ); break;
+        case VS_LEECHSEED: snprintf( buffer, 99, GET_STRING( 668 ), pkmnstr.c_str( ) ); break;
+        case VS_PROTECT: snprintf( buffer, 99, GET_STRING( 674 ), pkmnstr.c_str( ) ); break;
         default: return;
         }
         log( buffer );
@@ -2331,7 +2333,7 @@ namespace BATTLE {
             IO::regularFont->setColor( 0, 2 );
             IO::smallFont->setColor( IO::WHITE_IDX, 1 );
             IO::smallFont->setColor( 0, 2 );
-            auto mdatas = std::vector<MOVE::moveData>( );
+            auto mdatas = std::vector<moveData>( );
             for( int i = 0; i < 4; i++ ) {
                 oam[ SPR_TYPE_OAM_SUB( i ) ].isHidden    = !p_pokemon->getMove( i );
                 oam[ SPR_DMG_CAT_OAM_SUB( i ) ].isHidden = !p_pokemon->getMove( i );
@@ -2346,14 +2348,14 @@ namespace BATTLE {
                                               : IO::choiceBox::DISABLED_CHOICE ) );
 
                 if( !p_pokemon->getMove( i ) ) {
-                    IO::loadTypeIcon( type::UNKNOWN, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
+                    IO::loadTypeIcon( TYPE_UNKNOWN, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
                                       oam[ SPR_TYPE_OAM_SUB( i ) ].y, SPR_TYPE_OAM_SUB( i ),
                                       SPR_TYPE_PAL_SUB( i ), oam[ SPR_TYPE_OAM_SUB( i ) ].gfxIndex,
                                       true, CURRENT_LANGUAGE );
                     oam[ SPR_TYPE_OAM_SUB( i ) ].isHidden = true;
                     continue;
                 }
-                auto mdata = MOVE::getMoveData( p_pokemon->getMove( i ) );
+                auto mdata = FS::getMoveData( p_pokemon->getMove( i ) );
                 mdatas.push_back( mdata );
 
                 type t;
@@ -2400,7 +2402,7 @@ namespace BATTLE {
 
             for( int i = 0; i < 4; i++ ) {
                 if( !p_pokemon->getMove( i ) ) continue;
-                auto mname = MOVE::getMoveName( p_pokemon->getMove( i ) );
+                auto mname = FS::getMoveName( p_pokemon->getMove( i ) );
                 if( mname.length( ) > 18 ) {
                     snprintf( buffer, 20, "%s.", mname.c_str( ) );
                 } else {
@@ -2519,12 +2521,12 @@ namespace BATTLE {
                                                                : IO::choiceBox::DISABLED_CHOICE ) );
 
                 if( !( p_choices & ( 1 << i ) ) ) {
-                    IO::loadTypeIcon( type::NORMAL, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
+                    IO::loadTypeIcon( TYPE_NORMAL, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
                                       oam[ SPR_TYPE_OAM_SUB( i ) ].y, SPR_TYPE_OAM_SUB( i ),
                                       SPR_TYPE_PAL_SUB( i ), oam[ SPR_TYPE_OAM_SUB( i ) ].gfxIndex,
                                       true, CURRENT_LANGUAGE );
                 } else {
-                    IO::loadTypeIcon( type::WATER, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
+                    IO::loadTypeIcon( TYPE_WATER, oam[ SPR_TYPE_OAM_SUB( i ) ].x,
                                       oam[ SPR_TYPE_OAM_SUB( i ) ].y, SPR_TYPE_OAM_SUB( i ),
                                       SPR_TYPE_PAL_SUB( i ), oam[ SPR_TYPE_OAM_SUB( i ) ].gfxIndex,
                                       true, CURRENT_LANGUAGE );
@@ -2805,7 +2807,7 @@ namespace BATTLE {
     }
 
     void battleUI::continueWeather( ) {
-        if( _currentWeather == NO_WEATHER ) { return; }
+        if( _currentWeather == WE_NONE ) { return; }
 
         log( GET_STRING( 500 + u8( _currentWeather ) - 1 ) );
     }

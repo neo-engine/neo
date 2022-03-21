@@ -36,30 +36,25 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
+#include "bag/item.h"
+#include "battle/battle.h"
+#include "battle/battleTrainer.h"
 #include "defines.h"
-#include "fs.h"
-#include "saveGame.h"
-#include "sound.h"
-#include "startScreen.h"
-
-#include "berry.h"
-#include "item.h"
+#include "fs/fs.h"
+#include "io/choiceBox.h"
+#include "io/keyboard.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "io/yesNoBox.h"
+#include "map/mapDrawer.h"
+#include "map/mapObject.h"
+#include "map/mapSlice.h"
+#include "nav/nav.h"
 #include "pokemon.h"
-
-#include "choiceBox.h"
-#include "keyboard.h"
-#include "screenFade.h"
-#include "sprite.h"
-#include "uio.h"
-#include "yesNoBox.h"
-
-#include "mapDrawer.h"
-#include "mapObject.h"
-#include "mapSlice.h"
-
-#include "battle.h"
-#include "battleTrainer.h"
-#include "nav.h"
+#include "save/saveGame.h"
+#include "save/startScreen.h"
+#include "sound/sound.h"
 
 #include "consoleFont.h"
 
@@ -225,8 +220,8 @@ void vblankIRQ( ) {
 }
 
 int main( int, char** p_argv ) {
-    TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
-                   && ( *(u8*) 0x02000402 == 0 ) && ( *(u8*) 0x02000404 == 0 ) );
+    // TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
+    //                && ( *(u8*) 0x02000402 == 0 ) && ( *(u8*) 0x02000404 == 0 ) );
 
     // Init
     powerOn( POWER_ALL_2D );
@@ -323,15 +318,15 @@ int main( int, char** p_argv ) {
                 if( a.isEgg( ) ) continue;
                 for( u8 j = 0; j < 4; ++j )
                     for( u8 param = 0; param < 2; ++param ) {
-                        if( !MOVE::isFieldMove( a.m_boxdata.m_moves[ j ] )
-                            || !MOVE::possible( a.m_boxdata.m_moves[ j ], param )
-                            || !MOVE::text( a.m_boxdata.m_moves[ j ], param ) )
+                        if( !BATTLE::isFieldMove( a.m_boxdata.m_moves[ j ] )
+                            || !BATTLE::possible( a.m_boxdata.m_moves[ j ], param )
+                            || !BATTLE::text( a.m_boxdata.m_moves[ j ], param ) )
                             continue;
                         char buffer[ 100 ];
-                        auto mname = MOVE::getMoveName( a.m_boxdata.m_moves[ j ] );
+                        auto mname = FS::getMoveName( a.m_boxdata.m_moves[ j ] );
                         auto fstr  = std::string( GET_STRING( 3 ) );
                         snprintf( buffer, 99, fstr.c_str( ),
-                                  GET_STRING( MOVE::text( a.m_boxdata.m_moves[ j ], param ) ),
+                                  GET_STRING( BATTLE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                   mname.c_str( ) );
                         SOUND::playSoundEffect( SFX_CHOOSE );
                         IO::yesNoBox yn;
@@ -347,7 +342,7 @@ int main( int, char** p_argv ) {
                             if( i || !MAP::curMap->useFollowPkmn( ) ) {
                                 MAP::curMap->usePkmn( a.getSpriteInfo( ) );
                                 swiWaitForVBlank( );
-                                MOVE::use( a.m_boxdata.m_moves[ j ], param );
+                                BATTLE::use( a.m_boxdata.m_moves[ j ], param );
                             } else {
                                 swiWaitForVBlank( );
 
@@ -361,7 +356,7 @@ int main( int, char** p_argv ) {
                                         += MAP::dir[ d ][ 1 ];
                                 }
 
-                                MOVE::use( a.m_boxdata.m_moves[ j ], 2 );
+                                BATTLE::use( a.m_boxdata.m_moves[ j ], 2 );
 
                                 if( a.m_boxdata.m_moves[ j ] == M_CUT
                                     || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {

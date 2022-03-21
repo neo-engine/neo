@@ -25,10 +25,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <memory>
 
 #include "defines.h"
-#include "fs.h"
+#include "fs/fs.h"
 
 namespace FS::CARD {
     bool checkCard( ) {
@@ -123,7 +124,7 @@ namespace FS::CARD {
             // set WEL (Write Enable Latch)
             write( 0x40, 0x06 );
             write( 0x00,
-                   0x00 ); // This should not be necessary, but desmume seems to think otherwise
+                        0x00 ); // This should not be necessary, but desmume seems to think otherwise
                            // (just write( 0, 6 ); suffices for melonDS)
 
             swiDelay( 14 );

@@ -25,13 +25,14 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "partyScreenUI.h"
+#include "sts/partyScreenUI.h"
 #include "defines.h"
-#include "fs.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "uio.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "gen/pokemonNames.h"
+#include "io/screenFade.h"
+#include "io/uio.h"
+#include "save/saveGame.h"
 
 #include "NoPkmn.h"
 
@@ -881,7 +882,7 @@ namespace STS {
                 IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
 
                 IO::regularFont->printString(
-                    MOVE::getMoveName( move ).c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    FS::getMoveName( move ).c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom, IO::font::CENTER );
 
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );

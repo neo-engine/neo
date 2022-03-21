@@ -29,9 +29,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 #include "defines.h"
-#include "font.h"
-#include "saveGame.h"
-#include "uio.h"
+#include "io/font.h"
+#include "io/uio.h"
+#include "save/saveGame.h"
 
 namespace IO {
     u16 TMPBUF[ 256 * 64 ] = { 0 };

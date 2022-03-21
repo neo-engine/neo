@@ -28,16 +28,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cstdio>
 
-#include "choiceBox.h"
 #include "defines.h"
-#include "dex.h"
-#include "dexUI.h"
-#include "fs.h"
-#include "nav.h"
-#include "saveGame.h"
-#include "screenFade.h"
-#include "sprite.h"
-#include "uio.h"
+#include "dex/dex.h"
+#include "dex/dexUI.h"
+#include "fs/data.h"
+#include "fs/fs.h"
+#include "io/choiceBox.h"
+#include "io/screenFade.h"
+#include "io/sprite.h"
+#include "io/uio.h"
+#include "nav/nav.h"
+#include "save/saveGame.h"
 
 #define SPR_WINDOW_NAME_OAM    0
 #define SPR_PKMN_START_OAM     6
@@ -535,7 +536,7 @@ namespace DEX {
 
     void dexUI::drawPkmnInfo( const pkmnSpriteInfo& p_pkmn, u8 p_page, bool p_bottom ) {
         auto     oamTop = !p_bottom ? IO::OamTop->oamBuffer : IO::Oam->oamBuffer;
-        pkmnData data   = getPkmnData( p_pkmn.m_pkmnIdx, p_pkmn.m_forme );
+        pkmnData data   = FS::getPkmnData( p_pkmn.m_pkmnIdx, p_pkmn.m_forme );
 
         bool seen   = SAVE::SAV.getActiveFile( ).seen( p_pkmn.m_pkmnIdx );
         bool caught = SAVE::SAV.getActiveFile( ).caught( p_pkmn.m_pkmnIdx );
@@ -565,8 +566,9 @@ namespace DEX {
                     oamTop[ SPR_TYPE_OAM( 0 ) ].isHidden = true;
                 }
             } else {
-                IO::loadTypeIcon( UNKNOWN, SPR_TYPE_X( 1 ), SPR_TYPE_Y( 1 ), SPR_TYPE_OAM( 1 ),
-                                  SPR_TYPE_PAL( 1 ), oamTop[ SPR_TYPE_OAM( 1 ) ].gfxIndex, p_bottom,
+                IO::loadTypeIcon( BATTLE::TYPE_UNKNOWN, SPR_TYPE_X( 1 ), SPR_TYPE_Y( 1 ),
+                                  SPR_TYPE_OAM( 1 ), SPR_TYPE_PAL( 1 ),
+                                  oamTop[ SPR_TYPE_OAM( 1 ) ].gfxIndex, p_bottom,
                                   CURRENT_LANGUAGE );
                 oamTop[ SPR_TYPE_OAM( 0 ) ].isHidden = true;
             }
@@ -576,11 +578,11 @@ namespace DEX {
             if( seen || caught ) {
                 if( !p_pkmn.m_forme ) {
                     IO::regularFont->printStringC(
-                        getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 112,
+                        FS::getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 112,
                         p_bottom, IO::font::CENTER );
                 } else {
                     IO::regularFont->printStringC(
-                        getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                        FS::getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
                         SPR_TYPE_X( 0 ) - 4, 112, p_bottom, IO::font::RIGHT );
                 }
             } else {
@@ -610,13 +612,13 @@ namespace DEX {
             IO::regularFont->setColor( 0, 2 );
             if( caught ) {
                 snprintf( buffer, 99, GET_STRING( 582 ),
-                          getSpeciesName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                          FS::getSpeciesName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
                           data.m_baseForme.m_size / 10.0, data.m_baseForme.m_weight / 10.0 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                 IO::regularFont->printStringC( buffer, 128, 128, p_bottom, IO::font::CENTER );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->printBreakingStringC(
-                    getDexEntry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 141, 214,
+                    FS::getDexEntry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 141, 214,
                     p_bottom, IO::font::CENTER, 12 );
 
                 // base stats
@@ -797,7 +799,7 @@ namespace DEX {
 
             std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
             if( seen || caught ) {
-                IO::regularFont->printStringBC( getDisplayName( p_pkmnIdx ).c_str( ), TEXT_PAL,
+                IO::regularFont->printStringBC( FS::getDisplayName( p_pkmnIdx ).c_str( ), TEXT_PAL,
                                                 NAV::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
             } else {
                 IO::regularFont->printStringBC( GET_STRING( 581 ), TEXT_PAL, NAV::TEXT_BUF, 96,

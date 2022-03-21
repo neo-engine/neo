@@ -28,20 +28,19 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <vector>
 
-#include "ability.h"
-#include "abilityNames.h"
-#include "battle.h"
-#include "battleField.h"
-#include "battleSide.h"
-#include "battleSlot.h"
-#include "battleUI.h"
+#include "battle/ability.h"
+#include "battle/battle.h"
+#include "battle/battleField.h"
+#include "battle/battleSide.h"
+#include "battle/battleSlot.h"
+#include "battle/battleUI.h"
+#include "battle/move.h"
+#include "battle/type.h"
 #include "defines.h"
-#include "itemNames.h"
-#include "move.h"
-#include "pokemonNames.h"
-#include "saveGame.h"
-
-#include "type.h"
+#include "gen/abilityNames.h"
+#include "gen/itemNames.h"
+#include "gen/pokemonNames.h"
+#include "save/saveGame.h"
 
 /*
 
@@ -119,7 +118,7 @@ namespace BATTLE {
                 p_ui->logItem( pkmn, p_opponent );
                 auto fmt = std::string( GET_STRING( 539 ) );
                 snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                          ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                          FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                 p_ui->log( buffer );
                 healPokemon( p_ui, p_opponent, p_pos, pkmn->m_stats.m_maxHP / 4 );
                 removeItem( p_ui, p_opponent, p_pos );
@@ -136,7 +135,7 @@ namespace BATTLE {
                     auto fmt = std::string( GET_STRING( 537 ) );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                     removeItem( p_ui, p_opponent, p_pos );
@@ -145,14 +144,14 @@ namespace BATTLE {
             break;
         }
         case I_MENTAL_HERB:
-            if( userVolStat & ATTRACT ) {
+            if( userVolStat & VS_ATTRACT ) {
                 p_ui->logItem( pkmn, p_opponent );
                 auto fmt = std::string( GET_STRING( 537 ) );
                 snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                          ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                          FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                 p_ui->log( buffer );
 
-                removeVolatileStatus( p_ui, p_opponent, p_pos, ATTRACT );
+                removeVolatileStatus( p_ui, p_opponent, p_pos, VS_ATTRACT );
                 removeItem( p_ui, p_opponent, p_pos );
             }
             break;
@@ -182,7 +181,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                         removeItem( p_ui, p_opponent, p_pos );
@@ -196,7 +195,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     removeStatusCondition( p_opponent, p_pos );
                     p_ui->updatePkmnStats( p_opponent, p_pos, pkmn );
@@ -209,7 +208,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     removeStatusCondition( p_opponent, p_pos );
                     p_ui->updatePkmnStats( p_opponent, p_pos, pkmn );
@@ -223,7 +222,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     removeStatusCondition( p_opponent, p_pos );
                     p_ui->updatePkmnStats( p_opponent, p_pos, pkmn );
@@ -237,7 +236,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     removeStatusCondition( p_opponent, p_pos );
                     p_ui->updatePkmnStats( p_opponent, p_pos, pkmn );
@@ -251,7 +250,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     removeStatusCondition( p_opponent, p_pos );
                     p_ui->updatePkmnStats( p_opponent, p_pos, pkmn );
@@ -264,7 +263,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos, 10 * ( 1 + ripen ) );
                     removeItem( p_ui, p_opponent, p_pos );
@@ -273,42 +272,42 @@ namespace BATTLE {
                 break;
             case I_RIE_BERRY:
             case I_PERSIM_BERRY:
-                if( userVolStat & CONFUSION ) {
+                if( userVolStat & VS_CONFUSION ) {
                     p_ui->logItem( pkmn, p_opponent );
                     fmt = std::string( GET_STRING( 278 ) );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
 
-                    removeVolatileStatus( p_ui, p_opponent, p_pos, CONFUSION );
+                    removeVolatileStatus( p_ui, p_opponent, p_pos, VS_CONFUSION );
                     removeItem( p_ui, p_opponent, p_pos );
                     checkOnEatBerry( p_ui, p_opponent, p_pos, pkmn->getItem( ) );
                 }
                 break;
             case I_GARC_BERRY:
-                if( userVolStat & ATTRACT ) {
+                if( userVolStat & VS_ATTRACT ) {
                     p_ui->logItem( pkmn, p_opponent );
                     fmt = std::string( GET_STRING( 278 ) );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
 
-                    removeVolatileStatus( p_ui, p_opponent, p_pos, ATTRACT );
+                    removeVolatileStatus( p_ui, p_opponent, p_pos, VS_ATTRACT );
                     removeItem( p_ui, p_opponent, p_pos );
                     checkOnEatBerry( p_ui, p_opponent, p_pos, pkmn->getItem( ) );
                 }
                 break;
             case I_LUM_BERRY:
-                if( pkmn->m_statusint || ( userVolStat & CONFUSION ) ) {
+                if( pkmn->m_statusint || ( userVolStat & VS_CONFUSION ) ) {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     removeStatusCondition( p_opponent, p_pos );
-                    removeVolatileStatus( p_ui, p_opponent, p_pos, CONFUSION );
+                    removeVolatileStatus( p_ui, p_opponent, p_pos, VS_CONFUSION );
                     p_ui->updatePkmnStats( p_opponent, p_pos, pkmn );
                     removeItem( p_ui, p_opponent, p_pos );
                     checkOnEatBerry( p_ui, p_opponent, p_pos, pkmn->getItem( ) );
@@ -319,7 +318,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos,
                                  pkmn->m_stats.m_maxHP * ( 1 + ripen ) / 4 );
@@ -332,7 +331,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos,
                                  pkmn->m_stats.m_maxHP * ( 1 + ripen ) / 4 );
@@ -345,7 +344,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos,
                                  pkmn->m_stats.m_maxHP * ( 1 + ripen ) / 4 );
@@ -358,7 +357,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos,
                                  pkmn->m_stats.m_maxHP * ( 1 + ripen ) / 4 );
@@ -371,7 +370,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos,
                                  pkmn->m_stats.m_maxHP * ( 1 + ripen ) / 4 );
@@ -384,7 +383,7 @@ namespace BATTLE {
                     p_ui->logItem( pkmn, p_opponent );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                              ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                              FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
                     healPokemon( p_ui, p_opponent, p_pos,
                                  pkmn->m_stats.m_maxHP * ( 1 + ripen ) / 4 );
@@ -402,7 +401,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                         removeItem( p_ui, p_opponent, p_pos );
@@ -421,7 +420,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                         removeItem( p_ui, p_opponent, p_pos );
@@ -440,7 +439,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                         removeItem( p_ui, p_opponent, p_pos );
@@ -459,7 +458,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                         removeItem( p_ui, p_opponent, p_pos );
@@ -478,7 +477,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, bs, res );
                         removeItem( p_ui, p_opponent, p_pos );
@@ -505,7 +504,7 @@ namespace BATTLE {
                         p_ui->logItem( pkmn, p_opponent );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         p_ui->logBoosts( pkmn, p_opponent, p_pos, res, res2 );
@@ -536,11 +535,11 @@ namespace BATTLE {
         // Check for M_FOCUS_PUNCH and M_SHELL_TRAP
 
         auto tgvol = getVolatileStatus( p_target.first, p_target.second );
-        if( p_damage && ( tgvol & FOCUSPUNCH ) ) {
-            removeVolatileStatus( p_ui, p_target.first, p_target.second, FOCUSPUNCH );
+        if( p_damage && ( tgvol & VS_FOCUSPUNCH ) ) {
+            removeVolatileStatus( p_ui, p_target.first, p_target.second, VS_FOCUSPUNCH );
         }
-        if( p_move.m_moveData.m_category == MOVE::PHYSICAL && p_damage && ( tgvol & SHELLTRAP ) ) {
-            removeVolatileStatus( p_ui, p_target.first, p_target.second, SHELLTRAP );
+        if( p_move.m_moveData.m_category == MH_PHYSICAL && p_damage && ( tgvol & VS_SHELLTRAP ) ) {
+            removeVolatileStatus( p_ui, p_target.first, p_target.second, VS_SHELLTRAP );
         }
 
         if( canUseItem( p_target.first, p_target.second ) ) {
@@ -558,7 +557,7 @@ namespace BATTLE {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -568,7 +567,7 @@ namespace BATTLE {
                 }
                 break;
             case I_SNOWBALL:
-                if( p_move.m_moveData.m_type == type::ICE && target->canBattle( )
+                if( p_move.m_moveData.m_type == TYPE_ICE && target->canBattle( )
                     && target->m_stats.m_curHP < target->m_stats.m_maxHP ) {
                     boosts bs = boosts( );
                     bs.setBoost( ATK, 1 );
@@ -578,7 +577,7 @@ namespace BATTLE {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -588,7 +587,7 @@ namespace BATTLE {
                 }
                 break;
             case I_ABSORB_BULB:
-                if( p_move.m_moveData.m_type == type::WATER && target->canBattle( )
+                if( p_move.m_moveData.m_type == TYPE_WATER && target->canBattle( )
                     && target->m_stats.m_curHP < target->m_stats.m_maxHP ) {
                     boosts bs = boosts( );
                     bs.setBoost( SATK, 1 );
@@ -598,7 +597,7 @@ namespace BATTLE {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -609,7 +608,7 @@ namespace BATTLE {
                 break;
 
             case I_LUMINOUS_MOSS:
-                if( p_move.m_moveData.m_type == type::WATER && target->canBattle( )
+                if( p_move.m_moveData.m_type == TYPE_WATER && target->canBattle( )
                     && target->m_stats.m_curHP < target->m_stats.m_maxHP ) {
                     boosts bs = boosts( );
                     bs.setBoost( SDEF, 1 );
@@ -619,7 +618,7 @@ namespace BATTLE {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -629,7 +628,7 @@ namespace BATTLE {
                 }
                 break;
             case I_CELL_BATTERY:
-                if( p_move.m_moveData.m_type == type::ELECTRIC && target->canBattle( )
+                if( p_move.m_moveData.m_type == TYPE_LIGHTNING && target->canBattle( )
                     && target->m_stats.m_curHP < target->m_stats.m_maxHP ) {
                     boosts bs = boosts( );
                     bs.setBoost( ATK, 1 );
@@ -639,7 +638,7 @@ namespace BATTLE {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -661,7 +660,7 @@ namespace BATTLE {
                 p_ui->logItem( target, p_target.first );
                 snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                          ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                          FS::getItemName( target->getItem( ) ).c_str( ) );
                 p_ui->log( buffer );
                 removeItem( p_ui, p_target.first, p_target.second );
                 // TODO: should only work if opponent has > 1 pkmn that can battle
@@ -684,7 +683,7 @@ namespace BATTLE {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         if( supprAbs || target->getAbility( ) != A_RIPEN ) {
@@ -701,11 +700,11 @@ namespace BATTLE {
                     }
                     break;
                 case I_JABOCA_BERRY:
-                    if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::PHYSICAL ) {
+                    if( user->canBattle( ) && p_move.m_moveData.m_category == MH_PHYSICAL ) {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         if( supprAbs || target->getAbility( ) != A_RIPEN ) {
@@ -722,7 +721,7 @@ namespace BATTLE {
                     }
                     break;
                 case I_KEE_BERRY:
-                    if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::PHYSICAL ) {
+                    if( user->canBattle( ) && p_move.m_moveData.m_category == MH_PHYSICAL ) {
                         boosts bs = boosts( );
                         if( supprAbs || target->getAbility( ) != A_RIPEN ) {
                             bs.setBoost( DEF, 1 );
@@ -735,7 +734,7 @@ namespace BATTLE {
                             p_ui->logItem( target, p_target.first );
                             snprintf( buffer, 99, fmt.c_str( ),
                                       p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                      ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                      FS::getItemName( target->getItem( ) ).c_str( ) );
                             p_ui->log( buffer );
 
                             p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -747,7 +746,7 @@ namespace BATTLE {
                     }
                     break;
                 case I_MARANGA_BERRY:
-                    if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::SPECIAL ) {
+                    if( user->canBattle( ) && p_move.m_moveData.m_category == MH_SPECIAL ) {
                         boosts bs = boosts( );
                         if( supprAbs || target->getAbility( ) != A_RIPEN ) {
                             bs.setBoost( SDEF, 1 );
@@ -760,7 +759,7 @@ namespace BATTLE {
                             p_ui->logItem( target, p_target.first );
                             snprintf( buffer, 99, fmt.c_str( ),
                                       p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                      ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                      FS::getItemName( target->getItem( ) ).c_str( ) );
                             p_ui->log( buffer );
 
                             p_ui->logBoosts( target, p_target.first, p_target.second, bs, res );
@@ -773,11 +772,11 @@ namespace BATTLE {
                     break;
 
                 case I_ROWAP_BERRY:
-                    if( user->canBattle( ) && p_move.m_moveData.m_category == MOVE::SPECIAL ) {
+                    if( user->canBattle( ) && p_move.m_moveData.m_category == MH_SPECIAL ) {
                         p_ui->logItem( target, p_target.first );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( target, p_target.first ).c_str( ),
-                                  ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                                  FS::getItemName( target->getItem( ) ).c_str( ) );
                         p_ui->log( buffer );
 
                         if( supprAbs || target->getAbility( ) != A_RIPEN ) {
@@ -888,52 +887,52 @@ namespace BATTLE {
                 // Weather abilities
                 case A_DRIZZLE:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, RAIN, items && pkmn->getItem( ) == I_DAMP_ROCK );
+                    setWeather( p_ui, WE_RAIN, items && pkmn->getItem( ) == I_DAMP_ROCK );
                     break;
                 case A_DROUGHT:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, SUN, items && pkmn->getItem( ) == I_HEAT_ROCK );
+                    setWeather( p_ui, WE_SUN, items && pkmn->getItem( ) == I_HEAT_ROCK );
                     break;
                 case A_SAND_STREAM:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, SANDSTORM, items && pkmn->getItem( ) == I_SMOOTH_ROCK );
+                    setWeather( p_ui, WE_SANDSTORM, items && pkmn->getItem( ) == I_SMOOTH_ROCK );
                     break;
                 case A_SNOW_WARNING:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, HAIL, items && pkmn->getItem( ) == I_ICY_ROCK );
+                    setWeather( p_ui, WE_HAIL, items && pkmn->getItem( ) == I_ICY_ROCK );
                     break;
                 case A_PRIMORDIAL_SEA:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, HEAVY_RAIN );
+                    setWeather( p_ui, WE_HEAVY_RAIN );
                     break;
                 case A_DESOLATE_LAND:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, HEAVY_SUNSHINE );
+                    setWeather( p_ui, WE_HEAVY_SUNSHINE );
                     break;
                 case A_DELTA_STREAM:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setWeather( p_ui, HEAVY_WINDS );
+                    setWeather( p_ui, WE_HEAVY_WINDS );
                     break;
 
                 // Terrain abilities
                 case A_ELECTRIC_SURGE:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setTerrain( p_ui, ELECTRICTERRAIN,
+                    setTerrain( p_ui, TR_ELECTRICTERRAIN,
                                 items && pkmn->getItem( ) == I_TERRAIN_EXTENDER );
                     break;
                 case A_PSYCHIC_SURGE:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setTerrain( p_ui, PSYCHICTERRAIN,
+                    setTerrain( p_ui, TR_PSYCHICTERRAIN,
                                 items && pkmn->getItem( ) == I_TERRAIN_EXTENDER );
                     break;
                 case A_GRASSY_SURGE:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setTerrain( p_ui, GRASSYTERRAIN,
+                    setTerrain( p_ui, TR_GRASSYTERRAIN,
                                 items && pkmn->getItem( ) == I_TERRAIN_EXTENDER );
                     break;
                 case A_MISTY_SURGE:
                     p_ui->logAbility( pkmn, p_opponent );
-                    setTerrain( p_ui, MISTYTERRAIN,
+                    setTerrain( p_ui, TR_MISTYTERRAIN,
                                 items && pkmn->getItem( ) == I_TERRAIN_EXTENDER );
                     break;
 
@@ -972,8 +971,8 @@ namespace BATTLE {
                         if( tmp == nullptr ) { continue; }
                         for( u8 j = 0; j < 4; ++j ) {
                             if( tmp->getMove( j ) ) [[likely]] {
-                                auto mdata = MOVE::getMoveData( tmp->getMove( j ) );
-                                if( ( mdata.m_flags & MOVE::OHKO ) ) [[unlikely]] {
+                                auto mdata = FS::getMoveData( tmp->getMove( j ) );
+                                if( ( mdata.m_flags & MF_OHKO ) ) [[unlikely]] {
                                     warn = true;
                                     break;
                                 }
@@ -1001,7 +1000,7 @@ namespace BATTLE {
                         for( u8 j = 0; j < 4; ++j ) {
                             if( tmp->getMove( j ) ) {
                                 moves.push_back( std::pair<u8, u16>(
-                                    255 - MOVE::getMoveData( tmp->getMove( j ) ).m_basePower,
+                                    255 - FS::getMoveData( tmp->getMove( j ) ).m_basePower,
                                     tmp->getMove( j ) ) );
                             }
                         }
@@ -1029,14 +1028,14 @@ namespace BATTLE {
                     p_ui->logAbility( pkmn, p_opponent );
                     for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         _sides[ i ].removeSideCondition(
-                            p_ui, sideCondition( LIGHTSCREEN | REFLECT | AURORAVEIL ) );
+                            p_ui, sideCondition( SC_LIGHTSCREEN | SC_REFLECT | SC_AURORAVEIL ) );
                     }
                     break;
                 }
                 case A_FLOWER_GIFT: {
                     if( pkmn->getSpecies( ) == PKMN_CHERRIM ) {
                         if( !suppressesWeather( ) ) {
-                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                            if( getWeather( ) == WE_SUN || getWeather( ) == WE_HEAVY_SUNSHINE ) {
                                 pkmn->setBattleForme( 1 );
                                 p_ui->updatePkmn( p_opponent, p_slot, pkmn );
                                 break;
@@ -1051,17 +1050,17 @@ namespace BATTLE {
                 case A_FORECAST: {
                     if( pkmn->getSpecies( ) == PKMN_CASTFORM ) {
                         if( !suppressesWeather( ) ) {
-                            if( getWeather( ) == RAIN || getWeather( ) == HEAVY_RAIN ) {
+                            if( getWeather( ) == WE_RAIN || getWeather( ) == WE_HEAVY_RAIN ) {
                                 pkmn->setBattleForme( 2 );
                                 p_ui->updatePkmn( p_opponent, p_slot, pkmn );
                                 break;
                             }
-                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                            if( getWeather( ) == WE_SUN || getWeather( ) == WE_HEAVY_SUNSHINE ) {
                                 pkmn->setBattleForme( 1 );
                                 p_ui->updatePkmn( p_opponent, p_slot, pkmn );
                                 break;
                             }
-                            if( getWeather( ) == HAIL ) {
+                            if( getWeather( ) == WE_HAIL ) {
                                 pkmn->setBattleForme( 3 );
                                 p_ui->updatePkmn( p_opponent, p_slot, pkmn );
                                 break;
@@ -1234,7 +1233,7 @@ namespace BATTLE {
                 if( pkmn == nullptr || supprA ) { continue; }
 
                 auto volst = getVolatileStatus( i, j );
-                if( volst & NIGHTMARE ) {
+                if( volst & VS_NIGHTMARE ) {
                     auto fmt = std::string( GET_STRING( 536 ) );
                     if( hasStatusCondition( i, j, SLEEP ) ) {
                         snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
@@ -1243,22 +1242,22 @@ namespace BATTLE {
                         if( !amount ) { amount = 1; }
                         damagePokemon( p_ui, i, j, amount );
                     } else {
-                        _sides[ i ].removeVolatileStatus( p_ui, j, NIGHTMARE );
+                        _sides[ i ].removeVolatileStatus( p_ui, j, VS_NIGHTMARE );
                     }
                 }
 
-                if( volst & YAWN ) {
-                    if( getVolatileStatusCounter( i, j, YAWN ) == 1 ) {
+                if( volst & VS_YAWN ) {
+                    if( getVolatileStatusCounter( i, j, VS_YAWN ) == 1 ) {
                         if( setStatusCondition( i, j, SLEEP, 4 + ( rand( ) & 3 ) ) ) {
                             p_ui->animateGetStatusCondition( pkmn, i, j, SLEEP );
                             p_ui->updatePkmnStats( i, j, pkmn, true );
                         }
 
-                        _sides[ i ].removeVolatileStatus( p_ui, j, YAWN );
+                        _sides[ i ].removeVolatileStatus( p_ui, j, VS_YAWN );
                     }
                 }
-                if( volst & AQUARING ) {
-                    if( !( volst & HEALBLOCK ) ) {
+                if( volst & VS_AQUARING ) {
+                    if( !( volst & VS_HEALBLOCK ) ) {
                         auto fmt = std::string( GET_STRING( 535 ) );
                         snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
                         p_ui->log( buffer );
@@ -1270,8 +1269,8 @@ namespace BATTLE {
                         healPokemon( p_ui, i, j, amount );
                     }
                 }
-                if( volst & INGRAIN ) {
-                    if( !( volst & HEALBLOCK ) ) {
+                if( volst & VS_INGRAIN ) {
+                    if( !( volst & VS_HEALBLOCK ) ) {
                         auto fmt = std::string( GET_STRING( 534 ) );
                         snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, i ).c_str( ) );
                         p_ui->log( buffer );
@@ -1283,7 +1282,7 @@ namespace BATTLE {
                         healPokemon( p_ui, i, j, amount );
                     }
                 }
-                if( volst & CURSE ) {
+                if( volst & VS_CURSE ) {
 #ifdef DESQUID_MORE
                     p_ui->log( std::to_string( volst ) );
 #endif
@@ -1330,7 +1329,7 @@ namespace BATTLE {
                     p_ui->animateStatusCondition( pkmn, i, j, POISON );
                     if( supprA || pkmn->getAbility( ) != A_POISON_HEAL ) {
                         damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
-                    } else if( !( volst & HEALBLOCK ) ) {
+                    } else if( !( volst & VS_HEALBLOCK ) ) {
                         p_ui->logAbility( pkmn, i );
                         healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
                     }
@@ -1341,7 +1340,7 @@ namespace BATTLE {
                     if( turns > 15 ) { turns = 15; }
                     if( supprA || pkmn->getAbility( ) != A_POISON_HEAL ) {
                         damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP * turns / 16 );
-                    } else if( !( volst & HEALBLOCK ) ) {
+                    } else if( !( volst & VS_HEALBLOCK ) ) {
                         p_ui->logAbility( pkmn, i );
                         healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
                     }
@@ -1366,12 +1365,12 @@ namespace BATTLE {
                 if( !canUseItem( i, j ) ) { continue; }
                 auto volst = getVolatileStatus( i, j );
 
-                if( pkmn->getItem( ) == I_LEFTOVERS && !( volst & HEALBLOCK ) ) {
+                if( pkmn->getItem( ) == I_LEFTOVERS && !( volst & VS_HEALBLOCK ) ) {
                     healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
                 }
                 if( pkmn->getItem( ) == I_BLACK_SLUDGE ) {
-                    if( hasType( i, j, type::POISON ) ) {
-                        if( !( volst & HEALBLOCK ) ) {
+                    if( hasType( i, j, TYPE_POISON ) ) {
+                        if( !( volst & VS_HEALBLOCK ) ) {
                             healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
                         }
                     } else {
@@ -1411,11 +1410,11 @@ namespace BATTLE {
             return false;
         }
 
-        if( _weather == HEAVY_RAIN || _weather == HEAVY_SUNSHINE || _weather == HEAVY_WINDS )
-            [[unlikely]] {
+        if( _weather == WE_HEAVY_RAIN || _weather == WE_HEAVY_SUNSHINE
+            || _weather == WE_HEAVY_WINDS ) [[unlikely]] {
             // weather can be replaced only with a similar weather
-            if( p_newWeather != HEAVY_RAIN && p_newWeather != HEAVY_SUNSHINE
-                && p_newWeather != HEAVY_WINDS ) {
+            if( p_newWeather != WE_HEAVY_RAIN && p_newWeather != WE_HEAVY_SUNSHINE
+                && p_newWeather != WE_HEAVY_WINDS ) {
                 p_ui->log( GET_STRING( 304 ) );
                 return false;
             }
@@ -1437,17 +1436,17 @@ namespace BATTLE {
                     if( pkmn->getSpecies( ) == PKMN_CASTFORM
                         && pkmn->getAbility( ) == A_FORECAST ) {
                         if( !suppressesWeather( ) ) {
-                            if( getWeather( ) == RAIN || getWeather( ) == HEAVY_RAIN ) {
+                            if( getWeather( ) == WE_RAIN || getWeather( ) == WE_HEAVY_RAIN ) {
                                 pkmn->setBattleForme( 2 );
                                 p_ui->updatePkmn( i, j, pkmn );
                                 continue;
                             }
-                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                            if( getWeather( ) == WE_SUN || getWeather( ) == WE_HEAVY_SUNSHINE ) {
                                 pkmn->setBattleForme( 1 );
                                 p_ui->updatePkmn( i, j, pkmn );
                                 continue;
                             }
-                            if( getWeather( ) == HAIL ) {
+                            if( getWeather( ) == WE_HAIL ) {
                                 pkmn->setBattleForme( 3 );
                                 p_ui->updatePkmn( i, j, pkmn );
                                 continue;
@@ -1460,7 +1459,7 @@ namespace BATTLE {
                     if( pkmn->getSpecies( ) == PKMN_CHERRIM
                         && pkmn->getAbility( ) == A_FLOWER_GIFT ) {
                         if( !suppressesWeather( ) ) {
-                            if( getWeather( ) == SUN || getWeather( ) == HEAVY_SUNSHINE ) {
+                            if( getWeather( ) == WE_SUN || getWeather( ) == WE_HEAVY_SUNSHINE ) {
                                 pkmn->setBattleForme( 1 );
                                 p_ui->updatePkmn( i, j, pkmn );
                                 continue;
@@ -1480,7 +1479,7 @@ namespace BATTLE {
         p_ui->continueWeather( );
 
         auto weather = getWeather( );
-        if( weather == NO_WEATHER || suppressesWeather( ) ) {
+        if( weather == WE_NONE || suppressesWeather( ) ) {
             // nothing to do
             return;
         }
@@ -1493,7 +1492,7 @@ namespace BATTLE {
                 if( pkmn == nullptr ) { continue; }
                 auto volst = getVolatileStatus( i, j );
 
-                if( weather == RAIN || weather == HEAVY_RAIN ) {
+                if( weather == WE_RAIN || weather == WE_HEAVY_RAIN ) {
                     if( !supprA && pkmn->getAbility( ) == A_HYDRATION ) {
                         if( pkmn->m_statusint ) {
                             if( removeStatusCondition( i, j ) ) {
@@ -1502,16 +1501,18 @@ namespace BATTLE {
                             }
                         }
                     }
-                    if( !supprA && pkmn->getAbility( ) == A_DRY_SKIN && !( volst & HEALBLOCK ) ) {
+                    if( !supprA && pkmn->getAbility( ) == A_DRY_SKIN
+                        && !( volst & VS_HEALBLOCK ) ) {
                         p_ui->logAbility( pkmn, i );
                         healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
                     }
-                    if( !supprA && pkmn->getAbility( ) == A_RAIN_DISH && !( volst & HEALBLOCK ) ) {
+                    if( !supprA && pkmn->getAbility( ) == A_RAIN_DISH
+                        && !( volst & VS_HEALBLOCK ) ) {
                         p_ui->logAbility( pkmn, i );
                         healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
                     }
                 }
-                if( weather == SUN || weather == HEAVY_SUNSHINE ) {
+                if( weather == WE_SUN || weather == WE_HEAVY_SUNSHINE ) {
                     if( !supprA
                         && ( pkmn->getAbility( ) == A_DRY_SKIN
                              || pkmn->getAbility( ) == A_SOLAR_POWER ) ) {
@@ -1519,9 +1520,9 @@ namespace BATTLE {
                         damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 8 );
                     }
                 }
-                if( weather == HAIL ) {
+                if( weather == WE_HAIL ) {
                     if( !supprA && pkmn->getAbility( ) == A_ICE_BODY ) {
-                        if( !( volst & HEALBLOCK ) ) {
+                        if( !( volst & VS_HEALBLOCK ) ) {
                             p_ui->logAbility( pkmn, i );
                             healPokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
                         }
@@ -1530,15 +1531,15 @@ namespace BATTLE {
                                     || pkmn->getAbility( ) == A_MAGIC_GUARD
                                     || pkmn->getAbility( ) == A_OVERCOAT ) ) {
                     } else if( canUseItem( i, j ) && pkmn->getItem( ) == I_SAFETY_GOGGLES ) {
-                    } else if( hasType( i, j, ICE ) ) {
+                    } else if( hasType( i, j, TYPE_ICE ) ) {
                     } else {
                         damagePokemon( p_ui, i, j, pkmn->m_stats.m_maxHP / 16 );
                     }
                 }
 
-                if( weather == SANDSTORM ) {
-                    if( hasType( i, j, GROUND ) || hasType( i, j, ROCK )
-                        || hasType( i, j, STEEL ) ) {
+                if( weather == WE_SANDSTORM ) {
+                    if( hasType( i, j, TYPE_GROUND ) || hasType( i, j, TYPE_ROCK )
+                        || hasType( i, j, TYPE_STEEL ) ) {
                     } else if( !supprA
                                && ( pkmn->getAbility( ) == A_SAND_FORCE
                                     || pkmn->getAbility( ) == A_SAND_RUSH
@@ -1560,12 +1561,12 @@ namespace BATTLE {
     }
 
     bool field::removeWeather( battleUI* p_ui ) {
-        if( _weather != NO_WEATHER ) {
-            p_ui->setNewWeather( NO_WEATHER );
+        if( _weather != WE_NONE ) {
+            p_ui->setNewWeather( WE_NONE );
         } else {
             return false;
         }
-        _weather      = NO_WEATHER;
+        _weather      = WE_NONE;
         _weatherTimer = 0;
         return true;
     }
@@ -1575,8 +1576,8 @@ namespace BATTLE {
         bool change = false;
         for( u8 i = 0; i < MAX_PSEUDO_WEATHER; ++i ) {
             if( ( p_newPseudoWeather & ( 1LLU << i ) ) && _pseudoWeatherTimer[ i ]
-                && ( ( 1LLU << i ) == MAGICROOM || ( 1LLU << i ) == WONDERROOM
-                     || ( 1LLU << i ) == TRICKROOM ) ) {
+                && ( ( 1LLU << i ) == PW_MAGICROOM || ( 1LLU << i ) == PW_WONDERROOM
+                     || ( 1LLU << i ) == PW_TRICKROOM ) ) {
                 removePseudoWeather( p_ui, pseudoWeather( 1LLU << i ) );
                 change = true;
                 continue;
@@ -1584,7 +1585,7 @@ namespace BATTLE {
             if( ( p_newPseudoWeather & ( 1LLU << i ) ) && !_pseudoWeatherTimer[ i ] ) {
                 change                   = true;
                 _pseudoWeatherTimer[ i ] = p_extended ? EXTENDED_DURATION : NORMAL_DURATION;
-                if( ( 1LLU << i ) == FAIRYLOCK ) { _pseudoWeatherTimer[ i ] = 2; }
+                if( ( 1LLU << i ) == PW_FAIRYLOCK ) { _pseudoWeatherTimer[ i ] = 2; }
                 p_ui->addPseudoWeather( i );
             }
         }
@@ -1616,8 +1617,8 @@ namespace BATTLE {
     }
 
     bool field::removeTerrain( battleUI* p_ui ) {
-        if( _terrain == NO_TERRAIN ) { return false; }
-        p_ui->setNewTerrain( _terrain = NO_TERRAIN );
+        if( _terrain == TR_NONE ) { return false; }
+        p_ui->setNewTerrain( _terrain = TR_NONE );
         _terrainTimer = 0;
         return true;
     }
@@ -1629,7 +1630,7 @@ namespace BATTLE {
         char buffer[ 100 ];
         auto fmt = std::string( GET_STRING( 307 ) );
         snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( pkmn, p_opponent ).c_str( ),
-                  ITEM::getItemName( pkmn->getItem( ) ).c_str( ) );
+                  FS::getItemName( pkmn->getItem( ) ).c_str( ) );
         p_ui->log( std::string( buffer ) );
 
         pkmn->battleTransform( );
@@ -1666,9 +1667,9 @@ namespace BATTLE {
 
             // compute targets, priority
             switch( m.m_type ) {
-            case ATTACK:
-            case SWITCH_PURSUIT: {
-                if( m.m_type == battleMoveType::SWITCH_PURSUIT ) {
+            case MT_ATTACK:
+            case MT_SWITCH_PURSUIT: {
+                if( m.m_type == MT_SWITCH_PURSUIT ) {
                     // Double the power of pursuit
                     bm.m_priority = 123;
                     bm.m_moveData.m_basePower *= 2;
@@ -1679,7 +1680,7 @@ namespace BATTLE {
                     // Check for priority changing abilities
                     if( !suppressesAbilities( ) ) [[likely]] {
                         // Gale wings
-                        if( m.m_moveData.m_type == FLYING
+                        if( m.m_moveData.m_type == TYPE_FLYING
                             && getPkmn( m.m_user.first, m.m_user.second )->getStat( HP )
                                    == getPkmn( m.m_user.first, m.m_user.second )->m_stats.m_maxHP
                             && getPkmn( m.m_user.first, m.m_user.second )->getAbility( )
@@ -1688,7 +1689,7 @@ namespace BATTLE {
                         }
 
                         // Prankster
-                        if( m.m_moveData.m_category == MOVE::STATUS
+                        if( m.m_moveData.m_category == MH_STATUS
                             && getPkmn( m.m_user.first, m.m_user.second )->getAbility( )
                                    == A_PRANKSTER ) [[unlikely]] {
                             bm.m_priority += 3;
@@ -1727,14 +1728,14 @@ namespace BATTLE {
                             [[unlikely]] {
                             if( rand( ) % 100 < 20 ) {
                                 bm.m_priority++;
-                                res.push_back( { MESSAGE_ITEM,
+                                res.push_back( { MT_MESSAGE_ITEM,
                                                  I_QUICK_CLAW,
                                                  { },
                                                  { 255, 255 },
                                                  127,
                                                  0,
                                                  u8( 5 + j ),
-                                                 MOVE::moveData( ),
+                                                 moveData( ),
                                                  false } );
                             }
                         }
@@ -1750,14 +1751,14 @@ namespace BATTLE {
                                 p_ui->logItem( getPkmn( m.m_user.first, m.m_user.second ),
                                                m.m_user.first );
                                 bm.m_priority++;
-                                res.push_back( { MESSAGE_ITEM,
+                                res.push_back( { MT_MESSAGE_ITEM,
                                                  I_CUSTAP_BERRY,
                                                  { },
                                                  { m.m_user.first, m.m_user.second },
                                                  127,
                                                  0,
                                                  u8( 5 + j ),
-                                                 MOVE::moveData( ),
+                                                 moveData( ),
                                                  false } );
                                 removeItem( p_ui, m.m_user.first, m.m_user.second );
                                 checkOnEatBerry( p_ui, m.m_user.first, m.m_user.second,
@@ -1770,83 +1771,83 @@ namespace BATTLE {
 
                     if( bm.m_param == M_FOCUS_PUNCH || bm.m_param == M_BEAK_BLAST
                         || bm.m_param == M_SHELL_TRAP ) {
-                        res.push_back( { MESSAGE_MOVE,
+                        res.push_back( { MT_MESSAGE_MOVE,
                                          bm.m_param,
                                          { },
                                          { m.m_user.first, m.m_user.second },
                                          125,
                                          0,
                                          u8( 5 + j ),
-                                         MOVE::moveData( ),
+                                         moveData( ),
                                          false } );
                     }
                 }
-                bm.m_type = ATTACK;
+                bm.m_type = MT_ATTACK;
 
-                auto tg = ( m.m_moveData.m_pressureTarget != MOVE::NO_TARGET )
+                auto tg = ( m.m_moveData.m_pressureTarget != TG_NONE )
                               ? m.m_moveData.m_pressureTarget
                               : m.m_moveData.m_target;
                 switch( tg ) {
-                case MOVE::ANY:
-                case MOVE::RANDOM:
-                case MOVE::ALLY_OR_SELF:
-                case MOVE::ANY_FOE:
+                case TG_ANY:
+                case TG_RANDOM:
+                case TG_ALLY_OR_SELF:
+                case TG_ANY_FOE:
                     // target is already computed
                     bm.m_target.push_back( m.m_target );
                     break;
-                case MOVE::ALL_FOES_AND_ALLY:
+                case TG_ALL_FOES_AND_ALLY:
                     if( getPkmn( m.m_user.first, !m.m_user.second ) ) {
                         bm.m_target.push_back( fieldPosition( m.m_user.first, !m.m_user.second ) );
                     }
                     [[fallthrough]];
-                case MOVE::ALL_FOES:
+                case TG_ALL_FOES:
                     for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         if( getPkmn( !m.m_user.first, i ) != nullptr ) {
                             bm.m_target.push_back( fieldPosition( !m.m_user.first, i ) );
                         }
                     }
                     break;
-                case MOVE::ALL_ALLIES:
+                case TG_ALL_ALLIES:
                     for( u8 i = 0; i < getBattlingPKMNCount( _mode ); ++i ) {
                         if( getPkmn( m.m_user.first, i ) != nullptr ) {
                             bm.m_target.push_back( fieldPosition( m.m_user.first, i ) );
                         }
                     }
                     break;
-                case MOVE::SELF:
+                case TG_SELF:
                     bm.m_target.push_back( fieldPosition( m.m_user.first, m.m_user.second ) );
                     break;
-                case MOVE::ALLY:
+                case TG_ALLY:
                     bm.m_target.push_back( fieldPosition( m.m_user.first, !m.m_user.second ) );
                     break;
-                case MOVE::FIELD:
-                case MOVE::SCRIPTED:
-                case MOVE::ALLY_SIDE:
-                case MOVE::ALLY_TEAM:
+                case TG_FIELD:
+                case TG_SCRIPTED:
+                case TG_ALLY_SIDE:
+                case TG_ALLY_TEAM:
                     bm.m_target.push_back( fieldPosition( m.m_user.first, m.m_user.second ) );
                     break;
-                case MOVE::FOE_SIDE:
+                case TG_FOE_SIDE:
                     bm.m_target.push_back( fieldPosition( m.m_user.first, m.m_user.second ) );
                     break;
                 default: break;
                 }
                 break;
             }
-            case SWITCH:
-            case USE_ITEM:
+            case MT_SWITCH:
+            case MT_USE_ITEM:
                 bm.m_type = m.m_type;
                 bm.m_target.push_back( m.m_user );
                 bm.m_priority = 120;
                 break;
             default:
-                bm.m_type = NO_OP;
+                bm.m_type = MT_NO_OP;
                 bm.m_target.push_back( m.m_user );
                 bm.m_priority = -120;
                 break;
             }
 
             if( bm.m_priority > -100 ) [[likely]] {
-                if( getPseudoWeather( ) & TRICKROOM ) {
+                if( getPseudoWeather( ) & PW_TRICKROOM ) {
                     bm.m_userSpeed = -getStat( m.m_user.first, m.m_user.second, SPEED );
                 } else {
                     bm.m_userSpeed = getStat( m.m_user.first, m.m_user.second, SPEED );
@@ -1878,7 +1879,7 @@ namespace BATTLE {
         if( user == nullptr ) [[unlikely]] { return; }
 
         if( p_move.m_param == M_CURSE ) {
-            if( !hasType( p_move.m_user.first, p_move.m_user.second, GHOST ) ) {
+            if( !hasType( p_move.m_user.first, p_move.m_user.second, TYPE_GHOST ) ) {
                 boosts bs = boosts( );
                 bs.setBoost( SPEED, -1 );
                 bs.setBoost( ATK, 1 );
@@ -1901,16 +1902,16 @@ namespace BATTLE {
     void field::executeStatusEffects( battleUI* p_ui, battleMove p_move, fieldPosition p_target ) {
         auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
         auto target = getPkmn( p_target.first, p_target.second );
-        if( p_move.m_moveData.m_target == MOVE::SELF || p_move.m_moveData.m_target == MOVE::FIELD
-            || p_move.m_moveData.m_target == MOVE::FOE_SIDE
-            || p_move.m_moveData.m_target == MOVE::ALLY_SIDE ) {
+        if( p_move.m_moveData.m_target == TG_SELF || p_move.m_moveData.m_target == TG_FIELD
+            || p_move.m_moveData.m_target == TG_FOE_SIDE
+            || p_move.m_moveData.m_target == TG_ALLY_SIDE ) {
             target   = user;
             p_target = p_move.m_user;
         }
         if( user == nullptr || target == nullptr ) [[unlikely]] { return; }
 
         if( p_move.m_param == M_CURSE ) {
-            if( hasType( p_move.m_user.first, p_move.m_user.second, GHOST ) ) {
+            if( hasType( p_move.m_user.first, p_move.m_user.second, TYPE_GHOST ) ) {
                 damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
                                user->m_stats.m_maxHP / 2 );
             } else {
@@ -1934,7 +1935,7 @@ namespace BATTLE {
         }
 
         if( p_move.m_param == M_REST ) {
-            if( getVolatileStatus( p_target.first, p_target.second ) & HEALBLOCK ) {
+            if( getVolatileStatus( p_target.first, p_target.second ) & VS_HEALBLOCK ) {
                 p_ui->log( GET_STRING( 304 ) );
             } else {
                 user->m_status.m_isAsleep = 3;
@@ -1956,7 +1957,7 @@ namespace BATTLE {
 
         // Heal
         if( p_move.m_moveData.m_heal ) {
-            if( getVolatileStatus( p_target.first, p_target.second ) & HEALBLOCK ) {
+            if( getVolatileStatus( p_target.first, p_target.second ) & VS_HEALBLOCK ) {
                 p_ui->log( GET_STRING( 304 ) );
             } else {
                 u16 amount = target->m_stats.m_maxHP * p_move.m_moveData.m_heal / 240;
@@ -1966,15 +1967,15 @@ namespace BATTLE {
         }
         if( p_move.m_param == M_SYNTHESIS || p_move.m_param == M_MOONLIGHT
             || p_move.m_param == M_MORNING_SUN ) {
-            if( getVolatileStatus( p_target.first, p_target.second ) & HEALBLOCK ) {
+            if( getVolatileStatus( p_target.first, p_target.second ) & VS_HEALBLOCK ) {
                 p_ui->log( GET_STRING( 304 ) );
             } else {
                 u16 amount = 1;
                 switch( getWeather( ) ) {
-                case SUN:
-                case HEAVY_SUNSHINE: amount = target->m_stats.m_maxHP * 2 / 3; break;
-                case NO_WEATHER:
-                case HEAVY_WINDS: amount = target->m_stats.m_maxHP / 2; break;
+                case WE_SUN:
+                case WE_HEAVY_SUNSHINE: amount = target->m_stats.m_maxHP * 2 / 3; break;
+                case WE_NONE:
+                case WE_HEAVY_WINDS: amount = target->m_stats.m_maxHP / 2; break;
                 default: amount = target->m_stats.m_maxHP / 4; break;
                 }
                 if( !amount ) { amount = 1; }
@@ -1982,12 +1983,12 @@ namespace BATTLE {
             }
         }
         if( p_move.m_param == M_SHORE_UP ) {
-            if( getVolatileStatus( p_target.first, p_target.second ) & HEALBLOCK ) {
+            if( getVolatileStatus( p_target.first, p_target.second ) & VS_HEALBLOCK ) {
                 p_ui->log( GET_STRING( 304 ) );
             } else {
                 u16 amount = 1;
                 switch( getWeather( ) ) {
-                case SANDSTORM: amount = target->m_stats.m_maxHP * 2 / 3; break;
+                case WE_SANDSTORM: amount = target->m_stats.m_maxHP * 2 / 3; break;
                 default: amount = target->m_stats.m_maxHP / 2; break;
                 }
                 if( !amount ) { amount = 1; }
@@ -1998,7 +1999,7 @@ namespace BATTLE {
             if( removeVolatileStatus( p_ui, p_target.first, p_target.second,
                                       volatileStatus( u64( -1 ) ) ) ) {
                 if( !( getVolatileStatus( p_move.m_user.first, p_move.m_user.second )
-                       & HEALBLOCK ) ) {
+                       & VS_HEALBLOCK ) ) {
                     u16 amount = user->m_stats.m_maxHP / 2;
                     if( !amount ) { amount = 1; }
                     healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
@@ -2018,7 +2019,7 @@ namespace BATTLE {
                 p_ui->logAbility( target, p_target.first );
                 damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
             } else if( !( getVolatileStatus( p_move.m_user.first, p_move.m_user.second )
-                          & HEALBLOCK ) ) {
+                          & VS_HEALBLOCK ) ) {
                 healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
             }
         }
@@ -2042,7 +2043,7 @@ namespace BATTLE {
         }
 
         if( p_move.m_moveData.m_sideCondition ) {
-            if( p_move.m_moveData.m_target == MOVE::FOE_SIDE ) {
+            if( p_move.m_moveData.m_target == TG_FOE_SIDE ) {
                 addSideCondition( p_ui, !p_move.m_user.first, p_move.m_moveData.m_sideCondition );
             } else {
                 addSideCondition( p_ui, p_move.m_user.first, p_move.m_moveData.m_sideCondition );
@@ -2052,17 +2053,17 @@ namespace BATTLE {
         if( p_move.m_moveData.m_weather ) {
             bool extended = false;
             if( canUseItem( p_move.m_user.first, p_move.m_user.second ) ) {
-                if( p_move.m_moveData.m_weather == RAIN && user->getItem( ) == I_DAMP_ROCK ) {
+                if( p_move.m_moveData.m_weather == WE_RAIN && user->getItem( ) == I_DAMP_ROCK ) {
                     extended = true;
                 }
-                if( p_move.m_moveData.m_weather == SUN && user->getItem( ) == I_HEAT_ROCK ) {
+                if( p_move.m_moveData.m_weather == WE_SUN && user->getItem( ) == I_HEAT_ROCK ) {
                     extended = true;
                 }
-                if( p_move.m_moveData.m_weather == SANDSTORM
+                if( p_move.m_moveData.m_weather == WE_SANDSTORM
                     && user->getItem( ) == I_SMOOTH_ROCK ) {
                     extended = true;
                 }
-                if( p_move.m_moveData.m_weather == HAIL && user->getItem( ) == I_ICY_ROCK ) {
+                if( p_move.m_moveData.m_weather == WE_HAIL && user->getItem( ) == I_ICY_ROCK ) {
                     extended = true;
                 }
             }
@@ -2070,9 +2071,9 @@ namespace BATTLE {
         }
         if( p_move.m_moveData.m_pseudoWeather ) {
             bool extended = false;
-            if( p_move.m_moveData.m_pseudoWeather == MAGICROOM
-                || p_move.m_moveData.m_pseudoWeather == WONDERROOM
-                || p_move.m_moveData.m_pseudoWeather == TRICKROOM ) {
+            if( p_move.m_moveData.m_pseudoWeather == PW_MAGICROOM
+                || p_move.m_moveData.m_pseudoWeather == PW_WONDERROOM
+                || p_move.m_moveData.m_pseudoWeather == PW_TRICKROOM ) {
                 extended = canUseItem( p_move.m_user.first, p_move.m_user.second )
                            && user->getItem( ) == I_ROOM_SERVICE;
             }
@@ -2093,11 +2094,11 @@ namespace BATTLE {
         if( p_move.m_moveData.m_volatileStatus ) {
             u8   duration = 255;
             bool fail     = false;
-            if( p_move.m_moveData.m_volatileStatus & ( PROTECT | ENDURE ) ) {
+            if( p_move.m_moveData.m_volatileStatus & ( VS_PROTECT | VS_ENDURE ) ) {
                 duration = 1;
 
                 auto lstmv = getLastUsedMove( p_target.first, p_target.second );
-                if( lstmv.m_moveData.m_volatileStatus & ( PROTECT | ENDURE ) ) {
+                if( lstmv.m_moveData.m_volatileStatus & ( VS_PROTECT | VS_ENDURE ) ) {
                     fail = ( rand( ) & 31 ) > 10;
                 }
             }
@@ -2117,7 +2118,7 @@ namespace BATTLE {
                                         fieldPosition p_target ) {
         auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
         auto target = getPkmn( p_target.first, p_target.second );
-        if( p_move.m_moveData.m_target == MOVE::SELF ) {
+        if( p_move.m_moveData.m_target == TG_SELF ) {
             target   = user;
             p_target = p_move.m_user;
         }
@@ -2143,10 +2144,10 @@ namespace BATTLE {
         if( p_move.m_moveData.m_secondaryVolatileStatus ) {
             u8   duration = 255;
             bool fail     = false;
-            if( p_move.m_moveData.m_secondaryVolatileStatus & ( PROTECT | ENDURE ) ) {
+            if( p_move.m_moveData.m_secondaryVolatileStatus & ( VS_PROTECT | VS_ENDURE ) ) {
                 duration   = 1;
                 auto lstmv = getLastUsedMove( p_target.first, p_target.second );
-                if( lstmv.m_moveData.m_volatileStatus & ( PROTECT | ENDURE ) ) {
+                if( lstmv.m_moveData.m_volatileStatus & ( VS_PROTECT | VS_ENDURE ) ) {
                     fail = ( rand( ) & 31 ) > 10;
                 }
             }
@@ -2167,7 +2168,7 @@ namespace BATTLE {
                                          fieldPosition p_target ) {
         auto user   = getPkmn( p_move.m_user.first, p_move.m_user.second );
         auto target = getPkmn( p_target.first, p_target.second );
-        if( p_move.m_moveData.m_target == MOVE::SELF ) {
+        if( p_move.m_moveData.m_target == TG_SELF ) {
             target   = user;
             p_target = p_move.m_user;
         }
@@ -2205,30 +2206,30 @@ namespace BATTLE {
 
         // TODO messages
 
-        if( tgvol & SPIKYSHIELD ) {
+        if( tgvol & VS_SPIKYSHIELD ) {
             damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
                            pkmn->m_stats.m_maxHP / 8 );
         }
-        if( tgvol & KINGSSHIELD ) {
+        if( tgvol & VS_KINGSSHIELD ) {
             boosts bs = boosts( );
             bs.setBoost( ATK, -1 );
             auto res = addBoosts( p_move.m_user.first, p_move.m_user.second, bs );
             p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second, bs, res );
         }
-        if( tgvol & OBSTRUCT ) {
+        if( tgvol & VS_OBSTRUCT ) {
             boosts bs = boosts( );
             bs.setBoost( DEF, -2 );
             auto res = addBoosts( p_move.m_user.first, p_move.m_user.second, bs );
             p_ui->logBoosts( user, p_move.m_user.first, p_move.m_user.second, bs, res );
         }
-        if( tgvol & BANEFULBUNKER ) {
+        if( tgvol & VS_BANEFULBUNKER ) {
             if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, POISON ) ) {
                 p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
                                                  POISON );
                 p_ui->updatePkmnStats( p_move.m_user.first, p_move.m_user.second, pkmn );
             }
         }
-        if( tgvol & BEAKBLAST ) {
+        if( tgvol & VS_BEAKBLAST ) {
             if( setStatusCondition( p_move.m_user.first, p_move.m_user.second, BURN ) ) {
                 p_ui->animateGetStatusCondition( pkmn, p_move.m_user.first, p_move.m_user.second,
                                                  BURN );
@@ -2317,10 +2318,10 @@ namespace BATTLE {
             case A_CUTE_CHARM: {
                 if( !( rand( ) % 3 ) ) {
                     p_ui->logAbility( target, p_target.first );
-                    addVolatileStatus( p_ui, p_move.m_user.first, p_move.m_user.second, ATTRACT,
+                    addVolatileStatus( p_ui, p_move.m_user.first, p_move.m_user.second, VS_ATTRACT,
                                        255 );
                     p_ui->animateGetVolatileStatusCondition( target, p_target.first,
-                                                             p_target.second, ATTRACT );
+                                                             p_target.second, VS_ATTRACT );
                 }
                 break;
             }
@@ -2422,14 +2423,14 @@ namespace BATTLE {
 
         auto volst = getVolatileStatus( opponent, slot );
 
-        if( p_move.m_param == M_FOCUS_PUNCH && !( volst & FOCUSPUNCH ) ) [[unlikely]] {
+        if( p_move.m_param == M_FOCUS_PUNCH && !( volst & VS_FOCUSPUNCH ) ) [[unlikely]] {
             auto fmt = std::string( GET_STRING( 548 ) );
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
             return MOVE_FAIL;
         }
-        if( p_move.m_param == M_SHELL_TRAP && ( volst & SHELLTRAP ) ) [[unlikely]] {
+        if( p_move.m_param == M_SHELL_TRAP && ( volst & VS_SHELLTRAP ) ) [[unlikely]] {
             auto fmt = std::string( GET_STRING( 536 ) );
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
@@ -2437,18 +2438,18 @@ namespace BATTLE {
             return MOVE_FAIL;
         }
 
-        if( volst & RECHARGE ) [[unlikely]] {
+        if( volst & VS_RECHARGE ) [[unlikely]] {
             auto fmt = std::string( GET_STRING( 276 ) );
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
             p_ui->log( buffer );
 
-            removeVolatileStatus( p_ui, opponent, slot, RECHARGE );
+            removeVolatileStatus( p_ui, opponent, slot, VS_RECHARGE );
             removeLockedMove( opponent, slot );
             return MOVE_FAIL_NO_PP;
         }
 
-        if( volst & FLINCH ) [[unlikely]] {
+        if( volst & VS_FLINCH ) [[unlikely]] {
             auto fmt = std::string( GET_STRING( 296 ) );
             snprintf( buffer, 99, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
@@ -2457,7 +2458,7 @@ namespace BATTLE {
         }
 
         if( hasStatusCondition( opponent, slot, FROZEN ) ) [[unlikely]] {
-            if( p_move.m_moveData.m_type == FIRE || ( p_move.m_moveData.m_flags & MOVE::DEFROST )
+            if( p_move.m_moveData.m_type == TYPE_FIRE || ( p_move.m_moveData.m_flags & MF_DEFROST )
                 || ( rand( ) % 100 < 20 ) ) {
                 // user thaws
                 auto fmt = std::string( GET_STRING( 298 ) );
@@ -2478,7 +2479,7 @@ namespace BATTLE {
                 p_ui->animateStatusCondition( getPkmn( opponent, slot ), opponent, slot, SLEEP );
                 // force the sleep counter to decrease
                 setStatusCondition( opponent, slot, SLEEP, slp - 1, true );
-                if( !( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) ) { return MOVE_FAIL_NO_PP; }
+                if( !( p_move.m_moveData.m_flags & MF_SLEEPUSABLE ) ) { return MOVE_FAIL_NO_PP; }
             } else {
                 removeStatusCondition( opponent, slot );
                 auto fmt = std::string( GET_STRING( 300 ) );
@@ -2487,12 +2488,12 @@ namespace BATTLE {
                 p_ui->log( buffer );
                 p_ui->updatePkmnStats( opponent, slot, getPkmn( opponent, slot ) );
             }
-        } else if( p_move.m_moveData.m_flags & MOVE::SLEEPUSABLE ) {
+        } else if( p_move.m_moveData.m_flags & MF_SLEEPUSABLE ) {
             if( getPkmn( opponent, slot )->getAbility( ) != A_COMATOSE ) {
                 auto fmt = std::string( GET_STRING( 10 ) );
                 snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
-                          MOVE::getMoveName( p_move.m_param ).c_str( ) );
+                          FS::getMoveName( p_move.m_param ).c_str( ) );
                 p_ui->log( buffer );
                 p_ui->log( GET_STRING( 304 ) );
                 return MOVE_FAIL;
@@ -2507,17 +2508,17 @@ namespace BATTLE {
             }
         }
 
-        if( volst & CONFUSION ) [[unlikely]] {
-            u8 curVal = getVolatileStatusCounter( opponent, slot, CONFUSION );
+        if( volst & VS_CONFUSION ) [[unlikely]] {
+            u8 curVal = getVolatileStatusCounter( opponent, slot, VS_CONFUSION );
             if( curVal > 250 ) {
                 --curVal;
                 p_ui->animateVolatileStatusCondition( getPkmn( opponent, slot ), opponent, slot,
-                                                      CONFUSION );
+                                                      VS_CONFUSION );
                 auto fmt = std::string( GET_STRING( 293 ) );
                 snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
-                addVolatileStatus( p_ui, opponent, slot, CONFUSION, curVal );
+                addVolatileStatus( p_ui, opponent, slot, VS_CONFUSION, curVal );
 
                 if( rand( ) % 300 < 100 ) {
                     confusionSelfDamage( p_ui, opponent, slot );
@@ -2529,21 +2530,20 @@ namespace BATTLE {
                 snprintf( buffer, 99, fmt.c_str( ),
                           p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                 p_ui->log( buffer );
-                removeVolatileStatus( p_ui, opponent, slot, CONFUSION );
+                removeVolatileStatus( p_ui, opponent, slot, VS_CONFUSION );
             }
         }
 
-        if( ( volst & HEALBLOCK ) && ( p_move.m_moveData.m_flags & MOVE::HEAL ) ) [[unlikely]] {
+        if( ( volst & VS_HEALBLOCK ) && ( p_move.m_moveData.m_flags & MF_HEAL ) ) [[unlikely]] {
             // TODO: this may be wrong
             return MOVE_FAIL;
         }
 
-        if( _pseudoWeatherTimer[ 4 ] && ( p_move.m_moveData.m_flags & MOVE::GRAVITY ) )
-            [[unlikely]] {
+        if( _pseudoWeatherTimer[ 4 ] && ( p_move.m_moveData.m_flags & MF_GRAVITY ) ) [[unlikely]] {
             return MOVE_FAIL;
         }
 
-        if( volst & ATTRACT ) [[unlikely]] {
+        if( volst & VS_ATTRACT ) [[unlikely]] {
             if( rand( ) % 100 < 50 ) {
                 auto fmt = std::string( GET_STRING( 302 ) );
                 snprintf( buffer, 99, fmt.c_str( ),
@@ -2568,44 +2568,44 @@ namespace BATTLE {
 
         if( !supprAbs && user->getAbility( ) == A_NO_GUARD ) { return false; }
 
-        if( p_move.m_moveData.m_target == MOVE::SELF || p_move.m_moveData.m_target == MOVE::FIELD
-            || p_move.m_moveData.m_target == MOVE::FOE_SIDE
-            || p_move.m_moveData.m_target == MOVE::ALLY_SIDE ) {
+        if( p_move.m_moveData.m_target == TG_SELF || p_move.m_moveData.m_target == TG_FIELD
+            || p_move.m_moveData.m_target == TG_FOE_SIDE
+            || p_move.m_moveData.m_target == TG_ALLY_SIDE ) {
             return false;
         }
 
-        if( tgvol & DIGGING ) {
+        if( tgvol & VS_DIGGING ) {
             return !( p_move.m_param == M_EARTHQUAKE || p_move.m_param == M_MAGNITUDE
                       || p_move.m_param == M_FISSURE );
         }
-        if( tgvol & DIVING ) {
+        if( tgvol & VS_DIVING ) {
             return !( p_move.m_param == M_SURF || p_move.m_param == M_WHIRLPOOL );
         }
-        if( tgvol & INAIR ) {
+        if( tgvol & VS_INAIR ) {
             return !( p_move.m_param == M_GUST || p_move.m_param == M_TWISTER
                       || p_move.m_param == M_THUNDER || p_move.m_param == M_THOUSAND_ARROWS
                       || p_move.m_param == M_HURRICANE || p_move.m_param == M_SMACK_DOWN
                       || p_move.m_param == M_SKY_UPPERCUT );
         }
-        if( tgvol & INVISIBLE ) { return true; }
+        if( tgvol & VS_INVISIBLE ) { return true; }
 
-        if( p_move.m_moveData.m_flags & MOVE::OHKOICE ) {
-            if( hasType( p_target.first, p_target.second, ICE ) ) { return true; }
+        if( p_move.m_moveData.m_flags & MF_OHKOICE ) {
+            if( hasType( p_target.first, p_target.second, TYPE_ICE ) ) { return true; }
         }
-        if( p_move.m_moveData.m_flags & MOVE::OHKO ) {
+        if( p_move.m_moveData.m_flags & MF_OHKO ) {
             if( target->m_level > user->m_level ) { return true; }
             return ( rand( ) % 100 ) > ( 20 + user->m_level - target->m_level );
         }
 
-        if( usvol & FORESIGHT ) { return false; }
-        if( usvol & MIRACLEEYE ) { return false; }
+        if( usvol & VS_FORESIGHT ) { return false; }
+        if( usvol & VS_MIRACLEEYE ) { return false; }
 
         u16 acc = p_move.m_moveData.m_accuracy;
         if( !acc || acc > 100 ) { return false; }
 
-        if( !suppressesWeather( ) && getWeather( ) == FOG ) { acc = ( 3 * acc ) / 5; }
+        if( !suppressesWeather( ) && getWeather( ) == WE_FOG ) { acc = ( 3 * acc ) / 5; }
 
-        bool ignoreEvasion = !!( p_move.m_moveData.m_flags & MOVE::IGNOREEVASION ) || p_critical;
+        bool ignoreEvasion = !!( p_move.m_moveData.m_flags & MF_IGNOREEVASION ) || p_critical;
 
         s8 ev = s8( getStat( p_move.m_user.first, p_move.m_user.second, ACCURACY ) )
                 - ( ignoreEvasion * s8( getStat( p_target.first, p_target.second, EVASION ) ) );
@@ -2629,28 +2629,27 @@ namespace BATTLE {
             if( user->getAbility( ) == A_COMPOUND_EYES ) { acc = ( acc * 13 ) / 10; }
 
             // Hustle
-            if( user->getAbility( ) == A_HUSTLE
-                && p_move.m_moveData.m_category == MOVE::PHYSICAL ) {
+            if( user->getAbility( ) == A_HUSTLE && p_move.m_moveData.m_category == MH_PHYSICAL ) {
                 acc = ( acc * 8 ) / 10;
             }
 
             // Wonder Skin
             if( target->getAbility( ) == A_WONDER_SKIN
-                && p_move.m_moveData.m_category == MOVE::SPECIAL ) {
+                && p_move.m_moveData.m_category == MH_SPECIAL ) {
                 acc = 50;
             }
             // Sand Veil
-            if( target->getAbility( ) == A_SAND_VEIL && getWeather( ) == SANDSTORM
+            if( target->getAbility( ) == A_SAND_VEIL && getWeather( ) == WE_SANDSTORM
                 && !suppressesWeather( ) ) {
                 acc = ( 4 * acc ) / 5;
             }
             // Snow Cloak
-            if( target->getAbility( ) == A_SNOW_CLOAK && getWeather( ) == HAIL
+            if( target->getAbility( ) == A_SNOW_CLOAK && getWeather( ) == WE_HAIL
                 && !suppressesWeather( ) ) {
                 acc = ( 4 * acc ) / 5;
             }
             // Tangled Feet
-            if( target->getAbility( ) == A_TANGLED_FEET && ( tgvol & CONFUSION ) ) { acc >>= 1; }
+            if( target->getAbility( ) == A_TANGLED_FEET && ( tgvol & VS_CONFUSION ) ) { acc >>= 1; }
         }
 
         if( canUseItem( p_target.first, p_target.second ) ) {
@@ -2698,10 +2697,10 @@ namespace BATTLE {
             return false;
         }
 
-        if( getSideCondition( !p_target.first ) & LUCKYCHANT ) { return false; }
+        if( getSideCondition( !p_target.first ) & SC_LUCKYCHANT ) { return false; }
 
-        if( userVolStat & LASERFOCUS ) { return true; }
-        if( p_move.m_moveData.m_flags & MOVE::WILLCRIT ) { return true; }
+        if( userVolStat & VS_LASERFOCUS ) { return true; }
+        if( p_move.m_moveData.m_flags & MF_WILLCRIT ) { return true; }
 
         // Calculate critical hit
 
@@ -2738,7 +2737,7 @@ namespace BATTLE {
                     auto fmt = std::string( GET_STRING( 279 ) );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
-                              ITEM::getItemName( I_LANSAT_BERRY ).c_str( ) );
+                              FS::getItemName( I_LANSAT_BERRY ).c_str( ) );
                     p_ui->log( buffer );
 
                     critLevel += 3;
@@ -2747,7 +2746,7 @@ namespace BATTLE {
                     checkOnEatBerry( p_ui, opponent, slot, I_LANSAT_BERRY );
                 }
             }
-        } else if( userVolStat & FOCUSENERGY ) {
+        } else if( userVolStat & VS_FOCUSENERGY ) {
             critLevel += 2;
         }
 
@@ -2779,7 +2778,7 @@ namespace BATTLE {
             case A_AERILATE:
             case A_REFRIGERATE:
             case A_GALVANIZE:
-                if( moveType == NORMAL ) { basepower = ( basepower * 120 ) / 100; }
+                if( moveType == TYPE_NORMAL ) { basepower = ( basepower * 120 ) / 100; }
                 break;
                 [[likely]] default : break;
             }
@@ -2787,14 +2786,14 @@ namespace BATTLE {
 
         if( p_move.m_param == M_WEATHER_BALL && !suppressesWeather( ) ) {
             switch( getWeather( ) ) {
-            case NO_WEATHER: basepower = 50; break;
+            case WE_NONE: basepower = 50; break;
             default: basepower = 100; break;
             }
         }
 
         if( p_move.m_param == M_TERRAIN_PULSE ) {
             switch( getTerrain( ) ) {
-            case NO_TERRAIN: basepower = 50; break;
+            case TR_NONE: basepower = 50; break;
             default: basepower = 100; break;
             }
         }
@@ -2811,37 +2810,37 @@ namespace BATTLE {
     type field::getMoveType( battleMove p_move ) {
         type moveType = p_move.m_moveData.m_type;
         auto pkmn     = getPkmn( p_move.m_user.first, p_move.m_user.second );
-        if( pkmn == nullptr ) [[unlikely]] { return UNKNOWN; }
+        if( pkmn == nullptr ) [[unlikely]] { return TYPE_UNKNOWN; }
 
-        if( p_move.m_param == M_STRUGGLE ) { return NORMAL; }
+        if( p_move.m_param == M_STRUGGLE ) { return TYPE_NORMAL; }
 
         if( p_move.m_param == M_HIDDEN_POWER ) [[unlikely]] { moveType = pkmn->getHPType( ); }
 
         if( p_move.m_param == M_AURA_WHEEL ) [[unlikely]] {
             if( pkmn->getForme( ) == 1 ) {
-                moveType = DARK;
+                moveType = TYPE_DARKNESS;
             } else {
-                moveType = ELECTRIC;
+                moveType = TYPE_LIGHTNING;
             }
         }
 
         if( !suppressesAbilities( ) ) {
             switch( pkmn->getAbility( ) ) {
-            case A_NORMALIZE: moveType = NORMAL; break;
+            case A_NORMALIZE: moveType = TYPE_NORMAL; break;
             case A_PIXILATE:
-                if( moveType == NORMAL ) { return FAIRY; }
+                if( moveType == TYPE_NORMAL ) { return TYPE_FAIRY; }
                 break;
             case A_AERILATE:
-                if( moveType == NORMAL ) { return FLYING; }
+                if( moveType == TYPE_NORMAL ) { return TYPE_FLYING; }
                 break;
             case A_GALVANIZE:
-                if( moveType == NORMAL ) { return ELECTRIC; }
+                if( moveType == TYPE_NORMAL ) { return TYPE_LIGHTNING; }
                 break;
             case A_REFRIGERATE:
-                if( moveType == NORMAL ) { return ICE; }
+                if( moveType == TYPE_NORMAL ) { return TYPE_ICE; }
                 break;
             case A_LIQUID_VOICE:
-                if( p_move.m_moveData.m_flags & MOVE::SOUND ) { return WATER; }
+                if( p_move.m_moveData.m_flags & MF_SOUND ) { return TYPE_WATER; }
                 break;
                 [[likely]] default : break;
             }
@@ -2850,60 +2849,60 @@ namespace BATTLE {
         if( p_move.m_param == M_JUDGMENT
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) ) [[unlikely]] {
             switch( pkmn->getItem( ) ) {
-            case I_FLAME_PLATE: moveType = FIRE; break;
-            case I_SPLASH_PLATE: moveType = WATER; break;
-            case I_ZAP_PLATE: moveType = ELECTRIC; break;
-            case I_MEADOW_PLATE: moveType = GRASS; break;
-            case I_ICICLE_PLATE: moveType = ICE; break;
-            case I_FIST_PLATE: moveType = FIGHT; break;
-            case I_TOXIC_PLATE: moveType = type::POISON; break;
-            case I_EARTH_PLATE: moveType = GROUND; break;
-            case I_SKY_PLATE: moveType = FLYING; break;
-            case I_MIND_PLATE: moveType = PSYCHIC; break;
-            case I_INSECT_PLATE: moveType = BUG; break;
-            case I_STONE_PLATE: moveType = ROCK; break;
-            case I_SPOOKY_PLATE: moveType = GHOST; break;
-            case I_DRACO_PLATE: moveType = DRAGON; break;
-            case I_DREAD_PLATE: moveType = DARK; break;
-            case I_IRON_PLATE: moveType = STEEL; break;
-            case I_PIXIE_PLATE: moveType = FAIRY; break;
-            case I_NULL_PLATE: moveType = UNKNOWN; break;
-            default: moveType = NORMAL; break;
+            case I_FLAME_PLATE: moveType = TYPE_FIRE; break;
+            case I_SPLASH_PLATE: moveType = TYPE_WATER; break;
+            case I_ZAP_PLATE: moveType = TYPE_LIGHTNING; break;
+            case I_MEADOW_PLATE: moveType = TYPE_GRASS; break;
+            case I_ICICLE_PLATE: moveType = TYPE_ICE; break;
+            case I_FIST_PLATE: moveType = TYPE_FIGHTING; break;
+            case I_TOXIC_PLATE: moveType = TYPE_POISON; break;
+            case I_EARTH_PLATE: moveType = TYPE_GROUND; break;
+            case I_SKY_PLATE: moveType = TYPE_FLYING; break;
+            case I_MIND_PLATE: moveType = TYPE_PSYCHIC; break;
+            case I_INSECT_PLATE: moveType = TYPE_BUG; break;
+            case I_STONE_PLATE: moveType = TYPE_ROCK; break;
+            case I_SPOOKY_PLATE: moveType = TYPE_GHOST; break;
+            case I_DRACO_PLATE: moveType = TYPE_DRAGON; break;
+            case I_DREAD_PLATE: moveType = TYPE_DARKNESS; break;
+            case I_IRON_PLATE: moveType = TYPE_STEEL; break;
+            case I_PIXIE_PLATE: moveType = TYPE_FAIRY; break;
+            case I_NULL_PLATE: moveType = TYPE_UNKNOWN; break;
+            default: moveType = TYPE_NORMAL; break;
             }
         }
 
         if( p_move.m_param == M_MULTI_ATTACK
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) ) [[unlikely]] {
             switch( pkmn->getItem( ) ) {
-            case I_FIGHTING_MEMORY: moveType = FIGHT; break;
-            case I_FLYING_MEMORY: moveType = FLYING; break;
-            case I_POISON_MEMORY: moveType = type::POISON; break;
-            case I_GROUND_MEMORY: moveType = GROUND; break;
-            case I_ROCK_MEMORY: moveType = ROCK; break;
-            case I_BUG_MEMORY: moveType = BUG; break;
-            case I_GHOST_MEMORY: moveType = GHOST; break;
-            case I_STEEL_MEMORY: moveType = STEEL; break;
-            case I_FIRE_MEMORY: moveType = FIRE; break;
-            case I_WATER_MEMORY: moveType = WATER; break;
-            case I_GRASS_MEMORY: moveType = GRASS; break;
-            case I_ELECTRIC_MEMORY: moveType = ELECTRIC; break;
-            case I_PSYCHIC_MEMORY: moveType = PSYCHIC; break;
-            case I_ICE_MEMORY: moveType = ICE; break;
-            case I_DRAGON_MEMORY: moveType = DRAGON; break;
-            case I_DARK_MEMORY: moveType = DARK; break;
-            case I_FAIRY_MEMORY: moveType = FAIRY; break;
-            default: moveType = NORMAL; break;
+            case I_FIGHTING_MEMORY: moveType = TYPE_FIGHTING; break;
+            case I_FLYING_MEMORY: moveType = TYPE_FLYING; break;
+            case I_POISON_MEMORY: moveType = TYPE_POISON; break;
+            case I_GROUND_MEMORY: moveType = TYPE_GROUND; break;
+            case I_ROCK_MEMORY: moveType = TYPE_ROCK; break;
+            case I_BUG_MEMORY: moveType = TYPE_BUG; break;
+            case I_GHOST_MEMORY: moveType = TYPE_GHOST; break;
+            case I_STEEL_MEMORY: moveType = TYPE_STEEL; break;
+            case I_FIRE_MEMORY: moveType = TYPE_FIRE; break;
+            case I_WATER_MEMORY: moveType = TYPE_WATER; break;
+            case I_GRASS_MEMORY: moveType = TYPE_GRASS; break;
+            case I_ELECTRIC_MEMORY: moveType = TYPE_LIGHTNING; break;
+            case I_PSYCHIC_MEMORY: moveType = TYPE_PSYCHIC; break;
+            case I_ICE_MEMORY: moveType = TYPE_ICE; break;
+            case I_DRAGON_MEMORY: moveType = TYPE_DRAGON; break;
+            case I_DARK_MEMORY: moveType = TYPE_DARKNESS; break;
+            case I_FAIRY_MEMORY: moveType = TYPE_FAIRY; break;
+            default: moveType = TYPE_NORMAL; break;
             }
         }
 
         if( p_move.m_param == M_TECHNO_BLAST
             && canUseItem( p_move.m_user.first, p_move.m_user.second ) ) [[unlikely]] {
             switch( pkmn->getItem( ) ) {
-            case I_BURN_DRIVE: moveType = FIRE; break;
-            case I_DOUSE_DRIVE: moveType = WATER; break;
-            case I_CHILL_DRIVE: moveType = ICE; break;
-            case I_SHOCK_DRIVE: moveType = ELECTRIC; break;
-            default: moveType = NORMAL; break;
+            case I_BURN_DRIVE: moveType = TYPE_FIRE; break;
+            case I_DOUSE_DRIVE: moveType = TYPE_WATER; break;
+            case I_CHILL_DRIVE: moveType = TYPE_ICE; break;
+            case I_SHOCK_DRIVE: moveType = TYPE_LIGHTNING; break;
+            default: moveType = TYPE_NORMAL; break;
             }
         }
 
@@ -2912,38 +2911,40 @@ namespace BATTLE {
             if( types.size( ) >= 1 ) {
                 moveType = types[ 0 ];
             } else {
-                moveType = NORMAL;
+                moveType = TYPE_NORMAL;
             }
         }
 
         if( p_move.m_param == M_WEATHER_BALL && !suppressesWeather( ) ) {
             switch( getWeather( ) ) {
-            case RAIN:
-            case HEAVY_RAIN: moveType = WATER; break;
-            case SUN:
-            case HEAVY_SUNSHINE: moveType = FIRE; break;
-            case HAIL: moveType = ICE; break;
-            case SANDSTORM: moveType = ROCK; break;
-            case FOG: moveType = FLYING; break;
-            default: moveType = NORMAL; break;
+            case WE_RAIN:
+            case WE_HEAVY_RAIN: moveType = TYPE_WATER; break;
+            case WE_SUN:
+            case WE_HEAVY_SUNSHINE: moveType = TYPE_FIRE; break;
+            case WE_HAIL: moveType = TYPE_ICE; break;
+            case WE_SANDSTORM: moveType = TYPE_ROCK; break;
+            case WE_FOG: moveType = TYPE_FLYING; break;
+            default: moveType = TYPE_NORMAL; break;
             }
         }
 
         if( p_move.m_param == M_TERRAIN_PULSE ) {
             switch( getTerrain( ) ) {
-            case PSYCHICTERRAIN: moveType = PSYCHIC; break;
-            case ELECTRICTERRAIN: moveType = ELECTRIC; break;
-            case MISTYTERRAIN: moveType = FAIRY; break;
-            case GRASSYTERRAIN: moveType = GRASS; break;
-            default: moveType = NORMAL; break;
+            case TR_PSYCHICTERRAIN: moveType = TYPE_PSYCHIC; break;
+            case TR_ELECTRICTERRAIN: moveType = TYPE_LIGHTNING; break;
+            case TR_MISTYTERRAIN: moveType = TYPE_FAIRY; break;
+            case TR_GRASSYTERRAIN: moveType = TYPE_GRASS; break;
+            default: moveType = TYPE_NORMAL; break;
             }
         }
 
-        if( getVolatileStatus( p_move.m_user.first, p_move.m_user.second ) & ELECTRIFY ) {
-            moveType = ELECTRIC;
+        if( getVolatileStatus( p_move.m_user.first, p_move.m_user.second ) & VS_ELECTRIFY ) {
+            moveType = TYPE_LIGHTNING;
         }
 
-        if( ( getPseudoWeather( ) & IONDELUGE ) && moveType == NORMAL ) { moveType = ELECTRIC; }
+        if( ( getPseudoWeather( ) & PW_IONDELUGE ) && moveType == TYPE_NORMAL ) {
+            moveType = TYPE_LIGHTNING;
+        }
 
         return moveType;
     }
@@ -2957,7 +2958,7 @@ namespace BATTLE {
         bool items = canUseItem( p_target.first, p_target.second );
 
         bool abilities
-            = !suppressesAbilities( ) && !( p_move.m_moveData.m_flags & MOVE::IGNOREABILITY );
+            = !suppressesAbilities( ) && !( p_move.m_moveData.m_flags & MF_IGNOREABILITY );
 
         bool wonderguard = abilities && target->getAbility( ) == A_WONDER_GUARD;
 
@@ -2965,12 +2966,15 @@ namespace BATTLE {
 
         // Heavy weather
 
-        if( getWeather( ) == HEAVY_SUNSHINE && moveType == WATER && !suppressesWeather( ) ) {
+        if( getWeather( ) == WE_HEAVY_SUNSHINE && moveType == TYPE_WATER
+            && !suppressesWeather( ) ) {
             return 0;
         }
-        if( getWeather( ) == HEAVY_RAIN && moveType == FIRE && !suppressesWeather( ) ) { return 0; }
+        if( getWeather( ) == WE_HEAVY_RAIN && moveType == TYPE_FIRE && !suppressesWeather( ) ) {
+            return 0;
+        }
 
-        if( ( p_move.m_moveData.m_flags & MOVE::SOUND )
+        if( ( p_move.m_moveData.m_flags & MF_SOUND )
             && ( target->getAbility( ) == A_SOUNDPROOF || target->getAbility( ) == A_CACOPHONY )
             && abilities ) [[unlikely]] {
             return 0;
@@ -2978,9 +2982,9 @@ namespace BATTLE {
 
         // Thousand arrows
         if( p_move.m_param == M_THOUSAND_ARROWS
-            || ( p_move.m_moveData.m_flags & MOVE::IGNOREIMMUNITYGROUND ) ) [[unlikely]] {
+            || ( p_move.m_moveData.m_flags & MF_IGNOREIMMUNITYGROUND ) ) [[unlikely]] {
             if( !isGrounded( p_target.first, p_target.second )
-                && hasType( p_target.first, p_target.second, FLYING ) ) {
+                && hasType( p_target.first, p_target.second, TYPE_FLYING ) ) {
                 return res;
             }
         }
@@ -2993,36 +2997,37 @@ namespace BATTLE {
         for( type t : getTypes( p_target.first, p_target.second ) ) {
             u16 curval = getTypeEffectiveness( moveType, t );
 
-            if( !targetIsGrounded && moveType == GROUND ) [[unlikely]] {
+            if( !targetIsGrounded && moveType == TYPE_GROUND ) [[unlikely]] {
                 curval = 0;
-            } else if( targetIsGrounded && moveType == GROUND && t == FLYING ) {
+            } else if( targetIsGrounded && moveType == TYPE_GROUND && t == TYPE_FLYING ) {
                 curval = 100;
             }
 
             if( p_move.m_param == M_FLYING_PRESS ) {
-                curval = ( curval * getTypeEffectiveness( FLYING, t ) ) / 100;
+                curval = ( curval * getTypeEffectiveness( TYPE_FLYING, t ) ) / 100;
             }
 
-            if( !curval && ( p_move.m_moveData.m_flags & MOVE::IGNOREIMMUNITY ) ) { curval = 100; }
+            if( !curval && ( p_move.m_moveData.m_flags & MF_IGNOREIMMUNITY ) ) { curval = 100; }
 
-            if( t == GHOST && ( moveType == NORMAL || moveType == FIGHT ) ) [[unlikely]] {
+            if( t == TYPE_GHOST && ( moveType == TYPE_NORMAL || moveType == TYPE_FIGHTING ) )
+                [[unlikely]] {
                 if( abilities && user->getAbility( ) == A_SCRAPPY ) { continue; }
-                if( getVolatileStatus( p_target.first, p_target.second ) & FORESIGHT )
+                if( getVolatileStatus( p_target.first, p_target.second ) & VS_FORESIGHT )
                     [[unlikely]] {
                     continue;
                 }
             }
 
-            if( t == DARK && moveType == PSYCHIC
-                && ( getVolatileStatus( p_target.first, p_target.second ) & MIRACLEEYE ) )
+            if( t == TYPE_DARKNESS && moveType == TYPE_PSYCHIC
+                && ( getVolatileStatus( p_target.first, p_target.second ) & VS_MIRACLEEYE ) )
                 [[unlikely]] {
                 continue;
             }
 
-            if( t == WATER && p_move.m_param == M_FREEZE_DRY ) { curval = 200; }
+            if( t == TYPE_WATER && p_move.m_param == M_FREEZE_DRY ) { curval = 200; }
 
-            if( t == FLYING ) {
-                if( !suppressesWeather( ) && _weather == HEAVY_WINDS ) [[unlikely]] { continue; }
+            if( t == TYPE_FLYING ) {
+                if( !suppressesWeather( ) && _weather == WE_HEAVY_WINDS ) [[unlikely]] { continue; }
             }
 
             if( !curval && items && target->getItem( ) == I_RING_TARGET ) [[unlikely]] { continue; }
@@ -3063,15 +3068,15 @@ namespace BATTLE {
             damage = p_move.m_moveData.m_fixedDamage;
         } else {
             u16 atk = getStat( p_move.m_user.first, p_move.m_user.second,
-                               p_move.m_moveData.m_category == MOVE::SPECIAL ? SATK : ATK,
+                               p_move.m_moveData.m_category == MH_SPECIAL ? SATK : ATK,
                                !supprAbs && p_move.m_param != M_SUNSTEEL_STRIKE, p_critical );
             u16 def
                 = getStat( p_target.first, p_target.second,
-                           p_move.m_moveData.m_defensiveCategory == MOVE::SPECIAL ? SDEF : DEF,
+                           p_move.m_moveData.m_defensiveCategory == MH_SPECIAL ? SDEF : DEF,
                            !supprAbs && p_move.m_param != M_SUNSTEEL_STRIKE, false, p_critical );
-            if( p_move.m_moveData.m_flags & MOVE::DEFASOFF ) {
+            if( p_move.m_moveData.m_flags & MF_DEFASOFF ) {
                 atk = getStat( p_move.m_user.first, p_move.m_user.second,
-                               p_move.m_moveData.m_category == MOVE::SPECIAL ? SDEF : DEF,
+                               p_move.m_moveData.m_category == MH_SPECIAL ? SDEF : DEF,
                                !supprAbs && p_move.m_param != M_SUNSTEEL_STRIKE, p_critical );
             }
 
@@ -3205,18 +3210,20 @@ namespace BATTLE {
                     movePower = 480;
                 }
 
-                if( getVolatileStatus( p_move.m_user.first, p_move.m_user.second ) & DEFENSECURL ) {
+                if( getVolatileStatus( p_move.m_user.first, p_move.m_user.second )
+                    & VS_DEFENSECURL ) {
                     movePower <<= 1;
                 }
             }
             if( p_move.m_param == M_SPIT_UP ) {
                 u8 stkpile = getVolatileStatusCounter( p_move.m_user.first, p_move.m_user.second,
-                                                       STOCKPILE );
+                                                       VS_STOCKPILE );
                 if( stkpile > 3 ) { stkpile = 3; }
 
                 movePower = 100 * stkpile;
 
-                removeVolatileStatus( p_ui, p_move.m_user.first, p_move.m_user.second, STOCKPILE );
+                removeVolatileStatus( p_ui, p_move.m_user.first, p_move.m_user.second,
+                                      VS_STOCKPILE );
                 boosts bt = boosts( );
                 bt.setBoost( DEF, -stkpile );
                 bt.setBoost( SDEF, -stkpile );
@@ -3256,20 +3263,20 @@ namespace BATTLE {
             if( p_move.m_target.size( ) > 1 ) { damage = ( damage * 75 ) / 100; }
 
             if( !suppressesWeather( ) ) [[likely]] {
-                if( p_move.m_moveData.m_type == WATER
-                    && ( _weather == RAIN || _weather == HEAVY_RAIN ) ) [[unlikely]] {
+                if( p_move.m_moveData.m_type == TYPE_WATER
+                    && ( _weather == WE_RAIN || _weather == WE_HEAVY_RAIN ) ) [[unlikely]] {
                     damage = ( damage * 3 ) >> 1;
                 }
-                if( p_move.m_moveData.m_type == FIRE
-                    && ( _weather == RAIN || _weather == HEAVY_RAIN ) ) [[unlikely]] {
+                if( p_move.m_moveData.m_type == TYPE_FIRE
+                    && ( _weather == WE_RAIN || _weather == WE_HEAVY_RAIN ) ) [[unlikely]] {
                     damage = ( damage >> 1 );
                 }
-                if( p_move.m_moveData.m_type == FIRE
-                    && ( _weather == SUN || _weather == HEAVY_SUNSHINE ) ) [[unlikely]] {
+                if( p_move.m_moveData.m_type == TYPE_FIRE
+                    && ( _weather == WE_SUN || _weather == WE_HEAVY_SUNSHINE ) ) [[unlikely]] {
                     damage = ( damage * 3 ) >> 1;
                 }
-                if( p_move.m_moveData.m_type == WATER
-                    && ( _weather == SUN || _weather == HEAVY_SUNSHINE ) ) [[unlikely]] {
+                if( p_move.m_moveData.m_type == TYPE_WATER
+                    && ( _weather == WE_SUN || _weather == WE_HEAVY_SUNSHINE ) ) [[unlikely]] {
                     damage = ( damage >> 1 );
                 }
             }
@@ -3302,7 +3309,7 @@ namespace BATTLE {
 
             // burn
 
-            if( user->m_status.m_isBurned && p_move.m_moveData.m_category == MOVE::PHYSICAL
+            if( user->m_status.m_isBurned && p_move.m_moveData.m_category == MH_PHYSICAL
                 && ( supprAbs || user->getAbility( ) != A_GUTS ) && p_move.m_param != M_FACADE ) {
                 damage >>= 1;
             }
@@ -3312,11 +3319,11 @@ namespace BATTLE {
             auto sidec = getSideCondition( !p_move.m_user.first );
 
             if( supprAbs || !anyHasAbility( A_SCREEN_CLEANER ) ) {
-                if( ( sidec & AURORAVEIL )
-                    || ( ( sidec & REFLECT )
-                         && p_move.m_moveData.m_defensiveCategory == MOVE::PHYSICAL )
-                    || ( ( sidec & LIGHTSCREEN )
-                         && p_move.m_moveData.m_defensiveCategory == MOVE::SPECIAL ) ) {
+                if( ( sidec & SC_AURORAVEIL )
+                    || ( ( sidec & SC_REFLECT )
+                         && p_move.m_moveData.m_defensiveCategory == MH_PHYSICAL )
+                    || ( ( sidec & SC_LIGHTSCREEN )
+                         && p_move.m_moveData.m_defensiveCategory == MH_SPECIAL ) ) {
                     // nerf intentional!
                     damage = ( damage * 66 ) / 100;
                 }
@@ -3326,25 +3333,28 @@ namespace BATTLE {
                 || p_move.m_param == M_FLYING_PRESS || p_move.m_param == M_HEAT_CRASH
                 || p_move.m_param == M_HEAVY_SLAM || p_move.m_param == M_PHANTOM_FORCE
                 || p_move.m_param == M_SHADOW_FORCE || p_move.m_param == M_STOMP ) {
-                if( getVolatileStatus( p_target.first, p_target.second ) & MINIMIZE ) [[unlikely]] {
+                if( getVolatileStatus( p_target.first, p_target.second ) & VS_MINIMIZE )
+                    [[unlikely]] {
                     damage <<= 1;
                 }
             }
 
             if( p_move.m_param == M_SURF || p_move.m_param == M_WHIRLPOOL ) {
-                if( getVolatileStatus( p_target.first, p_target.second ) & DIVING ) {
+                if( getVolatileStatus( p_target.first, p_target.second ) & VS_DIVING ) {
                     damage <<= 1;
                 }
             }
 
             if( p_move.m_param == M_EARTHQUAKE || p_move.m_param == M_MAGNITUDE ) {
-                if( getVolatileStatus( p_target.first, p_target.second ) & DIGGING ) {
+                if( getVolatileStatus( p_target.first, p_target.second ) & VS_DIGGING ) {
                     damage <<= 1;
                 }
             }
 
             if( p_move.m_param == M_GUST || p_move.m_param == M_TWISTER ) {
-                if( getVolatileStatus( p_target.first, p_target.second ) & INAIR ) { damage <<= 1; }
+                if( getVolatileStatus( p_target.first, p_target.second ) & VS_INAIR ) {
+                    damage <<= 1;
+                }
             }
 
             // abilities
@@ -3394,8 +3404,8 @@ namespace BATTLE {
             if( !supprAbs ) {
                 switch( target->getAbility( ) ) {
                 case A_FLUFFY:
-                    if( p_move.m_moveData.m_flags & MOVE::CONTACT ) {
-                        if( moveType == FIRE ) {
+                    if( p_move.m_moveData.m_flags & MF_CONTACT ) {
+                        if( moveType == TYPE_FIRE ) {
                             damage <<= 1;
                         } else {
                             damage >>= 1;
@@ -3412,10 +3422,10 @@ namespace BATTLE {
                     if( target->m_stats.m_curHP == target->m_stats.m_maxHP ) { damage >>= 1; }
                     break;
                 case A_ICE_SCALES:
-                    if( p_move.m_moveData.m_defensiveCategory == MOVE::SPECIAL ) { damage >>= 1; }
+                    if( p_move.m_moveData.m_defensiveCategory == MH_SPECIAL ) { damage >>= 1; }
                     break;
                 case A_PUNK_ROCK:
-                    if( p_move.m_moveData.m_flags & MOVE::SOUND ) { damage >>= 1; }
+                    if( p_move.m_moveData.m_flags & MF_SOUND ) { damage >>= 1; }
                     break;
                     [[likely]] default : break;
                 }
@@ -3428,27 +3438,31 @@ namespace BATTLE {
 
                 switch( user->getAbility( ) ) {
                 case A_TORRENT:
-                    if( moveType == WATER && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
+                    if( moveType == TYPE_WATER
+                        && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
                         damage = ( 3 * damage ) >> 1;
                     }
                     break;
                 case A_OVERGROW:
-                    if( moveType == GRASS && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
+                    if( moveType == TYPE_GRASS
+                        && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
                         damage = ( 3 * damage ) >> 1;
                     }
                     break;
                 case A_BLAZE:
-                    if( moveType == FIRE && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
+                    if( moveType == TYPE_FIRE
+                        && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
                         damage = ( 3 * damage ) >> 1;
                     }
                     break;
                 case A_SWARM:
-                    if( moveType == BUG && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
+                    if( moveType == TYPE_BUG
+                        && user->m_stats.m_curHP * 3 < user->m_stats.m_maxHP ) {
                         damage = ( 3 * damage ) >> 1;
                     }
                     break;
                 case A_STEELWORKER:
-                    if( moveType == STEEL ) { damage = ( 3 * damage ) >> 1; }
+                    if( moveType == TYPE_STEEL ) { damage = ( 3 * damage ) >> 1; }
                     break;
 
                 case A_RIVALRY:
@@ -3500,58 +3514,58 @@ namespace BATTLE {
                 bool eatitem = false;
                 switch( target->getItem( ) ) {
                 case I_CHILAN_BERRY:
-                    if( moveType == type::NORMAL ) { eatitem = true; }
+                    if( moveType == TYPE_NORMAL ) { eatitem = true; }
                     break;
                 case I_BABIRI_BERRY:
-                    if( moveType == type::STEEL && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_STEEL && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_CHARTI_BERRY:
-                    if( moveType == type::ROCK && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_ROCK && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_CHOPLE_BERRY:
-                    if( moveType == type::FIGHTING && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_FIGHTING && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_COBA_BERRY:
-                    if( moveType == type::FLYING && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_FLYING && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_COLBUR_BERRY:
-                    if( moveType == type::DARK && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_DARKNESS && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_HABAN_BERRY:
-                    if( moveType == type::DRAGON && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_DRAGON && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_KASIB_BERRY:
-                    if( moveType == type::GHOST && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_GHOST && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_KEBIA_BERRY:
-                    if( moveType == type::POISON && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_POISON && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_OCCA_BERRY:
-                    if( moveType == type::FIRE && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_FIRE && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_PASSHO_BERRY:
-                    if( moveType == type::WATER && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_WATER && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_PAYAPA_BERRY:
-                    if( moveType == type::PSYCHIC && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_PSYCHIC && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_RINDO_BERRY:
-                    if( moveType == type::GRASS && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_GRASS && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_ROSELI_BERRY:
-                    if( moveType == type::FAIRY && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_FAIRY && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_SHUCA_BERRY:
-                    if( moveType == type::GROUND && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_GROUND && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_TANGA_BERRY:
-                    if( moveType == type::BUG && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_BUG && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_WACAN_BERRY:
-                    if( moveType == type::ELECTRIC && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_LIGHTNING && effectiveness > 100 ) { eatitem = true; }
                     break;
                 case I_YACHE_BERRY:
-                    if( moveType == type::ICE && effectiveness > 100 ) { eatitem = true; }
+                    if( moveType == TYPE_ICE && effectiveness > 100 ) { eatitem = true; }
                     break;
                 default: break;
                 }
@@ -3565,7 +3579,7 @@ namespace BATTLE {
                     auto fmt = std::string( GET_STRING( 279 ) );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( user, p_move.m_user.first ).c_str( ),
-                              ITEM::getItemName( target->getItem( ) ).c_str( ) );
+                              FS::getItemName( target->getItem( ) ).c_str( ) );
                     p_ui->log( buffer );
 
                     removeItem( p_ui, p_target.first, p_target.second );
@@ -3581,7 +3595,7 @@ namespace BATTLE {
 
         if( damage >= target->m_stats.m_curHP ) { damage = target->m_stats.m_curHP; }
 
-        if( p_move.m_moveData.m_flags & MOVE::NOFAINT ) {
+        if( p_move.m_moveData.m_flags & MF_NOFAINT ) {
             if( damage >= target->m_stats.m_curHP ) { damage = target->m_stats.m_curHP - 1; }
         }
 
@@ -3639,7 +3653,7 @@ namespace BATTLE {
             if( !suppressesAbilities( ) && target->getAbility( ) == A_LIQUID_OOZE ) {
                 p_ui->logAbility( target, p_target.first );
                 damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
-            } else if( !( userVolStat & HEALBLOCK ) ) {
+            } else if( !( userVolStat & VS_HEALBLOCK ) ) {
                 if( user->m_stats.m_curHP < user->m_stats.m_maxHP ) {
                     healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
@@ -3666,7 +3680,7 @@ namespace BATTLE {
         // Shell bell
         if( user->canBattle( ) && canUseItem( p_move.m_user.first, p_move.m_user.second )
             && user->getItem( ) == I_SHELL_BELL ) {
-            if( !( userVolStat & HEALBLOCK ) ) {
+            if( !( userVolStat & VS_HEALBLOCK ) ) {
                 u32 amount = damage / 8;
                 if( !amount ) { amount = 1; }
 
@@ -3731,10 +3745,10 @@ namespace BATTLE {
                 deducePP( opponent, slot, p_move.m_param );
             }
 
-            if( slotc & MOVECHARGE ) { // Move is already charged
-                removeVolatileStatus(
-                    p_ui, opponent, slot,
-                    volatileStatus( MOVECHARGE | DIGGING | DIVING | INAIR | INVISIBLE ) );
+            if( slotc & VS_MOVECHARGE ) { // Move is already charged
+                removeVolatileStatus( p_ui, opponent, slot,
+                                      volatileStatus( VS_MOVECHARGE | VS_DIGGING | VS_DIVING
+                                                      | VS_INAIR | VS_INVISIBLE ) );
                 removeLockedMove( opponent, slot );
                 p_ui->showPkmn( opponent, slot );
             }
@@ -3744,11 +3758,11 @@ namespace BATTLE {
             return;
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::CHARGE ) {
-            if( slotc & MOVECHARGE ) { // Move is already charged
-                removeVolatileStatus(
-                    p_ui, opponent, slot,
-                    volatileStatus( MOVECHARGE | DIGGING | DIVING | INAIR | INVISIBLE ) );
+        if( p_move.m_moveData.m_flags & MF_CHARGE ) {
+            if( slotc & VS_MOVECHARGE ) { // Move is already charged
+                removeVolatileStatus( p_ui, opponent, slot,
+                                      volatileStatus( VS_MOVECHARGE | VS_DIGGING | VS_DIVING
+                                                      | VS_INAIR | VS_INVISIBLE ) );
                 removeLockedMove( opponent, slot );
                 p_ui->showPkmn( opponent, slot );
             } else {
@@ -3759,8 +3773,8 @@ namespace BATTLE {
                 for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
 
                 if( ( p_move.m_param == M_SOLAR_BLADE || p_move.m_param == M_SOLAR_BEAM )
-                    && !suppressesWeather( ) && ( _weather == SUN || _weather == HEAVY_SUNSHINE ) )
-                    [[unlikely]] {
+                    && !suppressesWeather( )
+                    && ( _weather == WE_SUN || _weather == WE_HEAVY_SUNSHINE ) ) [[unlikely]] {
                     // empty!
                 } else if( canUseItem( opponent, slot ) && tg->getItem( ) == I_POWER_HERB )
                     [[unlikely]] {
@@ -3772,23 +3786,25 @@ namespace BATTLE {
 
                     removeItem( p_ui, opponent, slot );
                 } else {
-                    addVolatileStatus( p_ui, opponent, slot, MOVECHARGE, 255 );
+                    addVolatileStatus( p_ui, opponent, slot, VS_MOVECHARGE, 255 );
                     switch( p_move.m_param ) {
-                    case M_DIVE: addVolatileStatus( p_ui, opponent, slot, DIVING, 255 ); break;
-                    case M_DIG: addVolatileStatus( p_ui, opponent, slot, DIGGING, 255 ); break;
+                    case M_DIVE: addVolatileStatus( p_ui, opponent, slot, VS_DIVING, 255 ); break;
+                    case M_DIG: addVolatileStatus( p_ui, opponent, slot, VS_DIGGING, 255 ); break;
                     case M_FLY:
                     case M_BOUNCE:
-                    case M_SKY_DROP: addVolatileStatus( p_ui, opponent, slot, INAIR, 255 ); break;
+                    case M_SKY_DROP:
+                        addVolatileStatus( p_ui, opponent, slot, VS_INAIR, 255 );
+                        break;
                     case M_PHANTOM_FORCE:
                     case M_SHADOW_FORCE:
-                        addVolatileStatus( p_ui, opponent, slot, INVISIBLE, 255 );
+                        addVolatileStatus( p_ui, opponent, slot, VS_INVISIBLE, 255 );
                         break;
 
                     default: break;
                     }
 
                     battleMoveSelection bms = NO_OP_SELECTION;
-                    bms.m_type              = ATTACK;
+                    bms.m_type              = MT_ATTACK;
                     bms.m_param             = p_move.m_param;
                     bms.m_moveData          = p_move.m_moveData;
                     if( p_move.m_target.size( ) != 1 ) [[unlikely]] {
@@ -3811,16 +3827,16 @@ namespace BATTLE {
         auto fmt = std::string( GET_STRING( 10 ) );
         snprintf( buffer, 99, fmt.c_str( ),
                   p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ),
-                  MOVE::getMoveName( p_move.m_param ).c_str( ) );
+                  FS::getMoveName( p_move.m_param ).c_str( ) );
         p_ui->log( buffer );
 
-        bool moveHadTarget = _mode == SINGLE;
+        bool moveHadTarget = _mode == BM_SINGLE;
         for( u8 i = 0; i < p_move.m_target.size( ); ++i ) {
             // Check if the move needs to be redirected
 
             auto curTg = getPkmn( p_move.m_target[ i ].first, p_move.m_target[ i ].second );
             if( curTg == nullptr ) {
-                if( p_move.m_target.size( ) == 1 && _mode == DOUBLE
+                if( p_move.m_target.size( ) == 1 && _mode == BM_DOUBLE
                     && p_move.m_target[ i ].first != opponent ) {
                     // in double battles, moves targeting a single opponent get redirected
                     // to an opponent that actually exists.
@@ -3851,7 +3867,7 @@ namespace BATTLE {
                 }
             } else if( !suppressesAbilities( )
                        && getPkmn( opponent, slot )->getAbility( ) == A_PARENTAL_BOND
-                       && p_move.m_moveData.m_category != MOVE::STATUS ) [[unlikely]] {
+                       && p_move.m_moveData.m_category != MH_STATUS ) [[unlikely]] {
                 numHits     = 2;
                 strengthMod = 25;
             }
@@ -3864,11 +3880,11 @@ namespace BATTLE {
 
                 // Check if the move is protected against
                 bool protect = false;
-                if( ( tgsc & PROTECT ) || ( tgsc & OBSTRUCT ) || ( tgsc & SPIKYSHIELD )
-                    || ( p_move.m_moveData.m_category != MOVE::STATUS && ( tgsc & KINGSSHIELD ) ) )
+                if( ( tgsc & VS_PROTECT ) || ( tgsc & VS_OBSTRUCT ) || ( tgsc & VS_SPIKYSHIELD )
+                    || ( p_move.m_moveData.m_category != MH_STATUS && ( tgsc & VS_KINGSSHIELD ) ) )
                     [[unlikely]] {
                     protect = true;
-                    if( ( p_move.m_moveData.m_flags & MOVE::PROTECT ) ) {
+                    if( ( p_move.m_moveData.m_flags & MF_PROTECT ) ) {
                         fmt = std::string( GET_STRING( 674 ) );
                         snprintf( buffer, 99, fmt.c_str( ),
                                   p_ui->getPkmnName( getPkmn( p_move.m_target[ i ].first,
@@ -3879,10 +3895,10 @@ namespace BATTLE {
                     }
                 }
 
-                if( protect && ( p_move.m_moveData.m_flags & MOVE::BREAKSPROTECT ) ) {
+                if( protect && ( p_move.m_moveData.m_flags & MF_BREAKSPROTECT ) ) {
                     // remove protect
                     removeVolatileStatus( p_ui, p_move.m_target[ i ].first,
-                                          p_move.m_target[ i ].second, PROTECT );
+                                          p_move.m_target[ i ].second, VS_PROTECT );
                     tgsc = getVolatileStatus( p_move.m_target[ i ].first,
                                               p_move.m_target[ i ].second );
                     fmt  = std::string( GET_STRING( 675 ) );
@@ -3895,7 +3911,7 @@ namespace BATTLE {
                     protect = false;
                 }
 
-                if( ( p_move.m_moveData.m_flags & MOVE::PROTECT ) && !protect ) [[likely]] {
+                if( ( p_move.m_moveData.m_flags & MF_PROTECT ) && !protect ) [[likely]] {
                     bool critical = executeCriticalCheck( p_ui, p_move, p_move.m_target[ i ] );
 
                     // Check if the move misses
@@ -3909,7 +3925,7 @@ namespace BATTLE {
                         p_ui->log( buffer );
                         // check for crash damage
 
-                        if( p_move.m_moveData.m_flags & MOVE::CRASHDAMAGE ) {
+                        if( p_move.m_moveData.m_flags & MF_CRASHDAMAGE ) {
                             u16 maxHP = getPkmn( opponent, slot )->m_stats.m_maxHP;
                             damagePokemon( p_ui, opponent, slot, maxHP / 2 );
                             fmt = std::string( GET_STRING( 546 ) );
@@ -3924,11 +3940,11 @@ namespace BATTLE {
                         }
 
                         continue;
-                    } else if( p_move.m_moveData.m_flags & MOVE::OHKO ) [[unlikely]] {
+                    } else if( p_move.m_moveData.m_flags & MF_OHKO ) [[unlikely]] {
                         faintPokemon( p_ui, p_move.m_target[ i ].first,
                                       p_move.m_target[ i ].second );
                         p_ui->log( GET_STRING( 547 ) );
-                    } else if( p_move.m_moveData.m_category != MOVE::STATUS
+                    } else if( p_move.m_moveData.m_category != MH_STATUS
                                && !executeDamagingMove(
                                    p_ui, p_move, p_move.m_target[ i ], critical,
                                    j == 1 && strengthMod < 100 ? strengthMod : 100 ) ) {
@@ -3970,7 +3986,7 @@ namespace BATTLE {
                     break;
                 }
 
-                if( p_move.m_moveData.m_flags & MOVE::CONTACT ) {
+                if( p_move.m_moveData.m_flags & MF_CONTACT ) {
                     // move makes contact
                     executeContact( p_ui, p_move, p_move.m_target[ i ] );
                 }
@@ -3983,7 +3999,7 @@ namespace BATTLE {
                     break;
                 }
 
-                if( p_move.m_moveData.m_flags & MOVE::FORCESWITCH ) {
+                if( p_move.m_moveData.m_flags & MF_FORCESWITCH ) {
                     // move forces switch out
                     if( _isWildBattle && p_move.m_target[ i ].first != opponent ) {
                         // recall opposing pkmn to end battle
@@ -3996,7 +4012,7 @@ namespace BATTLE {
                     break;
                 }
 
-                if( p_move.m_moveData.m_flags & MOVE::DEFROSTTARGET ) {
+                if( p_move.m_moveData.m_flags & MF_DEFROSTTARGET ) {
                     if( hasStatusCondition( p_move.m_target[ i ].first, p_move.m_target[ i ].second,
                                             FROZEN ) ) {
                         fmt = std::string( GET_STRING( 298 ) );
@@ -4036,12 +4052,12 @@ namespace BATTLE {
 
         // Check for flags and stuff
 
-        if( p_move.m_moveData.m_flags & MOVE::DANCE ) {
+        if( p_move.m_moveData.m_flags & MF_DANCE ) {
             // Check if any pkmn has the "dancer" ability
             // TODO
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::MINDBLOWNRECOIL ) {
+        if( p_move.m_moveData.m_flags & MF_MINDBLOWNRECOIL ) {
             // pkmn loses half of its max hp
             u16 maxHP = getPkmn( opponent, slot )->m_stats.m_maxHP;
             damagePokemon( p_ui, opponent, slot, maxHP / 2 );
@@ -4052,17 +4068,17 @@ namespace BATTLE {
             }
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::RECHARGE ) {
+        if( p_move.m_moveData.m_flags & MF_RECHARGE ) {
             battleMoveSelection bms = NO_OP_SELECTION;
-            bms.m_type              = ATTACK;
+            bms.m_type              = MT_ATTACK;
             addLockedMove( opponent, slot, bms, 0 );
-            addVolatileStatus( p_ui, opponent, slot, RECHARGE, 255 );
+            addVolatileStatus( p_ui, opponent, slot, VS_RECHARGE, 255 );
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::LOCKEDMOVE ) {
+        if( p_move.m_moveData.m_flags & MF_LOCKEDMOVE ) {
             auto                lmcnt = getLockedMoveCount( opponent, slot );
             battleMoveSelection bms   = NO_OP_SELECTION;
-            bms.m_type                = ATTACK;
+            bms.m_type                = MT_ATTACK;
             bms.m_param               = p_move.m_param;
             bms.m_moveData            = p_move.m_moveData;
             bms.m_target              = { 255, 255 };
@@ -4075,42 +4091,38 @@ namespace BATTLE {
                 removeLockedMove( opponent, slot );
                 if( suppressesAbilities( )
                     || getPkmn( opponent, slot )->getAbility( ) != A_OWN_TEMPO
-                    || ( getTerrain( ) == MISTYTERRAIN && isGrounded( opponent, slot ) )
-                    || ( getVolatileStatus( opponent, slot ) & SUBSTITUTE ) ) {
+                    || ( getTerrain( ) == TR_MISTYTERRAIN && isGrounded( opponent, slot ) )
+                    || ( getVolatileStatus( opponent, slot ) & VS_SUBSTITUTE ) ) {
                     fmt = std::string( GET_STRING( 277 ) );
                     snprintf( buffer, 99, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmn( opponent, slot ), opponent ).c_str( ) );
                     p_ui->log( buffer );
 
-                    if( getVolatileStatus( opponent, slot ) & CONFUSION ) {
+                    if( getVolatileStatus( opponent, slot ) & VS_CONFUSION ) {
                         // empty!
                     } else {
-                        addVolatileStatus( p_ui, opponent, slot, CONFUSION,
+                        addVolatileStatus( p_ui, opponent, slot, VS_CONFUSION,
                                            250 + 2 + ( rand( ) % 4 ) );
                     }
                 }
             }
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::ROOST ) {
-            addVolatileStatus( p_ui, opponent, slot, ROOST, 2 );
+        if( p_move.m_moveData.m_flags & MF_ROOST ) {
+            addVolatileStatus( p_ui, opponent, slot, VS_ROOST, 2 );
         }
 
         if( p_move.m_param == M_BURN_UP ) {
-            addVolatileStatus( p_ui, opponent, slot, BURNUP, 255 );
+            addVolatileStatus( p_ui, opponent, slot, VS_BURNUP, 255 );
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::SELFSWITCH ) {
-            recallPokemon( p_ui, opponent, slot );
-        }
+        if( p_move.m_moveData.m_flags & MF_SELFSWITCH ) { recallPokemon( p_ui, opponent, slot ); }
 
-        if( p_move.m_moveData.m_flags & MOVE::BATONPASS ) {
+        if( p_move.m_moveData.m_flags & MF_BATONPASS ) {
             recallPokemon( p_ui, opponent, slot, true );
         }
 
-        if( p_move.m_moveData.m_flags & MOVE::SELFDESTRUCT ) {
-            faintPokemon( p_ui, opponent, slot );
-        }
+        if( p_move.m_moveData.m_flags & MF_SELFDESTRUCT ) { faintPokemon( p_ui, opponent, slot ); }
 
         // check for held item
         checkItemAfterAttack( p_ui, opponent, slot );

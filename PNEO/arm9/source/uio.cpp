@@ -30,11 +30,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <ctime>
 
+#include "battle/type.h"
 #include "defines.h"
-#include "fs.h"
-#include "saveGame.h"
-#include "type.h"
-#include "uio.h"
+#include "fs/data.h"
+#include "io/uio.h"
+#include "save/saveGame.h"
 
 namespace IO {
     font *regularFont
@@ -423,12 +423,12 @@ namespace IO {
         default:
         case 0: // EN
             // I know that this will "break" in 2100.
-            snprintf( buffer, 19, "%s %hhu, 20%02hhu", MONTHS[ p_date[ 1 ] ][ p_language ],
+            snprintf( buffer, 19, "%s %hhu, 20%02hhu", FS::MONTHS[ p_date[ 1 ] ][ p_language ],
                       p_date[ 0 ] + 1, p_date[ 2 ] % 100 );
             break;
         case 1: // DE
             snprintf( buffer, 19, "%hhu. %s 20%02hhu", p_date[ 0 ] + 1,
-                      MONTHS[ p_date[ 1 ] ][ p_language ], p_date[ 2 ] );
+                      FS::MONTHS[ p_date[ 1 ] ][ p_language ], p_date[ 2 ] );
             break;
         }
         return std::string( buffer );
