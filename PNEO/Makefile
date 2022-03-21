@@ -5,7 +5,7 @@ endif
 
 include $(DEVKITARM)/ds_rules
 
-GAME_TITLE_JP	    :=  ポケモン
+GAME_TITLE_JP	    :=  ポケットモンスター
 GAME_SUBTITLE1_JP	:=  ネオ
 GAME_SUBTITLE2_JP	:=  Homebrew
 
@@ -68,17 +68,8 @@ endif
 arm7/$(TARGET).elf: FORCE
 	$(MAKE) -C arm7
 
-ifdef MMOD
-arm9/$(TARGET).elf: FORCE $(_ADDFILES)/SOUND/sound.msl ndstool
-else
 arm9/$(TARGET).elf: FORCE ndstool
-endif
 	$(MAKE) -C arm9
-
-
-$(_ADDFILES)/SOUND/sound.msl:
-	$(MAKE) -C audio clean
-	$(MAKE) -C audio
 
 ndstool:
 	$(MAKE) -C tools/ndstool

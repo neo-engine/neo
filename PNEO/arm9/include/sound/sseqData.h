@@ -26,7 +26,7 @@
     */
 
 #pragma once
-#ifndef MMOD
+#ifndef NO_SOUND
 #include "defines.h"
 #include "gen/bgmNames.h"
 

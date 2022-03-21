@@ -43,9 +43,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "save/saveGame.h"
 
 #ifndef NO_SOUND
-#ifndef MMOD
 #include "sound/sseq.h"
-#endif
 #endif
 
 namespace FS {
@@ -233,12 +231,10 @@ namespace FS {
                                            BATTLE::battleTrainer* p_out );
 
 #ifndef NO_SOUND
-#ifndef MMOD
     bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f );
     bool loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId );
     bool loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId );
     bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId );
-#endif
 #endif
 
 } // namespace FS

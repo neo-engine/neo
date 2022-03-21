@@ -5,7 +5,6 @@
 #include "sound/sseq.h"
 
 #ifndef NO_SOUND
-#ifndef MMOD
 namespace SOUND::SSEQ {
     int          TRACK_CNT         = 0;
     u8*          SEQUENCE_DATA     = NULL;
@@ -577,5 +576,4 @@ namespace SOUND::SSEQ {
         }
     }
 } // namespace SOUND::SSEQ
-#endif
 #endif

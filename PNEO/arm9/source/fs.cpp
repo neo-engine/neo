@@ -50,9 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 #ifndef NO_SOUND
-#ifndef MMOD
 #include "sound/sseq.h"
-#endif
 #endif
 
 namespace FS {

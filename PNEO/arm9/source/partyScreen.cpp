@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sts/partyScreen.h"
 #include "bag/bagViewer.h"
 #include "bag/item.h"
+#include "fs/data.h"
 #include "io/yesNoBox.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -35,7 +36,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef DESQUID
 #include "battle/ability.h"
-#include "fs/data.h"
 #include "fs/fs.h"
 #endif
 

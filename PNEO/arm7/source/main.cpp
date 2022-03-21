@@ -57,11 +57,7 @@ distribution.
 #include <dswifi7.h>
 #include <nds.h>
 #ifndef NOSOUND
-#ifdef MMOD
-#include <maxmod7.h>
-#else
 #include "sound/sseq.h"
-#endif
 #endif
 
 volatile bool exitflag = false;
@@ -98,11 +94,7 @@ int main( ) {
     soundInit( );
 
 #ifndef NO_SOUND
-#ifdef MMOD
-    mmInstall( FIFO_MAXMOD );
-#else
     SOUND::SSEQ::installSoundSys( );
-#endif
 #endif
 
     SetYtrigger( 80 );
@@ -120,9 +112,7 @@ int main( ) {
     setPowerButtonCB( powerButtonCB );
 
 #ifndef NO_SOUND
-#ifndef MMOD
     u32 fadeCounter = 0;
-#endif
 #endif
 
     // Keep the ARM7 mostly idle
@@ -133,7 +123,6 @@ int main( ) {
 
         swiWaitForVBlank( );
 #ifndef NO_SOUND
-#ifndef MMOD
         if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADING ) {
             if( fadeCounter < 24 ) {
                 fadeCounter += 10;
@@ -143,7 +132,6 @@ int main( ) {
                 if( !SOUND::SSEQ::ADSR_MASTER_VOLUME ) { SOUND::SSEQ::stopSequence( ); }
             }
         }
-#endif
 #endif
     }
     return 0;

@@ -82,8 +82,6 @@ Build requirements
 
 * make
 
-* maxmod-nds ≥ 1.0.14 (deprecated; used only when compiling with `MMOD=1`)
-
 Having installed the above tools, _neo_ can be built with a single `make` command.
 See the section below for optional compilation parameters.
 
@@ -105,12 +103,6 @@ to make; the exact (non-empty) value of a variable is unused.
   shows the current location and other desquid output on `L`, and enables a
   walk-through-walls mode while pressing `R`.
 * `NOSOUND` Disable all sound output.
-* `MMOD` Use (legacy and deprecated) MaxMod code for BGM playback. Also compiles the `*.xm`
-  modules in the `audio` folder into a soundbank that is then used.
-  If `MMOD` is not set, BGM playback is realized via an
-  adaption of [RocketRobz' SSEQPlayer](https://github.com/RocketRobz/SSEQPlayer); loading
-  `*.sseq`, `*.swar`, `*.sbnk` files from FSROOT; which is much faster and yields a superior
-  audio experience.
 * `FLASHCARD` Optimize for flashcards. Uses `argv` parameters to write save game files
   (instead of writing directly to CARD memory). Typically, `FLASHCARD` builds cannot
   create/load save games in an emulator.

@@ -1,6 +1,5 @@
 // Based on SSEQ Player by "RocketRobz" (https://github.com/RocketRobz/SSEQPlayer)
 #ifndef NO_SOUND
-#ifndef MMOD
 
 #include <nds.h>
 
@@ -65,5 +64,4 @@ namespace SOUND::SSEQ {
 
 } // namespace SOUND::SSEQ
 
-#endif
 #endif

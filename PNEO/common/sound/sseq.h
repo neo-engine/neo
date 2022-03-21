@@ -2,7 +2,6 @@
 
 #pragma once
 #ifndef NO_SOUND
-#ifndef MMOD
 
 #include <nds.h>
 
@@ -345,5 +344,4 @@ namespace SOUND::SSEQ {
 #endif
 } // namespace SOUND::SSEQ
 
-#endif
 #endif

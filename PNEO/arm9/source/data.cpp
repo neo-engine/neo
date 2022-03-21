@@ -50,9 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 #ifndef NO_SOUND
-#ifndef MMOD
 #include "sound/sseq.h"
-#endif
 #endif
 
 namespace FS {
@@ -60,13 +58,11 @@ namespace FS {
     const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
 
 #ifndef NO_SOUND
-    const char CRY_PATH[] = "nitro:/SOUND/CRIES/";
-    const char SFX_PATH[] = "nitro:/SOUND/SFX/";
-#ifndef MMOD
+    const char CRY_PATH[]  = "nitro:/SOUND/CRIES/";
+    const char SFX_PATH[]  = "nitro:/SOUND/SFX/";
     const char SSEQ_PATH[] = "nitro:/SOUND/BGM/SSEQ/";
     const char SBNK_PATH[] = "nitro:/SOUND/BGM/SBNK/";
     const char SWAR_PATH[] = "nitro:/SOUND/BGM/SWAR/";
-#endif
 #endif
 
     const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/itemname";
@@ -636,7 +632,6 @@ namespace FS {
     }
 
 #ifndef NO_SOUND
-#ifndef MMOD
     bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f ) {
         if( !p_f ) { return false; }
         fseek( p_f, 0, SEEK_END );
@@ -669,7 +664,6 @@ namespace FS {
         fclose( f );
         return res;
     }
-#endif
 #endif
 
     const char* getUIString( u16 p_stringId, u8 p_language ) {

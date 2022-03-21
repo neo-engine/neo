@@ -25,8 +25,7 @@
     along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-#ifndef MMOD
-
+#ifndef NO_SOUND
 #include "sound/sseqData.h"
 
 namespace SOUND::SSEQ {
