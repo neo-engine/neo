@@ -74,7 +74,7 @@ namespace SOUND::SSEQ {
         case BGM_ROUTE_10: return 4;
         case BGM_POKEMON_CENTER: return 2;
         case BGM_POKEMON_GYM: return 1;
-        case BGM_POKEMON_MART: return SSEQ_NONE;
+        case BGM_POKEMON_MART: return 25;
         case BGM_PROF_BIRCH_LAB: return SSEQ_NONE;
         case BGM_CAVE_FORESTS: return SSEQ_NONE;
         case BGM_EX03: return 0; // floaroma town
@@ -136,7 +136,7 @@ namespace SOUND::SSEQ {
         case BGM_UNWAVERING_EMOTIONS: return 18; // (defunct)
         case BGM_DESERT: return SSEQ_NONE;
         case BGM_CABLE_CAR: return SSEQ_NONE;
-        case BGM_EVOLVING: return SSEQ_NONE;
+        case BGM_EVOLVING: return 26;
         case BGM_MYSTERY_GIFT: return 20;
         case BGM_OS_BADGE: return 21;
         case BGM_OS_SYMBOL: return SSEQ_NONE;

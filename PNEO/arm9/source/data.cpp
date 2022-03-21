@@ -223,6 +223,7 @@ namespace FS {
     }
 
     u8* readCry( u16 p_pkmnIdx, u8 p_forme, u32& p_len ) {
+#ifndef NO_SOUND
         FILE* f;
 
         if( p_forme ) {
@@ -236,9 +237,16 @@ namespace FS {
         if( !( p_len = read( f, CRY_DATA, sizeof( u8 ), sizeof( CRY_DATA ) ) ) ) { return nullptr; }
         p_len >>= 2;
         return CRY_DATA;
+#else
+        (void) p_pkmnIdx;
+        (void) p_forme;
+        (void) p_len;
+        return nullptr;
+#endif
     }
 
     u8* readSFX( u16 p_sfxIdx, u16& p_len ) {
+#ifndef NO_SOUND
         FILE* f = openSplit( SFX_PATH, p_sfxIdx, ".raw", 400 );
         if( !f ) { return nullptr; }
 
@@ -246,6 +254,11 @@ namespace FS {
         if( !( p_len = read( f, CRY_DATA, 1, sizeof( CRY_DATA ) ) ) ) { return nullptr; }
         p_len >>= 2;
         return CRY_DATA;
+#else
+        (void) p_sfxIdx;
+        (void) p_len;
+        return nullptr;
+#endif
     }
 
     /*

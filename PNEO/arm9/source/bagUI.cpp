@@ -291,8 +291,6 @@ namespace BAG {
     }
 
     void drawItemTop( u16 p_itemId, const itemData* p_data, u16 p_count ) {
-        std::string display;
-        std::string descr;
         IO::OamTop->oamBuffer[ 0 ].isHidden = true;
         IO::OamTop->oamBuffer[ 1 ].isHidden = true;
         IO::OamTop->oamBuffer[ 2 ].isHidden = true;
@@ -300,18 +298,21 @@ namespace BAG {
 
         if( !p_itemId || p_data == nullptr ) { return; }
 
-        char buffer[ 100 ];
+        std::string descr;
+        char        buffer[ 100 ];
 
         if( p_data->m_itemType != ITEMTYPE_TM ) {
             IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
 
             if( p_data->m_itemType & ITEMTYPE_BERRY ) {
-                display = std::string( GET_STRING( IO::STR_UI_BAG_NUMBER ) )
-                          + std::to_string( itemToBerry( p_itemId ) ) + ": "
-                          + FS::getItemName( p_itemId );
+                snprintf( buffer, 90, "%6s%hu: %75s", GET_STRING( IO::STR_UI_BAG_NUMBER ),
+                          itemToBerry( p_itemId ), FS::getItemName( p_itemId ).c_str( ) );
             } else {
-                display = FS::getItemName( p_itemId );
+                FS::getItemName( p_itemId, CURRENT_LANGUAGE, buffer );
             }
+
+            IO::regularFont->printStringC( buffer, 128, 26, false, IO::font::CENTER );
+
             descr = FS::getItemDescr( p_itemId );
             if( p_data->m_itemType != ITEMTYPE_KEYITEM
                 && p_data->m_itemType != ITEMTYPE_FORMECHANGE ) {
@@ -374,7 +375,9 @@ namespace BAG {
             if( tmtype == 1 && BATTLE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
             u16 tileCnt = IO::loadTMIcon( move.m_type, tmtype, 112, 44, 0, 0, 0, false );
 
-            display = FS::getItemName( p_itemId ) + ": " + FS::getMoveName( p_data->m_param2 );
+            snprintf( buffer, 99, "%15s: %65s", FS::getItemName( p_itemId ).c_str( ),
+                      FS::getMoveName( p_data->m_param2 ).c_str( ) );
+            IO::regularFont->printStringC( buffer, 128, 26, false, IO::font::CENTER );
 
             IO::regularFont->printStringC( GET_STRING( IO::STR_UI_BAG_TYPE ), 56, 147, false,
                                            IO::font::RIGHT );
@@ -409,8 +412,6 @@ namespace BAG {
             }
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         }
-
-        IO::regularFont->printStringC( display.c_str( ), 128, 26, false, IO::font::CENTER );
 
         IO::regularFont->printBreakingStringC( descr.c_str( ), 33, 83, 196, false, IO::font::LEFT,
                                                11 );

@@ -43,6 +43,8 @@ namespace SOUND::SSEQ {
     constexpr u16 BANK_BW_BT_LEADER       = 10;
     constexpr u16 BANK_BW_BT_CHAMP        = 11;
     constexpr u16 BANK_BW_UNDERSEA_TUNNEL = 12;
+    constexpr u16 BANK_BW_FS              = 13;
+    constexpr u16 BANK_GS_BGM_BASIC       = 14;
 
     constexpr u16 SSEQ_PL_FLOAROMA_TOWN   = 0;
     constexpr u16 SSEQ_PL_LAKE_CAVE       = 1;
@@ -69,6 +71,8 @@ namespace SOUND::SSEQ {
     constexpr u16 SSEQ_BW_CAVE_REGI       = 22;
     constexpr u16 SSEQ_BW_BT_LEADER       = 23;
     constexpr u16 SSEQ_BW_BT_CHAMP        = 24;
+    constexpr u16 SSEQ_BW_FS              = 25;
+    constexpr u16 SSEQ_GS_SHINKA          = 26;
 
     constexpr u16 SWAR_PL_BASIC           = 0;
     constexpr u16 SWAR_PL_BGM_FIELD       = 1;
@@ -83,6 +87,8 @@ namespace SOUND::SSEQ {
     constexpr u16 SWAR_BW_BT_LEADER       = 10;
     constexpr u16 SWAR_BW_BT_CHAMP        = 11;
     constexpr u16 SWAR_BW_UNDERSEA_TUNNEL = 12;
+    constexpr u16 SWAR_BW_FS              = 13;
+    constexpr u16 SWAR_GS_BASIC           = 14;
 
     const sseqData SSEQ_LIST[ NUM_SSEQ ] = {
         { BANK_PL_BGM_FIELD, SSEQ_PL_FLOAROMA_TOWN, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_FIELD } },
@@ -118,6 +124,9 @@ namespace SOUND::SSEQ {
         { BANK_PL_BGM_BASIC, SSEQ_PL_OS_TM, 1, { SWAR_PL_BASIC } },
         { BANK_PL_BGM_BASIC, SSEQ_PL_OS_HEAL, 1, { SWAR_PL_BASIC } },
         { BANK_BW_UNDERSEA_TUNNEL, SSEQ_BW_UNDERSEA_TUNNEL, 1, { SWAR_BW_UNDERSEA_TUNNEL } },
+
+        { BANK_BW_FS, SSEQ_BW_FS, 1, { SWAR_BW_FS } },
+        { BANK_GS_BGM_BASIC, SSEQ_GS_SHINKA, 1, { SWAR_GS_BASIC } },
     };
 
 } // namespace SOUND::SSEQ
