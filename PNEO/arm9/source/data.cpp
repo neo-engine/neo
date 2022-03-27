@@ -654,21 +654,21 @@ namespace FS {
     }
 
     bool loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId ) {
-        FILE* f   = open( SSEQ_PATH, p_sseqId, ".sseq", "rb" );
+        FILE* f   = openSplit( SSEQ_PATH, p_sseqId, ".sseq", 9 * ITEMS_PER_DIR, "rb" );
         auto  res = loadSequenceData( p_data, f );
         fclose( f );
         return res;
     }
 
     bool loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId ) {
-        FILE* f   = open( SBNK_PATH, p_sbnkId, ".sbnk", "rb" );
+        FILE* f   = openSplit( SBNK_PATH, p_sbnkId, ".sbnk", 9 * ITEMS_PER_DIR, "rb" );
         auto  res = loadSequenceData( p_data, f );
         fclose( f );
         return res;
     }
 
     bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId ) {
-        FILE* f   = open( SWAR_PATH, p_swarId, ".swar", "rb" );
+        FILE* f   = openSplit( SWAR_PATH, p_swarId, ".swar", 9 * ITEMS_PER_DIR, "rb" );
         auto  res = loadSequenceData( p_data, f );
         fclose( f );
         return res;
