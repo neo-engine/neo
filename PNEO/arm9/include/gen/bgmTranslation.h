@@ -6,16 +6,16 @@ namespace SOUND::SSEQ {
         switch( p_name ) {
         default: return -1;
         case REC_NONE: return 0;
-        case BGM_OS_LEVEL_UP: return 1;
-        case BGM_OS_EVOLVED: return 2;
-        case BGM_OS_PKMN_CAPTURE: return 3;
-        case BGM_OS_BADGE: return 4;
-        case BGM_OS_HEAL_PKMN: return 5;
-        case BGM_OS_SYMBOL: return 6;
-        case BGM_OS_CABLE_CAR: return 7;
-        case BGM_OS_FERRIS_WHEEL: return 8;
-        case REC_EVENT: return 9;
-        case BGM_TITLE: return 10;
+        case BGM_OS_TITLE: return 1;
+        case BGM_OS_LEVEL_UP: return 2;
+        case BGM_OS_EVOLVED: return 3;
+        case BGM_OS_PKMN_CAPTURE: return 4;
+        case BGM_OS_BADGE: return 5;
+        case BGM_OS_HEAL_PKMN: return 6;
+        case BGM_OS_SYMBOL: return 7;
+        case BGM_OS_CABLE_CAR: return 8;
+        case BGM_OS_FERRIS_WHEEL: return 9;
+        case REC_EVENT: return 10;
         case BGM_HELP_PROF_BIRCH: return 11;
         case BGM_SHOW_ME_AROUND: return 12;
         case BGM_UNWAVERING_EMOTIONS: return 13;

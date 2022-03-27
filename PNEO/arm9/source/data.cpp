@@ -50,7 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 #ifndef NO_SOUND
-#include "sound/sseq.h"
+#include "gen/bgmTranslation.h"
 #endif
 
 namespace FS {
@@ -405,10 +405,19 @@ namespace FS {
     }
 
     bool getBGMName( const u16 p_BGMId, const u8 p_language, char* p_out ) {
+#ifndef NO_SOUND
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;
+
+        auto bgmid = SOUND::SSEQ::BGMIndexForName( p_BGMId );
+        if( bgmid < 0 ) { return false; }
         if( !checkOrOpen( bankfile, BGM_NAME_PATH, lastLang, p_language ) ) { return false; }
-        if( getString( bankfile, BGM_NAMELENGTH, p_BGMId, p_out ) ) { return true; }
+        if( getString( bankfile, BGM_NAMELENGTH, bgmid, p_out ) ) { return true; }
+#else
+        (void) p_BGMId;
+        (void) p_language;
+        (void) p_out;
+#endif
         return false;
     }
     std::string getBGMName( const u16 p_BGMId, const u8 p_language ) {

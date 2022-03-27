@@ -58,6 +58,11 @@ namespace IO {
     constexpr u16 STR_UI_PKMN_STAT_LONG_SDF   = STR_UI_PKMN_STAT_LONG_START + 4;
     constexpr u16 STR_UI_PKMN_STAT_LONG_SPD   = STR_UI_PKMN_STAT_LONG_START + 5;
 
+    constexpr u16 STR_UI_JBOX_LUDICOBOX     = 585;
+    constexpr u16 STR_UI_JBOX_CHOOSE_SONG   = 647;
+    constexpr u16 STR_UI_JBOX_STOP_PLAYBACK = 646;
+    constexpr u16 STR_UI_JBOX_CHOOSE_RECORD = 700;
+
     constexpr u16 STR_UI_WOULD_YOU_LIKE_TO_SAVE = 92;
     constexpr u16 STR_UI_SAVING_A_LOT_OF_DATA   = 93;
     constexpr u16 STR_UI_SAVING_COMPLETE        = 94;

@@ -4,16 +4,16 @@
 namespace SOUND::SSEQ {
     const sseqData SSEQ_LIST[ NUM_SSEQ ] = {
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_NONE
-        { 1, 1, 1, { 1, 0, 0, 0 } },     // BGM_OS_LEVEL_UP
-        { 1, 2, 1, { 1, 0, 0, 0 } },     // BGM_OS_EVOLVED
-        { 1, 3, 1, { 1, 0, 0, 0 } },     // BGM_OS_PKMN_CAPTURE
-        { 1, 4, 1, { 1, 0, 0, 0 } },     // BGM_OS_BADGE
-        { 1, 5, 1, { 1, 0, 0, 0 } },     // BGM_OS_HEAL_PKMN
-        { 1, 6, 1, { 1, 0, 0, 0 } },     // BGM_OS_SYMBOL
-        { 2, 7, 1, { 2, 0, 0, 0 } },     // BGM_OS_CABLE_CAR
-        { 2, 7, 1, { 2, 0, 0, 0 } },     // BGM_OS_FERRIS_WHEEL
+        { 1, 1, 1, { 1, 0, 0, 0 } },     // BGM_OS_TITLE
+        { 1, 2, 1, { 1, 0, 0, 0 } },     // BGM_OS_LEVEL_UP
+        { 1, 3, 1, { 1, 0, 0, 0 } },     // BGM_OS_EVOLVED
+        { 1, 4, 1, { 1, 0, 0, 0 } },     // BGM_OS_PKMN_CAPTURE
+        { 1, 5, 1, { 1, 0, 0, 0 } },     // BGM_OS_BADGE
+        { 1, 6, 1, { 1, 0, 0, 0 } },     // BGM_OS_HEAL_PKMN
+        { 1, 7, 1, { 1, 0, 0, 0 } },     // BGM_OS_SYMBOL
+        { 2, 8, 1, { 2, 0, 0, 0 } },     // BGM_OS_CABLE_CAR
+        { 2, 8, 1, { 2, 0, 0, 0 } },     // BGM_OS_FERRIS_WHEEL
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_EVENT
-        { 1, 8, 1, { 1, 0, 0, 0 } },     // BGM_TITLE
         { 3, 9, 1, { 3, 0, 0, 0 } },     // BGM_HELP_PROF_BIRCH
         { 4, 10, 1, { 4, 0, 0, 0 } },    // BGM_SHOW_ME_AROUND
         { 5, 11, 1, { 5, 0, 0, 0 } },    // BGM_UNWAVERING_EMOTIONS
@@ -53,118 +53,118 @@ namespace SOUND::SSEQ {
         { 20, 33, 1, { 20, 0, 0, 0 } },  // BGM_BATTLE_WILD_ALT
         { 21, 34, 1, { 21, 0, 0, 0 } },  // BGM_BATTLE_REGI
         { 22, 35, 2, { 7, 22, 0, 0 } },  // BGM_BATTLE_RAYQUAZA
-        { 23, 36, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_SUICUNE
-        { 23, 37, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_ENTEI
-        { 23, 38, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_RAIKOU
-        { 24, 39, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_HOUOU
-        { 25, 40, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_LUGIA
+        { 23, 36, 2, { 7, 23, 0, 0 } },  // BGM_BATTLE_SUICUNE
+        { 23, 37, 2, { 7, 23, 0, 0 } },  // BGM_BATTLE_ENTEI
+        { 23, 38, 2, { 7, 23, 0, 0 } },  // BGM_BATTLE_RAIKOU
+        { 24, 39, 2, { 7, 24, 0, 0 } },  // BGM_BATTLE_HOUOU
+        { 25, 40, 2, { 7, 25, 0, 0 } },  // BGM_BATTLE_LUGIA
         { 18, 41, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_EX01
         { 18, 42, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_LAKE
         { 18, 43, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_DIALGA_PALKIA
         { 18, 44, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_GIRATINA
         { 18, 45, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_HEATRAN
-        { 26, 46, 1, { 23, 0, 0, 0 } },  // BGM_VICTORY_WILD
-        { 27, 47, 1, { 24, 0, 0, 0 } },  // BGM_VICTORY_TRAINER
-        { 28, 48, 1, { 25, 0, 0, 0 } },  // BGM_VICTORY_TEAM_AM_GRUNT
+        { 26, 46, 1, { 26, 0, 0, 0 } },  // BGM_VICTORY_WILD
+        { 27, 47, 1, { 27, 0, 0, 0 } },  // BGM_VICTORY_TRAINER
+        { 28, 48, 1, { 28, 0, 0, 0 } },  // BGM_VICTORY_TEAM_AM_GRUNT
         { 18, 49, 2, { 1, 18, 0, 0 } },  // BGM_VICTORY_GYM_LEADER
         { 18, 50, 2, { 1, 18, 0, 0 } },  // BGM_VICTORY_FRONTIER_BRAIN
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_RS
         { 1, 51, 1, { 1, 0, 0, 0 } },    // BGM_LITTLEROOT_TOWN
-        { 29, 52, 1, { 26, 0, 0, 0 } },  // BGM_OLDALE_TOWN
-        { 30, 53, 1, { 27, 0, 0, 0 } },  // BGM_PETALBURG_CITY
-        { 31, 54, 1, { 28, 0, 0, 0 } },  // BGM_RUSTBORO_CITY
-        { 32, 55, 1, { 29, 0, 0, 0 } },  // BGM_DEWFORD_TOWN
-        { 33, 56, 1, { 30, 0, 0, 0 } },  // BGM_SLATEPORT_CITY
-        { 34, 57, 1, { 31, 0, 0, 0 } },  // BGM_VERDANTURF_TOWN
-        { 35, 58, 1, { 32, 0, 0, 0 } },  // BGM_FALLARBOR_TOWN
-        { 36, 59, 1, { 33, 0, 0, 0 } },  // BGM_FORTREE_CITY
-        { 30, 53, 1, { 27, 0, 0, 0 } },  // BGM_LILYCOVE_CITY
-        { 37, 60, 1, { 34, 0, 0, 0 } },  // BGM_NEW_LILYCOVE_CITY
-        { 38, 61, 1, { 35, 0, 0, 0 } },  // BGM_SOOTOPOLIS_CITY
-        { 36, 59, 1, { 33, 0, 0, 0 } },  // BGM_CLIFFELTA_CITY
-        { 39, 62, 1, { 36, 0, 0, 0 } },  // BGM_BLOSSAND_TOWN
-        { 40, 63, 1, { 37, 0, 0, 0 } },  // BGM_EVER_GRANDE_CITY
+        { 29, 52, 1, { 29, 0, 0, 0 } },  // BGM_OLDALE_TOWN
+        { 30, 53, 1, { 30, 0, 0, 0 } },  // BGM_PETALBURG_CITY
+        { 31, 54, 1, { 31, 0, 0, 0 } },  // BGM_RUSTBORO_CITY
+        { 32, 55, 1, { 32, 0, 0, 0 } },  // BGM_DEWFORD_TOWN
+        { 33, 56, 1, { 33, 0, 0, 0 } },  // BGM_SLATEPORT_CITY
+        { 34, 57, 1, { 34, 0, 0, 0 } },  // BGM_VERDANTURF_TOWN
+        { 35, 58, 1, { 35, 0, 0, 0 } },  // BGM_FALLARBOR_TOWN
+        { 36, 59, 1, { 36, 0, 0, 0 } },  // BGM_FORTREE_CITY
+        { 30, 53, 1, { 30, 0, 0, 0 } },  // BGM_LILYCOVE_CITY
+        { 37, 60, 1, { 37, 0, 0, 0 } },  // BGM_NEW_LILYCOVE_CITY
+        { 38, 61, 1, { 38, 0, 0, 0 } },  // BGM_SOOTOPOLIS_CITY
+        { 36, 59, 1, { 36, 0, 0, 0 } },  // BGM_CLIFFELTA_CITY
+        { 39, 62, 1, { 39, 0, 0, 0 } },  // BGM_BLOSSAND_TOWN
+        { 40, 63, 1, { 40, 0, 0, 0 } },  // BGM_EVER_GRANDE_CITY
         { 7, 64, 1, { 7, 0, 0, 0 } },    // BGM_ROUTE_101
         { 1, 65, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_104
         { 1, 66, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_110
         { 1, 67, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_113
         { 1, 68, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_119
         { 1, 69, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_120
-        { 41, 70, 1, { 38, 0, 0, 0 } },  // BGM_ROUTE_123
-        { 42, 71, 1, { 39, 0, 0, 0 } },  // BGM_ROUTE_135
-        { 43, 72, 2, { 1, 40, 0, 0 } },  // BGM_POKEMON_GYM
-        { 44, 73, 2, { 7, 41, 0, 0 } },  // BGM_POKEMON_CENTER
-        { 44, 74, 2, { 7, 41, 0, 0 } },  // BGM_POKEMON_MART
-        { 44, 75, 2, { 7, 41, 0, 0 } },  // BGM_PROF_BIRCH_LAB
-        { 45, 76, 2, { 1, 42, 0, 0 } },  // BGM_CAVE_FORESTS
-        { 43, 77, 2, { 1, 40, 0, 0 } },  // BGM_EX03
-        { 46, 78, 1, { 43, 0, 0, 0 } },  // BGM_TRAINER_SCHOOL
+        { 41, 70, 1, { 41, 0, 0, 0 } },  // BGM_ROUTE_123
+        { 42, 71, 1, { 42, 0, 0, 0 } },  // BGM_ROUTE_135
+        { 43, 72, 2, { 1, 43, 0, 0 } },  // BGM_POKEMON_GYM
+        { 44, 73, 2, { 7, 44, 0, 0 } },  // BGM_POKEMON_CENTER
+        { 44, 74, 2, { 7, 44, 0, 0 } },  // BGM_POKEMON_MART
+        { 44, 75, 2, { 7, 44, 0, 0 } },  // BGM_PROF_BIRCH_LAB
+        { 45, 76, 2, { 1, 45, 0, 0 } },  // BGM_CAVE_FORESTS
+        { 43, 77, 2, { 1, 43, 0, 0 } },  // BGM_EX03
+        { 46, 78, 1, { 46, 0, 0, 0 } },  // BGM_TRAINER_SCHOOL
         { 11, 20, 1, { 11, 0, 0, 0 } },  // BGM_ABANDONED_SHIP
         { 11, 20, 1, { 11, 0, 0, 0 } },  // BGM_MARINE_SCIENCE_MUSEUM
-        { 47, 79, 1, { 44, 0, 0, 0 } },  // BGM_TRICK_HOUSE
-        { 48, 80, 1, { 45, 0, 0, 0 } },  // BGM_NEW_MAUVILLE
-        { 44, 81, 2, { 7, 41, 0, 0 } },  // BGM_MAUVILLE_GAME_CORNER
-        { 49, 82, 1, { 46, 0, 0, 0 } },  // BGM_MT_CHIMNEY
-        { 50, 83, 1, { 47, 0, 0, 0 } },  // BGM_METEOR_FALLS
-        { 51, 84, 2, { 7, 48, 0, 0 } },  // BGM_SAFARI_ZONE
-        { 52, 85, 2, { 7, 49, 0, 0 } },  // BGM_LILYCOVE_MUSEUM
-        { 53, 86, 2, { 7, 50, 0, 0 } },  // BGM_MT_PYRE_PEAK
-        { 49, 82, 1, { 46, 0, 0, 0 } },  // BGM_TEAM_AM_HIDEOUT
-        { 54, 87, 1, { 51, 0, 0, 0 } },  // BGM_SHOAL_CAVE
-        { 55, 88, 2, { 7, 52, 0, 0 } },  // BGM_VICTORY_ROAD
-        { 56, 89, 1, { 53, 0, 0, 0 } },  // BGM_SEALED_CHAMBER
-        { 57, 90, 1, { 54, 0, 0, 0 } },  // BGM_CRYSTAL_CAVERN
-        { 58, 91, 1, { 55, 0, 0, 0 } },  // BGM_BATTLE_FRONTIER
-        { 59, 92, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_ARENA
-        { 59, 93, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_PYRAMID
-        { 59, 93, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_PYRAMID_PEAK
-        { 59, 94, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_TOWER
-        { 45, 95, 2, { 1, 42, 0, 0 } },  // BGM_BATTLE_FACTORY
-        { 60, 96, 2, { 7, 57, 0, 0 } },  // BGM_BATTLE_PALACE
+        { 47, 79, 1, { 47, 0, 0, 0 } },  // BGM_TRICK_HOUSE
+        { 48, 80, 1, { 48, 0, 0, 0 } },  // BGM_NEW_MAUVILLE
+        { 44, 81, 2, { 7, 44, 0, 0 } },  // BGM_MAUVILLE_GAME_CORNER
+        { 49, 82, 1, { 49, 0, 0, 0 } },  // BGM_MT_CHIMNEY
+        { 50, 83, 1, { 50, 0, 0, 0 } },  // BGM_METEOR_FALLS
+        { 51, 84, 2, { 7, 51, 0, 0 } },  // BGM_SAFARI_ZONE
+        { 52, 85, 2, { 7, 52, 0, 0 } },  // BGM_LILYCOVE_MUSEUM
+        { 53, 86, 2, { 7, 53, 0, 0 } },  // BGM_MT_PYRE_PEAK
+        { 49, 82, 1, { 49, 0, 0, 0 } },  // BGM_TEAM_AM_HIDEOUT
+        { 54, 87, 1, { 54, 0, 0, 0 } },  // BGM_SHOAL_CAVE
+        { 55, 88, 2, { 7, 55, 0, 0 } },  // BGM_VICTORY_ROAD
+        { 56, 89, 1, { 56, 0, 0, 0 } },  // BGM_SEALED_CHAMBER
+        { 57, 90, 1, { 57, 0, 0, 0 } },  // BGM_CRYSTAL_CAVERN
+        { 58, 91, 1, { 58, 0, 0, 0 } },  // BGM_BATTLE_FRONTIER
+        { 59, 92, 2, { 7, 59, 0, 0 } },  // BGM_BATTLE_ARENA
+        { 59, 93, 2, { 7, 59, 0, 0 } },  // BGM_BATTLE_PYRAMID
+        { 59, 93, 2, { 7, 59, 0, 0 } },  // BGM_BATTLE_PYRAMID_PEAK
+        { 59, 94, 2, { 7, 59, 0, 0 } },  // BGM_BATTLE_TOWER
+        { 45, 95, 2, { 1, 45, 0, 0 } },  // BGM_BATTLE_FACTORY
+        { 60, 96, 2, { 7, 60, 0, 0 } },  // BGM_BATTLE_PALACE
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_GS
-        { 44, 97, 2, { 7, 41, 0, 0 } },  // BGM_NEW_BARK_TOWN
-        { 44, 98, 2, { 7, 41, 0, 0 } },  // BGM_CHERRYGROVE_CITY
-        { 61, 99, 2, { 7, 58, 0, 0 } },  // BGM_VIOLET_CITY
-        { 62, 100, 2, { 7, 59, 0, 0 } }, // BGM_AZALEA_TOWN
-        { 63, 101, 2, { 7, 60, 0, 0 } }, // BGM_GOLDENROD_CITY
-        { 60, 102, 2, { 7, 57, 0, 0 } }, // BGM_ECRUTEAK_CITY
-        { 64, 103, 2, { 7, 61, 0, 0 } }, // BGM_OLIVINE_CITY
-        { 64, 104, 2, { 7, 61, 0, 0 } }, // BGM_CIANWOOD_CITY
-        { 65, 105, 2, { 7, 62, 0, 0 } }, // BGM_MAHOGANY_TOWN
-        { 66, 106, 2, { 7, 63, 0, 0 } }, // BGM_BLACKTHORN_CITY
-        { 44, 107, 2, { 7, 41, 0, 0 } }, // BGM_ROUTE_29
-        { 44, 108, 2, { 7, 41, 0, 0 } }, // BGM_ROUTE_30
-        { 63, 109, 2, { 7, 60, 0, 0 } }, // BGM_ROUTE_34
-        { 64, 110, 2, { 7, 61, 0, 0 } }, // BGM_ROUTE_38
-        { 65, 111, 2, { 7, 62, 0, 0 } }, // BGM_ROUTE_42
-        { 51, 112, 2, { 7, 48, 0, 0 } }, // BGM_ROUTE_47
-        { 52, 85, 2, { 7, 49, 0, 0 } },  // BGM_NATIONAL_PARK
+        { 44, 97, 2, { 7, 44, 0, 0 } },  // BGM_NEW_BARK_TOWN
+        { 44, 98, 2, { 7, 44, 0, 0 } },  // BGM_CHERRYGROVE_CITY
+        { 61, 99, 2, { 7, 61, 0, 0 } },  // BGM_VIOLET_CITY
+        { 62, 100, 2, { 7, 62, 0, 0 } }, // BGM_AZALEA_TOWN
+        { 63, 101, 2, { 7, 63, 0, 0 } }, // BGM_GOLDENROD_CITY
+        { 60, 102, 2, { 7, 60, 0, 0 } }, // BGM_ECRUTEAK_CITY
+        { 64, 103, 2, { 7, 64, 0, 0 } }, // BGM_OLIVINE_CITY
+        { 64, 104, 2, { 7, 64, 0, 0 } }, // BGM_CIANWOOD_CITY
+        { 65, 105, 2, { 7, 65, 0, 0 } }, // BGM_MAHOGANY_TOWN
+        { 66, 106, 2, { 7, 66, 0, 0 } }, // BGM_BLACKTHORN_CITY
+        { 44, 107, 2, { 7, 44, 0, 0 } }, // BGM_ROUTE_29
+        { 44, 108, 2, { 7, 44, 0, 0 } }, // BGM_ROUTE_30
+        { 63, 109, 2, { 7, 63, 0, 0 } }, // BGM_ROUTE_34
+        { 64, 110, 2, { 7, 64, 0, 0 } }, // BGM_ROUTE_38
+        { 65, 111, 2, { 7, 65, 0, 0 } }, // BGM_ROUTE_42
+        { 51, 112, 2, { 7, 51, 0, 0 } }, // BGM_ROUTE_47
+        { 52, 85, 2, { 7, 52, 0, 0 } },  // BGM_NATIONAL_PARK
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_RG
-        { 67, 113, 2, { 7, 64, 0, 0 } }, // BGM_PALLET_TOWN
-        { 68, 114, 2, { 7, 65, 0, 0 } }, // BGM_VIRIDIAN_CITY
-        { 69, 115, 2, { 7, 66, 0, 0 } }, // BGM_PEWTER_CITY
-        { 70, 116, 2, { 7, 67, 0, 0 } }, // BGM_CERULIAN_CITY
-        { 71, 117, 2, { 7, 68, 0, 0 } }, // BGM_VERMILION_CITY
-        { 72, 118, 2, { 7, 69, 0, 0 } }, // BGM_LAVENDER_TOWN
-        { 73, 119, 2, { 7, 70, 0, 0 } }, // BGM_CELADON_CITY
-        { 74, 120, 2, { 7, 71, 0, 0 } }, // BGM_FUCHSIA_CITY
-        { 75, 121, 2, { 7, 72, 0, 0 } }, // BGM_SAFFRON_CITY
-        { 67, 122, 2, { 7, 64, 0, 0 } }, // BGM_CINNABAR_ISLAND
-        { 68, 123, 2, { 7, 65, 0, 0 } }, // BGM_ROUTE_1
-        { 68, 124, 2, { 7, 65, 0, 0 } }, // BGM_ROUTE_3
-        { 71, 125, 2, { 7, 72, 0, 0 } }, // BGM_ROUTE_11
-        { 70, 126, 2, { 7, 67, 0, 0 } }, // BGM_ROUTE_24
-        { 44, 127, 2, { 7, 41, 0, 0 } }, // BGM_ROUTE_26
-        { 55, 128, 2, { 7, 52, 0, 0 } }, // BGM_MT_MOON
+        { 67, 113, 2, { 7, 67, 0, 0 } }, // BGM_PALLET_TOWN
+        { 68, 114, 2, { 7, 68, 0, 0 } }, // BGM_VIRIDIAN_CITY
+        { 69, 115, 2, { 7, 69, 0, 0 } }, // BGM_PEWTER_CITY
+        { 70, 116, 2, { 7, 70, 0, 0 } }, // BGM_CERULIAN_CITY
+        { 71, 117, 2, { 7, 71, 0, 0 } }, // BGM_VERMILION_CITY
+        { 72, 118, 2, { 7, 72, 0, 0 } }, // BGM_LAVENDER_TOWN
+        { 73, 119, 2, { 7, 73, 0, 0 } }, // BGM_CELADON_CITY
+        { 74, 120, 2, { 7, 74, 0, 0 } }, // BGM_FUCHSIA_CITY
+        { 75, 121, 2, { 7, 75, 0, 0 } }, // BGM_SAFFRON_CITY
+        { 67, 122, 2, { 7, 67, 0, 0 } }, // BGM_CINNABAR_ISLAND
+        { 68, 123, 2, { 7, 68, 0, 0 } }, // BGM_ROUTE_1
+        { 68, 124, 2, { 7, 68, 0, 0 } }, // BGM_ROUTE_3
+        { 71, 125, 2, { 7, 75, 0, 0 } }, // BGM_ROUTE_11
+        { 70, 126, 2, { 7, 70, 0, 0 } }, // BGM_ROUTE_24
+        { 44, 127, 2, { 7, 44, 0, 0 } }, // BGM_ROUTE_26
+        { 55, 128, 2, { 7, 55, 0, 0 } }, // BGM_MT_MOON
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_DP
-        { 45, 76, 2, { 1, 42, 0, 0 } },  // BGM_ETERNA_FOREST
-        { 45, 129, 2, { 1, 42, 0, 0 } }, // BGM_SPRING_PATH
-        { 45, 130, 2, { 1, 42, 0, 0 } }, // BGM_LAKE_CAVE
-        { 45, 131, 2, { 1, 42, 0, 0 } }, // BGM_DISTORTION_WORLD
+        { 45, 76, 2, { 1, 45, 0, 0 } },  // BGM_ETERNA_FOREST
+        { 45, 129, 2, { 1, 45, 0, 0 } }, // BGM_SPRING_PATH
+        { 45, 130, 2, { 1, 45, 0, 0 } }, // BGM_LAKE_CAVE
+        { 45, 131, 2, { 1, 45, 0, 0 } }, // BGM_DISTORTION_WORLD
         { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_BW
-        { 76, 132, 1, { 73, 0, 0, 0 } }, // BGM_UNOVA_GATE
-        { 42, 71, 1, { 39, 0, 0, 0 } },  // BGM_ROUTE_9
-        { 77, 133, 1, { 74, 0, 0, 0 } }, // BGM_ROUTE_10
+        { 76, 132, 1, { 76, 0, 0, 0 } }, // BGM_UNOVA_GATE
+        { 42, 71, 1, { 42, 0, 0, 0 } },  // BGM_ROUTE_9
+        { 77, 133, 1, { 77, 0, 0, 0 } }, // BGM_ROUTE_10
     };
 } // namespace SOUND::SSEQ
 #endif

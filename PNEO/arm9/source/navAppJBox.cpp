@@ -25,177 +25,19 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "nav/navApp.h"
+#ifndef NO_SOUND
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "io/sprite.h"
+#include "io/strings.h"
 #include "io/uio.h"
-#include "map/mapDefines.h"
 #include "nav/nav.h"
+#include "nav/navApp.h"
 #include "sound/sound.h"
+#include "sound/sseqData.h"
 
 namespace NAV {
-
-    void mapNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        IO::loadSprite( "NV/app01", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
-                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, false, false, false,
-                        OBJPRIORITY_1, p_bottom );
-    }
-
-    void mapNavApp::load( bool p_bottom ) {
-        char buffer[ 100 ];
-
-        auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
-        auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
-
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-
-        for( u8 i = 0; i < MAX_NAV_APPS; ++i ) { oam[ SPR_NAV_APP_ICON_SUB( i ) ].isHidden = true; }
-
-        oam[ SPR_NAV_APP_RSV_SUB + 2 ]          = oam[ SPR_X_OAM_SUB ];
-        oam[ SPR_NAV_APP_RSV_SUB + 2 ].isHidden = false;
-        oam[ SPR_NAV_APP_RSV_SUB + 2 ].x        = 200;
-        oam[ SPR_NAV_APP_RSV_SUB + 2 ].y        = 166;
-
-        computePlayerPosition( );
-        _cursorX = _playerX;
-        _cursorY = _playerY;
-        computeCursorLocationId( );
-
-        // load player icon
-        u16 tileCnt = 0;
-
-        if( !SAVE::SAV.getActiveFile( ).m_appearance ) {
-            tileCnt
-                = IO::loadSprite( "NV/player0", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
-                                  tileCnt, _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, false,
-                                  false, false, OBJPRIORITY_3, p_bottom );
-        } else {
-            tileCnt
-                = IO::loadSprite( "NV/player1", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
-                                  tileCnt, _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, false,
-                                  false, false, OBJPRIORITY_3, p_bottom );
-        }
-
-        // load cursor icon
-        tileCnt = IO::loadSprite( "BX/box_arrow", SPR_NAV_APP_RSV_SUB, SPR_NAV_APP_RSV2_PAL_SUB,
-                                  tileCnt, _cursorX, _cursorY + MAP_TOP_Y - 14, 16, 16, false,
-                                  false, false, OBJPRIORITY_3, true );
-
-        // load bg
-
-        FS::readPictureData( ptr3, "nitro:/PICS/NAV_APP/", "app01bg", 192 * 2, 192 * 256,
-                             p_bottom );
-        pal[ 0 ] = IO::BLACK;
-
-        if( _cursorLocationId ) {
-            snprintf( buffer, 99, "%s: %s", FS::getLocation( 2005 ).c_str( ),
-                      FS::getLocation( _cursorLocationId ).c_str( ) );
-        } else {
-            snprintf( buffer, 99, "%s", FS::getLocation( 2005 ).c_str( ) );
-        }
-
-        IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
-
-        IO::updateOAM( p_bottom );
-    }
-
-    void mapNavApp::computePlayerPosition( ) {
-        if( SAVE::SAV.getActiveFile( ).m_currentMap == MAP::OW_MAP ) {
-            // player is in OW
-            _playerX = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / MAP_IMG_RES;
-            _playerY = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / MAP_IMG_RES;
-        } else if( SAVE::SAV.getActiveFile( ).m_lastOWPos.first == MAP::OW_MAP ) {
-            _playerX = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posX / MAP_IMG_RES;
-            _playerY = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posY / MAP_IMG_RES;
-        } else {
-            _playerX = 0;
-            _playerY = 0;
-        }
-    }
-
-    void mapNavApp::computeCursorLocationId( ) {
-        _cursorLocationId = MAP::BANK_10_MAP_LOCATIONS[ _cursorY / 2 ][ _cursorX / 2 ];
-    }
-
-    bool mapNavApp::tick( bool p_bottom ) {
-        char buffer[ 100 ];
-
-        // update player position
-        auto oldx = _playerX, oldy = _playerY;
-        auto oldl = _cursorLocationId;
-        computePlayerPosition( );
-        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-
-        bool change    = _playerX != oldx || _playerY != oldy;
-        bool locChange = false;
-
-        // update player sprite
-
-        oam[ SPR_NAV_APP_RSV_SUB + 1 ].x = _playerX - 8;
-        oam[ SPR_NAV_APP_RSV_SUB + 1 ].y = _playerY + MAP_TOP_Y - 8;
-        if( change ) {
-            locChange |= ( _playerX != _cursorX || _playerY != _cursorY );
-            _cursorX = _playerX;
-            _cursorY = _playerY;
-        }
-
-        // check for (touch) input
-
-        if( touch.px >= MAP_TOP_X && touch.px <= MAP_BOT_X && touch.py >= MAP_TOP_Y
-            && touch.py <= MAP_BOT_Y ) {
-            // move cursor
-            locChange |= ( touch.px != _cursorX || touch.py != _cursorY );
-
-            _cursorX = touch.px;
-            _cursorY = touch.py - MAP_TOP_Y;
-        }
-
-        if( locChange ) {
-            oam[ SPR_NAV_APP_RSV_SUB ].x = _cursorX;
-            oam[ SPR_NAV_APP_RSV_SUB ].y = _cursorY + MAP_TOP_Y - 14;
-
-            computeCursorLocationId( );
-            if( _cursorLocationId != oldl ) {
-                if( _cursorLocationId ) {
-                    snprintf( buffer, 99, "%s: %s", FS::getLocation( 2005 ).c_str( ),
-                              FS::getLocation( _cursorLocationId ).c_str( ) );
-                } else {
-                    snprintf( buffer, 99, "%s", FS::getLocation( 2005 ).c_str( ) );
-                }
-                IO::printRectangle( 43, 10, 200, 30, p_bottom, 0 );
-                IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
-            }
-        }
-
-        if( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
-            && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
-            && touch.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
-            && touch.py <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y + 20 ) {
-            bool suc = true;
-            while( touch.px || touch.py ) {
-                swiWaitForVBlank( );
-                scanKeys( );
-
-                if( !( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
-                       && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
-                       && touch.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
-                       && touch.py <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y + 20 ) ) {
-                    suc = false;
-                    break;
-                }
-                touchRead( &touch );
-                swiWaitForVBlank( );
-            }
-            if( suc ) { return true; }
-        }
-
-        if( change || locChange ) { IO::updateOAM( p_bottom ); }
-        return false;
-    }
-
     void jboxNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::loadSprite( "NV/app02", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
@@ -298,15 +140,16 @@ namespace NAV {
                              p_bottom );
         pal[ 0 ] = IO::BLACK;
 
-        drawSongList( _currentSelStart, p_bottom );
+        setMode( _currentMode, p_bottom );
 
-        IO::updateOAM( p_bottom );
-
-        auto s1 = std::string( GET_STRING( 585 ) );
-        if( _currentSong && _currentSong <= MAX_BGM ) {
+        auto s1 = std::string( GET_STRING( IO::STR_UI_JBOX_LUDICOBOX ) );
+        if( _currentSong && SOUND::SSEQ::existsBGM( _currentSong ) ) {
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
         } else {
-            snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ),
+                      GET_STRING( _currentMode == JMODE_SHOW_RECORD
+                                      ? IO::STR_UI_JBOX_CHOOSE_RECORD
+                                      : IO::STR_UI_JBOX_CHOOSE_SONG ) );
         }
         IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
     }
@@ -329,11 +172,21 @@ namespace NAV {
                 = SPR_BOX_PAL_SUB;
         }
 
-        for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( p_btn == NUM_SPECIAL_TGS + i ) {
-                setSongChoicePal( i, SPR_BOX_SEL_PAL_SUB, p_bottom );
-            } else {
-                setSongChoicePal( i, SPR_BOX_PAL_SUB, p_bottom );
+        if( _currentMode == JMODE_SHOW_RECORD ) {
+            for( u16 i = 0; i < SONGS_PER_PAGE; ++i ) {
+                if( p_btn == NUM_SPECIAL_TGS + i * MAX_SONGS_PER_RECORD ) {
+                    setSongChoicePal( i, SPR_BOX_SEL_PAL_SUB, p_bottom );
+                } else {
+                    setSongChoicePal( i, SPR_BOX_PAL_SUB, p_bottom );
+                }
+            }
+        } else {
+            for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
+                if( p_btn == NUM_SPECIAL_TGS + i ) {
+                    setSongChoicePal( i, SPR_BOX_SEL_PAL_SUB, p_bottom );
+                } else {
+                    setSongChoicePal( i, SPR_BOX_PAL_SUB, p_bottom );
+                }
             }
         }
 
@@ -347,43 +200,64 @@ namespace NAV {
     }
 
     void jboxNavApp::selectSong( u16 p_idx, bool p_bottom ) {
-        char buffer[ 100 ];
         SOUND::playCry( PKMN_LUDICOLO );
-        _currentSong = p_idx;
-        auto s1      = std::string( GET_STRING( 585 ) );
-        if( _currentSong && _currentSong <= MAX_BGM ) {
+
+        char buffer[ 100 ];
+        if( !p_idx || !SOUND::SSEQ::existsBGM( _currentSong ) ) {
+            auto s1 = std::string( GET_STRING( IO::STR_UI_JBOX_LUDICOBOX ) );
+            SOUND::setJBoxBGM( SOUND::JBOX_DISABLED );
+            snprintf( buffer, 99, "%s: %s", s1.c_str( ),
+                      GET_STRING( _currentMode == JMODE_SHOW_RECORD
+                                      ? IO::STR_UI_JBOX_CHOOSE_RECORD
+                                      : IO::STR_UI_JBOX_CHOOSE_SONG ) );
+            IO::printRectangle( 45, 10, 200, 30, p_bottom, 0 );
+            IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
+            return;
+        }
+
+        if( _currentMode == JMODE_SHOW_RECORD ) {
+            _currentRecord   = p_idx;
+            _currentSelStart = _currentRecord + 1;
+            setMode( JMODE_SHOW_SONG );
+        } else {
+            _currentSong = p_idx;
+            auto s1      = std::string( GET_STRING( IO::STR_UI_JBOX_LUDICOBOX ) );
             SOUND::setJBoxBGM( _currentSong );
             snprintf( buffer, 99, "%s: %s", s1.c_str( ), FS::getBGMName( _currentSong ).c_str( ) );
-        } else {
-            SOUND::setJBoxBGM( SOUND::JBOX_DISABLED );
-            snprintf( buffer, 99, "%s: %s", s1.c_str( ), GET_STRING( 647 ) );
+            IO::printRectangle( 45, 10, 200, 30, p_bottom, 0 );
+            IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
         }
-        IO::printRectangle( 45, 10, 200, 30, p_bottom, 0 );
-        IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
     }
 
-    void jboxNavApp::drawSongList( u16 p_startIdx, bool p_bottom ) {
+    void jboxNavApp::drawSongList( u16 p_startIdx, bool p_listRecords, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::printRectangle( 45, 30, 200, 180, p_bottom, 0 );
+
         for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( p_startIdx + i <= MAX_BGM ) {
+            auto next = p_listRecords ? p_startIdx + MAX_SONGS_PER_RECORD * i : p_startIdx + i;
+
+            if( SOUND::SSEQ::existsBGM( next ) ) {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
 
                 setSongChoiceVis( i, false, p_bottom );
-                IO::regularFont->printStringC( FS::getBGMName( p_startIdx + i ).c_str( ),
-                                               oam[ idx ].x + 64, oam[ idx ].y + 2, p_bottom,
-                                               IO::font::CENTER );
+                IO::regularFont->printStringC( FS::getBGMName( next ).c_str( ), oam[ idx ].x + 64,
+                                               oam[ idx ].y + 2, p_bottom, IO::font::CENTER );
             } else {
                 setSongChoiceVis( i, true, p_bottom );
             }
         }
 
-        oam[ SPR_NAV_APP_RSV_SUB + 1 ].isHidden = p_startIdx + SONGS_PER_PAGE > MAX_BGM;
-        oam[ SPR_NAV_APP_RSV_SUB ].isHidden     = p_startIdx <= SONGS_PER_PAGE;
+        auto ub = p_listRecords ? p_startIdx + MAX_SONGS_PER_RECORD * SONGS_PER_PAGE
+                                : p_startIdx + SONGS_PER_PAGE;
+        auto lb = p_listRecords ? p_startIdx / MAX_SONGS_PER_RECORD : p_startIdx - _currentRecord;
+
+        oam[ SPR_NAV_APP_RSV_SUB + 1 ].isHidden = !SOUND::SSEQ::existsBGM( ub );
+        oam[ SPR_NAV_APP_RSV_SUB ].isHidden     = lb <= s16( SONGS_PER_PAGE );
 
         auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * SONGS_PER_PAGE;
-        IO::regularFont->printStringC( GET_STRING( 646 ), oam[ idx ].x + 64, oam[ idx ].y + 2,
-                                       p_bottom, IO::font::CENTER );
+        IO::regularFont->printStringC( GET_STRING( IO::STR_UI_JBOX_STOP_PLAYBACK ),
+                                       oam[ idx ].x + 64, oam[ idx ].y + 2, p_bottom,
+                                       IO::font::CENTER );
     }
 
     std::vector<std::pair<IO::inputTarget, u16>> jboxNavApp::touchPositions( bool p_bottom ) {
@@ -406,11 +280,15 @@ namespace NAV {
 
         // select song
         for( u8 i = 0; i < SONGS_PER_PAGE; ++i ) {
-            if( _currentSelStart + i <= MAX_BGM ) {
+            auto next = _currentMode == JMODE_SHOW_RECORD
+                            ? _currentRecSelStart + i * MAX_SONGS_PER_RECORD
+                            : _currentSelStart + i;
+
+            if( SOUND::SSEQ::existsBGM( next ) ) {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
                 res.push_back( std::pair( IO::inputTarget( oam[ idx ].x, oam[ idx ].y,
                                                            oam[ idx ].x + 128, oam[ idx ].y + 20 ),
-                                          _currentSelStart + i + NUM_SPECIAL_TGS ) );
+                                          next + NUM_SPECIAL_TGS ) );
             }
         }
 
@@ -430,11 +308,29 @@ namespace NAV {
         return res;
     }
 
+    void jboxNavApp::redraw( bool p_bottom ) {
+        if( _currentMode == JMODE_SHOW_RECORD ) {
+            drawSongList( _currentRecSelStart, true, p_bottom );
+        } else {
+            drawSongList( _currentSelStart, false, p_bottom );
+        }
+        IO::updateOAM( p_bottom );
+    }
+
+    void jboxNavApp::setMode( mode p_newMode, bool p_bottom ) {
+        _currentMode = p_newMode;
+        redraw( p_bottom );
+    }
+
     bool jboxNavApp::tick( bool p_bottom ) {
         for( auto c : touchPositions( ) ) {
             if( c.first.inRange( touch ) ) {
                 if( c.second >= NUM_SPECIAL_TGS ) {
-                    hoverButton( c.second - _currentSelStart, p_bottom );
+                    if( _currentMode == JMODE_SHOW_RECORD ) {
+                        hoverButton( c.second - _currentRecSelStart, p_bottom );
+                    } else {
+                        hoverButton( c.second - _currentSelStart, p_bottom );
+                    }
                 } else {
                     hoverButton( c.second, p_bottom );
                 }
@@ -453,22 +349,47 @@ namespace NAV {
                 hoverButton( 0, p_bottom );
                 if( suc ) {
                     if( c.second == EXIT_CHOICE ) {
-                        return true;
-                    } else if( c.second == FWD_CHOICE ) {
-                        if( _currentSelStart + SONGS_PER_PAGE <= MAX_BGM ) {
-                            SOUND::playCry( PKMN_BELLOSSOM );
-                            _currentSelStart += SONGS_PER_PAGE;
-                            drawSongList( _currentSelStart, p_bottom );
-                            IO::updateOAM( p_bottom );
+                        // if currently showing songs, go back to record overview;
+                        // otherwise exit
+                        if( _currentMode == JMODE_SHOW_RECORD ) {
+                            return true;
+                        } else {
+                            setMode( JMODE_SHOW_RECORD, p_bottom );
                             break;
                         }
+                    } else if( c.second == FWD_CHOICE ) {
+                        if( _currentMode == JMODE_SHOW_RECORD ) {
+                            if( SOUND::SSEQ::existsBGM( _currentRecSelStart
+                                                        + SONGS_PER_PAGE
+                                                              * MAX_SONGS_PER_RECORD ) ) {
+                                SOUND::playCry( PKMN_BELLOSSOM );
+                                _currentRecSelStart += SONGS_PER_PAGE * MAX_SONGS_PER_RECORD;
+                                redraw( p_bottom );
+                                break;
+                            }
+                        } else {
+                            if( SOUND::SSEQ::existsBGM( _currentSelStart + SONGS_PER_PAGE ) ) {
+                                SOUND::playCry( PKMN_BELLOSSOM );
+                                _currentSelStart += SONGS_PER_PAGE;
+                                redraw( p_bottom );
+                                break;
+                            }
+                        }
                     } else if( c.second == BWD_CHOICE ) {
-                        if( _currentSelStart > SONGS_PER_PAGE ) {
-                            SOUND::playCry( PKMN_BELLOSSOM );
-                            _currentSelStart -= SONGS_PER_PAGE;
-                            drawSongList( _currentSelStart, p_bottom );
-                            IO::updateOAM( p_bottom );
-                            break;
+                        if( _currentMode == JMODE_SHOW_RECORD ) {
+                            if( _currentRecSelStart > SONGS_PER_PAGE * MAX_SONGS_PER_RECORD ) {
+                                SOUND::playCry( PKMN_BELLOSSOM );
+                                _currentRecSelStart -= SONGS_PER_PAGE * MAX_SONGS_PER_RECORD;
+                                redraw( p_bottom );
+                                break;
+                            }
+                        } else {
+                            if( _currentSelStart > _currentRecord + SONGS_PER_PAGE ) {
+                                SOUND::playCry( PKMN_BELLOSSOM );
+                                _currentSelStart -= SONGS_PER_PAGE;
+                                redraw( p_bottom );
+                                break;
+                            }
                         }
                     } else if( c.second == STOP_PLAYBACK ) {
                         selectSong( 0 );
@@ -483,3 +404,4 @@ namespace NAV {
     }
 
 } // namespace NAV
+#endif

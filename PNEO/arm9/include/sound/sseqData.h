@@ -43,5 +43,9 @@ namespace SOUND::SSEQ {
     extern const sseqData SSEQ_LIST[ NUM_SSEQ ];
 
     constexpr int SSEQ_NONE = -1;
+
+    constexpr bool existsBGM( u16 p_bgmIdx ) {
+        return BGMIndexForName( p_bgmIdx ) != SSEQ_NONE;
+    }
 } // namespace SOUND::SSEQ
 #endif

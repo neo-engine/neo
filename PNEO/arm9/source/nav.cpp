@@ -60,10 +60,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace NAV {
 
-    mapNavApp            MAP_NAV_APP  = mapNavApp( );
-    jboxNavApp           JBOX_NAV_APP = jboxNavApp( );
-    std::vector<navApp*> NAV_APPS     = std::vector<navApp*>( );
-    navApp*              CUR_NAV_APP  = nullptr;
+    mapNavApp MAP_NAV_APP = mapNavApp( );
+#ifndef NO_SOUND
+    jboxNavApp JBOX_NAV_APP = jboxNavApp( );
+#endif
+    std::vector<navApp*> NAV_APPS    = std::vector<navApp*>( );
+    navApp*              CUR_NAV_APP = nullptr;
 
     bool NAV_NEEDS_REDRAW = false;
 
