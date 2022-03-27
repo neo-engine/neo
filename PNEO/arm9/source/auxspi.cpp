@@ -33,7 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace FS::CARD {
     bool checkCard( ) {
-#ifdef NO_AUXSPI
+#ifdef FLASHCARD
         return false;
 #else
         u8 header1[ 512 ], header2[ 512 ];

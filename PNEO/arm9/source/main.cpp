@@ -230,20 +230,41 @@ int main( int, char** p_argv ) {
 
     irqEnable( IRQ_VBLANK );
     initGraphics( );
+#ifdef DESQUID
+    printf( "\n\nBooting NEO.\n"
+                    "- Init Graphics     [ OK ]\n"
+                    "- Init time and RND " );
+#endif
     initTimeAndRnd( );
+#ifdef DESQUID
+    printf( "[ OK ]\n- Init sound        " );
+#endif
     initSound( );
+#ifdef DESQUID
+    printf( "[ OK ]\n- Init map          " );
+#endif
 
     // keysSetRepeat( 25, 5 );
     // sysSetBusOwners( true, true );
 
     MAP::curMap = new MAP::mapDrawer( );
+#ifdef DESQUID
+    printf( "[ OK ]\n- Loading SAV       " );
+#endif
 
     // Read the savegame
     if( gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
         || !FS::readSave( p_argv[ 0 ] ) ) {
+#ifdef DESQUID
+        printf( "[FAIL]\n- Creating new SAV  " );
+#endif
         std::memset( &SAVE::SAV, 0, sizeof( SAVE::saveGame ) );
         SAVE::SAV.clear( );
     }
+
+#ifdef DESQUID
+    printf( "[ OK ]\nALL GOOD!" );
+#endif
 
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
