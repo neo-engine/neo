@@ -147,9 +147,10 @@ namespace SOUND {
         case TC_LEADER:
         case TC__LEADER:
         case TC_LEADERS: return BGM_BATTLE_GYM_LEADER;
+        case TC_CHAMPION: return BGM_BATTLE_CHAMPION;
+        case TC_FRONTIER_BRAIN: return BGM_BATTLE_FRONTIER_BRAIN;
         case TC_MAGMA_LEADER:
-        case TC_AQUA_LEADER:
-            // return BGM_BATTLE_TEAM_AM_LEADER;
+        case TC_AQUA_LEADER: return BGM_BATTLE_TEAM_AM_LEADER;
         case TC_AQUA_ADMIN:
         case TC_TEAM_AQUA:
         case TC_MAGMA_ADMIN:
@@ -174,6 +175,7 @@ namespace SOUND {
         case TC_TEAM_AQUA:
         case TC_MAGMA_ADMIN:
         case TC_TEAM_MAGMA: return BGM_VICTORY_TEAM_AM_GRUNT;
+        case TC_FRONTIER_BRAIN: return BGM_VICTORY_FRONTIER_BRAIN;
         default: return BGM_VICTORY_TRAINER;
         }
 #endif
@@ -185,9 +187,11 @@ namespace SOUND {
         return 0;
 #else
         switch( p_pokemonId ) {
-        case PKMN_RAIKOU:
-        case PKMN_SUICUNE:
-        case PKMN_ENTEI: return BGM_BATTLE_RAIKOU_ENTEI_SUICUNE;
+        case PKMN_RAIKOU: return BGM_BATTLE_RAIKOU;
+        case PKMN_SUICUNE: return BGM_BATTLE_SUICUNE;
+        case PKMN_ENTEI: return BGM_BATTLE_ENTEI;
+        case PKMN_LUGIA: return BGM_BATTLE_LUGIA;
+        case PKMN_HO_OH: return BGM_BATTLE_HOUOU;
         case PKMN_REGIROCK:
         case PKMN_REGICE:
         case PKMN_REGISTEEL:
@@ -197,6 +201,16 @@ namespace SOUND {
         case PKMN_GROUDON:
         case PKMN_KYOGRE:
         case PKMN_RAYQUAZA: return BGM_BATTLE_RAYQUAZA;
+        case PKMN_AZELF:
+        case PKMN_MESPRIT:
+        case PKMN_UXIE: return BGM_BATTLE_LAKE;
+        case PKMN_HEATRAN:
+        case PKMN_CRESSELIA:
+        case PKMN_DARKRAI:
+        case PKMN_SHAYMIN: return BGM_BATTLE_HEATRAN;
+        case PKMN_DIALGA:
+        case PKMN_PALKIA: return BGM_BATTLE_DIALGA_PALKIA;
+        case PKMN_GIRATINA: return BGM_BATTLE_GIRATINA;
         default:
             if( p_pokemonId > PKMN_DEOXYS && p_pokemonId <= PKMN_ARCEUS ) {
                 return BGM_BATTLE_EX01;

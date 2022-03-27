@@ -1,132 +1,170 @@
-/*
-    Pokémon neo
-    ------------------------------
-
-    file        : sseqData.cpp
-    author      : Philip Wellnitz
-    description : Definitions of sseq music files
-
-    Copyright (C) 2012 - 2022
-    Philip Wellnitz
-
-    This file is part of Pokémon neo.
-
-    Pokémon neo is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Pokémon neo is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
-    */
-
 #ifndef NO_SOUND
 #include "sound/sseqData.h"
 
 namespace SOUND::SSEQ {
-    constexpr u16 BANK_PL_BGM_FIELD       = 0;
-    constexpr u16 BANK_PL_BGM_DUNGEON     = 1;
-    constexpr u16 BANK_PL_BGM_BASIC       = 2;
-    constexpr u16 BANK_PL_BGM_BATTLE      = 3;
-    constexpr u16 BANK_BW_GATE            = 4;
-    constexpr u16 BANK_BW_R10             = 5;
-    constexpr u16 BANK_PMDB_ESC           = 6;
-    constexpr u16 BANK_BW_EMO             = 7;
-    constexpr u16 BANK_BW_BT_REGI         = 8;
-    constexpr u16 BANK_BW_CAVE_REGI       = 9;
-    constexpr u16 BANK_BW_BT_LEADER       = 10;
-    constexpr u16 BANK_BW_BT_CHAMP        = 11;
-    constexpr u16 BANK_BW_UNDERSEA_TUNNEL = 12;
-    constexpr u16 BANK_BW_FS              = 13;
-    constexpr u16 BANK_GS_BGM_BASIC       = 14;
-
-    constexpr u16 SSEQ_PL_FLOAROMA_TOWN   = 0;
-    constexpr u16 SSEQ_PL_LAKE_CAVE       = 1;
-    constexpr u16 SSEQ_PL_FOREST          = 2;
-    constexpr u16 SSEQ_PL_CAVE            = 3;
-    constexpr u16 SSEQ_PL_GYM             = 4;
-    constexpr u16 SSEQ_PL_PC_N            = 5;
-    constexpr u16 SSEQ_PL_EYE_SHIRONA     = 6;
-    constexpr u16 SSEQ_PL_EYE_MOUNTAIN    = 7;
-    constexpr u16 SSEQ_PL_BT_PKMN         = 8;
-    constexpr u16 SSEQ_PL_POKETORE        = 9;
-    constexpr u16 SSEQ_PL_OS_BADGE        = 10;
-    constexpr u16 SSEQ_PL_OS_TM           = 11;
-    constexpr u16 SSEQ_PL_OS_HEAL         = 12;
-    constexpr u16 SSEQ_BW_UNDERSEA_TUNNEL = 13;
-    constexpr u16 SSEQ_PL_WIFIGIFT        = 14;
-    constexpr u16 SSEQ_PL_TORN_WORLD      = 15;
-    constexpr u16 SSEQ_PL_BT_TIMESPACE    = 16;
-    constexpr u16 SSEQ_BW_GATE            = 17;
-    constexpr u16 SSEQ_BW_R10             = 18;
-    constexpr u16 SSEQ_PMDB_ESC           = 19;
-    constexpr u16 SSEQ_BW_EMO             = 20;
-    constexpr u16 SSEQ_BW_BT_REGI         = 21;
-    constexpr u16 SSEQ_BW_CAVE_REGI       = 22;
-    constexpr u16 SSEQ_BW_BT_LEADER       = 23;
-    constexpr u16 SSEQ_BW_BT_CHAMP        = 24;
-    constexpr u16 SSEQ_BW_FS              = 25;
-    constexpr u16 SSEQ_GS_SHINKA          = 26;
-
-    constexpr u16 SWAR_PL_BASIC           = 0;
-    constexpr u16 SWAR_PL_BGM_FIELD       = 1;
-    constexpr u16 SWAR_PL_BGM_DUNGEON     = 2;
-    constexpr u16 SWAR_PL_BGM_BATTLE      = 3;
-    constexpr u16 SWAR_BW_GATE            = 4;
-    constexpr u16 SWAR_BW_R10             = 5;
-    constexpr u16 SWAR_PMDB               = 6;
-    constexpr u16 SWAR_BW_EMO             = 7;
-    constexpr u16 SWAR_BW_BT_REGI         = 8;
-    constexpr u16 SWAR_BW_CAVE_REGI       = 9;
-    constexpr u16 SWAR_BW_BT_LEADER       = 10;
-    constexpr u16 SWAR_BW_BT_CHAMP        = 11;
-    constexpr u16 SWAR_BW_UNDERSEA_TUNNEL = 12;
-    constexpr u16 SWAR_BW_FS              = 13;
-    constexpr u16 SWAR_GS_BASIC           = 14;
-
     const sseqData SSEQ_LIST[ NUM_SSEQ ] = {
-        { BANK_PL_BGM_FIELD, SSEQ_PL_FLOAROMA_TOWN, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_FIELD } },
-        { BANK_PL_BGM_FIELD, SSEQ_PL_GYM, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_FIELD } },
-        { BANK_PL_BGM_FIELD, SSEQ_PL_PC_N, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_FIELD } },
-        { BANK_BW_GATE, SSEQ_BW_GATE, 1, { SWAR_BW_GATE } },
-        { BANK_BW_R10, SSEQ_BW_R10, 1, { SWAR_BW_R10 } },
-
-        { BANK_PMDB_ESC, SSEQ_PMDB_ESC, 1, { SWAR_PMDB } }, // defunct (sbnk tto large)
-        { BANK_PL_BGM_DUNGEON, SSEQ_PL_LAKE_CAVE, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_DUNGEON } },
-        { BANK_PL_BGM_DUNGEON, SSEQ_PL_FOREST, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_DUNGEON } },
-        { BANK_PL_BGM_DUNGEON, SSEQ_PL_CAVE, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_DUNGEON } },
-        { BANK_PL_BGM_DUNGEON, SSEQ_PL_TORN_WORLD, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_DUNGEON } },
-
-        // 10
-
-        { BANK_BW_CAVE_REGI, SSEQ_BW_CAVE_REGI, 1, { SWAR_BW_CAVE_REGI } },
-        { BANK_PL_BGM_BASIC, SSEQ_PL_EYE_SHIRONA, 1, { SWAR_PL_BASIC } },
-        { BANK_PL_BGM_BASIC, SSEQ_PL_EYE_MOUNTAIN, 1, { SWAR_PL_BASIC } },
-        { BANK_BW_BT_LEADER, SSEQ_BW_BT_LEADER, 1, { SWAR_BW_BT_LEADER } },
-        { BANK_BW_BT_CHAMP, SSEQ_BW_BT_CHAMP, 1, { SWAR_BW_BT_CHAMP } },
-
-        { BANK_PL_BGM_BATTLE, SSEQ_PL_BT_PKMN, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_BATTLE } },
-        { BANK_PL_BGM_BATTLE, SSEQ_PL_BT_TIMESPACE, 2, { SWAR_PL_BASIC, SWAR_PL_BGM_BATTLE } },
-        { BANK_BW_BT_REGI, SSEQ_BW_BT_REGI, 1, { SWAR_BW_BT_REGI } },
-        { BANK_BW_EMO, SSEQ_BW_EMO, 1, { SWAR_BW_EMO } },
-        { BANK_PL_BGM_BASIC, SSEQ_PL_POKETORE, 1, { SWAR_PL_BASIC } },
-
-        // 20
-
-        { BANK_PL_BGM_BASIC, SSEQ_PL_WIFIGIFT, 1, { SWAR_PL_BASIC } },
-        { BANK_PL_BGM_BASIC, SSEQ_PL_OS_BADGE, 1, { SWAR_PL_BASIC } },
-        { BANK_PL_BGM_BASIC, SSEQ_PL_OS_TM, 1, { SWAR_PL_BASIC } },
-        { BANK_PL_BGM_BASIC, SSEQ_PL_OS_HEAL, 1, { SWAR_PL_BASIC } },
-        { BANK_BW_UNDERSEA_TUNNEL, SSEQ_BW_UNDERSEA_TUNNEL, 1, { SWAR_BW_UNDERSEA_TUNNEL } },
-
-        { BANK_BW_FS, SSEQ_BW_FS, 1, { SWAR_BW_FS } },
-        { BANK_GS_BGM_BASIC, SSEQ_GS_SHINKA, 1, { SWAR_GS_BASIC } },
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_NONE
+        { 1, 1, 1, { 1, 0, 0, 0 } },     // BGM_OS_LEVEL_UP
+        { 1, 2, 1, { 1, 0, 0, 0 } },     // BGM_OS_EVOLVED
+        { 1, 3, 1, { 1, 0, 0, 0 } },     // BGM_OS_PKMN_CAPTURE
+        { 1, 4, 1, { 1, 0, 0, 0 } },     // BGM_OS_BADGE
+        { 1, 5, 1, { 1, 0, 0, 0 } },     // BGM_OS_HEAL_PKMN
+        { 1, 6, 1, { 1, 0, 0, 0 } },     // BGM_OS_SYMBOL
+        { 2, 7, 1, { 2, 0, 0, 0 } },     // BGM_OS_CABLE_CAR
+        { 2, 7, 1, { 2, 0, 0, 0 } },     // BGM_OS_FERRIS_WHEEL
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_EVENT
+        { 1, 8, 1, { 1, 0, 0, 0 } },     // BGM_TITLE
+        { 3, 9, 1, { 3, 0, 0, 0 } },     // BGM_HELP_PROF_BIRCH
+        { 4, 10, 1, { 4, 0, 0, 0 } },    // BGM_SHOW_ME_AROUND
+        { 5, 11, 1, { 5, 0, 0, 0 } },    // BGM_UNWAVERING_EMOTIONS
+        { 6, 12, 1, { 6, 0, 0, 0 } },    // BGM_GHOST_GIRL
+        { 6, 12, 1, { 6, 0, 0, 0 } },    // BGM_INISHIE
+        { 7, 13, 1, { 7, 0, 0, 0 } },    // BGM_EVOLVING
+        { 7, 14, 1, { 7, 0, 0, 0 } },    // BGM_SURFING
+        { 7, 14, 1, { 7, 0, 0, 0 } },    // BGM_SURFING_ALT
+        { 8, 15, 1, { 8, 0, 0, 0 } },    // BGM_SAILING
+        { 9, 16, 1, { 9, 0, 0, 0 } },    // BGM_DIVING
+        { 1, 17, 1, { 1, 0, 0, 0 } },    // BGM_CYCLING
+        { 10, 18, 1, { 10, 0, 0, 0 } },  // BGM_CYCLING_ALT
+        { 1, 19, 1, { 1, 0, 0, 0 } },    // BGM_POKE_RADAR
+        { 11, 20, 1, { 11, 0, 0, 0 } },  // BGM_DESERT
+        { 1, 21, 1, { 1, 0, 0, 0 } },    // BGM_MYSTERY_GIFT
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_BATTLE
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_BRENDAN
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_MAY
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_TEAM_AM
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_ELECTRIC
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_HIKER
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_SAILOR
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_TUBER
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_TWINS
+        { 7, 23, 1, { 7, 0, 0, 0 } },    // BGM_ENCOUNTER_YOUNGSTER
+        { 7, 24, 1, { 7, 0, 0, 0 } },    // BGM_ENCOUNTER_LASS
+        { 1, 22, 1, { 1, 0, 0, 0 } },    // BGM_ENCOUNTER_SHIRONA
+        { 12, 25, 1, { 12, 0, 0, 0 } },  // BGM_BATTLE_TRAINER
+        { 12, 25, 1, { 12, 0, 0, 0 } },  // BGM_BATTLE_MAY_BRENDAN
+        { 13, 26, 1, { 13, 0, 0, 0 } },  // BGM_BATTLE_TEAM_AM
+        { 14, 27, 1, { 14, 0, 0, 0 } },  // BGM_BATTLE_TEAM_AM_LEADER
+        { 15, 28, 1, { 15, 0, 0, 0 } },  // BGM_BATTLE_GYM_LEADER
+        { 16, 29, 1, { 16, 0, 0, 0 } },  // BGM_BATTLE_CHAMPION
+        { 17, 30, 2, { 7, 17, 0, 0 } },  // BGM_BATTLE_FRONTIER_BRAIN
+        { 18, 31, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_SHIRONA
+        { 19, 32, 1, { 19, 0, 0, 0 } },  // BGM_BATTLE_WILD
+        { 20, 33, 1, { 20, 0, 0, 0 } },  // BGM_BATTLE_WILD_ALT
+        { 21, 34, 1, { 21, 0, 0, 0 } },  // BGM_BATTLE_REGI
+        { 22, 35, 2, { 7, 22, 0, 0 } },  // BGM_BATTLE_RAYQUAZA
+        { 23, 36, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_SUICUNE
+        { 23, 37, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_ENTEI
+        { 23, 38, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_RAIKOU
+        { 24, 39, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_HOUOU
+        { 25, 40, 1, { 7, 0, 0, 0 } },   // BGM_BATTLE_LUGIA
+        { 18, 41, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_EX01
+        { 18, 42, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_LAKE
+        { 18, 43, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_DIALGA_PALKIA
+        { 18, 44, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_GIRATINA
+        { 18, 45, 2, { 1, 18, 0, 0 } },  // BGM_BATTLE_HEATRAN
+        { 26, 46, 1, { 23, 0, 0, 0 } },  // BGM_VICTORY_WILD
+        { 27, 47, 1, { 24, 0, 0, 0 } },  // BGM_VICTORY_TRAINER
+        { 28, 48, 1, { 25, 0, 0, 0 } },  // BGM_VICTORY_TEAM_AM_GRUNT
+        { 18, 49, 2, { 1, 18, 0, 0 } },  // BGM_VICTORY_GYM_LEADER
+        { 18, 50, 2, { 1, 18, 0, 0 } },  // BGM_VICTORY_FRONTIER_BRAIN
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_RS
+        { 1, 51, 1, { 1, 0, 0, 0 } },    // BGM_LITTLEROOT_TOWN
+        { 29, 52, 1, { 26, 0, 0, 0 } },  // BGM_OLDALE_TOWN
+        { 30, 53, 1, { 27, 0, 0, 0 } },  // BGM_PETALBURG_CITY
+        { 31, 54, 1, { 28, 0, 0, 0 } },  // BGM_RUSTBORO_CITY
+        { 32, 55, 1, { 29, 0, 0, 0 } },  // BGM_DEWFORD_TOWN
+        { 33, 56, 1, { 30, 0, 0, 0 } },  // BGM_SLATEPORT_CITY
+        { 34, 57, 1, { 31, 0, 0, 0 } },  // BGM_VERDANTURF_TOWN
+        { 35, 58, 1, { 32, 0, 0, 0 } },  // BGM_FALLARBOR_TOWN
+        { 36, 59, 1, { 33, 0, 0, 0 } },  // BGM_FORTREE_CITY
+        { 30, 53, 1, { 27, 0, 0, 0 } },  // BGM_LILYCOVE_CITY
+        { 37, 60, 1, { 34, 0, 0, 0 } },  // BGM_NEW_LILYCOVE_CITY
+        { 38, 61, 1, { 35, 0, 0, 0 } },  // BGM_SOOTOPOLIS_CITY
+        { 36, 59, 1, { 33, 0, 0, 0 } },  // BGM_CLIFFELTA_CITY
+        { 39, 62, 1, { 36, 0, 0, 0 } },  // BGM_BLOSSAND_TOWN
+        { 40, 63, 1, { 37, 0, 0, 0 } },  // BGM_EVER_GRANDE_CITY
+        { 7, 64, 1, { 7, 0, 0, 0 } },    // BGM_ROUTE_101
+        { 1, 65, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_104
+        { 1, 66, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_110
+        { 1, 67, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_113
+        { 1, 68, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_119
+        { 1, 69, 1, { 1, 0, 0, 0 } },    // BGM_ROUTE_120
+        { 41, 70, 1, { 38, 0, 0, 0 } },  // BGM_ROUTE_123
+        { 42, 71, 1, { 39, 0, 0, 0 } },  // BGM_ROUTE_135
+        { 43, 72, 2, { 1, 40, 0, 0 } },  // BGM_POKEMON_GYM
+        { 44, 73, 2, { 7, 41, 0, 0 } },  // BGM_POKEMON_CENTER
+        { 44, 74, 2, { 7, 41, 0, 0 } },  // BGM_POKEMON_MART
+        { 44, 75, 2, { 7, 41, 0, 0 } },  // BGM_PROF_BIRCH_LAB
+        { 45, 76, 2, { 1, 42, 0, 0 } },  // BGM_CAVE_FORESTS
+        { 43, 77, 2, { 1, 40, 0, 0 } },  // BGM_EX03
+        { 46, 78, 1, { 43, 0, 0, 0 } },  // BGM_TRAINER_SCHOOL
+        { 11, 20, 1, { 11, 0, 0, 0 } },  // BGM_ABANDONED_SHIP
+        { 11, 20, 1, { 11, 0, 0, 0 } },  // BGM_MARINE_SCIENCE_MUSEUM
+        { 47, 79, 1, { 44, 0, 0, 0 } },  // BGM_TRICK_HOUSE
+        { 48, 80, 1, { 45, 0, 0, 0 } },  // BGM_NEW_MAUVILLE
+        { 44, 81, 2, { 7, 41, 0, 0 } },  // BGM_MAUVILLE_GAME_CORNER
+        { 49, 82, 1, { 46, 0, 0, 0 } },  // BGM_MT_CHIMNEY
+        { 50, 83, 1, { 47, 0, 0, 0 } },  // BGM_METEOR_FALLS
+        { 51, 84, 2, { 7, 48, 0, 0 } },  // BGM_SAFARI_ZONE
+        { 52, 85, 2, { 7, 49, 0, 0 } },  // BGM_LILYCOVE_MUSEUM
+        { 53, 86, 2, { 7, 50, 0, 0 } },  // BGM_MT_PYRE_PEAK
+        { 49, 82, 1, { 46, 0, 0, 0 } },  // BGM_TEAM_AM_HIDEOUT
+        { 54, 87, 1, { 51, 0, 0, 0 } },  // BGM_SHOAL_CAVE
+        { 55, 88, 2, { 7, 52, 0, 0 } },  // BGM_VICTORY_ROAD
+        { 56, 89, 1, { 53, 0, 0, 0 } },  // BGM_SEALED_CHAMBER
+        { 57, 90, 1, { 54, 0, 0, 0 } },  // BGM_CRYSTAL_CAVERN
+        { 58, 91, 1, { 55, 0, 0, 0 } },  // BGM_BATTLE_FRONTIER
+        { 59, 92, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_ARENA
+        { 59, 93, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_PYRAMID
+        { 59, 93, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_PYRAMID_PEAK
+        { 59, 94, 2, { 7, 56, 0, 0 } },  // BGM_BATTLE_TOWER
+        { 45, 95, 2, { 1, 42, 0, 0 } },  // BGM_BATTLE_FACTORY
+        { 60, 96, 2, { 7, 57, 0, 0 } },  // BGM_BATTLE_PALACE
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_GS
+        { 44, 97, 2, { 7, 41, 0, 0 } },  // BGM_NEW_BARK_TOWN
+        { 44, 98, 2, { 7, 41, 0, 0 } },  // BGM_CHERRYGROVE_CITY
+        { 61, 99, 2, { 7, 58, 0, 0 } },  // BGM_VIOLET_CITY
+        { 62, 100, 2, { 7, 59, 0, 0 } }, // BGM_AZALEA_TOWN
+        { 63, 101, 2, { 7, 60, 0, 0 } }, // BGM_GOLDENROD_CITY
+        { 60, 102, 2, { 7, 57, 0, 0 } }, // BGM_ECRUTEAK_CITY
+        { 64, 103, 2, { 7, 61, 0, 0 } }, // BGM_OLIVINE_CITY
+        { 64, 104, 2, { 7, 61, 0, 0 } }, // BGM_CIANWOOD_CITY
+        { 65, 105, 2, { 7, 62, 0, 0 } }, // BGM_MAHOGANY_TOWN
+        { 66, 106, 2, { 7, 63, 0, 0 } }, // BGM_BLACKTHORN_CITY
+        { 44, 107, 2, { 7, 41, 0, 0 } }, // BGM_ROUTE_29
+        { 44, 108, 2, { 7, 41, 0, 0 } }, // BGM_ROUTE_30
+        { 63, 109, 2, { 7, 60, 0, 0 } }, // BGM_ROUTE_34
+        { 64, 110, 2, { 7, 61, 0, 0 } }, // BGM_ROUTE_38
+        { 65, 111, 2, { 7, 62, 0, 0 } }, // BGM_ROUTE_42
+        { 51, 112, 2, { 7, 48, 0, 0 } }, // BGM_ROUTE_47
+        { 52, 85, 2, { 7, 49, 0, 0 } },  // BGM_NATIONAL_PARK
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_RG
+        { 67, 113, 2, { 7, 64, 0, 0 } }, // BGM_PALLET_TOWN
+        { 68, 114, 2, { 7, 65, 0, 0 } }, // BGM_VIRIDIAN_CITY
+        { 69, 115, 2, { 7, 66, 0, 0 } }, // BGM_PEWTER_CITY
+        { 70, 116, 2, { 7, 67, 0, 0 } }, // BGM_CERULIAN_CITY
+        { 71, 117, 2, { 7, 68, 0, 0 } }, // BGM_VERMILION_CITY
+        { 72, 118, 2, { 7, 69, 0, 0 } }, // BGM_LAVENDER_TOWN
+        { 73, 119, 2, { 7, 70, 0, 0 } }, // BGM_CELADON_CITY
+        { 74, 120, 2, { 7, 71, 0, 0 } }, // BGM_FUCHSIA_CITY
+        { 75, 121, 2, { 7, 72, 0, 0 } }, // BGM_SAFFRON_CITY
+        { 67, 122, 2, { 7, 64, 0, 0 } }, // BGM_CINNABAR_ISLAND
+        { 68, 123, 2, { 7, 65, 0, 0 } }, // BGM_ROUTE_1
+        { 68, 124, 2, { 7, 65, 0, 0 } }, // BGM_ROUTE_3
+        { 71, 125, 2, { 7, 72, 0, 0 } }, // BGM_ROUTE_11
+        { 70, 126, 2, { 7, 67, 0, 0 } }, // BGM_ROUTE_24
+        { 44, 127, 2, { 7, 41, 0, 0 } }, // BGM_ROUTE_26
+        { 55, 128, 2, { 7, 52, 0, 0 } }, // BGM_MT_MOON
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_DP
+        { 45, 76, 2, { 1, 42, 0, 0 } },  // BGM_ETERNA_FOREST
+        { 45, 129, 2, { 1, 42, 0, 0 } }, // BGM_SPRING_PATH
+        { 45, 130, 2, { 1, 42, 0, 0 } }, // BGM_LAKE_CAVE
+        { 45, 131, 2, { 1, 42, 0, 0 } }, // BGM_DISTORTION_WORLD
+        { 0, 0, 0, { 0, 0, 0, 0 } },     // REC_BW
+        { 76, 132, 1, { 73, 0, 0, 0 } }, // BGM_UNOVA_GATE
+        { 42, 71, 1, { 39, 0, 0, 0 } },  // BGM_ROUTE_9
+        { 77, 133, 1, { 74, 0, 0, 0 } }, // BGM_ROUTE_10
     };
-
 } // namespace SOUND::SSEQ
 #endif

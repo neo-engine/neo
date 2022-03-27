@@ -11,8 +11,11 @@ namespace SOUND::SSEQ {
     void*        SEQUENCE_BANK     = NULL;
     void*        SEQUENCE_WAR[ 4 ] = { NULL, NULL, NULL, NULL };
     trackState   TRACKS[ NUM_CHANNEL ];
-    int          MESSAGE_SEND_FLAG = 0;
-    volatile int SEQ_BPM           = 0;
+    int          MESSAGE_SEND_FLAG            = 0;
+    volatile int SEQ_BPM                      = 0;
+    s16          GLOBAL_VARS[ NUM_GLOB_VARS ] = {
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    };
 
     sampleInfo* getWav( void* p_war, int p_id ) {
         return (sampleInfo*) ( int( p_war ) + ( (int*) ( int( p_war ) + 60 ) )[ p_id ] );
@@ -152,7 +155,7 @@ namespace SOUND::SSEQ {
     ( (u32) SEQUENCE_DATA[ ( p_pos ) ] | ( (u32) SEQUENCE_DATA[ ( p_pos ) + 1 ] << 8 ) \
       | ( (u32) SEQUENCE_DATA[ ( p_pos ) + 2 ] << 16 ) )
 
-    static inline void prepareTrack( int p_track, int p_pos ) {
+    inline void prepareTrack( int p_track, int p_pos ) {
         std::memset( TRACKS + p_track, 0, sizeof( trackState ) );
         TRACKS[ p_track ].m_pos                 = p_pos;
         TRACKS[ p_track ].m_playInfo.m_vol      = 64;
@@ -173,6 +176,10 @@ namespace SOUND::SSEQ {
         TRACKS[ p_track ].m_decayRate           = -1;
         TRACKS[ p_track ].m_sustainRate         = -1;
         TRACKS[ p_track ].m_releaseRate         = -1;
+        TRACKS[ p_track ].m_retpos              = 0;
+        TRACKS[ p_track ].m_tiemode             = 0;
+        TRACKS[ p_track ].m_muteState           = 0;
+        for( u8 i = 0; i < NUM_VARS; ++i ) { TRACKS[ p_track ].m_variables[ i ] = -1; }
     }
 
     void playSequence( sequenceData* p_sequence, sequenceData* p_bnk, sequenceData* p_war ) {
@@ -183,8 +190,7 @@ namespace SOUND::SSEQ {
         SEQUENCE_WAR[ 3 ] = p_war[ 3 ].m_data;
 
         // Some TRACKS alter this, and may cause undesireable effects with playing other
-        // TRACKS
-        // later.
+        // TRACKS later.
         ADSR_MASTER_VOLUME = 127;
 
         // Load sequence data
@@ -213,17 +219,18 @@ namespace SOUND::SSEQ {
 
         for( u8 i = 0; i < NUM_CHANNEL; ++i ) { // stop p_note
             adsrState* chstat = ADSR_CHANNEL + i;
-            chstat->m_state   = adsrState::ADSR_NONE;
-            chstat->m_count   = 0;
-            chstat->m_track   = -1;
-            SCHANNEL_CR( i )  = 0;
+            if( chstat->m_state == adsrState::ADSR_LOCKED ) { continue; }
+            chstat->m_state  = adsrState::ADSR_NONE;
+            chstat->m_count  = 0;
+            chstat->m_track  = -1;
+            SCHANNEL_CR( i ) = 0;
         }
         msg.m_count     = 1;
         msg.m_data[ 0 ] = 6;
         fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
     }
 
-    void seq_tick( ) {
+    void sequenceTick( ) {
         int looped_twice = 0;
         int ended        = 0;
 
@@ -336,9 +343,10 @@ namespace SOUND::SSEQ {
 
         if( track->m_count ) {
             track->m_count--;
-            if( track->m_count ) return;
+            if( track->m_count ) { return; }
         }
 
+        bool skipNextCommand = false;
         while( !track->m_count ) {
             soundCommandType cmd = soundCommandType( SEQ_READ8( track->m_pos ) );
             track->m_pos++;
@@ -349,10 +357,16 @@ namespace SOUND::SSEQ {
             msg.m_data[ 2 ] = SEQ_READ8( track->m_pos + 1 );
             msg.m_data[ 3 ] = SEQ_READ8( track->m_pos + 2 );
             if( cmd < SC_COMMAND_RANGE_START ) {
+                // TODO: implement tie mode
+
                 // p_note-ON
                 u8 vel = SEQ_READ8( track->m_pos );
                 track->m_pos++;
                 int len = readValue( &track->m_pos );
+                if( skipNextCommand ) [[unlikely]] {
+                    skipNextCommand = false;
+                    continue;
+                }
                 if( track->m_waitmode ) { track->m_count = len; }
 
                 track->m_playInfo.m_vel = vel;
@@ -363,14 +377,29 @@ namespace SOUND::SSEQ {
                 switch( cmd ) {
                 default: break;
                 case SC_REST: {
-                    track->m_count = readValue( &track->m_pos );
+                    auto len = readValue( &track->m_pos );
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        continue;
+                    }
+                    track->m_count = len;
                     break;
                 }
                 case SC_PATCH_CHANGE: {
-                    track->m_patch = readValue( &track->m_pos );
+                    auto len = readValue( &track->m_pos );
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        continue;
+                    }
+                    track->m_patch = len;
                     break;
                 }
                 case SC_JUMP: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
                     if( u32( track->m_pos ) > SEQ_READ24( track->m_pos ) ) {
                         track->m_trackLooped++;
                     }
@@ -378,190 +407,588 @@ namespace SOUND::SSEQ {
                     break;
                 }
                 case SC_CALL: {
-                    int dest     = SEQ_READ24( track->m_pos );
-                    track->m_ret = track->m_pos + 3;
-                    track->m_pos = dest;
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    int dest                          = SEQ_READ24( track->m_pos );
+                    track->m_ret[ track->m_retpos++ ] = track->m_pos + 3;
+                    track->m_pos                      = dest;
                     break;
                 }
-                case SC_RANDOM: {
+                case SC_PARAMETER_RANDOM: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 5;
+                        continue;
+                    }
                     // TODO
                     // [statusByte] [min16] [max16]
                     track->m_pos += 5;
                     break;
                 }
-                case SC_UNKNOWN_1: {
+                case SC_PARAMETER_FROM_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 5;
+                        continue;
+                    }
                     // TODO
-                    int t = SEQ_READ8( track->m_pos );
-                    track->m_pos++;
-                    if( t >= 0xB0 && t <= 0xBD ) track->m_pos++;
-                    track->m_pos++;
+                    // int t = SEQ_READ8( track->m_pos );
+                    track->m_pos += 5;
                     break;
                 }
                 case SC_IF: {
-                    // TODO
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        continue;
+                    }
+                    skipNextCommand = !track->m_lastConditionTrue;
+                    if( skipNextCommand ) [[unlikely]] { continue; }
                     break;
                 }
-                case SC_UNKNOWN_2:
-                case SC_UNKNOWN_3:
-                case SC_UNKNOWN_4:
-                case SC_UNKNOWN_5:
-                case SC_UNKNOWN_6:
-                case SC_UNKNOWN_7:
-                case SC_UNKNOWN_8:
-                case SC_UNKNOWN_9:
-                case SC_UNKNOWN_10:
-                case SC_UNKNOWN_11:
-                case SC_UNKNOWN_12:
-                case SC_UNKNOWN_13:
-                case SC_UNKNOWN_14:
-                case SC_UNKNOWN_15: {
+                case SC_SHIFT_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    auto shift = SEQ_READ16( track->m_pos );
+                    if( varname <= NUM_VARS ) {
+                        if( shift > 0 ) {
+                            track->m_variables[ varname ] <<= shift;
+                        } else {
+                            track->m_variables[ varname ] >>= shift;
+                        }
+                    } else {
+                        if( shift > 0 ) {
+                            GLOBAL_VARS[ varname - NUM_VARS ] <<= shift;
+                        } else {
+                            GLOBAL_VARS[ varname - NUM_VARS ] >>= shift;
+                        }
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_SET_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_variables[ varname ] = SEQ_READ16( track->m_pos );
+                    } else {
+                        GLOBAL_VARS[ varname - NUM_VARS ] = SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_ADD_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+
+                    if( varname <= NUM_VARS ) {
+                        track->m_variables[ varname ] += SEQ_READ16( track->m_pos );
+                    } else {
+                        GLOBAL_VARS[ varname - NUM_VARS ] += SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_SUBTRACT_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+
+                    if( varname <= NUM_VARS ) {
+                        track->m_variables[ varname ] -= SEQ_READ16( track->m_pos );
+                    } else {
+                        GLOBAL_VARS[ varname - NUM_VARS ] -= SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_MULTIPLY_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_variables[ varname ] *= SEQ_READ16( track->m_pos );
+                    } else {
+                        GLOBAL_VARS[ varname - NUM_VARS ] *= SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_DIVIDE_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_variables[ varname ] /= SEQ_READ16( track->m_pos );
+                    } else {
+                        GLOBAL_VARS[ varname - NUM_VARS ] /= SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_RANDOM_VARIABLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    auto bnd = SEQ_READ16( track->m_pos );
+                    auto rnd = 0; // Let's be cheap on randomness
+                    // auto ubnd = bnd > 0 ? bnd : -bnd;
+                    // auto rnd = rand( ) % ubnd;
+                    if( bnd < 0 ) { rnd = -rnd; }
+                    if( varname <= NUM_VARS ) {
+                        track->m_variables[ varname ] = rnd;
+                    } else {
+                        GLOBAL_VARS[ varname - NUM_VARS ] = rnd;
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_COMPARE_EQUAL: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_lastConditionTrue
+                            = track->m_variables[ varname ] == SEQ_READ16( track->m_pos );
+                    } else {
+                        track->m_lastConditionTrue
+                            = GLOBAL_VARS[ varname - NUM_VARS ] == SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_COMPARE_GTOE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_lastConditionTrue
+                            = track->m_variables[ varname ] >= SEQ_READ16( track->m_pos );
+                    } else {
+                        track->m_lastConditionTrue
+                            = GLOBAL_VARS[ varname - NUM_VARS ] >= SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_COMPARE_GT: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_lastConditionTrue
+                            = track->m_variables[ varname ] > SEQ_READ16( track->m_pos );
+                    } else {
+                        track->m_lastConditionTrue
+                            = GLOBAL_VARS[ varname - NUM_VARS ] > SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_COMPARE_LTOE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_lastConditionTrue
+                            = track->m_variables[ varname ] <= SEQ_READ16( track->m_pos );
+                    } else {
+                        track->m_lastConditionTrue
+                            = GLOBAL_VARS[ varname - NUM_VARS ] <= SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_COMPARE_LT: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_lastConditionTrue
+                            = track->m_variables[ varname ] < SEQ_READ16( track->m_pos );
+                    } else {
+                        track->m_lastConditionTrue
+                            = GLOBAL_VARS[ varname - NUM_VARS ] < SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_COMPARE_NE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
+                    auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    track->m_pos++;
+                    if( varname <= NUM_VARS ) {
+                        track->m_lastConditionTrue
+                            = track->m_variables[ varname ] != SEQ_READ16( track->m_pos );
+                    } else {
+                        track->m_lastConditionTrue
+                            = GLOBAL_VARS[ varname - NUM_VARS ] != SEQ_READ16( track->m_pos );
+                    }
+                    track->m_pos += 2;
+                    break;
+                }
+                case SC_UNKNOWN_9: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 3;
+                        continue;
+                    }
                     // TODO
                     track->m_pos += 3;
                     break;
                 }
                 case SC_RET: {
-                    track->m_pos = track->m_ret;
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        continue;
+                    }
+                    track->m_pos = track->m_ret[ --track->m_retpos ];
                     break;
                 }
                 case SC_PAN: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_pan = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceNote( p_trackId, &track->m_playInfo );
                     break;
                 }
                 case SC_VOL: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_vol = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceNote( p_trackId, &track->m_playInfo );
                     break;
                 }
                 case SC_MASTER_VOL: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     ADSR_MASTER_VOLUME = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
-                case SC_TRANSPOSE:
-                case SC_TIE:
+                case SC_TRANSPOSE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
+                    track->m_tiemode = SEQ_READ8( track->m_pos );
+                    track->m_pos++;
+                    break;
+                }
+                case SC_TIE: {
+                    // enables/disables "tie" mode
+                    // when tie mode is on, notes play indefinitely (ignoring length of
+                    // note commands); future note commands just change pitch and velocity
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
+                    track->m_tiemode = SEQ_READ8( track->m_pos );
+                    track->m_pos++;
+                    break;
+                }
                 case SC_PRINT_VAR: {
-                    // TODO
+#ifdef DESQUID
+                    // auto varname = SEQ_READ8( track->m_pos ) & MAX_VAR;
+                    // print track->variables[ varname ] to squid eater
+#endif
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_portakey = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO_TOGGLE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_portakey &= ~0x80;
                     track->m_portakey |= ( !SEQ_READ8( track->m_pos ) ) << 7;
                     track->m_pos++;
                     break;
                 }
                 case SC_PORTAMENTO_TIME: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_portatime = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_PITCH_BEND: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_pitchb = (s8) SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequencePitchBend( p_trackId, &track->m_playInfo );
                     break;
                 }
                 case SC_PITCH_BEND_RANGE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_pitchr = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequencePitchBend( p_trackId, &track->m_playInfo );
                     break;
                 }
                 case SC_PRIORITY: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_priority = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_NOTEWAIT: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_waitmode = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     break;
                 }
                 case SC_MODULATION_DEPTH: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_modDepth = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceModulation( p_trackId, &track->m_playInfo, BIT( 0 ) );
                     break;
                 }
                 case SC_MODULATION_SPEED: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_modSpeed = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceModulation( p_trackId, &track->m_playInfo, BIT( 1 ) );
                     break;
                 }
                 case SC_MODULATION_TYPE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_modType = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceModulation( p_trackId, &track->m_playInfo, BIT( 2 ) );
                     break;
                 }
                 case SC_MODULATION_RANGE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_modRange = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceModulation( p_trackId, &track->m_playInfo, BIT( 3 ) );
                     break;
                 }
                 case SC_ATTACK: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_attackRate = convertAttack( SEQ_READ8( track->m_pos ) );
                     track->m_pos++;
                     break;
                 }
                 case SC_DECAY: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_decayRate = convertFall( SEQ_READ8( track->m_pos ) );
                     track->m_pos++;
                     break;
                 }
                 case SC_SUSTAIN: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_sustainRate = convertSustain( SEQ_READ8( track->m_pos ) );
                     track->m_pos++;
                     break;
                 }
                 case SC_RELEASE: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_releaseRate = convertFall( SEQ_READ8( track->m_pos ) );
                     track->m_pos++;
                     break;
                 }
                 case SC_LOOP_START: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_loopcount = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     track->m_looppos = track->m_pos;
-                    if( !track->m_loopcount ) track->m_loopcount = -1;
+                    if( !track->m_loopcount ) { track->m_loopcount = -1; }
                     break;
                 }
                 case SC_LOOP_END: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        continue;
+                    }
                     int shouldRepeat = 1;
-                    if( track->m_loopcount > 0 ) shouldRepeat = --track->m_loopcount;
-                    if( shouldRepeat ) track->m_pos = track->m_looppos;
-                    if( ( shouldRepeat == 1 ) && ( track->m_loopcount == 0 ) )
-                        track->m_trackLooped++;
+                    if( track->m_loopcount > 0 ) { shouldRepeat = --track->m_loopcount; }
+                    if( shouldRepeat ) { track->m_pos = track->m_looppos; }
+                    if( shouldRepeat == 1 && track->m_loopcount == 0 ) { track->m_trackLooped++; }
                     break;
                 }
                 case SC_EXPR: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 1;
+                        continue;
+                    }
                     track->m_playInfo.m_expr = SEQ_READ8( track->m_pos );
                     track->m_pos++;
                     updateSequenceNote( p_trackId, &track->m_playInfo );
                     break;
                 }
                 case SC_MODULATION_DELAY: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 2;
+                        continue;
+                    }
                     track->m_playInfo.m_modDelay = SEQ_READ16( track->m_pos );
                     track->m_pos += 2;
                     updateSequenceModulation( p_trackId, &track->m_playInfo, BIT( 4 ) );
                     break;
                 }
-                case SC_SWEEP_PITCH: {
+                case SC_SWEEP_PITCH:
+                case SC_SWEEP_PITCH_ALT: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 2;
+                        continue;
+                    }
                     track->m_sweepPitch = SEQ_READ16( track->m_pos );
                     track->m_pos += 2;
                     break;
                 }
                 case SC_TEMPO: {
+                    if( skipNextCommand ) [[unlikely]] {
+                        skipNextCommand = false;
+                        track->m_pos += 2;
+                        continue;
+                    }
                     SEQ_BPM = SEQ_READ16( track->m_pos );
                     track->m_pos += 2;
                     break;

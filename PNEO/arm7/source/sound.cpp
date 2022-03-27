@@ -8,10 +8,10 @@
 
 #ifndef NO_SOUND
 namespace SOUND::SSEQ {
-    static void soundTimer( );
-    static void soundSysMessageHandler( int, void* );
-    static void adsrTickChannel( int );
-    static void adsrTick( );
+    void soundTimer( );
+    void soundSysMessageHandler( int, void* );
+    void adsrTickChannel( int );
+    void adsrTick( );
 
     volatile int SEQ_STATUS = STATUS_STOPPED;
     volatile int CUR_BPM;
@@ -30,14 +30,14 @@ namespace SOUND::SSEQ {
         for( u8 i = NUM_BLOCKED_CHANNEL; i < NUM_CHANNEL; ++i ) { ADSR_CHANNEL[ i ].m_track = -1; }
     }
 
-    static void soundTimer( ) {
+    void soundTimer( ) {
         static volatile int v = 0;
 
         adsrTick( );
 
         while( v > MAX_BPM ) {
             v -= MAX_BPM;
-            seq_tick( );
+            sequenceTick( );
         }
         v += SEQ_BPM;
     }
@@ -46,11 +46,11 @@ namespace SOUND::SSEQ {
 
     volatile int ADSR_MASTER_VOLUME = 127;
 
-    static inline void adsrTick( ) {
+    inline void adsrTick( ) {
         for( auto i = NUM_BLOCKED_CHANNEL; i < NUM_CHANNEL; ++i ) { adsrTickChannel( i ); }
     }
 
-    static void adsrTickChannel( int p_channel ) {
+    void adsrTickChannel( int p_channel ) {
         adsrState* chstat = ADSR_CHANNEL + p_channel;
         switch( chstat->m_state ) {
         default:

@@ -46,25 +46,27 @@ namespace SOUND::SSEQ {
         SC_JUMP       = 0x94,
         SC_CALL       = 0x95,
 
-        SC_RANDOM    = 0xA0,
-        SC_UNKNOWN_1 = 0xA1, // basic arithmetic
-        SC_IF        = 0xA2,
+        SC_PARAMETER_RANDOM        = 0xA0,
+        SC_PARAMETER_FROM_VARIABLE = 0xA1, // basic arithmetic
+        SC_IF                      = 0xA2,
 
         // basic arithmetic block
-        SC_UNKNOWN_2  = 0xB0, // =
-        SC_UNKNOWN_3  = 0xB1, // +=
-        SC_UNKNOWN_4  = 0xB2, // -=
-        SC_UNKNOWN_5  = 0xB3, // *=
-        SC_UNKNOWN_6  = 0xB4, // /=
-        SC_UNKNOWN_7  = 0xB5, // [Shift]
-        SC_UNKNOWN_8  = 0xB6, // [Rand]
-        SC_UNKNOWN_9  = 0xB7, // ""
-        SC_UNKNOWN_10 = 0xB8, // ==
-        SC_UNKNOWN_11 = 0xB9, // >=
-        SC_UNKNOWN_12 = 0xBA, // >
-        SC_UNKNOWN_13 = 0xBB, // <=
-        SC_UNKNOWN_14 = 0xBC, // <
-        SC_UNKNOWN_15 = 0xBD, // !=
+        SC_ARITH_START       = 0xB0, // =
+        SC_SET_VARIABLE      = 0xB0, // =
+        SC_ADD_VARIABLE      = 0xB1, // +=
+        SC_SUBTRACT_VARIABLE = 0xB2, // -=
+        SC_MULTIPLY_VARIABLE = 0xB3, // *=
+        SC_DIVIDE_VARIABLE   = 0xB4, // /=
+        SC_SHIFT_VARIABLE    = 0xB5, // [Shift]
+        SC_RANDOM_VARIABLE   = 0xB6, // [Rand]
+        SC_UNKNOWN_9         = 0xB7, // ""
+        SC_COMPARE_EQUAL     = 0xB8, // ==
+        SC_COMPARE_GTOE      = 0xB9, // >=
+        SC_COMPARE_GT        = 0xBA, // >
+        SC_COMPARE_LTOE      = 0xBB, // <=
+        SC_COMPARE_LT        = 0xBC, // <
+        SC_COMPARE_NE        = 0xBD, // !=
+        SC_ARITH_END         = 0xBD, // =
 
         SC_PAN               = 0xC0,
         SC_VOL               = 0xC1,
@@ -92,8 +94,8 @@ namespace SOUND::SSEQ {
 
         SC_MODULATION_DELAY = 0xE0,
         SC_TEMPO            = 0xE1,
-
-        SC_SWEEP_PITCH = 0xE3,
+        SC_SWEEP_PITCH      = 0xE2,
+        SC_SWEEP_PITCH_ALT  = 0xE3,
 
         SC_LOOP_END     = 0xFC,
         SC_RET          = 0xFD,
@@ -187,6 +189,12 @@ namespace SOUND::SSEQ {
         u8  m_pan;
     };
 
+    constexpr u8 CALLSTACK_SIZE = 3;
+    constexpr u8 MAX_VAR        = 15;
+    constexpr u8 NUM_VARS       = MAX_VAR + 1;
+    constexpr u8 MAX_GLOB_VAR   = 15;
+    constexpr u8 NUM_GLOB_VARS  = MAX_GLOB_VAR + 1;
+
     struct trackState {
         int      m_count;
         int      m_pos;
@@ -196,11 +204,16 @@ namespace SOUND::SSEQ {
         playInfo m_playInfo;
         int      m_attackRate, m_decayRate, m_sustainRate, m_releaseRate;
         int      m_loopcount, m_looppos;
-        int      m_ret;
+        int      m_ret[ CALLSTACK_SIZE ];
+        int      m_retpos;
         int      m_trackEnded;
         int      m_trackLooped;
         u8       m_portakey, m_portatime;
         s16      m_sweepPitch;
+        s16      m_variables[ NUM_VARS ];
+        u8 m_lastConditionTrue;
+        u8 m_tiemode;
+        u8 m_muteState;
     };
 
     struct adsrState {
@@ -240,13 +253,14 @@ namespace SOUND::SSEQ {
     };
 
     extern adsrState ADSR_CHANNEL[ NUM_CHANNEL ];
+    extern s16       GLOBAL_VARS[ NUM_GLOB_VARS ];
 
     volatile extern int SEQ_BPM;
     volatile extern int SEQ_STATUS;
 
     volatile extern int ADSR_MASTER_VOLUME;
 
-    void seq_tick( );
+    void sequenceTick( );
     void trackTick( int p_n );
     void updateSequencePortamento( adsrState *p_state, trackState *p_track );
 
