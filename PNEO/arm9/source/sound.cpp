@@ -39,7 +39,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound/sound.h"
 
 void initSound( ) {
+#ifndef NO_SOUND
     SOUND::SSEQ::installSoundSys( );
+#endif
 }
 
 namespace SOUND {
