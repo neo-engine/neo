@@ -305,7 +305,7 @@ namespace BAG {
             IO::loadItemIcon( p_itemId, 112, 44, 0, 0, 0, false );
 
             if( p_data->m_itemType & ITEMTYPE_BERRY ) {
-                snprintf( buffer, 90, "%6s%hu: %75s", GET_STRING( IO::STR_UI_BAG_NUMBER ),
+                snprintf( buffer, 90, "%s%hu: %s", GET_STRING( IO::STR_UI_BAG_NUMBER ),
                           itemToBerry( p_itemId ), FS::getItemName( p_itemId ).c_str( ) );
             } else {
                 FS::getItemName( p_itemId, CURRENT_LANGUAGE, buffer );
@@ -375,7 +375,7 @@ namespace BAG {
             if( tmtype == 1 && BATTLE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
             u16 tileCnt = IO::loadTMIcon( move.m_type, tmtype, 112, 44, 0, 0, 0, false );
 
-            snprintf( buffer, 99, "%15s: %65s", FS::getItemName( p_itemId ).c_str( ),
+            snprintf( buffer, 99, "%s: %s", FS::getItemName( p_itemId ).c_str( ),
                       FS::getMoveName( p_data->m_param2 ).c_str( ) );
             IO::regularFont->printStringC( buffer, 128, 26, false, IO::font::CENTER );
 
