@@ -32,7 +32,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
 			-Wfloat-equal -Wformat=1 -Wlogical-op\
 			-Wno-analyzer-possible-null-dereference\
-			-Wno-analyzer-possible-null-argument\
+			-Wno-analyzer-possible-null-argument -Wno-stringop-overread\
 			-Wno-array-bounds -Wno-analyzer-null-dereference\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\

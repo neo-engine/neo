@@ -90,10 +90,10 @@ namespace SOUND {
         case TC__POKEMON_TRAINER: return BGM_ENCOUNTER_MAY;
         case TC_AQUA_ADMIN:
         case TC_AQUA_LEADER:
-        case TC_TEAM_AQUA:
+        case TC_TEAM_AQUA: return BGM_ENCOUNTER_TEAM_M;
         case TC_MAGMA_ADMIN:
         case TC_MAGMA_LEADER:
-        case TC_TEAM_MAGMA: return BGM_ENCOUNTER_TEAM_AM;
+        case TC_TEAM_MAGMA: return BGM_ENCOUNTER_TEAM_M;
         case TC_TWINS:
         case TC_SCHOOLBOY:
         case TC_SCHOOLGIRL:
@@ -106,10 +106,10 @@ namespace SOUND {
         case TC_YOUNGSTER:
         case TC_CAMPER:
         case TC_PICNICKER:
-        case TC_LASS:
         case TC_SIS_BRO:
         case TC_BUG_CATCHER:
         case TC_YOUNG_COUPLE: return BGM_ENCOUNTER_YOUNGSTER;
+        case TC_LASS: return BGM_ENCOUNTER_LASS;
         case TC_HIKER:
         case TC_RUIN_MANIAC:
         case TC_TOURIST:
@@ -126,11 +126,11 @@ namespace SOUND {
         case TC_MONSIEUR:
         case TC_MADAME:
         case TC_GENTLEMAN:
-        case TC_EXPERT:
-        case TC__EXPERT:
         case TC_FISHERMAN:
         case TC_BUG_MANIAC:
         case TC_COLLECTOR: return BGM_ENCOUNTER_SAILOR;
+        case TC_EXPERT:
+        case TC__EXPERT: return BGM_ENCOUNTER_ACE_TRAINER;
         default: return BGM_ENCOUNTER_YOUNGSTER;
         }
 #endif
