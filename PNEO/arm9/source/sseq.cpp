@@ -12,13 +12,13 @@ namespace SOUND::SSEQ {
     static void sndsysMsgHandler( int, void * );
     static void returnMsgHandler( int, void * );
 
-    constexpr u16   MAX_MESSAGE_POINTER = 1536;
-    u8              MESSAGE_DATA[ MAX_MESSAGE_POINTER ];
-    u32             MESSAGE_POINTER = 0;
     soundSysMessage CURRENT_SEQUENCE;
     u32             CURRENT_SEQUENCE_OFFSET[ 6 ] = { 0, 0, 0, 0, 0, 0 };
     u32             CURRENT_SEQUENCE_SIZE[ 6 ]
         = { 0, 0, 0, 0, 0, 0 }; // To save reloading stuff that is already loaded.
+
+    u16 CURRENT_SEQUENCE_ID = 0;
+    u16 NEXT_SEQUENCE_ID    = 0;
 
     void installSoundSys( ) {
         /* Install FIFO */
@@ -33,13 +33,14 @@ namespace SOUND::SSEQ {
 
     static void returnMsgHandler( int p_length, void * ) {
         returnMessage msg;
-        if( MESSAGE_POINTER + p_length < MAX_MESSAGE_POINTER ) {
-            fifoGetDatamsg( FIFO_RETURN, p_length, (u8 *) &MESSAGE_DATA[ MESSAGE_POINTER ] );
-            MESSAGE_POINTER += p_length;
-        } else {
-            fifoGetDatamsg( FIFO_RETURN, p_length,
-                            (u8 *) &msg ); // Toss the overflowing message.
+        fifoGetDatamsg( FIFO_RETURN, p_length, (u8 *) &msg );
+
+        if( msg.m_count < 1 ) {
+            // nothing of value is lost
+            return;
         }
+
+        switch( msg.m_data[ 0 ] ) {}
     }
 
     void freeSequenceData( sequenceData *p_userdata ) {
@@ -56,6 +57,15 @@ namespace SOUND::SSEQ {
         freeSequenceData( CURRENT_SEQUENCE.m_war + 1 );
         freeSequenceData( CURRENT_SEQUENCE.m_war + 2 );
         freeSequenceData( CURRENT_SEQUENCE.m_war + 3 );
+    }
+
+    void fadeSwapSequence( u16 p_seqId ) {
+        if( NEXT_SEQUENCE_ID == p_seqId ) {
+            // sequence already queued, do nothing
+            return;
+        }
+        NEXT_SEQUENCE = p_seqId;
+        fadeSequence( );
     }
 
     void playSequence( u16 p_seqId ) {
@@ -78,6 +88,7 @@ namespace SOUND::SSEQ {
                              + " failed." );
             }
         }
+        CURRENT_SEQUENCE_ID = p_seqId;
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
     }
 

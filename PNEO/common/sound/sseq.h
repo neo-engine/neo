@@ -113,7 +113,7 @@ namespace SOUND::SSEQ {
         SNDSYS_VOLUME,
     };
 
-    enum { STATUS_PLAYING, STATUS_STOPPED, STATUS_FADING, STATUS_PAUSED };
+    enum { STATUS_PLAYING, STATUS_STOPPED, STATUS_FADE_OUT, STATUS_FADE_IN, STATUS_PAUSED };
 
     struct soundReg {
         u32 m_cr;
@@ -147,9 +147,15 @@ namespace SOUND::SSEQ {
     };
 
     struct returnMessage {
-        u8 m_count;
-        u8 m_data[ 4 ];
-        u8 m_channel;
+        enum msg : u8 {
+            MSG_SEQUENCE_STOPPED      = 6,
+            MSG_SEQUENCE_LOOPED_TWICE = 7,
+            MSG_SEQUENCE_ENDED        = 8,
+        };
+
+        u8  m_count;
+        msg m_data[ 4 ];
+        u8  m_channel;
     };
 
 #define fifoRetWait( p_ch )  while( !fifoCheckValue32( p_ch ) )
@@ -211,9 +217,9 @@ namespace SOUND::SSEQ {
         u8       m_portakey, m_portatime;
         s16      m_sweepPitch;
         s16      m_variables[ NUM_VARS ];
-        u8 m_lastConditionTrue;
-        u8 m_tiemode;
-        u8 m_muteState;
+        u8       m_lastConditionTrue;
+        u8       m_tiemode;
+        u8       m_muteState;
     };
 
     struct adsrState {
@@ -259,12 +265,14 @@ namespace SOUND::SSEQ {
     volatile extern int SEQ_STATUS;
 
     volatile extern int ADSR_MASTER_VOLUME;
+    volatile extern int ADSR_FADE_TARGET_VOLUME;
 
     void sequenceTick( );
     void trackTick( int p_n );
     void updateSequencePortamento( adsrState *p_state, trackState *p_track );
 
-    void playSequence( sequenceData *p_seq, sequenceData *p_bnk, sequenceData *p_war );
+    void playSequence( sequenceData *p_seq, sequenceData *p_bnk, sequenceData *p_war,
+                       bool p_fadeIn = false );
     void stopSequence( );
 
     inline s8 nextFreeChannel( int p_priority = 0, u8 p_chStart = 0, u8 p_chEnd = NUM_CHANNEL ) {

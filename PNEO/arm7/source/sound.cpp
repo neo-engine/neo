@@ -299,7 +299,7 @@ namespace SOUND::SSEQ {
         }
 
         case SNDSYS_FADESEQ: {
-            SEQ_STATUS = STATUS_FADING;
+            SEQ_STATUS = STATUS_FADE_OUT;
             return;
         }
 

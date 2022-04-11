@@ -226,7 +226,7 @@ namespace SOUND::SSEQ {
             SCHANNEL_CR( i ) = 0;
         }
         msg.m_count     = 1;
-        msg.m_data[ 0 ] = 6;
+        msg.m_data[ 0 ] = MSG_SEQUENCE_STOPPED;
         fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
     }
 
@@ -253,21 +253,21 @@ namespace SOUND::SSEQ {
             if( looped_twice == TRACK_CNT ) {
                 MESSAGE_SEND_FLAG = 1;
                 msg.m_count       = 1;
-                msg.m_data[ 0 ]   = 7;
+                msg.m_data[ 0 ]   = MSG_SEQUENCE_LOOPED_TWICE;
                 fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
                 return;
             }
             if( ended == TRACK_CNT ) {
                 MESSAGE_SEND_FLAG = 1;
                 msg.m_count       = 1;
-                msg.m_data[ 0 ]   = 8;
+                msg.m_data[ 0 ]   = MSG_SEQUENCE_ENDED;
                 fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
                 return;
             }
             if( ( looped_twice + ended ) >= TRACK_CNT ) {
                 MESSAGE_SEND_FLAG = 1;
                 msg.m_count       = 1;
-                msg.m_data[ 0 ]   = 7;
+                msg.m_data[ 0 ]   = MSG_SEQUENCE_LOOPED_TWICE;
                 fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
                 return;
             }
@@ -338,8 +338,8 @@ namespace SOUND::SSEQ {
     }
 
     void trackTick( int p_trackId ) {
-        returnMessage msg;
-        trackState*   track = TRACKS + p_trackId;
+        //        returnMessage msg;
+        trackState* track = TRACKS + p_trackId;
 
         if( track->m_count ) {
             track->m_count--;
@@ -350,12 +350,14 @@ namespace SOUND::SSEQ {
         while( !track->m_count ) {
             soundCommandType cmd = soundCommandType( SEQ_READ8( track->m_pos ) );
             track->m_pos++;
+            /*
             msg.m_count     = 0;
             msg.m_channel   = p_trackId;
             msg.m_data[ 0 ] = cmd;
             msg.m_data[ 1 ] = SEQ_READ8( track->m_pos );
             msg.m_data[ 2 ] = SEQ_READ8( track->m_pos + 1 );
             msg.m_data[ 3 ] = SEQ_READ8( track->m_pos + 2 );
+            */
             if( cmd < SC_COMMAND_RANGE_START ) {
                 // TODO: implement tie mode
 
@@ -999,7 +1001,7 @@ namespace SOUND::SSEQ {
                     return;
                 }
                 }
-            if( msg.m_count ) { fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg ); }
+            // if( msg.m_count ) { fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg ); }
         }
     }
 } // namespace SOUND::SSEQ

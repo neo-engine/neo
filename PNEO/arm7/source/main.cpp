@@ -123,7 +123,7 @@ int main( ) {
 
         swiWaitForVBlank( );
 #ifndef NO_SOUND
-        if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADING ) {
+        if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADE_OUT ) {
             if( fadeCounter < 24 ) {
                 fadeCounter += 10;
             } else {
@@ -132,6 +132,19 @@ int main( ) {
                 if( !SOUND::SSEQ::ADSR_MASTER_VOLUME ) { SOUND::SSEQ::stopSequence( ); }
             }
         }
+        if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADE_IN ) {
+            if( fadeCounter < 24 ) {
+                fadeCounter += 10;
+            } else {
+                fadeCounter -= 24;
+                SOUND::SSEQ::ADSR_MASTER_VOLUME++;
+                if( SOUND::SSEQ::ADSR_MASTER_VOLUME >= SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME ) {
+                    SOUND::SSEQ::ADSR_MASTER_VOLUME = SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME;
+                    SOUND::SSEQ::SEQ_STATUS = SOUND::SSEQ::PLAYING;
+                }
+            }
+        }
+
 #endif
     }
     return 0;
