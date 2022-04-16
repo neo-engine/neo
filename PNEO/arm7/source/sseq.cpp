@@ -148,6 +148,25 @@ namespace SOUND::SSEQ {
         ADSR_CHANNEL[ p_channel ].m_state = adsrState::ADSR_RELEASE;
     }
 
+    void setSequenceStatus( sequenceStatus p_seqStatus ) {
+        if( SEQ_STATUS == p_seqStatus ) { return; }
+
+        returnMessage ret;
+        ret.m_count = 1;
+
+        if( SEQ_STATUS == STATUS_FADE_IN && p_seqStatus == STATUS_PLAYING ) {
+            // send fade complete ret message
+            ret.m_data[ 0 ] = returnMessage::MSG_SEQUENCE_UNFADED;
+            fifoSendDatamsg( FIFO_RETURN, sizeof( ret ), (u8*) &ret );
+        }
+        if( SEQ_STATUS != STATUS_STOPPED && p_seqStatus == STATUS_STOPPED ) {
+            ret.m_data[ 0 ] = returnMessage::MSG_SEQUENCE_STOPPED;
+            fifoSendDatamsg( FIFO_RETURN, sizeof( ret ), (u8*) &ret );
+        }
+
+        SEQ_STATUS = p_seqStatus;
+    }
+
 #define SEQ_READ8( p_pos ) SEQUENCE_DATA[ p_pos ]
 #define SEQ_READ16( p_pos ) \
     ( (u16) SEQUENCE_DATA[ ( p_pos ) ] | ( (u16) SEQUENCE_DATA[ ( p_pos ) + 1 ] << 8 ) )
@@ -182,7 +201,8 @@ namespace SOUND::SSEQ {
         for( u8 i = 0; i < NUM_VARS; ++i ) { TRACKS[ p_track ].m_variables[ i ] = -1; }
     }
 
-    void playSequence( sequenceData* p_sequence, sequenceData* p_bnk, sequenceData* p_war ) {
+    void playSequence( sequenceData* p_sequence, sequenceData* p_bnk, sequenceData* p_war,
+                       bool p_fadeIn ) {
         SEQUENCE_BANK     = p_bnk->m_data;
         SEQUENCE_WAR[ 0 ] = p_war[ 0 ].m_data;
         SEQUENCE_WAR[ 1 ] = p_war[ 1 ].m_data;
@@ -211,10 +231,17 @@ namespace SOUND::SSEQ {
         prepareTrack( 0, pos );
         SEQ_BPM           = 120;
         MESSAGE_SEND_FLAG = 0;
+
+        if( p_fadeIn ) {
+            ADSR_FADE_TARGET_VOLUME = ADSR_MASTER_VOLUME;
+            ADSR_MASTER_VOLUME      = 0;
+            SEQ_STATUS              = STATUS_FADE_IN;
+        } else {
+            SEQ_STATUS = STATUS_PLAYING;
+        }
     }
 
     void stopSequence( ) {
-        returnMessage msg;
         SEQ_BPM = 0; // stop sound_timer
 
         for( u8 i = 0; i < NUM_CHANNEL; ++i ) { // stop p_note
@@ -225,9 +252,8 @@ namespace SOUND::SSEQ {
             chstat->m_track  = -1;
             SCHANNEL_CR( i ) = 0;
         }
-        msg.m_count     = 1;
-        msg.m_data[ 0 ] = MSG_SEQUENCE_STOPPED;
-        fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
+
+        setSequenceStatus( STATUS_STOPPED );
     }
 
     void sequenceTick( ) {
@@ -253,21 +279,21 @@ namespace SOUND::SSEQ {
             if( looped_twice == TRACK_CNT ) {
                 MESSAGE_SEND_FLAG = 1;
                 msg.m_count       = 1;
-                msg.m_data[ 0 ]   = MSG_SEQUENCE_LOOPED_TWICE;
+                msg.m_data[ 0 ]   = returnMessage::MSG_SEQUENCE_LOOPED_TWICE;
                 fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
                 return;
             }
             if( ended == TRACK_CNT ) {
                 MESSAGE_SEND_FLAG = 1;
                 msg.m_count       = 1;
-                msg.m_data[ 0 ]   = MSG_SEQUENCE_ENDED;
+                msg.m_data[ 0 ]   = returnMessage::MSG_SEQUENCE_ENDED;
                 fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
                 return;
             }
             if( ( looped_twice + ended ) >= TRACK_CNT ) {
                 MESSAGE_SEND_FLAG = 1;
                 msg.m_count       = 1;
-                msg.m_data[ 0 ]   = MSG_SEQUENCE_LOOPED_TWICE;
+                msg.m_data[ 0 ]   = returnMessage::MSG_SEQUENCE_LOOPED_TWICE;
                 fifoSendDatamsg( FIFO_RETURN, sizeof( msg ), (u8*) &msg );
                 return;
             }

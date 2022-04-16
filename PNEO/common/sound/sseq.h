@@ -113,7 +113,13 @@ namespace SOUND::SSEQ {
         SNDSYS_VOLUME,
     };
 
-    enum { STATUS_PLAYING, STATUS_STOPPED, STATUS_FADE_OUT, STATUS_FADE_IN, STATUS_PAUSED };
+    enum sequenceStatus {
+        STATUS_PLAYING,
+        STATUS_STOPPED,
+        STATUS_FADE_OUT,
+        STATUS_FADE_IN,
+        STATUS_PAUSED
+    };
 
     struct soundReg {
         u32 m_cr;
@@ -139,6 +145,7 @@ namespace SOUND::SSEQ {
             int m_channel;
             u8  m_volume;
             struct {
+                bool         m_fadeIn;
                 sequenceData m_seq;
                 sequenceData m_bnk;
                 sequenceData m_war[ 4 ];
@@ -151,6 +158,7 @@ namespace SOUND::SSEQ {
             MSG_SEQUENCE_STOPPED      = 6,
             MSG_SEQUENCE_LOOPED_TWICE = 7,
             MSG_SEQUENCE_ENDED        = 8,
+            MSG_SEQUENCE_UNFADED      = 9,
         };
 
         u8  m_count;
@@ -261,8 +269,10 @@ namespace SOUND::SSEQ {
     extern adsrState ADSR_CHANNEL[ NUM_CHANNEL ];
     extern s16       GLOBAL_VARS[ NUM_GLOB_VARS ];
 
-    volatile extern int SEQ_BPM;
-    volatile extern int SEQ_STATUS;
+    volatile extern int            SEQ_BPM;
+    volatile extern sequenceStatus SEQ_STATUS;
+
+    void setSequenceStatus( sequenceStatus p_seqStatus );
 
     volatile extern int ADSR_MASTER_VOLUME;
     volatile extern int ADSR_FADE_TARGET_VOLUME;
@@ -356,12 +366,47 @@ namespace SOUND::SSEQ {
 #ifdef ARM9
     extern soundSysMessage CURRENT_SEQUENCE;
 
-    int  playSample( void *p_data, const sampleInfo &p_sampleInfo, const playInfo &p_playInfo );
+    /*
+     * @brief: Interprets p_data as audio data and redirects it to the speaker. If p_data
+     * contains garbage, the speaker will play garbage.
+     * @returns: The channel on which the sample is playing.
+     */
+    int playSample( void *p_data, const sampleInfo &p_sampleInfo, const playInfo &p_playInfo );
+
+    /*
+     * @brief: Stops a sample that plays on channel p_handle.
+     */
     void stopSample( int p_handle );
 
-    void playSequence( u16 );
+    /*
+     * @brief: Stops and unloads any currently playing sequence; and then loads and starts
+     * to play sequence p_seqId (fading in when p_fadeIn is true).
+     */
+    void playSequence( u16 p_seqId, bool p_fadeIn = false );
+
+    /*
+     * @brief: Schedules sequence no. p_seqId to be played next, after first fading out of
+     * the current sequence. If a fade out/in is already in progress, p_seqId overwrites
+     * the next spot in the to-play queue (ensuring that the corresponding sequence is
+     * swapped in after the current fade out/in is completed)
+     */
+    void fadeSwapSequence( u16 p_seqId );
+
+    /*
+     * @brief: Stops any currently playing sequence, but keeps it in storage.
+     */
     void stopSequence( );
 
+    /*
+     * @brief: Freea any memory occupied by a currently loaded sequence. Unloading a
+     * playing sequence is not advised and will most likely result in either a crash or
+     * garbage being played.
+     */
+    void fadeSequence( );
+
+    /*
+     * @brief: Sets the master playback volume; 0 is mute, 127 is full volume.
+     */
     void setMasterVolume( u8 p_volume );
 #endif
 } // namespace SOUND::SSEQ

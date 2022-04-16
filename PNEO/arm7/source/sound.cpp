@@ -13,9 +13,9 @@ namespace SOUND::SSEQ {
     void adsrTickChannel( int );
     void adsrTick( );
 
-    volatile int SEQ_STATUS = STATUS_STOPPED;
-    volatile int CUR_BPM;
-    volatile int CUR_VOL;
+    volatile sequenceStatus SEQ_STATUS = STATUS_STOPPED;
+    volatile int            CUR_BPM;
+    volatile int            CUR_VOL;
 
     constexpr int MAX_BPM = 240;
 
@@ -44,7 +44,8 @@ namespace SOUND::SSEQ {
 
     adsrState ADSR_CHANNEL[ NUM_CHANNEL ];
 
-    volatile int ADSR_MASTER_VOLUME = 127;
+    volatile int ADSR_MASTER_VOLUME      = 127;
+    volatile int ADSR_FADE_TARGET_VOLUME = 127;
 
     inline void adsrTick( ) {
         for( auto i = NUM_BLOCKED_CHANNEL; i < NUM_CHANNEL; ++i ) { adsrTickChannel( i ); }
@@ -284,28 +285,27 @@ namespace SOUND::SSEQ {
                 CUR_VOL            = ADSR_MASTER_VOLUME;
                 ADSR_MASTER_VOLUME = 0;
                 SEQ_STATUS         = STATUS_PAUSED;
+                setSequenceStatus( STATUS_PAUSED );
             } else if( SEQ_STATUS == STATUS_PAUSED ) {
                 SEQ_BPM            = CUR_BPM;
                 ADSR_MASTER_VOLUME = CUR_VOL;
-                SEQ_STATUS         = STATUS_PLAYING;
+                setSequenceStatus( STATUS_PLAYING );
             }
             return;
         }
 
         case SNDSYS_PLAYSEQ: {
-            playSequence( &msg.m_seq, &msg.m_bnk, msg.m_war );
-            SEQ_STATUS = STATUS_PLAYING;
+            playSequence( &msg.m_seq, &msg.m_bnk, msg.m_war, msg.m_fadeIn );
             return;
         }
 
         case SNDSYS_FADESEQ: {
-            SEQ_STATUS = STATUS_FADE_OUT;
+            setSequenceStatus( STATUS_FADE_OUT );
             return;
         }
 
         case SNDSYS_STOPSEQ: {
             stopSequence( );
-            SEQ_STATUS = STATUS_STOPPED;
             return;
         }
         }

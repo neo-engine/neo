@@ -17,8 +17,9 @@ namespace SOUND::SSEQ {
     u32             CURRENT_SEQUENCE_SIZE[ 6 ]
         = { 0, 0, 0, 0, 0, 0 }; // To save reloading stuff that is already loaded.
 
-    u16 CURRENT_SEQUENCE_ID = 0;
-    u16 NEXT_SEQUENCE_ID    = 0;
+    u16  CURRENT_SEQUENCE_ID   = 0;
+    u16  NEXT_SEQUENCE_ID[ 2 ] = { 0 };
+    bool SEQ_SWAP_IN_PROGRESS  = false;
 
     void installSoundSys( ) {
         /* Install FIFO */
@@ -39,8 +40,37 @@ namespace SOUND::SSEQ {
             // nothing of value is lost
             return;
         }
+        switch( msg.m_data[ 0 ] ) {
+        default: return;
+        case returnMessage::MSG_SEQUENCE_ENDED: {
+            // restart orig bgm (after one shot)
+            // TODO
+            break;
+        }
+        case returnMessage::MSG_SEQUENCE_STOPPED: {
+            if( SEQ_SWAP_IN_PROGRESS ) {
+                // start queued bgm
+                if( NEXT_SEQUENCE_ID[ 0 ] ) {
+                    playSequence( NEXT_SEQUENCE_ID[ 0 ], true );
+                } else {
+                    SEQ_SWAP_IN_PROGRESS = false;
+                }
+            }
+            break;
+        }
+        case returnMessage::MSG_SEQUENCE_UNFADED: {
+            // bgm swap complete, check if another chage was requested
+            SEQ_SWAP_IN_PROGRESS  = false;
+            NEXT_SEQUENCE_ID[ 0 ] = NEXT_SEQUENCE_ID[ 1 ];
+            NEXT_SEQUENCE_ID[ 1 ] = 0;
 
-        switch( msg.m_data[ 0 ] ) {}
+            if( NEXT_SEQUENCE_ID[ 0 ] ) {
+                // next fade already lined up, start new fade
+                fadeSequence( );
+            }
+            break;
+        }
+        }
     }
 
     void freeSequenceData( sequenceData *p_userdata ) {
@@ -60,21 +90,32 @@ namespace SOUND::SSEQ {
     }
 
     void fadeSwapSequence( u16 p_seqId ) {
-        if( NEXT_SEQUENCE_ID == p_seqId ) {
+        if( NEXT_SEQUENCE_ID[ 0 ] == p_seqId ) {
+            // cancel previously enqueued swap
+            NEXT_SEQUENCE_ID[ 1 ] = 0;
+            return;
+        }
+        if( NEXT_SEQUENCE_ID[ SEQ_SWAP_IN_PROGRESS ] == p_seqId ) {
             // sequence already queued, do nothing
             return;
         }
-        NEXT_SEQUENCE = p_seqId;
-        fadeSequence( );
+        NEXT_SEQUENCE_ID[ SEQ_SWAP_IN_PROGRESS ] = p_seqId;
+        if( !SEQ_SWAP_IN_PROGRESS ) { fadeSequence( ); }
     }
 
-    void playSequence( u16 p_seqId ) {
+    void playSequence( u16 p_seqId, bool p_fadeIn ) {
+        if( !p_fadeIn ) {
+            SEQ_SWAP_IN_PROGRESS  = false;
+            NEXT_SEQUENCE_ID[ 0 ] = NEXT_SEQUENCE_ID[ 1 ] = 0;
+        }
         stopSequence( );
         freeSequence( );
         CURRENT_SEQUENCE.m_message = SNDSYS_PLAYSEQ;
 
         auto &seq = SSEQ_LIST[ p_seqId ];
 
+        auto oa     = ANIMATE_MAP;
+        ANIMATE_MAP = false;
         if( !FS::loadSoundSequence( &CURRENT_SEQUENCE.m_seq, seq.m_sseqId ) ) {
             DESQUID_LOG( std::string( "Sound sequence " ) + std::to_string( p_seqId )
                          + " failed." );
@@ -88,8 +129,10 @@ namespace SOUND::SSEQ {
                              + " failed." );
             }
         }
+        CURRENT_SEQUENCE.m_fadeIn = p_fadeIn;
         CURRENT_SEQUENCE_ID = p_seqId;
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
+        ANIMATE_MAP = oa;
     }
 
     void stopSequence( ) {
@@ -113,7 +156,8 @@ namespace SOUND::SSEQ {
 
     void fadeSequence( ) {
         soundSysMessage msg;
-        msg.m_message = SNDSYS_FADESEQ;
+        msg.m_message        = SNDSYS_FADESEQ;
+        SEQ_SWAP_IN_PROGRESS = true;
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
     }
 

@@ -108,7 +108,9 @@ namespace SOUND {
         currentLocation = p_newLocation;
 
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
-        if( currentMoveMode == MAP::WALK ) { playBGM( FS::BGMforLocation( currentLocation ) ); }
+        if( currentMoveMode == MAP::WALK ) {
+            playBGM( FS::BGMforLocation( currentLocation ), false, true );
+        }
     }
 
     void onMovementTypeChange( MAP::moveMode p_newMoveMode ) {
@@ -116,7 +118,7 @@ namespace SOUND {
 
         currentMoveMode = p_newMoveMode;
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
-        playBGM( BGMforWeather( currentWeather ) );
+        playBGM( BGMforWeather( currentWeather ), false, true );
     }
 
     void onWeatherChange( MAP::mapWeather p_newWeather ) {
@@ -124,7 +126,7 @@ namespace SOUND {
 
         currentWeather = p_newWeather;
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
-        playBGM( BGMforWeather( currentWeather ) );
+        playBGM( BGMforWeather( currentWeather ), false, true );
     }
 
     void restartBGM( ) {

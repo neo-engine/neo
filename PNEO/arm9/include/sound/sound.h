@@ -57,7 +57,7 @@ namespace SOUND {
      * @brief: Sets the specified bgm.
      * @param p_id: BGM name from bgmNames.h (BGM_<NAME>)
      */
-    void playBGM( s16 p_id, bool p_force = false );
+    void playBGM( s16 p_id, bool p_force = false, bool p_fade = false );
 
     /*
      * @brief: Plays the specified bgm once (non.looped)

@@ -75,28 +75,28 @@ namespace SOUND {
 #endif
     }
 
-    void playBGM( s16 p_id, bool p_force ) {
+    void playBGM( s16 p_id, bool p_force, bool p_fade ) {
 #ifndef NO_SOUND
-        auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( p_force ) { BGMforced = true; }
             if( BGMLoaded && p_id == currentBGM ) { return; }
-            ANIMATE_MAP = false;
-
             auto sseqId = SSEQ::BGMIndexForName( p_id );
-            if( sseqId != SSEQ::SSEQ_NONE ) { SSEQ::playSequence( sseqId ); }
+            if( sseqId != SSEQ::SSEQ_NONE ) {
+                if( p_fade ) {
+                    SSEQ::fadeSwapSequence( sseqId );
+                } else {
+                    SSEQ::playSequence( sseqId );
+                }
+            }
 
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
-            ANIMATE_MAP = false;
-
             // TODO: Fade seq instead?
             SSEQ::stopSequence( );
 
             BGMLoaded = false;
         }
-        ANIMATE_MAP = oa;
 #else
         (void) p_id;
         (void) p_force;
@@ -105,10 +105,8 @@ namespace SOUND {
 
     void playBGMOneshot( s16 p_id ) {
 #ifndef NO_SOUND
-        auto oa = ANIMATE_MAP;
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( BGMLoaded && p_id == currentBGM ) { return; }
-            ANIMATE_MAP = false;
             // looping is done via sseq commands; no need for different code here
             // TODO: (blockingly) wait for OS to complete?
 
@@ -117,11 +115,9 @@ namespace SOUND {
             BGMLoaded  = true;
             currentBGM = p_id;
         } else if( BGMLoaded ) {
-            ANIMATE_MAP = false;
             SSEQ::stopSequence( );
             BGMLoaded = false;
         }
-        ANIMATE_MAP = oa;
 #else
         (void) p_id;
 #endif

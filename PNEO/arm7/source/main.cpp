@@ -60,6 +60,8 @@ distribution.
 #include "sound/sseq.h"
 #endif
 
+#define FADE_SPEED 7
+
 volatile bool exitflag = false;
 
 void VblankHandler( void ) {
@@ -128,8 +130,12 @@ int main( ) {
                 fadeCounter += 10;
             } else {
                 fadeCounter -= 24;
-                SOUND::SSEQ::ADSR_MASTER_VOLUME--;
-                if( !SOUND::SSEQ::ADSR_MASTER_VOLUME ) { SOUND::SSEQ::stopSequence( ); }
+                if( SOUND::SSEQ::ADSR_MASTER_VOLUME <= FADE_SPEED ) {
+                    SOUND::SSEQ::ADSR_MASTER_VOLUME = 0;
+                    SOUND::SSEQ::stopSequence( );
+                } else {
+                    SOUND::SSEQ::ADSR_MASTER_VOLUME -= FADE_SPEED;
+                }
             }
         }
         if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADE_IN ) {
@@ -137,10 +143,12 @@ int main( ) {
                 fadeCounter += 10;
             } else {
                 fadeCounter -= 24;
-                SOUND::SSEQ::ADSR_MASTER_VOLUME++;
-                if( SOUND::SSEQ::ADSR_MASTER_VOLUME >= SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME ) {
+                if( SOUND::SSEQ::ADSR_MASTER_VOLUME + FADE_SPEED
+                    >= SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME ) {
                     SOUND::SSEQ::ADSR_MASTER_VOLUME = SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME;
-                    SOUND::SSEQ::SEQ_STATUS = SOUND::SSEQ::PLAYING;
+                    SOUND::SSEQ::setSequenceStatus( SOUND::SSEQ::STATUS_PLAYING );
+                } else {
+                    SOUND::SSEQ::ADSR_MASTER_VOLUME += FADE_SPEED;
                 }
             }
         }
