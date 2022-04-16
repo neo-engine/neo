@@ -577,6 +577,10 @@ namespace MAP {
 
         void animateMap( u8 p_frame );
 
+        void animateMapObjects( u8 p_frame );
+
+        bool checkTrainerEye( u16 p_globPlayerX, u16 p_globPlayerY );
+
         bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK,
                       bool p_events = true );
         void movePlayer( direction p_direction, bool p_fast = false );

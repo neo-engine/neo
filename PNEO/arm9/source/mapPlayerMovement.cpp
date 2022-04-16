@@ -44,32 +44,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound/sound.h"
 
 namespace MAP {
-    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn,
-                            bool p_unfade ) {
-        animateField( p_globX, p_globY );
-        u8 behave = at( p_globX, p_globY ).m_bottombehave;
-
-        auto curLocId = getCurrentLocationId( );
-        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
-
-        // Check for things that activate upon stepping on a tile
-
-        switch( behave ) {
-        case BEH_GRASS_ASH: { // Add ash to the soot bag
-            if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
-                                                        I_SOOT_SACK ) ) {
-                SAVE::SAV.getActiveFile( ).m_ashCount++;
-                if( SAVE::SAV.getActiveFile( ).m_ashCount > 999'999'999 ) {
-                    SAVE::SAV.getActiveFile( ).m_ashCount = 999'999'999;
-                }
-            }
-            break;
-        }
-        default: break;
-        }
-
-        if( p_allowWildPkmn && !_scriptRunning ) {
-            bool hadBattle = false;
+    bool mapDrawer::checkTrainerEye( u16 p_globX, u16 p_globY ) {
+        bool hadBattle = false;
+        if( !_scriptRunning ) {
             // Check for trainer
             for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
                 auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
@@ -157,12 +134,41 @@ namespace MAP {
                                 }
                             }
                             runEvent( o.second.m_event, i );
+                            hadBattle = true;
                         }
                     }
                 }
             }
+        }
+        return hadBattle;
+    }
 
-            if( !hadBattle ) { handleWildPkmn( p_globX, p_globY ); }
+    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn,
+                            bool p_unfade ) {
+        animateField( p_globX, p_globY );
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+        auto curLocId = getCurrentLocationId( );
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
+
+        // Check for things that activate upon stepping on a tile
+
+        switch( behave ) {
+        case BEH_GRASS_ASH: { // Add ash to the soot bag
+            if( SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
+                                                        I_SOOT_SACK ) ) {
+                SAVE::SAV.getActiveFile( ).m_ashCount++;
+                if( SAVE::SAV.getActiveFile( ).m_ashCount > 999'999'999 ) {
+                    SAVE::SAV.getActiveFile( ).m_ashCount = 999'999'999;
+                }
+            }
+            break;
+        }
+        default: break;
+        }
+
+        if( p_allowWildPkmn && !_scriptRunning ) {
+            if( !checkTrainerEye( p_globX, p_globY ) ) { handleWildPkmn( p_globX, p_globY ); }
         }
 
         if( p_unfade ) {

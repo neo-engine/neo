@@ -183,15 +183,10 @@ namespace MAP {
         animateDoor( p_globX, p_globY, p_z, true );
     }
 
-    void mapDrawer::animateMap( u8 p_frame ) {
-        // animate weather
-        if( _weatherScrollX || _weatherScrollY ) {
-            bgScrollf( IO::bg3, ( _weatherScrollX << 8 ) / 10, ( _weatherScrollY << 8 ) / 10 );
-            bgUpdate( );
-        }
-
-        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+    void mapDrawer::animateMapObjects( u8 p_frame ) {
+        bool change = false;
+        u16  curx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  cury   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         u16 cx2 = curx, cy2 = cury;
 
@@ -200,9 +195,6 @@ namespace MAP {
             cy2 = _followPkmn.m_pos.m_posY;
         }
 
-        // animate map objects
-
-        bool change = false;
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
@@ -375,8 +367,26 @@ namespace MAP {
         }
 
         if( change ) { _mapSprites.update( ); }
+    }
+
+    void mapDrawer::animateMap( u8 p_frame ) {
+        ANIMATE_MAP = false;
+        // animate weather
+        if( _weatherScrollX || _weatherScrollY ) {
+            bgScrollf( IO::bg3, ( _weatherScrollX << 8 ) / 10, ( _weatherScrollY << 8 ) / 10 );
+            bgUpdate( );
+        }
+
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+
+        // animate map objects
+        animateMapObjects( p_frame );
 
         loadAnimatedTiles( p_frame );
+
+        // checkTrainerEye( curx, cury );
+        ANIMATE_MAP = true;
     }
 
     void mapDrawer::loadAnimatedTiles( u8 p_frame ) {

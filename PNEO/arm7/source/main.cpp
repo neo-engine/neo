@@ -60,7 +60,7 @@ distribution.
 #include "sound/sseq.h"
 #endif
 
-#define FADE_SPEED 7
+#define FADE_SPEED 9
 
 volatile bool exitflag = false;
 
