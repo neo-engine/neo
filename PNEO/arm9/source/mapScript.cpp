@@ -1219,6 +1219,8 @@ namespace MAP {
                                                                     (boxPokemon*) nullptr );
                             SAVE::SAV.getActiveFile( ).consolidatePkmn( );
 
+                            if( selpkmn == 0 ) { MAP::curMap->removeFollowPkmn( ); }
+
                             snprintf( buffer, 199, GET_MAP_STRING( 486 ),
                                       dc1[ depositpkmn - 1 ].m_name );
                             printMapMessage( buffer, (style) 0 );
