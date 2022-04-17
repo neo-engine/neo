@@ -1940,9 +1940,11 @@ namespace MAP {
                         videoSetMode( MODE_5_2D );
                         bgUpdate( );
 
-                        // plant the berry
-                        SAVE::SAV.getActiveFile( ).plantBerry(
-                            mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx, itm );
+                        if( itm ) {
+                            // plant the berry
+                            SAVE::SAV.getActiveFile( ).plantBerry(
+                                mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx, itm );
+                        }
 
                         FADE_TOP_DARK( );
                         NAV::init( );
@@ -1953,9 +1955,13 @@ namespace MAP {
                         SOUND::restartBGM( );
                         ANIMATE_MAP = true;
                         SOUND::restoreVolume( );
-                        char buffer[ 100 ];
-                        snprintf( buffer, 99, GET_STRING( 572 ), FS::getItemName( itm ).c_str( ) );
-                        NAV::printMessage( buffer, MSG_INFO );
+                        if( itm ) {
+                            char buffer[ 100 ];
+                            snprintf( buffer, 99, GET_STRING( 572 ),
+                                      FS::getItemName( itm ).c_str( ) );
+                            NAV::printMessage( buffer, MSG_INFO );
+                        }
+                        return;
                     } else {
                         NAV::init( );
                     }
@@ -2051,8 +2057,6 @@ namespace MAP {
 
                         if( IO::yesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
                             == IO::yesNoBox::YES ) {
-                            SAVE::SAV.getActiveFile( ).harvestBerry(
-                                o.second.m_event.m_data.m_berryTree.m_treeIdx );
                             NAV::init( );
                             NAV::printMessage( GET_STRING( 573 ), MSG_INFO );
                             SAVE::SAV.getActiveFile( ).waterBerry(

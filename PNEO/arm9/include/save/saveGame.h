@@ -189,8 +189,8 @@ namespace SAVE {
 
             u8   m_berryTrees[ BERRY_SLOTS ];       // berry indices for each berry tree
             u8   m_berryHealth[ BERRY_SLOTS ];      // health of the berry (255 for default)
-            date m_berryPlantedDate[ BERRY_SLOTS ]; // Date when the berry was planted
-            time m_berryPlantedTime[ BERRY_SLOTS ]; // Time when the berry was planted
+            date m_berryPlantedDate[ BERRY_SLOTS ]; // unused
+            time m_berryPlantedTime[ BERRY_SLOTS ]; // play time when the berry was planted
 
             MAP::warpPos m_lastPokeCenter; // position where the player is teleported to if all of
                                            // their pkmn are fainted
@@ -455,6 +455,8 @@ namespace SAVE {
                     }
                 }
             }
+
+            u32 berryTimeSincePlanted( u8 p_berrySlot ) const;
 
             /*
              * @brief: Checks whether the specified berry plant is still alive.

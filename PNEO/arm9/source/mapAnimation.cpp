@@ -377,8 +377,8 @@ namespace MAP {
             bgUpdate( );
         }
 
-        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        // u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        // u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         // animate map objects
         animateMapObjects( p_frame );

@@ -47,14 +47,19 @@ namespace SAVE {
     SAVE::date CURRENT_DATE;
     SAVE::time CURRENT_TIME;
 
-    // Time (in h) for a berry to grow to the next stage.
+    // Time (in playtime h) for a berry to grow to the next stage.
     constexpr u8 BERRY_GROWTH_TIME[ 80 ]
-        = { 0,  12, 12, 12, 12, 12, 16, 12,  12,  48,  24,  24,  24, 24, 24, 24, 4,
-            4,  4,  4,  4,  12, 12, 12, 12,  12,  24,  24,  24,  24, 24, 72, 72, 72,
-            72, 72, 32, 32, 32, 32, 32, 32,  32,  32,  32,  32,  32, 32, 32, 32,
+        = { 0,  3,  3,  3,  3,  3,  4,  3,  3,  9,  6,  6,  6,  6,  6,  6,  1,
+            1,  1,  1,  1,  3,  3,  3,  3,  3,  6,  6,  6,  6,  6,  12, 12, 12,
+            12, 12, 7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,
 
-            32, 32, 32, 32, 96, 96, 96, 96,  96,  96,  96,  96,  96, 96, 96, 96, 96,
-            96, 56, 56, 56, 56, 56, 56, 108, 108, 108, 108, 108, 108 };
+            7,  7,  7,  7,  16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+            16, 20, 20, 20, 20, 20, 20, 20, 20, 24, 24, 24, 24 };
+    constexpr u8 BERRY_YIELD[ 80 ] = {
+        0, 4, 4, 4, 4, 4, 6, 4, 4, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 6, 6, 6, 6,
+        6, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+
+        3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 
     void saveGame::playerInfo::drawTrainersCard( bool p_bottom, bool p_dummy ) {
         IO::initVideo( true );
@@ -461,8 +466,8 @@ namespace SAVE {
 
         // r 119 (north east)
 
-        m_berryTrees[ 67 ]  = BAG::itemToBerry( I_LEPPA_BERRY );
-        m_berryHealth[ 67 ] = 255;
+        m_berryTrees[ 88 ]  = BAG::itemToBerry( I_LEPPA_BERRY );
+        m_berryHealth[ 88 ] = 255;
         m_berryTrees[ 68 ]  = BAG::itemToBerry( I_COBA_BERRY );
         m_berryHealth[ 68 ] = 255;
         m_berryTrees[ 69 ]  = BAG::itemToBerry( I_SITRUS_BERRY );
@@ -516,40 +521,61 @@ namespace SAVE {
         m_berryHealth[ 87 ] = 255;
     }
 
+    u32 saveGame::playerInfo::berryTimeSincePlanted( u8 p_berrySlot ) const {
+        if( !m_berryHealth[ p_berrySlot ] || !m_berryTrees[ p_berrySlot ] ) { return 0; }
+        if( m_playTime < m_berryPlantedTime[ p_berrySlot ] ) { return 0; }
+        return m_playTime.m_hours - m_berryPlantedTime[ p_berrySlot ].m_hours + 1;
+    }
+
     bool saveGame::playerInfo::berryIsAlive( u8 p_berrySlot ) const {
         if( m_berryHealth[ p_berrySlot ] == 255 ) { return true; }
+        if( !m_berryHealth[ p_berrySlot ] || !m_berryTrees[ p_berrySlot ] ) { return false; }
+
+        // berries from the future shall not live
+        if( m_playTime < m_berryPlantedTime[ p_berrySlot ] ) { return false; }
 
         // For each hour, decrease the health by 1.
-        if( CURRENT_DATE < m_berryPlantedDate[ p_berrySlot ]
-            || CURRENT_TIME < m_berryPlantedTime[ p_berrySlot ] ) {
-            return false;
-        }
-
-        if( !m_berryHealth[ p_berrySlot ] || !m_berryTrees[ p_berrySlot ] ) { return false; }
+        auto bptime = berryTimeSincePlanted( p_berrySlot );
+        if( m_berryHealth[ p_berrySlot ] < bptime ) { return false; }
         return true;
     }
 
     u8 saveGame::playerInfo::getBerryYield( u8 p_berrySlot ) const {
-        if( m_berryHealth[ p_berrySlot ] == 255 ) { return 2; }
+        auto base = BERRY_YIELD[ m_berryTrees[ p_berrySlot ] ];
+        if( m_berryHealth[ p_berrySlot ] == 255 ) {
+            base = 2;
+        } else if( m_berryHealth[ p_berrySlot ] > 180 ) {
+            base <<= 3;
+        } else if( m_berryHealth[ p_berrySlot ] > 90 ) {
+            base <<= 2;
+        } else if( m_berryHealth[ p_berrySlot ] > 45 ) {
+            base <<= 1;
+        }
 
-        // TODO: Double yield if leading party pkmn has harvest
-        // TODO
-        return 0;
+        if( m_pkmnTeam[ 0 ].getAbility( ) == A_HARVEST ) { base <<= 1; }
+
+        return base;
     }
 
     u8 saveGame::playerInfo::getBerryStage( u8 p_berrySlot ) const {
         if( m_berryHealth[ p_berrySlot ] == 255 ) { return 4; }
+        if( !m_berryTrees[ p_berrySlot ] ) { return 0; }
+        if( !berryIsAlive( p_berrySlot ) ) { return 0; }
 
-        // TODO
+        auto bptime = berryTimeSincePlanted( p_berrySlot );
 
+        for( u8 i = 1; i <= BAG::BERRY_STAGES; ++i ) {
+            if( bptime > i * BERRY_GROWTH_TIME[ m_berryTrees[ p_berrySlot ] ] ) { return i; }
+        }
         return 0;
     }
 
     void saveGame::playerInfo::plantBerry( u8 p_berrySlot, u16 p_berry ) {
-        m_berryHealth[ p_berrySlot ]      = 5 * BERRY_GROWTH_TIME[ BAG::itemToBerry( p_berry ) ];
-        m_berryTrees[ p_berrySlot ]       = BAG::itemToBerry( p_berry );
-        m_berryPlantedDate[ p_berrySlot ] = CURRENT_DATE;
-        m_berryPlantedTime[ p_berrySlot ] = CURRENT_TIME;
+        m_berryHealth[ p_berrySlot ]
+            = ( 1 + BAG::BERRY_STAGES ) * BERRY_GROWTH_TIME[ BAG::itemToBerry( p_berry ) ];
+        m_berryTrees[ p_berrySlot ] = BAG::itemToBerry( p_berry );
+        // m_berryPlantedDate[ p_berrySlot ] = CURRENT_DATE;
+        m_berryPlantedTime[ p_berrySlot ] = m_playTime;
     }
 
     void saveGame::playerInfo::waterBerry( u8 p_berrySlot ) {
@@ -574,8 +600,8 @@ namespace SAVE {
             for( size_t s = 0; s < 6; ++s ) {
                 pokemon& ac = m_pkmnTeam[ s ];
                 if( !ac.m_boxdata.m_speciesId ) break;
-                hasHatchSpdUp |= ( ac.m_boxdata.m_ability == A_FLAME_BODY
-                                   || ac.m_boxdata.m_ability == A_MAGMA_ARMOR );
+                hasHatchSpdUp
+                    |= ( ac.getAbility( ) == A_FLAME_BODY || ac.getAbility( ) == A_MAGMA_ARMOR );
             }
 
             for( size_t s = 0; s < 6; ++s ) {

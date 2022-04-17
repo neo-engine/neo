@@ -55,6 +55,8 @@ namespace BAG {
         u16 m_buyPrice;
     };
 
+    constexpr u8 BERRY_STAGES = 4;
+
     /*
      * @brief: Compute itemtype character.
      */
