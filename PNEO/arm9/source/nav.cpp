@@ -2059,6 +2059,7 @@ namespace NAV {
                 //                ) % 24;
                 SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED, true );
 
+                SAVE::SAV.getActiveFile( ).m_playTime.m_hours += 10;
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 9999 );
 

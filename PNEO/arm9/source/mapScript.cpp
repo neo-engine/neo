@@ -1912,6 +1912,12 @@ namespace MAP {
             }
 
             if( mdata.m_events[ i ].m_type == EVENT_BERRYTREE ) {
+                if( !SAVE::SAV.getActiveFile( ).berryIsAlive(
+                        mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx ) ) {
+                    SAVE::SAV.getActiveFile( ).harvestBerry(
+                        mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx );
+                }
+
                 u8 berryType = SAVE::SAV.getActiveFile( ).getBerry(
                     mdata.m_events[ i ].m_data.m_berryTree.m_treeIdx );
 

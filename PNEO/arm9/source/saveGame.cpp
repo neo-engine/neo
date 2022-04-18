@@ -564,7 +564,7 @@ namespace SAVE {
 
         auto bptime = berryTimeSincePlanted( p_berrySlot );
 
-        for( u8 i = 1; i <= BAG::BERRY_STAGES; ++i ) {
+        for( u8 i = BAG::BERRY_STAGES; i; --i ) {
             if( bptime > i * BERRY_GROWTH_TIME[ m_berryTrees[ p_berrySlot ] ] ) { return i; }
         }
         return 0;

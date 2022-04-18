@@ -508,9 +508,12 @@ namespace MAP {
                                         u8 p_berryIdx, u8 p_stage ) {
         FILE* f;
         u8    fr = 0;
-        if( p_stage <= 1 ) { // generic sprite for all berries
+        if( p_stage == 0 ) { // generic sprite for all berries
+            f  = FS::open( IO::BERRY_PATH, 998, ".rsd" );
+            fr = 0;
+        } else if( p_stage == 1 ) { // generic sprite for all berries
             f  = FS::open( IO::BERRY_PATH, 999, ".rsd" );
-            fr = 2 * p_stage;
+            fr = 0;
         } else { // custom sprite
             f = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
             if( !f ) { f = FS::open( IO::BERRY_PATH, u16( 0 ), ".rsd" ); }
