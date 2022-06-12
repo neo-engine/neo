@@ -2128,7 +2128,7 @@ namespace NAV {
                 void drawMapMug( ) {
                     auto ptr = SCREENS_SWAPPED ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr(
 IO::bg3sub ); char buffer[ 100 ]; snprintf( buffer, 99, "%03hu/%hu_%hhu", CURRENT_BANK /
-FS::ITEMS_PER_DIR, CURRENT_BANK, getCurrentDaytime( ) % 4 ); FS::readPictureData( ptr,
+ITEMS_PER_DIR, CURRENT_BANK, getCurrentDaytime( ) % 4 ); FS::readPictureData( ptr,
 "nitro:/PICS/MAP_MUG/", buffer, 512, 49152, !SCREENS_SWAPPED ); drawBorder( );
                 }
 

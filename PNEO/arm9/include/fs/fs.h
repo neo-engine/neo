@@ -34,9 +34,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 namespace FS {
-    constexpr u8  MAXITEMSPERPAGE = 12;
-    constexpr u16 ITEMS_PER_DIR   = 30;
-
     bool SDFound( );
     bool FCFound( );
 
@@ -45,7 +42,7 @@ namespace FS {
     FILE*  open( const char* p_path, u16 p_value, const char* p_ext = ".raw",
                  const char* p_mode = "rb" );
     FILE*  openSplit( const char* p_path, u16 p_value, const char* p_ext = ".raw",
-                      u16 p_maxValue = 99 * ITEMS_PER_DIR, const char* p_mode = "rb" );
+                      u16 p_maxValue = 99 * 30, const char* p_mode = "rb" );
     FILE*  openBank( const char* p_path, u8 p_lang, const char* p_ext = ".strb",
                      const char* p_mode = "rb" );
     void   close( FILE* p_file );
@@ -73,6 +70,8 @@ namespace FS {
     bool readSave( const char* p_path );
     bool writeSave( const char* p_path );
     bool writeSave( const char* p_path, std::function<void( u16, u16 )> p_progress );
+
+    bool readFsInfo( );
 
     namespace CARD {
         bool checkCard( );

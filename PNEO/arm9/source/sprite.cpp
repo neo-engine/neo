@@ -71,7 +71,7 @@ namespace IO {
 
     // Lower-y of bounding box of sprite
     // (identify -format "%[bounding-box]" $i.png | string match -r '\d+$')
-    constexpr u16 SPECIES_HEIGHTS[ MAX_PKMN + 5 ] = {
+    const std::vector<u16> SPECIES_HEIGHTS{
         79, 63, 74, 81, 71, 78, 88, 68, 78, 80, 68, 66, 83, 67, 68, 88, 68, 90, 82, 65, 73, 66, 90,
         69, 79, 70, 77, 66, 71, 68, 67, 82, 64, 71, 84, 70, 76, 74, 84, 65, 76, 75, 87, 67, 71, 74,
         64, 77, 73, 84, 64, 69, 72, 80, 69, 78, 73, 76, 68, 84, 69, 72, 77, 70, 78, 82, 73, 82, 83,
@@ -469,7 +469,7 @@ namespace IO {
             }
         } else {
             snprintf( BUFFER, 149, "%s/%d/%d_%hhu%s%s.raw", p_path,
-                      p_pkmn.m_pkmnIdx / FS::ITEMS_PER_DIR, p_pkmn.m_pkmnIdx, p_pkmn.m_forme,
+                      p_pkmn.m_pkmnIdx / ITEMS_PER_DIR, p_pkmn.m_pkmnIdx, p_pkmn.m_forme,
                       p_pkmn.m_female ? "f" : "", p_pkmn.m_shiny ? "s" : "" );
             f = fopen( BUFFER, "rb" );
             if( f == nullptr ) { return false; }

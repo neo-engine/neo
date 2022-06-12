@@ -48,15 +48,15 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 // ´´ \"
 
 namespace FS {
-    const char* EPISODE_NAMES[ SAVE::MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ]
+    const char* EPISODE_NAMES[ SAVE::MAX_SPECIAL_EPISODES + 1 ][ MAX_LANGUAGES ]
         = { { "Dev's Heaven", "Dev's Heaven" } };
 
-    const char* LANGUAGE_NAMES[ LANGUAGES ] = { "English", "Deutsch" };
+    const char* LANGUAGE_NAMES[ MAX_LANGUAGES ] = { "English", "Deutsch" };
 
-    const char* HP_ICONS[ LANGUAGES ] = { "\xd", "\xe" };
+    const char* HP_ICONS[ MAX_LANGUAGES ] = { "\xd", "\xe" };
 
 #ifdef DESQUID
-    const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ] = {
+    const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ MAX_LANGUAGES ] = {
         { "Desquid" },
         { "Basic Data" },
         { "Status" },
@@ -134,7 +134,7 @@ namespace FS {
 
 #endif
 
-    const char* const MONTHS[ 12 ][ LANGUAGES ]
+    const char* const MONTHS[ 12 ][ MAX_LANGUAGES ]
         = { { "Jan.", "Jan." }, { "Feb.", "Feb." }, { "Mar.", "M\xe4r." }, { "Apr.", "Apr." },
             { "May", "Mai" },   { "June", "Juni" }, { "July", "Juli" },    { "Aug.", "Aug." },
             { "Sep.", "Sep." }, { "Oct.", "Okt." }, { "Nov.", "Nov." },    { "Dec.", "Dez." } };

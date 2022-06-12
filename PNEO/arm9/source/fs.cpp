@@ -90,6 +90,14 @@ namespace FS {
         return FC_READ;
     }
 
+    bool readFsInfo( ) {
+        FILE* f = fopen( "fsinfo", "rb" );
+        if( !f ) { return false; }
+        fread( &FSDATA, sizeof( fsdataInfo ), 1, f );
+        fclose( f );
+        return true;
+    }
+
     FILE* open( const char* p_path, const char* p_name, const char* p_ext, const char* p_mode ) {
         snprintf( TMP_BUFFER, 99, "%s%s%s", p_path, p_name, p_ext );
         return fopen( TMP_BUFFER, p_mode );

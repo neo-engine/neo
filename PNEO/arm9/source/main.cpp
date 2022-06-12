@@ -66,6 +66,8 @@ GameMod gMod = GameMod::DEVELOPER;
 GameMod gMod = GameMod::ALPHA;
 #endif
 
+fsdataInfo FSDATA;
+
 constexpr u8 DAY_TIMES[ 4 ][ 5 ]
     = { { 7, 10, 15, 17, 23 }, { 6, 9, 12, 18, 23 }, { 5, 8, 10, 20, 23 }, { 7, 9, 13, 19, 23 } };
 
@@ -232,8 +234,18 @@ int main( int, char** p_argv ) {
     initGraphics( );
 #ifdef DESQUID
     printf( "\n\nBooting NEO.\n"
-                    "- Init Graphics     [ OK ]\n"
-                    "- Init time and RND " );
+            "- Init Graphics     [ OK ]\n"
+            "- Init FSROOT       " );
+#endif
+#ifdef DESQUID
+    if( FS::readFsInfo( ) ) {
+        printf( "[ OK ]\n" );
+    } else {
+        printf( "[FAIL]\n" );
+    }
+    printf( "- Init time and RND " );
+#else
+    FS::readFsInfo( );
 #endif
     initTimeAndRnd( );
 #ifdef DESQUID

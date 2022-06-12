@@ -88,7 +88,7 @@ namespace FS {
 
     // strings
 
-    extern const char* EPISODE_NAMES[ SAVE::MAX_SPECIAL_EPISODES + 1 ][ LANGUAGES ];
+    extern const char* EPISODE_NAMES[ SAVE::MAX_SPECIAL_EPISODES + 1 ][ MAX_LANGUAGES ];
 
 #ifdef DESQUID
     constexpr u16 DESQUID_STRING = ( 1 << 13 );
@@ -96,9 +96,9 @@ namespace FS {
 
     constexpr u16 MAP_STRING = ( 1 << 11 );
 
-    extern const char*       LANGUAGE_NAMES[ LANGUAGES ];
-    extern const char*       HP_ICONS[ LANGUAGES ];
-    extern const char* const MONTHS[ 12 ][ LANGUAGES ];
+    extern const char*       LANGUAGE_NAMES[ MAX_LANGUAGES ];
+    extern const char*       HP_ICONS[ MAX_LANGUAGES ];
+    extern const char* const MONTHS[ 12 ][ MAX_LANGUAGES ];
 #define CURRENT_LANGUAGE SAVE::SAV.getActiveFile( ).m_options.m_language
 
 #define getBadgeName( p_type, p_badge )                                                         \
@@ -113,7 +113,7 @@ namespace FS {
 
 #ifdef DESQUID
     constexpr u16            MAX_DESQUID_STRINGS = 100;
-    extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ LANGUAGES ];
+    extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ MAX_LANGUAGES ];
 #define GET_STRING( p_stringId )                                                               \
     ( ( ( p_stringId ) >= FS::DESQUID_STRING )                                                 \
           ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ]                        \

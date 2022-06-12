@@ -43,7 +43,7 @@ namespace SAVE {
         s8       m_encounterRateModifier;
         s8       m_textSpeedModifier;
 
-        constexpr void clear( ) {
+        inline void clear( ) {
             m_EXPShareEnabled = false;
             m_enableBGM       = true;
             m_enableSFX       = true;

@@ -89,10 +89,10 @@ namespace MAP {
 
             char buf[ 100 ];
             if( !forme ) {
-                snprintf( buf, 99, "%02d/%hu%s%s", species / FS::ITEMS_PER_DIR, species,
+                snprintf( buf, 99, "%02d/%hu%s%s", species / ITEMS_PER_DIR, species,
                           shiny ? "s" : "", female ? "f" : "" );
             } else {
-                snprintf( buf, 99, "%02d/%hu%s%s_%hhu", species / FS::ITEMS_PER_DIR, species,
+                snprintf( buf, 99, "%02d/%hu%s%s_%hhu", species / ITEMS_PER_DIR, species,
                           shiny ? "s" : "", female ? "f" : "", forme );
             }
             f = FS::open( IO::OWP_PATH, buf, ".rsd" );

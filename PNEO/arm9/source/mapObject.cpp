@@ -247,10 +247,10 @@ namespace MAP {
 
         char buf[ 100 ];
         if( !p_forme ) {
-            snprintf( buf, 99, "%02d/%hu%s", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+            snprintf( buf, 99, "%02d/%hu%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId,
                       p_shiny ? "s" : "" );
         } else {
-            snprintf( buf, 99, "%02d/%hu%s_%hhu", p_pkmnId / FS::ITEMS_PER_DIR, p_pkmnId,
+            snprintf( buf, 99, "%02d/%hu%s_%hhu", p_pkmnId / ITEMS_PER_DIR, p_pkmnId,
                       p_shiny ? "s" : "", p_forme );
         }
         FILE* f = FS::open( IO::OWP_PATH, buf, ".rsd" );

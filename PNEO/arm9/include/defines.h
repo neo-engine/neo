@@ -39,14 +39,37 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     {}
 #endif
 
+struct fsdataInfo {
+    u16 m_maxPkmn = 0;
+    u16 m_maxItem = 0;
+
+    u16 m_maxMove   = 0;  // valid move idx 0..m_maxMove
+    u8  m_languages = 2;  // num languages
+    u8  m_fileSplit = 30; // max num files per dir
+
+    u8 m_maxNavBG     = 0; // valid subscrn wallpaper 0..m_maxNavBg
+    u8 m_defaultNavBG = 0;
+};
+
+extern fsdataInfo FSDATA;
+
 // Assumes that the Backup is a 512k flash memory
 constexpr u32 BACKUP_SIZE = ( 512 * 1024 );
 
-constexpr u16 MAX_ITEMS           = 1300;
-constexpr u16 MAX_ITEMS_IN_BAG    = 1280;
-constexpr u16 MAX_ATTACK          = 830;
-constexpr u16 MAX_MOVE            = MAX_ATTACK;
-constexpr u16 MAX_PKMN            = 905;
+#define MAX_ITEMS      FSDATA.m_maxItem
+#define MAX_ATTACK     FSDATA.m_maxMove
+#define MAX_MOVE       FSDATA.m_maxMove
+#define MAX_PKMN       FSDATA.m_maxPkmn
+#define ITEMS_PER_DIR  FSDATA.m_fileSplit
+#define MAX_NAV_BG     FSDATA.m_maxNavBG
+#define NUM_BGS        ( MAX_NAV_BG - 1 )
+#define DEFAULT_NAV_BG FSDATA.m_defaultNavBG
+#define INITIAL_NAVBG  DEFAULT_NAV_BG
+#define LANGUAGES      FSDATA.m_languages
+
+constexpr u16 MAX_ITEMS_IN_BAG = 1280;
+constexpr u16 MAX_LANGUAGES    = 6; // max number of different languages supported
+
 constexpr u16 OTLENGTH            = 8;
 constexpr u16 SPECIES_NAMELENGTH  = 30;
 constexpr u16 PKMN_NAMELENGTH     = 15;
@@ -97,12 +120,6 @@ extern bool TWL_CONFIG;
 
 extern unsigned int   TEMP[ 256 * 256 / 4 ];
 extern unsigned short TEMP_PAL[ 256 ];
-
-constexpr u8 LANGUAGES      = 2;
-constexpr u8 NUM_BGS        = 12;
-constexpr u8 MAX_NAV_BG     = 13;
-constexpr u8 DEFAULT_NAV_BG = 5;
-constexpr u8 INITIAL_NAVBG  = DEFAULT_NAV_BG;
 
 constexpr u8 DAYTIMES        = 5;
 constexpr u8 DAYTIME_NIGHT   = 0;
