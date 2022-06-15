@@ -57,6 +57,12 @@ namespace IO {
                    selection                        p_initialSelection = YES,
                    std::function<void( )>           p_tick             = DEFAULT_TICK );
 
+        /*
+         * @brief: A simplified yes/no-box that uses the message output system (from the NAV
+         * namespace) when the player is in the overworld and no special menu is currently visible.
+         * @param p_showMoney: Display the current money the player owns; used for shop
+         * dialogs (i.e. "Do you want to buy/pay <..>?").
+         */
         selection getResult( const char* p_message, style p_style, bool p_showMoney = false );
     };
 

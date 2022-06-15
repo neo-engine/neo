@@ -61,6 +61,10 @@ namespace IO {
                        std::function<void( s32 )> p_hoverButton, s32 p_initialValue = 0,
                        std::function<void( )> p_tick = DEFAULT_TICK );
 
+        /*
+         * @brief: A simplified counter using the default (overworld) message printing
+         * system (from the NAV namespace).
+         */
         s32 getResult( const char* p_message, style p_style );
     };
 } // namespace IO

@@ -83,6 +83,7 @@ namespace IO {
             pressed = keysUp( );
             held    = keysHeld( );
 
+            // key controls
             if( pressed & KEY_A ) {
                 if( sel < choices.size( ) ) {
                     if( choices[ sel ].second == choiceBox::BACK_CHOICE
@@ -224,6 +225,7 @@ namespace IO {
                 cooldown = COOLDOWN_COUNT;
             }
 
+            // touch controls
             for( auto i : choices ) {
                 if( i.first.inRange( touch ) ) {
                     sel = i.second;

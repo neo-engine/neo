@@ -53,7 +53,7 @@ namespace BAG {
         }
 
         /*
-         * @brief: Sorts the specified bag. (slow)
+         * @brief: Sorts the specified bag.
          */
         void sort( bagType );
 

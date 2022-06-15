@@ -38,6 +38,9 @@ namespace BAG {
 
 #define BETWEEN( p_lb, p_idx, p_ub ) ( ( p_lb ) <= ( p_idx ) && ( p_idx ) <= ( p_ub ) )
 
+    // use explicit item orderings to speed up sorting (don't need to load item properties
+    // from FS; still want to group similar items together).
+    // Item indices are picked to be compatible with existing mainline games.
     constexpr u16 MAX_ITEMS_ORDER                = 350;
     constexpr u16 ITEMS_ORDER[ MAX_ITEMS_ORDER ] = {
         // usables

@@ -33,8 +33,8 @@ namespace NAV {
     class navApp {
       public:
         /*
-         * @brief: Draws the icon of the application at the specified position on the
-         * screen.
+         * @brief: Draws the icon of the application at the specified position (via
+         * pre-defined "slots") on the screen.
          */
         virtual void drawIcon( u8 p_oamSlot, bool p_bottom = true ) = 0;
 

@@ -433,6 +433,7 @@ namespace MAP {
 
         mapDrawer( );
 
+        // mapDrawer is a singleton; no need to implement copy/move ctor and friends.
         inline ~mapDrawer( ) {
             if( _currentBank != nullptr ) { fclose( _currentBank ); }
             _currentBank = nullptr;

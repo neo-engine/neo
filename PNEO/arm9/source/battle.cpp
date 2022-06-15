@@ -216,8 +216,8 @@ namespace BATTLE {
                 }
 
                 if( _policy.m_mode == BM_DOUBLE || _policy.m_mode == BM_MULTI_OPPONENT ) {
-                    if( _field.getPkmn( false, 0 ) == nullptr ) {
-                        // There is no first pkmn, so it cannot move.
+                    if( _field.getPkmn( false, 1 ) == nullptr ) {
+                        // There is no second pkmn, so it cannot move.
                         moves[ field::PLAYER_SIDE ][ 1 ] = NO_OP_SELECTION;
                     } else {
                         moves[ field::PLAYER_SIDE ][ 1 ] = getMoveSelection(
@@ -242,8 +242,6 @@ namespace BATTLE {
                 break;
             }
 
-            // Compute AI's moves
-
             // Check if player is able to escape from wild battle
             if( _isWildBattle && _opponentRuns && _field.canSwitchOut( true, 0 ) ) {
                 SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
@@ -254,12 +252,15 @@ namespace BATTLE {
                 return battleEnd;
             }
 
+            // empty the log window / remove logs from previous rounds
             _battleUI.resetLog( );
 
+            // Compute AI's moves
             for( u8 i = 0; i < getBattlingPKMNCount( _policy.m_mode ); ++i ) {
                 moves[ field::OPPONENT_SIDE ][ i ] = getAIMove( i );
             }
 
+            // Check if player can escape the battle
             if( ( playerWillRun && playerRuns( ) )
                 || ( moves[ field::PLAYER_SIDE ][ 0 ].m_type == MT_USE_ITEM
                      && ( moves[ field::PLAYER_SIDE ][ 0 ].m_param == I_POKE_DOLL
@@ -281,6 +282,7 @@ namespace BATTLE {
                 for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
             }
 
+            // Check if player successfully catches
             if( playerWillCatch && playerCaptures( playerWillCatch ) ) {
                 endBattle( battleEnd = BATTLE_CAPTURE );
                 return battleEnd;
@@ -340,6 +342,7 @@ namespace BATTLE {
             for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 #endif
 
+            // Mega evolve battlers
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
                 if( sortedMoves[ i ].m_megaEvolve && sortedMoves[ i ].m_type == MT_ATTACK ) {
                     megaEvolve( sortedMoves[ i ].m_user );
@@ -348,8 +351,10 @@ namespace BATTLE {
                 }
             }
 
+            // Execute moves
             for( size_t i = 0; i < sortedMoves.size( ); ++i ) {
                 for( u8 j = 0; j < 30; ++j ) { swiWaitForVBlank( ); }
+                // show messages for special items
                 if( sortedMoves[ i ].m_type == MT_MESSAGE_ITEM ) [[unlikely]] {
                     auto itmnm = FS::getItemName( sortedMoves[ i ].m_param );
                     auto fmt   = std::string( GET_STRING( 169 ) );
@@ -363,6 +368,7 @@ namespace BATTLE {
                     _battleUI.log( std::string( buffer ) );
                 }
 
+                // show special messages for special moves
                 if( sortedMoves[ i ].m_type == MT_MESSAGE_MOVE ) [[unlikely]] {
                     auto pnm = std::string(
                         _battleUI.getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
@@ -392,6 +398,7 @@ namespace BATTLE {
                     }
                 }
 
+                // pkmn attacks
                 if( sortedMoves[ i ].m_type == MT_ATTACK ) [[likely]] {
                     std::vector<battleMove> targets    = std::vector<battleMove>( );
                     std::vector<battleMove> targetedBy = std::vector<battleMove>( );
@@ -409,19 +416,24 @@ namespace BATTLE {
                     checkAndRefillBattleSpots( slot::status::RECALLED );
                 }
 
+                // execute switch-outs
                 if( sortedMoves[ i ].m_type == MT_SWITCH ) {
                     switchPokemon( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
                 }
 
+                // actually use items
                 if( sortedMoves[ i ].m_type == MT_USE_ITEM ) {
                     useItem( sortedMoves[ i ].m_user, sortedMoves[ i ].m_param );
                 }
 
+                // check if the battle ended (e.g. if all pkmn got ko'ed)
                 if( endConditionHit( battleEnd ) ) {
                     endBattle( battleEnd );
                     return battleEnd;
                 }
             }
+
+            // execute end-of-turn effects
             _field.age( &_battleUI );
 
             distributeEXP( );

@@ -74,6 +74,11 @@ namespace IO {
             std::function<void( selection )> p_selectFunction, selection p_initialSelection = 0,
             std::function<void( )> p_tick = DEFAULT_TICK, u8 p_initialPage = 0 );
 
+        /*
+         * @brief: Simplified choice box using the default drawing functions from the NAV
+         * namespace. (Works only while the player is in the OW and no menu/application is currently
+         * opened.)
+         */
         selection getResult( const char* p_message, style p_style,
                              const std::vector<u16>& p_choices );
     };

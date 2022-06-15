@@ -149,6 +149,7 @@ namespace IO {
                 cooldown = COOLDOWN_COUNT;
             }
 
+            // touch controls
             for( auto i : choices ) {
                 if( i.first.inRange( touch ) ) {
                     s32 df2 = i.second;
