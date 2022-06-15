@@ -151,4 +151,12 @@ namespace IO {
     constexpr u16 STR_UI_BAG_ITEM_TOSS_ASK_QTY  = 698;
     constexpr u16 STR_UI_BAG_ITEM_SELL_ASK_QTY  = 699;
 
+    constexpr u16 STR_MAP_FISH_SUCCESS       = 8;
+    constexpr u16 STR_MAP_FISH_FAIL          = 9;
+    constexpr u16 STR_MAP_FISH_FAIL_OLD_BALL = 5;
+    constexpr u16 STR_MAP_FISH_SUCCESSS_PKMN = 6;
+
+    constexpr u16 STR_MAP_FAINT_TO_POKE_CENTER = 561;
+    constexpr u16 STR_MAP_FAINT_TO_HOME        = 562;
+    constexpr u16 STR_MAP_TRACER_FAIL          = 696;
 } // namespace IO

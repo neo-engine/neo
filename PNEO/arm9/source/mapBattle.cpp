@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/pokemonNames.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
 #include "nav/nav.h"
@@ -283,21 +284,27 @@ namespace MAP {
         if( rn > 40 || !level ) {
             if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
                 _playerIsFast = false;
-                NAV::printMessage( GET_STRING( 5 ) );
+                NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL_OLD_BALL ) );
             }
             return false;
         }
-        if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
-            _playerIsFast = false;
-            NAV::printMessage( GET_STRING( 6 ) );
-        } else if( SAVE::SAV.getActiveFile( ).m_repelSteps && !p_forceEncounter ) {
-            return false;
-        }
-
         u16 pkmnId    = 0;
         u8  pkmnForme = 0;
 
-        if( !getWildPkmnSpecies( p_type, pkmnId, pkmnForme ) ) { return false; }
+        if( !getWildPkmnSpecies( p_type, pkmnId, pkmnForme ) ) {
+            if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
+                _playerIsFast = false;
+                NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL_OLD_BALL ) );
+            }
+            return false;
+        }
+
+        if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
+            _playerIsFast = false;
+            NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESSS_PKMN ) );
+        } else if( SAVE::SAV.getActiveFile( ).m_repelSteps && !p_forceEncounter ) {
+            return false;
+        }
 
         bool luckyenc = SAVE::SAV.getActiveFile( ).m_bag.count(
                             BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
@@ -380,8 +387,6 @@ namespace MAP {
         SOUND::setTracerStatus( false, !p_updateMusic );
     }
 
-    static constexpr u16 STR_TRACER_FAIL = 696;
-
     bool mapDrawer::startTracerChain( ) {
         SOUND::setTracerStatus( true );
         bool specialTracerPkmn = rand( ) & 1;
@@ -389,7 +394,7 @@ namespace MAP {
         if( ( !specialTracerPkmn || !getWildPkmnSpecies( POKE_TORE, _tracerSpecies, _tracerForme ) )
             && !getWildPkmnSpecies( GRASS, _tracerSpecies, _tracerForme ) ) {
             // couldn't find suitable pkmn, no chain will start
-            NAV::printMessage( GET_STRING( STR_TRACER_FAIL ) );
+            NAV::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
             return false;
         }
         return true;
@@ -526,7 +531,7 @@ namespace MAP {
         }
 
         if( !spotFound ) {
-            NAV::printMessage( GET_STRING( STR_TRACER_FAIL ) );
+            NAV::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
             return false;
         } else {
             return true;

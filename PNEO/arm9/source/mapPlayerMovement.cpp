@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/abilityNames.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
 #include "nav/nav.h"
@@ -1514,12 +1515,24 @@ namespace MAP {
     }
 
     bool mapDrawer::canFish( position p_start, direction p_direction ) {
-        // TODO: allow fishing on sand tiles
-        return atom( p_start.m_posX + dir[ p_direction ][ 0 ],
-                     p_start.m_posY + dir[ p_direction ][ 1 ] )
-                       .m_movedata
-                   == MVD_SURF
-               && atom( p_start.m_posX, p_start.m_posY ).m_movedata != MVD_BRIDGE;
+        // allow fishing on water tiles, as long as they are not a bridge (fishing under
+        // bridges creates visual oddities.
+        if( atom( p_start.m_posX + dir[ p_direction ][ 0 ],
+                  p_start.m_posY + dir[ p_direction ][ 1 ] )
+                    .m_movedata
+                == MVD_SURF
+            && atom( p_start.m_posX, p_start.m_posY ).m_movedata != MVD_BRIDGE ) {
+            return true;
+        }
+
+        // allow fishing on sand tiles
+        if( at( p_start.m_posX + dir[ p_direction ][ 0 ], p_start.m_posY + dir[ p_direction ][ 1 ] )
+                .m_bottombehave
+            == BEH_SAND_WITH_ENCOUNTER_AND_FISH ) {
+            return true;
+        }
+
+        return false;
     }
 
     void mapDrawer::fishPlayer( direction p_direction, u8 p_rodType ) {
@@ -1545,14 +1558,17 @@ namespace MAP {
             swiWaitForVBlank( );
             swiWaitForVBlank( );
         }
-        u8   rounds = rand( ) % 5;
-        bool failed = false;
+        u8          rounds = rand( ) % 5;
+        bool        failed = false;
+        std::string msg    = "";
         NAV::printMessage( 0, MSG_NOCLOSE );
         for( u8 i = 0; i < rounds + 1; ++i ) {
             u8 cr = rand( ) % 7;
+            msg   = "";
             NAV::printMessage( 0, MSG_NOCLOSE );
             for( u8 j = 0; j < cr + 5; ++j ) {
-                NAV::printMessage( " .", MSG_NOCLOSE );
+                msg += ". ";
+                NAV::printMessage( msg.c_str( ), MSG_NOCLOSE, true );
                 for( u8 k = 0; k < 30; ++k ) {
                     scanKeys( );
                     swiWaitForVBlank( );
@@ -1564,18 +1580,16 @@ namespace MAP {
                 }
             }
             FRAME_COUNT = 0;
-            NAV::printMessage( "\n", MSG_NOCLOSE );
-            NAV::printMessage( GET_STRING( 8 ), MSG_NOCLOSE );
-            if( FRAME_COUNT > 60 ) {
+            NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESS ), MSG_NOCLOSE );
+            if( FRAME_COUNT > 180 ) {
                 failed = true;
                 break;
             }
         }
 
     OUT:
-        NAV::printMessage( 0, MSG_NOCLOSE );
         if( failed ) {
-            NAV::printMessage( GET_STRING( 9 ) );
+            NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL ) );
         } else {
             NAV::printMessage( 0 );
         }
@@ -1623,14 +1637,14 @@ namespace MAP {
         auto tgpos = SAVE::SAV.getActiveFile( ).m_lastPokeCenter;
         if( !SAVE::SAV.getActiveFile( ).m_lastPokeCenter.first
             || SAVE::SAV.getActiveFile( ).m_lastPokeCenter.first == 255 ) {
-            SAVE::printTextAndWait( GET_STRING( 562 ) );
+            SAVE::printTextAndWait( GET_STRING( IO::STR_MAP_FAINT_TO_HOME ) );
             if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
                 tgpos = { 21, { 0x2b, 0x29, 3 } };
             } else {
                 tgpos = { 21, { 0x31, 0x49, 3 } };
             }
         } else {
-            SAVE::printTextAndWait( GET_STRING( 561 ) );
+            SAVE::printTextAndWait( GET_STRING( IO::STR_MAP_FAINT_TO_POKE_CENTER ) );
         }
         _mapSprites.setPriority( _playerSprite,
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = OBJPRIORITY_2 );
