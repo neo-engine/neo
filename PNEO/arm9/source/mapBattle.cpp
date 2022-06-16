@@ -395,7 +395,7 @@ namespace MAP {
         SOUND::setTracerStatus( true );
         bool specialTracerPkmn = rand( ) & 1;
 
-        if( true || specialTracerPkmn ) {
+        if( specialTracerPkmn ) {
             if( !getWildPkmnSpecies( POKE_TORE, _tracerSpecies, _tracerForme ) ) {
                 _tracerSpecies = 0;
             }

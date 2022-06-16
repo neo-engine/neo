@@ -1846,8 +1846,6 @@ namespace MAP {
         auto mdata = currentData( );
 
         for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
-            if( mdata.m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
-
             if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
                 || mdata.m_events[ i ].m_posZ != z ) {
                 continue;
@@ -1893,7 +1891,6 @@ namespace MAP {
 
         auto mdata = currentData( p_globX, p_globY );
         for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
-            if( mdata.m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
 
             if( mdata.m_events[ i ].m_posX != x || mdata.m_events[ i ].m_posY != y
                 || mdata.m_events[ i ].m_posZ != z ) {
@@ -2108,8 +2105,6 @@ namespace MAP {
 
     bool mapData::hasEvent( eventType p_type, u8 p_x, u8 p_y, u8 p_z ) const {
         for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
-            if( m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
-
             if( m_events[ i ].m_posX == p_x && m_events[ i ].m_posY == p_y
                 && m_events[ i ].m_posZ == p_z && m_events[ i ].m_type == p_type ) {
                 if( m_events[ i ].m_activateFlag
@@ -2128,7 +2123,6 @@ namespace MAP {
 
     void mapDrawer::runLevelScripts( const mapData& p_data, u16 p_mapX, u16 p_mapY ) {
         for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
-            if( p_data.m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
             if( p_data.m_events[ i ].m_trigger != TRIGGER_ON_MAP_ENTER ) { continue; }
 
             if( p_data.m_events[ i ].m_activateFlag
@@ -2150,7 +2144,6 @@ namespace MAP {
         p_globY %= SIZE;
 
         for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
-            if( data.m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
             if( data.m_events[ i ].m_type == EVENT_WARP && data.m_events[ i ].m_posX == p_globX
                 && data.m_events[ i ].m_posY == p_globY && data.m_events[ i ].m_posZ == p_z ) {
                 if( data.m_events[ i ].m_activateFlag
