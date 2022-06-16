@@ -321,46 +321,7 @@ namespace BAG {
             }
 
             if( p_data->m_itemType & ITEMTYPE_BERRY ) {
-                /*
-                IO::regularFont->setColor( IO::RED_IDX, 1 );
-                snprintf( buffer, 99, GET_STRING( 16 ),
-                          ( curr->m_berryData.m_berryGuete == berry::berryGueteType::HARD )
-                              ? GET_STRING( 17 )
-                              : ( ( curr->m_berryData.m_berryGuete == berry::berryGueteType::SOFT )
-                                      ? GET_STRING( 18 )
-                                      : ( ( curr->m_berryData.m_berryGuete
-                                            == berry::berryGueteType::SUPER_HARD )
-                                              ? GET_STRING( 19 )
-                                              : ( ( curr->m_berryData.m_berryGuete
-                                                    == berry::berryGueteType::SUPER_SOFT )
-                                                      ? GET_STRING( 20 )
-                                                      : ( ( curr->m_berryData.m_berryGuete
-                                                            == berry::berryGueteType::VERY_HARD )
-                                                              ? GET_STRING( 21 )
-                                                              : ( GET_STRING( 22 ) ) ) ) ) ) );
-                IO::regularFont->printStringC( buffer, 24, 145, false );
-                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-                snprintf( buffer, 99, GET_STRING( 23 ), curr->m_berryData.m_berrySize / 10.0 );
-                IO::regularFont->printStringC( buffer, 140, 145, false );
-                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-
-                u8 poses[ 5 ] = {18, 66, 124, 150, 194};
-                u8 mx         = 0;
-                for( u8 i = 0; i < 5; ++i )
-                    mx = std::max( mx, curr->m_berryData.m_berryTaste[ i ] );
-                for( u8 i = 0; i < 5; ++i ) {
-                    if( curr->m_berryData.m_berryTaste[ i ] != mx ) {
-                        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
-                        IO::regularFont->setColor( IO::WHITE_IDX, 2 );
-                    } else {
-                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-                        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                    }
-                    IO::regularFont->printStringC( GET_STRING( 24 + i ), poses[ i ], 160, false );
-                }
-                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                */
+                // TODO: print extra berry data
             }
         } else {
             if( p_data->m_effect == 2 ) { // TR

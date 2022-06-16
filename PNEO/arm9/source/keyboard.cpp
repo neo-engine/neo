@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "io/keyboard.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "nav/nav.h"
 #include "sound/sound.h"
@@ -292,8 +293,10 @@ namespace IO {
 
         IO::boldFont->setColor( IO::GRAY_IDX, 3 );
         IO::boldFont->setColor( IO::GRAY_IDX, 1 );
-        IO::smallFont->printString( GET_STRING( 439 ), 136, 158, true, IO::font::CENTER );
-        IO::smallFont->printString( GET_STRING( 440 ), 195, 158, true, IO::font::CENTER );
+        IO::smallFont->printString( GET_STRING( IO::STR_UI_KEY_BACKSPACE ), 136, 158, true,
+                                    IO::font::CENTER );
+        IO::smallFont->printString( GET_STRING( IO::STR_UI_KEY_ENTER ), 195, 158, true,
+                                    IO::font::CENTER );
     }
 
     void keyboard::drawChar( u8 p_pos, u16 p_char ) {

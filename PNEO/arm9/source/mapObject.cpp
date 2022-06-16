@@ -565,7 +565,8 @@ namespace MAP {
         //        bool loadingNewObjectFailed = false;
 
         // add new objects
-        for( u8 i = 0; i < p_data.m_eventCount; ++i ) {
+        for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
+            if( p_data.m_events[ i ].m_trigger == TRIGGER_NONE ) { continue; }
             if( p_data.m_events[ i ].m_activateFlag
                 && !SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_activateFlag ) ) {
                 continue;

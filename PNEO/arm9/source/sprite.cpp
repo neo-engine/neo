@@ -476,8 +476,14 @@ namespace IO {
         }
 
         if( !f ) { return false; }
-        if( !fread( TEMP_PAL, 16, sizeof( u16 ), f ) ) { return false; }
-        if( !fread( TEMP, p_dataSize, sizeof( u32 ), f ) ) { return false; }
+        if( !fread( TEMP_PAL, 16, sizeof( u16 ), f ) ) {
+            fclose( f );
+            return false;
+        }
+        if( !fread( TEMP, p_dataSize, sizeof( u32 ), f ) ) {
+            fclose( f );
+            return false;
+        }
 
         // small color variation for pkmn of the same species
         for( u8 i = 1; i < 16; ++i ) {

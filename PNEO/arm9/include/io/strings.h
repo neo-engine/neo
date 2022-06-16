@@ -58,6 +58,14 @@ namespace IO {
     constexpr u16 STR_UI_PKMN_STAT_LONG_SDF   = STR_UI_PKMN_STAT_LONG_START + 4;
     constexpr u16 STR_UI_PKMN_STAT_LONG_SPD   = STR_UI_PKMN_STAT_LONG_START + 5;
 
+    constexpr u16 STR_UI_PKMN_ALREADY_KNOWS_MOVE    = 102;
+    constexpr u16 STR_UI_PKMN_LEARNED_MOVE          = 103;
+    constexpr u16 STR_UI_PKMN_TRIES_TO_LEARN_MOVE   = 139;
+    constexpr u16 STR_UI_PKMN_ALREADY_KNOWS_4_MOVES = 104;
+    constexpr u16 STR_UI_PKMN_CANT_FORGET_MOVE      = 106;
+    constexpr u16 STR_UI_PKMN_CANT_LEARN_MOVE       = 107;
+    constexpr u16 STR_UI_PKMN_DIDNT_LEARN_MOVE      = 403;
+
     constexpr u16 STR_UI_JBOX_LUDICOBOX     = 585;
     constexpr u16 STR_UI_JBOX_CHOOSE_SONG   = 647;
     constexpr u16 STR_UI_JBOX_STOP_PLAYBACK = 646;
@@ -92,6 +100,10 @@ namespace IO {
 
     constexpr u16 STR_UI_ITEMCOUNT_IN_BAG = 474; // "In Bag: %lu"
 
+    constexpr u16 STR_UI_ASH_COUNT  = 557;
+    constexpr u16 STR_UI_COIN_COUNT = 68;
+    constexpr u16 STR_UI_BP_COUNT   = 69;
+
     constexpr u16 STR_UI_MENU_ITEM_NAME_START = 413;
     constexpr u16 STR_UI_MENU_ITEM_PKMN       = STR_UI_MENU_ITEM_NAME_START + 0;
     constexpr u16 STR_UI_MENU_ITEM_POKEDEX    = STR_UI_MENU_ITEM_NAME_START + 1;
@@ -100,6 +112,9 @@ namespace IO {
     constexpr u16 STR_UI_MENU_ITEM_SAVE       = STR_UI_MENU_ITEM_NAME_START + 4;
     constexpr u16 STR_UI_MENU_ITEM_OPTIONS    = STR_UI_MENU_ITEM_NAME_START + 5;
 
+    constexpr u16 STR_UI_KEY_BACKSPACE = 439;
+    constexpr u16 STR_UI_KEY_ENTER     = 440;
+
     constexpr u16 STR_UI_USED_ITEM_X_TIMES        = 682;
     constexpr u16 STR_UI_USED_ITEM                = 683;
     constexpr u16 STR_UI_HANDED_OVER_ITEM_X_TIMES = 676;
@@ -107,6 +122,13 @@ namespace IO {
     constexpr u16 STR_UI_OBTAINED_ITEM_X_TIMES    = 563;
     constexpr u16 STR_UI_OBTAINED_ITEM            = 564;
     constexpr u16 STR_UI_PUT_ITEM_INTO_BAG        = 86;
+
+    constexpr u16 STR_ITEM_TRACER_NO_CHARGE      = 695;
+    constexpr u16 STR_ITEM_REPEL_ACTIVATED       = 63;
+    constexpr u16 STR_ITEM_SUPER_REPEL_ACTIVATED = 64;
+    constexpr u16 STR_ITEM_MAX_REPEL_ACTIVATED   = 65;
+    constexpr u16 STR_ITEM_EXP_ALL_ACTIVATED     = 66;
+    constexpr u16 STR_ITEM_EXP_ALL_DEACTIVATED   = 67;
 
     constexpr u16 STR_UI_CANNOT_USE_FIELD_ITEM  = 58;
     constexpr u16 STR_UI_CAN_REGISTER_ITEM_TO_Y = 98;
@@ -150,6 +172,41 @@ namespace IO {
     constexpr u16 STR_UI_BAG_ITEM_TOSS_CONFIRM  = 485;
     constexpr u16 STR_UI_BAG_ITEM_TOSS_ASK_QTY  = 698;
     constexpr u16 STR_UI_BAG_ITEM_SELL_ASK_QTY  = 699;
+
+    constexpr u16 STR_UI_BATTLE_WILD_PKMN_FLED        = 170;
+    constexpr u16 STR_UI_BATTLE_GOT_AWAY_SAFELY       = 163;
+    constexpr u16 STR_UI_BATTLE_COULDNT_ESCAPE        = 164;
+    constexpr u16 STR_UI_BATTLE_USE_ITEM_TO_ACT_FIRST = 169;
+
+    constexpr u16 STR_UI_BATTLE_PREPARE_SHELL_TRAP  = 269;
+    constexpr u16 STR_UI_BATTLE_PREPARE_FOCUS_PUNCH = 270;
+    constexpr u16 STR_UI_BATTLE_PREPARE_BEAK_BLAST  = 271;
+
+    constexpr u16 STR_UI_BATTLE_WIN_MONEY  = 552;
+    constexpr u16 STR_UI_BATTLE_LOSE_MONEY = 553;
+
+    constexpr u16 STR_UI_BATTLE_EXP_GAINED    = 167;
+    constexpr u16 STR_UI_BATTLE_ADVANCE_LEVEL = 168;
+
+    constexpr u16 STR_UI_BATTLE_TRAINER_USED_ITEM = 551;
+    constexpr u16 STR_UI_BATTLE_PLAYER_USED_ITEM  = 50;
+
+    constexpr u16 STR_UI_BATTLE_NOTHING_HAPPENED = 171;
+
+    constexpr u16 STR_UI_BATTLE_CONFUSION_HEALED = 294;
+
+    constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_SUCC              = 486;
+    constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_0 = 487;
+    constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_1 = 488;
+    constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_2 = 489;
+    constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_3 = 490;
+
+    constexpr u16 STR_UI_PKMN_DEX_REGISTERED    = 174;
+    constexpr u16 STR_UI_PKMN_SENT_TO_STORAGE   = 175;
+    constexpr u16 STR_UI_STORAGE_BOX_FULL       = 176;
+    constexpr u16 STR_UI_STORAGE_BOX_PICKED     = 177;
+    constexpr u16 STR_UI_STORAGE_ALL_BOXES_FULL = 178;
+    constexpr u16 STR_UI_PKMN_RELEASED          = 179;
 
     constexpr u16 STR_MAP_FISH_SUCCESS       = 8;
     constexpr u16 STR_MAP_FISH_FAIL          = 9;

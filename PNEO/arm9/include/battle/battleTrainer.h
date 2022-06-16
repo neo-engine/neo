@@ -34,14 +34,20 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BATTLE {
     struct trainerStrings {
-        char m_name[ 16 ];
-        char m_message1[ 200 ];
-        char m_message2[ 200 ];
-        char m_message3[ 200 ];
-        char m_message4[ 200 ];
+        static constexpr u8 NAME_LENGTH = 16;
+        static constexpr u8 MSG_LENGTH  = 200;
+
+        char m_name[ NAME_LENGTH ];
+        char m_message1[ MSG_LENGTH ];
+        char m_message2[ MSG_LENGTH ];
+        char m_message3[ MSG_LENGTH ];
+        char m_message4[ MSG_LENGTH ];
     };
 
     struct trainerData {
+        static constexpr u8 NUM_ITEMS = 5;
+        static constexpr u8 NUM_PKMN  = 6;
+
         u8             m_trainerClass;
         u8             m_AILevel;
         u16            m_trainerBG;
@@ -49,9 +55,9 @@ namespace BATTLE {
         u8             m_battlePlat1;
         u8             m_battlePlat2;
         u8             m_numPokemon;
-        u16            m_items[ 5 ];
+        u16            m_items[ NUM_ITEMS ];
         u32            m_moneyEarned;
-        trainerPokemon m_pokemon[ 6 ];
+        trainerPokemon m_pokemon[ NUM_PKMN ];
     };
 
     struct battleTrainer {

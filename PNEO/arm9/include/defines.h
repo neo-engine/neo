@@ -32,6 +32,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 #include <nds/ndstypes.h>
 
+#define WAIT( p_time )                                                               \
+    do {                                                                             \
+        for( size_t __wait = 0; __wait < p_time; ++__wait ) { swiWaitForVBlank( ); } \
+    } while( false )
+#define HALF_SEC          30
+#define THREE_QUARTER_SEC 45
+#define FULL_SEC          60
+#define THREEHALF_SEC     90
+#define DOUBLE_SEC        120
+
 #ifdef DESQUID
 #define DESQUID_LOG( p_msg ) NAV::printMessage( p_msg )
 #else
@@ -66,6 +76,11 @@ constexpr u32 BACKUP_SIZE = ( 512 * 1024 );
 #define DEFAULT_NAV_BG FSDATA.m_defaultNavBG
 #define INITIAL_NAVBG  DEFAULT_NAV_BG
 #define LANGUAGES      FSDATA.m_languages
+
+constexpr u8 MAX_PKMN_LEVEL      = 100;
+constexpr u8 MIN_OPP_LEVEL       = 5;
+constexpr u8 DIFF_HARD_LEVEL_INC = 8;
+constexpr u8 DIFF_EASY_LEVEL_DEC = 3;
 
 constexpr u16 MAX_ITEMS_IN_BAG = 1280;
 constexpr u16 MAX_LANGUAGES    = 6; // max number of different languages supported

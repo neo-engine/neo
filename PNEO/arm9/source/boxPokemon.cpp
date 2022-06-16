@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "gen/itemNames.h"
 #include "gen/pokemonNames.h"
+#include "io/strings.h"
 #include "map/mapDrawer.h"
 #include "pokemon.h"
 #include "save/saveGame.h"
@@ -626,7 +627,8 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
     char buffer[ 100 ];
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
-        snprintf( buffer, 99, GET_STRING( 102 ), m_name, FS::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_MOVE ), m_name,
+                  FS::getMoveName( p_move ).c_str( ) );
         p_message( buffer );
         return false;
     } else if( FS::canLearn( getSpecies( ), getForme( ), p_move, FS::LEARN_TM ) ) {
@@ -637,25 +639,27 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                 m_moves[ i ] = p_move;
                 m_curPP[ i ] = mdata.m_pp;
 
-                snprintf( buffer, 99, GET_STRING( 103 ), m_name,
+                snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_LEARNED_MOVE ), m_name,
                           FS::getMoveName( p_move ).c_str( ) );
                 p_message( buffer );
                 freeSpot = true;
                 break;
             }
         if( !freeSpot ) {
-            snprintf( buffer, 99, GET_STRING( 139 ), m_name, FS::getMoveName( p_move ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_TRIES_TO_LEARN_MOVE ), m_name,
+                      FS::getMoveName( p_move ).c_str( ) );
             p_message( buffer );
-            snprintf( buffer, 99, GET_STRING( 104 ), m_name );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_4_MOVES ), m_name );
             if( p_yesNoMessage( buffer ) ) {
                 loop( ) {
                     u8 res = p_getMove( this, p_move );
                     if( res < 4 ) {
                         if( BATTLE::isFieldMove( m_moves[ res ] ) ) {
-                            snprintf( buffer, 99, GET_STRING( 106 ), m_name,
-                                      FS::getMoveName( m_moves[ res ] ).c_str( ) );
+                            snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_CANT_FORGET_MOVE ),
+                                      m_name, FS::getMoveName( m_moves[ res ] ).c_str( ) );
                             p_message( buffer );
-                            snprintf( buffer, 99, GET_STRING( 104 ), m_name );
+                            snprintf( buffer, 99,
+                                      GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_4_MOVES ), m_name );
                             p_message( buffer );
                             continue;
                         } else {
@@ -667,12 +671,14 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                     break;
                 }
             }
-            snprintf( buffer, 99, GET_STRING( 403 ), m_name, FS::getMoveName( p_move ).c_str( ) );
+            snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_DIDNT_LEARN_MOVE ), m_name,
+                      FS::getMoveName( p_move ).c_str( ) );
             p_message( buffer );
             return false;
         }
     } else {
-        snprintf( buffer, 99, GET_STRING( 107 ), m_name, FS::getMoveName( p_move ).c_str( ) );
+        snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_CANT_LEARN_MOVE ), m_name,
+                  FS::getMoveName( p_move ).c_str( ) );
         p_message( buffer );
         return false;
     }

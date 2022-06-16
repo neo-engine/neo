@@ -106,7 +106,9 @@ namespace MAP {
         s8 availmod = ( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) - 3 ) / 3;
 
         u8 total = 0;
-        for( u8 i = 0; i < currentData( ).m_pokemonDescrCount; ++i ) {
+        for( u8 i = 0; i < MAX_PKMN_PER_SLICE; ++i ) {
+            if( !currentData( ).m_pokemon[ i ].m_speciesId ) { continue; }
+
             if( currentData( ).m_pokemon[ i ].m_encounterType == p_type ) {
                 s8 ownedbadge = SAVE::SAV.getActiveFile( ).getBadgeCount( ) + availmod;
                 if( ownedbadge < 0 ) { ownedbadge = 0; }
@@ -130,7 +132,9 @@ namespace MAP {
 
         u8 res = rand( ) % total;
         total  = 0;
-        for( u8 i = 0; i < currentData( ).m_pokemonDescrCount; ++i ) {
+        for( u8 i = 0; i < MAX_PKMN_PER_SLICE; ++i ) {
+            if( !currentData( ).m_pokemon[ i ].m_speciesId ) { continue; }
+
             if( currentData( ).m_pokemon[ i ].m_encounterType == p_type ) {
                 s8 ownedbadge = SAVE::SAV.getActiveFile( ).getBadgeCount( ) + availmod;
                 if( ownedbadge < 0 ) { ownedbadge = 0; }
@@ -391,8 +395,12 @@ namespace MAP {
         SOUND::setTracerStatus( true );
         bool specialTracerPkmn = rand( ) & 1;
 
-        if( ( !specialTracerPkmn || !getWildPkmnSpecies( POKE_TORE, _tracerSpecies, _tracerForme ) )
-            && !getWildPkmnSpecies( GRASS, _tracerSpecies, _tracerForme ) ) {
+        if( true || specialTracerPkmn ) {
+            if( !getWildPkmnSpecies( POKE_TORE, _tracerSpecies, _tracerForme ) ) {
+                _tracerSpecies = 0;
+            }
+        }
+        if( !_tracerSpecies && !getWildPkmnSpecies( GRASS, _tracerSpecies, _tracerForme ) ) {
             // couldn't find suitable pkmn, no chain will start
             NAV::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
             return false;

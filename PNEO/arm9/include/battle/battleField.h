@@ -49,7 +49,12 @@ namespace BATTLE {
     class field {
       public:
         static constexpr u8 PLAYER_SIDE       = 0;
+        static constexpr u8 OWN_SIDE          = PLAYER_SIDE;
         static constexpr u8 OPPONENT_SIDE     = 1;
+        static constexpr u8 PKMN_0            = 0;
+        static constexpr u8 PKMN_1            = 1;
+        static constexpr u8 NUM_SIDES         = 2;
+        static constexpr u8 MAX_PKMN_PER_SIDE = 2;
         static constexpr u8 NORMAL_DURATION   = 5;
         static constexpr u8 EXTENDED_DURATION = 8;
 

@@ -31,14 +31,16 @@
 #include "battle/type.h"
 
 namespace BATTLE {
-    constexpr u8 HP       = 0;
-    constexpr u8 ATK      = 1;
-    constexpr u8 DEF      = 2;
-    constexpr u8 SATK     = 3;
-    constexpr u8 SDEF     = 4;
-    constexpr u8 SPEED    = 5;
-    constexpr u8 EVASION  = 6;
-    constexpr u8 ACCURACY = 7;
+    constexpr u8 HP              = 0;
+    constexpr u8 ATK             = 1;
+    constexpr u8 DEF             = 2;
+    constexpr u8 SATK            = 3;
+    constexpr u8 SDEF            = 4;
+    constexpr u8 SPEED           = 5;
+    constexpr u8 EVASION         = 6;
+    constexpr u8 ACCURACY        = 7;
+    constexpr u8 NUM_BOOSTS      = 8;
+    constexpr u8 BOOST_MAX_VALUE = 7;
 
     constexpr u8 BURN      = 1;
     constexpr u8 PARALYSIS = 2;
@@ -54,17 +56,18 @@ namespace BATTLE {
 
         constexpr boosts( ) {
             m_boosts = 0;
-            for( u8 i = 0; i < 8; ++i ) { setBoost( i, 0 ); }
+            for( u8 i = 0; i < NUM_BOOSTS; ++i ) { setBoost( i, 0 ); }
         }
 
         constexpr void setBoost( u8 p_stat, s8 p_val ) {
-            p_val += 7;
+            // shift boost value to be always positive
+            p_val += BOOST_MAX_VALUE;
 
             m_boosts &= ( 0xFFFFFFFF - ( 0xF << ( 4 * p_stat ) ) );
             m_boosts |= ( p_val << ( 4 * p_stat ) );
         }
         constexpr s8 getBoost( u8 p_stat ) const {
-            return ( ( m_boosts >> ( 4 * p_stat ) ) & 0xF ) - 7;
+            return ( ( m_boosts >> ( 4 * p_stat ) ) & 0xF ) - BOOST_MAX_VALUE;
         }
 
         /*
@@ -81,10 +84,11 @@ namespace BATTLE {
          */
         inline boosts addBoosts( boosts p_other ) {
             boosts res = boosts( );
-            for( u8 i = 0; i < 8; ++i ) {
+            for( u8 i = 0; i < NUM_BOOSTS; ++i ) {
                 s8 old = getBoost( i );
-                setBoost( i, std::min( s8( 6 ),
-                                       std::max( s8( -6 ), s8( old + p_other.getBoost( i ) ) ) ) );
+                setBoost( i, std::min( s8( BOOST_MAX_VALUE - 1 ),
+                                       std::max( s8( -BOOST_MAX_VALUE + 1 ),
+                                                 s8( old + p_other.getBoost( i ) ) ) ) );
                 res.setBoost( i, getBoost( i ) - old );
             }
             return res;
@@ -94,7 +98,7 @@ namespace BATTLE {
          * @brief: Inverts all boosts.
          */
         inline boosts invert( ) {
-            for( u8 i = 0; i < 8; ++i ) { setBoost( i, -getBoost( i ) ); }
+            for( u8 i = 0; i < NUM_BOOSTS; ++i ) { setBoost( i, -getBoost( i ) ); }
             return *this;
         }
 
@@ -103,7 +107,7 @@ namespace BATTLE {
          */
         constexpr boosts negative( ) {
             boosts res = boosts( );
-            for( u8 i = 0; i < 8; ++i ) {
+            for( u8 i = 0; i < NUM_BOOSTS; ++i ) {
                 if( getBoost( i ) < 0 ) { res.setBoost( i, -getBoost( i ) ); }
             }
             return res;

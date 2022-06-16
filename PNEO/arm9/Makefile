@@ -34,6 +34,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wno-analyzer-possible-null-dereference\
 			-Wno-analyzer-possible-null-argument -Wno-stringop-overread\
 			-Wno-array-bounds -Wno-analyzer-null-dereference\
+			-Wno-analyzer-use-of-uninitialized-value -Wno-restrict\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
 			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\

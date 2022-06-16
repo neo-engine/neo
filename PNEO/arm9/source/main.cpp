@@ -326,8 +326,7 @@ int main( int, char** p_argv ) {
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
-                      MAP::curMap->currentData( ).m_eventCount,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, 0,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
                       MAP::curMap
@@ -454,10 +453,11 @@ int main( int, char** p_argv ) {
 
         // tamatama play cry of wild pkmn
 
-        if( MAP::curMap->currentData( ).m_pokemonDescrCount && FRAME_COUNT == 72
-            && rand( ) % 100 < 10 ) {
-            u8 cr = rand( ) % MAP::curMap->currentData( ).m_pokemonDescrCount;
-            SOUND::playCry( MAP::curMap->currentData( ).m_pokemon[ cr ].m_speciesId );
+        if( FRAME_COUNT == 72 && rand( ) % 100 < 10 ) {
+            u8 cr = rand( ) % MAP::MAX_PKMN_PER_SLICE;
+            if( MAP::curMap->currentData( ).m_pokemon[ cr ].m_speciesId ) {
+                SOUND::playCry( MAP::curMap->currentData( ).m_pokemon[ cr ].m_speciesId );
+            }
         }
 
         // End

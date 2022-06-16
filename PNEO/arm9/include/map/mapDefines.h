@@ -235,6 +235,7 @@ namespace MAP {
         SLIDING_DOOR
     };
 
+    constexpr u8 MAX_PKMN_PER_SLICE   = 30;
     constexpr u8 MAX_EVENTS_PER_SLICE = 64;
     struct mapData {
         u8 m_mapType;
@@ -247,9 +248,7 @@ namespace MAP {
         u8 m_surfBattlePlat1;
         u8 m_surfBattlePlat2;
 
-        u8 m_pokemonDescrCount;
-        u8 m_eventCount;
-        u32 : 16;
+        u32 : 32;
 
         u16 m_locationIds[ 4 ][ 4 ]; // (y, x), 8x8 blocks each
 
@@ -261,7 +260,7 @@ namespace MAP {
             u8 m_slot;
             u8 m_daytime;
             u8 m_encounterRate;
-        } m_pokemon[ 30 ];
+        } m_pokemon[ MAX_PKMN_PER_SLICE ];
         struct event {
             u8  m_posX;
             u8  m_posY;

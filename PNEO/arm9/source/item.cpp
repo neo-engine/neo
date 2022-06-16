@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 #include "battle/move.h"
 #include "gen/moveNames.h"
 #include "gen/pokemonNames.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDefines.h"
 #include "map/mapDrawer.h"
@@ -289,7 +290,6 @@ namespace BAG {
         return change;
     }
 
-    static constexpr u16 NO_TRACER_CHARGE = 695;
     bool use( const u16 p_itemId, std::function<void( const char* )> p_message, bool p_dryRun ) {
         char buffer[ 50 ];
         if( !p_dryRun ) {
@@ -304,7 +304,7 @@ namespace BAG {
             bool tracerCharged = MAP::curMap->tracerCharged( );
             if( !p_dryRun ) {
                 if( !tracerCharged ) {
-                    p_message( GET_STRING( NO_TRACER_CHARGE ) );
+                    p_message( GET_STRING( IO::STR_ITEM_TRACER_NO_CHARGE ) );
                     return true;
                 }
                 if( !tracerUsable ) { return true; }
@@ -318,48 +318,51 @@ namespace BAG {
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 50 );
-                p_message( GET_STRING( 63 ) );
+                p_message( GET_STRING( IO::STR_ITEM_REPEL_ACTIVATED ) );
             }
             return true;
         case I_SUPER_REPEL:
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 100 );
-                p_message( GET_STRING( 64 ) );
+                p_message( GET_STRING( IO::STR_ITEM_SUPER_REPEL_ACTIVATED ) );
             }
             return true;
         case I_MAX_REPEL:
             if( !p_dryRun ) {
                 SAVE::SAV.getActiveFile( ).m_repelSteps
                     = std::max( SAVE::SAV.getActiveFile( ).m_repelSteps, (s16) 250 );
-                p_message( GET_STRING( 65 ) );
+                p_message( GET_STRING( IO::STR_ITEM_MAX_REPEL_ACTIVATED ) );
             }
             return true;
         case I_EXP_ALL:
             if( !p_dryRun ) {
                 if( SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled )
-                    p_message( GET_STRING( 66 ) );
+                    p_message( GET_STRING( IO::STR_ITEM_EXP_ALL_ACTIVATED ) );
                 else
-                    p_message( GET_STRING( 67 ) );
+                    p_message( GET_STRING( IO::STR_ITEM_EXP_ALL_DEACTIVATED ) );
                 SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled
                     = !SAVE::SAV.getActiveFile( ).m_options.m_EXPShareEnabled;
             }
             return true;
         case I_SOOT_SACK:
             if( !p_dryRun ) {
-                snprintf( buffer, 50, GET_STRING( 557 ), SAVE::SAV.getActiveFile( ).m_ashCount );
+                snprintf( buffer, 50, GET_STRING( IO::STR_UI_ASH_COUNT ),
+                          SAVE::SAV.getActiveFile( ).m_ashCount );
                 p_message( buffer );
             }
             return true;
         case I_COIN_CASE:
             if( !p_dryRun ) {
-                snprintf( buffer, 50, GET_STRING( 68 ), SAVE::SAV.getActiveFile( ).m_coins );
+                snprintf( buffer, 50, GET_STRING( IO::STR_UI_COIN_COUNT ),
+                          SAVE::SAV.getActiveFile( ).m_coins );
                 p_message( buffer );
             }
             return true;
         case I_POINT_CARD:
             if( !p_dryRun ) {
-                snprintf( buffer, 50, GET_STRING( 69 ), SAVE::SAV.getActiveFile( ).m_battlePoints );
+                snprintf( buffer, 50, GET_STRING( IO::STR_UI_BP_COUNT ),
+                          SAVE::SAV.getActiveFile( ).m_battlePoints );
                 p_message( buffer );
             }
             return true;
