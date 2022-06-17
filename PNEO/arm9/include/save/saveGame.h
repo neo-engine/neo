@@ -500,12 +500,16 @@ namespace SAVE {
         u32 m_version;         // The game version the save was created with.
         u16 m_specialEpisodes; // Unlocked special episodes
 
+        /*
+         * @brief: Returns which special episodes the player has unlocked so far.
+         */
         inline std::vector<u8> getSpecialEpisodes( ) const {
             auto res = std::vector<u8>( );
             for( u8 i = 0; i < MAX_SPECIAL_EPISODES; ++i ) {
                 if( m_specialEpisodes & ( 1 << i ) ) { res.push_back( i + 1 ); }
             }
 #ifdef DESQUID
+            // special desquid episode used for testing purposes.
             res.push_back( 0 );
 #endif
             return res;

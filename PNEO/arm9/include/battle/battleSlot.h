@@ -40,6 +40,7 @@
 #include "fs/data.h"
 #include "gen/abilityNames.h"
 #include "gen/pokemonNames.h"
+#include "io/strings.h"
 #include "pokemon.h"
 
 namespace BATTLE {
@@ -157,7 +158,7 @@ namespace BATTLE {
         inline std::vector<type> getTypes( ) const {
             std::vector<type> res = std::vector<type>( );
 
-            for( u8 i = 0; i <= 18; ++i ) {
+            for( u8 i = 0; i < NUM_TYPES; ++i ) {
                 if( hasType( type( i ) ) ) { res.push_back( type( i ) ); }
             }
 
@@ -486,7 +487,7 @@ namespace BATTLE {
                                       u8 p_duration = 0 ) {
 
             if( ( _slotCondition & p_slotCondition ) == p_slotCondition ) {
-                p_ui->log( GET_STRING( 304 ) );
+                p_ui->log( GET_STRING( IO::STR_UI_BATTLE_IT_FAILED ) );
                 return false;
             }
 

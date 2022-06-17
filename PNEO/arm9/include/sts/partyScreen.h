@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "battle/move.h"
+#include "io/strings.h"
 #include "pokemon.h"
 #include "sts/partyScreenUI.h"
 
@@ -134,22 +135,22 @@ namespace STS {
             switch( p_choice ) {
             case SELECT:
                 if( !_inBattle ) {
-                    return 323;
+                    return IO::STR_UI_SELECT;
                 } else {
-                    return 151;
+                    return IO::STR_UI_SEND_IN;
                 }
-            case UNSELECT: return 331;
-            case STATUS: return 324;
-            case GIVE_ITEM: return 325;
-            case TAKE_ITEM: return 326;
-            case USE_ITEM: return 327;
+            case UNSELECT: return IO::STR_UI_DESELECT;
+            case STATUS: return IO::STR_UI_STATUS;
+            case GIVE_ITEM: return IO::STR_UI_GIVE_ITEM;
+            case TAKE_ITEM: return IO::STR_UI_TAKE_ITEM;
+            case USE_ITEM: return IO::STR_UI_USE_ITEM;
             case FIELD_MOVE_1: return CHOICE_FIELD_MOVE | 0;
             case FIELD_MOVE_2: return CHOICE_FIELD_MOVE | 1;
             case FIELD_MOVE_3: return CHOICE_FIELD_MOVE | 2;
             case FIELD_MOVE_4: return CHOICE_FIELD_MOVE | 3;
-            case SWAP: return 328;
-            case DEX_ENTRY: return 329;
-            case CANCEL: return 330;
+            case SWAP: return IO::STR_UI_SWAP;
+            case DEX_ENTRY: return IO::STR_UI_DEX_ENTRY;
+            case CANCEL: return IO::STR_UI_CANCEL;
 #ifdef DESQUID
             case _DESQUID: return FS::DESQUID_STRING + 0;
 #endif

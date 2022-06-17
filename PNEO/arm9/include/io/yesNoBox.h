@@ -46,10 +46,12 @@ namespace IO {
 
         yesNoBox( ) {
         }
+
         /*
          * @brief: Opens a yesNoBox and returns the player's selection.
          * @param p_drawFunction: Callback used to draw the yesNoBox
          * @param p_selectFunction: Callback used when the player selects a choice.
+         * @param p_tick: Callback that is called every frame.
          */
         selection
         getResult( std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,

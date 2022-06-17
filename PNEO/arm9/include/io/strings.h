@@ -29,18 +29,55 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace IO {
 
     // UI strings
+    constexpr u16 STR_UI_TOUCH_TO_START = 70;
+
+    constexpr u16 STR_UI_CHOOSE_A_DIFFERENT_LANGUAGE = 85; // States current language and
+                                                           // asks if the player wishes to
+                                                           // change the language
+
+    constexpr u16 STR_UI_PICK_A_LANGUAGE             = 109; // "Pick a language."
+    constexpr u16 STR_UI_OVERWRITE_EXISTING_SAVEDATA = 79;
 
     constexpr u16 STR_ANIM_EVOLUTION_START    = 51;
     constexpr u16 STR_ANIM_EVOLUTION_COMPLETE = 52;
     constexpr u16 STR_ANIM_EVOLUTION_ABORTED  = 388;
     constexpr u16 STR_ANIM_EGG_HATCH          = 389;
 
-    constexpr u16 STR_UI_YES    = 80;
-    constexpr u16 STR_UI_NO     = 81;
-    constexpr u16 STR_UI_SELECT = 323;
-    constexpr u16 STR_UI_CANCEL = 330;
-    constexpr u16 STR_UI_MONEY  = 471;
-    constexpr u16 STR_UI_NONE   = 690;
+    constexpr u16 STR_UI_CONTINUE        = 71;
+    constexpr u16 STR_UI_NEW_GAME        = 72;
+    constexpr u16 STR_UI_SPECIAL_EPISODE = 73;
+    constexpr u16 STR_UI_TRANSFER_GAME   = 74;
+    constexpr u16 STR_UI_MYSTERY_GIFT    = 404;
+
+    constexpr u16 STR_UI_YES       = 80;
+    constexpr u16 STR_UI_NO        = 81;
+    constexpr u16 STR_UI_SELECT    = 323;
+    constexpr u16 STR_UI_STATUS    = 324;
+    constexpr u16 STR_UI_GIVE_ITEM = 325;
+    constexpr u16 STR_UI_TAKE_ITEM = 326;
+    constexpr u16 STR_UI_USE_ITEM  = 327;
+    constexpr u16 STR_UI_SWAP      = 328;
+    constexpr u16 STR_UI_DEX_ENTRY = 329;
+    constexpr u16 STR_UI_DESELECT  = 331;
+    constexpr u16 STR_UI_SEND_IN   = 151;
+    constexpr u16 STR_UI_CANCEL    = 330;
+    constexpr u16 STR_UI_MONEY     = 471;
+    constexpr u16 STR_UI_NONE      = 690;
+
+    constexpr u16 STR_UI_EP0_TEXT_START = 111;
+    constexpr u16 STR_UI_EP0_TEXT_END   = 113;
+
+    constexpr u16 STR_UI_INIT_GAME_TEXT0             = 441;
+    constexpr u16 STR_UI_INIT_GAME_TEXT1             = 442;
+    constexpr u16 STR_UI_INIT_GAME_TEXT2             = 446;
+    constexpr u16 STR_UI_INIT_GAME_CHOOSE_APPEARANCE = 457;
+    constexpr u16 STR_UI_INIT_GAME_CHOOSE_NAME       = 458;
+    constexpr u16 STR_UI_INIT_GAME_CHARACTER_OK      = 459;
+    constexpr u16 STR_UI_INIT_GAME_DEFAULT_NAME0     = 460;
+    constexpr u16 STR_UI_INIT_GAME_DEFAULT_NAME1     = 461;
+    constexpr u16 STR_UI_INIT_GAME_TEXT3             = 462;
+    constexpr u16 STR_UI_INIT_GAME_TEXT4             = 463;
+    constexpr u16 STR_UI_INIT_GAME_TEXT5             = 464;
 
     constexpr u16 STR_UI_PKMN_STAT_START = 684;
     constexpr u16 STR_UI_PKMN_STAT_HP    = STR_UI_PKMN_STAT_START + 0;
@@ -167,16 +204,22 @@ namespace IO {
     constexpr u16 STR_UI_BAG_ITEM_USE           = 47;
     constexpr u16 STR_UI_BAG_ITEM_TOSS          = 48;
     constexpr u16 STR_UI_BAG_ITEM_SELL          = 483;
+    constexpr u16 STR_UI_BAG_ITEM_DETAILS       = 401;
+    constexpr u16 STR_UI_BAG_ITEM_DEREGISTER    = 402;
     constexpr u16 STR_UI_BAG_CANNOT_BUY_ITEM    = 482;
     constexpr u16 STR_UI_BAG_WILL_BUY_ITEM_FOR  = 484;
     constexpr u16 STR_UI_BAG_ITEM_TOSS_CONFIRM  = 485;
     constexpr u16 STR_UI_BAG_ITEM_TOSS_ASK_QTY  = 698;
     constexpr u16 STR_UI_BAG_ITEM_SELL_ASK_QTY  = 699;
 
-    constexpr u16 STR_UI_BATTLE_WILD_PKMN_FLED        = 170;
-    constexpr u16 STR_UI_BATTLE_GOT_AWAY_SAFELY       = 163;
-    constexpr u16 STR_UI_BATTLE_COULDNT_ESCAPE        = 164;
-    constexpr u16 STR_UI_BATTLE_USE_ITEM_TO_ACT_FIRST = 169;
+    constexpr u16 STR_UI_BATTLE_WILD_PKMN_FLED         = 170;
+    constexpr u16 STR_UI_BATTLE_GOT_AWAY_SAFELY        = 163;
+    constexpr u16 STR_UI_BATTLE_COULDNT_ESCAPE         = 164;
+    constexpr u16 STR_UI_BATTLE_USE_ITEM_TO_ACT_FIRST  = 169;
+    constexpr u16 STR_UI_BATTLE_PASS_ITEM_SPECIAL      = 281;
+    constexpr u16 STR_UI_BATTLE_PASS_ITEM_PROTECT_PKMN = 282;
+    constexpr u16 STR_UI_BATTLE_NO_EFFECT_ON           = 284;
+    constexpr u16 STR_UI_BATTLE_IT_FAILED              = 304;
 
     constexpr u16 STR_UI_BATTLE_PREPARE_SHELL_TRAP  = 269;
     constexpr u16 STR_UI_BATTLE_PREPARE_FOCUS_PUNCH = 270;

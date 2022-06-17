@@ -32,18 +32,21 @@
 #include "pokemon.h"
 
 namespace BAG {
-    const u8 ITEMTYPE_POKEBALL    = 1;
-    const u8 ITEMTYPE_MEDICINE    = 2;
-    const u8 ITEMTYPE_BATTLEITEM  = 3;
-    const u8 ITEMTYPE_COLLECTIBLE = 4;
-    const u8 ITEMTYPE_USABLE      = 5;
-    const u8 ITEMTYPE_EVOLUTION   = 6;
-    const u8 ITEMTYPE_FORMECHANGE = 8;
-    const u8 ITEMTYPE_KEYITEM     = 9;
-    const u8 ITEMTYPE_TM          = 12;
-    const u8 ITEMTYPE_APRICORN    = 13;
-    const u8 ITEMTYPE_BERRY       = 16;
-    const u8 ITEMTYPE_HOLD        = 32;
+    constexpr u8 ITEMTYPE_POKEBALL    = 1;
+    constexpr u8 ITEMTYPE_MEDICINE    = 2;
+    constexpr u8 ITEMTYPE_BATTLEITEM  = 3;
+    constexpr u8 ITEMTYPE_COLLECTIBLE = 4;
+    constexpr u8 ITEMTYPE_USABLE      = 5;
+    constexpr u8 ITEMTYPE_EVOLUTION   = 6;
+    constexpr u8 ITEMTYPE_FORMECHANGE = 8;
+    constexpr u8 ITEMTYPE_KEYITEM     = 9;
+    constexpr u8 ITEMTYPE_TM          = 12;
+    constexpr u8 ITEMTYPE_APRICORN    = 13;
+
+    constexpr u8 ITEMTYPE_NONFLAG = 15;
+
+    constexpr u8 ITEMTYPE_BERRY = 16;
+    constexpr u8 ITEMTYPE_HOLD  = 32;
 
     struct itemData {
         u8  m_itemType;
@@ -63,7 +66,7 @@ namespace BAG {
     constexpr u16 getItemChar( const u8 p_itemType ) {
         if( p_itemType & ITEMTYPE_BERRY ) { return 472; }
 
-        auto itemType = ( p_itemType & 15 );
+        auto itemType = ( p_itemType & ITEMTYPE_NONFLAG );
 
         switch( itemType ) {
         case ITEMTYPE_POKEBALL: return 473;

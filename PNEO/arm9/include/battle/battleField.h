@@ -40,6 +40,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "gen/abilityNames.h"
 #include "gen/pokemonNames.h"
+#include "io/strings.h"
 #include "pokemon.h"
 
 namespace BATTLE {
@@ -54,7 +55,6 @@ namespace BATTLE {
         static constexpr u8 PKMN_0            = 0;
         static constexpr u8 PKMN_1            = 1;
         static constexpr u8 NUM_SIDES         = 2;
-        static constexpr u8 MAX_PKMN_PER_SIDE = 2;
         static constexpr u8 NORMAL_DURATION   = 5;
         static constexpr u8 EXTENDED_DURATION = 8;
 
@@ -67,7 +67,7 @@ namespace BATTLE {
         terrain _terrain;
         u8      _terrainTimer;
 
-        side _sides[ 2 ];
+        side _sides[ NUM_SIDES ];
 
         bool       _isWildBattle;
         battleMode _mode;
@@ -737,19 +737,21 @@ namespace BATTLE {
 
             u16 item = sc->getItem( );
             removeItem( p_ui, p_sourceOpp, p_sorceSlot, false );
-            char buffer[ 100 ];
+            constexpr u8 TMP_BUFFER_SIZE = 100;
+            char         buffer[ TMP_BUFFER_SIZE + 10 ];
 
             // Check for move item effects
 
-            auto fmt = std::string( GET_STRING( 281 ) );
+            auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_PASS_ITEM_SPECIAL ) );
 
             switch( item ) {
             case I_CHILAN_BERRY2: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                          itemname.c_str( ), itemname.c_str( ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
                 p_ui->log( buffer );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( DEF, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
@@ -758,10 +760,11 @@ namespace BATTLE {
             }
             case I_EGGANT_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                          itemname.c_str( ), itemname.c_str( ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
                 p_ui->log( buffer );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( SDEF, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
@@ -770,10 +773,11 @@ namespace BATTLE {
             }
             case I_NUTPEA_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                          itemname.c_str( ), itemname.c_str( ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
                 p_ui->log( buffer );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( ATK, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
@@ -782,10 +786,11 @@ namespace BATTLE {
             }
             case I_STRIB_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                          itemname.c_str( ), itemname.c_str( ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
                 p_ui->log( buffer );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( SATK, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
@@ -794,10 +799,11 @@ namespace BATTLE {
             }
             case I_YAGO_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                          itemname.c_str( ), itemname.c_str( ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
                 p_ui->log( buffer );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( SPEED, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
@@ -806,14 +812,16 @@ namespace BATTLE {
             }
             case I_TOPO_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, 99, fmt.c_str( ), p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ),
-                          itemname.c_str( ), itemname.c_str( ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
+                          itemname.c_str( ) );
                 p_ui->log( buffer );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 addVolatileStatus( p_ui, p_sourceOpp, p_sorceSlot, VS_PROTECT, 1 );
-                snprintf( buffer, 99, GET_STRING( 282 ), itemname.c_str( ),
+                snprintf( buffer, TMP_BUFFER_SIZE,
+                          GET_STRING( IO::STR_UI_BATTLE_PASS_ITEM_PROTECT_PKMN ), itemname.c_str( ),
                           p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ) );
-                for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+                WAIT( HALF_SEC );
                 return;
             }
                 [[likely]] default : break;
@@ -825,13 +833,14 @@ namespace BATTLE {
         inline void giveItem( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_item ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].giveItem( p_slot, p_item );
 
-            char buffer[ 100 ];
-            auto fmt = std::string( GET_STRING( 284 ) );
-            snprintf( buffer, 99, fmt.c_str( ),
+            constexpr u8 TMP_BUFFER_SIZE = 100;
+            char         buffer[ TMP_BUFFER_SIZE + 10 ];
+            auto         fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_NO_EFFECT_ON ) );
+            snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                       p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
                       FS::getItemName( p_item ).c_str( ) );
             p_ui->log( buffer );
-            for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+            WAIT( HALF_SEC );
         }
 
         /*

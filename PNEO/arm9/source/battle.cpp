@@ -185,7 +185,7 @@ namespace BATTLE {
                 }
             }
 
-            battleMoveSelection moves[ field::NUM_SIDES ][ field::MAX_PKMN_PER_SIDE ]
+            battleMoveSelection moves[ field::NUM_SIDES ][ side::MAX_PKMN_PER_SIDE ]
                 = { {} }; // fieldPosition -> selected move
 
             // Compute player's moves

@@ -42,8 +42,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound/sound.h"
 
 namespace SAVE {
-    constexpr u16 EP_INTRO_TEXT_START[] = { 111 };
-    constexpr u8  EP_INTRO_TEXT_LEN[]   = { 3 };
+    constexpr u16 EP_INTRO_TEXT_START[] = { IO::STR_UI_EP0_TEXT_START };
+    constexpr u8  EP_INTRO_TEXT_LEN[] = { IO::STR_UI_EP0_TEXT_END - IO::STR_UI_EP0_TEXT_START + 1 };
 
     void printTextAndWait( const char* p_text ) {
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
@@ -129,7 +129,7 @@ namespace SAVE {
         for( u8 i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
 
         printTextAndWait( "... ..." );
-        printTextAndWait( GET_STRING( 441 ) );
+        printTextAndWait( GET_STRING( IO::STR_UI_INIT_GAME_TEXT0 ) );
 
         IO::clearScreen( true, true, true );
         SOUND::playBGM( BGM_ROUTE_123 );
@@ -159,8 +159,11 @@ namespace SAVE {
 
         IO::fadeScreen( IO::fadeType::UNFADE, true, true );
 
-        for( u8 i = 0; i < 4; ++i ) { printMBoxTextAndWait( GET_STRING( 442 + i ) ); }
+        for( u8 i = 0; i < 4; ++i ) {
+            printMBoxTextAndWait( GET_STRING( IO::STR_UI_INIT_GAME_TEXT1 + i ) );
+        }
 
+        // poke ball demo animation
         tileCnt = IO::loadSprite( "PB/3/3_0", 22, 3, tileCnt + 32, 76, 46, 32, 32, false, false,
                                   false, OBJPRIORITY_0, true );
 
@@ -252,6 +255,7 @@ namespace SAVE {
         IO::Oam->oamBuffer[ 22 ].isHidden      = true;
         IO::Oam->oamBuffer[ 22 ].isRotateScale = false;
 
+        // pball opened, load pkmn sprite
         pkmnSpriteInfo pinfo
             = { PKMN_LOTAD, 0, false, !( rand( ) & 31 ), false, DEFAULT_SPRITE_PID };
         IO::loadPKMNSprite( pinfo, 40, 36, 23, 3, tileCnt, true );
@@ -259,8 +263,11 @@ namespace SAVE {
         SOUND::playCry( PKMN_LOTAD );
         for( u8 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
 
-        for( u8 i = 0; i < 11; ++i ) { printMBoxTextAndWait( GET_STRING( 446 + i ) ); }
+        for( u8 i = 0; i < 11; ++i ) {
+            printMBoxTextAndWait( GET_STRING( IO::STR_UI_INIT_GAME_TEXT2 + i ) );
+        }
 
+        // run chara creation
         do {
             std::strncpy( SAV.getActiveFile( ).m_playername, "", 12 );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
@@ -289,11 +296,13 @@ namespace SAVE {
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
-            IO::regularFont->printBreakingStringC( GET_STRING( 457 ), 8, 8, 240, true,
-                                                   IO::font::LEFT, 16 );
+            IO::regularFont->printBreakingStringC(
+                GET_STRING( IO::STR_UI_INIT_GAME_CHOOSE_APPEARANCE ), 8, 8, 240, true,
+                IO::font::LEFT, 16 );
 
             IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_LEFT_RIGHT );
 
+            // make player pick an appearance
             SAV.getActiveFile( ).m_appearance = cb.getResult(
                 [ & ]( u8 ) {
                     std::vector<std::pair<IO::inputTarget, u8>> res
@@ -324,12 +333,16 @@ namespace SAVE {
             IO::loadTrainerSprite( SAV.getActiveFile( ).m_appearance, 33, 45, 0, 0, 0, false );
             IO::updateOAM( false );
 
+            // make player pick a name
             dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 50 );
-            IO::regularFont->printBreakingStringC( GET_STRING( 458 ), 8, 4, 40, true,
-                                                   IO::font::LEFT, 13 );
+            IO::regularFont->printBreakingStringC( GET_STRING( IO::STR_UI_INIT_GAME_CHOOSE_NAME ),
+                                                   8, 4, 40, true, IO::font::LEFT, 13 );
 
             auto name = IO::keyboard( ).getText( 10 );
-            if( name == "" ) { name = GET_STRING( 460 + SAV.getActiveFile( ).m_appearance ); }
+            if( name == "" ) {
+                name = GET_STRING( IO::STR_UI_INIT_GAME_DEFAULT_NAME0
+                                   + SAV.getActiveFile( ).m_appearance );
+            }
             std::strncpy( SAV.getActiveFile( ).m_playername, name.c_str( ), 11 );
 
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
@@ -352,6 +365,7 @@ namespace SAVE {
 #define SPR_CHOICE_START_OAM_SUB( p_pos ) ( 7 + 8 * ( p_pos ) )
 #define SPR_BOX_PAL_SUB                   7
 #define SPR_BOX_SEL_PAL_SUB               8
+            // init sprites for yes/no box
             for( u8 i = 0; i < 3; i++ ) {
                 u8 pos = 2 * i;
 
@@ -412,12 +426,13 @@ namespace SAVE {
 #undef SPR_BOX_PAL_SUB
 #undef SPR_BOX_SEL_PAL_SUB
 #undef SPR_CHOICE_START_OAM_SUB
-        } while( IO::yesNoBox( ).getResult(
+        } while( IO::yesNoBox( ).getResult( // make player confirm their chara choice
                      [ & ]( ) {
                          auto res = NAV::printYNMessage( 0, MSG_NORMAL, 253 );
 
-                         IO::regularFont->printBreakingStringC( GET_STRING( 459 ), 8, 8, 240, true,
-                                                                IO::font::LEFT, 16 );
+                         IO::regularFont->printBreakingStringC(
+                             GET_STRING( IO::STR_UI_INIT_GAME_CHARACTER_OK ), 8, 8, 240, true,
+                             IO::font::LEFT, 16 );
                          return res;
                      },
                      [ & ]( IO::yesNoBox::selection p_selection ) {
@@ -425,6 +440,7 @@ namespace SAVE {
                      } )
                  == IO::yesNoBox::NO );
 
+        // re-init sprites for initial game conversation/explanation
         IO::initOAMTable( true );
         IO::initOAMTable( false );
         IO::clearScreen( true, true, true );
@@ -438,7 +454,7 @@ namespace SAVE {
         tileCnt = IO::loadTrainerSprite( 240, 80, 32, 0, 0, tileCnt, true );
         tileCnt = IO::loadPlatform( 10, 48, 16 + 48, 1, 1, tileCnt, true );
 
-        // mbox
+        // load mbox
 
         IO::loadSprite( "UI/mbox1", 10, 2, tileCnt, 14, 192 - 60, 32, 64, false, false, false,
                         OBJPRIORITY_3, true );
@@ -454,12 +470,16 @@ namespace SAVE {
 
         IO::fadeScreen( IO::fadeType::UNFADE, true, true );
 
-        auto p1 = std::string( GET_STRING( 462 ) );
+        auto p1 = std::string( GET_STRING( IO::STR_UI_INIT_GAME_TEXT3 ) );
         p1 += std::string( SAV.getActiveFile( ).m_playername );
-        p1 += std::string( GET_STRING( 463 ) );
+        p1 += std::string( GET_STRING( IO::STR_UI_INIT_GAME_TEXT4 ) );
         printMBoxTextAndWait( p1.c_str( ) );
 
-        for( u8 i = 0; i < 4; ++i ) { printMBoxTextAndWait( GET_STRING( 464 + i ) ); }
+        for( u8 i = 0; i < 4; ++i ) {
+            printMBoxTextAndWait( GET_STRING( IO::STR_UI_INIT_GAME_TEXT5 + i ) );
+        }
+
+        // initialize player data / send player to a reasonable start position on the map
 
         SAV.getActiveFile( ).m_currentMap = 10;
         SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
@@ -485,6 +505,7 @@ namespace SAVE {
 
         switch( p_episode ) {
         case 0:
+            // Initialize character and send them to starting towm
             std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
             SAV.getActiveFile( ).m_appearance = 1;
             SAV.getActiveFile( ).setFlag( F_RIVAL_APPEARANCE,
@@ -495,6 +516,7 @@ namespace SAVE {
                     u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
             SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
 
+            // hand out useful items
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_ACRO_BIKE, 1 );
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_POKE_RADAR, 1 );
@@ -517,168 +539,7 @@ namespace SAVE {
     }
 
     bool startScreen::transferGame( ) {
-        /*
-        IO::clearScreen( true, false, false );
-        char acSlot2Game[ 5 ] = {0};
-
-        sysSetBusOwners( true, true );
-        memcpy( acSlot2Game, (char*) 0x080000AC, 4 );
-
-        char cmpgm[ 5 ][ 4 ] = {"BPE", "AXP", "AXV", "BPR", "BPG"};
-        s8   acgame          = -1;
-
-        for( u8 i = 0; i < 5; ++i )
-            if( !strncmp( cmpgm[ i ], acSlot2Game, 3 ) ) {
-                acgame = i;
-                break;
-            }
-        if( acgame == -1 ) {
-            char buffer[ 50 ];
-            snprintf( buffer, 49, "%s\n(%s)", GET_STRING( 119 ), acSlot2Game );
-            IO::messageBox( buffer, true );
-            IO::clearScreen( true, false, false );
-            return false;
-        }
-
-        IO::yesNoBox yn = IO::yesNoBox( );
-        if( !yn.getResult( GET_STRING( 114 ) ) ) {
-            IO::clearScreen( true, false, false );
-            return false;
-        }
-        IO::clearScreen( true, false, false );
-        IO::messageBox( GET_STRING( 115 ), true );
-        IO::messageBox( GET_STRING( 116 ), true );
-        IO::messageBox( GET_STRING( 117 ), true );
-        IO::messageBox( GET_STRING( 118 ), true );
-        yn = IO::yesNoBox( );
-        if( !yn.getResult( GET_STRING( 120 ) ) ) {
-            IO::clearScreen( true, false, false );
-            return false;
-        }
-        IO::clearScreen( true, false, false );
-        IO::messageBox( GET_STRING( 121 ), true );
-        int loadgame = acgame > 2 ? 1 : 0;
-
-        FS::gen3Parser* save3 = FS::gen3Parser::Instance( );
-
-        if( save3->load( loadgame ) == -1 ) {
-            IO::messageBox( GET_STRING( 122 ), true );
-            IO::clearScreen( true, false, false );
-            return false;
-        }
-        IO::clearScreen( true, false, false );
-
-        SAV.m_activeFile                = p_slot;
-        SAV.getActiveFile( ).m_gameType = TRANSFER;
-
-        char savname[ 8 ] = {0};
-        for( int i = 0; i < 7; ++i ) savname[ i ] = FS::getNText( save3->unpackeddata[ i ] );
-        strcpy( SAV.getActiveFile( ).m_playername, savname );
-
-        SAV.getActiveFile( ).m_isMale = !save3->unpackeddata[ 8 ];
-
-        SAV.getActiveFile( ).m_id = ( save3->unpackeddata[ 11 ] << 8 ) | save3->unpackeddata[ 10 ];
-        SAV.getActiveFile( ).m_sid
-            = ( save3->unpackeddata[ 13 ] << 8 ) | save3->unpackeddata[ 12 ];
-
-        SAV.getActiveFile( ).m_pt.m_hours
-            = ( save3->unpackeddata[ 15 ] << 8 ) | save3->unpackeddata[ 14 ];
-        SAV.getActiveFile( ).m_pt.m_mins = save3->unpackeddata[ 16 ];
-        SAV.getActiveFile( ).m_pt.m_secs = save3->unpackeddata[ 17 ];
-
-        // SAV.getActiveFile( ).m_gba.m_gameid = ( save3->unpackeddata[ 0xaf ] << 24 ) | (
-        // save3->unpackeddata[ 0xae ] << 16 ) | ( save3->unpackeddata[ 0xad ] << 8 ) |
-        // save3->unpackeddata[ 0xac ];
-
-        pkmnData p;
-        for( u8 i = 0; i < 6; ++i ) {
-            if( save3->pokemon[ i ]->personality ) {
-
-                pokemon&             acPkmn  = SAV.getActiveFile( ).m_pkmnTeam[ i ];
-                FS::belt_pokemon_t*& acBeltP = save3->pokemon[ i ];
-
-                acPkmn.m_boxdata.m_pid   = acBeltP->personality;
-                acPkmn.m_boxdata.m_oTSid = acBeltP->otid >> 16;
-                acPkmn.m_boxdata.m_oTId  = acBeltP->otid % ( 1 << 16 );
-                for( u8 j = 0; j < 10; ++j )
-                    acPkmn.m_boxdata.m_name[ j ] = FS::getNText( acBeltP->name[ j ] );
-                acPkmn.m_boxdata.m_name[ 10 ] = 0;
-                acPkmn.m_boxdata.m_hometown   = acBeltP->language;
-                for( u8 j = 0; j < 7; ++j )
-                    acPkmn.m_boxdata.m_oT[ j ] = FS::getNText( acBeltP->otname[ j ] );
-                acPkmn.m_boxdata.m_oT[ 7 ]  = 0;
-
-                acPkmn.m_statusint         = acBeltP->status;
-                acPkmn.m_level             = acBeltP->level;
-                acPkmn.m_boxdata.m_pokerus = acBeltP->pokerus;
-
-                acPkmn.m_stats.m_curHP  = acBeltP->currentHP;
-                acPkmn.m_stats.m_maxHP = acBeltP->maxHP;
-                acPkmn.m_stats.m_Atk   = acBeltP->move;
-                acPkmn.m_stats.m_Def   = acBeltP->defense;
-                acPkmn.m_stats.m_SAtk  = acBeltP->spatk;
-                acPkmn.m_stats.m_SDef  = acBeltP->spdef;
-                acPkmn.m_stats.m_Spd   = acBeltP->speed;
-
-                FS::gen3Pokemon::pokemon_growth_t*& acBG = save3->pokemon_growth[ i ];
-                acPkmn.m_boxdata.m_speciesId             = FS::getNPKMNIdx( acBG->species );
-                acPkmn.m_boxdata.m_heldItem              = FS::getNItemIdx( acBG->held );
-                acPkmn.m_boxdata.m_experienceGained      = acBG->xp;
-                acPkmn.m_boxdata.m_steps                 = acBG->happiness;
-                acPkmn.m_boxdata.m_pPUps                 = acBG->ppbonuses;
-
-                FS::gen3Pokemon::pokemon_moves_t*& acBA = save3->pokemon_moves[ i ];
-                for( u8 j = 0; j < 4; ++j ) {
-                    acPkmn.m_boxdata.m_moves[ j ] = acBA->atk[ j ];
-                    acPkmn.m_boxdata.m_curPP[ j ] = acBA->pp[ j ];
-                }
-
-                FS::gen3Pokemon::pokemon_effort_t*& acBE = save3->pokemon_effort[ i ];
-                for( u8 j = 0; j < 6; ++j ) {
-                    acPkmn.m_boxdata.m_effortValues[ j ] = acBE->EV[ j ];
-                    acPkmn.m_boxdata.m_contestStats[ j ] = acBE->ConStat[ j ];
-                }
-
-                FS::gen3Pokemon::pokemon_misc_t*& acBM = save3->pokemon_misc[ i ];
-                acPkmn.m_boxdata.m_iVint               = acBM->IVint;
-
-                p = getPkmnData( acPkmn.getSpecies( ) );
-                acPkmn.m_boxdata.m_ability
-                    = p.m_baseForme.m_abilities[ acPkmn.isEgg( ) ];
-                acPkmn.m_boxdata.setIsEgg( acPkmn.m_boxdata.isNicknamed( ) );
-                acPkmn.m_boxdata.m_gotPlace = FS::getNLocation( acBM->locationcaught );
-
-                acPkmn.m_boxdata.m_gotLevel = acBM->levelcaught;
-
-                if( acPkmn.isEgg( ) || acPkmn.m_boxdata.m_gotLevel ) {
-                    acPkmn.m_boxdata.m_hatchPlace           = 999;
-                    acPkmn.m_boxdata.m_gotLevel             = 5;
-                    acPkmn.m_boxdata.m_hatchDate[ 0 ]       = acPkmn.m_boxdata.m_hatchDate[ 1 ]
-                        = acPkmn.m_boxdata.m_hatchDate[ 2 ] = 0;
-                    acPkmn.m_boxdata.m_gotDate[ 0 ]         = acPkmn.m_boxdata.m_gotDate[ 1 ]
-                        = acPkmn.m_boxdata.m_gotDate[ 2 ]   = 1;
-                }
-                acPkmn.m_boxdata.m_oTisFemale         = acBM->tgender;
-                acPkmn.m_boxdata.m_ball               = acBM->pokeball;
-                acPkmn.m_boxdata.m_gotDate[ 0 ]       = acPkmn.m_boxdata.m_gotDate[ 1 ]
-                    = acPkmn.m_boxdata.m_gotDate[ 2 ] = 0;
-            }
-        }
-
-        IO::messageBox( GET_STRING( 123 ), true );
-        IO::clearScreen( true, false, false );
-
-        SAV.getActiveFile( ).m_player     = {MAP::mapObject::PLYR,
-                                          {104, 120, 5},
-                                          SAV.getActiveFile( ).m_isMale ? (u16) 0 : (u16) 10,
-                                          MAP::moveMode::WALK,
-                                          0,
-                                          0,
-                                          MAP::direction::RIGHT};
-        SAV.getActiveFile( ).m_isMale     = true;
-        SAV.getActiveFile( ).m_currentMap = 10;
-
-*/
+        // TODO
         return false;
     }
 } // namespace SAVE

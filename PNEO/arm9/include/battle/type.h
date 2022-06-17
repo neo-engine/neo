@@ -28,6 +28,8 @@
 #pragma once
 
 namespace BATTLE {
+    constexpr u8 NUM_TYPES = 19;
+
     enum type : u8 {
         TYPE_NORMAL    = 0,
         TYPE_FIGHTING  = 1,
@@ -59,7 +61,7 @@ namespace BATTLE {
         CONTEST_TYPE_CUTE      = 5
     };
 
-    constexpr u8 TypeEffectiveness[ 19 ][ 19 ] = {
+    constexpr u8 TypeEffectiveness[ NUM_TYPES ][ NUM_TYPES ] = {
         { 100, 100, 100, 100, 100, 50, 100, 0, 50, 75, 100, 100, 100, 100, 100, 100, 100, 100,
           100 }, // Normal
         { 200, 100, 50, 50, 100, 200, 50, 0, 200, 75, 100, 100, 100, 100, 50, 200, 100, 200,

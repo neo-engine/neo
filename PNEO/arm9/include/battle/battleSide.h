@@ -47,11 +47,14 @@ namespace BATTLE {
      * @brief: A side of the field.
      */
     class side {
+      public:
+        static constexpr u8 MAX_PKMN_PER_SIDE = 2;
+
       private:
         u8 _sideConditionCounter[ MAX_SIDE_CONDITIONS ]; // Counts turns that side con is active
         u8 _sideConditionAmount[ MAX_SIDE_CONDITIONS ];
 
-        slot _slots[ 2 ];
+        slot _slots[ MAX_PKMN_PER_SIDE ];
 
       public:
         side( ) {
@@ -125,7 +128,7 @@ namespace BATTLE {
 #ifdef DESQUID_MORE
                         // TODO: proper log
                         p_ui->log( "Set side condition " + std::to_string( 1LLU << i ) );
-                        for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
+                        WAIT( HALF_SEC );
 #else
                         (void) p_ui;
 #endif
@@ -145,7 +148,7 @@ namespace BATTLE {
 #ifdef DESQUID_MORE
                     // TODO: proper log
                     p_ui->log( "Remove side condition " + std::to_string( 1LLU << i ) );
-                    for( u8 x = 0; x < 30; ++x ) { swiWaitForVBlank( ); }
+                    WAIT( HALF_SEC );
 #else
                     (void) p_ui;
 #endif

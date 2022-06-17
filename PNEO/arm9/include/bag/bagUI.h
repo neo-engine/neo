@@ -39,8 +39,6 @@ namespace BAG {
     constexpr u8 MOVE_ITEM = 3;
     constexpr u8 MOVE_BAG  = 4;
 
-    constexpr u8 BAG_CNT = 5;
-
     constexpr u8 MAX_ITEMS_PER_PAGE = 8;
     class bagUI {
       private:

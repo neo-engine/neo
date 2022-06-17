@@ -36,6 +36,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/pokemonNames.h"
 #include "pokemonData.h"
 
+/*
+ * @brief: holds information that is sufficient to construct a behaviourally consistent
+ * pkmn.
+ */
 struct trainerPokemon {
     u16 m_speciesId;
     u8  m_forme;
@@ -57,6 +61,10 @@ struct trainerPokemon {
     }
 };
 
+/*
+ * @brief: stores non-volatile data of a pkmn, i.e., data preserved even when depositing a
+ * pkmn to the pkmn storage system.
+ */
 struct boxPokemon {
     u32 m_pid      = 0;
     u16 m_checksum = 0;
@@ -319,6 +327,10 @@ struct boxPokemon {
 };
 static_assert( std::is_trivially_copyable<boxPokemon>::value, "" );
 
+/*
+ * @brief: stores boxdata and additionally volatile pkmn data, i.e., data that is lost when
+ * depositing the pkmn to the storage system.
+ */
 struct pokemon {
   public:
     boxPokemon m_boxdata;

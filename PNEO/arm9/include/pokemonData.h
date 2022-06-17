@@ -247,6 +247,9 @@ constexpr u8 NatMod[ 25 ][ 5 ] = {
  */
 constexpr u32 MAX_EXP = 1640000;
 
+/*
+ * @brief: lut for speed; min exp required to reach a certain level.
+ */
 constexpr u32 EXP[ 100 ][ 6 ] = { { 0, 0, 0, 0, 0, 0 },
                                   { 15, 6, 8, 9, 10, 4 },
                                   { 52, 21, 27, 57, 33, 13 },

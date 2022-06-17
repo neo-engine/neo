@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "bag/bag.h"
 #include "bag/bagUI.h"
 #include "bag/item.h"
+#include "io/strings.h"
 #include "io/uio.h"
 
 namespace BAG {
@@ -83,18 +84,18 @@ namespace BAG {
 
         void waitForInteract( );
 
-        constexpr u16 getTextForChoice( const choice p_choice ) const {
+        constexpr u16 getTextForChoice( choice p_choice ) const {
             switch( p_choice ) {
-            case DEREGISTER_ITEM: return 402;
-            case REGISTER_ITEM: return 46;
-            case TOSS_ITEM: return 48; return 47;
-            case GIVE_ITEM: return 44;
+            case DEREGISTER_ITEM: return IO::STR_UI_BAG_ITEM_DEREGISTER;
+            case REGISTER_ITEM: return IO::STR_UI_BAG_ITEM_REGISTER;
+            case TOSS_ITEM: return IO::STR_UI_BAG_ITEM_TOSS;
+            case GIVE_ITEM: return IO::STR_UI_BAG_ITEM_GIVE;
             case USE_ITEM:
-            case USE_TM:
-            case APPLY_ITEM: return 47;
-            case VIEW_DETAILS: return 401;
-            case BACK: return 330;
-            case SELL: return 483;
+            case USE_TM: return IO::STR_UI_BAG_ITEM_USE;
+            case APPLY_ITEM: return IO::STR_UI_BAG_ITEM_APPLY;
+            case VIEW_DETAILS: return IO::STR_UI_BAG_ITEM_DETAILS;
+            case BACK: return IO::STR_UI_CANCEL;
+            case SELL: return IO::STR_UI_BAG_ITEM_SELL;
             }
             return 0;
         }

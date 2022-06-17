@@ -48,6 +48,7 @@ namespace IO {
         counter( s32 p_minValue, s32 p_maxValue )
             : _minValue( p_minValue ), _maxValue( p_maxValue ) {
         }
+
         /*
          * @brief: Opens a counter and returns the player's selection.
          * @param p_drawFunction: Callback used to draw the counter. (the special value

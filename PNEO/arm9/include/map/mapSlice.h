@@ -43,18 +43,23 @@ namespace MAP {
     constexpr u16     SIZE          = 32;
     constexpr s16     dir[ 4 ][ 2 ] = { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
 
-    typedef struct {
-        u16 m_pal[ 16 ];
-    } palette;
-    typedef struct {
+    constexpr u8 COLORS_PER_PAL    = 16;
+    constexpr u8 PALS_PER_BLOCKSET = 8;
+
+    struct palette {
+        u16 m_pal[ COLORS_PER_PAL ];
+    };
+
+    struct tile {
         u8 m_tile[ 32 ];
-    } tile;
-    // typedef struct{
+    };
+
+    // struct blockAtom {
     //    u16 m_tileidx   : 10;
     //    u8 m_vflip      :  1;
     //    u8 m_hflip      :  1;
     //    u8 m_palno      :  4;
-    //}blockAtom;
+    // };
     typedef u16 blockAtom;
 
     class block {
@@ -123,7 +128,7 @@ namespace MAP {
     struct mapSlice {
         bool         m_loaded = false;
         u16          m_x = 0, m_y = 0;
-        palette      m_pals[ 16 * 5 ];
+        palette      m_pals[ 2 * PALS_PER_BLOCKSET * DAYTIMES ];
         tileSet      m_tileSet;
         blockSet     m_blockSet;
         mapSliceData m_data;

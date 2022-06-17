@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include <vector>
+#include "io/strings.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
 #include "save/saveGame.h"
@@ -48,11 +49,11 @@ namespace SAVE {
 
         constexpr u16 getTextForMainChoice( choice p_choice ) const {
             switch( p_choice ) {
-            case CONTINUE: return 71;
-            case NEW_GAME: return 72;
-            case SPECIAL_EPISODE: return 73;
-            case TRANSFER_GAME: return 74;
-            case MYSTERY_GIFT: return 404;
+            case CONTINUE: return IO::STR_UI_CONTINUE;
+            case NEW_GAME: return IO::STR_UI_NEW_GAME;
+            case SPECIAL_EPISODE: return IO::STR_UI_SPECIAL_EPISODE;
+            case TRANSFER_GAME: return IO::STR_UI_TRANSFER_GAME;
+            case MYSTERY_GIFT: return IO::STR_UI_MYSTERY_GIFT;
             default: return 0;
             }
         }

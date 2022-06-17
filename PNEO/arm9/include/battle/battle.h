@@ -44,6 +44,7 @@
 #include "gen/abilityNames.h"
 #include "gen/pokemonNames.h"
 #include "pokemon.h"
+#include "save/saveGame.h"
 
 namespace BATTLE {
     class battle {
@@ -70,17 +71,17 @@ namespace BATTLE {
         battleUI _battleUI;
 
         battleTrainer _opponent;
-        pokemon       _opponentTeam[ 6 ];
-        std::set<u8>
-            _yieldEXP[ 6 ]; // idx's of the player's pkmn that will receive EXP when the pkmn faints
-        u8  _opponentTeamSize;
-        u8  _opponentPkmnPerm[ 6 ];
+        pokemon       _opponentTeam[ SAVE::NUM_PARTY_SLOTS ];
+        std::set<u8>  _yieldEXP[ SAVE::NUM_PARTY_SLOTS ]; // idx's of the player's pkmn that will
+                                                          // receive EXP when the pkmn faints
+        u8 _opponentTeamSize;
+        u8 _opponentPkmnPerm[ SAVE::NUM_PARTY_SLOTS ];
 
         pokemon* _playerTeam;
         u8       _playerTeamSize;
-        u8       _playerPkmnPerm[ 6 ];
+        u8       _playerPkmnPerm[ SAVE::NUM_PARTY_SLOTS ];
 
-        u8 _playerPkmnOrigLevel[ 6 ]; // unaffected by permutation
+        u8 _playerPkmnOrigLevel[ SAVE::NUM_PARTY_SLOTS ]; // unaffected by permutation
 
         battlePolicy _policy;
         bool         _isWildBattle;

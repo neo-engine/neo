@@ -404,6 +404,7 @@ namespace BATTLE {
         MF_OHKOICE = ( 1ULL << 47 ),
     };
 
+    constexpr u8 NUM_MOVE_HIT_TYPES = 3;
     enum moveHitTypes : u8 { MH_NONE = 0, MH_PHYSICAL = 1, MH_SPECIAL = 2, MH_STATUS = 3 };
 
     enum target : u8 {

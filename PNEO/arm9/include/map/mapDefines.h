@@ -32,37 +32,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
 
-#define MAP_HOENN        10
-#define MAP_METEOR_FALLS 11
-#define MAP_DESERT_RUINS 12
-#define MAP_ISLAND_CAVE  13
-#define MAP_ANCIENT_TOMB 14
-
-#define MAP_KANTO              110
-#define MAP_TOHJO_FALLS        111
-#define MAP_KANTO_VICTORY_ROAD 112
-#define MAP_VIRIDIAN_FOREST    113
-#define MAP_SEAFOAM_ISLANDS    114
-#define MAP_MT_MOON            115
-#define MAP_DIGLETTS_CAVE      116
-#define MAP_ROCK_TUNNEL        117
-#define MAP_CERULEAN_CAVE      118
-
-#define MAP_JOHTO         210
-#define MAP_DARK_CAVE     211
-#define MAP_SPROUT_TOWER  212
-#define MAP_RUINS_OF_ALPH 213
-#define MAP_UNION_CAVE    214
-#define MAP_SLOWPOKE_WELL 215
-#define MAP_ILEX_FOREST   216
-#define MAP_NATIONAL_PARK 217
-#define MAP_BURNED_TOWER  218
-#define MAP_BELL_TOWER    219
-#define MAP_WHIRL_ISLANDS 220
-#define MAP_MT_MORTAR     221
-#define MAP_ICE_PATH      222
-#define MAP_DRAGONS_DEN   223
-
 namespace MAP {
     constexpr u8 NUM_ROWS         = 16;
     constexpr u8 NUM_COLS         = 32;
@@ -166,6 +135,7 @@ namespace MAP {
         EVENT_BERRYTREE   = 9,
         EVENT_NPC_MESSAGE = 10,
     };
+
     enum eventTrigger : u8 {
         TRIGGER_NONE           = 0,
         TRIGGER_STEP_ON        = ( 1 << 0 ),
@@ -200,6 +170,7 @@ namespace MAP {
         POKE_TORE,
         SWARM,
     };
+
     enum mapWeather : u16 {
         NOTHING         = 0, // Inside
         SUNNY           = 1,
@@ -224,7 +195,9 @@ namespace MAP {
         DARK_FLASH_1    = 0x14, // dewford gym defeated 1-2 trainers
         DARK_FLASH_2    = 0x15, // dewford gym defeated 3-4 trainers
     };
+
     enum mapType : u8 { OUTSIDE = 0, CAVE = 1, INSIDE = 2, DARK = 4, FLASHABLE = 8 };
+
     enum warpType : u8 {
         NO_SPECIAL,
         CAVE_ENTRY,
@@ -338,7 +311,7 @@ namespace MAP {
         u8 m_sizeX   = 0;
         u8 m_sizeY   = 0;
         u8 m_mapMode = 0; // 0: normal maps/data in folder, 1: scattered in subfolders, 2: combined
-                          // (ignored, assumed 2)
+                          // (ignored, assumed to be 2)
         u8 : 8;
         u32 : 32;
 

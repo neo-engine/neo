@@ -61,6 +61,10 @@ namespace MAP {
     constexpr u8 TIER_FOR_STREAK[ TIER_MAX_STREAK ]
         = { TIER_BAD, TIER_BAD, TIER_AVERAGE, TIER_AVERAGE, TIER_GOOD };
 
+    /*
+     * @brief: returns the general strength tier (as agrred upon by the competitive scene) of the
+     * specified pkmn species.
+     */
     constexpr u8 getTier( u16 p_species ) {
         switch( p_species ) {
         case PKMN_MEWTWO:

@@ -40,14 +40,6 @@ namespace IO {
     extern const char* TRAINER_PATH;
     extern const char* BERRY_PATH;
 
-    extern const unsigned int*   TypeTiles[ 19 ][ 2 ];
-    extern const unsigned short* TypePals[ 19 ][ 2 ];
-    extern const unsigned int*   HitTypeTiles[ 3 ];
-    extern const unsigned short* HitTypePals[ 3 ];
-#define MAX_PLATFORMS 12
-    extern const unsigned int*   PlatformTiles[ 2 * MAX_PLATFORMS ];
-    extern const unsigned short* PlatformPals[ MAX_PLATFORMS ];
-
     struct SpriteInfo {
         u8           m_oamId;
         u8           m_width;

@@ -33,23 +33,25 @@
 #include "defines.h"
 
 namespace BAG {
+    constexpr u16 BAG_TYPES = 5;
+
     class bag {
       private:
-        static const u16 ITEM_START      = 0;
-        static const u16 MEDICINE_START  = 500;
-        static const u16 TM_HM_START     = 625;
-        static const u16 BERRIES_START   = 850;
-        static const u16 KEY_ITEMS_START = 950;
+        static constexpr u16 ITEM_START      = 0;
+        static constexpr u16 MEDICINE_START  = 500;
+        static constexpr u16 TM_HM_START     = 625;
+        static constexpr u16 BERRIES_START   = 850;
+        static constexpr u16 KEY_ITEMS_START = 950;
 
-        u16                 _startIdx[ 6 ] = { ITEM_START,    MEDICINE_START,  TM_HM_START,
-                               BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG };
+        u16 _startIdx[ BAG_TYPES + 1 ] = { ITEM_START,    MEDICINE_START,  TM_HM_START,
+                                           BERRIES_START, KEY_ITEMS_START, MAX_ITEMS_IN_BAG };
         std::pair<u16, u16> _items[ MAX_ITEMS_IN_BAG ];
-        u16                 _nextFree[ 5 ];
+        u16                 _nextFree[ BAG_TYPES ];
 
       public:
         enum bagType { ITEMS, MEDICINE, TM_HM, BERRIES, KEY_ITEMS };
         bag( ) {
-            for( u8 i = 0; i < 5; ++i ) _nextFree[ i ] = _startIdx[ i ];
+            for( u8 i = 0; i < BAG_TYPES; ++i ) _nextFree[ i ] = _startIdx[ i ];
         }
 
         /*
@@ -129,7 +131,9 @@ namespace BAG {
     constexpr bag::bagType toBagType( u8 p_itemType ) {
         if( p_itemType & ITEMTYPE_BERRY ) { return bag::bagType::BERRIES; }
 
-        if( ( p_itemType & 15 ) == ITEMTYPE_MEDICINE ) { return bag::bagType::MEDICINE; }
+        if( ( p_itemType & ITEMTYPE_NONFLAG ) == ITEMTYPE_MEDICINE ) {
+            return bag::bagType::MEDICINE;
+        }
 
         switch( p_itemType ) {
         case ITEMTYPE_FORMECHANGE:

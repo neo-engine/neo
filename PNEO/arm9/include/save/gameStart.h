@@ -30,6 +30,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 namespace SAVE {
+    /*
+     * @brief: Initialzes the specified special episode (i.e. setting up the save game
+     * data structure, displaying introductory messages, etc.)
+     * @returns: true on success.
+     */
     bool initSpecialEpisode( s8 p_episode );
+
+    /*
+     * @brief: Prints white-on-black text centered on the sreen; blocks until player
+     * interaction.
+     */
     void printTextAndWait( const char* p_text );
-}
+} // namespace SAVE

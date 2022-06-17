@@ -535,12 +535,13 @@ namespace BAG {
         } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
             SOUND::playSoundEffect( SFX_SELECT );
             _currSelectedIdx = 0;
-            selectPage( SAVE::SAV.getActiveFile( ).m_lstBag = ( curBg + BAG_CNT - 1 ) % BAG_CNT );
+            selectPage( SAVE::SAV.getActiveFile( ).m_lstBag
+                        = ( curBg + BAG_TYPES - 1 ) % BAG_TYPES );
             cooldown = COOLDOWN_COUNT;
         } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
             SOUND::playSoundEffect( SFX_SELECT );
             _currSelectedIdx = 0;
-            selectPage( SAVE::SAV.getActiveFile( ).m_lstBag = ( curBg + 1 ) % BAG_CNT );
+            selectPage( SAVE::SAV.getActiveFile( ).m_lstBag = ( curBg + 1 ) % BAG_TYPES );
 
             cooldown = COOLDOWN_COUNT;
         } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {

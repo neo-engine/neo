@@ -32,7 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/uio.h"
 
 namespace IO {
-#define MAX_KEYBOARD_PAGES 5
+    constexpr u8 MAX_KEYBOARD_PAGES = 5;
     class keyboard {
       private:
         u8 _page   = 0;
