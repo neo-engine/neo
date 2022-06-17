@@ -164,7 +164,12 @@ namespace BAG {
         u8 handleSomeInput( bool p_allowSort = true );
 
       public:
+        /*
+         * @brief: Initializes a new bagViewer.
+         * @param p_playerTeam: Player's party which is to be displayed in the bag.
+         */
         bagViewer( pokemon* p_playerTeam, context p_context = NO_SPECIAL_CONTEXT );
+
         ~bagViewer( ) {
             delete _bagUI;
         }

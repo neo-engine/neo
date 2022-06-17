@@ -74,15 +74,50 @@ namespace FS {
     bool readFsInfo( );
 
     namespace CARD {
+        /*
+         * @brief: Check if an (emulated) flash storage device is available and usable.
+         */
         bool checkCard( );
 
+        /*
+         * @brief: Wait until the latest flash mem op completes.
+         */
         void waitBusy( );
+
+        /*
+         * @brief: Wait until the latest write to flash mem completes.
+         */
         void waitWriteInProgress( );
-        u8   transfer( u8 p_data );
+
+        /*
+         * @brief: Write data to REG_AUXSPIDATA and read the possibly different result
+         * of the write op from REG_AUXSPIDATA.
+         */
+        u8 transfer( u8 p_data );
+
+        /*
+         * @brief: Alias for transfer that ignores the return value.
+         */
         void write( u8 p_data );
 
+        /*
+         * @brief: Read p_cnt bytes from flash mem address p_address into p_out.
+         */
         void readData( u32 p_address, u8* p_out, u32 p_cnt );
+
+        /*
+         * @brief: Write p_cnt bytes from p_data to flash mem (starting from flash mem
+         * address 0).
+         * @param p_progress: callback that is called whenever a block (256 bytes) has been
+         * successfully written; gets #num blocks written and #total blocks to be written
+         * as parameters.
+         */
         bool writeData( u8* p_data, u32 p_cnt, std::function<void( u16, u16 )> p_progress );
-        bool writeData( u32 p_addressr, u8* p_data, u32 p_cnt );
+
+        /*
+         * @brief: Write p_cnt bytes from p_data to flash memory starting from flash mem
+         * address p_address.
+         */
+        bool writeData( u32 p_address, u8* p_data, u32 p_cnt );
     } // namespace CARD
 } // namespace FS

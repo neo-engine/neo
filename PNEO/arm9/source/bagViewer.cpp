@@ -95,7 +95,11 @@ namespace BAG {
         }
     }
 
+    /*
+     * @brief: Returns if an item (identified by its index no) can be held by a pkmn.
+     */
     bool canGive( u16 p_itemId ) {
+        // hard code items for speed
         constexpr u16 NO_GIVE_ITEMS[ 30 ] = {
             I_TEA,          I_MYSTIC_TICKET,  I_AUTOGRAPH,     I_BIKE_VOUCHER, I_FAME_CHECKER,
             I_BERRY_POUCH,  I_TEACHY_TV,      I_POWDER_JAR,    I_EXP_ALL,      I_LOCK_CAPSULE,
@@ -132,6 +136,7 @@ namespace BAG {
         if( _context == NO_SPECIAL_CONTEXT || _context == SELL_ITEM ) {
             return true;
         } else if( _context == BATTLE || _context == WILD_BATTLE ) {
+            // hard code items for speed.
             constexpr u16 BATTLE_ITEMS[ 75 ] = {
                 I_POTION,          I_ANTIDOTE,      I_BURN_HEAL,        I_ICE_HEAL,
                 I_AWAKENING,       I_PARALYZE_HEAL, I_FULL_RESTORE,     I_MAX_POTION,

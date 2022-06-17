@@ -206,12 +206,15 @@ namespace BATTLE {
                 }
 
                 if( moves[ field::PLAYER_SIDE ][ field::PKMN_0 ].m_type == MT_RUN ) {
+                    // player wants to run, cancel any selected moves
                     moves[ field::PLAYER_SIDE ][ field::PKMN_0 ] = NO_OP_SELECTION;
                     moves[ field::PLAYER_SIDE ][ field::PKMN_1 ] = NO_OP_SELECTION;
                     playerWillRun                                = true;
                     break;
                 }
                 if( moves[ field::PLAYER_SIDE ][ field::PKMN_0 ].m_type == MT_CAPTURE ) {
+                    // player wants to catch a wild pkmn, cancel any moves
+                    // m_param contains the type of poke ball the player wishes to throw
                     playerWillCatch = moves[ field::PLAYER_SIDE ][ field::PKMN_0 ].m_param;
                     moves[ field::PLAYER_SIDE ][ field::PKMN_0 ] = NO_OP_SELECTION;
                     moves[ field::PLAYER_SIDE ][ field::PKMN_1 ] = NO_OP_SELECTION;
@@ -235,13 +238,14 @@ namespace BATTLE {
                     }
 
                     if( moves[ field::PLAYER_SIDE ][ field::PKMN_1 ].m_type == MT_RUN ) {
-                        // player wants to run, cancel any selected moves for pkmn 0
+                        // player wants to run, cancel any selected moves
                         moves[ field::PLAYER_SIDE ][ field::PKMN_0 ] = NO_OP_SELECTION;
                         moves[ field::PLAYER_SIDE ][ field::PKMN_1 ] = NO_OP_SELECTION;
                         playerWillRun                                = true;
                     }
                     if( moves[ field::PLAYER_SIDE ][ field::PKMN_1 ].m_type == MT_CAPTURE ) {
-                        // player wants to catch a wild pkmn, cancel any move for pkmn 0
+                        // player wants to catch a wild pkmn, cancel any moves
+                        // m_param contains the type of poke ball the player wishes to throw
                         playerWillCatch = moves[ field::PLAYER_SIDE ][ field::PKMN_1 ].m_param;
                         moves[ field::PLAYER_SIDE ][ field::PKMN_0 ] = NO_OP_SELECTION;
                         moves[ field::PLAYER_SIDE ][ field::PKMN_1 ] = NO_OP_SELECTION;
@@ -290,6 +294,7 @@ namespace BATTLE {
                 endBattle( battleEnd = BATTLE_RUN );
                 return battleEnd;
             } else if( playerWillRun ) [[unlikely]] {
+                // escape failed
                 _battleUI.log( std::string( GET_STRING( IO::STR_UI_BATTLE_COULDNT_ESCAPE ) ) );
                 WAIT( THREE_QUARTER_SEC );
             }

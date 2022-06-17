@@ -123,9 +123,8 @@ namespace FS::CARD {
         while( p_address < addr_end ) {
             // set WEL (Write Enable Latch)
             write( 0x40, 0x06 );
-            write( 0x00,
-                        0x00 ); // This should not be necessary, but desmume seems to think otherwise
-                           // (just write( 0, 6 ); suffices for melonDS)
+            write( 0x00, 0x00 ); // This should not be necessary, but desmume seems to think
+                                 // otherwise (just write( 0, 6 ); suffices for melonDS)
 
             swiDelay( 14 );
 

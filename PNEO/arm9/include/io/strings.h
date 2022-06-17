@@ -225,6 +225,24 @@ namespace IO {
     constexpr u16 STR_UI_BATTLE_PREPARE_FOCUS_PUNCH = 270;
     constexpr u16 STR_UI_BATTLE_PREPARE_BEAK_BLAST  = 271;
 
+    constexpr u16 STR_UI_BATTLE_DRINK_ITEM              = 539;
+    constexpr u16 STR_UI_BATTLE_ACTIVATE_ITEM           = 537;
+    constexpr u16 STR_UI_BATTLE_EAT_ITEM                = 279;
+    constexpr u16 STR_UI_BATTLE_EAT_ITEM_HEAL_CONFUSION = 278;
+    constexpr u16 STR_UI_BATTLE_ACTIVATE_AIR_BALLON     = 538;
+
+    constexpr u16 STR_UI_BATTLE_HARMED_BY_NIGHTMARE = 536;
+    constexpr u16 STR_UI_BATTLE_HEALED_BY_AQUA_RING = 535;
+    constexpr u16 STR_UI_BATTLE_HEALED_BY_INGRAIN   = 534;
+    constexpr u16 STR_UI_BATTLE_HARMED_BY_CURSE     = 533;
+
+    constexpr u16 STR_UI_BATTLE_MEGA_EVOLVE_WISH         = 307;
+    constexpr u16 STR_UI_BATTLE_MEGA_EVOLVE_WISH_GRANTED = 308;
+
+    constexpr u16 STR_UI_BATTLE_TERRAIN_NO_CHANGE = 140;
+
+    constexpr u16 STR_UI_BATTLE_CONFUSION_HEALED = 294;
+
     constexpr u16 STR_UI_BATTLE_WIN_MONEY  = 552;
     constexpr u16 STR_UI_BATTLE_LOSE_MONEY = 553;
 
@@ -235,8 +253,6 @@ namespace IO {
     constexpr u16 STR_UI_BATTLE_PLAYER_USED_ITEM  = 50;
 
     constexpr u16 STR_UI_BATTLE_NOTHING_HAPPENED = 171;
-
-    constexpr u16 STR_UI_BATTLE_CONFUSION_HEALED = 294;
 
     constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_SUCC              = 486;
     constexpr u16 STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_0 = 487;
