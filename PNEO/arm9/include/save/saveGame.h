@@ -42,7 +42,7 @@ namespace SAVE {
     // #ifdef FLASHCARD
     //    constexpr u8 MAX_SAVE_FILES = 1;
     // #else
-    constexpr u8 MAX_SAVE_FILES = 3;
+    constexpr u8 MAX_SAVE_FILES = 2;
     // #endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
