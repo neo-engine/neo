@@ -591,6 +591,16 @@ namespace MAP {
         void slidePlayer( direction p_direction );
         void walkPlayer( direction p_direction, bool p_fast = false );
 
+        /*
+         * @brief: playes the fly animation and warps the player to the specified
+         * position.
+         */
+        void flyPlayer( warpPos p_target );
+
+        /*
+         * @brief: warps the player to the specified position using the specified
+         * animation.
+         */
         void warpPlayer( warpType p_type, warpPos p_target );
 
         /*

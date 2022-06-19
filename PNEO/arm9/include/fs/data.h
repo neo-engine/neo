@@ -75,6 +75,12 @@ namespace FS {
     u16 mugForLocation( u16 p_locationId );
     u16 BGMforLocation( u16 p_locationId );
 
+    /*
+     * @brief: Loads location data into MAP_LOCATIONS for the specified bank; returns true
+     * on success.
+     */
+    bool loadLocationData( u8 p_bank );
+
     // sprite / picture data
 
     // bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );

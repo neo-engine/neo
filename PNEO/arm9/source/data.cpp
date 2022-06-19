@@ -54,8 +54,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace FS {
-    const char PKMNDATA_PATH[] = "nitro:/PKMNDATA/";
-    const char SCRIPT_PATH[]   = "nitro:/DATA/MAP_SCRIPT/";
+    const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
+    const char SCRIPT_PATH[]      = "nitro:/DATA/MAP_SCRIPT/";
+    const char MAPLOCATION_PATH[] = "nitro:/DATA/MAP_LOCATION/";
 
 #ifndef NO_SOUND
     const char CRY_PATH[]  = "nitro:/SOUND/CRIES/";
@@ -175,6 +176,30 @@ namespace FS {
 
     FILE* openScript( u16 p_scriptId ) {
         return openSplit( SCRIPT_PATH, p_scriptId, ".mapscr", 10 * 30 );
+    }
+
+    bool loadLocationData( u8 p_bank ) {
+        FILE* f = open( MAPLOCATION_PATH, p_bank, ".loc.data" );
+        if( !f ) {
+            MAP::MAP_LOCATIONS.m_good = false;
+            MAP::MAP_LOCATIONS.m_bank = 0;
+            return false;
+        }
+
+        fread( &MAP::MAP_LOCATIONS.m_owMapSizeX, sizeof( u8 ), 1, f );
+        fread( &MAP::MAP_LOCATIONS.m_owMapSizeY, sizeof( u8 ), 1, f );
+        fread( &MAP::MAP_LOCATIONS.m_defaultLocation, sizeof( u16 ), 1, f );
+
+        MAP::MAP_LOCATIONS.m_locationData.resize( MAP::MAP_LOCATIONS.m_owMapSizeX
+                                                  * MAP::MAP_LOCATIONS.m_owMapSizeY );
+
+        fread( &MAP::MAP_LOCATIONS.m_locationData[ 0 ], sizeof( u16 ),
+               MAP::MAP_LOCATIONS.m_locationData.size( ), f );
+
+        MAP::MAP_LOCATIONS.m_good = true;
+        MAP::MAP_LOCATIONS.m_bank = p_bank;
+        fclose( f );
+        return true;
     }
 
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name,

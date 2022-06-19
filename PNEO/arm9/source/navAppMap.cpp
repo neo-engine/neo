@@ -42,7 +42,8 @@ namespace NAV {
     }
 
     void mapNavApp::load( bool p_bottom ) {
-        char buffer[ 100 ];
+        constexpr u8 TMP_BUFFER_SIZE = 100;
+        char         buffer[ TMP_BUFFER_SIZE + 10 ];
 
         auto ptr3 = !p_bottom ? bgGetGfxPtr( IO::bg3 ) : bgGetGfxPtr( IO::bg3sub );
         auto pal  = !p_bottom ? BG_PALETTE : BG_PALETTE_SUB;
@@ -88,10 +89,12 @@ namespace NAV {
         pal[ 0 ] = IO::BLACK;
 
         if( _cursorLocationId ) {
-            snprintf( buffer, 99, "%s: %s", FS::getLocation( 2005 ).c_str( ),
+            snprintf( buffer, TMP_BUFFER_SIZE, "%s: %s",
+                      FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
                       FS::getLocation( _cursorLocationId ).c_str( ) );
         } else {
-            snprintf( buffer, 99, "%s", FS::getLocation( 2005 ).c_str( ) );
+            snprintf( buffer, TMP_BUFFER_SIZE, "%s",
+                      FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ) );
         }
 
         IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
@@ -100,11 +103,20 @@ namespace NAV {
     }
 
     void mapNavApp::computePlayerPosition( ) {
-        if( SAVE::SAV.getActiveFile( ).m_currentMap == MAP::OW_MAP ) {
+        if( FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_currentMap ) ) {
+            if( MAP::MAP_LOCATIONS.m_bank != SAVE::SAV.getActiveFile( ).m_currentMap
+                || !MAP::MAP_LOCATIONS.m_good ) {
+                FS::loadLocationData( SAVE::SAV.getActiveFile( ).m_currentMap );
+            }
+
             // player is in OW
             _playerX = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / MAP_IMG_RES;
             _playerY = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / MAP_IMG_RES;
-        } else if( SAVE::SAV.getActiveFile( ).m_lastOWPos.first == MAP::OW_MAP ) {
+        } else if( FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_lastOWPos.first ) ) {
+            if( MAP::MAP_LOCATIONS.m_bank != SAVE::SAV.getActiveFile( ).m_lastOWPos.first
+                || !MAP::MAP_LOCATIONS.m_good ) {
+                FS::loadLocationData( SAVE::SAV.getActiveFile( ).m_lastOWPos.first );
+            }
             _playerX = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posX / MAP_IMG_RES;
             _playerY = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posY / MAP_IMG_RES;
         } else {
@@ -114,11 +126,12 @@ namespace NAV {
     }
 
     void mapNavApp::computeCursorLocationId( ) {
-        _cursorLocationId = MAP::BANK_10_MAP_LOCATIONS[ _cursorY / 2 ][ _cursorX / 2 ];
+        _cursorLocationId = MAP::MAP_LOCATIONS.get( _cursorY / 2, _cursorX / 2 );
     }
 
     bool mapNavApp::tick( bool p_bottom ) {
-        char buffer[ 100 ];
+        constexpr u8 TMP_BUFFER_SIZE = 100;
+        char         buffer[ TMP_BUFFER_SIZE + 10 ];
 
         // update player position
         auto oldx = _playerX, oldy = _playerY;
@@ -157,10 +170,12 @@ namespace NAV {
             computeCursorLocationId( );
             if( _cursorLocationId != oldl ) {
                 if( _cursorLocationId ) {
-                    snprintf( buffer, 99, "%s: %s", FS::getLocation( 2005 ).c_str( ),
+                    snprintf( buffer, TMP_BUFFER_SIZE, "%s: %s",
+                              FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
                               FS::getLocation( _cursorLocationId ).c_str( ) );
                 } else {
-                    snprintf( buffer, 99, "%s", FS::getLocation( 2005 ).c_str( ) );
+                    snprintf( buffer, TMP_BUFFER_SIZE, "%s",
+                              FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ) );
                 }
                 IO::printRectangle( 43, 10, 200, 30, p_bottom, 0 );
                 IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );

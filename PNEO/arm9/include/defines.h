@@ -50,6 +50,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 struct fsdataInfo {
+    static constexpr u8 MAX_OW_MAPS = 8;
+
     u16 m_maxPkmn = 0;
     u16 m_maxItem = 0;
 
@@ -59,6 +61,17 @@ struct fsdataInfo {
 
     u8 m_maxNavBG     = 0; // valid subscrn wallpaper 0..m_maxNavBg
     u8 m_defaultNavBG = 0;
+    u8 m_owMapCount   = 1;
+    u8 m_defaultOWMap = 0;
+
+    u8 m_owMaps[ MAX_OW_MAPS ] = { 10 };
+
+    inline bool isOWMap( u8 p_map ) {
+        for( u8 i = 0; i < m_owMapCount; ++i ) {
+            if( m_owMaps[ i ] == p_map ) { return true; }
+        }
+        return false;
+    }
 };
 
 extern fsdataInfo FSDATA;

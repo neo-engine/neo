@@ -42,6 +42,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "save/saveGame.h"
 
 namespace MAP {
+    mapLocation MAP_LOCATIONS;
+
     mapDrawer*   curMap = nullptr;
     constexpr s8 currentHalf( u16 p_pos ) {
         return s8( ( p_pos % SIZE >= SIZE / 2 ) ? 1 : -1 );
@@ -452,11 +454,15 @@ namespace MAP {
     }
 
     u16 mapDrawer::getCurrentLocationId( ) const {
-        if( SAVE::SAV.getActiveFile( ).m_currentMap == OW_MAP ) [[likely]] {
-            return BANK_10_MAP_LOCATIONS[ SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
-                                          / MAP_LOCATION_RES ]
-                                        [ SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
-                                          / MAP_LOCATION_RES ];
+        if( FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_currentMap ) ) [[likely]] {
+            if( MAP_LOCATIONS.m_bank != SAVE::SAV.getActiveFile( ).m_currentMap
+                || !MAP_LOCATIONS.m_good ) {
+                FS::loadLocationData( SAVE::SAV.getActiveFile( ).m_currentMap );
+            }
+
+            return MAP_LOCATIONS.get(
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / mapLocation::MAP_LOCATION_RES,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / mapLocation::MAP_LOCATION_RES );
         }
 
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % SIZE;

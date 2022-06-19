@@ -229,7 +229,7 @@ namespace SAVE {
 
         m_options.clear( );
 
-        m_currentFlyBank = m_forcedMovement = m_mapObjAttachedIdx = m_objectAttached = 0;
+        m_numRegisteredFlyPos = m_forcedMovement = m_mapObjAttachedIdx = m_objectAttached = 0;
 
         m_currentMapWeather = (MAP::mapWeather) 0;
 
@@ -256,7 +256,6 @@ namespace SAVE {
         std::memset( m_caughtPkmn, 0, sizeof( m_caughtPkmn ) );
         std::memset( m_seenPkmn, 0, sizeof( m_seenPkmn ) );
         std::memset( m_shinyPkmn, 0, sizeof( m_shinyPkmn ) );
-        std::memset( m_unusedPkmn, 0, sizeof( m_unusedPkmn ) );
     }
     void saveGame::playerInfo::initialize( ) {
         clear( );

@@ -53,7 +53,9 @@ namespace SAVE {
     // #ifdef FLASHCARD
     //     constexpr u8 MAX_BOXES = 2;
     // #else
-    constexpr u8 MAX_BOXES = 35;
+    constexpr u8  MAX_BOXES              = 35;
+    constexpr u8  MAX_REGISTERED_FLY_POS = 75;
+    constexpr u16 MAX_MAPOBJECT          = 256;
     // #endif
     constexpr u8 BERRY_SLOTS = 150;
 
@@ -172,7 +174,7 @@ namespace SAVE {
             u16            m_lstDex;
             u16            m_lstLocalDexPage;
             u16            m_lstLocalDexSlot;
-            u16            m_lstViewedItem[ 3 ]; // Last viewed item in the bag
+            u16            m_lstViewedItem[ 5 ]; // Last viewed item in the bag
 
             ObjPriority m_playerPriority;
 
@@ -199,7 +201,7 @@ namespace SAVE {
             MAP::warpPos    m_lastOWPos;  // last position of the player on an outside-type map
             MAP::mapWeather m_currentMapWeather; // current map weather
 
-            std::pair<u8, MAP::mapObject> m_mapObjects[ 256 ];
+            std::pair<u8, MAP::mapObject> m_mapObjects[ MAX_MAPOBJECT ];
             u8                            m_mapObjectCount;
 
             u16 m_initGameItemCount = 0; // Items accessible during begin game PC check
@@ -212,10 +214,10 @@ namespace SAVE {
 
             u8 m_forcedMovement = 0;
 
-            u8 m_currentFlyBank = 0;
+            u8          m_numRegisteredFlyPos                        = 0;
+            MAP::flyPos m_registeredFlyPos[ MAX_REGISTERED_FLY_POS ] = { };
 
-            u32 m_reserved2 : 16;
-            u32 m_reserved[ 57 ] = { 0 }; // reserved for future things that need to be stored
+            u32 m_reserved[ 10 ] = { 0 }; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 
@@ -227,8 +229,45 @@ namespace SAVE {
             u8 m_caughtPkmn[ 125 ]; // The pkmn the player has caught
             u8 m_seenPkmn[ 125 ];   // The pkmn the player has seen
             u8 m_shinyPkmn[ 125 ];  // The pkmn the player has seen as a shiny (unused)
-            u8 m_unusedPkmn[ 125 ]; // (unused)
 
+            /*
+             * @brief: returns all positions the player can fly to on the current ow map.
+             */
+            constexpr std::vector<MAP::flyPos> currentOWFlyPos( ) const {
+                std::vector<MAP::flyPos> res{ };
+
+                for( u8 i = 0; i < m_numRegisteredFlyPos; ++i ) {
+                    if( m_registeredFlyPos[ i ].owMap( ) == m_lastOWPos.first ) {
+                        // relevant fly pos
+                        res.push_back( m_registeredFlyPos[ i ] );
+                    }
+                }
+
+                return res;
+            }
+
+            /*
+             * @brief: tries to register a new fly pos; returns true on success.
+             */
+            bool registerFlyPos( MAP::flyPos p_flyPos ) {
+                if( m_numRegisteredFlyPos >= MAX_REGISTERED_FLY_POS ) { return false; }
+                m_registeredFlyPos[ ++m_numRegisteredFlyPos ] = p_flyPos;
+                return true;
+            }
+
+            /*
+             * @brief: returns whether the current ow map (i.e. the last ow map the player
+             * visited) has any positions the player may fly to.
+             */
+            constexpr bool currentOWHasFlyData( ) const {
+                // obtain activated fly pos for current ow.
+                return !currentOWFlyPos( ).empty( );
+            }
+
+            /*
+             * @brief: returns whether the player can receive badges/symbols of the
+             * specified type.
+             */
             constexpr bool hasBadgeCase( u8 p_case ) const {
                 if( p_case == 0 ) { return true; }
 

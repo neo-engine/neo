@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <map>
 #include <string>
+#include <vector>
 #include <nds.h>
 
 #include "defines.h"
@@ -37,21 +38,6 @@ namespace MAP {
     constexpr u8 NUM_COLS         = 32;
     constexpr u8 UNUSED_MAPOBJECT = 200;
 
-    /*
-     * @brief: Map bank id of the OW map (i.e. the map which is displayed in the PNAV)
-     */
-    constexpr u8 OW_MAP = 10;
-
-    constexpr u8     MAP_LOCATION_RES = 8;
-    constexpr u8     OW_MAP_SIZE_X    = 29 * 4;
-    constexpr u8     OW_MAP_SIZE_Y    = 16 * 4;
-    extern const u16 BANK_10_MAP_LOCATIONS[ OW_MAP_SIZE_Y ][ OW_MAP_SIZE_X ];
-
-    std::string parseLogCmd( const std::string& p_cmd );
-    std::string convertMapString( const std::string& p_text, style p_style );
-    void        printMapMessage( const std::string& p_text, style p_style );
-    void        printMapYNMessage( const std::string& p_text, style p_style );
-
     struct position {
         u16 m_posX; // Global
         u16 m_posY; // Global
@@ -60,17 +46,46 @@ namespace MAP {
         constexpr auto operator<=>( const position& ) const = default;
     };
 
-    constexpr position DUMMY_POSITION = { 0, 0, 0 };
-    constexpr position getOWPosForLocation( u16 p_location ) {
-        for( u16 y = 0; y < OW_MAP_SIZE_Y; ++y ) {
-            for( u16 x = 0; x < OW_MAP_SIZE_X; ++x ) {
-                if( BANK_10_MAP_LOCATIONS[ y ][ x ] == p_location ) {
-                    return { u16( 8 * x ), u16( 8 * y ), 0 };
-                }
+    struct mapLocation {
+        static constexpr position DUMMY_POSITION   = { 0, 0, 0 };
+        static constexpr u8       MAP_LOCATION_RES = 8;
+
+        u8   m_bank;
+        bool m_good; // data has been read from fs
+        u8   m_owMapSizeX;
+        u8   m_owMapSizeY;
+
+        u16 m_defaultLocation; // location to return for out-of-bounds; e.g. L_HOENN
+
+        std::vector<u16> m_locationData;
+
+        inline u16 get( u16 p_y, u16 p_x ) const {
+            size_t idx = p_y * m_owMapSizeX + p_x;
+            if( idx < m_locationData.size( ) ) {
+                return m_locationData[ idx ];
+            } else {
+                return m_defaultLocation;
             }
         }
-        return DUMMY_POSITION;
-    }
+
+        constexpr position getOWPosForLocation( u16 p_location ) const {
+            for( u16 y = 0; y < m_owMapSizeY; ++y ) {
+                for( u16 x = 0; x < m_owMapSizeX; ++x ) {
+                    if( get( y, x ) == p_location ) {
+                        return { u16( MAP_LOCATION_RES * x ), u16( MAP_LOCATION_RES * y ), 0 };
+                    }
+                }
+            }
+            return DUMMY_POSITION;
+        }
+    };
+
+    extern mapLocation MAP_LOCATIONS;
+
+    std::string parseLogCmd( const std::string& p_cmd );
+    std::string convertMapString( const std::string& p_text, style p_style );
+    void        printMapMessage( const std::string& p_text, style p_style );
+    void        printMapYNMessage( const std::string& p_text, style p_style );
 
     enum direction : u8 { UP, RIGHT, DOWN, LEFT };
 
@@ -91,6 +106,35 @@ namespace MAP {
     };
 
     typedef std::pair<u8, position> warpPos;
+    struct flyPos {
+        // ensure that a flyPos fits into 2 bytes.
+
+        u8  m_owBank; // position on ow map where this fly pos should appear
+        u8  m_targetBank;
+        u16 m_targetZ : 4;
+        u16 m_owMapX : 6;
+        u16 m_owMapY : 6;
+
+        u16 m_targetX;
+        u16 m_targetY;
+
+        /*
+         * @brief: returns the ow map this flypos shoul appear on
+         */
+        constexpr auto owMap( ) const {
+            return m_owBank;
+        }
+
+        /*
+         * @brief: returns the target position this fly pos should warp to.
+         */
+        constexpr warpPos target( ) const {
+            return { m_targetBank, { m_targetX, m_targetY, u8( m_targetZ ) } };
+        }
+
+        constexpr auto operator<=>( const flyPos& ) const = default;
+    };
+
     enum moveMode {
         // Player modes
         WALK       = 0,
@@ -134,6 +178,7 @@ namespace MAP {
         EVENT_HMOBJECT    = 8, // cut, rock smash, strength
         EVENT_BERRYTREE   = 9,
         EVENT_NPC_MESSAGE = 10,
+        EVENT_FLY_POS     = 11,
     };
 
     enum eventTrigger : u8 {
@@ -205,7 +250,8 @@ namespace MAP {
         TELEPORT,
         EMERGE_WATER,
         LAST_VISITED,
-        SLIDING_DOOR
+        SLIDING_DOOR,
+        FLY,
     };
 
     constexpr u8 MAX_PKMN_PER_SLICE   = 30;
@@ -293,6 +339,12 @@ namespace MAP {
                 struct {
                     u8 m_treeIdx; // internal id of this berry tree
                 } m_berryTree;
+                struct {
+                    u8 m_bank; // map bank on whose map the fly pos should appear,
+                               // typically 10
+                    u8 m_mapX; // map coordinate where the fly pos should appear on ow map
+                    u8 m_mapY; // map coordinate where the fly pos should appear on ow map
+                } m_flyPos;
             } m_data;
         } m_events[ MAX_EVENTS_PER_SLICE ];
 
@@ -312,11 +364,17 @@ namespace MAP {
         u8 m_sizeY   = 0;
         u8 m_mapMode = 0; // 0: normal maps/data in folder, 1: scattered in subfolders, 2: combined
                           // (ignored, assumed to be 2)
+        u8 m_isOWMap = false;      // redundant information (unused); stores whether this bank
+                                   // has corresponding location data and an ow map
+        u16 m_defaultLocation = 0; // default location for this bank (unused)
+        u8  m_mapMug          = 0; // preview image shown when switching to this bank (0
+                                   // for none)
         u8 : 8;
-        u32 : 32;
 
-        constexpr bankInfo( u8 p_sizeX = 0, u8 p_sizeY = 0, u8 p_mapMode = MAPMODE_COMBINED )
-            : m_sizeX( p_sizeX ), m_sizeY( p_sizeY ), m_mapMode( p_mapMode ) {
+        constexpr bankInfo( u8 p_sizeX = 0, u8 p_sizeY = 0, u8 p_mapMode = MAPMODE_COMBINED,
+                            bool p_isOWMap = false )
+            : m_sizeX( p_sizeX ), m_sizeY( p_sizeY ), m_mapMode( p_mapMode ),
+              m_isOWMap( p_isOWMap ) {
         }
     };
 

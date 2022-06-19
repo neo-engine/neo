@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "gen/locationNames.h"
 #include "gen/moveNames.h"
+#include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
 #include "map/mapSlice.h"
@@ -39,25 +40,25 @@ namespace BATTLE {
     u16 text( const u16 p_moveId, u8 p_param ) {
         if( p_param == 1 ) {
             switch( p_moveId ) {
-            case M_DIVE: return 322;
+            case M_DIVE: return IO::STR_MAP_HM_MESSAGE_DIVE_UP;
             default: return 0;
             }
         }
         switch( p_moveId ) {
-        case M_CUT: return 313;
-        case M_ROCK_SMASH: return 314;
-        case M_WHIRLPOOL: return 315;
-        case M_SURF: return 316;
-        case M_DIVE: return 317;
+        case M_CUT: return IO::STR_MAP_HM_MESSAGE_CUT;
+        case M_ROCK_SMASH: return IO::STR_MAP_HM_MESSAGE_ROCK_SMASH;
+        case M_WHIRLPOOL: return IO::STR_MAP_HM_MESSAGE_WHIRLPOOL;
+        case M_SURF: return IO::STR_MAP_HM_MESSAGE_SURF;
+        case M_DIVE: return IO::STR_MAP_HM_MESSAGE_DIVE_UP;
         case M_STRENGTH:
             if( MAP::curMap->strengthEnabled( ) ) {
-                return 558;
+                return IO::STR_MAP_HM_MESSAGE_STRENGTH_ENABLED;
             } else {
-                return 318;
+                return IO::STR_MAP_HM_MESSAGE_STRENGTH;
             }
-        case M_ROCK_CLIMB: return 319;
-        case M_WATERFALL: return 320;
-        case M_HEADBUTT: return 321;
+        case M_ROCK_CLIMB: return IO::STR_MAP_HM_MESSAGE_ROCK_CLIMB;
+        case M_WATERFALL: return IO::STR_MAP_HM_MESSAGE_WATERFALL;
+        case M_HEADBUTT: return IO::STR_MAP_HM_MESSAGE_HEADBUTT;
         default: return 0;
         }
     }
@@ -131,7 +132,11 @@ namespace BATTLE {
         case M_FLY: {
             // Check for badge 6
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 5 ) ) ) { return false; }
-            return false;
+            // flying is always possible in the ow, so check if player is in ow
+            if( MAP::curMap->currentData( ).m_mapType != MAP::OUTSIDE ) { return false; }
+
+            // check if current outside map has flydata
+            return SAVE::SAV.getActiveFile( ).currentOWHasFlyData( );
         }
         case M_FLASH: {
             return SAVE::SAV.getActiveFile( ).m_currentMapWeather == MAP::DARK_FLASHABLE;
@@ -210,7 +215,7 @@ namespace BATTLE {
         case M_CUT:
         case M_ROCK_SMASH: MAP::curMap->destroyHMObject( tx, ty ); return;
         case M_STRENGTH: MAP::curMap->enableStrength( ); return;
-        case M_FLY: return;
+        case M_FLY: return; // handled separately
         case M_FLASH: {
             if( SAVE::SAV.getActiveFile( ).m_currentMapWeather == MAP::DARK_FLASHABLE ) {
                 bgSetScale( IO::bg3, 1 << 7 | 1 << 6 | 1 << 5, 1 << 7 | 1 << 6 | 1 << 5 );
@@ -291,7 +296,7 @@ namespace BATTLE {
         case M_HEADBUTT: return;
         case M_SWEET_SCENT:
             if( !possible( M_SWEET_SCENT, 0 ) || !MAP::curMap->requestWildPkmn( true ) ) {
-                NAV::printMessage( GET_STRING( 90 ) );
+                NAV::printMessage( GET_STRING( IO::STR_MAP_HM_MESSAGE_SWEET_SCENT_FAILED ) );
             }
             return;
         case M_TELEPORT:

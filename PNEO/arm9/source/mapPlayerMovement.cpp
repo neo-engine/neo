@@ -863,6 +863,10 @@ namespace MAP {
         draw( );
     }
 
+    void mapDrawer::flyPlayer( warpPos p_target ) {
+        warpPlayer( FLY, p_target );
+    }
+
     void mapDrawer::warpPlayer( warpType p_type, warpPos p_target ) {
         u8   oldMapType = u8( currentData( ).m_mapType );
         bool checkPos   = false;
@@ -873,7 +877,8 @@ namespace MAP {
         if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
             SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
         }
-        if( p_target.first != OW_MAP && SAVE::SAV.getActiveFile( ).m_currentMap == OW_MAP ) {
+        if( !FSDATA.isOWMap( p_target.first )
+            && FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_currentMap ) ) {
             SAVE::SAV.getActiveFile( ).m_lastOWPos = { SAVE::SAV.getActiveFile( ).m_currentMap,
                                                        SAVE::SAV.getActiveFile( ).m_player.m_pos };
 
@@ -890,8 +895,8 @@ namespace MAP {
         if( checkPos ) {
             auto curL = ndata.m_locationIds[ ( p_target.second.m_posY % SIZE ) / 8 ]
                                            [ ( p_target.second.m_posX % SIZE ) / 8 ];
-            auto tmpPos = getOWPosForLocation( curL );
-            if( tmpPos != DUMMY_POSITION ) {
+            auto tmpPos = MAP_LOCATIONS.getOWPosForLocation( curL );
+            if( tmpPos != mapLocation::DUMMY_POSITION ) {
                 SAVE::SAV.getActiveFile( ).m_lastOWPos
                     = { SAVE::SAV.getActiveFile( ).m_currentMap, tmpPos };
             }

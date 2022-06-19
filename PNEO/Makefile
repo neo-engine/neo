@@ -75,7 +75,6 @@ ndstool:
 	$(MAKE) -C tools/ndstool
 
 clean:
-	$(MAKE) -C audio clean
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean

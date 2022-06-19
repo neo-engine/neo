@@ -275,4 +275,17 @@ namespace IO {
     constexpr u16 STR_MAP_FAINT_TO_POKE_CENTER = 561;
     constexpr u16 STR_MAP_FAINT_TO_HOME        = 562;
     constexpr u16 STR_MAP_TRACER_FAIL          = 696;
+
+    constexpr u16 STR_MAP_HM_MESSAGE_DIVE_UP            = 322;
+    constexpr u16 STR_MAP_HM_MESSAGE_DIVE_DOWN          = 317;
+    constexpr u16 STR_MAP_HM_MESSAGE_CUT                = 313;
+    constexpr u16 STR_MAP_HM_MESSAGE_ROCK_SMASH         = 314;
+    constexpr u16 STR_MAP_HM_MESSAGE_WHIRLPOOL          = 315;
+    constexpr u16 STR_MAP_HM_MESSAGE_SURF               = 316;
+    constexpr u16 STR_MAP_HM_MESSAGE_STRENGTH           = 318;
+    constexpr u16 STR_MAP_HM_MESSAGE_STRENGTH_ENABLED   = 558;
+    constexpr u16 STR_MAP_HM_MESSAGE_ROCK_CLIMB         = 319;
+    constexpr u16 STR_MAP_HM_MESSAGE_WATERFALL          = 320;
+    constexpr u16 STR_MAP_HM_MESSAGE_HEADBUTT           = 321;
+    constexpr u16 STR_MAP_HM_MESSAGE_SWEET_SCENT_FAILED = 90;
 } // namespace IO
