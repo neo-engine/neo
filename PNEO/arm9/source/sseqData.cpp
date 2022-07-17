@@ -101,6 +101,7 @@ namespace SOUND::SSEQ {
         { 1, 91, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_120
         { 1, 92, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_123
         { 1, 93, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_135
+        { 1, 93, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_137
         { 29, 94, 2, { 1, 29, 0, 0 } }, // BGM_POKEMON_GYM
         { 29, 95, 2, { 1, 29, 0, 0 } }, // BGM_POKEMON_GYM2
         { 30, 96, 2, { 8, 30, 0, 0 } }, // BGM_POKEMON_CENTER
@@ -125,6 +126,7 @@ namespace SOUND::SSEQ {
         { 34, 115, 2, { 8, 34, 0, 0 } }, // BGM_VICTORY_ROAD
         { 35, 116, 1, { 35, 0, 0, 0 } }, // BGM_SEALED_CHAMBER
         { 36, 117, 1, { 36, 0, 0, 0 } }, // BGM_CRYSTAL_CAVERN
+        { 36, 117, 1, { 36, 0, 0, 0 } }, // BGM_INFINITY_CAVE
         { 1, 118, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_FRONTIER
         { 1, 119, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_ARENA
         { 1, 120, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_PYRAMID

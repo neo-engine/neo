@@ -46,7 +46,9 @@ namespace SAVE {
     // #endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
-    constexpr u8 NUM_PARTY_SLOTS = 6;
+    constexpr u8  NUM_PARTY_SLOTS = 6;
+    constexpr u16 NUM_FLAGS       = 256;
+    constexpr u16 NUM_VARS        = 256;
 
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
@@ -186,8 +188,8 @@ namespace SAVE {
             s16         m_repelSteps;     // Steps remaining of the currently active repel
             saveOptions m_options;        // Various options and settings
             pokemon     m_pkmnTeam[ NUM_PARTY_SLOTS ];
-            u16         m_vars[ 256 ];  // variables to be set by map scripts etc.
-            u16         m_flags[ 256 ]; // flags tracking the progress of the player's adventure
+            u16         m_vars[ NUM_VARS ]; // variables to be set by map scripts etc.
+            u16 m_flags[ NUM_FLAGS ];       // flags tracking the progress of the player's adventure
 
             u8   m_berryTrees[ BERRY_SLOTS ];       // berry indices for each berry tree
             u8   m_berryHealth[ BERRY_SLOTS ];      // health of the berry (255 for default)
