@@ -863,6 +863,22 @@ namespace MAP {
         draw( );
     }
 
+    void mapDrawer::divePlayer( ) {
+        // set move mode to "DIVE", change map bank to <current mapbank + DIVE_MAP>
+
+        IO::fadeScreen( IO::CLEAR_DARK );
+        changeMoveMode( DIVE );
+        loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
+        draw( OBJPRIORITY_2, false );
+    }
+
+    void mapDrawer::resurfacePlayer( ) {
+        IO::fadeScreen( IO::CLEAR_DARK );
+        changeMoveMode( SURF );
+        loadNewBank( SAVE::SAV.getActiveFile( ).m_currentMap );
+        draw( OBJPRIORITY_2, false );
+    }
+
     void mapDrawer::flyPlayer( warpPos p_target ) {
         warpPlayer( FLY, p_target );
     }
@@ -1471,6 +1487,7 @@ namespace MAP {
         switch( p_newMode ) {
         case WALK: SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic; break;
         case SURF:
+        case DIVE:
         case ROCK_CLIMB:
             removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;

@@ -56,12 +56,14 @@ namespace FS {
     bool seekTileSet( FILE* p_file, u8 p_tsIdx );
 
     FILE* openTileSet( );
-    FILE* openBank( u8 p_bank );
+    FILE* openBank( u16 p_bank );
 
     bool readMapData( FILE* p_file, MAP::mapData* p_result, bool p_close = true );
 
     bool readMapSlice( FILE* p_mapFile, MAP::mapSlice* p_result, u16 p_x = 0, u16 p_y = 0,
                        bool p_close = true );
+
+    u32 readMapBankInfo( FILE* p_mapFile, MAP::bankInfo* p_info );
 
     u32 readMapSliceAndData( FILE* p_mapFile, MAP::mapSlice* p_slice, MAP::mapData* p_data, u16 p_x,
                              u16 p_y );

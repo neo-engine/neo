@@ -66,7 +66,16 @@ namespace BATTLE {
     bool possible( u16 p_moveId, u8 p_param ) {
         if( p_param == 1 ) {
             switch( p_moveId ) {
-            case M_DIVE: return false;
+            case M_DIVE: {
+                // dive up
+                if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::DIVE ) { return false; }
+                if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return false; }
+                u8 curBehave = MAP::curMap
+                                   ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                         SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                                   .m_bottombehave;
+                return MAP::mapDrawer::canResurface( curBehave );
+            }
             default: return false;
             }
         }
@@ -146,21 +155,32 @@ namespace BATTLE {
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return false; }
             return false;
         }
-        case M_SURF:
+        case M_SURF: {
             // Check for badge 5
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 4 ) ) ) { return false; }
 
             return ( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::SURF )
-                   && MAP::curMap->atom( tx, ty ).m_movedata == 0x4
+                   && MAP::curMap->atom( tx, ty ).m_movedata == MAP::mapDrawer::MVD_SURF
                    && MAP::curMap
                               ->atom( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                               .m_movedata
-                          == 0xc;
+                          == MAP::mapDrawer::MVD_WALK;
+        }
         case M_DIVE: {
             // Check for badge 7
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return false; }
-            return false;
+
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::SURF ) { return false; }
+
+            // check if current bank has underwater information
+            if( !MAP::curMap->currentBankHasUnderwater( ) ) { return false; }
+
+            u8 curBehave = MAP::curMap
+                               ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                     SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                               .m_bottombehave;
+            return MAP::mapDrawer::canDive( curBehave );
         }
         case M_DEFOG: {
             // Check for badge 6
@@ -170,13 +190,13 @@ namespace BATTLE {
         case M_ROCK_CLIMB: {
             // Check for badge 8
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 7 ) ) ) { return false; }
-            return MAP::curMap->at( tx, ty ).m_bottombehave == 0x12;
+            return MAP::curMap->at( tx, ty ).m_bottombehave == MAP::mapDrawer::BEH_ROCK_CLIMB;
         }
         case M_WATERFALL: {
             // Check for badge 8
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 7 ) ) ) { return false; }
             return ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::SURF )
-                   && MAP::curMap->at( tx, ty ).m_bottombehave == 0x13;
+                   && MAP::curMap->at( tx, ty ).m_bottombehave == MAP::mapDrawer::BEH_WATERFALL;
         }
         case M_HEADBUTT: return false;
         case M_SWEET_SCENT: {
@@ -184,7 +204,7 @@ namespace BATTLE {
                                ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                                .m_bottombehave;
-            return curBehave == 0x2 || curBehave == 0x3;
+            return MAP::mapDrawer::isGrass( curBehave );
         }
         case M_TELEPORT:
             if( MAP::curMap->getCurrentLocationId( ) == L_POKEMON_CENTER ) { return false; }
@@ -201,7 +221,17 @@ namespace BATTLE {
     void use( u16 p_moveId, u8 p_param ) {
         if( p_param == 1 ) {
             switch( p_moveId ) {
-            case M_DIVE: return;
+            case M_DIVE: {
+                if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::DIVE ) { return; }
+                if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return; }
+                u8 curBehave = MAP::curMap
+                                   ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                         SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                                   .m_bottombehave;
+                if( !MAP::mapDrawer::canResurface( curBehave ) ) { return; }
+                MAP::curMap->resurfacePlayer( );
+                return;
+            }
             default: return;
             }
         }
@@ -247,7 +277,18 @@ namespace BATTLE {
 
             return;
         }
-        case M_DIVE: return;
+        case M_DIVE: {
+            // check if current bank has underwater information
+            if( !MAP::curMap->currentBankHasUnderwater( ) ) { return; }
+
+            u8 curBehave = MAP::curMap
+                               ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                                     SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+                               .m_bottombehave;
+            if( MAP::mapDrawer::canDive( curBehave ) ) { return; }
+            MAP::curMap->divePlayer( );
+            return;
+        }
         case M_DEFOG: return;
         case M_ROCK_CLIMB: {
             MAP::direction d  = SAVE::SAV.getActiveFile( ).m_player.m_direction;

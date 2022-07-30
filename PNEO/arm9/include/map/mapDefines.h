@@ -364,8 +364,10 @@ namespace MAP {
         u8 m_sizeY   = 0;
         u8 m_mapMode = 0; // 0: normal maps/data in folder, 1: scattered in subfolders, 2: combined
                           // (ignored, assumed to be 2)
-        u8 m_isOWMap = false;      // redundant information (unused); stores whether this bank
-                                   // has corresponding location data and an ow map
+        u8 m_isOWMap : 1 = false;    // redundant information (unused); stores whether this bank
+                                     // has corresponding location data and an ow map
+        u8 m_hasDiveMap : 1 = false; // stores whether there is a seperate map for hm dive
+        u8 : 6;
         u16 m_defaultLocation = 0; // default location for this bank (unused)
         u8  m_mapMug          = 0; // preview image shown when switching to this bank (0
                                    // for none)

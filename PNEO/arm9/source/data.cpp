@@ -374,8 +374,8 @@ namespace FS {
         return f;
     }
 
-    FILE* openBank( u8 p_bank ) {
-        snprintf( TMP_BUFFER_SHORT, 45, "%hhu", p_bank );
+    FILE* openBank( u16 p_bank ) {
+        snprintf( TMP_BUFFER_SHORT, 45, "%hu", p_bank );
         FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bank" );
         if( !f ) { return nullptr; }
         return f;
@@ -400,13 +400,19 @@ namespace FS {
         return true;
     }
 
+    u32 readMapBankInfo( FILE* p_mapFile, MAP::bankInfo* p_info ) {
+        if( p_mapFile == 0 ) { return 1; }
+
+        if( fseek( p_mapFile, 0, SEEK_SET ) ) { return 2; }
+        fread( &p_info, sizeof( MAP::bankInfo ), 1, p_mapFile );
+
+        return 0;
+    }
+
     u32 readMapSliceAndData( FILE* p_mapFile, MAP::mapSlice* p_slice, MAP::mapData* p_data, u16 p_x,
                              u16 p_y ) {
-        if( p_mapFile == 0 ) return 1;
-
         MAP::bankInfo info;
-        if( fseek( p_mapFile, 0, SEEK_SET ) ) { return 2; }
-        fread( &info, sizeof( MAP::bankInfo ), 1, p_mapFile );
+        if( readMapBankInfo( p_mapFile, &info ) ) { return 1; }
 
         if( fseek( p_mapFile,
                    sizeof( MAP::bankInfo )

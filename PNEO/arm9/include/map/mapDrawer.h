@@ -41,7 +41,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace MAP {
     class mapDrawer {
-      private:
+      public:
         enum tileBehavior : u8 {
             BEH_NONE = 0x00,
 
@@ -54,7 +54,11 @@ namespace MAP {
 
             BEH_LADDER = 0x0A,
 
-            BEH_WATERFALL = 0x13,
+            BEH_DIVE       = 0x11,
+            BEH_ROCK_CLIMB = 0x12,
+            BEH_WATERFALL  = 0x13,
+
+            BEH_UNDERWATER_NO_RESURFACE = 0x19,
 
             BEH_SLIDE_ON_ICE = 0x20,
 
@@ -62,7 +66,8 @@ namespace MAP {
 
             BEH_GRASS_ASH = 0x24,
 
-            BEH_WARP_TELEPORT = 0x29,
+            BEH_WARP_TELEPORT                 = 0x29,
+            BEH_GRASS_UNDERWATER_NO_RESURFACE = 0x2A,
 
             BEH_BLOCK_RIGHT         = 0x30,
             BEH_BLOCK_LEFT          = 0x31,
@@ -140,6 +145,7 @@ namespace MAP {
             // not passable if = 1 mod 4
         };
 
+      private:
         static constexpr u8 FASTBIKE_SPEED_NO_TILE_BREAK
             = 9; // min speed with bike to pass over breakable tiles
 
@@ -151,6 +157,8 @@ namespace MAP {
 
         static constexpr u8 WARP_TO_LAST_ENTRY     = 0xFF;
         static constexpr u8 PIKACHU_IS_MIMIKYU_MOD = 0xFF;
+
+        static constexpr u16 DIVE_MAP = 1000;
 
         FILE* _currentBank = nullptr;
         FILE* _tileset     = nullptr;
@@ -448,6 +456,38 @@ namespace MAP {
             return _tracerCharge >= TRACER_CHARGED;
         }
 
+        static inline bool isGrass( u8 p_behave ) {
+            switch( p_behave ) {
+                // Grass
+            case BEH_GRASS:
+            case BEH_GRASS_UNDERWATER:
+            case BEH_GRASS_UNDERWATER_NO_RESURFACE:
+            case BEH_GRASS_ASH: return true;
+            default: return false;
+            }
+        }
+
+        static inline bool canDive( u8 p_behave ) {
+            switch( p_behave ) {
+            case BEH_DIVE: return true;
+            default: return false;
+            }
+        }
+
+        static inline bool canResurface( u8 p_behave ) {
+            switch( p_behave ) {
+            case BEH_UNDERWATER_NO_RESURFACE: return false;
+            case BEH_GRASS_UNDERWATER_NO_RESURFACE: return false;
+            default: return true;
+            }
+        }
+
+        inline bool currentBankHasUnderwater( ) const {
+            bankInfo info;
+            if( FS::readMapBankInfo( _currentBank, &info ) ) { return false; }
+            return info.m_hasDiveMap;
+        }
+
         /*
          * @brief: Returns if tracer could be used at given pos (if it is additionally
          * charged.)
@@ -458,19 +498,17 @@ namespace MAP {
             auto lstblock  = at( p_position.m_posX, p_position.m_posY );
             u8   lstBehave = lstblock.m_bottombehave;
 
-            switch( lstBehave ) {
-                // Grass
-            case BEH_GRASS:
-            case BEH_GRASS_UNDERWATER:
-            case BEH_GRASS_ASH: return true;
-            default: return false;
-            }
+            return isGrass( lstBehave );
         }
 
         /*
          * @brief: Starts the poketore.
          */
         void useTracer( );
+
+        void resurfacePlayer( );
+
+        void divePlayer( );
 
         direction getFollowPkmnDirection( ) const;
 

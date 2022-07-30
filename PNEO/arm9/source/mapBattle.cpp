@@ -74,6 +74,7 @@ namespace MAP {
         if( moveData == MVD_SURF && behave != BEH_WATERFALL ) {
             handleWildPkmn( WATER );
         } else if( behave == BEH_GRASS || behave == BEH_GRASS_ASH || behave == BEH_GRASS_UNDERWATER
+                   || behave == BEH_GRASS_UNDERWATER_NO_RESURFACE
                    || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
                    || behave == BEH_CAVE_WITH_ENCOUNTER ) {
             handleWildPkmn( GRASS );
@@ -179,24 +180,24 @@ namespace MAP {
 
     pokemon WILD_PKMN;
     void    mapDrawer::prepareBattleWildPkmn( wildPkmnType p_type, u16 p_pkmnId, bool p_luckyEnc ) {
-        (void) p_type;
+           (void) p_type;
 
-        ANIMATE_MAP = false;
-        DRAW_TIME   = false;
-        if( p_luckyEnc ) {
-            SOUND::playBGM( BGM_BATTLE_WILD_ALT );
+           ANIMATE_MAP = false;
+           DRAW_TIME   = false;
+           if( p_luckyEnc ) {
+               SOUND::playBGM( BGM_BATTLE_WILD_ALT );
         } else {
-            SOUND::playBGM( SOUND::BGMforWildBattle( p_pkmnId ) );
+               SOUND::playBGM( SOUND::BGMforWildBattle( p_pkmnId ) );
         }
-        _playerIsFast = false;
-        _fastBike     = false;
-        _mapSprites.setFrameD( _playerSprite, SAVE::SAV.getActiveFile( ).m_player.m_direction );
+           _playerIsFast = false;
+           _fastBike     = false;
+           _mapSprites.setFrameD( _playerSprite, SAVE::SAV.getActiveFile( ).m_player.m_direction );
 
-        IO::fadeScreen( IO::BATTLE );
-        IO::BG_PAL( true )[ 0 ] = 0;
-        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-        dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+           IO::fadeScreen( IO::BATTLE );
+           IO::BG_PAL( true )[ 0 ] = 0;
+           IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+           dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+           dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
     }
 
     BATTLE::battle::battleEndReason mapDrawer::battleWildPkmn( wildPkmnType p_type ) {
