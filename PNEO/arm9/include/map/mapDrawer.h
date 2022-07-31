@@ -108,9 +108,9 @@ namespace MAP {
             BEH_WARP_NO_SPECIAL_2 = 0x68,
             BEH_DOOR              = 0x69,
 
-            BEH_WARP_EMERGE_WATER   = 0x6C,
-            BEH_WARP_ON_WALK_DOWN_2 = 0x6D,
-            BEH_WARP_THEN_WALK_UP   = 0x6E,
+            BEH_WARP_DIVE              = 0x6C,
+            BEH_WARP_ON_WALK_DOWN_DIVE = 0x6D,
+            BEH_WARP_THEN_WALK_UP      = 0x6E,
 
             BEH_PACIFIDLOG_LOG_VERTICAL_TOP     = 0x74,
             BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM  = 0x75,

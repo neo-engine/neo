@@ -299,7 +299,7 @@ namespace MAP {
             if( p_direction == UP ) return true;
             break;
         case BEH_WARP_ON_WALK_DOWN:
-        case BEH_WARP_ON_WALK_DOWN_2:
+        case BEH_WARP_ON_WALK_DOWN_DIVE:
             if( p_direction == DOWN ) return true;
             break;
 
@@ -578,8 +578,15 @@ namespace MAP {
                     break;
                 }
                 goto NO_BREAK;
+            case BEH_WARP_ON_WALK_DOWN_DIVE:
+                if( p_direction == DOWN ) {
+                    walkPlayer( p_direction, p_fast );
+                    handleWarp( EMERGE_WATER );
+                    hadjump = false;
+                    break;
+                }
+                goto NO_BREAK;
             case BEH_WARP_ON_WALK_DOWN:
-            case BEH_WARP_ON_WALK_DOWN_2:
                 if( p_direction == DOWN ) {
                     walkPlayer( p_direction, p_fast );
                     handleWarp( NO_SPECIAL );
@@ -702,8 +709,14 @@ namespace MAP {
                         break;
                     }
                     goto NEXT_PASS;
+                case BEH_WARP_ON_WALK_DOWN_DIVE:
+                    if( p_direction == DOWN ) {
+                        redirectPlayer( DOWN, p_fast );
+                        handleWarp( EMERGE_WATER );
+                        return;
+                    }
+                    goto NEXT_PASS;
                 case BEH_WARP_ON_WALK_DOWN:
-                case BEH_WARP_ON_WALK_DOWN_2:
                     if( p_direction == DOWN ) {
                         redirectPlayer( DOWN, p_fast );
                         handleWarp( NO_SPECIAL );
@@ -751,7 +764,7 @@ namespace MAP {
                         walkPlayer( p_direction, p_fast );
                         handleWarp( DOOR );
                         break;
-                    case BEH_WARP_EMERGE_WATER:
+                    case BEH_WARP_DIVE:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( EMERGE_WATER );
                         break;
@@ -949,7 +962,7 @@ namespace MAP {
             }
             IO::fadeScreen( IO::CLEAR_DARK );
             break;
-        case EMERGE_WATER: break;
+        case EMERGE_WATER:
         case CAVE_ENTRY:
             SOUND::playSoundEffect( SFX_CAVE_WARP );
             if( entryCave ) {
