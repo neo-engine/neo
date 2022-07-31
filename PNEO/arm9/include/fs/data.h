@@ -48,6 +48,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace FS {
     // map data
+    static constexpr u16 DIVE_MAP = 1000;
 
     bool readPal( FILE* p_file, MAP::palette* p_palette, u8 p_count = 6 );
     bool readTiles( FILE* p_file, MAP::tile* p_tiles, u16 p_startIdx = 0, u16 p_size = 512 );
@@ -56,7 +57,7 @@ namespace FS {
     bool seekTileSet( FILE* p_file, u8 p_tsIdx );
 
     FILE* openTileSet( );
-    FILE* openBank( u16 p_bank );
+    FILE* openBank( u16 p_bank, bool p_underwater );
 
     bool readMapData( FILE* p_file, MAP::mapData* p_result, bool p_close = true );
 

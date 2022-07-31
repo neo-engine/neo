@@ -42,7 +42,9 @@ namespace MAP {
     void constructSlice( FILE* p_f, FILE* p_tileset, u8 p_map, u16 p_x, u16 p_y, mapSlice* p_result,
                          mapData* p_resultData, mapSlice p_cache[ 2 ][ 2 ] ) {
         bool mapExists = true;
-        if( !p_f ) { p_f = FS::openBank( p_map ); }
+        if( !p_f ) {
+            p_f = FS::openBank( p_map, SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE );
+        }
         if( !p_tileset ) { p_tileset = FS::openTileSet( ); }
 
 #ifdef DESQUID

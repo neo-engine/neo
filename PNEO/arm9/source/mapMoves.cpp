@@ -49,7 +49,7 @@ namespace BATTLE {
         case M_ROCK_SMASH: return IO::STR_MAP_HM_MESSAGE_ROCK_SMASH;
         case M_WHIRLPOOL: return IO::STR_MAP_HM_MESSAGE_WHIRLPOOL;
         case M_SURF: return IO::STR_MAP_HM_MESSAGE_SURF;
-        case M_DIVE: return IO::STR_MAP_HM_MESSAGE_DIVE_UP;
+        case M_DIVE: return IO::STR_MAP_HM_MESSAGE_DIVE_DOWN;
         case M_STRENGTH:
             if( MAP::curMap->strengthEnabled( ) ) {
                 return IO::STR_MAP_HM_MESSAGE_STRENGTH_ENABLED;
@@ -171,10 +171,11 @@ namespace BATTLE {
             // Check for badge 7
             if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return false; }
 
-            if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::SURF ) { return false; }
+            //            if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::SURF ) { return
+            //            false; }
 
             // check if current bank has underwater information
-            if( !MAP::curMap->currentBankHasUnderwater( ) ) { return false; }
+            // if( !MAP::curMap->currentBankHasUnderwater( ) ) { return false; }
 
             u8 curBehave = MAP::curMap
                                ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
@@ -222,8 +223,6 @@ namespace BATTLE {
         if( p_param == 1 ) {
             switch( p_moveId ) {
             case M_DIVE: {
-                if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::DIVE ) { return; }
-                if( !( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << 6 ) ) ) { return; }
                 u8 curBehave = MAP::curMap
                                    ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
@@ -279,13 +278,15 @@ namespace BATTLE {
         }
         case M_DIVE: {
             // check if current bank has underwater information
-            if( !MAP::curMap->currentBankHasUnderwater( ) ) { return; }
+            // if( !MAP::curMap->currentBankHasUnderwater( ) ) { return; }
 
             u8 curBehave = MAP::curMap
                                ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
+
                                .m_bottombehave;
-            if( MAP::mapDrawer::canDive( curBehave ) ) { return; }
+
+            if( !MAP::mapDrawer::canDive( curBehave ) ) { return; }
             MAP::curMap->divePlayer( );
             return;
         }

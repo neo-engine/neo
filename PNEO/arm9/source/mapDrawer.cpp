@@ -55,11 +55,8 @@ namespace MAP {
 
     void mapDrawer::loadNewBank( u8 p_bank ) {
         if( _currentBank != nullptr ) { fclose( _currentBank ); }
-        if( SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE ) {
-            _currentBank = FS::openBank( p_bank + DIVE_MAP );
-        } else {
-            _currentBank = FS::openBank( p_bank );
-        }
+        _currentBank
+            = FS::openBank( p_bank, SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE );
     }
 
     const mapBlockAtom& mapDrawer::atom( u16 p_x, u16 p_y ) const {

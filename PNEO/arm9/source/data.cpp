@@ -374,8 +374,8 @@ namespace FS {
         return f;
     }
 
-    FILE* openBank( u16 p_bank ) {
-        snprintf( TMP_BUFFER_SHORT, 45, "%hu", p_bank );
+    FILE* openBank( u16 p_bank, bool p_underwater ) {
+        snprintf( TMP_BUFFER_SHORT, 45, "%i", p_bank + ( p_underwater ? DIVE_MAP : 0 ) );
         FILE* f = open( MAP::MAP_PATH, TMP_BUFFER_SHORT, ".bank" );
         if( !f ) { return nullptr; }
         return f;
@@ -404,7 +404,7 @@ namespace FS {
         if( p_mapFile == 0 ) { return 1; }
 
         if( fseek( p_mapFile, 0, SEEK_SET ) ) { return 2; }
-        fread( &p_info, sizeof( MAP::bankInfo ), 1, p_mapFile );
+        fread( p_info, sizeof( MAP::bankInfo ), 1, p_mapFile );
 
         return 0;
     }

@@ -158,8 +158,6 @@ namespace MAP {
         static constexpr u8 WARP_TO_LAST_ENTRY     = 0xFF;
         static constexpr u8 PIKACHU_IS_MIMIKYU_MOD = 0xFF;
 
-        static constexpr u16 DIVE_MAP = 1000;
-
         FILE* _currentBank = nullptr;
         FILE* _tileset     = nullptr;
         void  loadNewBank( u8 p_bank );

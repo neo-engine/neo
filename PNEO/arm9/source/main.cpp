@@ -292,9 +292,9 @@ int main( int, char** p_argv ) {
     NAV::init( );
     //    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
     MAP::curMap->registerOnLocationChangedHandler( NAV::showNewLocation );
-    NAV::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
-
     MAP::curMap->draw( );
+
+    NAV::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
 
     ANIMATE_MAP = true;
 
