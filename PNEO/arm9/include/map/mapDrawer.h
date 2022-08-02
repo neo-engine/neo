@@ -491,6 +491,7 @@ namespace MAP {
          * charged.)
          */
         bool tracerUsable( position p_position ) const {
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE ) { return false; }
             if( currentData( ).m_mapType & MAP::INSIDE ) { return false; }
 
             auto lstblock  = at( p_position.m_posX, p_position.m_posY );

@@ -57,6 +57,8 @@ namespace MAP {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         switch( behave ) {
+        case BEH_GRASS_UNDERWATER_NO_RESURFACE: // TODO
+        case BEH_GRASS_UNDERWATER:              // TODO
         case BEH_GRASS:
         case BEH_GRASS_ASH:
             return p_shiny ? mapSpriteManager::SPR_GRASS_SHINY : mapSpriteManager::SPR_GRASS;

@@ -73,9 +73,7 @@ namespace MAP {
         // handle Pkmn stuff
         if( moveData == MVD_SURF && behave != BEH_WATERFALL ) {
             handleWildPkmn( WATER );
-        } else if( behave == BEH_GRASS || behave == BEH_GRASS_ASH || behave == BEH_GRASS_UNDERWATER
-                   || behave == BEH_GRASS_UNDERWATER_NO_RESURFACE
-                   || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
+        } else if( isGrass( behave ) || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
                    || behave == BEH_CAVE_WITH_ENCOUNTER ) {
             handleWildPkmn( GRASS );
         } else if( behave == BEH_LONG_GRASS ) {
@@ -373,8 +371,7 @@ namespace MAP {
             return handleWildPkmn( GRASS, true );
         } else if( behave == BEH_LONG_GRASS || p_forceHighGrass ) {
             return handleWildPkmn( HIGH_GRASS, true );
-        } else if( behave == BEH_GRASS_ASH || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
-                   || behave == BEH_GRASS ) {
+        } else if( behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH || isGrass( behave ) ) {
             return handleWildPkmn( GRASS, true );
         }
         return false;
