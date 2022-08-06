@@ -35,7 +35,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/keyboard.h"
 #include "io/strings.h"
 #include "io/uio.h"
-#include "nav/nav.h"
 #include "sound/sound.h"
 
 #include "key.h"

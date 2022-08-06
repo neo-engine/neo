@@ -34,12 +34,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/abilityNames.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -1596,14 +1597,14 @@ namespace MAP {
         u8          rounds = rand( ) % 5;
         bool        failed = false;
         std::string msg    = "";
-        NAV::printMessage( 0, MSG_NOCLOSE );
+        IO::printMessage( 0, MSG_NOCLOSE );
         for( u8 i = 0; i < rounds + 1; ++i ) {
             u8 cr = rand( ) % 7;
             msg   = "";
-            NAV::printMessage( 0, MSG_NOCLOSE );
+            IO::printMessage( 0, MSG_NOCLOSE );
             for( u8 j = 0; j < cr + 5; ++j ) {
                 msg += ". ";
-                NAV::printMessage( msg.c_str( ), MSG_NOCLOSE, true );
+                IO::printMessage( msg.c_str( ), MSG_NOCLOSE, true );
                 for( u8 k = 0; k < 30; ++k ) {
                     scanKeys( );
                     swiWaitForVBlank( );
@@ -1615,7 +1616,7 @@ namespace MAP {
                 }
             }
             FRAME_COUNT = 0;
-            NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESS ), MSG_NOCLOSE );
+            IO::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESS ), MSG_NOCLOSE );
             if( FRAME_COUNT > 180 ) {
                 failed = true;
                 break;
@@ -1624,9 +1625,9 @@ namespace MAP {
 
     OUT:
         if( failed ) {
-            NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL ) );
+            IO::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL ) );
         } else {
-            NAV::printMessage( 0 );
+            IO::printMessage( 0 );
         }
         for( s8 i = 2; i >= 0; --i ) {
             _mapSprites.drawFrame( _playerSprite, frame + i, p_direction == RIGHT, true );
@@ -1701,7 +1702,7 @@ namespace MAP {
         SOUND::setVolume( 0 );
         IO::initVideoSub( );
         IO::resetScale( true, false );
-        NAV::init( );
+        IO::init( );
         redirectPlayer( DOWN, false );
         warpPlayer( NO_SPECIAL, tgpos );
         ANIMATE_MAP = true;

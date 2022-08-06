@@ -120,16 +120,20 @@ namespace FS {
         { "PP(%s)" },
 
         { "Fateful Enc." },
+        { "Squids are evil. Eat them!" },
         { "PKMN Spawn" },
         { "Item Spawn" },
-        { "View Boxes" },
-        { "Tokens of god-being|" },
+        { "Flags" },
 
         // 50
 
-        { "RND Badge" },
-        { "Init PKMN" },
-        { "Pok\xe9Mart" },
+        { "Warp" },
+        { "Time" },
+        { "Btl Trainer" },
+        { "Edit Badges" },
+        { "Edit Flags" },
+
+        { "Edit Vars" },
     };
 
 #endif

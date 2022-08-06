@@ -36,11 +36,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/locationNames.h"
 #include "io/choiceBox.h"
 #include "io/counter.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 #include "spx/specials.h"
@@ -67,7 +68,7 @@ namespace MAP {
     constexpr u8 CLL_INIT_GAME_ITEM_COUNT = 4;
     constexpr u8 CLL_GET_AND_REMOVE_INIT_GAME_ITEM = 5;
     constexpr u8 CLL_RUN_INITIAL_PKMN_SELECTION    = 6;
-    constexpr u8 CLL_NAV_INIT                      = 7; // NAV::init( )
+    constexpr u8 CLL_NAV_INIT                      = 7; // IO::init( ) from io/message.h
     constexpr u8 CLL_RUN_CATCHING_TUTORIAL         = 8;
     constexpr u8 CLL_AWARD_BADGE                   = 9; // (p1: region, p2: badge)
     constexpr u8 CLL_RUN_CHOICE_BOX                = 10;
@@ -236,11 +237,11 @@ namespace MAP {
                 continue;
             } else if( p_text[ i ] == '\r' ) {
                 if( p_style == MSG_NORMAL ) {
-                    NAV::printMessage( res.c_str( ), MSG_NORMAL_CONT );
+                    IO::printMessage( res.c_str( ), MSG_NORMAL_CONT );
                 } else if( p_style == MSG_INFO ) {
-                    NAV::printMessage( res.c_str( ), MSG_INFO_CONT );
+                    IO::printMessage( res.c_str( ), MSG_INFO_CONT );
                 } else {
-                    NAV::printMessage( res.c_str( ), p_style );
+                    IO::printMessage( res.c_str( ), p_style );
                 }
                 res = "";
                 continue;
@@ -255,7 +256,7 @@ namespace MAP {
             // TODO: properly implement signs
             p_style = MSG_INFO;
         }
-        NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
+        IO::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
     void printMapYNMessage( const std::string& p_text, style p_style ) {
@@ -264,71 +265,71 @@ namespace MAP {
             // TODO: properly implement signs
             p_style = MSG_INFO;
         }
-        NAV::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
+        IO::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
     static u16 CURRENT_SCRIPT = -1;
     void       mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject, s16 p_mapX, s16 p_mapY ) {
-        if( CURRENT_SCRIPT == p_scriptId ) { return; }
-        CURRENT_SCRIPT = p_scriptId;
+              if( CURRENT_SCRIPT == p_scriptId ) { return; }
+              CURRENT_SCRIPT = p_scriptId;
 
-        FILE* f = FS::openScript( p_scriptId );
-        if( !f ) {
-            CURRENT_SCRIPT = -1;
-            return;
+              FILE* f = FS::openScript( p_scriptId );
+              if( !f ) {
+                  CURRENT_SCRIPT = -1;
+                  return;
         }
 
-        bool srn       = _scriptRunning;
-        _scriptRunning = true;
+              bool srn       = _scriptRunning;
+              _scriptRunning = true;
 
-        u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
-        fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
-        FS::close( f );
+              u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
+              fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
+              FS::close( f );
 
-        u8 pc = 0;
+              u8 pc = 0;
 
-        std::vector<std::pair<u16, u32>> martItems;
+              std::vector<std::pair<u16, u32>> martItems;
 
-        std::vector<u16> choiceBoxItems;
-        std::vector<u16> choiceBoxPL;
-        u16              choiceBoxMessage = 0;
-        u8               choiceBoxMsgType = 0;
+              std::vector<u16> choiceBoxItems;
+              std::vector<u16> choiceBoxPL;
+              u16              choiceBoxMessage = 0;
+              u8               choiceBoxMsgType = 0;
 
-        char buffer[ 200 ]   = { 0 };
-        u16  registers[ 10 ] = { 0 };
+              char buffer[ 200 ]   = { 0 };
+              u16  registers[ 10 ] = { 0 };
 
-        u8   pmartCurr = 0;
-        bool martSell  = true;
+              u8   pmartCurr = 0;
+              bool martSell  = true;
 
-        bool playerAttachedToObject = false;
+              bool playerAttachedToObject = false;
 
-        moveMode tmpmove = NO_MOVEMENT;
+              moveMode tmpmove = NO_MOVEMENT;
 
-        u8 newbnk = 255;
-        u8 newz   = 0;
+              u8 newbnk = 255;
+              u8 newz   = 0;
 
-        while( SCRIPT_INS[ pc ] ) {
-            u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-            u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-            u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
-            u16 mapX = curx / SIZE, mapY = cury / SIZE;
-            if( p_mapX >= 0 ) { mapX = p_mapX; }
-            if( p_mapY >= 0 ) { mapY = p_mapY; }
-            auto ins   = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
-            u8   par1  = PARAM1( SCRIPT_INS[ pc ] );
-            u8   par2  = PARAM2( SCRIPT_INS[ pc ] );
-            u8   par3  = PARAM3( SCRIPT_INS[ pc ] );
-            u8   par1s = PARAM1S( SCRIPT_INS[ pc ] );
-            u8   par2s = PARAM2S( SCRIPT_INS[ pc ] );
-            u16  par3s = PARAM3S( SCRIPT_INS[ pc ] );
-            u16  parA  = PARAMA( SCRIPT_INS[ pc ] );
-            u16  parB  = PARAMB( SCRIPT_INS[ pc ] );
+              while( SCRIPT_INS[ pc ] ) {
+                  u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+                  u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+                  u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+                  u16 mapX = curx / SIZE, mapY = cury / SIZE;
+                  if( p_mapX >= 0 ) { mapX = p_mapX; }
+                  if( p_mapY >= 0 ) { mapY = p_mapY; }
+                  auto ins   = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
+                  u8   par1  = PARAM1( SCRIPT_INS[ pc ] );
+                  u8   par2  = PARAM2( SCRIPT_INS[ pc ] );
+                  u8   par3  = PARAM3( SCRIPT_INS[ pc ] );
+                  u8   par1s = PARAM1S( SCRIPT_INS[ pc ] );
+                  u8   par2s = PARAM2S( SCRIPT_INS[ pc ] );
+                  u16  par3s = PARAM3S( SCRIPT_INS[ pc ] );
+                  u16  parA  = PARAMA( SCRIPT_INS[ pc ] );
+                  u16  parB  = PARAMB( SCRIPT_INS[ pc ] );
 
 #ifdef DESQUID_MORE
-            NAV::printMessage( ( std::to_string( pc ) + ": " + std::to_string( ins ) + " ( "
-                                 + std::to_string( par1 ) + " , " + std::to_string( par2 ) + " , "
-                                 + std::to_string( par3 ) + ")" )
-                                   .c_str( ) );
+            IO::printMessage( ( std::to_string( pc ) + ": " + std::to_string( ins ) + " ( "
+                                + std::to_string( par1 ) + " , " + std::to_string( par2 ) + " , "
+                                + std::to_string( par3 ) + ")" )
+                                  .c_str( ) );
 #endif
 
             switch( ins ) {
@@ -414,7 +415,7 @@ namespace MAP {
                     registers[ 0 ] = found;
                 } else {
 #ifdef DESQUID_MORE
-                    NAV::printMessage( ( std::to_string( cur.first ) ).c_str( ) );
+                    IO::printMessage( ( std::to_string( cur.first ) ).c_str( ) );
 #endif
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
                 }
@@ -539,7 +540,7 @@ namespace MAP {
 #ifdef DESQUID_MORE
                 std::string dstr = "";
                 for( u8 q = 0; q < 10; ++q ) { dstr += std::to_string( registers[ q ] ) + " "; }
-                NAV::printMessage( dstr, MSG_INFO );
+                IO::printMessage( dstr, MSG_INFO );
 
 #endif
 
@@ -599,7 +600,7 @@ namespace MAP {
             }
             case MMOR: {
 #ifdef DESQUID_MORE
-                NAV::printMessage(
+                IO::printMessage(
                     ( std::to_string(
                           SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first )
                       + " ( " + std::to_string( registers[ par1 ] ) + " , " + std::to_string( par2 )
@@ -634,7 +635,7 @@ namespace MAP {
             }
             case MFOR: {
 #ifdef DESQUID_MORE
-                NAV::printMessage(
+                IO::printMessage(
                     ( std::to_string(
                           SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first )
                       + " ( " + std::to_string( registers[ par1 ] ) + " , " + std::to_string( par2 )
@@ -769,7 +770,7 @@ namespace MAP {
                 ANIMATE_MAP = false;
                 swiWaitForVBlank( );
 
-                NAV::init( );
+                IO::init( );
                 draw( playerPrio );
                 _mapSprites.setPriority( _playerSprite,
                                          SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
@@ -804,7 +805,7 @@ namespace MAP {
                 }
 
                 FADE_TOP_DARK( );
-                NAV::init( );
+                IO::init( );
                 draw( playerPrio );
                 _mapSprites.setPriority( _playerSprite,
                                          SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
@@ -853,7 +854,7 @@ namespace MAP {
                 _mapSprites.setPriority( _playerSprite,
                                          SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
                 ANIMATE_MAP = true;
-                NAV::init( );
+                IO::init( );
                 break;
             }
             case BPKR:
@@ -865,15 +866,15 @@ namespace MAP {
 
                 // TODO
                 break;
-            case ITM: NAV::giveItemToPlayer( parA, parB ); break;
-            case TTM: NAV::takeItemFromPlayer( parA, parB ); break;
-            case UTM: NAV::useItemFromPlayer( parA, parB ); break;
-            case ITMR: NAV::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
+            case ITM: IO::giveItemToPlayer( parA, parB ); break;
+            case TTM: IO::takeItemFromPlayer( parA, parB ); break;
+            case UTM: IO::useItemFromPlayer( parA, parB ); break;
+            case ITMR: IO::giveItemToPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case TTMR: {
-                NAV::takeItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] );
+                IO::takeItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] );
                 break;
             }
-            case UTMR: NAV::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
+            case UTMR: IO::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
                 if( parA <= MAX_BGM ) { SOUND::playBGM( parA, true ); }
                 break;
@@ -988,7 +989,7 @@ namespace MAP {
                     break;
                 }
                 case CLL_NAV_INIT: {
-                    NAV::init( );
+                    IO::init( );
                     break;
                 }
                 case CLL_RUN_CATCHING_TUTORIAL: {
@@ -1004,7 +1005,7 @@ namespace MAP {
                     registers[ 0 ]   = cb.getResult( GET_MAP_STRING( choiceBoxMessage ),
                                                      style( choiceBoxMsgType ), choiceBoxItems );
                     registers[ 1 ]   = choiceBoxPL[ registers[ 0 ] ];
-                    NAV::init( );
+                    IO::init( );
                     break;
                 }
                 case CLL_GET_CURRENT_DAYTIME: { // get current time
@@ -1039,10 +1040,10 @@ namespace MAP {
                             == IO::yesNoBox( ).getResult(
                                 convertMapString( GET_MAP_STRING( 477 ), (style) 0 ).c_str( ),
                                 (style) 0 ) ) {
-                            NAV::init( );
+                            IO::init( );
                             depositpkmn = true;
                         } else {
-                            NAV::init( );
+                            IO::init( );
                             printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
                             break;
                         }
@@ -1056,10 +1057,10 @@ namespace MAP {
                                 == IO::yesNoBox( ).getResult(
                                     convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
                                     (style) 0 ) ) {
-                                NAV::init( );
+                                IO::init( );
                                 depositpkmn = 2;
                             } else {
-                                NAV::init( );
+                                IO::init( );
                             }
                         }
 
@@ -1067,8 +1068,8 @@ namespace MAP {
                             // ask if he player wants to take a pkmn back
                             printMapMessage( GET_MAP_STRING( 483 ), MSG_NOCLOSE );
                             loop( ) {
-                                u8 takeback = NAV::chooseDaycarePkmn( par2 );
-                                NAV::init( );
+                                u8 takeback = IO::chooseDaycarePkmn( par2 );
+                                IO::init( );
 
                                 if( takeback > 1 ) {
                                     // player doesn't want to get pkmn back
@@ -1091,7 +1092,7 @@ namespace MAP {
                                     == IO::yesNoBox( ).getResult(
                                         convertMapString( buffer, (style) 0 ).c_str( ),
                                         (style) 0 ) ) {
-                                    NAV::init( );
+                                    IO::init( );
                                     // check if the player has enough money
                                     if( SAVE::SAV.getActiveFile( ).m_money >= cost ) {
                                         SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
@@ -1128,7 +1129,7 @@ namespace MAP {
                                         break;
                                     }
                                 } else {
-                                    NAV::init( );
+                                    IO::init( );
                                     printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
                                     break;
                                 }
@@ -1180,7 +1181,7 @@ namespace MAP {
                         ANIMATE_MAP = true;
                         SOUND::restoreVolume( );
 
-                        NAV::init( );
+                        IO::init( );
                         MAP::curMap->draw( );
 
                         // check if the player has another pkmn that can battle
@@ -1234,10 +1235,10 @@ namespace MAP {
                                 == IO::yesNoBox( ).getResult(
                                     convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
                                     (style) 0 ) ) {
-                                NAV::init( );
+                                IO::init( );
                                 depositpkmn = 2;
                             } else {
-                                NAV::init( );
+                                IO::init( );
                                 printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
                                 break;
                             }
@@ -1265,13 +1266,13 @@ namespace MAP {
                             == IO::yesNoBox( ).getResult(
                                 convertMapString( GET_MAP_STRING( 464 ), (style) 0 ).c_str( ),
                                 (style) 0 ) ) {
-                            NAV::init( );
+                            IO::init( );
                             // ask if they really don't want the egg
                             if( IO::yesNoBox::YES
                                 == IO::yesNoBox( ).getResult(
                                     convertMapString( GET_MAP_STRING( 465 ), (style) 0 ).c_str( ),
                                     (style) 0 ) ) {
-                                NAV::init( );
+                                IO::init( );
                                 // throw away the egg
                                 *dce = boxPokemon( );
                                 SAVE::SAV.getActiveFile( ).setFlag(
@@ -1280,7 +1281,7 @@ namespace MAP {
                                 break;
                             }
                         }
-                        NAV::init( );
+                        IO::init( );
                         // hand egg to player
 
                         // check if they have space for an egg
@@ -1336,14 +1337,14 @@ namespace MAP {
                     if( par2 == 1
                         || yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE )
                                == IO::yesNoBox::YES ) {
-                        NAV::init( );
+                        IO::init( );
                         ANIMATE_MAP = false;
                         u16 lst     = -1;
                         if( FS::writeSave( ARGV[ 0 ], [ & ]( u16 p_perc, u16 p_total ) {
                                 u16 stat = p_perc * 18 / p_total;
                                 if( stat != lst ) {
                                     lst = stat;
-                                    NAV::printMessage( 0, MSG_INFO_NOCLOSE );
+                                    IO::printMessage( 0, MSG_INFO_NOCLOSE );
                                     std::string buf2 = "";
                                     for( u8 i = 0; i < stat; ++i ) {
                                         buf2 += "\x03";
@@ -1354,22 +1355,22 @@ namespace MAP {
                                         if( i % 3 == 2 ) { buf2 += " "; }
                                     }
                                     snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
-                                    NAV::printMessage( buffer, MSG_INFO_NOCLOSE, true );
+                                    IO::printMessage( buffer, MSG_INFO_NOCLOSE, true );
                                 }
                             } ) ) {
-                            NAV::printMessage( 0, MSG_INFO_NOCLOSE );
+                            IO::printMessage( 0, MSG_INFO_NOCLOSE );
                             SOUND::playSoundEffect( SFX_SAVE );
-                            NAV::printMessage( GET_STRING( 94 ), MSG_INFO );
+                            IO::printMessage( GET_STRING( 94 ), MSG_INFO );
                             registers[ 0 ] = 1;
                         } else {
-                            NAV::printMessage( 0, MSG_INFO_NOCLOSE );
-                            NAV::printMessage( GET_STRING( 95 ), MSG_INFO );
+                            IO::printMessage( 0, MSG_INFO_NOCLOSE );
+                            IO::printMessage( GET_STRING( 95 ), MSG_INFO );
                             registers[ 0 ] = 0;
                         }
                         ANIMATE_MAP = true;
                     } else {
                         registers[ 0 ] = 0;
-                        NAV::init( );
+                        IO::init( );
                     }
                     break;
                 }
@@ -1380,7 +1381,7 @@ namespace MAP {
                 style st       = MSG_INFO_NOCLOSE;
                 registers[ 0 ] = IO::counter( 0, parB ).getResult(
                     convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st );
-                NAV::init( );
+                IO::init( );
                 break;
             }
             case COUR: {
@@ -1388,11 +1389,11 @@ namespace MAP {
                 registers[ 0 ]
                     = IO::counter( 0, registers[ parB ] )
                           .getResult( convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st );
-                NAV::init( );
+                IO::init( );
 #ifdef DESQUID_MORE
                 std::string dstr = "";
                 for( u8 q = 0; q < 10; ++q ) { dstr += std::to_string( registers[ q ] ) + " "; }
-                NAV::printMessage( dstr, MSG_INFO );
+                IO::printMessage( dstr, MSG_INFO );
 #endif
                 break;
             }
@@ -1409,7 +1410,7 @@ namespace MAP {
                     = IO::yesNoBox::YES
                       == IO::yesNoBox( ).getResult(
                           convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st, showMoney );
-                NAV::init( );
+                IO::init( );
                 break;
             }
             case MSG: printMapMessage( GET_MAP_STRING( parA ), (style) parB ); break;
@@ -1613,7 +1614,7 @@ namespace MAP {
                        ( _lastrow + NUM_ROWS / 2 ) % NUM_ROWS );
             bgUpdate( );
             for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
-            NAV::printMessage( GET_STRING( 559 ), MSG_INFO );
+            IO::printMessage( GET_STRING( 559 ), MSG_INFO );
 
             BOX::boxViewer bxv;
             ANIMATE_MAP = false;
@@ -1633,7 +1634,7 @@ namespace MAP {
             IO::resetScale( true, false );
             ANIMATE_MAP = true;
             SOUND::restoreVolume( );
-            NAV::init( );
+            IO::init( );
             draw( );
 
             SOUND::playSoundEffect( SFX_PC_CLOSE );
@@ -1792,7 +1793,7 @@ namespace MAP {
                         SAVE::F_TRAINER_BATTLED( p_event.m_data.m_trainer.m_trainerId ), true );
                 }
                 FADE_TOP_DARK( );
-                NAV::init( );
+                IO::init( );
                 draw( playerPrio );
                 SOUND::restartBGM( );
                 ANIMATE_MAP = true;
@@ -1805,16 +1806,16 @@ namespace MAP {
             switch( p_event.m_data.m_hmObject.m_hmType ) {
             case mapSpriteManager::SPR_STRENGTH:
                 if( _strengthUsed ) {
-                    NAV::printMessage( GET_STRING( 558 ), MSG_NORMAL );
+                    IO::printMessage( GET_STRING( 558 ), MSG_NORMAL );
                 } else {
-                    NAV::printMessage( GET_STRING( 318 ), MSG_NORMAL );
+                    IO::printMessage( GET_STRING( 318 ), MSG_NORMAL );
                 }
                 break;
             case mapSpriteManager::SPR_ROCKSMASH:
-                NAV::printMessage( GET_STRING( 314 ), MSG_NORMAL );
+                IO::printMessage( GET_STRING( 314 ), MSG_NORMAL );
                 break;
             case mapSpriteManager::SPR_CUT:
-                NAV::printMessage( GET_STRING( 313 ), MSG_NORMAL );
+                IO::printMessage( GET_STRING( 313 ), MSG_NORMAL );
                 break;
             default: break;
             }
@@ -1829,7 +1830,7 @@ namespace MAP {
             break;
         }
         case EVENT_ITEM: {
-            NAV::giveItemToPlayer( p_event.m_data.m_item.m_itemId, 1 );
+            IO::giveItemToPlayer( p_event.m_data.m_item.m_itemId, 1 );
             SAVE::SAV.getActiveFile( ).setFlag( p_event.m_deactivateFlag, 1 );
             constructAndAddNewMapObjects( currentData( ), mapX, mapY );
         }
@@ -1956,7 +1957,7 @@ namespace MAP {
                         }
 
                         FADE_TOP_DARK( );
-                        NAV::init( );
+                        IO::init( );
                         draw( playerPrio );
                         _mapSprites.setPriority( _playerSprite,
                                                  SAVE::SAV.getActiveFile( ).m_playerPriority
@@ -1968,11 +1969,11 @@ namespace MAP {
                             char buffer[ 100 ];
                             snprintf( buffer, 99, GET_STRING( 572 ),
                                       FS::getItemName( itm ).c_str( ) );
-                            NAV::printMessage( buffer, MSG_INFO );
+                            IO::printMessage( buffer, MSG_INFO );
                         }
                         return;
                     } else {
-                        NAV::init( );
+                        IO::init( );
                     }
                     continue;
                 }
@@ -2038,20 +2039,20 @@ namespace MAP {
                     break;
                 default: continue;
                 }
-                NAV::printMessage( buffer, MSG_INFO_CONT );
+                IO::printMessage( buffer, MSG_INFO_CONT );
                 if( stage == 4 ) {
                     // Berries can be harvested
                     if( IO::yesNoBox( ).getResult( GET_STRING( 570 ), MSG_INFO_NOCLOSE )
                         == IO::yesNoBox::YES ) {
-                        NAV::init( );
-                        NAV::giveItemToPlayer( BAG::berryToItem( berryType ), yield );
+                        IO::init( );
+                        IO::giveItemToPlayer( BAG::berryToItem( berryType ), yield );
                         SAVE::SAV.getActiveFile( ).harvestBerry(
                             o.second.m_event.m_data.m_berryTree.m_treeIdx );
                         _mapSprites.destroySprite( o.first );
                         o.first = 255;
                         constructAndAddNewMapObjects( currentData( p_globX, p_globY ), mapX, mapY );
                     }
-                    NAV::init( );
+                    IO::init( );
                 } else {
                     // Ask player if they want to water the berry
                     // (only if they have a watering can, though)
@@ -2066,15 +2067,15 @@ namespace MAP {
 
                         if( IO::yesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
                             == IO::yesNoBox::YES ) {
-                            NAV::init( );
-                            NAV::printMessage( GET_STRING( 573 ), MSG_INFO );
+                            IO::init( );
+                            IO::printMessage( GET_STRING( 573 ), MSG_INFO );
                             SAVE::SAV.getActiveFile( ).waterBerry(
                                 o.second.m_event.m_data.m_berryTree.m_treeIdx );
                         } else {
-                            NAV::init( );
+                            IO::init( );
                         }
                     } else {
-                        NAV::init( );
+                        IO::init( );
                     }
                 }
                 continue;

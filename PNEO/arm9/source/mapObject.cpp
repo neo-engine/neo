@@ -32,11 +32,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "gen/abilityNames.h"
 #include "io/choiceBox.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -454,7 +455,7 @@ namespace MAP {
         char buffer[ 140 ];
         snprintf( buffer, 139, GET_STRING( 436 ), SAVE::SAV.getActiveFile( ).m_playername,
                   getBadgeName( p_type, p_badge ) );
-        NAV::printMessage( buffer, MSG_INFO );
+        IO::printMessage( buffer, MSG_INFO );
         SOUND::restartBGM( );
     }
 
@@ -479,7 +480,7 @@ namespace MAP {
             }
 
             if( curMode == 0 ) {
-                NAV::buyItem( p_offeredItems, p_paymentMethod );
+                IO::buyItem( p_offeredItems, p_paymentMethod );
             } else if( p_allowItemSell && curMode == 1 ) {
                 BAG::bagViewer bv = BAG::bagViewer( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                                     BAG::bagViewer::SELL_ITEM );
@@ -500,14 +501,14 @@ namespace MAP {
 
                 draw( );
                 SOUND::restoreVolume( );
-                NAV::init( );
+                IO::init( );
                 ANIMATE_MAP = true;
             } else if( ( !p_allowItemSell && curMode == 1 ) || curMode == 2 ) {
                 break;
             }
         }
 
-        NAV::init( );
+        IO::init( );
     }
 
     void mapDrawer::constructAndAddNewMapObjects( MAP::mapData const& p_data, u8 p_mapX,
@@ -520,9 +521,9 @@ namespace MAP {
 
 #ifdef DESQUID_MORE
         IO::fadeScreen( IO::UNFADE );
-        NAV::printMessage( ( std::string( "constructAndAddNewMapObjects " )
-                             + std::to_string( p_mapX ) + " " + std::to_string( p_mapY ) )
-                               .c_str( ) );
+        IO::printMessage( ( std::string( "constructAndAddNewMapObjects " )
+                            + std::to_string( p_mapX ) + " " + std::to_string( p_mapY ) )
+                              .c_str( ) );
 #endif
 
         // check old objects and purge them if they are not visible anymore
@@ -531,15 +532,14 @@ namespace MAP {
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
             if( _fixedMapObjects.count( i ) ) {
 #ifdef DESQUID_MORE
-                NAV::printMessage(
-                    ( std::string( "skip " ) + std::to_string( o.first ) ).c_str( ) );
+                IO::printMessage( ( std::string( "skip " ) + std::to_string( o.first ) ).c_str( ) );
 #endif
                 continue;
             }
 
             if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 24 ) {
 #ifdef DESQUID_MORE
-                NAV::printMessage(
+                IO::printMessage(
                     ( std::string( "Destroying " ) + std::to_string( i ) + " "
                       + std::to_string( o.first ) + " : " + std::to_string( o.second.m_pos.m_posX )
                       + " " + std::to_string( curx ) + " " + std::to_string( o.second.m_pos.m_posY )
@@ -600,18 +600,18 @@ namespace MAP {
             case EVENT_HMOBJECT: {
                 mapObject obj   = mapObject( );
                 obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
-                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
-                              p_data.m_events[ i ].m_posZ };
+                                    u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                    p_data.m_events[ i ].m_posZ };
                 obj.m_picNum    = (u16) -1;
                 obj.m_movement  = NO_MOVEMENT;
                 obj.m_range     = 0;
                 obj.m_direction = UP;
                 obj.m_event     = p_data.m_events[ i ];
 #ifdef DESQUID_MORE
-                NAV::printMessage( ( std::to_string( curx ) + "|" + std::to_string( cury ) + " : "
-                                     + std::to_string( obj.m_pos.m_posX ) + " , "
-                                     + std::to_string( obj.m_pos.m_posY ) )
-                                       .c_str( ) );
+                IO::printMessage( ( std::to_string( curx ) + "|" + std::to_string( cury ) + " : "
+                                    + std::to_string( obj.m_pos.m_posX ) + " , "
+                                    + std::to_string( obj.m_pos.m_posY ) )
+                                      .c_str( ) );
 #endif
                 cur = { 0, obj };
                 break;
@@ -626,8 +626,8 @@ namespace MAP {
                     // Check the growth of the specified berry tree
                     mapObject obj   = mapObject( );
                     obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
-                                  u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
-                                  p_data.m_events[ i ].m_posZ };
+                                        u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                        p_data.m_events[ i ].m_posZ };
                     obj.m_picNum    = (u16) -1;
                     obj.m_movement  = NO_MOVEMENT;
                     obj.m_range     = 0;
@@ -641,8 +641,8 @@ namespace MAP {
             case EVENT_ITEM: {
                 mapObject obj   = mapObject( );
                 obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
-                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
-                              p_data.m_events[ i ].m_posZ };
+                                    u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                    p_data.m_events[ i ].m_posZ };
                 obj.m_picNum    = (u16) -1;
                 obj.m_movement  = NO_MOVEMENT;
                 obj.m_range     = 0;
@@ -655,8 +655,8 @@ namespace MAP {
             case EVENT_TRAINER: {
                 mapObject obj = mapObject( );
                 obj.m_pos     = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
-                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
-                              p_data.m_events[ i ].m_posZ };
+                                  u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                  p_data.m_events[ i ].m_posZ };
                 obj.m_picNum  = p_data.m_events[ i ].m_data.m_trainer.m_spriteId;
                 obj.m_movement
                     = (MAP::moveMode) p_data.m_events[ i ].m_data.m_trainer.m_movementType;
@@ -672,8 +672,8 @@ namespace MAP {
             case EVENT_OW_PKMN: {
                 mapObject obj  = mapObject( );
                 obj.m_pos      = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
-                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
-                              p_data.m_events[ i ].m_posZ };
+                                   u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                   p_data.m_events[ i ].m_posZ };
                 obj.m_picNum   = p_data.m_events[ i ].m_data.m_owPkmn.m_speciesId + PKMN_SPRITE;
                 obj.m_movement = NO_MOVEMENT;
                 obj.m_range    = ( ( p_data.m_events[ i ].m_data.m_owPkmn.m_forme & 0x3f ) << 1 )
@@ -689,8 +689,8 @@ namespace MAP {
             case EVENT_NPC_MESSAGE: {
                 mapObject obj   = mapObject( );
                 obj.m_pos       = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
-                              u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
-                              p_data.m_events[ i ].m_posZ };
+                                    u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
+                                    p_data.m_events[ i ].m_posZ };
                 obj.m_picNum    = p_data.m_events[ i ].m_data.m_npc.m_spriteId;
                 obj.m_movement  = (MAP::moveMode) p_data.m_events[ i ].m_data.m_npc.m_movementType;
                 obj.m_range     = 0;

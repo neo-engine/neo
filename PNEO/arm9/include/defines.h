@@ -43,7 +43,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define DOUBLE_SEC        120
 
 #ifdef DESQUID
-#define DESQUID_LOG( p_msg ) NAV::printMessage( p_msg )
+#define DESQUID_LOG( p_msg ) IO::printMessage( p_msg )
 #else
 #define DESQUID_LOG( p_msg ) \
     {}

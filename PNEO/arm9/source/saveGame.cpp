@@ -35,10 +35,11 @@
 #include "gen/abilityNames.h"
 #include "gen/itemNames.h"
 #include "io/animations.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 
@@ -585,7 +586,7 @@ namespace SAVE {
         m_stepCount++;
         if( m_repelSteps > 0 ) {
             m_repelSteps--;
-            if( !m_repelSteps ) { NAV::printMessage( GET_STRING( 4 ) ); }
+            if( !m_repelSteps ) { IO::printMessage( GET_STRING( 4 ) ); }
         }
 
         // add exp to day care pkmn
@@ -628,7 +629,7 @@ namespace SAVE {
                         ANIMATE_MAP = anm;
                         SOUND::restoreVolume( );
 
-                        NAV::init( );
+                        IO::init( );
                         MAP::curMap->draw( );
 
                         break;

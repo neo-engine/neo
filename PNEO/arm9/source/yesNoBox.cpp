@@ -27,8 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "io/yesNoBox.h"
 #include "defines.h"
+#include "io/menuUI.h"
 #include "io/uio.h"
-#include "nav/nav.h"
 #include "sound/sound.h"
 
 namespace IO {
@@ -130,9 +130,9 @@ namespace IO {
     yesNoBox::selection yesNoBox::getResult( const char* p_message, style p_style,
                                              bool p_showMoney ) {
         return getResult(
-            [ & ]( ) { return NAV::printYNMessage( p_message, p_style, 255, p_showMoney ); },
+            [ & ]( ) { return IO::printYNMessage( p_message, p_style, 255, p_showMoney ); },
             [ & ]( yesNoBox::selection p_selection ) {
-                NAV::printYNMessage( 0, p_style, p_selection == IO::yesNoBox::NO, p_showMoney );
+                IO::printYNMessage( 0, p_style, p_selection == IO::yesNoBox::NO, p_showMoney );
             } );
     }
 } // namespace IO

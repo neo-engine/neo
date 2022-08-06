@@ -30,8 +30,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
 #include "io/choiceBox.h"
+#include "io/menuUI.h"
 #include "io/uio.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 
@@ -51,12 +51,13 @@ namespace IO {
     } while( false )
 
     choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
-                                               const std::vector<u16>& p_choices ) {
+                                               const std::vector<u16>& p_choices,
+                                               bool                    p_showExitButton ) {
         return getResult(
-            [ & ]( u8 ) { return NAV::printChoiceMessage( p_message, p_style, p_choices ); },
-            [ & ]( u8 p_selection ) {
-                NAV::printChoiceMessage( 0, p_style, p_choices, p_selection );
-            } );
+            [ & ]( u8 ) {
+                return printChoiceMessage( p_message, p_style, p_choices, p_showExitButton );
+            },
+            [ & ]( u8 p_selection ) { printChoiceMessage( 0, p_style, p_choices, p_selection ); } );
     }
 
     choiceBox::selection choiceBox::getResult(

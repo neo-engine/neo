@@ -33,10 +33,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/pokemonNames.h"
 #include "io/choiceBox.h"
 #include "io/keyboard.h"
+#include "io/menuUI.h"
 #include "io/screenFade.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 #include "save/startScreen.h"
 #include "sound/sound.h"
@@ -428,7 +428,7 @@ namespace SAVE {
 #undef SPR_CHOICE_START_OAM_SUB
         } while( IO::yesNoBox( ).getResult( // make player confirm their chara choice
                      [ & ]( ) {
-                         auto res = NAV::printYNMessage( 0, MSG_NORMAL, 253 );
+                         auto res = IO::printYNMessage( 0, MSG_NORMAL, 253 );
 
                          IO::regularFont->printBreakingStringC(
                              GET_STRING( IO::STR_UI_INIT_GAME_CHARACTER_OK ), 8, 8, 240, true,
@@ -436,7 +436,7 @@ namespace SAVE {
                          return res;
                      },
                      [ & ]( IO::yesNoBox::selection p_selection ) {
-                         NAV::printYNMessage( 0, MSG_NORMAL, p_selection == IO::yesNoBox::NO );
+                         IO::printYNMessage( 0, MSG_NORMAL, p_selection == IO::yesNoBox::NO );
                      } )
                  == IO::yesNoBox::NO );
 

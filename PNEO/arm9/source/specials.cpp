@@ -32,12 +32,13 @@
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "io/choiceBox.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "pokemon.h"
 #include "pokemonData.h"
 #include "sound/sound.h"
@@ -90,7 +91,7 @@ namespace SPX {
         IO::initVideoSub( );
         ANIMATE_MAP = true;
         SOUND::restoreVolume( );
-        NAV::init( );
+        IO::init( );
         MAP::curMap->draw( );
     }
 
@@ -386,7 +387,7 @@ namespace SPX {
         IO::initVideoSub( );
         ANIMATE_MAP = true;
         SOUND::restoreVolume( );
-        NAV::init( );
+        IO::init( );
         MAP::curMap->draw( );
 
 #undef SPR_CHOICE_START_OAM_SUB

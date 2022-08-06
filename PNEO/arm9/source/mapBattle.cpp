@@ -34,12 +34,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -242,7 +243,7 @@ namespace MAP {
         draw( playerPrio );
         _mapSprites.setPriority( _playerSprite,
                                  SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
-        NAV::init( );
+        IO::init( );
 
         ANIMATE_MAP = true;
         DRAW_TIME   = true;
@@ -287,7 +288,7 @@ namespace MAP {
         if( rn > 40 || !level ) {
             if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
                 _playerIsFast = false;
-                NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL_OLD_BALL ) );
+                IO::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL_OLD_BALL ) );
             }
             return false;
         }
@@ -297,14 +298,14 @@ namespace MAP {
         if( !getWildPkmnSpecies( p_type, pkmnId, pkmnForme ) ) {
             if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
                 _playerIsFast = false;
-                NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL_OLD_BALL ) );
+                IO::printMessage( GET_STRING( IO::STR_MAP_FISH_FAIL_OLD_BALL ) );
             }
             return false;
         }
 
         if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
             _playerIsFast = false;
-            NAV::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESSS_PKMN ) );
+            IO::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESSS_PKMN ) );
         } else if( SAVE::SAV.getActiveFile( ).m_repelSteps && !p_forceEncounter ) {
             return false;
         }
@@ -400,7 +401,7 @@ namespace MAP {
         }
         if( !_tracerSpecies && !getWildPkmnSpecies( GRASS, _tracerSpecies, _tracerForme ) ) {
             // couldn't find suitable pkmn, no chain will start
-            NAV::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
+            IO::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
             return false;
         }
         return true;
@@ -537,7 +538,7 @@ namespace MAP {
         }
 
         if( !spotFound ) {
-            NAV::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
+            IO::printMessage( GET_STRING( IO::STR_MAP_TRACER_FAIL ) );
             return false;
         } else {
             return true;

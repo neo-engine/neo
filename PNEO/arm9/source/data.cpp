@@ -46,7 +46,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/pokemonFormes.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "pokemon.h"
 
 #ifndef NO_SOUND
@@ -281,25 +280,6 @@ namespace FS {
         return nullptr;
 #endif
     }
-
-    /*
-    bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no ) {
-        if( p_no == SAVE::SAV.getActiveFile( ).m_options.m_bgIdx && NAV::NAV_DATA[ 0 ] ) {
-            dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
-            dmaCopy( NAV::NAV_DATA_PAL, IO::BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
-            return true;
-        }
-
-        if( !readData( "nitro:/PICS/NAV/", p_name, (unsigned int) 12288, NAV::NAV_DATA,
-                       (unsigned short) 192, NAV::NAV_DATA_PAL ) )
-            return false;
-
-        dmaCopy( NAV::NAV_DATA, p_layer, 256 * 192 );
-        dmaCopy( NAV::NAV_DATA_PAL, IO::BG_PAL( !SCREENS_SWAPPED ), 192 * 2 );
-
-        return true;
-    }
-    */
 
     bool readPal( FILE* p_file, MAP::palette* p_palette, u8 p_count ) {
         if( p_file == 0 ) return false;

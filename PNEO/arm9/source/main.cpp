@@ -43,6 +43,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "io/choiceBox.h"
 #include "io/keyboard.h"
+#include "io/menu.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
@@ -50,7 +53,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "map/mapDrawer.h"
 #include "map/mapObject.h"
 #include "map/mapSlice.h"
-#include "nav/nav.h"
 #include "pokemon.h"
 #include "save/saveGame.h"
 #include "save/startScreen.h"
@@ -211,10 +213,10 @@ void vblankIRQ( ) {
     if( !ANIMATE_MAP ) {
         return;
     } else {
-        if( NAV::LOCATION_TIMER && !--NAV::LOCATION_TIMER ) {
-            NAV::hideLocation( );
-        } else if( NAV::LOCATION_TIMER > 0 && NAV::LOCATION_TIMER < 16 ) {
-            NAV::hideLocation( NAV::LOCATION_TIMER );
+        if( IO::LOCATION_TIMER && !--IO::LOCATION_TIMER ) {
+            IO::hideLocation( );
+        } else if( IO::LOCATION_TIMER > 0 && IO::LOCATION_TIMER < 16 ) {
+            IO::hideLocation( IO::LOCATION_TIMER );
         }
     }
     FRAME_COUNT++;
@@ -289,12 +291,12 @@ int main( int, char** p_argv ) {
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
     MAP::curMap->registerOnWeatherChangedHandler( SOUND::onWeatherChange );
 
-    NAV::init( );
-    //    MAP::curMap->registerOnBankChangedHandler( NAV::showNewMap );
-    MAP::curMap->registerOnLocationChangedHandler( NAV::showNewLocation );
+    IO::init( );
+    //    MAP::curMap->registerOnBankChangedHandler( IO::showNewMap );
+    MAP::curMap->registerOnLocationChangedHandler( IO::showNewLocation );
     MAP::curMap->draw( );
 
-    NAV::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
+    IO::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
 
     ANIMATE_MAP = true;
 
@@ -339,7 +341,7 @@ int main( int, char** p_argv ) {
                           .m_topbehave,
                       getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
                       SAVE::CURRENT_TIME.m_secs );
-            NAV::printMessage( buffer );
+            IO::printMessage( buffer );
         }
 #endif
 
@@ -363,14 +365,14 @@ int main( int, char** p_argv ) {
                         SOUND::playSoundEffect( SFX_CHOOSE );
                         IO::yesNoBox yn;
                         if( yn.getResult( buffer, MSG_NOCLOSE ) == IO::yesNoBox::YES ) {
-                            NAV::init( );
-                            NAV::printMessage( 0, MSG_NOCLOSE );
+                            IO::init( );
+                            IO::printMessage( 0, MSG_NOCLOSE );
                             swiWaitForVBlank( );
                             snprintf( buffer, 99, GET_STRING( 99 ), a.m_boxdata.m_name,
                                       mname.c_str( ) );
-                            NAV::printMessage( buffer, MSG_NORMAL );
-                            NAV::printMessage( 0, MSG_NOCLOSE );
-                            NAV::init( );
+                            IO::printMessage( buffer, MSG_NORMAL );
+                            IO::printMessage( 0, MSG_NOCLOSE );
+                            IO::init( );
                             if( i || !MAP::curMap->useFollowPkmn( ) ) {
                                 MAP::curMap->usePkmn( a.getSpriteInfo( ) );
                                 swiWaitForVBlank( );
@@ -399,8 +401,8 @@ int main( int, char** p_argv ) {
                                 }
                             }
                         } else {
-                            NAV::printMessage( 0, MSG_NOCLOSE );
-                            NAV::init( );
+                            IO::printMessage( 0, MSG_NOCLOSE );
+                            IO::init( );
                         }
                         goto OUT;
                     }
@@ -411,7 +413,7 @@ int main( int, char** p_argv ) {
             continue;
         }
 
-        NAV::handleInput( p_argv[ 0 ] );
+        IO::handleInput( p_argv[ 0 ] );
 
         // Movement
         if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {

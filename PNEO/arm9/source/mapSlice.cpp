@@ -31,8 +31,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs/data.h"
 #include "fs/fs.h"
+#include "io/message.h"
 #include "map/mapSlice.h"
-#include "nav/nav.h"
 
 #ifdef DESQUID
 #include "io/uio.h"
@@ -49,7 +49,7 @@ namespace MAP {
 
 #ifdef DESQUID
         if( !p_result ) {
-            NAV::printMessage( "Bad things happened, aborting", MSG_INFO );
+            IO::printMessage( "Bad things happened, aborting", MSG_INFO );
             return;
         }
 #endif
@@ -58,7 +58,7 @@ namespace MAP {
 #ifdef DESQUID
             char buffer[ 50 ];
             snprintf( buffer, 49, "Map %d/%d,%d does not exist or TS broken", p_map, p_y, p_x );
-            NAV::printMessage( buffer, MSG_INFO );
+            IO::printMessage( buffer, MSG_INFO );
             swiWaitForVBlank( );
 #endif
             mapExists = false;

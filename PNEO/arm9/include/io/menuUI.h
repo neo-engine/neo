@@ -2,7 +2,7 @@
 Pokémon neo
 ------------------------------
 
-file        : nav.h
+file        : menuUI.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
@@ -31,23 +31,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 #include "defines.h"
+#include "io/menu.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
 
-namespace NAV {
+namespace IO {
+    constexpr u8 NUM_CB_CHOICES = 6;
 
     extern const u16 ARR_X_SPR_PAL[ 16 ];
-
-    constexpr u8 MAX_NAV_APPS = 3;
-
-    constexpr u16 SPR_MSGTEXT_OAM = 108;
-    constexpr u16 SPR_MSGCONT_OAM = 112;
-    constexpr u16 SPR_MSGBOX_OAM  = 113;
-
-    constexpr u16 SPR_MSG_GFX     = 348;
-    constexpr u16 SPR_MSG_EXT_GFX = 220;
-    constexpr u16 SPR_MSGBOX_GFX  = 476;
-    constexpr u16 SPR_MSGCONT_GFX = 508;
 
     constexpr u16 SPR_MENU_OAM_SUB( u16 p_idx ) {
         return ( 0 + ( p_idx ) );
@@ -90,59 +81,12 @@ namespace NAV {
     constexpr u16 SPR_NAV_APP_RSV1_PAL_SUB = 14;
     constexpr u16 SPR_NAV_APP_RSV2_PAL_SUB = 15;
 
-    extern u8  LOCATION_TIMER;
-    extern u16 TEXT_BUF[ 64 * 256 ];
-
-    enum menuOption {
-        VIEW_PARTY = 0,
-        VIEW_DEX   = 1,
-        VIEW_BAG   = 2,
-        VIEW_ID    = 3,
-        SAVE       = 4,
-        SETTINGS   = 5,
-
-        NAV_APP_START = 10,
-        NAV_APP_1     = 10,
-        NAV_APP_2     = 11,
-        NAV_APP_3     = 12,
-    };
-
-    struct backgroundSet {
-        std::string           m_name;
-        const unsigned int*   m_mainMenu;
-        const unsigned short* m_mainMenuPal;
-        bool                  m_loadFromRom;
-        bool                  m_allowsOverlay;
-    };
-
     /*
-     * @brief: Shows a message box informing the player that they obtained the specified
-     * item. (Also adds the specified item to the player's bag)
+     * @brief: (Re-)Initializes the bottom screen
      */
-    void giveItemToPlayer( u16 p_itemId, u16 p_amount = 1 );
+    void init( bool p_noPic = false, bool p_bottom = true );
 
-    /*
-     * @brief: Shows a message informing the player that they lost the specified item.
-     * (also removes the specified item from the bag)
-     */
-    void takeItemFromPlayer( u16 p_itemId, u16 p_amount = 1 );
-
-    /*
-     * @brief: Shows a message informing the player that they lost the specified item
-     * because the item was used.
-     * (also removes the specified item from the bag)
-     */
-    void useItemFromPlayer( u16 p_itemId, u16 p_amount = 1 );
-
-    /*
-     * @brief: Prints the given message. An empty message clears the message box.
-     */
-    void printMessage( const char* p_message, style p_style = MSG_NORMAL, bool p_noDelay = false );
-
-    inline void printMessage( const std::string& p_message, style p_style = MSG_NORMAL,
-                              bool p_noDelay = false ) {
-        printMessage( p_message.c_str( ), p_style, p_noDelay );
-    }
+    void redraw( bool p_bottom = true );
 
     std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>
     printYNMessage( const char* p_message, style p_style, u8 p_selection = 255,
@@ -168,22 +112,18 @@ namespace NAV {
     void updateCounterValue( s32 p_newValue, u8 p_selectedDigit, u8 p_numDigs );
     void hoverCounterButton( s32 p_min, s32 p_max, s32 p_button );
 
-    /*
-     * @brief: Initializes the bottom screen with the main menu
-     */
-    void init( bool p_noPic = false, bool p_bottom = true );
+    std::vector<std::pair<IO::inputTarget, menuOption>> getTouchPositions( bool p_bottom = true );
+    std::vector<std::pair<IO::inputTarget, u8>>         drawMenu( );
 
-    void handleInput( const char* p_path );
+    void selectMenuItem( u8 p_selection );
 
-    void buyItem( const std::vector<std::pair<u16, u32>>& p_offeredItems, u8 p_paymentMethod );
+    std::vector<std::pair<IO::inputTarget, u8>>
+    drawItemChoice( const std::vector<std::pair<u16, u32>>& p_offeredItems,
+                    const std::vector<std::string>&         p_itemNames,
+                    const std::vector<BAG::itemData>& p_data, u8 p_paymentMethod, u8 p_firstItem );
 
-    /*
-     * @brief: Make the player select a pkmn from the (up to 2) currently stored in
-     * daycare p_daycare. Also lists some basic stats and how many levels the pkmn have
-     * grown.
-     */
-    u8 chooseDaycarePkmn( u8 p_daycare );
+    void selectItem( std::pair<u16, u32> p_item, const BAG::itemData& p_itemData,
+                     const std::string& p_descr, u8 p_selection );
 
-    void showNewLocation( u16 p_newLocation );
-    void hideLocation( u8 p_remTime = 0 );
-} // namespace NAV
+    std::vector<std::pair<IO::inputTarget, u8>> drawDaycareChoice( u8 p_daycare );
+} // namespace IO

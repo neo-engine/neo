@@ -34,10 +34,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "io/choiceBox.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 
 #define SPR_WINDOW_NAME_OAM    0
@@ -294,7 +294,7 @@ namespace DEX {
                                                   IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y,
                                                   IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].x + 32,
                                                   IO::Oam->oamBuffer[ SPR_X_OAM_SUB ].y + 32 ),
-                        0 };
+                            0 };
         _touchPositions = std::vector<std::pair<IO::touchInputTarget, u16>>( );
     }
 
@@ -724,14 +724,14 @@ namespace DEX {
                 snprintf( buffer, 99, "%03hu%c", _mode ? p_pkmnIdx : getDexNo( p_pkmnIdx ),
                           p_pkmnForme ? 'a' + p_pkmnForme - 1 : 0 );
 
-                std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
+                std::memset( IO::TEXT_BUF, 0, sizeof( IO::TEXT_BUF ) );
 
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 0, 2 );
-                IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32,
+                IO::regularFont->printStringBC( buffer, TEXT_PAL, IO::TEXT_BUF, 32,
                                                 IO::font::CENTER, 0, 32 );
                 IO::loadSpriteB( p_OAMstart + 1, oam[ p_OAMstart + 1 ].gfxIndex, p_x - 1, p_y + 25,
-                                 32, 32, NAV::TEXT_BUF, 32 * 32 / 2, false, false, false,
+                                 32, 32, IO::TEXT_BUF, 32 * 32 / 2, false, false, false,
                                  OBJPRIORITY_3, p_bottom );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -785,37 +785,37 @@ namespace DEX {
             oam[ oamStart + 8 ].isHidden = true;
         } else {
             // load pkmn name
-            std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
+            std::memset( IO::TEXT_BUF, 0, sizeof( IO::TEXT_BUF ) );
 
             IO::regularFont->setColor( 1, 1 );
             IO::regularFont->setColor( 0, 2 );
             snprintf( buffer, 9, "%03hu", p_pkmnIdx );
-            IO::regularFont->printStringBC( buffer, TEXT_PAL, NAV::TEXT_BUF, 32, IO::font::LEFT, 0,
+            IO::regularFont->printStringBC( buffer, TEXT_PAL, IO::TEXT_BUF, 32, IO::font::LEFT, 0,
                                             32 );
             IO::loadSpriteB( oamStart + 5, oam[ oamStart + 5 ].gfxIndex,
                              SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 40,
-                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF,
                              16 * 32 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
 
-            std::memset( NAV::TEXT_BUF, 0, sizeof( NAV::TEXT_BUF ) );
+            std::memset( IO::TEXT_BUF, 0, sizeof( IO::TEXT_BUF ) );
             if( seen || caught ) {
                 IO::regularFont->printStringBC( FS::getDisplayName( p_pkmnIdx ).c_str( ), TEXT_PAL,
-                                                NAV::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
+                                                IO::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
             } else {
-                IO::regularFont->printStringBC( GET_STRING( 581 ), TEXT_PAL, NAV::TEXT_BUF, 96,
+                IO::regularFont->printStringBC( GET_STRING( 581 ), TEXT_PAL, IO::TEXT_BUF, 96,
                                                 IO::font::LEFT, 15, 32, 16 );
             }
             IO::loadSpriteB( oamStart + 6, oam[ oamStart + 6 ].gfxIndex,
                              SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64,
-                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF,
                              32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
             IO::loadSpriteB( oamStart + 7, oam[ oamStart + 7 ].gfxIndex,
                              SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64 + 32,
-                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF + 32 * 16,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF + 32 * 16,
                              32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
             IO::loadSpriteB( oamStart + 8, oam[ oamStart + 8 ].gfxIndex,
                              SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64 + 64,
-                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, NAV::TEXT_BUF + 32 * 32,
+                             SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF + 32 * 32,
                              32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );

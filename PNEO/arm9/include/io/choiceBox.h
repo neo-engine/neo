@@ -80,6 +80,6 @@ namespace IO {
          * opened.)
          */
         selection getResult( const char* p_message, style p_style,
-                             const std::vector<u16>& p_choices );
+                             const std::vector<u16>& p_choices, bool p_showExitButton = false );
     };
 } // namespace IO

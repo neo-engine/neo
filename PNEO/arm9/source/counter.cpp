@@ -30,8 +30,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
 #include "io/counter.h"
+#include "io/menuUI.h"
+#include "io/message.h"
 #include "io/uio.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 
@@ -42,13 +43,13 @@ namespace IO {
 
         return getResult(
             [ & ]( ) {
-                NAV::printMessage( p_message, p_style );
-                return NAV::drawCounter( _minValue, _maxValue );
+                IO::printMessage( p_message, p_style );
+                return IO::drawCounter( _minValue, _maxValue );
             },
             [ & ]( s32 p_value, u8 p_selDigit ) {
-                NAV::updateCounterValue( p_value, p_selDigit, mxdg );
+                IO::updateCounterValue( p_value, p_selDigit, mxdg );
             },
-            [ & ]( s32 p_button ) { NAV::hoverCounterButton( _minValue, _maxValue, p_button ); },
+            [ & ]( s32 p_button ) { IO::hoverCounterButton( _minValue, _maxValue, p_button ); },
             _minValue );
     }
 

@@ -27,9 +27,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "map/mapSprite.h"
 #include "fs/fs.h"
+#include "io/message.h"
 #include "io/uio.h"
 #include "map/mapSlice.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 
 #define SPR_MAPTILE_OAM( p_idx )   ( 0 + ( p_idx ) )
@@ -63,7 +63,7 @@ namespace MAP {
     void mapSpriteData::readData( FILE* p_f ) {
         if( !p_f ) {
 #ifdef DESQUID
-            NAV::printMessage( "Sprite failed" );
+            IO::printMessage( "Sprite failed" );
 #endif
         } else {
             FS::read( p_f, m_palData, sizeof( u16 ), 16 );
@@ -162,7 +162,7 @@ namespace MAP {
     void mapSprite::drawFrame( u8 p_oamIdx, u8 p_value, bool p_hFlip ) {
 
 #ifdef DESQUID
-//        NAV::printMessage( ( std::string( " Draw Frame " ) + std::to_string( p_value ) ).c_str( )
+//        IO::printMessage( ( std::string( " Draw Frame " ) + std::to_string( p_value ) ).c_str( )
 //        );
 #endif
         IO::setOWSpriteFrame( p_value, p_hFlip, p_oamIdx, _data.m_palData, _data.m_frameData );
@@ -377,7 +377,7 @@ namespace MAP {
         val2 += IO::spriteInfoTop[ p_idx2 ].m_height;
         /*
                 if( debug ) {
-                    NAV::printMessage( ( std::to_string( p_idx1 ) + ": " + std::to_string( val1 ) +
+                    IO::printMessage( ( std::to_string( p_idx1 ) + ": " + std::to_string( val1 ) +
            "\n"
                                          + std::to_string( p_idx2 ) + " : " + std::to_string( val2 )
            ) .c_str( ) );
@@ -402,7 +402,7 @@ namespace MAP {
         for( u8 i = 0; i < MAX_OAM; ++i ) {
             bool swp = false;
             for( u8 j = 1; j < MAX_OAM - i; ++j ) {
-                //                NAV::printMessage( ( std::to_string( j - 1 ) + " sw " +
+                //                IO::printMessage( ( std::to_string( j - 1 ) + " sw " +
                 //                std::to_string( j ) + " : "
                 //                                     + std::to_string( IO::OamTop->oamBuffer[ j -
                 //                                     1 ].y ) + " vs "
@@ -560,10 +560,10 @@ namespace MAP {
         }
 
 #ifdef DESQUID_MORE
-        NAV::printMessage( ( std::string( "load hm object " )
-                             + std::to_string( screenX( p_camX, p_posX, 16 ) ) + "."
-                             + std::to_string( screenY( p_camY, p_posY, 16 ) ) + "." )
-                               .c_str( ) );
+        IO::printMessage( ( std::string( "load hm object " )
+                            + std::to_string( screenX( p_camX, p_posX, 16 ) ) + "."
+                            + std::to_string( screenY( p_camY, p_posY, 16 ) ) + "." )
+                              .c_str( ) );
 #endif
         switch( p_particleId ) {
         case SPR_ITEM:
@@ -637,7 +637,7 @@ namespace MAP {
         if( p_spriteId == 255 ) { return; }
 
 #ifdef DESQUID_MORE
-        NAV::printMessage( ( std::to_string( p_spriteId ) + " destroy" ).c_str( ) );
+        IO::printMessage( ( std::to_string( p_spriteId ) + " destroy" ).c_str( ) );
 #endif
 
         IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden = true;
@@ -748,7 +748,7 @@ namespace MAP {
             IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden
                 = !_hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].second.isVisible( );
 #ifdef DESQUID_MORE
-            NAV::printMessage(
+            IO::printMessage(
                 ( std::to_string( p_spriteId )
                   + " x: " + std::to_string( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x )
                   + " y : "
@@ -769,7 +769,7 @@ namespace MAP {
             IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden
                 = !getManagedSprite( p_spriteId ).m_pos.isVisible( );
 #ifdef DESQUID_MORE
-            NAV::printMessage(
+            IO::printMessage(
                 ( std::to_string( p_spriteId ) + " hidden? "
                   + std::to_string( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden ) )
                     .c_str( ) );

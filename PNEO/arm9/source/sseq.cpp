@@ -6,7 +6,7 @@
 #include "sound/sseq.h"
 #include "sound/sseqData.h"
 
-#include "nav/nav.h"
+#include "io/message.h"
 
 namespace SOUND::SSEQ {
     static void sndsysMsgHandler( int, void * );
@@ -130,7 +130,7 @@ namespace SOUND::SSEQ {
             }
         }
         CURRENT_SEQUENCE.m_fadeIn = p_fadeIn;
-        CURRENT_SEQUENCE_ID = p_seqId;
+        CURRENT_SEQUENCE_ID       = p_seqId;
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
         ANIMATE_MAP = oa;
     }

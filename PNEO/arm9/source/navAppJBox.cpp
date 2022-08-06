@@ -29,15 +29,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
+#include "io/menuUI.h"
+#include "io/navApp.h"
 #include "io/sprite.h"
 #include "io/strings.h"
 #include "io/uio.h"
-#include "nav/nav.h"
-#include "nav/navApp.h"
 #include "sound/sound.h"
 #include "sound/sseqData.h"
 
-namespace NAV {
+namespace IO {
     void jboxNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::loadSprite( "NV/app02", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
@@ -403,5 +403,5 @@ namespace NAV {
         return false;
     }
 
-} // namespace NAV
+} // namespace IO
 #endif

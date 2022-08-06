@@ -27,13 +27,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs/data.h"
 #include "fs/fs.h"
+#include "io/menuUI.h"
+#include "io/navApp.h"
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "map/mapDefines.h"
-#include "nav/nav.h"
-#include "nav/navApp.h"
 
-namespace NAV {
+namespace IO {
     void mapNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::loadSprite( "NV/app01", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
@@ -207,4 +207,4 @@ namespace NAV {
         if( change || locChange ) { IO::updateOAM( p_bottom ); }
         return false;
     }
-} // namespace NAV
+} // namespace IO

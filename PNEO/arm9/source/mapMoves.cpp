@@ -28,12 +28,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "gen/locationNames.h"
 #include "gen/moveNames.h"
+#include "io/message.h"
 #include "io/strings.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
 #include "map/mapSlice.h"
 #include "map/mapSprite.h"
-#include "nav/nav.h"
 #include "save/saveGame.h"
 
 namespace BATTLE {
@@ -338,7 +338,7 @@ namespace BATTLE {
         case M_HEADBUTT: return;
         case M_SWEET_SCENT:
             if( !possible( M_SWEET_SCENT, 0 ) || !MAP::curMap->requestWildPkmn( true ) ) {
-                NAV::printMessage( GET_STRING( IO::STR_MAP_HM_MESSAGE_SWEET_SCENT_FAILED ) );
+                IO::printMessage( GET_STRING( IO::STR_MAP_HM_MESSAGE_SWEET_SCENT_FAILED ) );
             }
             return;
         case M_TELEPORT:

@@ -37,7 +37,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"

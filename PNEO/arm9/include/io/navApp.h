@@ -29,7 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "io/uio.h"
 
-namespace NAV {
+namespace IO {
     class navApp {
       public:
         /*
@@ -49,6 +49,9 @@ namespace NAV {
          */
         virtual bool tick( bool p_bottom = true ) = 0;
     };
+
+    extern std::vector<navApp*> NAV_APPS;
+    extern navApp*              CUR_NAV_APP;
 
     class mapNavApp : public navApp {
         static constexpr u16 MAP_TOP_X = 4;
@@ -123,4 +126,4 @@ namespace NAV {
         bool tick( bool p_bottom = true );
     };
 #endif
-} // namespace NAV
+} // namespace IO

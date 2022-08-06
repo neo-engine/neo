@@ -33,11 +33,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
 #include "fs/fs.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "map/mapDrawer.h"
-#include "nav/nav.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
 
@@ -312,7 +312,7 @@ namespace MAP {
                 DRAW_TIME   = true;
             }
 #ifdef DESQUID_MORE
-            NAV::printMessage( "Load Slice" );
+            IO::printMessage( "Load Slice" );
 #endif
         }
 
@@ -368,7 +368,7 @@ namespace MAP {
 #ifdef DESQUID_MORE
             char buffer[ 100 ];
             snprintf( buffer, 99, "Switch Slice to (%d, %d)", _curX, _curY );
-            NAV::printMessage( buffer );
+            IO::printMessage( buffer );
 #endif
         }
 
