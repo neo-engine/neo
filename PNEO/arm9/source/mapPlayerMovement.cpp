@@ -948,6 +948,8 @@ namespace MAP {
         if( newMapType & CAVE ) { hidePlayer = false; }
         if( exitCave && p_type != DOOR && p_type != SLIDING_DOOR ) { hidePlayer = false; }
 
+        if( SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE ) { hidePlayer = false; }
+
         switch( p_type ) {
         case TELEPORT:
             SOUND::playSoundEffect( SFX_WARP );
@@ -1506,7 +1508,7 @@ namespace MAP {
             removeFollowPkmn( );
             SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 3;
             surfing                                      = true;
-            resetTracerChain( true );
+            if( p_newMode != DIVE ) { resetTracerChain( true ); }
             break;
         case BIKE:
         case MACH_BIKE:

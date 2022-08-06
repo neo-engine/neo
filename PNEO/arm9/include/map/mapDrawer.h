@@ -399,6 +399,8 @@ namespace MAP {
         void runEvent( mapData::event p_event, u8 p_objectId = 0, s16 p_mapX = -1,
                        s16 p_mapY = -1 );
 
+        bool executeWarpScript( u16 p_scriptId, warpType& p_targetType, warpPos& p_targetPos );
+
         void executeScript( u16 p_scriptId, u8 p_mapObject = 0, s16 p_mapX = -1, s16 p_mapY = -1 );
 
         void handleEvents( u8 p_localX, u8 p_localY, u8 p_z );
@@ -491,7 +493,6 @@ namespace MAP {
          * charged.)
          */
         bool tracerUsable( position p_position ) const {
-            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE ) { return false; }
             if( currentData( ).m_mapType & MAP::INSIDE ) { return false; }
 
             auto lstblock  = at( p_position.m_posX, p_position.m_posY );

@@ -467,18 +467,12 @@ namespace MAP {
 
         // check if any position remains
         u16 active = 0;
-        for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) {
-            active |= _tracerPositions[ i ];
-#ifdef DESQUID_MORE
-            char buffer[ 100 ];
-            sprintf( buffer, "line %hhu: %hx", i, _tracerPositions[ i ] );
-            DESQUID_LOG( buffer );
-#endif
-        }
+        for( u8 i = 0; i < 2 * TRACER_AREA + 1; ++i ) { active |= _tracerPositions[ i ]; }
         return !!active;
     }
 
     bool mapDrawer::continueTracerChain( ) {
+        printf( "HERE\n" );
         // store current position
         std::memset( _tracerPositions, 0, sizeof( _tracerPositions ) );
         _tracerLastPos    = SAVE::SAV.getActiveFile( ).m_player.m_pos;

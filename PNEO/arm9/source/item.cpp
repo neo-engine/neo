@@ -308,7 +308,9 @@ namespace BAG {
                     return true;
                 }
                 if( !tracerUsable ) { return true; }
-                MAP::curMap->changeMoveMode( MAP::WALK );
+                if( SAVE::SAV.getActiveFile( ).m_player.m_movement != MAP::DIVE ) {
+                    MAP::curMap->changeMoveMode( MAP::WALK );
+                }
                 MAP::curMap->useTracer( );
                 return false;
             }

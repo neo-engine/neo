@@ -76,6 +76,8 @@ namespace MAP {
     constexpr u8 CLL_DAYCARE_BAA_SAN = 12; // (par: # of day care) (take/hand over pkmn)
     constexpr u8 CLL_DAYCARE_JII_SAN = 13; // (obtain egg)
     constexpr u8 CLL_SAVE_GAME       = 14;
+    constexpr u8 CLL_HOURS_MOD       = 15; // current time (hours) % par1 (used for
+                                           // shoal cave
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;
@@ -268,62 +270,82 @@ namespace MAP {
         IO::printMessage( convertMapString( p_text, p_style ).c_str( ), p_style );
     }
 
-    static u16 CURRENT_SCRIPT = -1;
-    void       mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject, s16 p_mapX, s16 p_mapY ) {
-              if( CURRENT_SCRIPT == p_scriptId ) { return; }
-              CURRENT_SCRIPT = p_scriptId;
+    static u16 CURRENT_SCRIPT  = -1;
+    u16        registers[ 10 ] = { 0 };
 
-              FILE* f = FS::openScript( p_scriptId );
-              if( !f ) {
-                  CURRENT_SCRIPT = -1;
-                  return;
+    bool mapDrawer::executeWarpScript( u16 p_scriptId, warpType& p_targetType,
+                                       warpPos& p_targetPos ) {
+        // run script
+        executeScript( p_scriptId );
+
+        // parse registers as returned data
+        p_targetType = warpType( registers[ 0 ] );
+        if( !p_targetType ) { return false; }
+
+        p_targetPos = warpPos( registers[ 1 ], position( registers[ 3 ] * SIZE + registers[ 5 ],
+                                                         registers[ 2 ] * SIZE + registers[ 4 ],
+                                                         +registers[ 6 ] ) );
+
+        if( !p_targetPos.first ) { return false; }
+        return true;
+    }
+
+    void mapDrawer::executeScript( u16 p_scriptId, u8 p_mapObject, s16 p_mapX, s16 p_mapY ) {
+        if( CURRENT_SCRIPT == p_scriptId ) { return; }
+        CURRENT_SCRIPT = p_scriptId;
+
+        FILE* f = FS::openScript( p_scriptId );
+        if( !f ) {
+            CURRENT_SCRIPT = -1;
+            return;
         }
 
-              bool srn       = _scriptRunning;
-              _scriptRunning = true;
+        bool srn       = _scriptRunning;
+        _scriptRunning = true;
 
-              u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
-              fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
-              FS::close( f );
+        u32 SCRIPT_INS[ MAX_SCRIPT_SIZE ];
+        fread( SCRIPT_INS, sizeof( u32 ), MAX_SCRIPT_SIZE, f );
+        FS::close( f );
 
-              u8 pc = 0;
+        u8 pc = 0;
 
-              std::vector<std::pair<u16, u32>> martItems;
+        std::vector<std::pair<u16, u32>> martItems;
 
-              std::vector<u16> choiceBoxItems;
-              std::vector<u16> choiceBoxPL;
-              u16              choiceBoxMessage = 0;
-              u8               choiceBoxMsgType = 0;
+        std::vector<u16> choiceBoxItems;
+        std::vector<u16> choiceBoxPL;
+        u16              choiceBoxMessage = 0;
+        u8               choiceBoxMsgType = 0;
 
-              char buffer[ 200 ]   = { 0 };
-              u16  registers[ 10 ] = { 0 };
+        char buffer[ 200 ] = { 0 };
 
-              u8   pmartCurr = 0;
-              bool martSell  = true;
+        u8   pmartCurr = 0;
+        bool martSell  = true;
 
-              bool playerAttachedToObject = false;
+        bool playerAttachedToObject = false;
 
-              moveMode tmpmove = NO_MOVEMENT;
+        moveMode tmpmove = NO_MOVEMENT;
 
-              u8 newbnk = 255;
-              u8 newz   = 0;
+        u8 newbnk = 255;
+        u8 newz   = 0;
 
-              while( SCRIPT_INS[ pc ] ) {
-                  u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-                  u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-                  u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
-                  u16 mapX = curx / SIZE, mapY = cury / SIZE;
-                  if( p_mapX >= 0 ) { mapX = p_mapX; }
-                  if( p_mapY >= 0 ) { mapY = p_mapY; }
-                  auto ins   = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
-                  u8   par1  = PARAM1( SCRIPT_INS[ pc ] );
-                  u8   par2  = PARAM2( SCRIPT_INS[ pc ] );
-                  u8   par3  = PARAM3( SCRIPT_INS[ pc ] );
-                  u8   par1s = PARAM1S( SCRIPT_INS[ pc ] );
-                  u8   par2s = PARAM2S( SCRIPT_INS[ pc ] );
-                  u16  par3s = PARAM3S( SCRIPT_INS[ pc ] );
-                  u16  parA  = PARAMA( SCRIPT_INS[ pc ] );
-                  u16  parB  = PARAMB( SCRIPT_INS[ pc ] );
+        memset( registers, 0, sizeof( registers ) );
+
+        while( SCRIPT_INS[ pc ] ) {
+            u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+            u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+            u16 curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+            u16 mapX = curx / SIZE, mapY = cury / SIZE;
+            if( p_mapX >= 0 ) { mapX = p_mapX; }
+            if( p_mapY >= 0 ) { mapY = p_mapY; }
+            auto ins   = opCode( OPCODE( SCRIPT_INS[ pc ] ) );
+            u8   par1  = PARAM1( SCRIPT_INS[ pc ] );
+            u8   par2  = PARAM2( SCRIPT_INS[ pc ] );
+            u8   par3  = PARAM3( SCRIPT_INS[ pc ] );
+            u8   par1s = PARAM1S( SCRIPT_INS[ pc ] );
+            u8   par2s = PARAM2S( SCRIPT_INS[ pc ] );
+            u16  par3s = PARAM3S( SCRIPT_INS[ pc ] );
+            u16  parA  = PARAMA( SCRIPT_INS[ pc ] );
+            u16  parB  = PARAMB( SCRIPT_INS[ pc ] );
 
 #ifdef DESQUID_MORE
             IO::printMessage( ( std::to_string( pc ) + ": " + std::to_string( ins ) + " ( "
@@ -1374,6 +1396,10 @@ namespace MAP {
                     }
                     break;
                 }
+                case CLL_HOURS_MOD: {
+                    registers[ 0 ] = SAVE::CURRENT_TIME.m_hours % par2;
+                    break;
+                }
                 default: break;
                 }
                 break;
@@ -2177,18 +2203,27 @@ namespace MAP {
 
         if( wdata.second.m_warp.m_warpType != NO_SPECIAL ) {
             p_type = (warpType) wdata.second.m_warp.m_warpType;
-            if( wdata.second.m_warp.m_warpType == LAST_VISITED ) {
-                tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+            if( wdata.second.m_warp.m_warpType == SCRIPT ) {
+                auto scriptId = wdata.second.m_warp.m_posZ;
+                if( !executeWarpScript( scriptId, p_type, tg ) ) {
+                    // warp script failed / didn't return
+                    return;
+                }
+                if( p_type == LAST_VISITED ) { tg = SAVE::SAV.getActiveFile( ).m_lastWarp; }
             } else {
-                tg = warpPos(
-                    wdata.second.m_warp.m_bank,
-                    position( wdata.second.m_warp.m_mapX * SIZE + wdata.second.m_warp.m_posX,
-                              wdata.second.m_warp.m_mapY * SIZE + wdata.second.m_warp.m_posY,
-                              +wdata.second.m_warp.m_posZ ) );
+                if( wdata.second.m_warp.m_warpType == LAST_VISITED ) {
+                    tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+                } else {
+                    tg = warpPos(
+                        wdata.second.m_warp.m_bank,
+                        position( wdata.second.m_warp.m_mapX * SIZE + wdata.second.m_warp.m_posX,
+                                  wdata.second.m_warp.m_mapY * SIZE + wdata.second.m_warp.m_posY,
+                                  +wdata.second.m_warp.m_posZ ) );
+                }
             }
         }
 
-        if( tg.first == WARP_TO_LAST_ENTRY ) tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+        if( tg.first == WARP_TO_LAST_ENTRY ) { tg = SAVE::SAV.getActiveFile( ).m_lastWarp; }
         if( !tg.first && !tg.second.m_posY && !tg.second.m_posZ && !tg.second.m_posX ) return;
 
         SAVE::SAV.getActiveFile( ).m_lastWarp = p_source;

@@ -288,6 +288,7 @@ namespace IO {
         if( res != IO::choiceBox::BACK_CHOICE ) {
             handleDesquidMenuSelection( desquidMenuOption( res ), p_path );
         }
+        init( );
     }
 
 #endif

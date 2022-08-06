@@ -252,6 +252,7 @@ namespace MAP {
         LAST_VISITED,
         SLIDING_DOOR,
         FLY,
+        SCRIPT
     };
 
     constexpr u8 MAX_PKMN_PER_SLICE   = 30;
@@ -327,7 +328,7 @@ namespace MAP {
 
                     u8 m_posX;
                     u8 m_posY;
-                    u8 m_posZ;
+                    u8 m_posZ; // script id if warp type is script.
                 } m_warp;
                 struct {
                     u16 m_scriptId;
