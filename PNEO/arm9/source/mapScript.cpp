@@ -78,6 +78,7 @@ namespace MAP {
     constexpr u8 CLL_SAVE_GAME       = 14;
     constexpr u8 CLL_HOURS_MOD       = 15; // current time (hours) % par1 (used for
                                            // shoal cave
+    constexpr u8 CLL_PLAYTIME_HOURS = 16;
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;
@@ -201,7 +202,8 @@ namespace MAP {
 
         DES = 150, // register pkmn as seen in pkdex
 
-        SBC = 196, // set block
+        SBC  = 196, // set block
+        SBCC = 197, // set block, with player dir correction
     };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
@@ -933,6 +935,14 @@ namespace MAP {
                 setBlock( u16( mapX * SIZE + par1s ), u16( mapY * SIZE + par2s ), par3s );
                 break;
             }
+            case SBCC: {
+                setBlock( u16( mapX * SIZE + par1s
+                               + dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 0 ] ),
+                          u16( mapY * SIZE + par2s
+                               + dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 1 ] ),
+                          par3s );
+                break;
+            }
             case CBG:
                 choiceBoxItems.clear( );
                 choiceBoxPL.clear( );
@@ -1398,6 +1408,10 @@ namespace MAP {
                 }
                 case CLL_HOURS_MOD: {
                     registers[ 0 ] = SAVE::CURRENT_TIME.m_hours % par2;
+                    break;
+                }
+                case CLL_PLAYTIME_HOURS: {
+                    registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_playTime.m_hours;
                     break;
                 }
                 default: break;

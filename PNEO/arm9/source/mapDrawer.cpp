@@ -283,8 +283,8 @@ namespace MAP {
             return;
         }
 
-        loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
-                   ( _lastrow + NUM_ROWS / 2 + 1 ) % NUM_ROWS );
+        loadBlock( at( p_globX, p_globY ), ( _lastcol + NUM_COLS / 2 - curx + p_globX ) % NUM_COLS,
+                   ( _lastrow + NUM_ROWS / 2 + 1 - cury + p_globY ) % NUM_ROWS );
         bgUpdate( );
     }
 
