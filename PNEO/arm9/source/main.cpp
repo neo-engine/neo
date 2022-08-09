@@ -70,9 +70,6 @@ GameMod gMod = GameMod::ALPHA;
 
 fsdataInfo FSDATA;
 
-constexpr u8 DAY_TIMES[ 4 ][ 5 ]
-    = { { 7, 10, 15, 17, 23 }, { 6, 9, 12, 18, 23 }, { 5, 8, 10, 20, 23 }, { 7, 9, 13, 19, 23 } };
-
 time_t        unixTime;
 int           pressed, held, last;
 touchPosition touch;

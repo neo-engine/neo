@@ -121,7 +121,7 @@ namespace FS {
 
         { "Fateful Enc." },
         { "Squids are evil. Eat them!" },
-        { "PKMN Spawn" },
+        { "PKMN" },
         { "Item Spawn" },
         { "Flags" },
 
@@ -134,6 +134,17 @@ namespace FS {
         { "Edit Flags" },
 
         { "Edit Vars" },
+        { "Set Dawn" },
+        { "Set Day" },
+        { "Set Dusk" },
+        { "Set Night" },
+
+        // 60
+
+        { "Playtime +10" },
+        { "Default Team" },
+        { "Repel 9999" },
+        { "Repel Off" },
     };
 
 #endif

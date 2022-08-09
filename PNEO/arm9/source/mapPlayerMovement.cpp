@@ -1677,9 +1677,11 @@ namespace MAP {
             || SAVE::SAV.getActiveFile( ).m_lastPokeCenter.first == 255 ) {
             SAVE::printTextAndWait( GET_STRING( IO::STR_MAP_FAINT_TO_HOME ) );
             if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
-                tgpos = { 21, { 0x2b, 0x29, 3 } };
+                // TODO: move to FSINFO
+                tgpos = { 20, { 0x2b, 0x89, 3 } };
             } else {
-                tgpos = { 21, { 0x31, 0x49, 3 } };
+                // TODO: move to FSINFO
+                tgpos = { 20, { 0x31, 0xa9, 3 } };
             }
         } else {
             SAVE::printTextAndWait( GET_STRING( IO::STR_MAP_FAINT_TO_POKE_CENTER ) );

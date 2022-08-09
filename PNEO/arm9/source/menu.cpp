@@ -169,49 +169,71 @@ namespace IO {
     void handleDesquidMenuSelection( desquidMenuOption p_selection, const char* ) {
         switch( p_selection ) {
         case DSQ_SPAWN_DEFAULT_TEAM: {
-            memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
-                    sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
-            std::vector<u16> tmp = { PKMN_SCEPTILE, PKMN_BLAZIKEN, PKMN_SWAMPERT };
-            for( int i = 0; i < 3; ++i ) {
-                pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
+            init( );
+            IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            auto          res  = menu.getResult( GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
+                                                 std::vector<u16>{ FS::DESQUID_STRING + 61,
+                                                                   FS::DESQUID_STRING + 62,
+                                                                   FS::DESQUID_STRING + 63 },
+                                                 true );
+            switch( res ) {
+            case 0: { // default team
+                memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
+                        sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
+                std::vector<u16> tmp = { PKMN_SCEPTILE, PKMN_BLAZIKEN, PKMN_SWAMPERT };
+                for( int i = 0; i < 3; ++i ) {
+                    pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
-                a = pokemon( tmp[ i ], 50, 0, 0, i );
+                    a = pokemon( tmp[ i ], 50, 0, 0, i );
 
-                // Hand out some ribbons
-                for( u8 j = 0; j < 4; ++j ) {
-                    a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
-                    a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
-                    a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
-                }
-                a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
-                a.m_boxdata.m_ribbons1[ 3 ] = 0;
-                if( a.m_boxdata.m_speciesId == 493 ) {
-                    u8 plate = rand( ) % 17;
-                    if( plate < 16 )
-                        a.giveItem( I_FLAME_PLATE + plate );
-                    else
-                        a.giveItem( I_PIXIE_PLATE );
-                } else {
-                    a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
+                    // Hand out some ribbons
+                    for( u8 j = 0; j < 4; ++j ) {
+                        a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
+                        a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
+                        a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
+                    }
+                    a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
+                    a.m_boxdata.m_ribbons1[ 3 ] = 0;
+                    if( a.m_boxdata.m_speciesId == 493 ) {
+                        u8 plate = rand( ) % 17;
+                        if( plate < 16 )
+                            a.giveItem( I_FLAME_PLATE + plate );
+                        else
+                            a.giveItem( I_PIXIE_PLATE );
+                    } else {
+                        a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
+                    }
+
+                    for( u16 j = 1; j <= MAX_PKMN; ++j ) {
+                        SAVE::SAV.getActiveFile( ).registerCaughtPkmn( j );
+                    }
                 }
 
-                for( u16 j = 1; j <= MAX_PKMN; ++j ) {
-                    SAVE::SAV.getActiveFile( ).registerCaughtPkmn( j );
-                }
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_FLASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 3 ] = M_CUT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_DIG;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_ROCK_SMASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_FLY;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 2 ] = M_DIVE;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 3 ] = M_SPLASH;
+
+                break;
             }
-
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_FLASH;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 3 ] = M_CUT;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_DIG;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_ROCK_SMASH;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_FLY;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 2 ] = M_DIVE;
-            SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 3 ] = M_SPLASH;
+            case 1: { // repel 9999
+                SAVE::SAV.getActiveFile( ).m_repelSteps = 9999;
+                break;
+            }
+            case 2: { // repel off
+                SAVE::SAV.getActiveFile( ).m_repelSteps = 0;
+                break;
+            }
+            default: break;
+            }
 
             init( );
             swiWaitForVBlank( );
@@ -263,6 +285,46 @@ namespace IO {
             break;
         }
         case DSQ_TIME: {
+            init( );
+            IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            auto          res  = menu.getResult(
+                          GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
+                          std::vector<u16>{ FS::DESQUID_STRING + 56, FS::DESQUID_STRING + 57,
+                                            FS::DESQUID_STRING + 58, FS::DESQUID_STRING + 59,
+                                            FS::DESQUID_STRING + 60 },
+                          true );
+            switch( res ) {
+            case 0: { // daytime to dawn
+                SAVE::CURRENT_TIME.m_hours
+                    = DAY_TIMES[ SAVE::CURRENT_DATE.m_month / 4 ][ DAYTIME_MORNING ];
+                break;
+            }
+            case 1: { // daytime to day
+                SAVE::CURRENT_TIME.m_hours
+                    = DAY_TIMES[ SAVE::CURRENT_DATE.m_month / 4 ][ DAYTIME_DAY ];
+                break;
+            }
+            case 2: { // daytime to dusk
+                SAVE::CURRENT_TIME.m_hours
+                    = DAY_TIMES[ SAVE::CURRENT_DATE.m_month / 4 ][ DAYTIME_DUSK ];
+                break;
+            }
+            case 3: { // daytime to night
+                SAVE::CURRENT_TIME.m_hours
+                    = DAY_TIMES[ SAVE::CURRENT_DATE.m_month / 4 ][ DAYTIME_NIGHT ];
+                break;
+            }
+            case 4: { // playtime +10h
+                if( SAVE::SAV.getActiveFile( ).m_playTime.m_hours + 10 <= 999 ) {
+                    SAVE::SAV.getActiveFile( ).m_playTime.m_hours += 10;
+                } else {
+                    SAVE::SAV.getActiveFile( ).m_playTime.m_hours = 999;
+                }
+                break;
+            }
+            default: break;
+            }
+
             init( );
             break;
         }

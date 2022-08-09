@@ -87,6 +87,12 @@ namespace MAP {
         mapData::event m_event;
         movement       m_currentMovement;
 
+        inline bool valid( ) const {
+            if( m_picNum > PKMN_SPRITE + MAX_PKMN && m_picNum != u16( -1 ) ) { return false; }
+
+            return true;
+        }
+
         inline mapSprite sprite( ) const {
             u8 frameStart = getFrame( m_direction );
             return mapSprite( m_picNum < PKMN_SPRITE ? ( m_picNum | 256 ) : m_picNum, frameStart,

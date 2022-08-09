@@ -63,7 +63,9 @@ namespace MAP {
         return DOWN;
     }
 
-    void mapDrawer::loadMapObject( std::pair<u8, mapObject>& p_mapObject ) {
+    bool mapDrawer::loadMapObject( std::pair<u8, mapObject>& p_mapObject ) {
+        if( !p_mapObject.second.valid( ) ) { return false; }
+
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         switch( p_mapObject.second.m_event.m_type ) {
@@ -123,6 +125,7 @@ namespace MAP {
         if( p_mapObject.first != 255 ) {
             animateField( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY );
         }
+        return true;
     }
 
     void mapDrawer::attachMapObjectToPlayer( u8 p_objectId ) {
@@ -304,10 +307,14 @@ namespace MAP {
             _followPkmn.m_event.m_type = EVENT_OW_PKMN;
 
             std::pair<u8, mapObject> cur = { 0, _followPkmn };
-            loadMapObject( cur );
-            _playerFollowPkmnSprite = cur.first;
-            _mapSprites.setFrameD( _playerFollowPkmnSprite, p_direction );
-            _pkmnFollowsPlayer = true;
+            if( loadMapObject( cur ) ) {
+                _playerFollowPkmnSprite = cur.first;
+                _mapSprites.setFrameD( _playerFollowPkmnSprite, p_direction );
+                _pkmnFollowsPlayer = true;
+            } else {
+                _pkmnFollowsPlayer = false;
+                removeFollowPkmn( );
+            }
         } else {
             _pkmnFollowsPlayer = false;
             removeFollowPkmn( );
@@ -704,8 +711,7 @@ namespace MAP {
             default: continue;
             }
 
-            loadMapObject( cur );
-            res.push_back( cur );
+            if( loadMapObject( cur ) ) { res.push_back( cur ); }
         }
 
         SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( ) + _fixedMapObjects.size( );

@@ -62,9 +62,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     void mapSpriteData::readData( FILE* p_f ) {
         if( !p_f ) {
-#ifdef DESQUID
-            IO::printMessage( "Sprite failed" );
-#endif
+            // empty!
         } else {
             FS::read( p_f, m_palData, sizeof( u16 ), 16 );
             FS::read( p_f, &m_frameCount, sizeof( u8 ), 1 );
@@ -96,8 +94,21 @@ namespace MAP {
                           shiny ? "s" : "", female ? "f" : "", forme );
             }
             f = FS::open( IO::OWP_PATH, buf, ".rsd" );
+
+#ifdef DESQUID
+            if( !f ) {
+                printf( "sf %s %hu\n", buf, p_imageId );
+                IO::printMessage( std::string( "Sprite failed: " ) + buf );
+            }
+#endif
         } else if( p_imageId < 250 ) {
             f = FS::open( IO::OW_PATH, p_imageId, ".rsd" );
+#ifdef DESQUID
+            if( !f ) {
+                IO::printMessage( std::string( "Sprite failed: OW/" )
+                                  + std::to_string( p_imageId ) );
+            }
+#endif
         } else {
             if( p_imageId == 250 ) {
                 // load player appearance
@@ -110,6 +121,12 @@ namespace MAP {
                 p_imageId &= 255;
             }
             f = FS::openSplit( IO::TRAINER_PATH, p_imageId, ".rsd", 255 );
+#ifdef DESQUID
+            if( !f ) {
+                IO::printMessage( std::string( "Sprite failed: Trainer/" )
+                                  + std::to_string( p_imageId ) );
+            }
+#endif
         }
         readData( f );
     }
@@ -509,14 +526,26 @@ namespace MAP {
         FILE* f;
         u8    fr = 0;
         if( p_stage == 0 ) { // generic sprite for all berries
-            f  = FS::open( IO::BERRY_PATH, 998, ".rsd" );
+            f = FS::open( IO::BERRY_PATH, 998, ".rsd" );
+#ifdef DESQUID
+            if( !f ) { IO::printMessage( std::string( "Sprite failed: Berry/998" ) ); }
+#endif
             fr = 0;
         } else if( p_stage == 1 ) { // generic sprite for all berries
-            f  = FS::open( IO::BERRY_PATH, 999, ".rsd" );
+            f = FS::open( IO::BERRY_PATH, 999, ".rsd" );
+#ifdef DESQUID
+            if( !f ) { IO::printMessage( std::string( "Sprite failed: Berry/999" ) ); }
+#endif
             fr = 0;
         } else { // custom sprite
             f = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
             if( !f ) { f = FS::open( IO::BERRY_PATH, u16( 0 ), ".rsd" ); }
+#ifdef DESQUID
+            if( !f ) {
+                IO::printMessage( std::string( "Sprite failed: Berry/" )
+                                  + std::to_string( p_berryIdx ) );
+            }
+#endif
             fr = 2 * ( p_stage - 2 );
         }
         return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_BERRYTREE, mapSprite( f, fr ) );

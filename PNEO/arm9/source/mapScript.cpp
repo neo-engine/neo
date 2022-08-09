@@ -865,6 +865,14 @@ namespace MAP {
                                       currentData( ).m_battlePlat1, currentData( ).m_battlePlat2,
                                       currentData( ).m_battleBG, getBattlePolicy( true ) )
                           .start( );
+
+                FADE_TOP_DARK( );
+                draw( playerPrio );
+                _mapSprites.setPriority( _playerSprite,
+                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
+                ANIMATE_MAP = true;
+                IO::init( );
+
                 if( res == BATTLE::battle::BATTLE_OPPONENT_WON ) {
                     registers[ 0 ] = 0;
                 } else {
@@ -873,12 +881,6 @@ namespace MAP {
 
                 if( res == BATTLE::battle::BATTLE_CAPTURE ) { registers[ 1 ] = 1; }
 
-                FADE_TOP_DARK( );
-                draw( playerPrio );
-                _mapSprites.setPriority( _playerSprite,
-                                         SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
-                ANIMATE_MAP = true;
-                IO::init( );
                 break;
             }
             case BPKR:
@@ -900,7 +902,7 @@ namespace MAP {
             }
             case UTMR: IO::useItemFromPlayer( registers[ par1 ], registers[ par1 + 1 ] ); break;
             case MSC: {
-                if( parA <= MAX_BGM ) { SOUND::playBGM( parA, true ); }
+                SOUND::playBGM( parA, true );
                 break;
             }
             case RMS: {
@@ -916,7 +918,7 @@ namespace MAP {
                 break;
             }
             case PMO: {
-                if( parA <= MAX_BGM ) { SOUND::playBGMOneshot( parA ); }
+                SOUND::playBGMOneshot( parA );
                 for( u16 i = 0; i < parB; ++i ) { swiWaitForVBlank( ); }
                 SOUND::restartBGM( );
                 break;

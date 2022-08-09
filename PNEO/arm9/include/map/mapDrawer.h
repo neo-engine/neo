@@ -367,7 +367,7 @@ namespace MAP {
          */
         void constructAndAddNewMapObjects( const mapData& p_data, u8 p_mapX, u8 p_mapY );
 
-        void loadMapObject( std::pair<u8, mapObject>& p_mapObject );
+        bool loadMapObject( std::pair<u8, mapObject>& p_mapObject );
 
         void updatePlayer( );
 
