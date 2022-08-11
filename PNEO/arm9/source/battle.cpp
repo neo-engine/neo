@@ -1036,16 +1036,16 @@ namespace BATTLE {
 
                                 bool canUse[ 4 ] = { 1, 1, 1, 1 };
                                 u8   rs          = cb.getResult(
-                                               [ & ]( u8 ) {
+                                    [ & ]( u8 ) {
                                         return _battleUI.showAttackSelection( p_pkmn, canUse,
                                                                                          false );
-                                               },
-                                               [ & ]( u8 p_selection ) {
+                                    },
+                                    [ & ]( u8 p_selection ) {
                                         curSel = p_selection;
                                         _battleUI.showAttackSelection( p_pkmn, canUse, false,
                                                                                   curSel, false );
-                                               },
-                                               curSel );
+                                    },
+                                    curSel );
 
                                 if( rs < 4 ) {
                                     return rs;

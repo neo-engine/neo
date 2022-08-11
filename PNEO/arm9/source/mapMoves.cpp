@@ -145,7 +145,7 @@ namespace BATTLE {
             if( MAP::curMap->currentData( ).m_mapType != MAP::OUTSIDE ) { return false; }
 
             // check if current outside map has flydata
-            return SAVE::SAV.getActiveFile( ).currentOWHasFlyData( );
+            return SAVE::SAV.getActiveFile( ).hasFlyPos( );
         }
         case M_FLASH: {
             return SAVE::SAV.getActiveFile( ).m_currentMapWeather == MAP::DARK_FLASHABLE;

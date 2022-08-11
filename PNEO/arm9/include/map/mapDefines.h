@@ -107,13 +107,11 @@ namespace MAP {
 
     typedef std::pair<u8, position> warpPos;
     struct flyPos {
-        // ensure that a flyPos fits into 2 bytes.
+        // ensure that a flyPos fits into 8 bytes.
 
-        u8  m_owBank; // position on ow map where this fly pos should appear
+        u16 m_targetLocation;
         u8  m_targetBank;
-        u16 m_targetZ : 4;
-        u16 m_owMapX : 6;
-        u16 m_owMapY : 6;
+        u8  m_targetZ;
 
         u16 m_targetX;
         u16 m_targetY;
@@ -121,8 +119,8 @@ namespace MAP {
         /*
          * @brief: returns the ow map this flypos shoul appear on
          */
-        constexpr auto owMap( ) const {
-            return m_owBank;
+        constexpr auto location( ) const {
+            return m_targetLocation;
         }
 
         /*
@@ -341,10 +339,7 @@ namespace MAP {
                     u8 m_treeIdx; // internal id of this berry tree
                 } m_berryTree;
                 struct {
-                    u8 m_bank; // map bank on whose map the fly pos should appear,
-                               // typically 10
-                    u8 m_mapX; // map coordinate where the fly pos should appear on ow map
-                    u8 m_mapY; // map coordinate where the fly pos should appear on ow map
+                    u16 m_location; // location for which this flypos should appear
                 } m_flyPos;
             } m_data;
         } m_events[ MAX_EVENTS_PER_SLICE ];

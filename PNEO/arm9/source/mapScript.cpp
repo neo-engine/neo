@@ -1881,7 +1881,7 @@ namespace MAP {
         _forceNoFollow = oldforce;
     }
 
-    void mapDrawer::handleEvents( u8 p_globX, u8 p_globY, u8 p_z ) {
+    void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z ) {
         u8 x = p_globX % SIZE;
         u8 y = p_globY % SIZE;
         u8 z = p_z;
@@ -1901,6 +1901,14 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
+            if( mdata.m_events[ i ].m_type == EVENT_FLY_POS ) {
+                // register fly pos
+                SAVE::SAV.getActiveFile( ).registerFlyPos(
+                    flyPos{ mdata.m_events[ i ].m_data.m_flyPos.m_location,
+                            SAVE::SAV.getActiveFile( ).m_currentMap, p_z, p_globX, p_globY } );
+                continue;
+            }
+
             if( mdata.m_events[ i ].m_type != EVENT_MESSAGE
                 && mdata.m_events[ i ].m_type != EVENT_GENERIC ) {
                 // These events have associated map objects

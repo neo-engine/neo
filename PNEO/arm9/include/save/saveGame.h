@@ -233,37 +233,46 @@ namespace SAVE {
             u8 m_shinyPkmn[ 125 ];  // The pkmn the player has seen as a shiny (unused)
 
             /*
-             * @brief: returns all positions the player can fly to on the current ow map.
-             */
-            constexpr std::vector<MAP::flyPos> currentOWFlyPos( ) const {
-                std::vector<MAP::flyPos> res{ };
-
-                for( u8 i = 0; i < m_numRegisteredFlyPos; ++i ) {
-                    if( m_registeredFlyPos[ i ].owMap( ) == m_lastOWPos.first ) {
-                        // relevant fly pos
-                        res.push_back( m_registeredFlyPos[ i ] );
-                    }
-                }
-
-                return res;
-            }
-
-            /*
              * @brief: tries to register a new fly pos; returns true on success.
              */
             bool registerFlyPos( MAP::flyPos p_flyPos ) {
+                for( u8 i = 0; i < m_numRegisteredFlyPos; ++i ) {
+                    if( m_registeredFlyPos[ i ].location( ) == p_flyPos.location( ) ) {
+                        m_registeredFlyPos[ i ] = p_flyPos;
+                        return true;
+                    }
+                }
                 if( m_numRegisteredFlyPos >= MAX_REGISTERED_FLY_POS ) { return false; }
-                m_registeredFlyPos[ ++m_numRegisteredFlyPos ] = p_flyPos;
+                m_registeredFlyPos[ m_numRegisteredFlyPos++ ] = p_flyPos;
                 return true;
             }
 
-            /*
-             * @brief: returns whether the current ow map (i.e. the last ow map the player
-             * visited) has any positions the player may fly to.
-             */
-            constexpr bool currentOWHasFlyData( ) const {
-                // obtain activated fly pos for current ow.
-                return !currentOWFlyPos( ).empty( );
+            inline bool hasFlyPos( ) const {
+                return !!m_numRegisteredFlyPos;
+            }
+
+            inline auto getFlyPosList( ) const {
+                std::vector<MAP::flyPos> res{ };
+                for( u8 i = 0; i < m_numRegisteredFlyPos; ++i ) {
+                    if( m_registeredFlyPos[ i ].location( ) ) {
+                        res.push_back( m_registeredFlyPos[ i ] );
+                    }
+                }
+                return res;
+            }
+
+            inline auto getFlyPos( u8 p_idx ) const {
+                if( p_idx >= m_numRegisteredFlyPos ) { return MAP::flyPos{ }; }
+                return m_registeredFlyPos[ p_idx ];
+            }
+
+            inline auto getFlyPosForLocation( u16 p_location ) const {
+                for( u8 i = 0; i < m_numRegisteredFlyPos; ++i ) {
+                    if( m_registeredFlyPos[ i ].location( ) == p_location ) {
+                        return m_registeredFlyPos[ i ];
+                    }
+                }
+                return MAP::flyPos{ };
             }
 
             /*

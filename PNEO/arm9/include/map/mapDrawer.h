@@ -403,7 +403,7 @@ namespace MAP {
 
         void executeScript( u16 p_scriptId, u8 p_mapObject = 0, s16 p_mapX = -1, s16 p_mapY = -1 );
 
-        void handleEvents( u8 p_localX, u8 p_localY, u8 p_z );
+        void handleEvents( u16 p_localX, u16 p_localY, u8 p_z );
         void handleEvents( u16 p_localX, u16 p_localY, u8 p_z, direction p_dir );
         void handleWarp( warpType p_type, warpPos p_source );
         void handleWarp( warpType p_type );
