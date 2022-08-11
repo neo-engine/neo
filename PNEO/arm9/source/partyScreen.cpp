@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sts/partyScreen.h"
 #include "bag/bagViewer.h"
 #include "bag/item.h"
+#include "dex/dex.h"
 #include "fs/data.h"
 #include "io/yesNoBox.h"
 #include "save/saveGame.h"
@@ -84,10 +85,10 @@ namespace STS {
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
         IO::yesNoBox yn;
         bool         res = yn.getResult( [ & ]( ) { return _partyUI->printYNMessage( 0, 254 ); },
-                                         [ & ]( IO::yesNoBox::selection p_sel ) {
+                                 [ & ]( IO::yesNoBox::selection p_sel ) {
                                      _partyUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
-                                         },
-                                         IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( _frame++ ); } )
+                                 },
+                                 IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( _frame++ ); } )
                    == IO::yesNoBox::YES;
 
         _partyUI->hideYNMessageBox( );
@@ -959,9 +960,9 @@ namespace STS {
         }
         if( _teamLength > 1 && !_inBattle ) { _currentChoices.push_back( SWAP ); }
         if( _swapSelection == 255 ) {
-            //  if( _allowDex && !_team[ _currentSelection ].isEgg( ) ) {
-            //      _currentChoices.push_back( DEX_ENTRY );
-            //  }
+            if( _allowDex && !_team[ _currentSelection ].isEgg( ) ) {
+                _currentChoices.push_back( DEX_ENTRY );
+            }
 #ifdef DESQUID
             _currentChoices.push_back( _DESQUID );
 #endif
@@ -1071,9 +1072,17 @@ namespace STS {
                 computeSelectionChoices( );
             }
             break;
-        case STS::partyScreen::DEX_ENTRY:
-            // TODO
+        case STS::partyScreen::DEX_ENTRY: {
+            DEX::dex( ).run(
+                _team[ _currentSelection ].getSpecies( ), _team[ _currentSelection ].getForme( ),
+                _team[ _currentSelection ].isShiny( ), _team[ _currentSelection ].isFemale( ) );
+
+            computeSelectionChoices( );
+            _partyUI->init( _currentSelection );
+            _partyUI->select( _currentSelection );
+            _frame = 0;
             break;
+        }
 #ifdef DESQUID
         case STS::partyScreen::_DESQUID:
             if( desquid( _currentSelection ) ) {
@@ -1155,7 +1164,7 @@ namespace STS {
                 _currentSelection, c + ( _currentChoiceSelection / 6 * 6 ),
                 std::min( size_t( 6 ), _currentChoices.size( ) - ( _currentChoiceSelection / 6 * 6 )
                                            - !( p_autoSel ) ),
-                _currentChoiceSelection < 6 && _currentChoices.size( ) > size_t( 6 + p_autoSel ),
+                _currentChoiceSelection < 6 && _currentChoices.size( ) > size_t( 7 + p_autoSel ),
                 _currentChoiceSelection >= 6, p_autoSel ? _currentChoiceSelection : 255 );
             return change;
         }
@@ -1176,7 +1185,7 @@ namespace STS {
                                                - ( _currentChoiceSelection / 6 * 6 )
                                                - !( p_autoSel ) ),
                     _currentChoiceSelection < 6
-                        && _currentChoices.size( ) > size_t( 6 + p_autoSel ),
+                        && _currentChoices.size( ) > size_t( 7 + p_autoSel ),
                     _currentChoiceSelection >= 6, i.second );
 
                 while( touch.px || touch.py ) {
@@ -1219,7 +1228,7 @@ namespace STS {
                 _currentSelection, c + ( _currentChoiceSelection / 6 * 6 ),
                 std::min( size_t( 6 ), _currentChoices.size( ) - ( _currentChoiceSelection / 6 * 6 )
                                            - !( p_autoSel ) ),
-                _currentChoiceSelection < 6 && _currentChoices.size( ) > size_t( 6 + p_autoSel ),
+                _currentChoiceSelection < 6 && _currentChoices.size( ) > size_t( 7 + p_autoSel ),
                 _currentChoiceSelection >= 6, p_autoSel ? _currentChoiceSelection : 255 );
         }
 
@@ -1239,7 +1248,7 @@ namespace STS {
                 _ranges = _partyUI->drawPartyPkmnChoice(
                     _currentSelection, c,
                     std::min( size_t( 6 ), _currentChoices.size( ) - !( p_autoSel ) ),
-                    _currentChoices.size( ) > size_t( 6 + p_autoSel ), false,
+                    _currentChoices.size( ) > size_t( 7 + p_autoSel ), false,
                     p_autoSel ? _currentChoiceSelection : 255 );
             }
         }
