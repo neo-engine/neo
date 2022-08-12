@@ -981,7 +981,8 @@ namespace MAP {
 
                 case CLL_HEAL_ENTIRE_TEAM: { // heal pkmn team
                     for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
-                        SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->heal( );
+                        auto tmp = SAVE::SAV.getActiveFile( ).getTeamPkmn( i );
+                        if( tmp ) { tmp->heal( ); }
                     }
                     break;
                 }

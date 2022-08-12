@@ -894,6 +894,20 @@ namespace MAP {
     }
 
     void mapDrawer::flyPlayer( warpPos p_target ) {
+        redirectPlayer( DOWN, false );
+        u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
+        SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
+
+        u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        _playerSprite = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
+                                                SAVE::SAV.getActiveFile( ).m_player.sprite( ) );
+        for( u8 i = 0; i < 5; ++i ) {
+            _mapSprites.drawFrame( _playerSprite, i, false, true );
+            for( u8 j = 0; j < 5; ++j ) swiWaitForVBlank( );
+        }
+
+        changeMoveMode( WALK );
         warpPlayer( FLY, p_target );
     }
 

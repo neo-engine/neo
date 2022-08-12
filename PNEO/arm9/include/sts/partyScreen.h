@@ -44,7 +44,10 @@ namespace STS {
       public:
         union result {
             u32 m_selectedPkmn = 0;
-            u16 m_selectedMove;
+            struct {
+                u16 m_selectedMove;
+                u16 m_selectedMoveTarget; // location idx for "fly"
+            };
 
             constexpr u8 getMark( u8 p_pos ) const {
                 return ( m_selectedPkmn >> ( 4 * p_pos ) ) & 0xF;
@@ -197,6 +200,12 @@ namespace STS {
          * @brief: Selects the specified choice window
          */
         void selectChoice( u8 p_choice, u8 p_numChoices = 255 );
+
+        /*
+         * @brief: Makes the player choose a destination for fly from the currently
+         * registered fly positions. Returns true on successful selection of a target.
+         */
+        bool chooseFlyTarget( );
 
         /*
          * @brief: Focusses the pkmn at position p_selectedIdx. Returns when pkmn leaves focus.

@@ -30,6 +30,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "bag/item.h"
 #include "dex/dex.h"
 #include "fs/data.h"
+#include "io/choiceBox.h"
+#include "io/strings.h"
 #include "io/yesNoBox.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -78,9 +80,9 @@ namespace STS {
 
     bool partyScreen::confirmSelection( ) {
         if( _toSelect > 1 ) {
-            _partyUI->select( _currentSelection, GET_STRING( 335 ) );
+            _partyUI->select( _currentSelection, GET_STRING( IO::STR_UI_STS_CHOOSE_THESE_PKMN ) );
         } else {
-            _partyUI->select( _currentSelection, GET_STRING( 336 ) );
+            _partyUI->select( _currentSelection, GET_STRING( IO::STR_UI_STS_CHOOSE_THIS_PKMN ) );
         }
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
         IO::yesNoBox yn;
@@ -88,7 +90,7 @@ namespace STS {
                                  [ & ]( IO::yesNoBox::selection p_sel ) {
                                      _partyUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
                                  },
-                                 IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( _frame++ ); } )
+                                 IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( ); } )
                    == IO::yesNoBox::YES;
 
         _partyUI->hideYNMessageBox( );
@@ -308,7 +310,9 @@ namespace STS {
                   [ & ]( u32 p_newValue ) {
                       _team[ _currentSelection ].m_boxdata.setNature( pkmnNatures( p_newValue ) );
                   },
-                  []( u32 p_value ) { return std::string( GET_STRING( 187 + p_value ) ); } } ) );
+                  []( u32 p_value ) {
+                      return std::string( GET_STRING( IO::STR_UI_STS_NATURE_START + p_value ) );
+                  } } ) );
             for( u8 i = 0; i < 5; ++i ) {
                 res.push_back( partyScreen::desquidItem(
                     { u16( FS::DESQUID_STRING + 31 + i ), true, 2, 0,
@@ -445,7 +449,7 @@ namespace STS {
         }
         cooldown = COOLDOWN_COUNT;
         loop( ) {
-            _partyUI->animate( _frame++ );
+            _partyUI->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
@@ -621,6 +625,37 @@ namespace STS {
     }
 #endif
 
+    bool partyScreen::chooseFlyTarget( ) {
+        auto locs = SAVE::SAV.getActiveFile( ).getFlyPosLocationListForCurrentOW( );
+
+        std::vector<std::string> locNames{ };
+        for( auto l : locs ) { locNames.push_back( FS::getLocation( l ) ); }
+
+        IO::choiceBox locChoice = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        u8            curPage   = 0;
+
+        u16 selectedLocation = locChoice.getResult(
+            [ & ]( u8 p_page ) {
+                curPage = p_page;
+                return _partyUI->drawChoice( locNames, p_page, 255,
+                                             GET_STRING( IO::STR_UI_STS_FLY_WHERE ) );
+            },
+            [ & ]( u8 p_selection ) { _partyUI->drawChoice( locNames, curPage, p_selection ); }, 0,
+            [ & ]( ) { _partyUI->animate( ); } );
+
+        if( selectedLocation == IO::choiceBox::BACK_CHOICE
+            || selectedLocation == IO::choiceBox::EXIT_CHOICE ) {
+            return false;
+        }
+
+        selectedLocation += curPage * 6;
+
+        if( selectedLocation > locs.size( ) || !locs[ selectedLocation ] ) { return false; }
+
+        _currentMarksOrMove.m_selectedMoveTarget = locs[ selectedLocation ];
+        return true;
+    }
+
     bool partyScreen::focus( ) {
         u16 c[ 12 ] = { 0 };
         for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
@@ -638,7 +673,7 @@ namespace STS {
         bool ex  = false;
         cooldown = COOLDOWN_COUNT;
         loop( ) {
-            _partyUI->animate( _frame++ );
+            _partyUI->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
@@ -767,7 +802,7 @@ namespace STS {
         bool ex  = false;
         cooldown = COOLDOWN_COUNT;
         loop( ) {
-            _partyUI->animate( _frame++ );
+            _partyUI->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
@@ -1004,7 +1039,6 @@ namespace STS {
             computeSelectionChoices( );
             _partyUI->init( oldchoice );
             _partyUI->select( _currentSelection );
-            _frame = 0;
 
             break;
         }
@@ -1013,7 +1047,6 @@ namespace STS {
             u16            itm = bv.getItem( );
             computeSelectionChoices( );
             _partyUI->init( _currentSelection );
-            _frame = 0;
             if( itm ) {
                 if( _team[ _currentSelection ].getItem( ) ) {
                     auto curItm = _team[ _currentSelection ].getItem( );
@@ -1023,7 +1056,8 @@ namespace STS {
                 _partyUI->select( _currentSelection );
                 _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
-                sprintf( BUFFER, GET_STRING( 334 ), FS::getItemName( itm ).c_str( ),
+                sprintf( BUFFER, GET_STRING( IO::STR_UI_STS_GAVE_ITEM_TO_PKMN ),
+                         FS::getItemName( itm ).c_str( ),
                          _team[ _currentSelection ].m_boxdata.m_name );
                 _partyUI->printMessage( BUFFER, itm );
                 waitForInteract( );
@@ -1039,8 +1073,8 @@ namespace STS {
             _partyUI->select( _currentSelection );
             _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
-            sprintf( BUFFER, GET_STRING( 101 ), FS::getItemName( acI ).c_str( ),
-                     _team[ _currentSelection ].m_boxdata.m_name );
+            sprintf( BUFFER, GET_STRING( IO::STR_UI_STS_TOOK_ITEM_FROM_PKMN ),
+                     FS::getItemName( acI ).c_str( ), _team[ _currentSelection ].m_boxdata.m_name );
             _partyUI->printMessage( BUFFER, acI );
             SAVE::SAV.getActiveFile( ).m_bag.insert(
                 BAG::toBagType( FS::getItemData( acI ).m_itemType ), acI, 1 );
@@ -1060,6 +1094,16 @@ namespace STS {
         case STS::partyScreen::FIELD_MOVE_4:
             _currentMarksOrMove.m_selectedMove
                 = _team[ _currentSelection ].m_boxdata.m_moves[ p_choice - FIELD_MOVE_1 ];
+
+            if( _currentMarksOrMove.m_selectedMove == M_FLY ) {
+                // make player choose a fly target
+                if( !chooseFlyTarget( ) || !_currentMarksOrMove.m_selectedMoveTarget ) {
+                    _currentMarksOrMove.m_selectedMove = 0;
+
+                    computeSelectionChoices( );
+                    _partyUI->select( _currentSelection );
+                }
+            }
             break;
         case STS::partyScreen::SWAP:
             if( _swapSelection != 255 ) {
@@ -1080,7 +1124,6 @@ namespace STS {
             computeSelectionChoices( );
             _partyUI->init( _currentSelection );
             _partyUI->select( _currentSelection );
-            _frame = 0;
             break;
         }
 #ifdef DESQUID
@@ -1088,7 +1131,6 @@ namespace STS {
             if( desquid( _currentSelection ) ) {
                 computeSelectionChoices( );
                 _partyUI->init( _currentSelection );
-                _frame = 0;
             }
             break;
 #endif
@@ -1107,7 +1149,7 @@ namespace STS {
     void STS::partyScreen::waitForInteract( ) {
         cooldown = COOLDOWN_COUNT;
         loop( ) {
-            _partyUI->animate( _frame++ );
+            _partyUI->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
@@ -1117,7 +1159,7 @@ namespace STS {
 
             if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
                 while( touch.px || touch.py ) {
-                    _partyUI->animate( _frame++ );
+                    _partyUI->animate( );
                     swiWaitForVBlank( );
                     scanKeys( );
                     touchRead( &touch );
@@ -1147,7 +1189,7 @@ namespace STS {
                     change = 2;
                 }
                 while( touch.px || touch.py ) {
-                    _partyUI->animate( _frame++ );
+                    _partyUI->animate( );
                     swiWaitForVBlank( );
                     scanKeys( );
                     touchRead( &touch );
@@ -1189,7 +1231,7 @@ namespace STS {
                     _currentChoiceSelection >= 6, i.second );
 
                 while( touch.px || touch.py ) {
-                    _partyUI->animate( _frame++ );
+                    _partyUI->animate( );
                     swiWaitForVBlank( );
                     if( !i.first.inRange( touch ) ) {
                         bad = true;
@@ -1262,10 +1304,9 @@ namespace STS {
         _currentChoiceSelection            = 0;
         _currentMarksOrMove.m_selectedMove = 0;
         select( p_initialSelection );
-        _frame   = 0;
         cooldown = COOLDOWN_COUNT;
         loop( ) {
-            _partyUI->animate( _frame++ );
+            _partyUI->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );

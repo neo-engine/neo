@@ -42,6 +42,7 @@ namespace STS {
         static constexpr u8 PREV_TARGET = 249;
 
       private:
+        u8               _frame       = 0;
         u8               _currentPage = 255;
         bool             _allowKeyUp;
         bool             _allowKeyDown;
@@ -118,7 +119,7 @@ namespace STS {
         /*
          * @brief: Draws the p_frame-th frame. Needs to be called every frame.
          */
-        void animate( u8 p_frame );
+        void animate( );
 
         /*
          * @brief: Returns information for the current buttons on the screen.

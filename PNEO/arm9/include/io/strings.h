@@ -170,6 +170,13 @@ namespace IO {
     constexpr u16 STR_UI_CANNOT_USE_FIELD_ITEM  = 58;
     constexpr u16 STR_UI_CAN_REGISTER_ITEM_TO_Y = 98;
 
+    constexpr u16 STR_UI_STS_TOOK_ITEM_FROM_PKMN = 101;
+    constexpr u16 STR_UI_STS_GAVE_ITEM_TO_PKMN   = 334;
+    constexpr u16 STR_UI_STS_CHOOSE_THESE_PKMN   = 335;
+    constexpr u16 STR_UI_STS_CHOOSE_THIS_PKMN    = 336;
+    constexpr u16 STR_UI_STS_NATURE_START        = 187;
+    constexpr u16 STR_UI_STS_FLY_WHERE           = 701;
+
     constexpr u16 STR_UI_BAG_PAGE_NAME_START    = 11;
     constexpr u16 STR_UI_BAG_PAGE_NAME_ITEMS    = STR_UI_BAG_PAGE_NAME_START + 0;
     constexpr u16 STR_UI_BAG_PAGE_NAME_MEDICINE = STR_UI_BAG_PAGE_NAME_START + 1;

@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
+#include "io/choiceBox.h"
 #include "io/screenFade.h"
 #include "io/uio.h"
 #include "save/saveGame.h"
@@ -79,7 +80,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_ITEM_PAL_SUB                  11
 
 namespace STS {
-    char BUFFER[ 50 ];
+    char BUFFER[ BUFFER_SIZE + 10 ];
 
     const u16 PARTY_BG_PAL[ 14 ] = { 0x0000, 0x1062, 0x1483, 0x2107, 0x2107, 0x2107,
                                      0x14A5, 0x1CE8, 0x3DEF, 0x5294, 0x1062 };
@@ -838,6 +839,107 @@ namespace STS {
     }
 
     std::vector<std::pair<IO::inputTarget, u8>>
+    partyScreenUI::drawChoice( const std::vector<std::string>& p_choices, u8 p_page,
+                               u8 p_selectedChoice, const char* p_message, bool p_bottom ) {
+        SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
+
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        oam[ SPR_PAGE_LEFT_OAM_SUB ].palette  = SPR_BOX_PAL_SUB;
+        oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_BOX_PAL_SUB;
+
+        auto start{ 6 * p_page };
+        auto len{ std::min( u16( 6 ), u16( p_choices.size( ) - 6 * p_page ) ) };
+
+        auto prevbtn{ p_page > 0 };
+        auto nextbtn{ u16( start + len ) < p_choices.size( ) };
+
+        if( p_selectedChoice > 100 && p_selectedChoice < 255 ) {
+            for( u8 i = 0; i < 6; i++ ) {
+                for( u8 j = 0; j < 6; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = i >= len;
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette  = SPR_BOX_PAL_SUB;
+                }
+            }
+
+            if( p_selectedChoice == IO::choiceBox::NEXT_PAGE_CHOICE ) {
+                oam[ SPR_PAGE_RIGHT_OAM_SUB ].palette = SPR_WINDOW_PAL_SUB;
+            } else if( p_selectedChoice == IO::choiceBox::PREV_PAGE_CHOICE ) {
+                oam[ SPR_PAGE_LEFT_OAM_SUB ].palette = SPR_WINDOW_PAL_SUB;
+            }
+
+            IO::updateOAM( p_bottom );
+            return res;
+        }
+        if( p_selectedChoice == 255 ) {
+            if( p_bottom ) {
+                FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "partysub", 0,
+                                     49152, true );
+            } else {
+                FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "partysub", 0, 49152,
+                                     false );
+            }
+            if( p_message ) { IO::regularFont->printString( p_message, 32, 2, p_bottom ); }
+        }
+
+        // show choice bgs
+        for( u8 i = 0; i < 6; i++ ) {
+            for( u8 j = 0; j < 6; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = i >= len;
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( i == p_selectedChoice ? SPR_WINDOW_PAL_SUB : SPR_BOX_PAL_SUB );
+            }
+            if( i >= len ) { continue; }
+
+            IO::regularFont->printString(
+                p_choices[ start + i ].c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom, IO::font::CENTER );
+
+            res.push_back(
+                std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                           i ) );
+        }
+        oam[ SPR_PAGE_LEFT_OAM_SUB ].isHidden  = !prevbtn;
+        oam[ SPR_ARROW_LEFT_OAM_SUB ].isHidden = !prevbtn;
+
+        if( prevbtn ) {
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_ARROW_LEFT_OAM_SUB ].x,
+                                                       oam[ SPR_ARROW_LEFT_OAM_SUB ].y,
+                                                       oam[ SPR_ARROW_LEFT_OAM_SUB ].x + 16,
+                                                       oam[ SPR_ARROW_LEFT_OAM_SUB ].y + 16 ),
+                                      IO::choiceBox::PREV_PAGE_CHOICE ) );
+        }
+
+        oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden  = !nextbtn;
+        oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = !nextbtn;
+
+        if( nextbtn ) {
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_ARROW_RIGHT_OAM_SUB ].x,
+                                                       oam[ SPR_ARROW_RIGHT_OAM_SUB ].y,
+                                                       oam[ SPR_ARROW_RIGHT_OAM_SUB ].x + 16,
+                                                       oam[ SPR_ARROW_RIGHT_OAM_SUB ].y + 16 ),
+                                      IO::choiceBox::NEXT_PAGE_CHOICE ) );
+        }
+
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 24, oam[ SPR_X_OAM_SUB ].y + 24 ),
+                       IO::choiceBox::EXIT_CHOICE ) );
+        res.push_back(
+            std::pair( IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                        oam[ SPR_X_OAM_SUB ].x + 24, oam[ SPR_X_OAM_SUB ].y + 24 ),
+                       IO::choiceBox::BACK_CHOICE ) );
+
+        IO::updateOAM( p_bottom );
+
+        return res;
+    }
+
+    std::vector<std::pair<IO::inputTarget, u8>>
     partyScreenUI::drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
                                         bool p_nextButton, bool p_prevButton, u8 p_selectedChoice,
                                         bool p_bottom ) {
@@ -953,8 +1055,8 @@ namespace STS {
 
             bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
             bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
-            bgSetScroll( IO::bg3sub, 0, 0 );
-            bgSetScroll( IO::bg3, 0, 0 );
+            IO::animateBG( _frame, IO::bg3 );
+            IO::animateBG( _frame, IO::bg3sub );
 
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4,
                                                         TEMP, 256, TEMP_PAL );
@@ -1059,6 +1161,7 @@ namespace STS {
 #endif
 
     void partyScreenUI::init( u8 p_initialSelection ) {
+        _frame       = 0;
         _selectedIdx = p_initialSelection;
 
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
@@ -1076,14 +1179,16 @@ namespace STS {
         if( _toSwap != 255 ) { mark( _toSwap, SWAP_COLOR, false ); }
     }
 
-    void partyScreenUI::animate( u8 p_frame ) {
-        animatePartyPkmn( p_frame );
-        IO::animateBG( p_frame, IO::bg3 );
-        IO::animateBG( p_frame, IO::bg3sub );
+    void partyScreenUI::animate( ) {
+        animatePartyPkmn( _frame );
+        IO::animateBG( _frame, IO::bg3 );
+        IO::animateBG( _frame, IO::bg3sub );
 
-        if( _animateMsg ) { animateMessageBox( p_frame ); }
+        if( _animateMsg ) { animateMessageBox( _frame ); }
 
         bgUpdate( );
+
+        _frame++;
     }
 
     void partyScreenUI::select( u8 p_selectedIdx, const char* p_message ) {

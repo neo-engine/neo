@@ -1295,10 +1295,11 @@ namespace STS {
         bgUpdate( );
     }
 
-    void statusScreenUI::animate( u8 p_frame ) {
-        IO::animateBG( p_frame, IO::bg3 );
-        IO::animateBG( p_frame, IO::bg3sub );
+    void statusScreenUI::animate( ) {
+        IO::animateBG( _frame, IO::bg3 );
+        IO::animateBG( _frame, IO::bg3sub );
         bgUpdate( );
+        ++_frame;
     }
 
     void statusScreenUI::highlightButton( u8 p_button, bool p_bottom ) {

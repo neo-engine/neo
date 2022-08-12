@@ -38,10 +38,12 @@ namespace STS {
     constexpr u8  PREV_PAGE_TARGET  = 249;
     constexpr u8  EXIT_TARGET       = 251;
 
-    extern char BUFFER[ 50 ];
+    constexpr u8 BUFFER_SIZE = 50;
+    extern char  BUFFER[ BUFFER_SIZE + 10 ];
 
     class partyScreenUI {
       private:
+        u8       _frame = 0;
         pokemon* _team;
         u8       _teamLength;
         u8       _selectedIdx;
@@ -95,9 +97,9 @@ namespace STS {
         void init( u8 p_initialSelection );
 
         /*
-         * @brief Draws the p_frame-th frame. Needs to be called every frame.
+         * @brief Draws the current frame. Needs to be called every frame.
          */
-        void animate( u8 p_frame );
+        void animate( );
 
         /*
          * @brief Changes the selection to p_selectedIdx. Unselects old selected idx.
@@ -116,6 +118,10 @@ namespace STS {
         drawPartyPkmnChoice( u8 p_selectedPkmn, const u16 p_choices[], u8 p_choiceCnt,
                              bool p_nextButton, bool p_prevButton, u8 p_selectedChoice = 255,
                              bool p_bottom = true );
+
+        std::vector<std::pair<IO::inputTarget, u8>>
+        drawChoice( const std::vector<std::string>& p_choices, u8 p_page, u8 p_selectedChoice = 255,
+                    const char* p_message = 0, bool p_bottom = true );
 
         /*
          * @brief Returns the upper left corner of the specified choice box. Must be called after

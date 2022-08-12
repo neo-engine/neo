@@ -357,7 +357,7 @@ namespace MAP {
     void mapDrawer::usePkmn( const pkmnSpriteInfo& p_pkmn ) {
         u8 basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
         SAVE::SAV.getActiveFile( ).m_player.m_picNum = basePic + 5;
-        bool surfing = ( SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF );
+        auto mmode = SAVE::SAV.getActiveFile( ).m_player.m_movement;
 
         u16 curx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
@@ -370,7 +370,7 @@ namespace MAP {
 
         showPkmn( p_pkmn, true );
 
-        changeMoveMode( surfing ? SURF : WALK );
+        changeMoveMode( mmode );
         swiWaitForVBlank( );
     }
 

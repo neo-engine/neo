@@ -402,6 +402,20 @@ namespace IO {
             init( );
             MAP::curMap->draw( );
             if( res.m_selectedMove ) {
+                if( res.m_selectedMove == M_FLY ) {
+                    auto fpos = SAVE::SAV.getActiveFile( ).getFlyPosForLocation(
+                        res.m_selectedMoveTarget );
+                    if( res.m_selectedMoveTarget != fpos.m_targetLocation
+                        || !fpos.m_targetLocation ) {
+                        return;
+                    }
+
+                    auto target = MAP::warpPos{
+                        fpos.m_targetBank,
+                        MAP::position{ fpos.m_targetX, fpos.m_targetY, fpos.m_targetZ } };
+                    MAP::curMap->flyPlayer( target );
+                    return;
+                }
                 for( u8 j = 0; j < 2; ++j ) {
                     if( BATTLE::possible( res.m_selectedMove, j ) ) {
                         BATTLE::use( res.m_selectedMove, j );

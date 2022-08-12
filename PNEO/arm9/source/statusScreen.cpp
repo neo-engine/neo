@@ -37,7 +37,8 @@ namespace STS {
         _allowKeyUp   = p_allowKeyUp;
         _allowKeyDown = p_allowKeyDown;
         if( p_ui ) {
-            _ui = p_ui;
+            _ui         = p_ui;
+            _externalui = true;
         } else {
             _ui = new statusScreenUI( );
         }
@@ -68,7 +69,7 @@ namespace STS {
                 _ui->highlightButton( i.second );
 
                 while( touch.px || touch.py ) {
-                    _ui->animate( _frame++ );
+                    _ui->animate( );
                     swiWaitForVBlank( );
                     scanKeys( );
 
@@ -106,7 +107,7 @@ namespace STS {
         _currentDetailChoice = p_initialChoice;
         _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
         loop( ) {
-            _ui->animate( _frame++ );
+            _ui->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );
@@ -162,12 +163,11 @@ namespace STS {
 
     statusScreen::result statusScreen::run( u8 p_initialPage ) {
         _ui->init( _pokemon, p_initialPage, _allowKeyUp, _allowKeyDown );
-        _frame       = 0;
         cooldown     = COOLDOWN_COUNT;
         _currentPage = p_initialPage;
 
         loop( ) {
-            _ui->animate( _frame++ );
+            _ui->animate( );
             scanKeys( );
             touchRead( &touch );
             swiWaitForVBlank( );

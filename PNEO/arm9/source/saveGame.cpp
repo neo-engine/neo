@@ -842,6 +842,22 @@ namespace SAVE {
         return res;
     }
 
+    std::vector<u16> saveGame::playerInfo::getFlyPosLocationListForCurrentOW( ) const {
+        std::vector<u16> res{ };
+        for( u8 i = 0; i < m_numRegisteredFlyPos; ++i ) {
+            if( m_registeredFlyPos[ i ].location( ) ) {
+                // check if location is present in current OW
+                if( MAP::MAP_LOCATIONS.getOWPosForLocation( m_registeredFlyPos[ i ].location( ) )
+                    != MAP::mapLocation::DUMMY_POSITION ) {
+                    res.push_back( m_registeredFlyPos[ i ].location( ) );
+                }
+            }
+        }
+
+        std::sort( res.begin( ), res.end( ) );
+        return res;
+    }
+
     bool saveGame::isGood( ) {
         for( u8 i = 0; i < MAX_SAVE_FILES; ++i ) {
             if( SAV.m_saveFile[ i ].isGood( ) ) { return true; }
@@ -854,4 +870,5 @@ namespace SAVE {
         m_version    = VERSION;
         m_activeFile = 0;
     }
+
 } // namespace SAVE

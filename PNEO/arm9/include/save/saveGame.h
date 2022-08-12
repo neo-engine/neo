@@ -261,6 +261,8 @@ namespace SAVE {
                 return res;
             }
 
+            std::vector<u16> getFlyPosLocationListForCurrentOW( ) const;
+
             inline auto getFlyPos( u8 p_idx ) const {
                 if( p_idx >= m_numRegisteredFlyPos ) { return MAP::flyPos{ }; }
                 return m_registeredFlyPos[ p_idx ];

@@ -27,13 +27,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs/data.h"
 #include "fs/fs.h"
+#include "gen/moveNames.h"
 #include "io/menuUI.h"
 #include "io/navApp.h"
 #include "io/sprite.h"
 #include "io/uio.h"
 #include "map/mapDefines.h"
+#include "map/mapDrawer.h"
 
 namespace IO {
+
     void mapNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         IO::loadSprite( "NV/app01", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
@@ -130,6 +133,8 @@ namespace IO {
     }
 
     bool mapNavApp::tick( bool p_bottom ) {
+        BG_PALETTE_SUB[ IO::BLUE_IDX ] = IO::BLUE2;
+
         constexpr u8 TMP_BUFFER_SIZE = 100;
         char         buffer[ TMP_BUFFER_SIZE + 10 ];
 
@@ -150,6 +155,20 @@ namespace IO {
             locChange |= ( _playerX != _cursorX || _playerY != _cursorY );
             _cursorX = _playerX;
             _cursorY = _playerY;
+        }
+
+        // Check for fly
+        bool flyusable = false;
+        for( u8 i = 0; i < 6; ++i ) {
+            if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) { break; }
+            auto a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
+            if( a.isEgg( ) ) { continue; }
+            for( u8 j = 0; j < 4; ++j ) {
+                if( a.m_boxdata.m_moves[ j ] == M_FLY && BATTLE::possible( M_FLY, 0 ) ) {
+                    flyusable = true;
+                    break;
+                }
+            }
         }
 
         // check for (touch) input
@@ -182,6 +201,25 @@ namespace IO {
             }
         }
 
+        auto nm     = FS::getMoveName( M_FLY );
+        auto wd     = IO::regularFont->stringWidth( nm.c_str( ) );
+        bool canfly = false;
+        if( flyusable && _cursorLocationId ) {
+            // check if current location has a registered fly position
+            auto fpos = SAVE::SAV.getActiveFile( ).getFlyPosForLocation( _cursorLocationId );
+            if( fpos.location( ) == _cursorLocationId ) {
+                IO::printRectangle( oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4, 10,
+                                    oam[ SPR_NAV_APP_RSV_SUB + 2 ].x, 26, p_bottom, IO::BLUE_IDX );
+                IO::regularFont->printStringC( nm.c_str( ),
+                                               oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - ( wd / 2 ) - 3,
+                                               10, p_bottom, IO::font::CENTER );
+                canfly = true;
+            }
+        } else {
+            IO::printRectangle( oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4, 10,
+                                oam[ SPR_NAV_APP_RSV_SUB + 2 ].x, 26, p_bottom, 0 );
+        }
+
         if( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
             && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
             && touch.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
@@ -202,6 +240,37 @@ namespace IO {
                 swiWaitForVBlank( );
             }
             if( suc ) { return true; }
+        }
+
+        if( canfly ) {
+            if( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4
+                && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - 1 && touch.py >= 10
+                && touch.py <= 26 ) {
+                bool suc = true;
+                while( touch.px || touch.py ) {
+                    swiWaitForVBlank( );
+                    scanKeys( );
+
+                    if( !( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4
+                           && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - 1 && touch.py >= 10
+                           && touch.py <= 26 ) ) {
+                        suc = false;
+                        break;
+                    }
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
+                if( suc ) {
+                    // execute fly
+                    auto fpos
+                        = SAVE::SAV.getActiveFile( ).getFlyPosForLocation( _cursorLocationId );
+                    auto target = MAP::warpPos{
+                        fpos.m_targetBank,
+                        MAP::position{ fpos.m_targetX, fpos.m_targetY, fpos.m_targetZ } };
+                    MAP::curMap->flyPlayer( target );
+                    return false;
+                }
+            }
         }
 
         if( change || locChange ) { IO::updateOAM( p_bottom ); }

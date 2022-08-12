@@ -41,9 +41,9 @@ _Partially_ implemented features are in _italics_.
         * [x] Player sprite, animated moving, surfing, cycling, and fishing
         * [x] PKMN following the player
         * [x] Weather and other overlays (flash, sandstorm, etc)
-        * [x] Field moves such as Surf, Waterfall, Rock Climb, Cut, Strength, Rock Smash,
+        * [x] Field moves such as Surf, Waterfall, Rock Climb, Cut, Strength, Fly, Dive,
           etc
-        * [ ] Currently unsupported field moves: Fly, Dive, Whirlpool, Defog
+        * [ ] Currently unsupported field moves: Whirlpool, Defog
         * [x] Mach Bike, Acro Bike, Fishing Rods, PokéRadar, Escape Rope, Honey
     * [x] BGM and SFX including
         * [x] An in-game jukebox

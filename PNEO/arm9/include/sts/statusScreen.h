@@ -38,6 +38,8 @@ namespace STS {
         pokemon*        _pokemon;
         statusScreenUI* _ui;
 
+        bool _externalui = false;
+
         u8   _currentPage;
         u8   _currentDetailChoice = 0;
         u8   _frame;
@@ -63,7 +65,7 @@ namespace STS {
                       statusScreenUI* p_ui = nullptr );
 
         inline ~statusScreen( ) {
-            if( _ui ) { delete _ui; }
+            if( _ui && !_externalui ) { delete _ui; }
         }
 
         /*

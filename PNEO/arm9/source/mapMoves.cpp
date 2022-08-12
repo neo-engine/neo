@@ -144,6 +144,8 @@ namespace BATTLE {
             // flying is always possible in the ow, so check if player is in ow
             if( MAP::curMap->currentData( ).m_mapType != MAP::OUTSIDE ) { return false; }
 
+            if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::DIVE ) { return false; }
+
             // check if current outside map has flydata
             return SAVE::SAV.getActiveFile( ).hasFlyPos( );
         }
