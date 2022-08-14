@@ -296,25 +296,6 @@ namespace FS {
     bool readBlocks( FILE* p_file, MAP::block* p_tileSet, u16 p_startIdx, u16 p_size ) {
         if( p_file == 0 ) return false;
 
-        /*
-        // read everything into a buffer first - not really faster
-
-        read( p_file, CRY_DATA, 4 + p_size * ( 8 * sizeof( MAP::blockAtom ) + 2 ), 1 );
-        u16 pos = 4;
-
-        for( u16 i = 0; i < p_size; ++i ) {
-            std::memcpy( &( p_tileSet + p_startIdx + i )->m_bottom, CRY_DATA + pos,
-                         4 * sizeof( MAP::blockAtom ) );
-            pos += 4 * sizeof( MAP::blockAtom );
-            std::memcpy( &( p_tileSet + p_startIdx + i )->m_top, CRY_DATA + pos,
-                         4 * sizeof( MAP::blockAtom ) );
-            pos += 4 * sizeof( MAP::blockAtom );
-        }
-        for( u16 i = 0; i < p_size; ++i ) {
-            ( p_tileSet + p_startIdx + i )->m_bottombehave = CRY_DATA[ pos++ ];
-            ( p_tileSet + p_startIdx + i )->m_topbehave    = CRY_DATA[ pos++ ];
-        }
-*/
         readNop( p_file, 4 );
         for( u16 i = 0; i < p_size; ++i ) {
             read( p_file, &( p_tileSet + p_startIdx + i )->m_bottom, 4 * sizeof( MAP::blockAtom ),
