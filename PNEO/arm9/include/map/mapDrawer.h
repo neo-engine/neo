@@ -54,9 +54,12 @@ namespace MAP {
 
             BEH_LADDER = 0x0A,
 
+            BEH_REFLECTION = 0x10,
             BEH_DIVE       = 0x11,
             BEH_ROCK_CLIMB = 0x12,
             BEH_WATERFALL  = 0x13,
+
+            BEH_REFLECTION_FOLLOW_CIRCLE = 0x16,
 
             BEH_UNDERWATER_NO_RESURFACE = 0x19,
 
@@ -454,6 +457,15 @@ namespace MAP {
          */
         inline bool tracerCharged( ) const {
             return _tracerCharge >= TRACER_CHARGED;
+        }
+
+        static inline bool isReflective( u8 p_behave ) {
+            switch( p_behave ) {
+            case BEH_REFLECTION:
+            case BEH_SLIDE_ON_ICE:
+            case BEH_REFLECTION_FOLLOW_CIRCLE: return true;
+            default: return false;
+            }
         }
 
         static inline bool isGrass( u8 p_behave ) {

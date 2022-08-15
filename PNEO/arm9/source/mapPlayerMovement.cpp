@@ -1219,12 +1219,31 @@ namespace MAP {
             _mapSprites.setFrame( _playerSprite, getFrame( p_direction ) );
             _mapSprites.nextFrame( _playerSprite );
         }
+
+        // check for reflection
+        bool disableRefl = true;
+        u8   behave
+            = at( gx + dir[ p_direction ][ 0 ], gy + dir[ p_direction ][ 1 ] + 1 ).m_bottombehave;
+        if( isReflective( behave ) ) {
+            _mapSprites.enableReflection( _playerSprite );
+            disableRefl = false;
+        }
+        behave
+            = at( gx + dir[ p_direction ][ 0 ], gy + dir[ p_direction ][ 1 ] + 2 ).m_bottombehave;
+        if( isReflective( behave ) ) {
+            _mapSprites.enableReflection( _playerSprite );
+            disableRefl = false;
+        }
+
         for( u8 i = 0; i < 16; ++i ) {
             moveCamera( p_direction, true );
             if( i == 8 ) { _mapSprites.currentFrame( _playerSprite ); }
             swiWaitForVBlank( );
         }
         clearFieldAnimation( gx, gy );
+
+        if( disableRefl ) { _mapSprites.disableReflection( _playerSprite ); }
+
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
@@ -1267,6 +1286,20 @@ namespace MAP {
             _mapSprites.setFrame( _playerSprite,
                                   ( p_fast * PLAYER_FAST ) + getFrame( p_direction ) );
         }
+
+        // check for reflection
+        bool disableRefl = true;
+        u8   behave      = at( nx, ny + 1 ).m_bottombehave;
+        if( isReflective( behave ) ) {
+            _mapSprites.enableReflection( _playerSprite );
+            disableRefl = false;
+        }
+        behave = at( nx, ny + 2 ).m_bottombehave;
+        if( isReflective( behave ) ) {
+            _mapSprites.enableReflection( _playerSprite );
+            disableRefl = false;
+        }
+
         u8 sid = 255;
         for( u8 i = 0; i < 16; ++i ) {
             if( anim && i == 0 ) { sid = animateField( nx, ny, anim, 0 ); }
@@ -1286,6 +1319,8 @@ namespace MAP {
                                false );
             }
         }
+
+        if( disableRefl ) { _mapSprites.disableReflection( _playerSprite ); }
 
         // check if the object following the player got somehow detached (due to a jump,  etc)
         if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
@@ -1509,6 +1544,8 @@ namespace MAP {
     void mapDrawer::changeMoveMode( moveMode p_newMode, bool p_hidden ) {
         bool change  = SAVE::SAV.getActiveFile( ).m_player.m_movement != p_newMode;
         u8   basePic = SAVE::SAV.getActiveFile( ).m_player.m_picNum / 10 * 10;
+        u16  nx      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  ny      = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         _fastBike    = false;
         bool surfing = false;
         u8   ydif    = 0;
@@ -1551,6 +1588,22 @@ namespace MAP {
         _playerSprite
             = _mapSprites.loadSprite( curx, cury, mapSpriteManager::SPTYPE_PLAYER,
                                       SAVE::SAV.getActiveFile( ).m_player.sprite( ), p_hidden );
+
+        // check for reflection
+        bool disableRefl = true;
+        u8   behave      = at( nx, ny + 1 ).m_bottombehave;
+        if( isReflective( behave ) ) {
+            _mapSprites.enableReflection( _playerSprite );
+            disableRefl = false;
+        }
+        behave = at( nx, ny + 2 ).m_bottombehave;
+        if( isReflective( behave ) ) {
+            _mapSprites.enableReflection( _playerSprite );
+            disableRefl = false;
+        }
+
+        if( disableRefl ) { _mapSprites.disableReflection( _playerSprite ); }
+
         if( ydif ) { _mapSprites.moveSprite( _playerSprite, UP, ydif, true ); }
         _mapSprites.setFrame( _playerSprite,
                               getFrame( SAVE::SAV.getActiveFile( ).m_player.m_direction ) );

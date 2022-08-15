@@ -79,6 +79,15 @@ namespace MAP {
                 mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
 
             _mapSprites.setFrameD( p_mapObject.first, p_mapObject.second.m_direction, false );
+
+            // check for reflection
+            u8 behave = at( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY + 1 )
+                            .m_bottombehave;
+            if( isReflective( behave ) ) { _mapSprites.enableReflection( p_mapObject.first ); }
+            behave = at( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY + 2 )
+                         .m_bottombehave;
+            if( isReflective( behave ) ) { _mapSprites.enableReflection( p_mapObject.first ); }
+
             break;
         }
         case EVENT_HMOBJECT: {
@@ -178,6 +187,16 @@ namespace MAP {
         if( p_movement.m_frame == 0 ) {
             _mapSprites.setFrameD( p_spriteId, p_movement.m_direction );
             if( p_movePlayer ) { _mapSprites.setFrameD( _playerSprite, p_playerMovement ); }
+
+            // check for reflection
+            u8 behave = at( p_mapObject.m_pos.m_posX + dir[ p_movement.m_direction ][ 0 ],
+                            p_mapObject.m_pos.m_posY + dir[ p_movement.m_direction ][ 1 ] + 1 )
+                            .m_bottombehave;
+            if( isReflective( behave ) ) { _mapSprites.enableReflection( p_spriteId ); }
+            behave = at( p_mapObject.m_pos.m_posX + dir[ p_movement.m_direction ][ 0 ],
+                         p_mapObject.m_pos.m_posY + dir[ p_movement.m_direction ][ 1 ] + 2 )
+                         .m_bottombehave;
+            if( isReflective( behave ) ) { _mapSprites.enableReflection( p_spriteId ); }
         }
         if( p_movement.m_frame == 15 ) {
             _mapSprites.drawFrameD( p_spriteId, p_movement.m_direction );
@@ -224,6 +243,21 @@ namespace MAP {
             // clear remnants of field animation on old tile
             clearFieldAnimation( p_mapObject.m_pos.m_posX - dir[ p_movement.m_direction ][ 0 ],
                                  p_mapObject.m_pos.m_posY - dir[ p_movement.m_direction ][ 1 ] );
+
+            bool refl = false;
+            // check for reflection
+            u8 behave = at( p_mapObject.m_pos.m_posX, p_mapObject.m_pos.m_posY + 1 ).m_bottombehave;
+            if( isReflective( behave ) ) {
+                _mapSprites.enableReflection( p_spriteId );
+                refl = true;
+            }
+            behave = at( p_mapObject.m_pos.m_posX, p_mapObject.m_pos.m_posY + 2 ).m_bottombehave;
+            if( isReflective( behave ) ) {
+                _mapSprites.enableReflection( p_spriteId );
+                refl = true;
+            }
+
+            if( !refl ) { _mapSprites.disableReflection( p_spriteId ); }
         }
     }
 

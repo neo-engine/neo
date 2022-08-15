@@ -189,9 +189,9 @@ namespace MAP {
       public:
         static constexpr u8 MAX_SMALL_NPC             = 16;
         static constexpr u8 MAX_LARGE_NPC             = 4;
-        static constexpr u8 MAX_HM_PARTICLE           = 32;
+        static constexpr u8 MAX_HM_PARTICLE           = 16;
         static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 6;
-        static constexpr u8 MAX_TILE_ANIM             = 32;
+        static constexpr u8 MAX_TILE_ANIM             = 16;
         static constexpr u8 MAX_TILE_ANIM_GFX_SLOTS   = 6;
 
         static constexpr u8 SPR_UNUSED    = 0;
@@ -224,6 +224,7 @@ namespace MAP {
             mapSprite    m_sprite;
             mapSpritePos m_pos;
             spriteType   m_type;
+            bool         m_reflectionVisible;
 
             constexpr void translateSprite( s8 p_dx, s8 p_dy ) {
                 m_pos.translateSprite( p_dx, p_dy );
@@ -427,6 +428,14 @@ namespace MAP {
         void showExclamation( u8 p_spriteId, u8 p_emote = 0 );
 
         void hideExclamation( );
+
+        /*
+         * @brief: Creates a y-flipped copy of the specified sprite that moves with the
+         * corresponding non-mirrored sprite.
+         */
+        void enableReflection( u8 p_spriteId );
+
+        void disableReflection( u8 p_spriteId );
 
         void update( );
     };
