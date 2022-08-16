@@ -32,11 +32,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "map/mapSlice.h"
 #include "save/saveGame.h"
 
-#define SPR_MAIN_PLAYER_OAM        0
+#define SPR_MAPTILE_OAM( p_idx )   ( 0 + ( p_idx ) )
+#define SPR_MAIN_PLAYER_OAM        SPR_MAPTILE_OAM( MAX_TILE_ANIM )
 #define SPR_SMALL_NPC_OAM( p_idx ) ( 1 + SPR_MAIN_PLAYER_OAM + ( p_idx ) )
 #define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
-#define SPR_MAPTILE_OAM( p_idx )   ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
-#define SPR_HM_OAM( p_idx )        ( SPR_MAPTILE_OAM( MAX_TILE_ANIM ) + ( p_idx ) )
+#define SPR_HM_OAM( p_idx )        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
 
 #define MAX_OAM ( SPR_HM_OAM( MAX_HM_PARTICLE ) )
 
@@ -44,7 +44,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_DOOR_OAM             ( SPR_MAIN_PLAYER_PLAT_OAM + 1 )
 #define SPR_EXCLM_OAM            SPR_DOOR_OAM + 1
 
-#define SPR_REFLECTION_START SPR_EXCLM_OAM + 1
+#define SPR_REFLECTION_START SPR_EXCLM_OAM + 1 - SPR_MAIN_PLAYER_OAM
 
 // Strength boulder (16x16)
 // Rock Smash rock  (16x16)
