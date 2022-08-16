@@ -54,6 +54,9 @@ namespace MAP {
         bool m_good; // data has been read from fs
         u8   m_owMapSizeX;
         u8   m_owMapSizeY;
+        u8   m_mapImageRes    = 4;
+        u8   m_mapImageShiftX = 0;
+        u8   m_mapImageShiftY = 0;
 
         u16 m_defaultLocation; // location to return for out-of-bounds; e.g. L_HOENN
 
@@ -365,9 +368,7 @@ namespace MAP {
         u8 m_hasDiveMap : 1 = false; // stores whether there is a seperate map for hm dive
         u8 : 6;
         u16 m_defaultLocation = 0; // default location for this bank (unused)
-        u8  m_mapMug          = 0; // preview image shown when switching to this bank (0
-                                   // for none)
-        u8 : 8;
+        u16 : 16;
 
         constexpr bankInfo( u8 p_sizeX = 0, u8 p_sizeY = 0, u8 p_mapMode = MAPMODE_COMBINED,
                             bool p_isOWMap = false )

@@ -422,7 +422,10 @@ namespace IO {
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
         if( FS::frameForLocation( p_newLocation ) == 3 || FS::frameForLocation( p_newLocation ) == 6
-            || FS::frameForLocation( p_newLocation ) == 0 ) {
+            || FS::frameForLocation( p_newLocation ) == 0
+            || FS::frameForLocation( p_newLocation ) == 8
+            || FS::frameForLocation( p_newLocation ) == 9
+            || FS::frameForLocation( p_newLocation ) == 10 ) {
             IO::regularFont->setColor( 1, 1 );
         } else {
             IO::regularFont->setColor( 3, 1 );

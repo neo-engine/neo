@@ -187,6 +187,9 @@ namespace FS {
 
         fread( &MAP::MAP_LOCATIONS.m_owMapSizeX, sizeof( u8 ), 1, f );
         fread( &MAP::MAP_LOCATIONS.m_owMapSizeY, sizeof( u8 ), 1, f );
+        fread( &MAP::MAP_LOCATIONS.m_mapImageRes, sizeof( u8 ), 1, f );
+        fread( &MAP::MAP_LOCATIONS.m_mapImageShiftX, sizeof( u8 ), 1, f );
+        fread( &MAP::MAP_LOCATIONS.m_mapImageShiftY, sizeof( u8 ), 1, f );
         fread( &MAP::MAP_LOCATIONS.m_defaultLocation, sizeof( u16 ), 1, f );
 
         MAP::MAP_LOCATIONS.m_locationData.resize( MAP::MAP_LOCATIONS.m_owMapSizeX

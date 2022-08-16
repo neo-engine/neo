@@ -54,16 +54,13 @@ namespace IO {
     extern navApp*              CUR_NAV_APP;
 
     class mapNavApp : public navApp {
-        static constexpr u16 MAP_TOP_X = 4;
-        static constexpr u16 MAP_TOP_Y = 36;
-        static constexpr u16 MAP_BOT_X = 219;
-        static constexpr u16 MAP_BOT_Y = 155;
+        u16           _cursorX, _cursorY;
+        u16           _cursorLocationId;
+        u16           _playerX, _playerY;
+        u8            _OWMap;
+        MAP::bankInfo _OWbankInfo;
 
-        static constexpr u16 MAP_IMG_RES = 4;
-
-        u16 _cursorX, _cursorY;
-        u16 _cursorLocationId;
-        u16 _playerX, _playerY;
+        u8 _mapTopX, _mapTopY, _mapBotX, _mapBotY;
 
         void computePlayerPosition( );
         void computeCursorLocationId( );

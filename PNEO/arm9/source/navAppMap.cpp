@@ -71,24 +71,24 @@ namespace IO {
         if( !SAVE::SAV.getActiveFile( ).m_appearance ) {
             tileCnt
                 = IO::loadSprite( "NV/player0", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
-                                  tileCnt, _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, false,
+                                  tileCnt, _playerX - 8, _playerY + _mapTopY - 8, 16, 16, false,
                                   false, false, OBJPRIORITY_3, p_bottom );
         } else {
             tileCnt
                 = IO::loadSprite( "NV/player1", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
-                                  tileCnt, _playerX - 8, _playerY + MAP_TOP_Y - 8, 16, 16, false,
+                                  tileCnt, _playerX - 8, _playerY + _mapTopY - 8, 16, 16, false,
                                   false, false, OBJPRIORITY_3, p_bottom );
         }
 
         // load cursor icon
         tileCnt = IO::loadSprite( "BX/box_arrow", SPR_NAV_APP_RSV_SUB, SPR_NAV_APP_RSV2_PAL_SUB,
-                                  tileCnt, _cursorX, _cursorY + MAP_TOP_Y - 14, 16, 16, false,
-                                  false, false, OBJPRIORITY_3, true );
+                                  tileCnt, _cursorX, _cursorY + _mapTopY - 14, 16, 16, false, false,
+                                  false, OBJPRIORITY_3, true );
 
         // load bg
-
-        FS::readPictureData( ptr3, "nitro:/PICS/NAV_APP/", "app01bg", 192 * 2, 192 * 256,
-                             p_bottom );
+        // use last OW map as dafault
+        snprintf( buffer, TMP_BUFFER_SIZE, "map%hhu", _OWMap );
+        FS::readPictureData( ptr3, "nitro:/PICS/NAV_APP/", buffer, 192 * 2, 192 * 256, p_bottom );
         pal[ 0 ] = IO::BLACK;
 
         if( _cursorLocationId ) {
@@ -111,20 +111,50 @@ namespace IO {
                 || !MAP::MAP_LOCATIONS.m_good ) {
                 FS::loadLocationData( SAVE::SAV.getActiveFile( ).m_currentMap );
             }
-
             // player is in OW
-            _playerX = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / MAP_IMG_RES;
-            _playerY = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / MAP_IMG_RES;
+            _playerX = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                       / MAP::MAP_LOCATIONS.m_mapImageRes;
+            _playerY = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                       / MAP::MAP_LOCATIONS.m_mapImageRes;
+            _OWMap = SAVE::SAV.getActiveFile( ).m_currentMap;
+
+            _mapTopX = MAP::MAP_LOCATIONS.m_mapImageShiftX;
+            _mapTopY = MAP::MAP_LOCATIONS.m_mapImageShiftY;
+            _mapBotX = _mapTopX
+                       + ( MAP::mapLocation::MAP_LOCATION_RES / MAP::MAP_LOCATIONS.m_mapImageRes )
+                             * ( MAP::MAP_LOCATIONS.m_owMapSizeX );
+            _mapBotY = _mapTopY
+                       + ( MAP::mapLocation::MAP_LOCATION_RES / MAP::MAP_LOCATIONS.m_mapImageRes )
+                             * ( MAP::MAP_LOCATIONS.m_owMapSizeY + 1 );
         } else if( FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_lastOWPos.first ) ) {
             if( MAP::MAP_LOCATIONS.m_bank != SAVE::SAV.getActiveFile( ).m_lastOWPos.first
                 || !MAP::MAP_LOCATIONS.m_good ) {
                 FS::loadLocationData( SAVE::SAV.getActiveFile( ).m_lastOWPos.first );
             }
-            _playerX = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posX / MAP_IMG_RES;
-            _playerY = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posY / MAP_IMG_RES;
+
+            _playerX = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posX
+                       / MAP::MAP_LOCATIONS.m_mapImageRes;
+            _playerY = SAVE::SAV.getActiveFile( ).m_lastOWPos.second.m_posY
+                       / MAP::MAP_LOCATIONS.m_mapImageRes;
+            _OWMap = SAVE::SAV.getActiveFile( ).m_lastOWPos.first;
+
+            _mapTopX = MAP::MAP_LOCATIONS.m_mapImageShiftX;
+            _mapTopY = MAP::MAP_LOCATIONS.m_mapImageShiftY;
+            _mapBotX = _mapTopX
+                       + ( MAP::mapLocation::MAP_LOCATION_RES / MAP::MAP_LOCATIONS.m_mapImageRes )
+                             * ( MAP::MAP_LOCATIONS.m_owMapSizeX );
+            _mapBotY = _mapTopY
+                       + ( MAP::mapLocation::MAP_LOCATION_RES / MAP::MAP_LOCATIONS.m_mapImageRes )
+                             * ( MAP::MAP_LOCATIONS.m_owMapSizeY + 1 );
         } else {
             _playerX = 0;
             _playerY = 0;
+            _OWMap   = 0;
+
+            _mapTopX = 0;
+            _mapTopY = 0;
+            _mapBotX = 0;
+            _mapBotY = 0;
         }
     }
 
@@ -150,7 +180,7 @@ namespace IO {
         // update player sprite
 
         oam[ SPR_NAV_APP_RSV_SUB + 1 ].x = _playerX - 8;
-        oam[ SPR_NAV_APP_RSV_SUB + 1 ].y = _playerY + MAP_TOP_Y - 8;
+        oam[ SPR_NAV_APP_RSV_SUB + 1 ].y = _playerY + _mapTopY - 8;
         if( change ) {
             locChange |= ( _playerX != _cursorX || _playerY != _cursorY );
             _cursorX = _playerX;
@@ -172,19 +202,18 @@ namespace IO {
         }
 
         // check for (touch) input
-
-        if( touch.px >= MAP_TOP_X && touch.px <= MAP_BOT_X && touch.py >= MAP_TOP_Y
-            && touch.py <= MAP_BOT_Y ) {
+        if( touch.px > _mapTopX && touch.px < _mapBotX && touch.py > _mapTopY
+            && touch.py < _mapBotY ) {
             // move cursor
             locChange |= ( touch.px != _cursorX || touch.py != _cursorY );
 
             _cursorX = touch.px;
-            _cursorY = touch.py - MAP_TOP_Y;
+            _cursorY = touch.py - _mapTopY;
         }
 
         if( locChange ) {
             oam[ SPR_NAV_APP_RSV_SUB ].x = _cursorX;
-            oam[ SPR_NAV_APP_RSV_SUB ].y = _cursorY + MAP_TOP_Y - 14;
+            oam[ SPR_NAV_APP_RSV_SUB ].y = _cursorY + _mapTopY - 14;
 
             computeCursorLocationId( );
             if( _cursorLocationId != oldl ) {
