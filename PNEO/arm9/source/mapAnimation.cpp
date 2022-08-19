@@ -66,6 +66,15 @@ namespace MAP {
         }
     }
 
+    u8 mapDrawer::getTileExitAnimation( u16 p_globX, u16 p_globY ) {
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+        // TODO
+        switch( behave ) {
+        default: return 0;
+        }
+    }
+
     u8 mapDrawer::animateField( u16 p_globX, u16 p_globY, u8 p_animation, u8 p_frame ) {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
@@ -118,7 +127,75 @@ namespace MAP {
             // breakable floor
             // breaks on step on
             setBlock( p_globX, p_globY, BREAKABLE_TILE_BLOCK );
+            break;
         }
+        case BEH_PACIFIDLOG_LOG_VERTICAL_TOP: {
+            setBlock( p_globX, p_globY, TS12_LOG_UPPER_DOWN );
+            setBlock( p_globX, p_globY + 1, TS12_LOG_LOWER_DOWN );
+            break;
+        }
+        case BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM: {
+            setBlock( p_globX, p_globY - 1, TS12_LOG_UPPER_DOWN );
+            setBlock( p_globX, p_globY, TS12_LOG_LOWER_DOWN );
+            break;
+        }
+        case BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT: {
+            setBlock( p_globX, p_globY, TS12_LOG_LEFT_DOWN );
+            setBlock( p_globX + 1, p_globY, TS12_LOG_RIGHT_DOWN );
+            break;
+        }
+        case BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT: {
+            setBlock( p_globX - 1, p_globY, TS12_LOG_LEFT_DOWN );
+            setBlock( p_globX, p_globY, TS12_LOG_RIGHT_DOWN );
+            break;
+        }
+        case BEH_FORRTREE_BRIDGE_BIKE_BELOW: {
+            if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3 ) {
+                setBlock( p_globX, p_globY, atom( p_globX, p_globY ).m_blockidx | 1 );
+            }
+            break;
+        }
+
+        default: break;
+        }
+
+        // TODO
+    }
+
+    void mapDrawer::animateExitField( u16 p_globX, u16 p_globY ) {
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+        u8 anim   = getTileExitAnimation( p_globX, p_globY );
+
+        (void) anim;
+
+        switch( behave ) {
+        case BEH_PACIFIDLOG_LOG_VERTICAL_TOP: {
+            setBlock( p_globX, p_globY, TS12_LOG_UPPER_UP );
+            setBlock( p_globX, p_globY + 1, TS12_LOG_LOWER_UP );
+            break;
+        }
+        case BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM: {
+            setBlock( p_globX, p_globY - 1, TS12_LOG_UPPER_UP );
+            setBlock( p_globX, p_globY, TS12_LOG_LOWER_UP );
+            break;
+        }
+        case BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT: {
+            setBlock( p_globX, p_globY, TS12_LOG_LEFT_UP );
+            setBlock( p_globX + 1, p_globY, TS12_LOG_RIGHT_UP );
+            break;
+        }
+        case BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT: {
+            setBlock( p_globX - 1, p_globY, TS12_LOG_LEFT_UP );
+            setBlock( p_globX, p_globY, TS12_LOG_RIGHT_UP );
+            break;
+        }
+        case BEH_FORRTREE_BRIDGE_BIKE_BELOW: {
+            if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3 ) {
+                setBlock( p_globX, p_globY, atom( p_globX, p_globY ).m_blockidx & ( ~1 ) );
+            }
+            break;
+        }
+
         default: break;
         }
 

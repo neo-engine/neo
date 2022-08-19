@@ -158,6 +158,16 @@ namespace MAP {
         static constexpr u16 TS7_ASH_GRASS_BLOCK  = 0x212;
         static constexpr u16 BREAKABLE_TILE_BLOCK = 0x206;
 
+        static constexpr u16 TS12_LOG_LEFT_UP    = 0x250;
+        static constexpr u16 TS12_LOG_LEFT_DOWN  = 0x252;
+        static constexpr u16 TS12_LOG_RIGHT_UP   = 0x251;
+        static constexpr u16 TS12_LOG_RIGHT_DOWN = 0x253;
+
+        static constexpr u16 TS12_LOG_UPPER_UP   = 0x258;
+        static constexpr u16 TS12_LOG_UPPER_DOWN = 0x259;
+        static constexpr u16 TS12_LOG_LOWER_UP   = 0x260;
+        static constexpr u16 TS12_LOG_LOWER_DOWN = 0x261;
+
         static constexpr u8 WARP_TO_LAST_ENTRY     = 0xFF;
         static constexpr u8 PIKACHU_IS_MIMIKYU_MOD = 0xFF;
 
@@ -358,6 +368,8 @@ namespace MAP {
          */
         u8 getTileAnimation( u16 p_globX, u16 p_globY, bool p_shiny = false );
 
+        u8 getTileExitAnimation( u16 p_globX, u16 p_globY );
+
         /*
          * @brief: Clears permanent tile animations from the specified field
          */
@@ -394,10 +406,14 @@ namespace MAP {
         void loadNewRow( direction p_direction, bool p_updatePlayer );
         void loadSlice( direction p_direction ); // dir: dir that needs to be extended
 
+        void stepOff( u16 p_globX, u16 p_globY );
+
         void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true,
                      bool p_unfade = false );
 
         void animateField( u16 p_globX, u16 p_globY );
+
+        void animateExitField( u16 p_globX, u16 p_globY );
 
         void runEvent( mapData::event p_event, u8 p_objectId = 0, s16 p_mapX = -1,
                        s16 p_mapY = -1 );

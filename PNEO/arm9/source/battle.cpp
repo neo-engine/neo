@@ -77,23 +77,17 @@ namespace BATTLE {
 
         switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
         case 0:
-            if( _opponent.m_data.m_numPokemon > 2 ) { _opponent.m_data.m_numPokemon--; }
+            _opponentTeamSize = _opponent.m_data.m_numPokemonEasy;
             if( _AILevel ) { _AILevel--; }
             break;
         case 3:
-        default: break;
+        default: _opponentTeamSize = _opponent.m_data.m_numPokemonNormal; break;
         case 6:
-            // Check if the opponent actually has an extra pkmn
-            if( _opponent.m_data.m_numPokemon < SAVE::NUM_PARTY_SLOTS
-                && _opponent.m_data.m_pokemon[ _opponent.m_data.m_numPokemon ].m_speciesId ) {
-                _opponent.m_data.m_numPokemon++;
-            }
+            _opponentTeamSize = _opponent.m_data.m_numPokemonHard;
             if( _AILevel < 9 ) { _AILevel++; }
             break;
         }
 
-        _opponentTeamSize = _opponent.m_data.m_numPokemon
-            = std::min( SAVE::NUM_PARTY_SLOTS, _opponent.m_data.m_numPokemon );
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
             _yieldEXP[ i ]     = std::set<u8>( );

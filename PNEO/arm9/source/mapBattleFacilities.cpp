@@ -111,10 +111,12 @@ namespace MAP {
             return false;
         }
 
-        NEXT_OPPONENT.m_data.m_numPokemon = p_rules.m_battleMode == BATTLE::BM_SINGLE ? 3 : 4;
+        NEXT_OPPONENT.m_data.m_numPokemonEasy = NEXT_OPPONENT.m_data.m_numPokemonNormal
+            = NEXT_OPPONENT.m_data.m_numPokemonHard
+            = p_rules.m_battleMode == BATTLE::BM_SINGLE ? 3 : 4;
         if( p_randomTeam ) {
             // choose random pkmn
-            for( u8 i = 0; i < NEXT_OPPONENT.m_data.m_numPokemon; ++i ) {
+            for( u8 i = 0; i < NEXT_OPPONENT.m_data.m_numPokemonNormal; ++i ) {
                 u16 species = 0;
                 u8  variant = NO_VARIANT;
 

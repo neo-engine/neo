@@ -145,6 +145,18 @@ namespace MAP {
         return hadBattle;
     }
 
+    void mapDrawer::stepOff( u16 p_globX, u16 p_globY ) {
+        clearFieldAnimation( p_globX, p_globY );
+        animateExitField( p_globX, p_globY );
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+        // Check for things that activate upon leaving a tile
+
+        switch( behave ) {
+        default: break;
+        }
+    }
+
     void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn,
                             bool p_unfade ) {
         animateField( p_globX, p_globY );
@@ -1107,7 +1119,7 @@ namespace MAP {
         u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
-            clearFieldAnimation( gx, gy );
+            stepOff( gx, gy );
         }
 
         redirectPlayer( p_direction, false );
@@ -1146,7 +1158,7 @@ namespace MAP {
             swiWaitForVBlank( );
         }
 
-        clearFieldAnimation( gx, gy );
+        stepOff( gx, gy );
         SAVE::SAV.getActiveFile( ).stepIncrease( );
     }
 
@@ -1166,7 +1178,7 @@ namespace MAP {
         u16 gy   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
-            clearFieldAnimation( gx, gy );
+            stepOff( gx, gy );
         }
 
         if( p_newMoveMode == SURF || p_newMoveMode == ROCK_CLIMB ) {
@@ -1201,7 +1213,7 @@ namespace MAP {
         swiWaitForVBlank( );
         moveCamera( di, true );
 
-        clearFieldAnimation( gx, gy );
+        stepOff( gx, gy );
     }
 
     void mapDrawer::slidePlayer( direction p_direction ) {
@@ -1210,7 +1222,7 @@ namespace MAP {
         u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
-            clearFieldAnimation( gx, gy );
+            stepOff( gx, gy );
         }
 
         redirectPlayer( p_direction, false );
@@ -1240,7 +1252,7 @@ namespace MAP {
             if( i == 8 ) { _mapSprites.currentFrame( _playerSprite ); }
             swiWaitForVBlank( );
         }
-        clearFieldAnimation( gx, gy );
+        stepOff( gx, gy );
 
         if( disableRefl ) { _mapSprites.disableReflection( _playerSprite ); }
 
@@ -1256,11 +1268,15 @@ namespace MAP {
         u16 gz   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
         u16 nx   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX + dir[ p_direction ][ 0 ];
         u16 ny   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + dir[ p_direction ][ 1 ];
+        u16 ox   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - dir[ _lastPlayerMove ][ 0 ];
+        u16 oy   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - dir[ _lastPlayerMove ][ 1 ];
         u8  anim = getTileAnimation( nx, ny );
-        if( p_direction == DOWN
-            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
+        if( p_direction == DOWN && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS
+            && at( gx, gy ).m_bottombehave != BEH_PACIFIDLOG_LOG_VERTICAL_TOP ) {
             if( !_pkmnFollowsPlayer && !SAVE::SAV.getActiveFile( ).m_objectAttached ) {
-                clearFieldAnimation( gx, gy );
+                stepOff( gx, gy );
+            } else {
+                stepOff( ox, oy );
             }
         }
 
@@ -1389,13 +1405,18 @@ namespace MAP {
             }
         }
         if( !_pkmnFollowsPlayer && !SAVE::SAV.getActiveFile( ).m_objectAttached ) {
-            clearFieldAnimation( gx, gy );
+            stepOff( gx, gy );
+        } else {
+            stepOff( ox, oy );
         }
 
         if( !updateTracerChain( p_direction ) ) { resetTracerChain( true ); }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        if( _pkmnFollowsPlayer || SAVE::SAV.getActiveFile( ).m_objectAttached ) {
+            stepOn( gx, gy, SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false );
+        }
         SAVE::SAV.getActiveFile( ).stepIncrease( );
         _mapSprites.reorderSprites( true );
     }
@@ -1405,7 +1426,7 @@ namespace MAP {
         u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
-            clearFieldAnimation( gx, gy );
+            stepOff( gx, gy );
         }
 
         SOUND::playSoundEffect( SFX_JUMP );
@@ -1416,7 +1437,7 @@ namespace MAP {
             if( i > 13 ) { _mapSprites.moveSprite( _playerSprite, DOWN, 3 ); }
             if( i % 2 ) swiWaitForVBlank( );
         }
-        clearFieldAnimation( gx, gy );
+        stepOff( gx, gy );
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
@@ -1431,7 +1452,7 @@ namespace MAP {
         u16 ny = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 2 * dir[ p_direction ][ 1 ];
         if( p_direction == DOWN
             && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS ) {
-            clearFieldAnimation( gx, gy );
+            stepOff( gx, gy );
         }
 
         // movement for attached objects
@@ -1473,7 +1494,7 @@ namespace MAP {
         }
 
         _mapSprites.drawFrame( _playerSprite, getFrame( p_direction ) );
-        clearFieldAnimation( gx, gy );
+        stepOff( gx, gy );
         if( !updateTracerChain( p_direction ) ) { resetTracerChain( true ); }
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
