@@ -75,7 +75,7 @@ namespace MAP {
         if( moveData == MVD_SURF && behave != BEH_WATERFALL ) {
             handleWildPkmn( WATER );
         } else if( isGrass( behave ) || behave == BEH_SAND_WITH_ENCOUNTER_AND_FISH
-                   || behave == BEH_CAVE_WITH_ENCOUNTER ) {
+                   || behave == BEH_CAVE_WITH_ENCOUNTER || behave == BEH_INDOOR_WITH_ENCOUNTER ) {
             handleWildPkmn( GRASS );
         } else if( behave == BEH_LONG_GRASS ) {
             handleWildPkmn( HIGH_GRASS );

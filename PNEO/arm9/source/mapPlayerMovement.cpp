@@ -286,11 +286,11 @@ namespace MAP {
         case BEH_BLOCK_DOWN_RIGHT:
             if( p_direction == DOWN || p_direction == RIGHT ) return false;
             break;
-        case BEH_BLOCK_UP_DOWN_LEFT:
-            if( p_direction == UP || p_direction == DOWN || p_direction == LEFT ) return false;
+        case BEH_BLOCK_UP_LEFT:
+            if( p_direction == UP || p_direction == LEFT ) return false;
             break;
-        case BEH_BLOCK_UP_DOWN_RIGHT:
-            if( p_direction == UP || p_direction == DOWN || p_direction == RIGHT ) return false;
+        case BEH_BLOCK_UP_RIGHT:
+            if( p_direction == UP || p_direction == RIGHT ) return false;
             break;
 
         case BEH_WALK_ONLY:

@@ -49,51 +49,60 @@ namespace MAP {
             BEH_LONG_GRASS = 0x03,
 
             BEH_SAND_WITH_ENCOUNTER_AND_FISH = 0x06,
-
-            BEH_CAVE_WITH_ENCOUNTER = 0x08,
-
-            BEH_LADDER = 0x0A,
+            BEH_SHORT_GRASS                  = 0x07, // TODO: animation
+            BEH_CAVE_WITH_ENCOUNTER          = 0x08,
+            BEH_LONG_GRASS_BORDER            = 0x09, // unused
+            BEH_LADDER                       = 0x0A, // no running
+            BEH_INDOOR_WITH_ENCOUNTER        = 0x0B,
 
             BEH_REFLECTION = 0x10,
             BEH_DIVE       = 0x11,
             BEH_ROCK_CLIMB = 0x12,
             BEH_WATERFALL  = 0x13,
 
-            BEH_REFLECTION_FOLLOW_CIRCLE = 0x16,
+            BEH_REFLECTION_FOLLOW_CIRCLE = 0x16, // TODO: follow circle
+            BEH_SHALLOW_WATER            = 0x17, // TODO
 
             BEH_UNDERWATER_NO_RESURFACE = 0x19,
 
-            BEH_SLIDE_ON_ICE = 0x20,
-
+            BEH_SLIDE_ON_ICE     = 0x20,
+            BEH_SAND_FOOTPRINTS  = 0x21, // TODO
             BEH_GRASS_UNDERWATER = 0x22,
 
-            BEH_GRASS_ASH = 0x24,
+            BEH_GRASS_ASH   = 0x24,
+            BEH_FOOTPRINTS  = 0x25, // TODO
+            BEH_THIN_ICE    = 0x26, // TODO
+            BEH_CRACKED_ICE = 0x27, // TODO
 
             BEH_WARP_TELEPORT                 = 0x29,
             BEH_GRASS_UNDERWATER_NO_RESURFACE = 0x2A,
+            BEH_REFLECTION_UNDER_BRIDGE       = 0x2B, // TODO / unused
 
-            BEH_BLOCK_RIGHT         = 0x30,
-            BEH_BLOCK_LEFT          = 0x31,
-            BEH_BLOCK_UP            = 0x32,
-            BEH_BLOCK_DOWN          = 0x33,
-            BEH_BLOCK_UP_DOWN_RIGHT = 0x34,
-            BEH_BLOCK_UP_DOWN_LEFT  = 0x35,
-            BEH_BLOCK_DOWN_RIGHT    = 0x36,
-            BEH_BLOCK_DOWN_LEFT     = 0x37,
-            BEH_JUMP_RIGHT          = 0x38,
-            BEH_JUMP_LEFT           = 0x39,
-            BEH_JUMP_UP             = 0x3A,
-            BEH_JUMP_DOWN           = 0x3B,
-
-            BEH_WALK_RIGHT     = 0x40,
-            BEH_WALK_LEFT      = 0x41,
-            BEH_WALK_UP        = 0x42,
-            BEH_WALK_DOWN      = 0x43,
-            BEH_SLIDE_RIGHT    = 0x44,
-            BEH_SLIDE_LEFT     = 0x45,
-            BEH_SLIDE_UP       = 0x46,
-            BEH_SLIDE_DOWN     = 0x47,
-            BEH_SLIDE_CONTINUE = 0x48,
+            BEH_BLOCK_RIGHT      = 0x30,
+            BEH_BLOCK_LEFT       = 0x31,
+            BEH_BLOCK_UP         = 0x32,
+            BEH_BLOCK_DOWN       = 0x33,
+            BEH_BLOCK_UP_RIGHT   = 0x34,
+            BEH_BLOCK_UP_LEFT    = 0x35,
+            BEH_BLOCK_DOWN_RIGHT = 0x36,
+            BEH_BLOCK_DOWN_LEFT  = 0x37,
+            BEH_JUMP_RIGHT       = 0x38,
+            BEH_JUMP_LEFT        = 0x39,
+            BEH_JUMP_UP          = 0x3A,
+            BEH_JUMP_DOWN        = 0x3B,
+            BEH_JUMP_UP_RIGHT    = 0x3C, // TODO
+            BEH_JUMP_UP_LEFT     = 0x3D, // TODO
+            BEH_JUMP_DOWN_RIGHT  = 0x3E, // TODO
+            BEH_JUMP_DOWN_LEFT   = 0x3F, // TODO
+            BEH_WALK_RIGHT       = 0x40,
+            BEH_WALK_LEFT        = 0x41,
+            BEH_WALK_UP          = 0x42,
+            BEH_WALK_DOWN        = 0x43,
+            BEH_SLIDE_RIGHT      = 0x44,
+            BEH_SLIDE_LEFT       = 0x45,
+            BEH_SLIDE_UP         = 0x46,
+            BEH_SLIDE_DOWN       = 0x47,
+            BEH_SLIDE_CONTINUE   = 0x48,
 
             BEH_RUN_RIGHT = 0x50,
             BEH_RUN_LEFT  = 0x51,
