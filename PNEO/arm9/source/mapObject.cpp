@@ -361,6 +361,10 @@ namespace MAP {
             _pkmnFollowsPlayer     = false;
             _followPkmnData        = nullptr;
             _followPkmnSpeciesData = nullptr;
+
+            u16 ox = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - dir[ _lastPlayerMove ][ 0 ];
+            u16 oy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - dir[ _lastPlayerMove ][ 1 ];
+            stepOff( ox, oy );
         }
     }
 
