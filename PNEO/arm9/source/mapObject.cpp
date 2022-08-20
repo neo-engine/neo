@@ -591,14 +591,6 @@ namespace MAP {
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
 
             if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 24 ) {
-#ifdef DESQUID_MORE
-                IO::printMessage(
-                    ( std::string( "Destroying " ) + std::to_string( i ) + " "
-                      + std::to_string( o.first ) + " : " + std::to_string( o.second.m_pos.m_posX )
-                      + " " + std::to_string( curx ) + " " + std::to_string( o.second.m_pos.m_posY )
-                      + " " + std::to_string( cury ) )
-                        .c_str( ) );
-#endif
                 _mapSprites.destroySprite( o.first, false );
             } else if( o.second.m_event.m_activateFlag
                        && !SAVE::SAV.getActiveFile( ).checkFlag(
@@ -660,13 +652,7 @@ namespace MAP {
                 obj.m_range     = 0;
                 obj.m_direction = UP;
                 obj.m_event     = p_data.m_events[ i ];
-#ifdef DESQUID_MORE
-                IO::printMessage( ( std::to_string( curx ) + "|" + std::to_string( cury ) + " : "
-                                    + std::to_string( obj.m_pos.m_posX ) + " , "
-                                    + std::to_string( obj.m_pos.m_posY ) )
-                                      .c_str( ) );
-#endif
-                cur = { 0, obj };
+                cur             = { 0, obj };
                 break;
             }
             case EVENT_BERRYTREE: {
@@ -723,6 +709,7 @@ namespace MAP {
             }
 
             case EVENT_OW_PKMN: {
+                break;
                 mapObject obj  = mapObject( );
                 obj.m_pos      = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
                                    u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
@@ -767,6 +754,7 @@ namespace MAP {
 
         // force an update
         _mapSprites.update( );
+
         ANIMATE_MAP = oa;
     }
 

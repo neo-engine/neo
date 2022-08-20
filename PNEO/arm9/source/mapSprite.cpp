@@ -1021,8 +1021,7 @@ namespace MAP {
         auto& spr = getManagedSprite( p_spriteId );
         IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ]
             = IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ];
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].vFlip    = true;
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].isHidden = false;
+        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].vFlip = true;
         IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].priority = OBJPRIORITY_3;
         IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].palette  = 0;
 
