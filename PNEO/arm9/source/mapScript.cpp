@@ -388,15 +388,15 @@ namespace MAP {
                 break;
             }
             case EXMR: {
-                showExclamationAboveMapObject( registers[ par1 ] );
+                if( par1 < 10 ) { showExclamationAboveMapObject( registers[ par1 ] ); }
                 break;
             }
             case FIXR: {
-                fixMapObject( registers[ par1 ] );
+                if( par1 < 10 ) { fixMapObject( registers[ par1 ] ); }
                 break;
             }
             case UFXR: {
-                unfixMapObject( registers[ par1 ] );
+                unfixMapObject( );
                 break;
             }
             case ATT: playerAttachedToObject = true; break;
@@ -427,8 +427,8 @@ namespace MAP {
                 // Check if there is some unused map object
 
                 u8 found = 255;
-                for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
-                    if( _fixedMapObjects.count( i ) ) { continue; }
+                for( u8 i = _fixedObjectCount; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount;
+                     ++i ) {
                     if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first == UNUSED_MAPOBJECT ) {
                         found = i;
                         break;
@@ -606,8 +606,8 @@ namespace MAP {
                 // Check if there is some unused map object
 
                 u8 found = 255;
-                for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
-                    if( _fixedMapObjects.count( i ) ) { continue; }
+                for( u8 i = _fixedObjectCount; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount;
+                     ++i ) {
                     if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first == UNUSED_MAPOBJECT ) {
                         found = i;
                         break;
@@ -2150,8 +2150,14 @@ namespace MAP {
                 }
             }
 
+            u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+            u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+
             runEvent( o.second.m_event, i );
-            o.second.m_movement = old;
+            if( curx == SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                && cury == SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY ) {
+                o.second.m_movement = old;
+            }
         }
     }
 

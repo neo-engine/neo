@@ -140,15 +140,14 @@ namespace MAP {
     void mapDrawer::attachMapObjectToPlayer( u8 p_objectId ) {
         removeAttachedObjects( );
         SAVE::SAV.getActiveFile( ).m_objectAttached    = 1;
-        SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx = p_objectId;
-        _fixedMapObjects.insert( p_objectId );
+        SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx = fixMapObject( p_objectId );
     }
 
     void mapDrawer::removeAttachedObjects( ) {
         if( SAVE::SAV.getActiveFile( ).m_objectAttached ) {
-            _fixedMapObjects.erase( SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx );
             SAVE::SAV.getActiveFile( ).m_mapObjAttachedIdx = 0;
             SAVE::SAV.getActiveFile( ).m_objectAttached    = 0;
+            unfixMapObject( );
         }
     }
 
@@ -165,11 +164,15 @@ namespace MAP {
         _mapSprites.setVisibility( _playerSprite, p_playerHidden );
     }
 
-    void mapDrawer::fixMapObject( u8 p_objectId ) {
-        _fixedMapObjects.insert( p_objectId );
+    u8 mapDrawer::fixMapObject( u8 p_objectId ) {
+        // swap mo to position 0
+        std::swap( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_objectId ],
+                   SAVE::SAV.getActiveFile( ).m_mapObjects[ _fixedObjectCount ] );
+        return _fixedObjectCount++;
     }
-    void mapDrawer::unfixMapObject( u8 p_objectId ) {
-        _fixedMapObjects.erase( p_objectId );
+
+    void mapDrawer::unfixMapObject( ) {
+        _fixedObjectCount = 0;
     }
 
     void mapDrawer::showExclamationAboveMapObject( u8 p_objectId ) {
@@ -556,8 +559,20 @@ namespace MAP {
         IO::init( );
     }
 
+    void mapDrawer::resetMapSprites( ) {
+        for( u16 i = 0; i < 20; ++i ) { swiWaitForVBlank( ); }
+        for( u16 i = 0; i < SAVE::MAX_MAPOBJECT; ++i ) {
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = { UNUSED_MAPOBJECT, mapObject( ) };
+        }
+        SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
+        unfixMapObject( );
+        _mapSprites.reset( );
+    }
+
     void mapDrawer::constructAndAddNewMapObjects( MAP::mapData const& p_data, u8 p_mapX,
                                                   u8 p_mapY ) {
+        bool oa     = ANIMATE_MAP;
+        ANIMATE_MAP = false;
         std::vector<std::pair<u8, mapObject>> res;
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
@@ -570,17 +585,10 @@ namespace MAP {
                             + std::to_string( p_mapX ) + " " + std::to_string( p_mapY ) )
                               .c_str( ) );
 #endif
-
         // check old objects and purge them if they are not visible anymore
-        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+        for( u8 i = _fixedObjectCount; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
-            if( _fixedMapObjects.count( i ) ) {
-#ifdef DESQUID_MORE
-                IO::printMessage( ( std::string( "skip " ) + std::to_string( o.first ) ).c_str( ) );
-#endif
-                continue;
-            }
 
             if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 24 ) {
 #ifdef DESQUID_MORE
@@ -752,21 +760,14 @@ namespace MAP {
             if( loadMapObject( cur ) ) { res.push_back( cur ); }
         }
 
-        SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( ) + _fixedMapObjects.size( );
-        for( u8 i = 0, shift = 0; i < res.size( ) + _fixedMapObjects.size( ); ++i ) {
-            if( _fixedMapObjects.count( i ) ) {
-                ++shift;
-                continue;
-            }
-            if( size_t( i - shift ) < res.size( ) ) {
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = res[ i - shift ];
-            } else {
-                SAVE::SAV.getActiveFile( ).m_mapObjects[ i ] = { UNUSED_MAPOBJECT, mapObject( ) };
-            }
+        SAVE::SAV.getActiveFile( ).m_mapObjectCount = res.size( ) + _fixedObjectCount;
+        for( u8 i = 0; i < res.size( ); ++i ) {
+            SAVE::SAV.getActiveFile( ).m_mapObjects[ i + _fixedObjectCount ] = res[ i ];
         }
 
         // force an update
         _mapSprites.update( );
+        ANIMATE_MAP = oa;
     }
 
     void mapDrawer::destroyHMObject( u16 p_globX, u16 p_globY ) {

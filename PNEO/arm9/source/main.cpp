@@ -312,12 +312,13 @@ int main( int, char** p_argv ) {
 
 #ifdef DESQUID
         if( held & KEY_L ) {
+
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
             snprintf( buffer, 99,
                       "Cur mappos %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | TM %hhu %02hhu:%02hhu.%02hhu",
+                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | TM %hhu %02hhu :%02hhu. %02hhu ",
                       SAVE::SAV.getActiveFile( ).m_currentMap,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
@@ -339,6 +340,15 @@ int main( int, char** p_argv ) {
                       getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
                       SAVE::CURRENT_TIME.m_secs );
             IO::printMessage( buffer );
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
+                if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
+                    == MAP::WALK_CONT_FOLLOW_OBJECT ) {
+                    printf( "%i->%i  ", i, SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first );
+                } else {
+                    printf( "%im%i  ", i,
+                            SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement );
+                }
+            }
         }
 #endif
 

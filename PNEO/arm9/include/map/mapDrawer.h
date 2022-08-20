@@ -203,8 +203,7 @@ namespace MAP {
 
         std::map<position, u8> _tileAnimations;
 
-        std::set<u16> _fixedMapObjects;
-
+        u8 _fixedObjectCount = 0;
 #ifdef DESQUID
         static constexpr u8 TRACER_CHARGED = 1;
 #else
@@ -400,8 +399,15 @@ namespace MAP {
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2, bool p_playerHidden = false );
 
-        void fixMapObject( u8 p_objectId );
-        void unfixMapObject( u8 p_objectId );
+        /*
+         * @brief: swaps the specified mo to slot "_fixedObjectCount" and returns the new
+         * slot id; increments "_fixedObjectCount".
+         */
+        u8 fixMapObject( u8 p_objectId );
+        /*
+         * @brief: unfixes all mapobjects.
+         */
+        void unfixMapObject( );
 
         void showExclamationAboveMapObject( u8 p_objectId );
         void moveMapObject( mapObject& p_mapObject, u8 p_spriteId, movement p_movement,
@@ -414,6 +420,8 @@ namespace MAP {
 
         void loadNewRow( direction p_direction, bool p_updatePlayer );
         void loadSlice( direction p_direction ); // dir: dir that needs to be extended
+
+        void resetMapSprites( );
 
         void stepOff( u16 p_globX, u16 p_globY );
 

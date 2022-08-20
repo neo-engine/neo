@@ -930,6 +930,7 @@ namespace MAP {
         _playerIsFast   = false;
         removeFollowPkmn( );
 
+        bool crossbank = false;
         if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) {
             SAVE::SAV.getActiveFile( ).m_mapObjectCount = 0;
         }
@@ -940,6 +941,8 @@ namespace MAP {
 
             checkPos = true;
         }
+
+        if( p_target.first != SAVE::SAV.getActiveFile( ).m_currentMap ) { crossbank = true; }
 
         loadNewBank( p_target.first );
 
@@ -1020,6 +1023,8 @@ namespace MAP {
             stopPlayer( DOWN );
             stopPlayer( );
         }
+
+        if( crossbank ) { resetMapSprites( ); }
 
         SAVE::SAV.getActiveFile( ).m_player.m_pos = p_target.second;
         //        if( SAVE::SAV.getActiveFile( ).m_currentMap != p_target.first ) {

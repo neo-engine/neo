@@ -276,6 +276,7 @@ namespace MAP {
         for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
             auto& o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
 
+            if( o.first == UNUSED_MAPOBJECT ) { continue; }
             if( o.first == 255 ) { continue; }
 
             if( o.second.m_event.m_type == EVENT_BERRYTREE ) {
@@ -313,6 +314,7 @@ namespace MAP {
                   || ( ( p_frame & 15 ) == 15 && o.second.m_movement == WALK_CONT_FOLLOW_OBJECT );
 
             if( o.second.m_movement == WALK_CONT_FOLLOW_OBJECT ) {
+                // printf( "MO %i - ", i );
                 if( movemnt ) {
                     auto curdir = o.second.m_currentMovement.m_direction;
                     auto nxdir  = direction( ( curdir + 1 ) % 4 );
