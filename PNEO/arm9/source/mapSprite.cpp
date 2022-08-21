@@ -343,7 +343,11 @@ namespace MAP {
             case SPR_GRASS_SHINY: return _shinyGrassData;
             case SPR_GRASS: return _grassData;
             case SPR_LONG_GRASS: return _longGrassData;
+            case SPR_FOOTPRINT_HORIZONTAL:
             case SPR_FOOTPRINT: return _footprintData;
+            case SPR_FOOTPRINT_BIKE_FRAME_2:
+            case SPR_FOOTPRINT_BIKE_FRAME_3:
+            case SPR_FOOTPRINT_BIKE_FRAME_4:
             case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
             case SPR_WATER_CIRCLE: return _waterCircleData;
             case SPR_DIVE_BUBBLE: return _diveBubbleData;
@@ -369,7 +373,11 @@ namespace MAP {
             case SPR_GRASS_SHINY: return _shinyGrassData;
             case SPR_GRASS: return _grassData;
             case SPR_LONG_GRASS: return _longGrassData;
+            case SPR_FOOTPRINT_HORIZONTAL:
             case SPR_FOOTPRINT: return _footprintData;
+            case SPR_FOOTPRINT_BIKE_FRAME_2:
+            case SPR_FOOTPRINT_BIKE_FRAME_3:
+            case SPR_FOOTPRINT_BIKE_FRAME_4:
             case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
             case SPR_WATER_CIRCLE: return _waterCircleData;
             case SPR_DIVE_BUBBLE: return _diveBubbleData;
@@ -656,13 +664,27 @@ namespace MAP {
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
 
-        case SPR_FOOTPRINT:
+        case SPR_FOOTPRINT_HORIZONTAL:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _footprintData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
-        case SPR_FOOTPRINT_BIKE:
+        case SPR_FOOTPRINT_VERTICAL:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _footprintData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_FOOTPRINT_BIKE_FRAME_1:
+        case SPR_FOOTPRINT_BIKE_FRAME_4:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _footprintBikeData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_FOOTPRINT_BIKE_FRAME_2:
+        case SPR_FOOTPRINT_BIKE_FRAME_3:
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _footprintBikeData, p_hidden );
