@@ -174,7 +174,7 @@ namespace IO {
                          u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_data[ 32 * 4 * 9 ] );
 
     void setOWSpriteFrame( u8 p_frame, bool p_flip, u8 p_oamIndex, u16 p_palData[ 16 ],
-                           u32 p_data[ 32 * 4 * 9 ] );
+                           u32 p_data[ 32 * 4 * 9 ], bool p_vflip = false );
 
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIndex, u16 p_tileCnt );
 

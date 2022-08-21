@@ -47,7 +47,7 @@ namespace MAP {
         if( !_tileAnimations.count( p ) ) {
             return;
         } else {
-            _mapSprites.destroySprite( _tileAnimations[ p ] );
+            _mapSprites.destroySprite( _tileAnimations[ p ].m_spriteId );
             _tileAnimations.erase( p );
         }
     }
@@ -56,8 +56,6 @@ namespace MAP {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         switch( behave ) {
-        case BEH_GRASS_UNDERWATER_NO_RESURFACE: // TODO
-        case BEH_GRASS_UNDERWATER:              // TODO
         case BEH_GRASS:
         case BEH_GRASS_ASH:
             return p_shiny ? mapSpriteManager::SPR_GRASS_SHINY : mapSpriteManager::SPR_GRASS;
@@ -66,11 +64,22 @@ namespace MAP {
         }
     }
 
-    u8 mapDrawer::getTileExitAnimation( u16 p_globX, u16 p_globY ) {
+    u8 mapDrawer::getTileExitAnimation( u16 p_globX, u16 p_globY, bool p_isPlayer ) {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
-        // TODO
+        auto mm = SAVE::SAV.getActiveFile( ).m_player.m_movement;
+
+        bool playerBike = mm == MAP::MACH_BIKE || mm == MAP::ACRO_BIKE || mm == MAP::BIKE;
+
         switch( behave ) {
+        case BEH_GRASS_UNDERWATER_NO_RESURFACE:
+        case BEH_GRASS_UNDERWATER: return mapSpriteManager::SPR_DIVE_BUBBLE;
+        case BEH_FOOTPRINTS:
+        case BEH_SAND_FOOTPRINTS:
+            if( p_isPlayer && playerBike ) { return mapSpriteManager::SPR_FOOTPRINT_BIKE; }
+            return mapSpriteManager::SPR_FOOTPRINT;
+        case BEH_SHALLOW_WATER:
+        case BEH_REFLECTION_FOLLOW_CIRCLE: return mapSpriteManager::SPR_WATER_CIRCLE;
         default: return 0;
         }
     }
@@ -92,14 +101,106 @@ namespace MAP {
         }
     }
 
-    void mapDrawer::animateField( u16 p_globX, u16 p_globY, u8 p_animation ) {
+    void mapDrawer::animateTiles( ) {
+        auto rmpos = std::vector<position>{ };
+        for( auto& [ pos, ad ] : _tileAnimations ) {
+            if( ad.m_expiry != 255 && ad.m_expiry-- == 1 ) {
+                // animation frame expires
+                auto nsp = mapSpriteManager::animationNextFrame( ad.m_animType, ad.m_frame );
+                if( !nsp ) {
+                    rmpos.push_back( pos );
+                    continue;
+                }
+                ad.m_frame = nsp;
+                _mapSprites.drawFrame( ad.m_spriteId, ad.m_frame );
+                ad.m_expiry = mapSpriteManager::animationExpiry( ad.m_animType );
+            }
+        }
+        for( auto p : rmpos ) { clearFieldAnimation( p.m_posX, p.m_posY ); }
+    }
+
+    void mapDrawer::animateField( u16 p_globX, u16 p_globY, u8 p_animation, direction p_enterDir,
+                                  direction p_exitDir ) {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( _tileAnimations.count( { p_globX, p_globY, 0 } ) ) {
             clearFieldAnimation( p_globX, p_globY );
         }
-        _tileAnimations[ { p_globX, p_globY, 0 } ]
-            = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
+
+        bool flipX = false;
+        bool flipY = false;
+        u8   frame = 0;
+        if( p_animation == mapSpriteManager::SPR_FOOTPRINT ) {
+            if( p_exitDir == LEFT ) {
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_HORIZONTAL;
+                flipX       = true;
+                frame       = 1;
+            } else if( p_exitDir == RIGHT ) {
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_HORIZONTAL;
+                frame       = 1;
+            } else if( p_exitDir == UP ) {
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_VERTICAL;
+                frame       = 0;
+                flipY       = true;
+            }
+        }
+
+        if( p_animation == mapSpriteManager::SPR_FOOTPRINT_BIKE ) {
+            if( ( p_enterDir == DOWN && p_exitDir == UP )
+                || ( p_enterDir == UP && p_exitDir == DOWN )
+                || ( p_enterDir == UP && p_exitDir == UP )
+                || ( p_enterDir == DOWN && p_exitDir == DOWN ) ) {
+                frame       = 2;
+                flipX       = false;
+                flipY       = false;
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_3;
+            }
+            if( ( p_enterDir == LEFT && p_exitDir == RIGHT )
+                || ( p_enterDir == RIGHT && p_exitDir == LEFT )
+                || ( p_enterDir == RIGHT && p_exitDir == RIGHT )
+                || ( p_enterDir == LEFT && p_exitDir == LEFT ) ) {
+                frame       = 1;
+                flipX       = false;
+                flipY       = false;
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_2;
+            }
+            if( ( p_enterDir == UP && p_exitDir == LEFT )
+                || ( p_enterDir == RIGHT && p_exitDir == DOWN ) ) {
+                frame       = 0;
+                flipX       = true;
+                flipY       = false;
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_1;
+            }
+            if( ( p_enterDir == UP && p_exitDir == RIGHT )
+                || ( p_enterDir == LEFT && p_exitDir == DOWN ) ) {
+                frame       = 0;
+                flipX       = false;
+                flipY       = false;
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_1;
+            }
+            if( ( p_enterDir == DOWN && p_exitDir == LEFT )
+                || ( p_enterDir == RIGHT && p_exitDir == UP ) ) {
+                frame       = 3;
+                flipX       = true;
+                flipY       = false;
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_4;
+            }
+            if( ( p_enterDir == DOWN && p_exitDir == RIGHT )
+                || ( p_enterDir == LEFT && p_exitDir == UP ) ) {
+                frame       = 3;
+                flipX       = false;
+                flipY       = false;
+                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_4;
+            }
+        }
+
+        auto ad = _tileAnimations[ { p_globX, p_globY, 0 } ]
+            = { _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation ),
+                mapSpriteManager::animationExpiry( p_animation ), p_animation, 0 };
+        if( frame || flipX || flipY ) {
+            _mapSprites.drawFrame( ad.m_spriteId, frame, flipX, false, flipY );
+            _mapSprites.setPriority( ad.m_spriteId, OBJPRIORITY_3 );
+        }
     }
 
     void mapDrawer::animateField( u16 p_globX, u16 p_globY ) {
@@ -110,12 +211,12 @@ namespace MAP {
         case BEH_GRASS:
         case BEH_LONG_GRASS: {
             // tall grass
-            animateField( p_globX, p_globY, anim );
+            animateField( p_globX, p_globY, anim, UP, UP );
             break;
         }
         case BEH_GRASS_ASH: {
             // ashen grass
-            animateField( p_globX, p_globY, anim );
+            animateField( p_globX, p_globY, anim, UP, UP );
             if( CUR_SLICE.m_data.m_tIdx2 == 6 ) {
                 setBlock( p_globX, p_globY, TS6_ASH_GRASS_BLOCK );
             } else if( CUR_SLICE.m_data.m_tIdx2 == 7 ) {
@@ -162,11 +263,12 @@ namespace MAP {
         // TODO
     }
 
-    void mapDrawer::animateExitField( u16 p_globX, u16 p_globY ) {
+    void mapDrawer::animateExitField( u16 p_globX, u16 p_globY, bool p_isPlayer,
+                                      direction p_enterDir, direction p_exitDir ) {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
-        u8 anim   = getTileExitAnimation( p_globX, p_globY );
+        u8 anim   = getTileExitAnimation( p_globX, p_globY, p_isPlayer );
 
-        (void) anim;
+        if( anim ) { animateField( p_globX, p_globY, anim, p_enterDir, p_exitDir ); }
 
         switch( behave ) {
         case BEH_PACIFIDLOG_LOG_VERTICAL_TOP: {
@@ -461,6 +563,8 @@ namespace MAP {
         // u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
 
         // animate map objects
+        animateTiles( );
+
         animateMapObjects( p_frame );
 
         loadAnimatedTiles( p_frame );

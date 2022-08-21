@@ -257,6 +257,9 @@ namespace MAP {
     void mapDrawer::draw( ObjPriority, bool p_playerHidden ) {
         draw( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true ); // Draw the map
+        stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false, false );
 
         drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority,
                     p_playerHidden ); // Draw the player
@@ -265,9 +268,7 @@ namespace MAP {
         auto curLocId = getCurrentLocationId( );
         for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
 
-        stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false, true );
+        unfadeScreen( );
     }
 
     void mapDrawer::setBlock( u16 p_globX, u16 p_globY, u16 p_newBlock ) {

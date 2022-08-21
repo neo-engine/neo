@@ -228,6 +228,11 @@ namespace MAP {
         _shinyGrassData = mapSpriteData( 256 | 254 );
         _longGrassData  = mapSpriteData( 256 | 255 );
 
+        _footprintData     = mapSpriteData( 256 | 245 );
+        _footprintBikeData = mapSpriteData( 256 | 241 );
+        _waterCircleData   = mapSpriteData( 256 | 242 );
+        _diveBubbleData    = mapSpriteData( 256 | 203 );
+
         _shinyGrassData.updatePalette( 3 );
         _grassData.updatePalette( 3 );
         _longGrassData.updatePalette( 3 );
@@ -333,16 +338,17 @@ namespace MAP {
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
-            case SPR_GRASS_SHINY: {
-                return _shinyGrassData;
-            }
-            case SPR_GRASS: {
-                return _grassData;
-            }
-            case SPR_LONG_GRASS: {
-                return _longGrassData;
-            }
-                [[unlikely]] default : break;
+            case SPR_GRASS_SHINY: return _shinyGrassData;
+            case SPR_GRASS: return _grassData;
+            case SPR_LONG_GRASS: return _longGrassData;
+            case SPR_FOOTPRINT_HORIZONTAL:
+            case SPR_FOOTPRINT: return _footprintData;
+            case SPR_FOOTPRINT_BIKE_FRAME_2:
+            case SPR_FOOTPRINT_BIKE_FRAME_3:
+            case SPR_FOOTPRINT_BIKE_FRAME_4:
+            case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
+            case SPR_WATER_CIRCLE: return _waterCircleData;
+            case SPR_DIVE_BUBBLE: return _diveBubbleData; [[unlikely]] default : break;
             }
         }
 
@@ -361,16 +367,17 @@ namespace MAP {
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             switch( _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first ) {
-            case SPR_GRASS_SHINY: {
-                return _shinyGrassData;
-            }
-            case SPR_GRASS: {
-                return _grassData;
-            }
-            case SPR_LONG_GRASS: {
-                return _longGrassData;
-            }
-                [[unlikely]] default : break;
+            case SPR_GRASS_SHINY: return _shinyGrassData;
+            case SPR_GRASS: return _grassData;
+            case SPR_LONG_GRASS: return _longGrassData;
+            case SPR_FOOTPRINT_HORIZONTAL:
+            case SPR_FOOTPRINT: return _footprintData;
+            case SPR_FOOTPRINT_BIKE_FRAME_2:
+            case SPR_FOOTPRINT_BIKE_FRAME_3:
+            case SPR_FOOTPRINT_BIKE_FRAME_4:
+            case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
+            case SPR_WATER_CIRCLE: return _waterCircleData;
+            case SPR_DIVE_BUBBLE: return _diveBubbleData; [[unlikely]] default : break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -635,23 +642,62 @@ namespace MAP {
             _shinyGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
-                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _shinyGrassData,
-                          p_hidden );
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_2 ), _shinyGrassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_GRASS:
             _grassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
-                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _grassData, p_hidden );
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_1 ), _grassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
             _longGrassData.updatePalette( 2 );
             doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
-                          SPR_MAPTILE_GFX( 2 * ( p_particleId % 100 ) ), _longGrassData, p_hidden );
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _longGrassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
+            return SPR_MAPTILE_OAM( nextfree );
+
+        case SPR_FOOTPRINT_HORIZONTAL:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _footprintData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_FOOTPRINT_VERTICAL:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _footprintData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_FOOTPRINT_BIKE_FRAME_1:
+        case SPR_FOOTPRINT_BIKE_FRAME_4:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _footprintBikeData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_FOOTPRINT_BIKE_FRAME_2:
+        case SPR_FOOTPRINT_BIKE_FRAME_3:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _footprintBikeData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_WATER_CIRCLE:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _waterCircleData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_DIVE_BUBBLE:
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY - 1, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _diveBubbleData, p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
 
         case SPR_PLATFORM:
@@ -894,7 +940,8 @@ namespace MAP {
         if( p_update ) { update( ); }
     }
 
-    void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_hflip, bool p_update ) {
+    void mapSpriteManager::drawFrame( u8 p_spriteId, u8 p_value, bool p_hflip, bool p_update,
+                                      bool p_vflip ) {
         if( p_spriteId == 255 ) { return; }
 
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
@@ -903,9 +950,9 @@ namespace MAP {
             doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
                           IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
                           _oamPosition[ p_spriteId ], SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ),
-                          data );
+                          data, IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden );
             IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ], data.m_palData,
-                                  data.m_frameData );
+                                  data.m_frameData, p_vflip );
             return;
         } else if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) ) {
             switch( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first ) {
@@ -1021,7 +1068,7 @@ namespace MAP {
         auto& spr = getManagedSprite( p_spriteId );
         IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ]
             = IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ];
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].vFlip = true;
+        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].vFlip    = true;
         IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].priority = OBJPRIORITY_3;
         IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].palette  = 0;
 

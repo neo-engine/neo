@@ -66,11 +66,11 @@ namespace MAP {
             BEH_UNDERWATER_NO_RESURFACE = 0x19,
 
             BEH_SLIDE_ON_ICE     = 0x20,
-            BEH_SAND_FOOTPRINTS  = 0x21, // TODO
+            BEH_SAND_FOOTPRINTS  = 0x21,
             BEH_GRASS_UNDERWATER = 0x22,
 
             BEH_GRASS_ASH   = 0x24,
-            BEH_FOOTPRINTS  = 0x25, // TODO
+            BEH_FOOTPRINTS  = 0x25,
             BEH_THIN_ICE    = 0x26, // TODO
             BEH_CRACKED_ICE = 0x27, // TODO
 
@@ -157,6 +157,13 @@ namespace MAP {
             // not passable if = 1 mod 4
         };
 
+        struct tileAnimationInfo {
+            u16 m_spriteId : 8;
+            u16 m_expiry : 8;
+            u16 m_animType : 8;
+            u16 m_frame : 8;
+        };
+
       private:
         static constexpr u8 FASTBIKE_SPEED_NO_TILE_BREAK
             = 9; // min speed with bike to pass over breakable tiles
@@ -188,6 +195,7 @@ namespace MAP {
 
         ObjPriority _lastPlayerPriority = OBJPRIORITY_1;
         direction   _lastPlayerMove     = DOWN;
+        direction   _lastFollowPkmnMove = DOWN;
 
         mapSlice _slices[ 2 ][ 2 ]; //[x][y]
         u8       _curX, _curY;      // Current main slice from the _slices array
@@ -201,7 +209,7 @@ namespace MAP {
 
         mapData _data[ 2 ][ 2 ];
 
-        std::map<position, u8> _tileAnimations;
+        std::map<position, tileAnimationInfo> _tileAnimations;
 
         u8 _fixedObjectCount = 0;
 #ifdef DESQUID
@@ -359,7 +367,13 @@ namespace MAP {
         /*
          * @brief: Loads permanent tile animations (e.g. first frame of grass, etc)
          */
-        void animateField( u16 p_globX, u16 p_globY, u8 p_animation );
+        void animateField( u16 p_globX, u16 p_globY, u8 p_animation, direction p_enterDir,
+                           direction p_exitDir );
+
+        /*
+         * @brief: Progresses tile animations;
+         */
+        void animateTiles( );
 
         /*
          * @brief: Loads the specified frame of the animation.
@@ -376,7 +390,7 @@ namespace MAP {
          */
         u8 getTileAnimation( u16 p_globX, u16 p_globY, bool p_shiny = false );
 
-        u8 getTileExitAnimation( u16 p_globX, u16 p_globY );
+        u8 getTileExitAnimation( u16 p_globX, u16 p_globY, bool p_isPlayer );
 
         /*
          * @brief: Clears permanent tile animations from the specified field
@@ -395,6 +409,8 @@ namespace MAP {
         void updatePlayer( );
 
         void initWeather( );
+
+        void unfadeScreen( );
 
         void draw( u16 p_globX, u16 p_globY, bool p_init );
         void drawPlayer( ObjPriority p_playerPrio = OBJPRIORITY_2, bool p_playerHidden = false );
@@ -423,14 +439,16 @@ namespace MAP {
 
         void resetMapSprites( );
 
-        void stepOff( u16 p_globX, u16 p_globY );
+        void stepOff( u16 p_globX, u16 p_globY, bool p_isPlayer, direction p_enterDir,
+                      direction p_exitDir );
 
         void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true,
                      bool p_unfade = false );
 
         void animateField( u16 p_globX, u16 p_globY );
 
-        void animateExitField( u16 p_globX, u16 p_globY );
+        void animateExitField( u16 p_globX, u16 p_globY, bool p_isPlayer, direction p_enterDir,
+                               direction p_exitDir );
 
         void runEvent( mapData::event p_event, u8 p_objectId = 0, s16 p_mapX = -1,
                        s16 p_mapY = -1 );

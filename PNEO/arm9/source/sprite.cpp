@@ -808,7 +808,7 @@ namespace IO {
     }
 
     void setOWSpriteFrame( u8 p_frame, bool p_flip, u8 p_oamIdx, u16 p_palData[ 16 ],
-                           u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
+                           u32 p_dataBuffer[ 32 * 4 * 9 ], bool p_vflip ) {
         u8 frame = p_frame;
         u8 wd = spriteInfoTop[ p_oamIdx ].m_width, hg = spriteInfoTop[ p_oamIdx ].m_height;
 
@@ -820,6 +820,7 @@ namespace IO {
                      OamTop->oamBuffer[ p_oamIdx ].priority, false );
 
         OamTop->oamBuffer[ p_oamIdx ].hFlip = p_flip;
+        OamTop->oamBuffer[ p_oamIdx ].vFlip = p_vflip;
     }
 
     void setAnimatedSpriteFrame( u8 p_frame, bool p_hFlip, u8 p_oamIdx, u16 p_tileCnt ) {

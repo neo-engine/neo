@@ -236,16 +236,32 @@ namespace MAP {
                 // this function may get called while the player is moving, so the player may
                 // be at a fractional grid point and we need to fix this shift by hand
                 // This is extremely hacky, I know
-                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ], p_spriteId, false );
-                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ],
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ].m_spriteId, p_spriteId,
+                                        false );
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ].m_spriteId,
                                         15 * dir[ p_movement.m_direction ][ 0 ],
                                         15 * dir[ p_movement.m_direction ][ 1 ], true );
             }
         }
         if( p_movement.m_frame == 15 ) {
             // clear remnants of field animation on old tile
-            clearFieldAnimation( p_mapObject.m_pos.m_posX - dir[ p_movement.m_direction ][ 0 ],
-                                 p_mapObject.m_pos.m_posY - dir[ p_movement.m_direction ][ 1 ] );
+            u16 px = p_mapObject.m_pos.m_posX - dir[ p_movement.m_direction ][ 0 ];
+            u16 py = p_mapObject.m_pos.m_posY - dir[ p_movement.m_direction ][ 1 ];
+            clearFieldAnimation( px, py );
+
+            // can't use bike
+            animateExitField( px, py, false, p_movement.m_direction, p_movement.m_direction );
+
+            if( p_adjustAnim && _tileAnimations.count( { px, py, 0 } ) ) {
+                // this function may get called while the player is moving, so the player may
+                // be at a fractional grid point and we need to fix this shift by hand
+                // This is extremely hacky, I know
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ].m_spriteId, p_spriteId,
+                                        false );
+                _mapSprites.moveSprite( _tileAnimations[ { px, py, 0 } ].m_spriteId,
+                                        -16 * dir[ p_movement.m_direction ][ 0 ],
+                                        -16 * dir[ p_movement.m_direction ][ 1 ], true );
+            }
 
             bool refl = false;
             // check for reflection
@@ -343,6 +359,8 @@ namespace MAP {
             _followPkmn.m_direction    = p_direction;
             _followPkmn.m_event.m_type = EVENT_OW_PKMN;
 
+            _lastFollowPkmnMove = p_direction;
+
             std::pair<u8, mapObject> cur = { 0, _followPkmn };
             if( loadMapObject( cur ) ) {
                 _playerFollowPkmnSprite = cur.first;
@@ -367,7 +385,7 @@ namespace MAP {
 
             u16 ox = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - dir[ _lastPlayerMove ][ 0 ];
             u16 oy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - dir[ _lastPlayerMove ][ 1 ];
-            stepOff( ox, oy );
+            stepOff( ox, oy, false, _lastFollowPkmnMove, _followPkmn.m_direction );
         }
     }
 
@@ -435,6 +453,7 @@ namespace MAP {
 
         // make the pkmn face the player's old direction
         _mapSprites.setFrameD( _playerFollowPkmnSprite, olddir, false );
+        _lastFollowPkmnMove     = _followPkmn.m_direction;
         _followPkmn.m_direction = olddir;
 
         // play cry

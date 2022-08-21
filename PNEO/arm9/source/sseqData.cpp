@@ -28,104 +28,103 @@ namespace SOUND::SSEQ {
         { 11, 21, 1, { 11, 0, 0, 0 } }, // BGM_CYCLING_ALT
         { 1, 22, 1, { 1, 0, 0, 0 } }, // BGM_POKE_RADAR
         { 1, 23, 1, { 1, 0, 0, 0 } }, // BGM_DESERT
-        { 12, 24, 1, { 12, 0, 0, 0 } }, // BGM_HIDDEN_LAND
-        { 1, 25, 1, { 1, 0, 0, 0 } }, // BGM_MYSTERY_GIFT
+        { 1, 24, 1, { 1, 0, 0, 0 } }, // BGM_MYSTERY_GIFT
         { 0, 0, 0, { 0, 0, 0, 0 } }, // REC_BATTLE
-        { 1, 26, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_BRENDAN
-        { 1, 27, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_MAY
-        { 1, 28, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TEAM_A
-        { 1, 29, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TEAM_M
-        { 1, 30, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_ELECTRIC
-        { 1, 31, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_HIKER
-        { 1, 32, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_SAILOR
-        { 1, 33, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TUBER
-        { 1, 34, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TWINS
-        { 1, 35, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_YOUNGSTER
-        { 1, 36, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_LASS
-        { 1, 37, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_PSYCHIC
-        { 1, 38, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_BIKINI_LADY
-        { 1, 39, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_ACE_TRAINER
-        { 1, 40, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_INTERVIEWERS
-        { 1, 41, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_SHIRONA
-        { 13, 42, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_TRAINER
-        { 13, 43, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_MAY_BRENDAN
-        { 13, 44, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_TEAM_AM
-        { 13, 45, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_TEAM_AM_LEADER
-        { 14, 46, 1, { 14, 0, 0, 0 } }, // BGM_BATTLE_GYM_LEADER
-        { 15, 47, 1, { 15, 0, 0, 0 } }, // BGM_BATTLE_CHAMPION
-        { 13, 48, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_FRONTIER_BRAIN
-        { 16, 49, 2, { 1, 16, 0, 0 } }, // BGM_BATTLE_SHIRONA
-        { 17, 50, 1, { 17, 0, 0, 0 } }, // BGM_BATTLE_WILD
-        { 13, 50, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_WILD_ALT
-        { 18, 51, 1, { 18, 0, 0, 0 } }, // BGM_BATTLE_REGI
-        { 13, 52, 2, { 8, 13, 0, 0 } }, // BGM_BATTLE_RAYQUAZA
-        { 19, 53, 2, { 8, 19, 0, 0 } }, // BGM_BATTLE_SUICUNE
-        { 19, 54, 2, { 8, 19, 0, 0 } }, // BGM_BATTLE_ENTEI
-        { 19, 55, 2, { 8, 19, 0, 0 } }, // BGM_BATTLE_RAIKOU
-        { 20, 56, 2, { 8, 20, 0, 0 } }, // BGM_BATTLE_HOUOU
-        { 21, 57, 2, { 8, 21, 0, 0 } }, // BGM_BATTLE_LUGIA
-        { 16, 58, 2, { 1, 16, 0, 0 } }, // BGM_BATTLE_EX01
-        { 16, 59, 2, { 1, 16, 0, 0 } }, // BGM_BATTLE_LAKE
-        { 16, 60, 2, { 1, 16, 0, 0 } }, // BGM_BATTLE_DIALGA_PALKIA
-        { 16, 61, 2, { 1, 16, 0, 0 } }, // BGM_BATTLE_GIRATINA
-        { 16, 62, 2, { 1, 16, 0, 0 } }, // BGM_BATTLE_HEATRAN
-        { 22, 63, 1, { 22, 0, 0, 0 } }, // BGM_BATTLE_EX02
-        { 23, 64, 1, { 23, 0, 0, 0 } }, // BGM_BATTLE_EX03
-        { 24, 65, 1, { 24, 0, 0, 0 } }, // BGM_VICTORY_WILD
-        { 25, 66, 1, { 25, 0, 0, 0 } }, // BGM_VICTORY_TRAINER
-        { 16, 67, 2, { 1, 16, 0, 0 } }, // BGM_VICTORY_TEAM_AM_GRUNT
-        { 16, 68, 2, { 1, 16, 0, 0 } }, // BGM_VICTORY_GYM_LEADER
-        { 16, 69, 2, { 1, 16, 0, 0 } }, // BGM_VICTORY_CHAMPION
-        { 16, 70, 2, { 1, 16, 0, 0 } }, // BGM_VICTORY_FRONTIER_BRAIN
+        { 1, 25, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_BRENDAN
+        { 1, 26, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_MAY
+        { 1, 27, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TEAM_A
+        { 1, 28, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TEAM_M
+        { 1, 29, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_ELECTRIC
+        { 1, 30, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_HIKER
+        { 1, 31, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_SAILOR
+        { 1, 32, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TUBER
+        { 1, 33, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_TWINS
+        { 1, 34, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_YOUNGSTER
+        { 1, 35, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_LASS
+        { 1, 36, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_PSYCHIC
+        { 1, 37, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_BIKINI_LADY
+        { 1, 38, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_ACE_TRAINER
+        { 1, 39, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_INTERVIEWERS
+        { 1, 40, 1, { 1, 0, 0, 0 } }, // BGM_ENCOUNTER_SHIRONA
+        { 12, 41, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_TRAINER
+        { 12, 42, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_MAY_BRENDAN
+        { 12, 43, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_TEAM_AM
+        { 12, 44, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_TEAM_AM_LEADER
+        { 13, 45, 1, { 13, 0, 0, 0 } }, // BGM_BATTLE_GYM_LEADER
+        { 14, 46, 1, { 14, 0, 0, 0 } }, // BGM_BATTLE_CHAMPION
+        { 12, 47, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_FRONTIER_BRAIN
+        { 15, 48, 2, { 1, 15, 0, 0 } }, // BGM_BATTLE_SHIRONA
+        { 16, 49, 1, { 16, 0, 0, 0 } }, // BGM_BATTLE_WILD
+        { 12, 49, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_WILD_ALT
+        { 17, 50, 1, { 17, 0, 0, 0 } }, // BGM_BATTLE_REGI
+        { 12, 51, 2, { 8, 12, 0, 0 } }, // BGM_BATTLE_RAYQUAZA
+        { 18, 52, 2, { 8, 18, 0, 0 } }, // BGM_BATTLE_SUICUNE
+        { 18, 53, 2, { 8, 18, 0, 0 } }, // BGM_BATTLE_ENTEI
+        { 18, 54, 2, { 8, 18, 0, 0 } }, // BGM_BATTLE_RAIKOU
+        { 19, 55, 2, { 8, 19, 0, 0 } }, // BGM_BATTLE_HOUOU
+        { 20, 56, 2, { 8, 20, 0, 0 } }, // BGM_BATTLE_LUGIA
+        { 15, 57, 2, { 1, 15, 0, 0 } }, // BGM_BATTLE_EX01
+        { 15, 58, 2, { 1, 15, 0, 0 } }, // BGM_BATTLE_LAKE
+        { 15, 59, 2, { 1, 15, 0, 0 } }, // BGM_BATTLE_DIALGA_PALKIA
+        { 15, 60, 2, { 1, 15, 0, 0 } }, // BGM_BATTLE_GIRATINA
+        { 15, 61, 2, { 1, 15, 0, 0 } }, // BGM_BATTLE_HEATRAN
+        { 21, 62, 1, { 21, 0, 0, 0 } }, // BGM_BATTLE_EX02
+        { 22, 63, 1, { 22, 0, 0, 0 } }, // BGM_BATTLE_EX03
+        { 23, 64, 1, { 23, 0, 0, 0 } }, // BGM_VICTORY_WILD
+        { 24, 65, 1, { 24, 0, 0, 0 } }, // BGM_VICTORY_TRAINER
+        { 15, 66, 2, { 1, 15, 0, 0 } }, // BGM_VICTORY_TEAM_AM_GRUNT
+        { 15, 67, 2, { 1, 15, 0, 0 } }, // BGM_VICTORY_GYM_LEADER
+        { 15, 68, 2, { 1, 15, 0, 0 } }, // BGM_VICTORY_CHAMPION
+        { 15, 69, 2, { 1, 15, 0, 0 } }, // BGM_VICTORY_FRONTIER_BRAIN
         { 0, 0, 0, { 0, 0, 0, 0 } }, // REC_RS
-        { 26, 71, 1, { 26, 0, 0, 0 } }, // BGM_LITTLEROOT_TOWN
-        { 27, 72, 1, { 27, 0, 0, 0 } }, // BGM_OLDALE_TOWN
-        { 1, 73, 1, { 1, 0, 0, 0 } }, // BGM_PETALBURG_CITY
-        { 1, 74, 1, { 1, 0, 0, 0 } }, // BGM_RUSTBORO_CITY
-        { 1, 75, 1, { 1, 0, 0, 0 } }, // BGM_DEWFORD_TOWN
-        { 1, 76, 1, { 1, 0, 0, 0 } }, // BGM_SLATEPORT_CITY
-        { 1, 77, 1, { 1, 0, 0, 0 } }, // BGM_VERDANTURF_TOWN
-        { 1, 78, 1, { 1, 0, 0, 0 } }, // BGM_FALLARBOR_TOWN
-        { 1, 79, 1, { 1, 0, 0, 0 } }, // BGM_FORTREE_CITY
-        { 1, 80, 1, { 1, 0, 0, 0 } }, // BGM_LILYCOVE_CITY
-        { 28, 81, 1, { 28, 0, 0, 0 } }, // BGM_NEW_LILYCOVE_CITY
-        { 1, 82, 1, { 1, 0, 0, 0 } }, // BGM_SOOTOPOLIS_CITY
-        { 8, 83, 1, { 8, 0, 0, 0 } }, // BGM_CLIFFELTA_CITY
-        { 1, 84, 1, { 1, 0, 0, 0 } }, // BGM_BLOSSAND_TOWN
-        { 1, 85, 1, { 1, 0, 0, 0 } }, // BGM_EVER_GRANDE_CITY
-        { 8, 86, 1, { 8, 0, 0, 0 } }, // BGM_ROUTE_101
-        { 1, 87, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_104
-        { 1, 88, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_110
-        { 1, 89, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_113
-        { 1, 90, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_119
-        { 1, 91, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_120
-        { 1, 92, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_123
-        { 1, 93, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_135
-        { 1, 93, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_137
-        { 29, 94, 2, { 1, 29, 0, 0 } }, // BGM_POKEMON_GYM
-        { 29, 95, 2, { 1, 29, 0, 0 } }, // BGM_POKEMON_GYM2
-        { 30, 96, 2, { 8, 30, 0, 0 } }, // BGM_POKEMON_CENTER
-        { 30, 97, 2, { 8, 30, 0, 0 } }, // BGM_POKEMON_CENTER2
-        { 30, 98, 2, { 8, 30, 0, 0 } }, // BGM_POKEMON_MART
-        { 30, 99, 2, { 8, 30, 0, 0 } }, // BGM_PROF_BIRCH_LAB
-        { 31, 100, 2, { 1, 31, 0, 0 } }, // BGM_CAVE_FORESTS
-        { 29, 101, 2, { 1, 29, 0, 0 } }, // BGM_EX03
-        { 30, 102, 2, { 8, 30, 0, 0 } }, // BGM_TRAINER_SCHOOL
-        { 1, 103, 1, { 1, 0, 0, 0 } }, // BGM_ABANDONED_SHIP
-        { 1, 104, 1, { 1, 0, 0, 0 } }, // BGM_MARINE_SCIENCE_MUSEUM
-        { 1, 105, 1, { 1, 0, 0, 0 } }, // BGM_TRICK_HOUSE
-        { 32, 106, 1, { 32, 0, 0, 0 } }, // BGM_NEW_MAUVILLE
-        { 1, 107, 1, { 1, 0, 0, 0 } }, // BGM_MAUVILLE_GAME_CORNER
-        { 1, 108, 1, { 1, 0, 0, 0 } }, // BGM_MT_CHIMNEY
-        { 1, 109, 1, { 1, 0, 0, 0 } }, // BGM_METEOR_FALLS
-        { 33, 110, 2, { 8, 33, 0, 0 } }, // BGM_SAFARI_ZONE
-        { 1, 111, 1, { 1, 0, 0, 0 } }, // BGM_LILYCOVE_MUSEUM
-        { 1, 112, 1, { 1, 0, 0, 0 } }, // BGM_MT_PYRE_PEAK
-        { 1, 113, 1, { 1, 0, 0, 0 } }, // BGM_TEAM_AM_HIDEOUT
-        { 1, 114, 1, { 1, 0, 0, 0 } }, // BGM_SHOAL_CAVE
-        { 34, 115, 2, { 8, 34, 0, 0 } }, // BGM_VICTORY_ROAD
-        { 35, 116, 1, { 35, 0, 0, 0 } }, // BGM_SEALED_CHAMBER
-        { 36, 117, 1, { 36, 0, 0, 0 } }, // BGM_CRYSTAL_CAVERN
+        { 25, 70, 1, { 25, 0, 0, 0 } }, // BGM_LITTLEROOT_TOWN
+        { 26, 71, 1, { 26, 0, 0, 0 } }, // BGM_OLDALE_TOWN
+        { 1, 72, 1, { 1, 0, 0, 0 } }, // BGM_PETALBURG_CITY
+        { 1, 73, 1, { 1, 0, 0, 0 } }, // BGM_RUSTBORO_CITY
+        { 1, 74, 1, { 1, 0, 0, 0 } }, // BGM_DEWFORD_TOWN
+        { 1, 75, 1, { 1, 0, 0, 0 } }, // BGM_SLATEPORT_CITY
+        { 1, 76, 1, { 1, 0, 0, 0 } }, // BGM_VERDANTURF_TOWN
+        { 1, 77, 1, { 1, 0, 0, 0 } }, // BGM_FALLARBOR_TOWN
+        { 1, 78, 1, { 1, 0, 0, 0 } }, // BGM_FORTREE_CITY
+        { 1, 79, 1, { 1, 0, 0, 0 } }, // BGM_LILYCOVE_CITY
+        { 27, 80, 1, { 27, 0, 0, 0 } }, // BGM_NEW_LILYCOVE_CITY
+        { 1, 81, 1, { 1, 0, 0, 0 } }, // BGM_SOOTOPOLIS_CITY
+        { 8, 82, 1, { 8, 0, 0, 0 } }, // BGM_CLIFFELTA_CITY
+        { 1, 83, 1, { 1, 0, 0, 0 } }, // BGM_BLOSSAND_TOWN
+        { 1, 84, 1, { 1, 0, 0, 0 } }, // BGM_EVER_GRANDE_CITY
+        { 8, 85, 1, { 8, 0, 0, 0 } }, // BGM_ROUTE_101
+        { 1, 86, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_104
+        { 1, 87, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_110
+        { 1, 88, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_113
+        { 1, 89, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_119
+        { 1, 90, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_120
+        { 1, 91, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_123
+        { 1, 92, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_135
+        { 1, 92, 1, { 1, 0, 0, 0 } }, // BGM_ROUTE_137
+        { 28, 93, 2, { 1, 28, 0, 0 } }, // BGM_POKEMON_GYM
+        { 28, 94, 2, { 1, 28, 0, 0 } }, // BGM_POKEMON_GYM2
+        { 29, 95, 2, { 8, 29, 0, 0 } }, // BGM_POKEMON_CENTER
+        { 29, 96, 2, { 8, 29, 0, 0 } }, // BGM_POKEMON_CENTER2
+        { 29, 97, 2, { 8, 29, 0, 0 } }, // BGM_POKEMON_MART
+        { 29, 98, 2, { 8, 29, 0, 0 } }, // BGM_PROF_BIRCH_LAB
+        { 30, 99, 2, { 1, 30, 0, 0 } }, // BGM_CAVE_FORESTS
+        { 28, 100, 2, { 1, 28, 0, 0 } }, // BGM_EX03
+        { 29, 101, 2, { 8, 29, 0, 0 } }, // BGM_TRAINER_SCHOOL
+        { 1, 102, 1, { 1, 0, 0, 0 } }, // BGM_ABANDONED_SHIP
+        { 1, 103, 1, { 1, 0, 0, 0 } }, // BGM_MARINE_SCIENCE_MUSEUM
+        { 1, 104, 1, { 1, 0, 0, 0 } }, // BGM_TRICK_HOUSE
+        { 31, 105, 1, { 31, 0, 0, 0 } }, // BGM_NEW_MAUVILLE
+        { 1, 106, 1, { 1, 0, 0, 0 } }, // BGM_MAUVILLE_GAME_CORNER
+        { 1, 107, 1, { 1, 0, 0, 0 } }, // BGM_MT_CHIMNEY
+        { 1, 108, 1, { 1, 0, 0, 0 } }, // BGM_METEOR_FALLS
+        { 32, 109, 2, { 8, 32, 0, 0 } }, // BGM_SAFARI_ZONE
+        { 1, 110, 1, { 1, 0, 0, 0 } }, // BGM_LILYCOVE_MUSEUM
+        { 1, 111, 1, { 1, 0, 0, 0 } }, // BGM_MT_PYRE_PEAK
+        { 1, 112, 1, { 1, 0, 0, 0 } }, // BGM_TEAM_AM_HIDEOUT
+        { 1, 113, 1, { 1, 0, 0, 0 } }, // BGM_SHOAL_CAVE
+        { 33, 114, 2, { 8, 33, 0, 0 } }, // BGM_VICTORY_ROAD
+        { 34, 115, 1, { 34, 0, 0, 0 } }, // BGM_SEALED_CHAMBER
+        { 35, 116, 1, { 35, 0, 0, 0 } }, // BGM_CRYSTAL_CAVERN
         { 36, 117, 1, { 36, 0, 0, 0 } }, // BGM_INFINITY_CAVE
         { 1, 118, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_FRONTIER
         { 1, 119, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_ARENA
@@ -136,8 +135,8 @@ namespace SOUND::SSEQ {
         { 1, 124, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_PALACE
         { 1, 125, 1, { 1, 0, 0, 0 } }, // BGM_BATTLE_PIKE
         { 0, 0, 0, { 0, 0, 0, 0 } }, // REC_GS
-        { 30, 126, 2, { 8, 30, 0, 0 } }, // BGM_NEW_BARK_TOWN
-        { 30, 127, 2, { 8, 30, 0, 0 } }, // BGM_CHERRYGROVE_CITY
+        { 29, 126, 2, { 8, 29, 0, 0 } }, // BGM_NEW_BARK_TOWN
+        { 29, 127, 2, { 8, 29, 0, 0 } }, // BGM_CHERRYGROVE_CITY
         { 37, 128, 2, { 8, 37, 0, 0 } }, // BGM_VIOLET_CITY
         { 38, 129, 2, { 8, 38, 0, 0 } }, // BGM_AZALEA_TOWN
         { 39, 130, 2, { 8, 39, 0, 0 } }, // BGM_GOLDENROD_CITY
@@ -146,15 +145,15 @@ namespace SOUND::SSEQ {
         { 41, 133, 2, { 8, 41, 0, 0 } }, // BGM_CIANWOOD_CITY
         { 42, 134, 2, { 8, 42, 0, 0 } }, // BGM_MAHOGANY_TOWN
         { 43, 135, 2, { 8, 43, 0, 0 } }, // BGM_BLACKTHORN_CITY
-        { 30, 136, 2, { 8, 30, 0, 0 } }, // BGM_ROUTE_29
-        { 30, 137, 2, { 8, 30, 0, 0 } }, // BGM_ROUTE_30
+        { 29, 136, 2, { 8, 29, 0, 0 } }, // BGM_ROUTE_29
+        { 29, 137, 2, { 8, 29, 0, 0 } }, // BGM_ROUTE_30
         { 39, 138, 2, { 8, 39, 0, 0 } }, // BGM_ROUTE_34
         { 41, 139, 2, { 8, 41, 0, 0 } }, // BGM_ROUTE_38
         { 42, 140, 2, { 8, 42, 0, 0 } }, // BGM_ROUTE_42
-        { 33, 141, 2, { 8, 33, 0, 0 } }, // BGM_ROUTE_47
-        { 30, 142, 2, { 8, 30, 0, 0 } }, // BGM_POKEMON_CENTER3
-        { 30, 143, 2, { 8, 30, 0, 0 } }, // BGM_POKEMON_MART2
-        { 30, 144, 2, { 8, 30, 0, 0 } }, // BGM_PROF_ELM_LAB
+        { 32, 141, 2, { 8, 32, 0, 0 } }, // BGM_ROUTE_47
+        { 29, 142, 2, { 8, 29, 0, 0 } }, // BGM_POKEMON_CENTER3
+        { 29, 143, 2, { 8, 29, 0, 0 } }, // BGM_POKEMON_MART2
+        { 29, 144, 2, { 8, 29, 0, 0 } }, // BGM_PROF_ELM_LAB
         { 44, 145, 2, { 8, 44, 0, 0 } }, // BGM_NATIONAL_PARK
         { 45, 146, 2, { 8, 45, 0, 0 } }, // BGM_DRAGON_DEN
         { 0, 0, 0, { 0, 0, 0, 0 } }, // REC_RG
@@ -172,20 +171,20 @@ namespace SOUND::SSEQ {
         { 47, 158, 2, { 8, 47, 0, 0 } }, // BGM_ROUTE_3
         { 50, 159, 2, { 8, 54, 0, 0 } }, // BGM_ROUTE_11
         { 49, 160, 2, { 8, 49, 0, 0 } }, // BGM_ROUTE_24
-        { 30, 161, 2, { 8, 30, 0, 0 } }, // BGM_ROUTE_26
-        { 34, 162, 2, { 8, 34, 0, 0 } }, // BGM_MT_MOON
+        { 29, 161, 2, { 8, 29, 0, 0 } }, // BGM_ROUTE_26
+        { 33, 162, 2, { 8, 33, 0, 0 } }, // BGM_MT_MOON
         { 0, 0, 0, { 0, 0, 0, 0 } }, // REC_DP
-        { 31, 163, 2, { 1, 31, 0, 0 } }, // BGM_ETERNA_FOREST
-        { 31, 164, 2, { 1, 31, 0, 0 } }, // BGM_SPRING_PATH
-        { 31, 165, 2, { 1, 31, 0, 0 } }, // BGM_LAKE_CAVE
-        { 31, 166, 2, { 1, 31, 0, 0 } }, // BGM_DISTORTION_WORLD
+        { 30, 163, 2, { 1, 30, 0, 0 } }, // BGM_ETERNA_FOREST
+        { 30, 164, 2, { 1, 30, 0, 0 } }, // BGM_SPRING_PATH
+        { 30, 165, 2, { 1, 30, 0, 0 } }, // BGM_LAKE_CAVE
+        { 30, 166, 2, { 1, 30, 0, 0 } }, // BGM_DISTORTION_WORLD
         { 0, 0, 0, { 0, 0, 0, 0 } }, // REC_BW
         { 55, 167, 1, { 55, 0, 0, 0 } }, // BGM_UNOVA_GATE
         { 56, 168, 1, { 56, 0, 0, 0 } }, // BGM_BW_C_02
         { 57, 169, 1, { 57, 0, 0, 0 } }, // BGM_BW_C_03
         { 58, 170, 1, { 58, 0, 0, 0 } }, // BGM_BW_C_07
         { 59, 171, 1, { 59, 0, 0, 0 } }, // BGM_BW_C_08_W
-        { 28, 81, 1, { 28, 0, 0, 0 } }, // BGM_BW_C_10_B
+        { 27, 80, 1, { 27, 0, 0, 0 } }, // BGM_BW_C_10_B
         { 60, 172, 1, { 60, 0, 0, 0 } }, // BGM_BW_C_12
         { 61, 173, 1, { 61, 0, 0, 0 } }, // BGM_BW_C_14
         { 62, 174, 1, { 62, 0, 0, 0 } }, // BGM_BW_T_01

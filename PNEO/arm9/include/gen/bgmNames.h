@@ -1,7 +1,7 @@
 #pragma once
 
-#define NUM_SSEQ 195
-#define MAX_BGM 194
+#define NUM_SSEQ 194
+#define MAX_BGM 193
 #define BGM_NONE 0
 #define REC_NONE 0
 #define BGM_OS_TITLE 1
@@ -28,8 +28,7 @@
 #define BGM_CYCLING_ALT 111
 #define BGM_POKE_RADAR 112
 #define BGM_DESERT 113
-#define BGM_HIDDEN_LAND 114
-#define BGM_MYSTERY_GIFT 115
+#define BGM_MYSTERY_GIFT 114
 #define REC_BATTLE 200
 #define BGM_ENCOUNTER_BRENDAN 201
 #define BGM_ENCOUNTER_MAY 202

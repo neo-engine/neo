@@ -192,7 +192,7 @@ namespace MAP {
         static constexpr u8 MAX_HM_PARTICLE           = 16;
         static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 6;
         static constexpr u8 MAX_TILE_ANIM             = 16;
-        static constexpr u8 MAX_TILE_ANIM_GFX_SLOTS   = 6;
+        static constexpr u8 MAX_TILE_ANIM_GFX_SLOTS   = 8;
 
         static constexpr u8 SPR_UNUSED    = 0;
         static constexpr u8 SPR_ITEM      = 1;
@@ -204,10 +204,27 @@ namespace MAP {
 
         static constexpr u8 SPR_DOOR = 99;
 
-        static constexpr u8 TILE_ANIM_START = 100;
-        static constexpr u8 SPR_GRASS       = 100;
-        static constexpr u8 SPR_LONG_GRASS  = 101;
-        static constexpr u8 SPR_GRASS_SHINY = 102;
+        enum tileAnimation : u8 {
+            TILE_ANIM_START            = 100,
+            SPR_GRASS                  = 100,
+            SPR_LONG_GRASS             = 101,
+            SPR_GRASS_SHINY            = 102,
+            SPR_FOOTPRINT              = 103,
+            SPR_FOOTPRINT_VERTICAL     = 103,
+            SPR_FOOTPRINT_HORIZONTAL   = 104,
+            SPR_WATER_CIRCLE           = 105,
+            SPR_DIVE_BUBBLE            = 106,
+            SPR_FOOTPRINT_BIKE         = 107,
+            SPR_FOOTPRINT_BIKE_FRAME_1 = 107,
+            SPR_FOOTPRINT_BIKE_FRAME_4 = 108, // shares gfx slot w/ f1
+            SPR_FOOTPRINT_BIKE_FRAME_2 = 109,
+            SPR_FOOTPRINT_BIKE_FRAME_3 = 110, // shares gfx slot w/ f3
+        };
+
+        static constexpr u8 SPR_MAPTILE_GFX_SLOT_1 = 0;
+        static constexpr u8 SPR_MAPTILE_GFX_SLOT_2 = 2;
+        static constexpr u8 SPR_MAPTILE_GFX_SLOT_3 = 4;
+        static constexpr u8 SPR_MAPTILE_GFX_SLOT_4 = 6;
 
         enum spriteType {
             SPTYPE_NONE       = 0,
@@ -239,6 +256,33 @@ namespace MAP {
             }
         };
 
+        static u8 animationExpiry( u8 p_animation ) {
+            switch( p_animation ) {
+            case SPR_FOOTPRINT_HORIZONTAL:
+            case SPR_FOOTPRINT_VERTICAL: return 30;
+            case SPR_FOOTPRINT_BIKE_FRAME_1:
+            case SPR_FOOTPRINT_BIKE_FRAME_2:
+            case SPR_FOOTPRINT_BIKE_FRAME_3:
+            case SPR_FOOTPRINT_BIKE_FRAME_4: return 20;
+            case SPR_WATER_CIRCLE: return 5;
+            case SPR_DIVE_BUBBLE: return 4;
+            default: return 255; // never
+            }
+        }
+        static u8 animationNextFrame( u8 p_animation, u8 p_currentFrame ) {
+            switch( p_animation ) {
+            case SPR_FOOTPRINT_HORIZONTAL:
+            case SPR_FOOTPRINT_VERTICAL: return 0;
+            case SPR_FOOTPRINT_BIKE_FRAME_1:
+            case SPR_FOOTPRINT_BIKE_FRAME_2:
+            case SPR_FOOTPRINT_BIKE_FRAME_3:
+            case SPR_FOOTPRINT_BIKE_FRAME_4: return 0;
+            case SPR_WATER_CIRCLE: return ( p_currentFrame + 1 ) % 5;
+            case SPR_DIVE_BUBBLE: return ( p_currentFrame + 1 ) % 8;
+            default: return 0; // never
+            }
+        }
+
       private:
         managedSprite _player;         // 32x32
         managedSprite _playerPlatform; // 32x32
@@ -246,14 +290,18 @@ namespace MAP {
         std::pair<bool, managedSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32
         std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32
 
-        mapSpriteData _itemBallData;   // 16x16
-        mapSpriteData _hmBallData;     // 16x16
-        mapSpriteData _strengthData;   // 16x16
-        mapSpriteData _rockSmashData;  // 16x16
-        mapSpriteData _cutData;        // 16x16
-        mapSpriteData _grassData;      // 2x16x16
-        mapSpriteData _shinyGrassData; // 2x16x16
-        mapSpriteData _longGrassData;  // 2x16x16
+        mapSpriteData _itemBallData;      // 16x16
+        mapSpriteData _hmBallData;        // 16x16
+        mapSpriteData _strengthData;      // 16x16
+        mapSpriteData _rockSmashData;     // 16x16
+        mapSpriteData _cutData;           // 16x16
+        mapSpriteData _grassData;         // 16x16
+        mapSpriteData _shinyGrassData;    // 16x16
+        mapSpriteData _longGrassData;     // 16x16
+        mapSpriteData _footprintData;     // 16x16
+        mapSpriteData _footprintBikeData; // 16x16
+        mapSpriteData _waterCircleData;   // 32x16
+        mapSpriteData _diveBubbleData;    // 16x16
 
         managedSprite _doorAnimation; // 32x16
 
@@ -409,7 +457,8 @@ namespace MAP {
         /*
          * @brief: Draws the specified frame of the specified sprite.
          */
-        void drawFrame( u8 p_spriteId, u8 p_value, bool p_hFlip, bool p_update = true );
+        void drawFrame( u8 p_spriteId, u8 p_value, bool p_hFlip, bool p_update = true,
+                        bool p_vFlip = false );
 
         /*
          * @brief: Sets the specified frame of the specified sprite.
