@@ -293,7 +293,7 @@ int main( int, char** p_argv ) {
     MAP::curMap->registerOnLocationChangedHandler( IO::showNewLocation );
     MAP::curMap->draw( );
 
-    IO::showNewLocation( MAP::curMap->getCurrentLocationId( ) );
+    IO::showNewLocation( MAP::curMap->getCurrentLocationId( ), false );
 
     ANIMATE_MAP = true;
 

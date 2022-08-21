@@ -219,14 +219,15 @@ namespace MAP {
 
     void mapSpriteManager::init( ) {
         // pre load item, hm sprites
-        _itemBallData   = mapSpriteData( 256 | 249 );
-        _hmBallData     = mapSpriteData( 256 | 250 );
-        _strengthData   = mapSpriteData( 256 | 251 );
-        _rockSmashData  = mapSpriteData( 256 | 252 );
-        _cutData        = mapSpriteData( 256 | 253 );
-        _grassData      = mapSpriteData( 256 | 254 );
-        _shinyGrassData = mapSpriteData( 256 | 254 );
-        _longGrassData  = mapSpriteData( 256 | 255 );
+        _itemBallData       = mapSpriteData( 256 | 249 );
+        _hmBallData         = mapSpriteData( 256 | 250 );
+        _strengthData       = mapSpriteData( 256 | 251 );
+        _rockSmashData      = mapSpriteData( 256 | 252 );
+        _cutData            = mapSpriteData( 256 | 253 );
+        _grassData          = mapSpriteData( 256 | 254 );
+        _shinyGrassData     = mapSpriteData( 256 | 254 );
+        _longGrassData      = mapSpriteData( 256 | 255 );
+        _hotSpringWaterData = mapSpriteData( 256 | 222 );
 
         _footprintData     = mapSpriteData( 256 | 245 );
         _footprintBikeData = mapSpriteData( 256 | 241 );
@@ -236,6 +237,7 @@ namespace MAP {
         _shinyGrassData.updatePalette( 3 );
         _grassData.updatePalette( 3 );
         _longGrassData.updatePalette( 3 );
+        _hotSpringWaterData.updatePalette( 8 );
 
         _playerPlatform.m_sprite = mapSprite( { 256 | 248, 0 }, mapSpriteData( 256 | 248 ) );
 
@@ -344,7 +346,8 @@ namespace MAP {
             case SPR_FOOTPRINT: return _footprintData;
             case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
             case SPR_WATER_CIRCLE: return _waterCircleData;
-            case SPR_DIVE_BUBBLE: return _diveBubbleData; [[unlikely]] default : break;
+            case SPR_DIVE_BUBBLE: return _diveBubbleData;
+            case SPR_HOT_SPRING_WATER: return _hotSpringWaterData; [[unlikely]] default : break;
             }
         }
 
@@ -369,7 +372,8 @@ namespace MAP {
             case SPR_FOOTPRINT: return _footprintData;
             case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
             case SPR_WATER_CIRCLE: return _waterCircleData;
-            case SPR_DIVE_BUBBLE: return _diveBubbleData; [[unlikely]] default : break;
+            case SPR_DIVE_BUBBLE: return _diveBubbleData;
+            case SPR_HOT_SPRING_WATER: return _hotSpringWaterData; [[unlikely]] default : break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -676,6 +680,14 @@ namespace MAP {
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _diveBubbleData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
+            return SPR_MAPTILE_OAM( nextfree );
+        case SPR_HOT_SPRING_WATER:
+            _hotSpringWaterData.updatePalette( 8 );
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+                          _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
+                          SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_1 ), _hotSpringWaterData,
+                          p_hidden );
+            setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
 
         case SPR_PLATFORM:

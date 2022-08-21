@@ -131,7 +131,7 @@ namespace MAP {
     void mapDrawer::registerOnBankChangedHandler( std::function<void( u8 )> p_handler ) {
         _newBankCallbacks.push_back( p_handler );
     }
-    void mapDrawer::registerOnLocationChangedHandler( std::function<void( u16 )> p_handler ) {
+    void mapDrawer::registerOnLocationChangedHandler( std::function<void( u16, bool )> p_handler ) {
         _newLocationCallbacks.push_back( p_handler );
     }
     void mapDrawer::registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler ) {
@@ -266,7 +266,7 @@ namespace MAP {
 
         for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
-        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, false ); }
 
         unfadeScreen( );
     }

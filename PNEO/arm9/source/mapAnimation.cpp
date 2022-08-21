@@ -62,6 +62,7 @@ namespace MAP {
         case BEH_GRASS_ASH:
             return p_shiny ? mapSpriteManager::SPR_GRASS_SHINY : mapSpriteManager::SPR_GRASS;
         case BEH_LONG_GRASS: return mapSpriteManager::SPR_LONG_GRASS;
+        case BEH_HOT_SPRING_WATER: return mapSpriteManager::SPR_HOT_SPRING_WATER;
         default: return 0;
         }
     }
@@ -201,6 +202,7 @@ namespace MAP {
         u8 anim   = getTileAnimation( p_globX, p_globY );
 
         switch( behave ) {
+        case BEH_HOT_SPRING_WATER:
         case BEH_GRASS:
         case BEH_LONG_GRASS: {
             // tall grass

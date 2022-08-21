@@ -69,11 +69,11 @@ namespace MAP {
             BEH_SAND_FOOTPRINTS  = 0x21,
             BEH_GRASS_UNDERWATER = 0x22,
 
-            BEH_GRASS_ASH   = 0x24,
-            BEH_FOOTPRINTS  = 0x25,
-            BEH_THIN_ICE    = 0x26, // TODO
-            BEH_CRACKED_ICE = 0x27, // TODO
-
+            BEH_GRASS_ASH                     = 0x24,
+            BEH_FOOTPRINTS                    = 0x25,
+            BEH_THIN_ICE                      = 0x26, // TODO
+            BEH_CRACKED_ICE                   = 0x27, // TODO
+            BEH_HOT_SPRING_WATER              = 0x28,
             BEH_WARP_TELEPORT                 = 0x29,
             BEH_GRASS_UNDERWATER_NO_RESURFACE = 0x2A,
             BEH_REFLECTION_UNDER_BRIDGE       = 0x2B, // TODO / unused
@@ -271,8 +271,9 @@ namespace MAP {
         bool _playerIsFast = false;
         s8   _fastBike     = false;
 
-        std::vector<std::function<void( u16 )>> _newLocationCallbacks
-            = std::vector<std::function<void( u16 )>>( ); // Called whenever player makes a step
+        std::vector<std::function<void( u16, bool )>> _newLocationCallbacks
+            = std::vector<std::function<void( u16, bool )>>( ); // Called whenever player makes a
+                                                                // step
         std::vector<std::function<void( u8 )>> _newBankCallbacks
             = std::vector<std::function<void( u8 )>>( ); // Called when a map bank was loaded
         std::vector<std::function<void( moveMode )>> _newMoveModeCallbacks
@@ -657,7 +658,7 @@ namespace MAP {
         void destroyHMObject( u16 p_globX, u16 p_globY );
 
         void registerOnBankChangedHandler( std::function<void( u8 )> p_handler );
-        void registerOnLocationChangedHandler( std::function<void( u16 )> p_handler );
+        void registerOnLocationChangedHandler( std::function<void( u16, bool )> p_handler );
         void registerOnMoveModeChangedHandler( std::function<void( moveMode )> p_handler );
         void registerOnWeatherChangedHandler( std::function<void( mapWeather )> p_handler );
 

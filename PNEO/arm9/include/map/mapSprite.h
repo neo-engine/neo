@@ -205,14 +205,15 @@ namespace MAP {
         static constexpr u8 SPR_DOOR = 99;
 
         enum tileAnimation : u8 {
-            TILE_ANIM_START    = 100,
-            SPR_GRASS          = 100,
-            SPR_LONG_GRASS     = 101,
-            SPR_GRASS_SHINY    = 102,
-            SPR_FOOTPRINT      = 103,
-            SPR_WATER_CIRCLE   = 104,
-            SPR_DIVE_BUBBLE    = 105,
-            SPR_FOOTPRINT_BIKE = 106,
+            TILE_ANIM_START      = 100,
+            SPR_GRASS            = 100,
+            SPR_LONG_GRASS       = 101,
+            SPR_GRASS_SHINY      = 102,
+            SPR_FOOTPRINT        = 103,
+            SPR_WATER_CIRCLE     = 104,
+            SPR_DIVE_BUBBLE      = 105,
+            SPR_FOOTPRINT_BIKE   = 106,
+            SPR_HOT_SPRING_WATER = 107,
         };
 
         static constexpr u8 SPR_MAPTILE_GFX_SLOT_1 = 0;
@@ -276,18 +277,19 @@ namespace MAP {
         std::pair<bool, managedSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32
         std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32
 
-        mapSpriteData _itemBallData;      // 16x16
-        mapSpriteData _hmBallData;        // 16x16
-        mapSpriteData _strengthData;      // 16x16
-        mapSpriteData _rockSmashData;     // 16x16
-        mapSpriteData _cutData;           // 16x16
-        mapSpriteData _grassData;         // 16x16
-        mapSpriteData _shinyGrassData;    // 16x16
-        mapSpriteData _longGrassData;     // 16x16
-        mapSpriteData _footprintData;     // 16x16
-        mapSpriteData _footprintBikeData; // 16x16
-        mapSpriteData _waterCircleData;   // 32x16
-        mapSpriteData _diveBubbleData;    // 16x16
+        mapSpriteData _itemBallData;       // 16x16
+        mapSpriteData _hmBallData;         // 16x16
+        mapSpriteData _strengthData;       // 16x16
+        mapSpriteData _rockSmashData;      // 16x16
+        mapSpriteData _cutData;            // 16x16
+        mapSpriteData _grassData;          // 16x16
+        mapSpriteData _shinyGrassData;     // 16x16
+        mapSpriteData _longGrassData;      // 16x16
+        mapSpriteData _footprintData;      // 16x16
+        mapSpriteData _footprintBikeData;  // 16x16
+        mapSpriteData _waterCircleData;    // 16x16
+        mapSpriteData _diveBubbleData;     // 32x16
+        mapSpriteData _hotSpringWaterData; // 16x16
 
         managedSprite _doorAnimation; // 32x16
 

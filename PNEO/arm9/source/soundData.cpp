@@ -102,14 +102,14 @@ namespace SOUND {
         if( !p_silent ) { restartBGM( ); }
     }
 
-    void onLocationChange( u16 p_newLocation ) {
+    void onLocationChange( u16 p_newLocation, bool p_warp ) {
         if( currentLocation == p_newLocation ) { return; }
 
         currentLocation = p_newLocation;
 
         if( currentJBoxBGM != JBOX_DISABLED || BGMforced || tracerActive ) { return; }
         if( currentMoveMode == MAP::WALK ) {
-            playBGM( FS::BGMforLocation( currentLocation ), false, true );
+            playBGM( FS::BGMforLocation( currentLocation ), false, !p_warp );
         }
     }
 

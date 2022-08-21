@@ -249,7 +249,7 @@ namespace MAP {
             u16 py = p_mapObject.m_pos.m_posY - dir[ p_movement.m_direction ][ 1 ];
             clearFieldAnimation( px, py );
 
-            // can't use bike
+            // can't use bike, no tire tracks in sand ~> need only exit dir
             animateExitField( px, py, false, p_movement.m_direction, p_movement.m_direction );
 
             if( p_adjustAnim && _tileAnimations.count( { px, py, 0 } ) ) {

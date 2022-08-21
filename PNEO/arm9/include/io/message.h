@@ -91,6 +91,6 @@ namespace IO {
      */
     void giveItemToPlayer( u16 p_itemId, u16 p_amount = 1 );
 
-    void showNewLocation( u16 p_newLocation );
+    void showNewLocation( u16 p_newLocation, bool );
     void hideLocation( u8 p_remTime = 0 );
 } // namespace IO

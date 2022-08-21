@@ -412,7 +412,7 @@ namespace IO {
 
     u16  CURRENT_LOCATION = 0;
     u8   LOCATION_TIMER   = 0;
-    void showNewLocation( u16 p_newLocation ) {
+    void showNewLocation( u16 p_newLocation, bool ) {
         if( p_newLocation == CURRENT_LOCATION ) { return; }
 
         if( p_newLocation == L_POKEMON_CENTER || p_newLocation == L_POKEMON_MART ) { return; }

@@ -229,7 +229,7 @@ namespace SOUND {
     void setTracerStatus( bool p_active, bool p_silent = false );
 
     void onWeatherChange( MAP::mapWeather p_newWeather );
-    void onLocationChange( u16 p_newLocatonId );
+    void onLocationChange( u16 p_newLocatonId, bool p_warp );
     void onMovementTypeChange( MAP::moveMode p_newMoveMode );
     void restartBGM( );
     void stopBGM( );

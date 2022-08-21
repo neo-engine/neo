@@ -174,7 +174,7 @@ namespace MAP {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         auto curLocId = getCurrentLocationId( );
-        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, false ); }
 
         // Check for things that activate upon stepping on a tile
 
@@ -1059,7 +1059,9 @@ namespace MAP {
             SAVE::SAV.getActiveFile( ).m_lastPokeCenter.second.m_posY -= 4;
         }
 
-        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId ); }
+        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, true ); }
+
+        for( u8 i{ 0 }; i < 15; ++i ) { swiWaitForVBlank( ); }
 
         auto posx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         auto posy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
@@ -1280,7 +1282,14 @@ namespace MAP {
         u16 ox   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - dir[ _lastPlayerMove ][ 0 ];
         u16 oy   = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - dir[ _lastPlayerMove ][ 1 ];
         u8  anim = getTileAnimation( nx, ny );
+        if( anim == mapSpriteManager::SPR_HOT_SPRING_WATER ) {
+            anim = 0;
+            animateField( nx, ny );
+        }
+        if( anim == mapSpriteManager::SPR_LONG_GRASS ) { animateField( nx, ny ); }
+
         if( p_direction == DOWN && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_LONG_GRASS
+            && getTileAnimation( gx, gy ) != mapSpriteManager::SPR_HOT_SPRING_WATER
             && at( gx, gy ).m_bottombehave != BEH_PACIFIDLOG_LOG_VERTICAL_TOP ) {
             if( !_pkmnFollowsPlayer && !SAVE::SAV.getActiveFile( ).m_objectAttached ) {
                 stepOff( gx, gy, true, _lastPlayerMove, p_direction );
