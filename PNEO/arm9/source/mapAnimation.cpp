@@ -56,6 +56,8 @@ namespace MAP {
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
         switch( behave ) {
+        case BEH_GRASS_UNDERWATER_NO_RESURFACE:
+        case BEH_GRASS_UNDERWATER:
         case BEH_GRASS:
         case BEH_GRASS_ASH:
             return p_shiny ? mapSpriteManager::SPR_GRASS_SHINY : mapSpriteManager::SPR_GRASS;
@@ -132,16 +134,13 @@ namespace MAP {
         u8   frame = 0;
         if( p_animation == mapSpriteManager::SPR_FOOTPRINT ) {
             if( p_exitDir == LEFT ) {
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_HORIZONTAL;
-                flipX       = true;
-                frame       = 1;
+                flipX = true;
+                frame = 1;
             } else if( p_exitDir == RIGHT ) {
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_HORIZONTAL;
-                frame       = 1;
+                frame = 1;
             } else if( p_exitDir == UP ) {
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_VERTICAL;
-                frame       = 0;
-                flipY       = true;
+                frame = 0;
+                flipY = true;
             }
         }
 
@@ -150,47 +149,41 @@ namespace MAP {
                 || ( p_enterDir == UP && p_exitDir == DOWN )
                 || ( p_enterDir == UP && p_exitDir == UP )
                 || ( p_enterDir == DOWN && p_exitDir == DOWN ) ) {
-                frame       = 2;
-                flipX       = false;
-                flipY       = false;
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_3;
+                frame = 2;
+                flipX = false;
+                flipY = false;
             }
             if( ( p_enterDir == LEFT && p_exitDir == RIGHT )
                 || ( p_enterDir == RIGHT && p_exitDir == LEFT )
                 || ( p_enterDir == RIGHT && p_exitDir == RIGHT )
                 || ( p_enterDir == LEFT && p_exitDir == LEFT ) ) {
-                frame       = 1;
-                flipX       = false;
-                flipY       = false;
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_2;
+                frame = 1;
+                flipX = false;
+                flipY = false;
             }
             if( ( p_enterDir == UP && p_exitDir == LEFT )
                 || ( p_enterDir == RIGHT && p_exitDir == DOWN ) ) {
-                frame       = 0;
-                flipX       = true;
-                flipY       = false;
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_1;
+                frame = 0;
+                flipX = true;
+                flipY = false;
             }
             if( ( p_enterDir == UP && p_exitDir == RIGHT )
                 || ( p_enterDir == LEFT && p_exitDir == DOWN ) ) {
-                frame       = 0;
-                flipX       = false;
-                flipY       = false;
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_1;
+                frame = 0;
+                flipX = false;
+                flipY = false;
             }
             if( ( p_enterDir == DOWN && p_exitDir == LEFT )
                 || ( p_enterDir == RIGHT && p_exitDir == UP ) ) {
-                frame       = 3;
-                flipX       = true;
-                flipY       = false;
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_4;
+                frame = 3;
+                flipX = true;
+                flipY = false;
             }
             if( ( p_enterDir == DOWN && p_exitDir == RIGHT )
                 || ( p_enterDir == LEFT && p_exitDir == UP ) ) {
-                frame       = 3;
-                flipX       = false;
-                flipY       = false;
-                p_animation = mapSpriteManager::SPR_FOOTPRINT_BIKE_FRAME_4;
+                frame = 3;
+                flipX = false;
+                flipY = false;
             }
         }
 

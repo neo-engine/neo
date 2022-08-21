@@ -205,20 +205,14 @@ namespace MAP {
         static constexpr u8 SPR_DOOR = 99;
 
         enum tileAnimation : u8 {
-            TILE_ANIM_START            = 100,
-            SPR_GRASS                  = 100,
-            SPR_LONG_GRASS             = 101,
-            SPR_GRASS_SHINY            = 102,
-            SPR_FOOTPRINT              = 103,
-            SPR_FOOTPRINT_VERTICAL     = 103,
-            SPR_FOOTPRINT_HORIZONTAL   = 104,
-            SPR_WATER_CIRCLE           = 105,
-            SPR_DIVE_BUBBLE            = 106,
-            SPR_FOOTPRINT_BIKE         = 107,
-            SPR_FOOTPRINT_BIKE_FRAME_1 = 107,
-            SPR_FOOTPRINT_BIKE_FRAME_4 = 108, // shares gfx slot w/ f1
-            SPR_FOOTPRINT_BIKE_FRAME_2 = 109,
-            SPR_FOOTPRINT_BIKE_FRAME_3 = 110, // shares gfx slot w/ f3
+            TILE_ANIM_START    = 100,
+            SPR_GRASS          = 100,
+            SPR_LONG_GRASS     = 101,
+            SPR_GRASS_SHINY    = 102,
+            SPR_FOOTPRINT      = 103,
+            SPR_WATER_CIRCLE   = 104,
+            SPR_DIVE_BUBBLE    = 105,
+            SPR_FOOTPRINT_BIKE = 106,
         };
 
         static constexpr u8 SPR_MAPTILE_GFX_SLOT_1 = 0;
@@ -258,27 +252,19 @@ namespace MAP {
 
         static u8 animationExpiry( u8 p_animation ) {
             switch( p_animation ) {
-            case SPR_FOOTPRINT_HORIZONTAL:
-            case SPR_FOOTPRINT_VERTICAL: return 30;
-            case SPR_FOOTPRINT_BIKE_FRAME_1:
-            case SPR_FOOTPRINT_BIKE_FRAME_2:
-            case SPR_FOOTPRINT_BIKE_FRAME_3:
-            case SPR_FOOTPRINT_BIKE_FRAME_4: return 20;
+            case SPR_FOOTPRINT: return 30;
+            case SPR_FOOTPRINT_BIKE: return 20;
             case SPR_WATER_CIRCLE: return 5;
-            case SPR_DIVE_BUBBLE: return 4;
+            case SPR_DIVE_BUBBLE: return 8;
             default: return 255; // never
             }
         }
         static u8 animationNextFrame( u8 p_animation, u8 p_currentFrame ) {
             switch( p_animation ) {
-            case SPR_FOOTPRINT_HORIZONTAL:
-            case SPR_FOOTPRINT_VERTICAL: return 0;
-            case SPR_FOOTPRINT_BIKE_FRAME_1:
-            case SPR_FOOTPRINT_BIKE_FRAME_2:
-            case SPR_FOOTPRINT_BIKE_FRAME_3:
-            case SPR_FOOTPRINT_BIKE_FRAME_4: return 0;
+            case SPR_FOOTPRINT: return 0;
+            case SPR_FOOTPRINT_BIKE: return 0;
             case SPR_WATER_CIRCLE: return ( p_currentFrame + 1 ) % 5;
-            case SPR_DIVE_BUBBLE: return ( p_currentFrame + 1 ) % 8;
+            case SPR_DIVE_BUBBLE: return ( p_currentFrame + 1 ) % 6;
             default: return 0; // never
             }
         }
