@@ -1061,7 +1061,7 @@ namespace MAP {
 
         for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, true ); }
 
-        for( u8 i{ 0 }; i < 15; ++i ) { swiWaitForVBlank( ); }
+        for( u8 i{ 0 }; i < 25; ++i ) { swiWaitForVBlank( ); }
 
         auto posx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         auto posy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
