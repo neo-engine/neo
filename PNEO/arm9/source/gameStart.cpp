@@ -500,8 +500,8 @@ namespace SAVE {
             return initNewGame( );
         }
 
-        SOUND::playBGM( BGM_ROUTE_123 );
-        printEpisodeInfo( p_episode );
+        // SOUND::playBGM( BGM_ROUTE_123 );
+        // printEpisodeInfo( p_episode );
 
         switch( p_episode ) {
         case 0:
@@ -512,9 +512,12 @@ namespace SAVE {
                                           1 - SAV.getActiveFile( ).m_appearance );
             SAV.getActiveFile( ).m_currentMap = 10;
             SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
-                    { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+                    { u16( 0xb3 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
                     u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
             SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
+
+            // Hand out badges
+            SAVE::SAV.getActiveFile( ).m_HOENN_Badges = 0b1111'1111;
 
             // hand out useful items
             SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_MACH_BIKE, 1 );

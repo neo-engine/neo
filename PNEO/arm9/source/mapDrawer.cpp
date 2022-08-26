@@ -254,21 +254,29 @@ namespace MAP {
         ANIMATE_MAP = true;
     }
 
-    void mapDrawer::draw( ObjPriority, bool p_playerHidden ) {
+    void mapDrawer::draw( ObjPriority, bool p_playerHidden, bool p_init ) {
         draw( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
               SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, true ); // Draw the map
         stepOn( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false, false );
+                SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ, false, false, false );
+
+        if( p_init ) { unfadeScreen( ); }
 
         drawPlayer( SAVE::SAV.getActiveFile( ).m_playerPriority,
                     p_playerHidden ); // Draw the player
+
+        unfadeScreen( );
 
         for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
         for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, false ); }
 
-        unfadeScreen( );
+        if( !_scriptRunning ) {
+            handleEvents( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        }
     }
 
     void mapDrawer::setBlock( u16 p_globX, u16 p_globY, u16 p_newBlock ) {

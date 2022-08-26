@@ -229,6 +229,9 @@ int main( int, char** p_argv ) {
     nitroFSInit( p_argv );
     ARGV = p_argv;
 
+    // keysSetRepeat( 25, 5 );
+    // sysSetBusOwners( true, true );
+
     irqEnable( IRQ_VBLANK );
     initGraphics( );
 #ifdef DESQUID
@@ -254,9 +257,6 @@ int main( int, char** p_argv ) {
 #ifdef DESQUID
     printf( "[ OK ]\n- Init map          " );
 #endif
-
-    // keysSetRepeat( 25, 5 );
-    // sysSetBusOwners( true, true );
 
     MAP::curMap = new MAP::mapDrawer( );
 #ifdef DESQUID
@@ -291,7 +291,7 @@ int main( int, char** p_argv ) {
     IO::init( );
     //    MAP::curMap->registerOnBankChangedHandler( IO::showNewMap );
     MAP::curMap->registerOnLocationChangedHandler( IO::showNewLocation );
-    MAP::curMap->draw( );
+    MAP::curMap->draw( OBJPRIORITY_2, false, true );
 
     IO::showNewLocation( MAP::curMap->getCurrentLocationId( ), false );
 

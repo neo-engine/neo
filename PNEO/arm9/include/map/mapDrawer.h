@@ -444,7 +444,7 @@ namespace MAP {
                       direction p_exitDir );
 
         void stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn = true,
-                     bool p_unfade = false );
+                     bool p_unfade = false, bool p_runScripts = true );
 
         void animateField( u16 p_globX, u16 p_globY );
 
@@ -674,7 +674,8 @@ namespace MAP {
 
         void changeWeather( mapWeather p_newWeather );
 
-        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2, bool p_playerHidden = false );
+        void draw( ObjPriority p_playerPrio = OBJPRIORITY_2, bool p_playerHidden = false,
+                   bool p_init = false );
 
         void interact( );
 

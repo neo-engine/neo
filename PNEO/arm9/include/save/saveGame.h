@@ -39,11 +39,11 @@
 #include "save/saveOptions.h"
 
 namespace SAVE {
-    // #ifdef FLASHCARD
-    //    constexpr u8 MAX_SAVE_FILES = 1;
-    // #else
+#ifdef FLASHCARD
     constexpr u8 MAX_SAVE_FILES = 2;
-    // #endif
+#else
+    constexpr u8 MAX_SAVE_FILES = 3;
+#endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
 
     constexpr u8  NUM_PARTY_SLOTS = 6;

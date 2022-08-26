@@ -90,7 +90,7 @@ namespace FS {
     }
 
     bool readFsInfo( ) {
-        FILE* f = fopen( "fsinfo", "rb" );
+        FILE* f = fopen( "nitro:/fsinfo", "rb" );
         if( !f ) { return false; }
         fread( &FSDATA, sizeof( fsdataInfo ), 1, f );
         fclose( f );

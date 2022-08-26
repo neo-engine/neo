@@ -1929,6 +1929,16 @@ namespace MAP {
                 runEvent( mdata.m_events[ i ] );
             }
         }
+
+        // check if player moved to different position; may need to check for events at
+        // new position
+        if( p_globX != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+            || p_globY != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+            || p_z != SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ ) {
+            handleEvents( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        }
     }
 
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z, direction p_dir ) {

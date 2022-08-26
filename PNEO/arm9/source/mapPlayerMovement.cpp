@@ -168,8 +168,8 @@ namespace MAP {
         bgUpdate( );
     }
 
-    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn,
-                            bool p_unfade ) {
+    void mapDrawer::stepOn( u16 p_globX, u16 p_globY, u8 p_z, bool p_allowWildPkmn, bool p_unfade,
+                            bool p_runScripts ) {
         animateField( p_globX, p_globY );
         u8 behave = at( p_globX, p_globY ).m_bottombehave;
 
@@ -198,7 +198,7 @@ namespace MAP {
             if( !checkTrainerEye( p_globX, p_globY ) ) { handleWildPkmn( p_globX, p_globY ); }
         }
 
-        handleEvents( p_globX, p_globY, p_z );
+        if( p_runScripts && !_scriptRunning ) { handleEvents( p_globX, p_globY, p_z ); }
     }
 
     bool mapDrawer::canMove( position p_start, direction p_direction, moveMode p_moveMode,
@@ -1049,6 +1049,9 @@ namespace MAP {
         if( oldw != SAVE::SAV.getActiveFile( ).m_currentMapWeather ) { initWeather( ); }
 
         // hide player, may need to open a door first
+        bool oldsc     = _scriptRunning;
+        _scriptRunning = true;
+
         draw( OBJPRIORITY_2, hidePlayer );
         for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
@@ -1090,6 +1093,7 @@ namespace MAP {
         _forceNoFollow = true;
         switch( behave ) {
         case BEH_WARP_THEN_WALK_UP: walkPlayer( UP, false ); break;
+        case BEH_WARP_ON_WALK_DOWN_DIVE:
         case BEH_WARP_CAVE_ENTRY: walkPlayer( DOWN, false ); break;
         case BEH_DOOR: {
             walkPlayer( DOWN, false );
@@ -1100,6 +1104,12 @@ namespace MAP {
         default: break;
         }
         _forceNoFollow = oldforce;
+        unfadeScreen( );
+        _scriptRunning = oldsc;
+
+        handleEvents( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast, bool p_force ) {

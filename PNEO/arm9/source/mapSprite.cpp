@@ -44,7 +44,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_DOOR_OAM             ( SPR_MAIN_PLAYER_PLAT_OAM + 1 )
 #define SPR_EXCLM_OAM            SPR_DOOR_OAM + 1
 
-#define SPR_REFLECTION_START SPR_EXCLM_OAM + 1 - SPR_MAIN_PLAYER_OAM
+#define SPR_REFLECTION_START    SPR_EXCLM_OAM - SPR_MAIN_PLAYER_OAM + 1
+#define SPR_REFLECTION( p_idx ) ( ( p_idx ) + SPR_REFLECTION_START )
 
 // Strength boulder (16x16)
 // Rock Smash rock  (16x16)
@@ -79,6 +80,7 @@ namespace MAP {
         std::memcpy( m_palData, &BG_PALETTE[ 16 * p_bgPalIdx ], 16 * sizeof( u16 ) );
     }
 
+    char buf[ 100 ];
     mapSpriteData::mapSpriteData( u16 p_imageId, u8 p_forme, bool p_shiny, bool p_female ) {
         FILE* f;
         if( p_imageId > PKMN_SPRITE ) {
@@ -87,7 +89,6 @@ namespace MAP {
             bool shiny   = p_shiny;
             bool female  = p_female;
 
-            char buf[ 100 ];
             if( !forme ) {
                 snprintf( buf, 99, "%02d/%hu%s%s", species / ITEMS_PER_DIR, species,
                           shiny ? "s" : "", female ? "f" : "" );
@@ -737,13 +738,13 @@ namespace MAP {
             && p_spriteId < SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) ) {
             _smallNpcs[ p_spriteId - SPR_SMALL_NPC_OAM( 0 ) ].first = false;
             if( _smallNpcs[ p_spriteId - SPR_SMALL_NPC_OAM( 0 ) ].second.m_reflectionVisible ) {
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].isHidden = true;
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].isHidden = true;
             }
         } else if( p_spriteId >= SPR_LARGE_NPC_OAM( 0 )
                    && p_spriteId < SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) ) {
             _bigNpcs[ p_spriteId - SPR_LARGE_NPC_OAM( 0 ) ].first = false;
             if( _bigNpcs[ p_spriteId - SPR_LARGE_NPC_OAM( 0 ) ].second.m_reflectionVisible ) {
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].isHidden = true;
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].isHidden = true;
             }
         } else if( p_spriteId >= SPR_MAPTILE_OAM( 0 )
                    && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
@@ -828,8 +829,8 @@ namespace MAP {
             auto& spr = getManagedSprite( p_spriteId );
             spr.m_pos.moveSprite( p_dx, p_dy );
             if( spr.m_reflectionVisible ) {
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].x += p_dx;
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].y += p_dy;
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].x += p_dx;
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].y += p_dy;
             }
         }
         reorderSprites( false );
@@ -873,10 +874,10 @@ namespace MAP {
             IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden = !spr.m_pos.isVisible( );
 
             if( spr.m_reflectionVisible ) {
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].isHidden
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].isHidden
                     = !spr.m_pos.isVisible( );
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].x += p_dx;
-                IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].y += p_dy;
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].x += p_dx;
+                IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].y += p_dy;
             }
 
 #ifdef DESQUID_MORE
@@ -1003,7 +1004,7 @@ namespace MAP {
         auto& spr = getManagedSprite( p_spriteId );
         spr.m_sprite.setFrame( _oamPosition[ p_spriteId ], p_value );
         if( spr.m_reflectionVisible ) {
-            IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].hFlip
+            IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].hFlip
                 = IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].hFlip;
         }
         if( p_update ) { update( ); }
@@ -1020,7 +1021,7 @@ namespace MAP {
         spr.m_sprite.setFrameD( _oamPosition[ p_spriteId ], p_direction );
 
         if( spr.m_reflectionVisible ) {
-            IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].hFlip
+            IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].hFlip
                 = IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].hFlip;
         }
 
@@ -1078,13 +1079,21 @@ namespace MAP {
 
     void mapSpriteManager::enableReflection( u8 p_spriteId ) {
         auto& spr = getManagedSprite( p_spriteId );
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ]
-            = IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ];
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].vFlip    = true;
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].priority = OBJPRIORITY_3;
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].palette  = 0;
 
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].y
+        IO::spriteInfoTop[ SPR_REFLECTION( p_spriteId ) ]
+            = IO::spriteInfoTop[ _oamPosition[ p_spriteId ] ];
+        IO::spriteInfoTop[ SPR_REFLECTION( p_spriteId ) ].m_entry
+            = &IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ];
+        IO::spriteInfoTop[ SPR_REFLECTION( p_spriteId ) ].m_oamId = SPR_REFLECTION( p_spriteId );
+
+        IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ]
+            = IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ];
+
+        IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].vFlip    = true;
+        IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].priority = OBJPRIORITY_3;
+        IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].palette  = 1;
+
+        IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].y
             += IO::spriteInfoTop[ _oamPosition[ p_spriteId ] ].m_height;
         spr.m_reflectionVisible = true;
         update( );
@@ -1092,8 +1101,8 @@ namespace MAP {
 
     void mapSpriteManager::disableReflection( u8 p_spriteId ) {
         auto& spr = getManagedSprite( p_spriteId );
-        IO::OamTop->oamBuffer[ SPR_REFLECTION_START + p_spriteId ].isHidden = true;
-        spr.m_reflectionVisible                                             = false;
+        IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].isHidden = true;
+        spr.m_reflectionVisible                                        = false;
         update( );
     }
 } // namespace MAP
