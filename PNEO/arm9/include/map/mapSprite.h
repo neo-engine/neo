@@ -190,7 +190,7 @@ namespace MAP {
         static constexpr u8 MAX_SMALL_NPC             = 22;
         static constexpr u8 MAX_LARGE_NPC             = 2;
         static constexpr u8 MAX_HM_PARTICLE           = 16;
-        static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 5;
+        static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 6;
         static constexpr u8 MAX_TILE_ANIM             = 16;
         static constexpr u8 MAX_TILE_ANIM_GFX_SLOTS   = 10;
 

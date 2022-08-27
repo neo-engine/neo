@@ -49,6 +49,58 @@ namespace MAP {
         _weatherScrollY = 0;
         REG_BLDALPHA    = 0;
         switch( getWeather( ) ) {
+        case RAINY:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "rain",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            _weatherScrollX = 32;
+            _weatherScrollY = -64;
+            REG_BLDALPHA    = 0xff | ( 0x08 << 8 );
+            _weatherFollow  = true;
+            break;
+
+        case FOG:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "fog",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            _weatherScrollX = 2;
+            _weatherScrollY = 0;
+            REG_BLDALPHA    = 0xff | ( 0x08 << 8 );
+            _weatherFollow  = true;
+            break;
+
+        case MIST:
+        case DENSE_MIST:
+            IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
+            bgWrapOn( IO::bg3 );
+
+            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "mist",
+                                                        256 * 256 / 4, TEMP, 256, TEMP_PAL );
+            dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
+            dmaCopy( TEMP_PAL, BG_PALETTE + 240, 32 );
+            bgSetScroll( IO::bg3, 0, 0 );
+            if( getWeather( ) == MIST ) {
+                _weatherScrollX = 1;
+                _weatherScrollY = 1;
+                REG_BLDALPHA    = 0xff | ( 0x05 << 8 );
+            } else {
+                _weatherScrollX = 2;
+                _weatherScrollY = 2;
+                REG_BLDALPHA    = 0xff | ( 0x0A << 8 );
+            }
+            _weatherFollow = true;
+            break;
+
         case CLOUDY:
             IO::bg3 = bgInit( 3, BgType_Bmp8, BgSize_B8_256x256, 3, 0 );
             bgWrapOn( IO::bg3 );

@@ -56,9 +56,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_MAIN_PLAYER_PLAT_GFX   16
 #define SPR_SMALL_NPC_GFX( p_idx ) ( 32 + 8 * ( p_idx ) )
 #define SPR_LARGE_NPC_GFX( p_idx ) ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC ) + 16 * ( p_idx ) )
-#define SPR_HM_GFX( p_idx )        ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 4 * ( p_idx ) )
+#define SPR_HM_GFX( p_idx )        ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 4 * ( (p_idx) -1 ) )
 #define SPR_MAPTILE_GFX( p_idx )   ( SPR_HM_GFX( MAX_HM_PARTICLE_GFX_SLOTS ) + 4 * ( p_idx ) )
-#define SPR_DOOR_GFX               ( SPR_MAPTILE_GFX( MAX_TILE_ANIM_GFX_SLOTS ) )
+// #define SPR_DOOR_GFX               ( SPR_MAPTILE_GFX( MAX_TILE_ANIM_GFX_SLOTS ) )
+#define SPR_DOOR_GFX SPR_MAIN_PLAYER_PLAT_GFX
 
 #define SPR_EXCLM_GFX 303
 

@@ -1086,14 +1086,13 @@ namespace MAP {
         }
 
         if( ( ( oldMapType & INSIDE ) && ( newMapType & INSIDE ) && p_type == CAVE_ENTRY ) ) {
-            stopPlayer( DOWN );
+            if( behave != BEH_WARP_ON_WALK_DOWN ) { stopPlayer( DOWN ); }
         }
 
         bool oldforce  = _forceNoFollow;
         _forceNoFollow = true;
         switch( behave ) {
         case BEH_WARP_THEN_WALK_UP: walkPlayer( UP, false ); break;
-        case BEH_WARP_ON_WALK_DOWN_DIVE:
         case BEH_WARP_CAVE_ENTRY: walkPlayer( DOWN, false ); break;
         case BEH_DOOR: {
             walkPlayer( DOWN, false );
