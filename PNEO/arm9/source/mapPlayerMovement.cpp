@@ -785,9 +785,13 @@ namespace MAP {
                         walkPlayer( p_direction, p_fast );
                         handleWarp( EMERGE_WATER );
                         break;
+                    case BEH_MOSSDEEP_GYM_WARP:
                     case BEH_WARP_TELEPORT:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( TELEPORT );
+                        p_direction = DOWN;
+                        p_fast      = false;
+                        redirectPlayer( DOWN, false );
                         break;
 
                     // These change the direction of movement
@@ -1091,7 +1095,9 @@ namespace MAP {
 
         bool oldforce  = _forceNoFollow;
         _forceNoFollow = true;
+        bool handleE   = true;
         switch( behave ) {
+        case BEH_MOSSDEEP_GYM_WARP: handleE = false; break;
         case BEH_WARP_THEN_WALK_UP: walkPlayer( UP, false ); break;
         case BEH_WARP_CAVE_ENTRY: walkPlayer( DOWN, false ); break;
         case BEH_DOOR: {
@@ -1106,9 +1112,11 @@ namespace MAP {
         unfadeScreen( );
         _scriptRunning = oldsc;
 
-        handleEvents( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        if( handleE ) {
+            handleEvents( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
+                          SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ );
+        }
     }
 
     void mapDrawer::redirectPlayer( direction p_direction, bool p_fast, bool p_force ) {

@@ -252,7 +252,7 @@ namespace MAP {
             setBlock( p_globX, p_globY, TS12_LOG_RIGHT_DOWN );
             break;
         }
-        case BEH_FORRTREE_BRIDGE_BIKE_BELOW: {
+        case BEH_FORTREE_BRIDGE_BIKE_BELOW: {
             if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3 ) {
                 setBlock( p_globX, p_globY, atom( p_globX, p_globY ).m_blockidx | 1 );
             }
@@ -293,7 +293,7 @@ namespace MAP {
             setBlock( p_globX, p_globY, TS12_LOG_RIGHT_UP );
             break;
         }
-        case BEH_FORRTREE_BRIDGE_BIKE_BELOW: {
+        case BEH_FORTREE_BRIDGE_BIKE_BELOW: {
             if( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ > 3 ) {
                 setBlock( p_globX, p_globY, atom( p_globX, p_globY ).m_blockidx & ( ~1 ) );
             }

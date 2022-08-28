@@ -54,6 +54,7 @@ namespace MAP {
             BEH_LONG_GRASS_BORDER            = 0x09, // unused
             BEH_LADDER                       = 0x0A, // no running
             BEH_INDOOR_WITH_ENCOUNTER        = 0x0B,
+            BEH_MOSSDEEP_GYM_WARP            = 0x0E,
 
             BEH_REFLECTION = 0x10,
             BEH_DIVE       = 0x11,
@@ -128,7 +129,7 @@ namespace MAP {
             BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM  = 0x75,
             BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT  = 0x76,
             BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT = 0x77,
-            BEH_FORRTREE_BRIDGE_BIKE_BELOW      = 0x78,
+            BEH_FORTREE_BRIDGE_BIKE_BELOW       = 0x78,
 
             BEH_WALK_ONLY = 0xA0,
 
@@ -607,7 +608,7 @@ namespace MAP {
             case BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM:
             case BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT:
             case BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT: return false;
-            case BEH_FORRTREE_BRIDGE_BIKE_BELOW: return p_start.m_posZ <= 3;
+            case BEH_FORTREE_BRIDGE_BIKE_BELOW: return p_start.m_posZ <= 3;
             default: break;
             }
 
