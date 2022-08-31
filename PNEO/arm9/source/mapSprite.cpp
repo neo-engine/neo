@@ -32,11 +32,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "map/mapSlice.h"
 #include "save/saveGame.h"
 
-#define SPR_MAPTILE_OAM( p_idx )   ( 0 + ( p_idx ) )
-#define SPR_MAIN_PLAYER_OAM        SPR_MAPTILE_OAM( MAX_TILE_ANIM )
-#define SPR_SMALL_NPC_OAM( p_idx ) ( 1 + SPR_MAIN_PLAYER_OAM + ( p_idx ) )
-#define SPR_LARGE_NPC_OAM( p_idx ) ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
-#define SPR_HM_OAM( p_idx )        ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
+#define SPR_MAPTILE_OAM( p_idx )         ( 0 + ( p_idx ) )
+#define SPR_MAIN_PLAYER_OAM              SPR_MAPTILE_OAM( MAX_TILE_ANIM )
+#define SPR_SMALL_NPC_OAM( p_idx )       ( 1 + SPR_MAIN_PLAYER_OAM + ( p_idx ) )
+#define SPR_LARGE_NPC_OAM( p_idx )       ( SPR_SMALL_NPC_OAM( MAX_SMALL_NPC ) + ( p_idx ) )
+#define SPR_EXTRA_LARGE_NPC_OAM( p_idx ) ( SPR_LARGE_NPC_OAM( 4 * ( p_idx ) + 1 ) )
+#define SPR_HM_OAM( p_idx )              ( SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) + ( p_idx ) )
 
 #define MAX_OAM ( SPR_HM_OAM( MAX_HM_PARTICLE ) )
 
@@ -52,12 +53,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // Cut tree         (16x16)
 // Map animation (rustling grass, etc)
 
-#define SPR_MAIN_PLAYER_GFX        0
-#define SPR_MAIN_PLAYER_PLAT_GFX   16
-#define SPR_LARGE_NPC_GFX( p_idx ) ( 32 + 16 * ( p_idx ) )
-#define SPR_SMALL_NPC_GFX( p_idx ) ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 8 * ( p_idx ) )
-#define SPR_HM_GFX( p_idx )        ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC - 6 ) + 4 * ( (p_idx) -1 ) )
-#define SPR_MAPTILE_GFX( p_idx )   ( SPR_HM_GFX( MAX_HM_PARTICLE_GFX_SLOTS ) + 4 * ( p_idx ) )
+#define SPR_MAIN_PLAYER_GFX              0
+#define SPR_MAIN_PLAYER_PLAT_GFX         16
+#define SPR_LARGE_NPC_GFX( p_idx )       ( 32 + 16 * ( p_idx ) )
+#define SPR_EXTRA_LARGE_NPC_GFX( p_idx ) ( SPR_LARGE_NPC_GFX( 4 * ( p_idx ) + 1 ) )
+#define SPR_SMALL_NPC_GFX( p_idx )       ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 8 * ( p_idx ) )
+#define SPR_HM_GFX( p_idx )              ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC - 6 ) + 4 * ( (p_idx) -1 ) )
+#define SPR_MAPTILE_GFX( p_idx )         ( SPR_HM_GFX( MAX_HM_PARTICLE_GFX_SLOTS ) + 4 * ( p_idx ) )
 // #define SPR_DOOR_GFX               ( SPR_MAPTILE_GFX( MAX_TILE_ANIM_GFX_SLOTS ) )
 #define SPR_DOOR_GFX SPR_MAIN_PLAYER_PLAT_GFX
 
@@ -72,6 +74,7 @@ namespace MAP {
             FS::read( p_f, &m_frameCount, sizeof( u8 ), 1 );
             FS::read( p_f, &m_width, sizeof( u8 ), 1 );
             FS::read( p_f, &m_height, sizeof( u8 ), 1 );
+            if( m_width >= 64 ) { m_frameCount = m_frameCount > 3 ? 3 : m_frameCount; }
             FS::read( p_f, m_frameData, sizeof( u32 ), m_width * m_height * m_frameCount / 8 );
             FS::close( p_f );
         }
@@ -174,7 +177,17 @@ namespace MAP {
 
     void mapSprite::drawFrameD( u8 p_oamIdx, direction p_direction ) {
         if( _info.m_picNum > PKMN_SPRITE ) {
-            drawFrame( p_oamIdx, getOWPKMNFrame( p_direction ), false );
+            if( _data.m_width < 64 ) {
+                drawFrame( p_oamIdx, getOWPKMNFrame( p_direction ), false );
+            } else {
+                switch( p_direction ) {
+                default:
+                case DOWN: drawFrame( p_oamIdx, 0, false ); break;
+                case UP: drawFrame( p_oamIdx, 1, false ); break;
+                case LEFT: drawFrame( p_oamIdx, 2, false ); break;
+                case RIGHT: drawFrame( p_oamIdx, 2, true ); break;
+                }
+            }
         } else {
             drawFrame( p_oamIdx, getFrame( p_direction ) );
         }
@@ -486,9 +499,30 @@ namespace MAP {
             return SPR_MAIN_PLAYER_OAM;
         case SPTYPE_BERRYTREE:
         case SPTYPE_NPC: {
-            bool isBig = p_sprite.getData( ).m_width == 32;
+            bool isVeryBig = p_sprite.getData( ).m_width == 64;
+            bool isBig     = p_sprite.getData( ).m_width == 32;
 
-            if( isBig ) {
+            if( isVeryBig ) {
+                // check if big sprite slots 1,2,3,4 are empty
+                if( _hasExtraLargeSprite || _bigNpcs[ 1 ].first || _bigNpcs[ 2 ].first
+                    || _bigNpcs[ 3 ].first || _bigNpcs[ 4 ].first ) {
+                    return 255;
+                }
+
+                _bigNpcs[ 1 ] = { true,
+                                  { p_sprite,
+                                    { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
+                                      camShift( p_camY, p_posY ) },
+                                    p_type,
+                                    false } };
+                doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
+                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                              _oamPosition[ SPR_EXTRA_LARGE_NPC_OAM( 0 ) ],
+                              SPR_EXTRA_LARGE_NPC_GFX( 0 ), p_sprite, p_hidden );
+                reorderSprites( false );
+                _hasExtraLargeSprite = true;
+                return SPR_EXTRA_LARGE_NPC_OAM( 0 );
+            } else if( isBig ) {
                 // search for free space
                 u8 freesp = 255;
                 for( u8 i = 0; i < MAX_LARGE_NPC; ++i ) {
@@ -497,7 +531,7 @@ namespace MAP {
                         break;
                     }
                 }
-                if( freesp == 255 ) { return 255; }
+                if( freesp == 255 || ( freesp && _hasExtraLargeSprite ) ) { return 255; }
                 _bigNpcs[ freesp ] = { true,
                                        { p_sprite,
                                          { p_posX, p_posY, 0, 0, camShift( p_camX, p_posX ),
@@ -743,10 +777,12 @@ namespace MAP {
             }
         } else if( p_spriteId >= SPR_LARGE_NPC_OAM( 0 )
                    && p_spriteId < SPR_LARGE_NPC_OAM( MAX_LARGE_NPC ) ) {
-            _bigNpcs[ p_spriteId - SPR_LARGE_NPC_OAM( 0 ) ].first = false;
-            if( _bigNpcs[ p_spriteId - SPR_LARGE_NPC_OAM( 0 ) ].second.m_reflectionVisible ) {
+            auto idx              = p_spriteId - SPR_LARGE_NPC_OAM( 0 );
+            _bigNpcs[ idx ].first = false;
+            if( _bigNpcs[ idx ].second.m_reflectionVisible ) {
                 IO::OamTop->oamBuffer[ SPR_REFLECTION( p_spriteId ) ].isHidden = true;
             }
+            if( _hasExtraLargeSprite && idx ) { _hasExtraLargeSprite = false; }
         } else if( p_spriteId >= SPR_MAPTILE_OAM( 0 )
                    && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
             _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first = SPR_UNUSED;

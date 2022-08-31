@@ -189,6 +189,7 @@ namespace MAP {
       public:
         static constexpr u8 MAX_SMALL_NPC             = 22;
         static constexpr u8 MAX_LARGE_NPC             = 5;
+        static constexpr u8 MAX_EXTRA_LARGE_NPC       = 1;
         static constexpr u8 MAX_HM_PARTICLE           = 16;
         static constexpr u8 MAX_HM_PARTICLE_GFX_SLOTS = 6;
         static constexpr u8 MAX_TILE_ANIM             = 16;
@@ -289,7 +290,8 @@ namespace MAP {
         managedSprite _playerPlatform; // 32x32
 
         std::pair<bool, managedSprite> _smallNpcs[ MAX_SMALL_NPC ]; // 16x32
-        std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32
+        std::pair<bool, managedSprite> _bigNpcs[ MAX_LARGE_NPC ];   // 32x32 (or 1x 32x32
+                                                                    // and 1x 64x64)
 
         mapSpriteData _itemBallData;       // 16x16
         mapSpriteData _hmBallData;         // 16x16
@@ -314,6 +316,8 @@ namespace MAP {
 
         std::pair<u8, mapSpritePos> _hmSpriteInfo[ MAX_HM_PARTICLE ];
         std::pair<u8, mapSpritePos> _tileAnimInfo[ MAX_TILE_ANIM ];
+
+        bool _hasExtraLargeSprite = false;
 
         constexpr s16 camShift( u16 p_cam, u16 p_pos ) const {
             return ( p_pos - p_cam ) * 16;

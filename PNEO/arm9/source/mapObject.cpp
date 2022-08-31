@@ -736,7 +736,6 @@ namespace MAP {
             }
 
             case EVENT_OW_PKMN: {
-                break;
                 mapObject obj  = mapObject( );
                 obj.m_pos      = { u16( p_mapX * SIZE + p_data.m_events[ i ].m_posX ),
                                    u16( p_mapY * SIZE + p_data.m_events[ i ].m_posY ),
