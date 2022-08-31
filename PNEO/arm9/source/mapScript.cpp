@@ -975,7 +975,13 @@ namespace MAP {
                 martSell  = par2;
                 martItems.clear( );
                 break;
-            case MIT: martItems.push_back( { parA, parB } ); break;
+            case MIT:
+                if( pmartCurr == 0 ) {
+                    martItems.push_back( { parA, u16( parB ) * 10 } );
+                } else {
+                    martItems.push_back( { parA, parB } );
+                }
+                break;
             case CLL:
                 switch( par1 ) {
 
@@ -2285,5 +2291,16 @@ namespace MAP {
         } else {
             handleWarp( p_type, current );
         }
+    }
+
+    bool mapDrawer::currentPosAllowsDirectFieldMove( ) const {
+        u16 gx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 gy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+
+        auto beh = at( gx, gy ).m_bottombehave;
+
+        if( beh == BEH_NO_DIRECT_FIELD_MOVE ) { return false; }
+
+        return true;
     }
 } // namespace MAP

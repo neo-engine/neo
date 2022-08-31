@@ -133,6 +133,9 @@ More screenshots are available in the `Screens` subdirectory.
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm16.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm17.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm18.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm23.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm24.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/gm26.png)
 
 ##### Pokémon status screens
 

@@ -42,6 +42,8 @@ namespace IO {
     font *boldFont = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar );
     font *smallFont
         = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
+    font *brailleFont
+        = new font( BRAILLE_FONT::fontData, BRAILLE_FONT::fontWidths, BRAILLE_FONT::shiftchar );
     ConsoleFont *consoleFont = new ConsoleFont( );
 
     OAMTable  *Oam = new OAMTable( );

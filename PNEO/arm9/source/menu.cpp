@@ -721,7 +721,7 @@ namespace IO {
             data.push_back( FS::getItemData( i.first ) );
             auto nm = FS::getItemName( i.first );
             if( data.back( ).m_itemType == BAG::ITEMTYPE_TM ) {
-                nm += ": " + FS::getMoveName( data.back( ).m_param2 );
+                nm = FS::getMoveName( data.back( ).m_param2 );
                 descr.push_back( FS::getMoveDescr( data.back( ).m_param2 ) );
             } else {
                 descr.push_back( FS::getItemDescr( i.first ) );

@@ -56,13 +56,16 @@ namespace MAP {
             BEH_INDOOR_WITH_ENCOUNTER        = 0x0B,
             BEH_MOSSDEEP_GYM_WARP            = 0x0E,
 
-            BEH_REFLECTION = 0x10,
-            BEH_DIVE       = 0x11,
-            BEH_ROCK_CLIMB = 0x12,
-            BEH_WATERFALL  = 0x13,
+            BEH_REFLECTION      = 0x10,
+            BEH_DIVE            = 0x11,
+            BEH_ROCK_CLIMB      = 0x12,
+            BEH_WATERFALL       = 0x13,
+            BEH_DIVE_REFLECTION = 0x14,
 
-            BEH_REFLECTION_FOLLOW_CIRCLE = 0x16, // TODO: follow circle
-            BEH_SHALLOW_WATER            = 0x17, // TODO
+            BEH_REFLECTION_FOLLOW_CIRCLE = 0x16,
+            BEH_SHALLOW_WATER            = 0x17,
+
+            BEH_NO_DIRECT_FIELD_MOVE = 0x18,
 
             BEH_UNDERWATER_NO_RESURFACE = 0x19,
 
@@ -171,9 +174,10 @@ namespace MAP {
 
         static constexpr u8 TBEH_ELEVATE_TOP_LAYER = 0x10;
 
-        static constexpr u16 TS6_ASH_GRASS_BLOCK  = 0x206;
-        static constexpr u16 TS7_ASH_GRASS_BLOCK  = 0x212;
-        static constexpr u16 BREAKABLE_TILE_BLOCK = 0x206;
+        static constexpr u16 TS6_ASH_GRASS_BLOCK    = 0x206;
+        static constexpr u16 TS7_ASH_GRASS_BLOCK    = 0x212;
+        static constexpr u16 BREAKABLE_TILE_BLOCK   = 0x206;
+        static constexpr u16 SOOTOPOLIS_CRACKED_ICE = 0x20E;
 
         static constexpr u16 TS12_LOG_LEFT_UP    = 0x250;
         static constexpr u16 TS12_LOG_LEFT_DOWN  = 0x252;
@@ -356,6 +360,8 @@ namespace MAP {
 
         void removeFollowPkmn( );
 
+        bool allowFollowPkmn( u16 p_globX, u16 p_globY );
+
         void loadBlock( block p_curblock, u32 p_memPos );
         void loadBlock( block p_curblock, u8 p_scrnX, u8 p_scrnY );
 
@@ -514,6 +520,7 @@ namespace MAP {
 
         static inline bool isReflective( u8 p_behave ) {
             switch( p_behave ) {
+            case BEH_DIVE_REFLECTION:
             case BEH_REFLECTION:
             case BEH_SLIDE_ON_ICE:
             case BEH_REFLECTION_FOLLOW_CIRCLE: return true;
@@ -535,6 +542,7 @@ namespace MAP {
         static inline bool canDive( u8 p_behave ) {
             switch( p_behave ) {
             case BEH_DIVE: return true;
+            case BEH_DIVE_REFLECTION: return true;
             default: return false;
             }
         }
@@ -552,6 +560,8 @@ namespace MAP {
             if( FS::readMapBankInfo( _currentBank, &info ) ) { return false; }
             return info.m_hasDiveMap;
         }
+
+        bool currentPosAllowsDirectFieldMove( ) const;
 
         /*
          * @brief: Returns if tracer could be used at given pos (if it is additionally

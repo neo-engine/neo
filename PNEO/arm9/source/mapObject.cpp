@@ -351,6 +351,14 @@ namespace MAP {
         return true;
     }
 
+    bool mapDrawer::allowFollowPkmn( u16 p_globX, u16 p_globY ) {
+        u8 behave = at( p_globX, p_globY ).m_bottombehave;
+
+        if( behave == BEH_THIN_ICE || behave == BEH_CRACKED_ICE ) { return false; }
+
+        return true;
+    }
+
     void mapDrawer::spawnFollowPkmn( u16 p_globX, u16 p_globY, u8 p_z, direction p_direction ) {
         _followPkmn = mapObject( );
         if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) && updateFollowPkmn( ) ) {

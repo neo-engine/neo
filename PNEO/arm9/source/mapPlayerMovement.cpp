@@ -1401,7 +1401,7 @@ namespace MAP {
         }
 
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement == WALK && !_pkmnFollowsPlayer ) {
-            spawnFollowPkmn( gx, gy, gz, olddir );
+            if( allowFollowPkmn( gx, gy ) ) { spawnFollowPkmn( gx, gy, gz, olddir ); }
         }
 
         if( sid < 255 ) { _mapSprites.destroySprite( sid, false ); }

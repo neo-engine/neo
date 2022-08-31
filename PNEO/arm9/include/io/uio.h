@@ -102,6 +102,7 @@ namespace IO {
     extern font*        regularFont;
     extern font*        boldFont;
     extern font*        smallFont;
+    extern font*        brailleFont;
     extern ConsoleFont* consoleFont;
 
     extern OAMTable*  Oam;

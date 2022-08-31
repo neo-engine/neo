@@ -226,10 +226,18 @@ namespace MAP {
             }
             break;
         }
+        case BEH_CRACKED_ICE:
         case BEH_BREAKABLE_TILE: {
             // breakable floor
             // breaks on step on
             setBlock( p_globX, p_globY, BREAKABLE_TILE_BLOCK );
+            removeFollowPkmn( );
+            break;
+        }
+        case BEH_THIN_ICE: {
+            // sootopolis gym thin ice, cracks on step on
+            setBlock( p_globX, p_globY, SOOTOPOLIS_CRACKED_ICE );
+            removeFollowPkmn( );
             break;
         }
         case BEH_PACIFIDLOG_LOG_VERTICAL_TOP: {

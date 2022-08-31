@@ -500,8 +500,8 @@ namespace SAVE {
             return initNewGame( );
         }
 
-        // SOUND::playBGM( BGM_ROUTE_123 );
-        // printEpisodeInfo( p_episode );
+        SOUND::playBGM( BGM_ROUTE_123 );
+        printEpisodeInfo( p_episode );
 
         switch( p_episode ) {
         case 0:

@@ -122,6 +122,19 @@ namespace IO {
                 }
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 2, 2 );
+            } else if( p_style == MSG_BRAILLE ) {
+                IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
+                                 false, false, false, OBJPRIORITY_0, false );
+
+                for( u8 i = 0; i < 13; ++i ) {
+                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46,
+                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
+                }
+                IO::regularFont->setColor( 3, 1 );
+                IO::regularFont->setColor( 0, 2 );
+                IO::brailleFont->setColor( 0, 0 );
+                IO::brailleFont->setColor( 1, 1 );
+                IO::brailleFont->setColor( 2, 2 );
             } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE || p_style == MSG_ITEM
                        || p_style == MSG_INFO_CONT ) {
                 IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
@@ -200,6 +213,9 @@ namespace IO {
 
             u8   tmppos         = 0;
             char shortbuf[ 20 ] = { 0 };
+
+            auto fnt = ( p_style == MSG_BRAILLE ) ? IO::brailleFont : IO::regularFont;
+
             while( p_message[ cpos ] ) {
                 if( !p_noDelay ) {
                     // Check for special escaped characters ([escape sequence]), that need
@@ -230,15 +246,14 @@ namespace IO {
                 u8 ln   = 1;
                 if( p_noDelay ) {
                     std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                    ln = IO::regularFont->printStringBC( p_message, TEXT_PAL, TEXT_BUF,
-                                                         256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                                         16 - ( 4 * !!p_item ), 64, hg, 20 );
+                    ln = fnt->printStringBC( p_message, TEXT_PAL, TEXT_BUF, 256 - ( 64 * !!p_item ),
+                                             IO::font::LEFT, 16 - ( 4 * !!p_item ), 64, hg, 20 );
                 } else {
                     std::strncat( TMP_TEXT_BUF, shortbuf, 20 );
                     if( !cpos ) { std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) ); }
-                    ln = IO::regularFont->printStringBC( TMP_TEXT_BUF, TEXT_PAL, TEXT_BUF,
-                                                         256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                                         16 - ( 4 * !!p_item ), 64, hg, 20 );
+                    ln = fnt->printStringBC( TMP_TEXT_BUF, TEXT_PAL, TEXT_BUF,
+                                             256 - ( 64 * !!p_item ), IO::font::LEFT,
+                                             16 - ( 4 * !!p_item ), 64, hg, 20 );
                 }
 
                 if( !p_noDelay ) {
@@ -323,7 +338,7 @@ namespace IO {
             std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
             IO::updateOAM( false );
         }
-        if( p_style == MSG_NORMAL || p_style == MSG_INFO ) {
+        if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_BRAILLE ) {
             waitForInteract( );
             hideMessageBox( );
         }

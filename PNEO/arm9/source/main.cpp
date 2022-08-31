@@ -85,6 +85,7 @@ bool          INIT_NITROFS      = false;
 bool          TWL_CONFIG        = false;
 bool          IN_GAME           = false;
 bool          RTC_BAD           = false;
+bool          HAD_NEW_GAME      = false;
 
 char** ARGV;
 
@@ -291,7 +292,7 @@ int main( int, char** p_argv ) {
     IO::init( );
     //    MAP::curMap->registerOnBankChangedHandler( IO::showNewMap );
     MAP::curMap->registerOnLocationChangedHandler( IO::showNewLocation );
-    MAP::curMap->draw( OBJPRIORITY_2, false, true );
+    MAP::curMap->draw( OBJPRIORITY_2, false, HAD_NEW_GAME );
 
     IO::showNewLocation( MAP::curMap->getCurrentLocationId( ), false );
 
@@ -353,66 +354,68 @@ int main( int, char** p_argv ) {
 #endif
 
         if( GET_AND_WAIT( KEY_A ) ) {
-            for( u8 i = 0; i < 6; ++i ) {
-                if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
-                auto a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
-                if( a.isEgg( ) ) continue;
-                for( u8 j = 0; j < 4; ++j )
-                    for( u8 param = 0; param < 2; ++param ) {
-                        if( !BATTLE::isFieldMove( a.m_boxdata.m_moves[ j ] )
-                            || !BATTLE::possible( a.m_boxdata.m_moves[ j ], param )
-                            || !BATTLE::text( a.m_boxdata.m_moves[ j ], param ) )
-                            continue;
-                        char buffer[ 100 ];
-                        auto mname = FS::getMoveName( a.m_boxdata.m_moves[ j ] );
-                        auto fstr  = std::string( GET_STRING( 3 ) );
-                        snprintf( buffer, 99, fstr.c_str( ),
-                                  GET_STRING( BATTLE::text( a.m_boxdata.m_moves[ j ], param ) ),
-                                  mname.c_str( ) );
-                        SOUND::playSoundEffect( SFX_CHOOSE );
-                        IO::yesNoBox yn;
-                        if( yn.getResult( buffer, MSG_NOCLOSE ) == IO::yesNoBox::YES ) {
-                            IO::init( );
-                            IO::printMessage( 0, MSG_NOCLOSE );
-                            swiWaitForVBlank( );
-                            snprintf( buffer, 99, GET_STRING( 99 ), a.m_boxdata.m_name,
+            if( MAP::curMap->currentPosAllowsDirectFieldMove( ) ) {
+                for( u8 i = 0; i < 6; ++i ) {
+                    if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
+                    auto a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
+                    if( a.isEgg( ) ) continue;
+                    for( u8 j = 0; j < 4; ++j )
+                        for( u8 param = 0; param < 2; ++param ) {
+                            if( !BATTLE::isFieldMove( a.m_boxdata.m_moves[ j ] )
+                                || !BATTLE::possible( a.m_boxdata.m_moves[ j ], param )
+                                || !BATTLE::text( a.m_boxdata.m_moves[ j ], param ) )
+                                continue;
+                            char buffer[ 100 ];
+                            auto mname = FS::getMoveName( a.m_boxdata.m_moves[ j ] );
+                            auto fstr  = std::string( GET_STRING( 3 ) );
+                            snprintf( buffer, 99, fstr.c_str( ),
+                                      GET_STRING( BATTLE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                       mname.c_str( ) );
-                            IO::printMessage( buffer, MSG_NORMAL );
-                            IO::printMessage( 0, MSG_NOCLOSE );
-                            IO::init( );
-                            if( i || !MAP::curMap->useFollowPkmn( ) ) {
-                                MAP::curMap->usePkmn( a.getSpriteInfo( ) );
+                            SOUND::playSoundEffect( SFX_CHOOSE );
+                            IO::yesNoBox yn;
+                            if( yn.getResult( buffer, MSG_NOCLOSE ) == IO::yesNoBox::YES ) {
+                                IO::init( );
+                                IO::printMessage( 0, MSG_NOCLOSE );
                                 swiWaitForVBlank( );
-                                BATTLE::use( a.m_boxdata.m_moves[ j ], param );
+                                snprintf( buffer, 99, GET_STRING( 99 ), a.m_boxdata.m_name,
+                                          mname.c_str( ) );
+                                IO::printMessage( buffer, MSG_NORMAL );
+                                IO::printMessage( 0, MSG_NOCLOSE );
+                                IO::init( );
+                                if( i || !MAP::curMap->useFollowPkmn( ) ) {
+                                    MAP::curMap->usePkmn( a.getSpriteInfo( ) );
+                                    swiWaitForVBlank( );
+                                    BATTLE::use( a.m_boxdata.m_moves[ j ], param );
+                                } else {
+                                    swiWaitForVBlank( );
+
+                                    auto d = MAP::curMap->getFollowPkmnDirection( );
+
+                                    if( a.m_boxdata.m_moves[ j ] == M_CUT
+                                        || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {
+                                        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                                            += MAP::dir[ d ][ 0 ];
+                                        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                                            += MAP::dir[ d ][ 1 ];
+                                    }
+
+                                    BATTLE::use( a.m_boxdata.m_moves[ j ], 2 );
+
+                                    if( a.m_boxdata.m_moves[ j ] == M_CUT
+                                        || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {
+                                        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
+                                            -= MAP::dir[ d ][ 0 ];
+                                        SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
+                                            -= MAP::dir[ d ][ 1 ];
+                                    }
+                                }
                             } else {
-                                swiWaitForVBlank( );
-
-                                auto d = MAP::curMap->getFollowPkmnDirection( );
-
-                                if( a.m_boxdata.m_moves[ j ] == M_CUT
-                                    || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {
-                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
-                                        += MAP::dir[ d ][ 0 ];
-                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
-                                        += MAP::dir[ d ][ 1 ];
-                                }
-
-                                BATTLE::use( a.m_boxdata.m_moves[ j ], 2 );
-
-                                if( a.m_boxdata.m_moves[ j ] == M_CUT
-                                    || a.m_boxdata.m_moves[ j ] == M_ROCK_SMASH ) {
-                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX
-                                        -= MAP::dir[ d ][ 0 ];
-                                    SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY
-                                        -= MAP::dir[ d ][ 1 ];
-                                }
+                                IO::printMessage( 0, MSG_NOCLOSE );
+                                IO::init( );
                             }
-                        } else {
-                            IO::printMessage( 0, MSG_NOCLOSE );
-                            IO::init( );
+                            goto OUT;
                         }
-                        goto OUT;
-                    }
+                }
             }
             MAP::curMap->interact( );
         OUT:

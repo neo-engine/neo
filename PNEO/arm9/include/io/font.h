@@ -49,6 +49,12 @@ namespace IO {
         extern u8      fontWidths[ NUM_CHARS ];
         extern u8      fontData[ NUM_CHARS * 256 ];
     } // namespace SMALL_FONT
+    namespace BRAILLE_FONT {
+        constexpr auto NUM_CHARS = 30;
+        void           shiftchar( u16 &val );
+        extern u8      fontWidths[ NUM_CHARS ];
+        extern u8      fontData[ NUM_CHARS * 256 ];
+    } // namespace BRAILLE_FONT
 
     class font {
       private:

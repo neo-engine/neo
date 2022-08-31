@@ -140,6 +140,7 @@ extern u8   FRAME_COUNT;
 extern bool SCREENS_SWAPPED;
 extern bool PLAYER_IS_FISHING;
 extern bool INIT_NITROFS;
+extern bool HAD_NEW_GAME;
 
 extern char** ARGV;
 
@@ -170,6 +171,7 @@ enum style : u8 {
     MSG_SIGN            = 6,
     MSG_NORMAL_CONT     = 7,
     MSG_INFO_CONT       = 8,
+    MSG_BRAILLE         = 9,
     MSG_SHOW_MONEY_FLAG = 128, // show the current money
 };
 

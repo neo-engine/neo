@@ -716,7 +716,12 @@ namespace SAVE {
                     cleanUp( );
                     return;
                 case NEW_GAME:
-                    if( !initNewGame( NORMAL, runLanguageChoice( ) ) ) break;
+                    if( !initNewGame( NORMAL, runLanguageChoice( ) ) ) {
+                        HAD_NEW_GAME = false;
+                        break;
+                    } else {
+                        HAD_NEW_GAME = true;
+                    }
                     return;
                 case TRANSFER_GAME:
                     if( !transferGame( ) ) break;
@@ -724,8 +729,12 @@ namespace SAVE {
                 case SPECIAL_EPISODE: {
                     u8 ep = runEpisodeChoice( );
                     if( ep == IO::choiceBox::BACK_CHOICE
-                        || !initNewGame( SPECIAL, runLanguageChoice( ), ep ) )
+                        || !initNewGame( SPECIAL, runLanguageChoice( ), ep ) ) {
+                        HAD_NEW_GAME = false;
                         break;
+                    } else {
+                        HAD_NEW_GAME = true;
+                    }
                     return;
                 }
                 default: continue;
