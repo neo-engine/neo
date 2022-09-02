@@ -130,6 +130,8 @@ namespace IO {
                     IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46,
                                      32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
                 }
+                IO::regularFont->setColor( 1, 1 );
+                IO::regularFont->setColor( 2, 2 );
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 0, 2 );
                 IO::brailleFont->setColor( 0, 0 );
@@ -310,7 +312,7 @@ namespace IO {
             }
 
             if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_NORMAL_CONT
-                || p_style == MSG_INFO_CONT || p_style == MSG_ITEM ) {
+                || p_style == MSG_INFO_CONT || p_style == MSG_ITEM || p_style == MSG_BRAILLE ) {
                 // "Continue" char
                 IO::regularFont->printCharB( 172, TEXT_PAL, CONT_BUF, 16, 0, 0 );
                 tileCnt = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 254 - 12,

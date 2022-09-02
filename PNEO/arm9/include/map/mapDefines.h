@@ -183,14 +183,16 @@ namespace MAP {
     };
 
     enum eventTrigger : u8 {
-        TRIGGER_NONE           = 0,
-        TRIGGER_STEP_ON        = ( 1 << 0 ),
-        TRIGGER_INTERACT       = ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ),
-        TRIGGER_INTERACT_DOWN  = ( 1 << 1 ),
-        TRIGGER_INTERACT_LEFT  = ( 1 << 2 ),
-        TRIGGER_INTERACT_UP    = ( 1 << 3 ),
-        TRIGGER_INTERACT_RIGHT = ( 1 << 4 ),
-        TRIGGER_ON_MAP_ENTER   = ( 1 << 5 ),
+        TRIGGER_NONE              = 0,
+        TRIGGER_STEP_ON           = ( 1 << 0 ),
+        TRIGGER_INTERACT          = ( 1 << 1 ) | ( 1 << 2 ) | ( 1 << 3 ) | ( 1 << 4 ),
+        TRIGGER_INTERACT_DOWN     = ( 1 << 1 ),
+        TRIGGER_INTERACT_LEFT     = ( 1 << 2 ),
+        TRIGGER_INTERACT_UP       = ( 1 << 3 ),
+        TRIGGER_INTERACT_RIGHT    = ( 1 << 4 ),
+        TRIGGER_ON_MAP_ENTER      = ( 1 << 5 ),
+        TRIGGER_ON_MOVE_AT_POS    = ( 1 << 6 ), // only for generic events
+        TRIGGER_ON_MOVE_IN_BATTLE = ( 1 << 7 ), // only for generic events
     };
 
     constexpr eventTrigger dirToEventTrigger( direction p_dir ) {
@@ -334,6 +336,7 @@ namespace MAP {
                 struct {
                     u16 m_scriptId;
                     u8  m_scriptType;
+                    u16 m_triggerMove; // only used when event triggered by a pkmn move
                 } m_generic;
                 struct {
                     u8 m_hmType;

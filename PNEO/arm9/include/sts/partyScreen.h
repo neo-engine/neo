@@ -161,6 +161,9 @@ namespace STS {
             return 0;
         }
 
+        std::vector<u16> _mapTriggerMoves; // moves that trigger some event at the current
+                                           // map pos
+
         std::vector<choice> _currentChoices; // Possible choices for the currently selected pkmn
         u8                  _currentChoiceSelection; // Current choice selected (SINGLE mode)
 

@@ -341,15 +341,9 @@ int main( int, char** p_argv ) {
                       getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
                       SAVE::CURRENT_TIME.m_secs );
             IO::printMessage( buffer );
-            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount; ++i ) {
-                if( SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement
-                    == MAP::WALK_CONT_FOLLOW_OBJECT ) {
-                    printf( "%i->%i  ", i, SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].first );
-                } else {
-                    printf( "%im%i  ", i,
-                            SAVE::SAV.getActiveFile( ).m_mapObjects[ i ].second.m_movement );
-                }
-            }
+
+            printf( "#mv %i\n", MAP::curMap->getTriggerMovesForCurPos( ).size( ) );
+            for( auto m : MAP::curMap->getTriggerMovesForCurPos( ) ) { printf( "%i\n", m ); }
         }
 #endif
 

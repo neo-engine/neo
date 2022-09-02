@@ -402,6 +402,16 @@ namespace IO {
             init( );
             MAP::curMap->draw( );
             if( res.m_selectedMove ) {
+                // check if selected move is a move that triggers some map event
+                bool maptg = false;
+                for( auto m : MAP::curMap->getTriggerMovesForCurPos( ) ) {
+                    maptg |= res.m_selectedMove == m;
+                }
+                if( maptg ) {
+                    MAP::curMap->executeMoveTriggerScript( res.m_selectedMove );
+                    return;
+                }
+
                 if( res.m_selectedMove == M_FLY ) {
                     auto fpos = SAVE::SAV.getActiveFile( ).getFlyPosForLocation(
                         res.m_selectedMoveTarget );

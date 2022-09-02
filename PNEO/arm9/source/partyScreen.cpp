@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/choiceBox.h"
 #include "io/strings.h"
 #include "io/yesNoBox.h"
+#include "map/mapDrawer.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 #include "sts/statusScreen.h"
@@ -977,17 +978,23 @@ namespace STS {
                 _currentChoices.push_back( GIVE_ITEM );
                 //  _currentChoices.push_back( USE_ITEM );
             }
+
             if( _allowMoveSelection && !_team[ _currentSelection ].isEgg( ) ) {
                 for( u8 i = 0; i < 4; i++ ) {
-                    if( _team[ _currentSelection ].m_boxdata.m_moves[ i ]
-                        && BATTLE::isFieldMove(
-                            _team[ _currentSelection ].m_boxdata.m_moves[ i ] ) ) {
+                    auto cm = _team[ _currentSelection ].m_boxdata.m_moves[ i ];
+                    if( !cm ) { continue; }
+                    if( BATTLE::isFieldMove( cm ) ) {
                         for( u8 j = 0; j < 2; ++j ) {
-                            if( BATTLE::possible( _team[ _currentSelection ].m_boxdata.m_moves[ i ],
-                                                  j ) ) {
+                            if( BATTLE::possible( cm, j ) ) {
                                 _currentChoices.push_back( choice( FIELD_MOVE_1 + i ) );
                                 break;
                             }
+                        }
+                    }
+                    for( auto m : _mapTriggerMoves ) {
+                        if( m == cm ) {
+                            _currentChoices.push_back( choice( FIELD_MOVE_1 + i ) );
+                            break;
                         }
                     }
                 }
@@ -1303,6 +1310,9 @@ namespace STS {
         _currentSelection                  = 255;
         _currentChoiceSelection            = 0;
         _currentMarksOrMove.m_selectedMove = 0;
+
+        if( MAP::curMap ) { _mapTriggerMoves = MAP::curMap->getTriggerMovesForCurPos( ); }
+
         select( p_initialSelection );
         cooldown = COOLDOWN_COUNT;
         loop( ) {

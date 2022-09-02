@@ -50,6 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
 #define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
+    // opcode : u8, param1s : u5, param2s : u5, param3s : u14
     // opcode : u8, paramA : u12, paramB : u12
 #define OPCODE( p_ins )  ( ( p_ins ) >> 24 )
 #define PARAM1( p_ins )  ( ( ( p_ins ) >> 16 ) & 0xFF )
@@ -153,6 +154,10 @@ namespace MAP {
         GMM = 52, // write current movement mode to reg 0
         CMM = 53, // change movement
 
+        PRM  = 54, // check pkmn <param3s> at party slot <p1s>, skip <p2s> if true
+        PRMA = 55, // check pkmn <param3s> appears at least <p1s> times in total in any party slot,
+                   // skip <p2s> if true
+
         HPK = 60, // Hide following pkmn
 
         CMN = 70, // check money >=
@@ -199,6 +204,7 @@ namespace MAP {
         BTZ  = 130, // battle zone facility script
 
         MAP = 140, // redraw current map
+        EQ  = 141, // earthquake animation
 
         DES = 150, // register pkmn as seen in pkdex
 
@@ -455,6 +461,22 @@ namespace MAP {
             case MPL: {
                 redirectPlayer( direction( par2 ), false );
                 for( u8 j = 0; j < par3; ++j ) { movePlayer( direction( par2 ) ); }
+                break;
+            }
+
+            case PRM: {
+                auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( par1s );
+                if( pkmn && pkmn->getSpecies( ) == par3s ) { pc += par2s; }
+                break;
+            }
+
+            case PRMA: {
+                u8 cnt = 0;
+                for( u8 k = 0; k < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++k ) {
+                    auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( k );
+                    if( pkmn && pkmn->getSpecies( ) == par3s ) { cnt++; }
+                }
+                if( cnt >= par1s ) { pc += par2s; }
                 break;
             }
 
@@ -799,6 +821,46 @@ namespace MAP {
                 _mapSprites.setPriority( _playerSprite,
                                          SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
                 ANIMATE_MAP = true;
+                break;
+            }
+            case EQ: {
+                SOUND::playSoundEffect( SFX_HM_STRENGTH );
+                for( u8 k = 0; k < 2; ++k ) {
+                    swiWaitForVBlank( );
+                    moveCamera( RIGHT, false, false );
+                    moveCamera( RIGHT, false, false );
+                    swiWaitForVBlank( );
+                    moveCamera( RIGHT, false, false );
+                    moveCamera( RIGHT, false, false );
+                    swiWaitForVBlank( );
+                    moveCamera( LEFT, false, false );
+                    moveCamera( LEFT, false, false );
+                }
+                for( u8 k = 0; k < 4; ++k ) {
+                    swiWaitForVBlank( );
+                    moveCamera( RIGHT, false, false );
+                    moveCamera( RIGHT, false, false );
+                    swiWaitForVBlank( );
+                    moveCamera( LEFT, false, false );
+                    moveCamera( LEFT, false, false );
+                    swiWaitForVBlank( );
+                    moveCamera( LEFT, false, false );
+                    moveCamera( LEFT, false, false );
+                }
+                for( u8 k = 0; k < 2; ++k ) {
+                    swiWaitForVBlank( );
+                    moveCamera( RIGHT, false, false );
+                    moveCamera( RIGHT, false, false );
+                    swiWaitForVBlank( );
+                    moveCamera( RIGHT, false, false );
+                    moveCamera( RIGHT, false, false );
+                    swiWaitForVBlank( );
+                    moveCamera( LEFT, false, false );
+                    moveCamera( LEFT, false, false );
+                }
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+
                 break;
             }
             case BTR: {
@@ -2209,6 +2271,104 @@ namespace MAP {
             }
             runEvent( p_data.m_events[ i ], u8( 0 ), s16( p_mapX ), s16( p_mapY ) );
         }
+    }
+
+    void mapDrawer::executeMoveTriggerScript( u16 p_move ) {
+        u16  curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16  curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+        auto data = currentData( curx, cury );
+
+        auto mx = curx / SIZE;
+        auto my = cury / SIZE;
+
+        curx %= SIZE;
+        cury %= SIZE;
+
+        for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
+            if( data.m_events[ i ].m_type == EVENT_GENERIC
+                && data.m_events[ i ].m_trigger == TRIGGER_ON_MOVE_AT_POS
+                && data.m_events[ i ].m_posX == curx && data.m_events[ i ].m_posY == cury
+                && data.m_events[ i ].m_posZ == curz
+                && data.m_events[ i ].m_data.m_generic.m_triggerMove == p_move ) {
+                if( data.m_events[ i ].m_activateFlag
+                    && !SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                if( data.m_events[ i ].m_deactivateFlag
+                    && SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_deactivateFlag ) ) {
+                    continue;
+                }
+
+                executeScript( data.m_events[ i ].m_data.m_generic.m_scriptId, 0, mx, my );
+                return;
+            }
+        }
+    }
+
+    std::vector<u16> mapDrawer::getTriggerMovesForCurPos( ) const {
+        std::vector<u16> res{ };
+
+        u16  curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        u16  curz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+        auto data = currentData( curx, cury );
+
+        curx %= SIZE;
+        cury %= SIZE;
+
+        for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
+            if( data.m_events[ i ].m_type == EVENT_GENERIC
+                && data.m_events[ i ].m_trigger == TRIGGER_ON_MOVE_AT_POS
+                && data.m_events[ i ].m_posX == curx && data.m_events[ i ].m_posY == cury
+                && data.m_events[ i ].m_posZ == curz ) {
+                if( data.m_events[ i ].m_activateFlag
+                    && !SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                if( data.m_events[ i ].m_deactivateFlag
+                    && SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_deactivateFlag ) ) {
+                    continue;
+                }
+
+                res.push_back( data.m_events[ i ].m_data.m_generic.m_triggerMove );
+            }
+        }
+        return res;
+    }
+
+    std::vector<u16> mapDrawer::getTriggerBattleMovesForCurPos( ) const {
+        std::vector<u16> res{ };
+
+        u16  curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        auto data = currentData( curx, cury );
+
+        curx %= SIZE;
+        cury %= SIZE;
+
+        for( u8 i = 0; i < MAX_EVENTS_PER_SLICE; ++i ) {
+            if( data.m_events[ i ].m_type == EVENT_GENERIC
+                && data.m_events[ i ].m_trigger == TRIGGER_ON_MOVE_IN_BATTLE ) {
+                if( data.m_events[ i ].m_activateFlag
+                    && !SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_activateFlag ) ) {
+                    continue;
+                }
+                if( data.m_events[ i ].m_deactivateFlag
+                    && SAVE::SAV.getActiveFile( ).checkFlag(
+                        data.m_events[ i ].m_deactivateFlag ) ) {
+                    continue;
+                }
+
+                res.push_back( data.m_events[ i ].m_data.m_generic.m_triggerMove );
+            }
+        }
+        return res;
     }
 
     std::pair<bool, mapData::event::data> mapDrawer::getWarpData( u16 p_globX, u16 p_globY,

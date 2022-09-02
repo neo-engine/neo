@@ -592,6 +592,28 @@ namespace MAP {
         }
 
         /*
+         * @brief: Returns indices of all moves that trigger some event at the current
+         * position when used in the OW.
+         */
+        std::vector<u16> getTriggerMovesForCurPos( ) const;
+
+        /*
+         * @brief: Returns indices of all moves that trigger some event at the current
+         * position when used in a battle on the current map.
+         */
+        std::vector<u16> getTriggerBattleMovesForCurPos( ) const;
+
+        /*
+         * @brief: Player used the specified move to trigger an event.
+         */
+        void executeMoveTriggerScript( u16 p_move );
+
+        /*
+         * @brief: Player used the specified move in a battle to trigger an event.
+         */
+        void executeBattleMoveTriggerScript( u16 p_move );
+
+        /*
          * @brief: Makes mapObject[ p_objectId ] mimic the movements of the player. At
          * most 1 mapObject may be attached to the player at once.
          */
