@@ -42,7 +42,7 @@ namespace IO {
     constexpr u16 SPR_MSGBOX_OAM_LEN  = 14;
 
     constexpr u16 SPR_MSG_GFX     = 348;
-    constexpr u16 SPR_MSG_EXT_GFX = 220;
+    constexpr u16 SPR_MSG_EXT_GFX = 268;
     constexpr u16 SPR_MSGBOX_GFX  = 476;
     constexpr u16 SPR_MSGCONT_GFX = 508;
 
