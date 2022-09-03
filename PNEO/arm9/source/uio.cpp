@@ -229,6 +229,47 @@ namespace IO {
         }
     }
 
+    void drawLine( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color, u8 p_layer ) {
+        if( p_x1 == p_x2 ) { // vertical line
+            if( p_y2 < p_y1 ) { std::swap( p_y1, p_y2 ); }
+            for( u16 y = p_y1; y <= p_y2; ++y ) { setPixel( p_x1, y, p_bottom, p_color, p_layer ); }
+            return;
+        }
+        if( p_y1 == p_y2 ) { // horizontal line
+            if( p_x2 < p_x1 ) { std::swap( p_x1, p_x2 ); }
+            for( u16 x = p_x1; x <= p_x2; ++x ) { setPixel( x, p_y1, p_bottom, p_color, p_layer ); }
+            return;
+        }
+
+        if( p_x2 < p_x1 ) {
+            std::swap( p_x1, p_x2 );
+            std::swap( p_y1, p_y2 );
+        }
+
+        auto dx = p_x2 - p_x1;
+        auto dy = -std::abs( p_y2 - p_y1 );
+        auto sy = p_y2 < p_y1 ? -1 : 1;
+        auto D  = dx + dy;
+        auto y  = p_y1;
+        auto x  = p_x1;
+
+        loop( ) {
+            setPixel( x, y, p_bottom, p_color, p_layer );
+            if( x == p_x2 && y == p_y2 ) { break; }
+            auto D2 = 2 * D;
+            if( D2 >= dy ) {
+                if( x == p_x2 ) { break; }
+                D += dy;
+                x++;
+            }
+            if( D2 <= dx ) {
+                if( y == p_y2 ) { break; }
+                D += dx;
+                y += sy;
+            }
+        }
+    }
+
     /*
      * @brief Prints a rectangle to the screen, all coordinates inclusive
      */
@@ -236,20 +277,6 @@ namespace IO {
                          u8 p_layer ) {
         for( u16 y = p_y1; y <= p_y2; ++y )
             for( u16 x = p_x1; x <= p_x2; ++x ) { setPixel( x, y, p_bottom, p_color, p_layer ); }
-    }
-
-    /*
-     * @brief A sine approximation via a third-order cosine approx.
-     * @param p_x   angle (with 2^15 units/circle)
-     * @return     Sine value (Q12)
-     */
-    constexpr s32 isin( s32 p_x ) {
-        const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
-        p_x <<= ( 30 - qN );             // shift to full s32 range (Q13->Q30)
-        if( ( p_x ^ ( p_x << 1 ) ) < 0 ) // test for quadrant 1 or 2
-            p_x = ( 1 << 31 ) - p_x;
-        p_x >>= ( 30 - qN );
-        return p_x * ( ( 3 << qP ) - ( p_x * p_x >> qR ) ) >> qS;
     }
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,

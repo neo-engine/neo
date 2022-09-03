@@ -188,12 +188,15 @@ namespace IO {
 
                     // Hand out some ribbons
                     for( u8 j = 0; j < 4; ++j ) {
-                        a.m_boxdata.m_ribbons0[ j ] = rand( ) % 255;
-                        a.m_boxdata.m_ribbons1[ j ] = rand( ) % 255;
-                        a.m_boxdata.m_ribbons2[ j ] = rand( ) % 255;
+                        a.m_boxdata.m_ribbons0[ j ]     = rand( ) % 255;
+                        a.m_boxdata.m_ribbons1[ j ]     = rand( ) % 255;
+                        a.m_boxdata.m_ribbons2[ j ]     = rand( ) % 255;
+                        a.m_boxdata.m_contestStats[ j ] = rand( );
                     }
-                    a.m_boxdata.m_ribbons1[ 2 ] = rand( ) % 63;
-                    a.m_boxdata.m_ribbons1[ 3 ] = 0;
+                    a.m_boxdata.m_contestStats[ 4 ] = 255;
+                    a.m_boxdata.m_contestStats[ 5 ] = rand( );
+                    a.m_boxdata.m_ribbons1[ 2 ]     = rand( ) % 63;
+                    a.m_boxdata.m_ribbons1[ 3 ]     = 0;
                     if( a.m_boxdata.m_speciesId == 493 ) {
                         u8 plate = rand( ) % 17;
                         if( plate < 16 )

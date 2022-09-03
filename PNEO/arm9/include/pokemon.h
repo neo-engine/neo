@@ -127,6 +127,10 @@ struct boxPokemon {
         return m_pid;
     }
 
+    std::vector<u8> getRibbons( ) const;
+
+    void awardRibbon( u8 p_ribbon );
+
     /*
      * @brief: Adds the specified amount of exp. Uses a fast, but very basic overflow
      * protection.

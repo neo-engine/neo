@@ -243,6 +243,8 @@ namespace IO {
     void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color,
                          u8 p_layer = 1 );
 
+    void drawLine( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y5, bool p_bottom, u8 p_color, u8 p_layer = 1 );
+
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
                     bool p_delay, bool p_big = false ); // HP in %
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
@@ -285,4 +287,20 @@ namespace IO {
         }
         return WHITE;
     }
+
+    /*
+     * @brief A sine approximation via a third-order cosine approx.
+     * @param p_x   angle (with 2^15 units/circle)
+     * @return     Sine value (Q12)
+     */
+    constexpr s32 isin( s32 p_x ) {
+        const u16 qN = 13, qA = 12, qP = 15, qR = 2 * qN - qP, qS = qN + qP + 1 - qA;
+        p_x <<= ( 30 - qN );               // shift to full s32 range (Q13->Q30)
+        if( ( p_x ^ ( p_x << 1 ) ) < 0 ) { // test for quadrant 1 or 2
+            p_x = ( 1 << 31 ) - p_x;
+        }
+        p_x >>= ( 30 - qN );
+        return p_x * ( ( 3 << qP ) - ( p_x * p_x >> qR ) ) >> qS;
+    }
+
 } // namespace IO

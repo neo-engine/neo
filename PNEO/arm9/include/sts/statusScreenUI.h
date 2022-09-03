@@ -50,46 +50,48 @@ namespace STS {
         pkmnData         _data;
         BATTLE::moveData _moves[ 4 ];
 
-        u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
-        u16 initBottomScreen( pokemon* p_pokemon, bool p_bottom = true );
+        virtual u16 initTopScreen( pokemon* p_pokemon, bool p_bottom = false );
+        virtual u16 initBottomScreen( pokemon* p_pokemon, bool p_bottom = true );
 
         /*
          * @brief: Draws basic information about the pkmn (name, etc)
          */
-        void drawBasicInfoTop( pokemon* p_pokemon, bool p_bottom = false );
+        virtual void drawBasicInfoTop( pokemon* p_pokemon, bool p_bottom = false );
 
         /*
          * @brief: Writes the given string to the specified line to the text field.
          */
-        void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
-                           bool p_bottom = false );
+        virtual void writeLineTop( const char* p_string, u8 p_line, u8 p_color = 252,
+                                   bool p_bottom = false );
         /*
          * @brief: Writes the given string to the specified line to the text field.
          */
-        void writeLineTop( const char* p_stringLeft, const char* p_stringRight, u8 p_line,
-                           u8 p_colorLeft = 250, u8 p_colorRight = 252, bool p_bottom = false );
+        virtual void writeLineTop( const char* p_stringLeft, const char* p_stringRight, u8 p_line,
+                                   u8 p_colorLeft = 250, u8 p_colorRight = 252,
+                                   bool p_bottom = false );
 
       public:
+        virtual ~statusScreenUI( ) = default;
+
         /*
          * @brief: Initializes the status screen UI. Destroys anything that was previously on the
          * screen.
          * @param p_initialPage: initially selected page
          */
-        void init( pokemon* p_pokemon, u8 p_initialPage, bool p_allowKeyUp = true,
-                   bool p_allowKeyDown = true );
+        virtual void init( pokemon* p_pokemon, u8 p_initialPage, bool p_allowKeyUp = true,
+                           bool p_allowKeyDown = true );
 
         /*
          * @brief: Returns the number of different pages.
          */
-        constexpr u8 getPageCount( ) {
-            // TODO: Add Contest Screen
-            return 2;
+        virtual inline u8 getPageCount( ) {
+            return 3;
         }
 
         /*
          * @brief: Returns the different choices for the given page.
          */
-        constexpr u8 getDetailsPageCount( pokemon* p_pokemon, u8 p_page ) {
+        virtual inline u8 getDetailsPageCount( pokemon* p_pokemon, u8 p_page ) {
             if( p_pokemon->isEgg( ) ) { return 0; }
             if( p_page == 1 ) {
                 u8 numMoves = 0;
@@ -104,26 +106,27 @@ namespace STS {
         /*
          * @brief: Highlights the specified button.
          */
-        void highlightButton( u8 p_button = 255, bool p_bottom = true );
+        virtual void highlightButton( u8 p_button = 255, bool p_bottom = true );
 
         /*
          * @brief: Draws the specified info page for the given pokemon.
          */
-        void draw( pokemon* p_pokemon, u8 p_page );
+        virtual void draw( pokemon* p_pokemon, u8 p_page );
 
         /*
          * @brief: Draws the specified details (i.e. move details, etc) for the given page.
          */
-        void showDetails( pokemon* p_pokemon, u8 p_page, u8 p_detailsPage );
+        virtual void showDetails( pokemon* p_pokemon, u8 p_page, u8 p_detailsPage );
 
         /*
          * @brief: Draws the p_frame-th frame. Needs to be called every frame.
          */
-        void animate( );
+        virtual void animate( );
 
         /*
          * @brief: Returns information for the current buttons on the screen.
          */
-        std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( bool p_bottom = true );
+        virtual std::vector<std::pair<IO::inputTarget, u8>> getTouchPositions( bool p_bottom
+                                                                               = true );
     };
 } // namespace STS

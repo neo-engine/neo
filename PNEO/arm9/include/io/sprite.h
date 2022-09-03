@@ -204,6 +204,13 @@ namespace IO {
     u16 loadTypeIcon( BATTLE::type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
                       u16 p_tileCnt, bool p_bottom, SAVE::language p_language );
 
+    u16 loadContestTypeIcon( BATTLE::contestType p_type, const s16 p_posX, const s16 p_posY,
+                             u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
+                             SAVE::language p_language );
+    u16 loadContestTypeIcon( BATTLE::contestType p_type, const s16 p_posX, const s16 p_posY,
+                             u8 p_oamIndex, u16 p_tileCnt, bool p_bottom,
+                             SAVE::language p_language );
+
     u16 loadDamageCategoryIcon( BATTLE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
                                 u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt, bool p_bottom );
     u16 loadDamageCategoryIcon( BATTLE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,

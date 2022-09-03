@@ -166,6 +166,32 @@ bool boxPokemon::gainExperience( u32 p_amount ) {
     return true;
 }
 
+std::vector<u8> boxPokemon::getRibbons( ) const {
+    std::vector<u8> res{ };
+
+    for( u8 i = 0; i < 32; ++i ) {
+        if( m_ribbons0[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
+    }
+    for( u8 i = 0; i < 32; ++i ) {
+        if( m_ribbons1[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
+    }
+    for( u8 i = 0; i < 32; ++i ) {
+        if( m_ribbons2[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
+    }
+
+    return res;
+}
+
+void boxPokemon::awardRibbon( u8 p_ribbon ) {
+    if( p_ribbon < 32 ) {
+        m_ribbons0[ p_ribbon / 8 ] |= ( 1 << ( p_ribbon % 8 ) );
+    } else if( p_ribbon < 64 ) {
+        m_ribbons1[ ( p_ribbon - 32 ) / 8 ] |= ( 1 << ( ( p_ribbon - 32 ) % 8 ) );
+    } else {
+        m_ribbons2[ ( p_ribbon - 64 ) / 8 ] |= ( 1 << ( ( p_ribbon - 64 ) % 8 ) );
+    }
+}
+
 bool boxPokemon::isFullyEvolved( ) const {
     auto edata = FS::getPkmnEvolveData( getSpecies( ), getForme( ) );
     return !!edata.m_evolutionCount;

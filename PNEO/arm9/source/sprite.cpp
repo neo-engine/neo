@@ -40,13 +40,14 @@ unsigned int   TEMP[ 256 * 256 / 4 ] = { 0 };
 unsigned short TEMP_PAL[ 256 ]       = { 0 };
 
 namespace IO {
-    const char* OW_PATH        = "nitro:/PICS/SPRITES/OW/";
-    const char* DOOR_PATH      = "nitro:/PICS/SPRITES/DOOR/";
-    const char* OWP_PATH       = "nitro:/PICS/SPRITES/NPCP/";
-    const char* TRAINER_PATH   = "nitro:/PICS/SPRITES/NPC/";
-    const char* BERRY_PATH     = "nitro:/PICS/SPRITES/BERRIES/";
-    const char* ICON_PATH      = "nitro:/PICS/SPRITES/ICONS/";
-    const char* TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/type";
+    const char* OW_PATH                = "nitro:/PICS/SPRITES/OW/";
+    const char* DOOR_PATH              = "nitro:/PICS/SPRITES/DOOR/";
+    const char* OWP_PATH               = "nitro:/PICS/SPRITES/NPCP/";
+    const char* TRAINER_PATH           = "nitro:/PICS/SPRITES/NPC/";
+    const char* BERRY_PATH             = "nitro:/PICS/SPRITES/BERRIES/";
+    const char* ICON_PATH              = "nitro:/PICS/SPRITES/ICONS/";
+    const char* TYPE_ICON_PATH         = "nitro:/PICS/SPRITES/ICONS/TP/type";
+    const char* CONTEST_TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/ctype";
 
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/item.icon.rawb";
     FILE*       ITEM_ICON_FILE = nullptr;
@@ -943,6 +944,39 @@ namespace IO {
         if( !seekSpriteData( TYPE_ICON_FILE, p_type, 16 * 32 / 8 ) ) { return false; }
         if( !fread( TEMP, 16 * 32 / 8, sizeof( u32 ), TYPE_ICON_FILE ) ) { return false; }
         if( !fread( TEMP_PAL, 16, sizeof( u16 ), TYPE_ICON_FILE ) ) { return false; }
+
+        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, TEMP_PAL, TEMP,
+                            16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
+    }
+
+    FILE* CONTEST_TYPE_ICON_FILE          = nullptr;
+    u8    LAST_CONTEST_TYPE_ICON_LANGUAGE = 0;
+
+    u16 loadContestTypeIcon( BATTLE::contestType p_type, const s16 p_posX, const s16 p_posY,
+                             u8 p_oamIdx, u8 p_palIdx, u16 p_tileCnt, bool p_bottom,
+                             const SAVE::language p_language ) {
+        if( !FS::checkOrOpen( CONTEST_TYPE_ICON_FILE, CONTEST_TYPE_ICON_PATH,
+                              LAST_CONTEST_TYPE_ICON_LANGUAGE, p_language ) ) {
+            return false;
+        }
+        if( !seekSpriteData( CONTEST_TYPE_ICON_FILE, p_type, 16 * 32 / 8 ) ) { return false; }
+        if( !fread( TEMP, 16 * 32 / 8, sizeof( u32 ), CONTEST_TYPE_ICON_FILE ) ) { return false; }
+        if( !fread( TEMP_PAL, 16, sizeof( u16 ), CONTEST_TYPE_ICON_FILE ) ) { return false; }
+
+        return loadSprite( p_oamIdx, p_palIdx, p_tileCnt, p_posX, p_posY, 32, 16, TEMP_PAL, TEMP,
+                           16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
+    }
+
+    u16 loadContestTypeIconB( BATTLE::contestType p_type, const s16 p_posX, const s16 p_posY,
+                              u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
+                              const SAVE::language p_language ) {
+        if( !FS::checkOrOpen( CONTEST_TYPE_ICON_FILE, CONTEST_TYPE_ICON_PATH,
+                              LAST_CONTEST_TYPE_ICON_LANGUAGE, p_language ) ) {
+            return false;
+        }
+        if( !seekSpriteData( CONTEST_TYPE_ICON_FILE, p_type, 16 * 32 / 8 ) ) { return false; }
+        if( !fread( TEMP, 16 * 32 / 8, sizeof( u32 ), CONTEST_TYPE_ICON_FILE ) ) { return false; }
+        if( !fread( TEMP_PAL, 16, sizeof( u16 ), CONTEST_TYPE_ICON_FILE ) ) { return false; }
 
         return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, TEMP_PAL, TEMP,
                             16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
