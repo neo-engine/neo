@@ -144,6 +144,7 @@ More screenshots are available in the `Screens` subdirectory.
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts03.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts04.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts05.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/sts06.png)
 
 ##### The storage system
 

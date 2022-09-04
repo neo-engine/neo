@@ -91,15 +91,11 @@ namespace STS {
         /*
          * @brief: Returns the different choices for the given page.
          */
-        virtual inline u8 getDetailsPageCount( pokemon* p_pokemon, u8 p_page ) {
-            if( p_pokemon->isEgg( ) ) { return 0; }
-            if( p_page == 1 ) {
-                u8 numMoves = 0;
-                for( ; numMoves < 4; ++numMoves ) {
-                    if( !p_pokemon->getMove( numMoves ) ) { break; }
-                }
-                return numMoves;
-            }
+        virtual u8 getDetailsPageCount( pokemon* p_pokemon, u8 p_page );
+
+        virtual u8 getBtnUpDetailInc( u8 p_page ) {
+            if( p_page == 1 ) { return 2; }
+            if( p_page == 2 ) { return 6; }
             return 0;
         }
 

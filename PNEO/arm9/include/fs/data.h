@@ -226,6 +226,10 @@ namespace FS {
     BAG::itemData getItemData( const u16 p_itemId );
     bool          getItemData( const u16 p_itemId, BAG::itemData* p_out );
 
+    const char* getRibbonName( const u16 p_ribbonId );
+
+    const char* getRibbonDescr( const u16 p_ribbonId );
+
     /*
      * @brief: loads the specified variant of the specified pkmn.
      * @param p_streak: Determines IVs given to the pkmn.

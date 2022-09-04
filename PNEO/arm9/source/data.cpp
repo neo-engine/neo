@@ -89,6 +89,8 @@ namespace FS {
     const char PKMNPHRS_PATH[]      = "nitro:/STRN/PHR/phr";
     const char BADGENAME_PATH[]     = "nitro:/STRN/BDG/bdg";
     const char ACHIEVEMENT_PATH[]   = "nitro:/STRN/AVM/avm";
+    const char RIBBONNAME_PATH[]    = "nitro:/STRN/RBN/rbn";
+    const char RIBBONDSCR_PATH[]    = "nitro:/STRN/RBN/rbd";
 
     const char LOCDATA_PATH[]        = "nitro:/DATA/location.datab";
     const char MOVE_DATA_PATH[]      = "nitro:/DATA/move.datab";
@@ -712,6 +714,24 @@ namespace FS {
         static FILE* bankfile = nullptr;
         checkOrOpen( bankfile, ACHIEVEMENT_PATH, lastLang, p_language );
         if( getString( bankfile, ACHIEVEMENT_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "";
+    }
+
+    const char* getRibbonName( u16 p_stringId ) {
+        static char  st_buffer[ RIBBONNAME_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, RIBBONNAME_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, RIBBONNAME_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "";
+    }
+
+    const char* getRibbonDescr( u16 p_stringId ) {
+        static char  st_buffer[ RIBBONDSCR_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, RIBBONDSCR_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, RIBBONDSCR_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "";
     }
 

@@ -1431,6 +1431,9 @@ namespace STS {
                 IO::regularFont->printStringC( buffer, 32, 156, true );
 
                 // load up to 12 ribbons
+                for( u8 i = 0; i < 12; ++i ) {
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( i ) ].isHidden = true;
+                }
                 for( u8 r = 0; r < 12 && r < ribs.size( ); ++r ) {
                     IO::loadRibbonIcon( ribs[ r ], 40 + 48 * ( r % 4 ), 16 + 44 * ( r / 4 ),
                                         SPR_RIBBON_OAM_SUB( r ), SPR_RIBBON_PAL_SUB( r ),
@@ -1482,11 +1485,13 @@ namespace STS {
                 = ( p_button == 50 + i ) ? SPR_WINDOW_PAL_SUB : SPR_BOX_PAL_SUB;
         }
 
-        for( u8 i = 0; i < 4; ++i ) {
-            if( i == p_button ) {
-                IO::copySpritePal( MOVEBOX3_SPR_PAL, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
-            } else {
-                IO::copySpritePal( MOVEBOX1_SPR_PAL, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
+        if( _currentPage == 1 ) {
+            for( u8 i = 0; i < 4; ++i ) {
+                if( i == p_button ) {
+                    IO::copySpritePal( MOVEBOX3_SPR_PAL, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
+                } else {
+                    IO::copySpritePal( MOVEBOX1_SPR_PAL, SPR_TYPE_PAL_SUB( i ), 4, 2 * 4, true );
+                }
             }
         }
 
@@ -1543,6 +1548,16 @@ namespace STS {
                                                            oam[ SPR_MOVE_OAM_SUB( i ) ].y - 2,
                                                            oam[ SPR_MOVE_OAM_SUB( i ) ].x + 96,
                                                            oam[ SPR_MOVE_OAM_SUB( i ) ].y + 32 ),
+                                          i ) );
+            }
+        }
+
+        for( u8 i = 0; i < 12; ++i ) {
+            if( !oam[ SPR_RIBBON_OAM_SUB( i ) ].isHidden ) {
+                res.push_back( std::pair( IO::inputTarget( oam[ SPR_RIBBON_OAM_SUB( i ) ].x,
+                                                           oam[ SPR_RIBBON_OAM_SUB( i ) ].y,
+                                                           oam[ SPR_RIBBON_OAM_SUB( i ) ].x + 32,
+                                                           oam[ SPR_RIBBON_OAM_SUB( i ) ].y + 32 ),
                                           i ) );
             }
         }
@@ -1649,74 +1664,135 @@ namespace STS {
             IO::updateOAM( true );
             break;
         }
+        case 2: {
+            // show ribbon details
+            for( u8 i = 0; i < 14; ++i ) {
+                IO::Oam->oamBuffer[ SPR_MOVE_DETAILS_OAM_SUB + i ].isHidden
+                    = p_detailsPage == (u8) -1;
+            }
+
+            // hide prev/next pkmn icons
+            IO::Oam->oamBuffer[ SPR_ARROW_UP_OAM_SUB ].isHidden
+                = !_allowKeyUp || p_detailsPage != (u8) -1;
+            IO::Oam->oamBuffer[ SPR_ARROW_DOWN_OAM_SUB ].isHidden
+                = !_allowKeyDown || p_detailsPage != (u8) -1;
+            IO::Oam->oamBuffer[ SPR_NAVIGATION_OAM_SUB( 2 ) ].isHidden
+                = !_allowKeyUp || p_detailsPage != (u8) -1;
+            IO::Oam->oamBuffer[ SPR_NAVIGATION_OAM_SUB( 1 ) ].isHidden
+                = !_allowKeyDown || p_detailsPage != (u8) -1;
+
+            // hide page icons
+            for( u8 i = 0; i < getPageCount( ); ++i ) {
+                IO::Oam->oamBuffer[ SPR_PAGE_OAM_SUB( i ) ].isHidden
+                    = ( i == p_page ) || p_pokemon->isEgg( ) || p_detailsPage != (u8) -1;
+                IO::Oam->oamBuffer[ SPR_WINDOW_ICON_OAM_SUB( i ) ].isHidden
+                    = ( i == p_page ) || p_pokemon->isEgg( ) || p_detailsPage != (u8) -1;
+            }
+
+            // Clear text window
+            FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "statussub", 0,
+                                 256 * 192, true );
+
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            auto ribs = p_pokemon->m_boxdata.getRibbons( );
+            // if no ribbons, write "no ribbons" string
+
+            if( ribs.empty( ) ) [[unlikely]] {
+                IO::regularFont->printStringC( GET_STRING( IO::STR_UI_STS_NO_RIBBONS ), 128, 84,
+                                               true, IO::font::CENTER );
+                return;
+            } else {
+                snprintf( buffer, 49, GET_STRING( IO::STR_UI_STS_RIBBONS ), ribs.size( ) );
+                IO::regularFont->printStringC( buffer, 32, 156, true );
+            }
+
+            if( p_detailsPage != (u8) -1 ) {
+                // show appropriate ribbons
+
+                auto start = p_detailsPage / 12 * 12;
+                auto end   = p_detailsPage / 12 * 12 + 12;
+
+                for( u8 i = 0; i < 12; ++i ) {
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( i ) ].isHidden = true;
+                }
+
+                for( u8 r = start, i = 0; r < end && r < ribs.size( ); ++r, ++i ) {
+                    IO::loadRibbonIcon( ribs[ r ], 20 + 36 * ( i % 6 ), 84 + 36 * ( i / 6 ),
+                                        SPR_RIBBON_OAM_SUB( i ), SPR_RIBBON_PAL_SUB( i ),
+                                        IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( i ) ].gfxIndex,
+                                        true );
+                }
+
+                // highlight selected ribbon
+                IO::printRectangle(
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 1,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 1,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 31,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 2, true,
+                    IO::RED_IDX );
+                IO::printRectangle(
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 30,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 1,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 31,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 31, true,
+                    IO::RED_IDX );
+                IO::printRectangle(
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 1,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 30,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 31,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 31, true,
+                    IO::RED_IDX );
+                IO::printRectangle(
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 1,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 1,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].x + 2,
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( p_detailsPage % 12 ) ].y + 31, true,
+                    IO::RED_IDX );
+
+                // print ribbon name / dscr
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( 0, 2 );
+
+                IO::regularFont->printBreakingStringC( FS::getRibbonDescr( ribs[ p_detailsPage ] ),
+                                                       INFO_X_SUB - 8, INFO_Y_SUB + 3 - 2, 200,
+                                                       true, IO::font::LEFT, 13 );
+
+                IO::regularFont->printStringC( FS::getRibbonName( ribs[ p_detailsPage ] ),
+                                               INFO_X_SUB + 190 - 8, INFO_Y_SUB + 58 - 2, true,
+                                               IO::font::RIGHT );
+
+            } else {
+                // load up to 12 ribbons
+                for( u8 i = 0; i < 12; ++i ) {
+                    IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( i ) ].isHidden = true;
+                }
+                for( u8 r = 0; r < 12 && r < ribs.size( ); ++r ) {
+                    IO::loadRibbonIcon( ribs[ r ], 40 + 48 * ( r % 4 ), 16 + 44 * ( r / 4 ),
+                                        SPR_RIBBON_OAM_SUB( r ), SPR_RIBBON_PAL_SUB( r ),
+                                        IO::Oam->oamBuffer[ SPR_RIBBON_OAM_SUB( r ) ].gfxIndex,
+                                        true );
+                }
+            }
+
+            IO::updateOAM( true );
+            break;
+        }
         default: break;
         }
     }
-} // namespace STS
 
-//    // Draw extra information about the specified ribbon
-//    bool statusScreenUI::drawRibbon( const pokemon& p_pokemon, u8 p_ribbonIdx, bool p_bottom )
-//    {
-//        auto currPkmn = p_pokemon;
-//        auto Oam      = p_bottom ? IO::Oam : IO::OamTop;
-//        auto pal      = IO::BG_PAL( p_bottom );
-//
-//        if( p_pokemon->isEgg( ) ) return false;
-//
-//        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ TYPE_IDX + i ].isHidden = true;
-//        for( u8 i = 0; i < 4; ++i ) Oam->oamBuffer[ ATK_DMGTYPE_IDX( i ) ].isHidden = true;
-//        for( u8 i = 0; i < 12; ++i ) Oam->oamBuffer[ RIBBON_IDX + i ].isHidden = true;
-//
-//        pal[ IO::WHITE_IDX ] = IO::WHITE;
-//        pal[ IO::GRAY_IDX ]  = IO::RGB( 20, 20, 20 );
-//        pal[ IO::BLACK_IDX ] = IO::BLACK;
-//        IO::regularFont->setColor( 0, 0 );
-//        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-//        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-//        IO::boldFont->setColor( 0, 0 );
-//        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
-//        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-//
-//        u8 isNotEgg = 1;
-//        drawPkmnInformation( currPkmn, isNotEgg, false, p_bottom );
-//        if( isNotEgg == (u8) -1 ) return false;
-//
-//        IO::regularFont->printString( "Bandinfos", 32, 4, p_bottom );
-//        IO::loadSprite( PAGE_ICON_IDX, PAGE_ICON_PAL, Oam->oamBuffer[ PAGE_ICON_IDX
-//        ].gfxIndex, 0,
-//                        -5, 32, 32, atksPal, atksTiles, atksTilesLen, false, false, false,
-//                        OBJPRIORITY_0, p_bottom );
-//
-//        ribbon currRb = RibbonList[ p_ribbonIdx ];
-//
-//        u16 tileCnt = Oam->oamBuffer[ TYPE_IDX ].gfxIndex;
-//
-//        if( !IO::loadRibbonIcon( p_ribbonIdx, 226, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt,
-//                                 p_bottom ) )
-//            tileCnt = IO::loadEggIcon( 226, 28, RIBBON_IDX, TYPE_PAL( 0 ), tileCnt, p_bottom
-//            );
-//
-//        u8   nlCnt = 0;
-//        auto nStr  = FS::breakString( currRb.m_name == "" ? ( "----" ) : currRb.m_name,
-//                                     IO::regularFont, 110 );
-//        for( auto c : nStr )
-//            if( c == '\n' ) nlCnt++;
-//
-//        if( currRb.m_name == "" ) currRb.m_description = "----";
-//
-//        IO::regularFont->printString( nStr.c_str( ), 226, 39 - 7 * nlCnt, p_bottom,
-//        IO::font::RIGHT,
-//                                      14 );
-//        IO::regularFont->printString(
-//            FS::breakString( ( currRb.m_description == "" )
-//                                 ? ( p_pokemon->m_boxdata.m_fateful
-//                                         ? "Ein Band für Pokémon-Freunde."
-//                                         : "Ein Gedenk-Band. An einem mysteriösen Ort
-//                                         erhalten." )
-//                                 : currRb.m_description,
-//                             IO::regularFont, 120 )
-//                .c_str( ),
-//            250, 66, p_bottom, IO::font::RIGHT, 14 );
-//        IO::updateOAM( p_bottom );
-//        return true;
-//    }
+    u8 statusScreenUI::getDetailsPageCount( pokemon* p_pokemon, u8 p_page ) {
+        if( p_pokemon->isEgg( ) ) { return 0; }
+        if( p_page == 1 ) {
+            u8 numMoves = 0;
+            for( ; numMoves < 4; ++numMoves ) {
+                if( !p_pokemon->getMove( numMoves ) ) { break; }
+            }
+            return numMoves;
+        }
+        if( p_page == 2 ) { return p_pokemon->m_boxdata.getRibbons( ).size( ); }
+        return 0;
+    }
+
+} // namespace STS

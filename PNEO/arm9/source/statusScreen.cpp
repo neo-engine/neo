@@ -84,9 +84,9 @@ namespace STS {
 
                 if( change ) {
                     if( change == 5 ) {
-                        if( i.second < 4 ) {
+                        if( i.second < _ui->getDetailsPageCount( _pokemon, _currentPage ) ) {
                             SOUND::playSoundEffect( SFX_SELECT );
-                            _currentDetailChoice = i.second;
+                            _currentDetailChoice = _currentDetailChoice / 12 * 12 + i.second;
                             _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                             _detailsMode = true;
                         } else if( i.second >= 50 ) {
@@ -123,15 +123,17 @@ namespace STS {
                 break;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
-                _currentDetailChoice = ( _currentDetailChoice + 2 )
-                                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
+                _currentDetailChoice
+                    = ( _currentDetailChoice + _ui->getBtnUpDetailInc( _currentPage ) )
+                      % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
-                _currentDetailChoice = ( _currentDetailChoice
-                                         + _ui->getDetailsPageCount( _pokemon, _currentPage ) - 2 )
-                                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
+                _currentDetailChoice
+                    = ( _currentDetailChoice + _ui->getDetailsPageCount( _pokemon, _currentPage )
+                        - _ui->getBtnUpDetailInc( _currentPage ) )
+                      % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {

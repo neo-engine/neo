@@ -115,6 +115,8 @@ constexpr u16 DEXENTRY_NAMELENGTH = 200;
 
 constexpr u16 UISTRING_LEN    = 250;
 constexpr u16 MAPSTRING_LEN   = 800;
+constexpr u16 RIBBONNAME_LEN  = 50;
+constexpr u16 RIBBONDSCR_LEN  = 250;
 constexpr u16 BADGENAME_LEN   = 50;
 constexpr u16 ACHIEVEMENT_LEN = 100;
 constexpr u16 PKMNPHRS_LEN    = 150;

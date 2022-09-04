@@ -173,10 +173,10 @@ std::vector<u8> boxPokemon::getRibbons( ) const {
         if( m_ribbons0[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
     }
     for( u8 i = 0; i < 32; ++i ) {
-        if( m_ribbons1[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
+        if( m_ribbons1[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( 32 + i ); }
     }
     for( u8 i = 0; i < 32; ++i ) {
-        if( m_ribbons2[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
+        if( m_ribbons2[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( 64 + i ); }
     }
 
     return res;
