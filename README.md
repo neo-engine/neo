@@ -173,11 +173,11 @@ More screenshots are available in the `Screens` subdirectory.
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt07.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt08.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt09.png)
-![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt10.png)
 
 ###### Trainer battles
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt06.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt05.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/bt10.png)
 
 #### Miscellaneous
 
