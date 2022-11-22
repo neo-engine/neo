@@ -48,12 +48,12 @@ namespace BATTLE {
         static constexpr u8 NUM_ITEMS = 5;
         static constexpr u8 NUM_PKMN  = 6;
 
-        u8             m_trainerClass;
-        u8             m_AILevel;
+        u16            m_trainerClass : 8;
+        u16            m_AILevel : 8;
         u16            m_trainerBG;
         u16            m_battleBG;
-        u8             m_battlePlat1;
-        u8             m_battlePlat2;
+        u16            m_battlePlat1 : 8;
+        u16            m_battlePlat2 : 8;
         u16            m_numPokemonEasy : 3;
         u16            m_numPokemonNormal : 3;
         u16            m_numPokemonHard : 3;
