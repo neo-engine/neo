@@ -248,7 +248,7 @@ namespace IO {
     constexpr u16 STR_UI_BAG_ASK_ITEM_ACTION    = 57;
     constexpr u16 STR_UI_BAG_CHOOSE_MOVE        = 49;
     constexpr u16 STR_UI_BAG_EMPTY              = 43;
-    constexpr u16 STR_UI_BAG_ITEM_USED          = 51;
+    constexpr u16 STR_UI_BAG_ITEM_USED          = 50;
     constexpr u16 STR_UI_BAG_ITEM_WASTED        = 53;
     constexpr u16 STR_UI_BAG_PKMN_CARRIES_ITEM  = 54;
     constexpr u16 STR_UI_BAG_CHOOSE_ITEM        = 56;
