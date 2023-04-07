@@ -47,6 +47,9 @@ endif
 ifdef NOSOUND
 CFLAGS	+=	-DNO_SOUND
 endif
+ifdef NOSOUNDFADE
+CFLAGS	+=	-DNO_FADE
+endif
 ifdef FLASHCARD
 CFLAGS	+=	-DFLASHCARD
 endif

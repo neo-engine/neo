@@ -77,20 +77,24 @@ namespace SOUND {
 
     void playBGM( s16 p_id, bool p_force, bool p_fade ) {
 #ifndef NO_SOUND
+
+#ifdef NO_FADE
+        p_fade = false;
+#endif
+
         if( SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
             if( p_force ) { BGMforced = true; }
             if( BGMLoaded && p_id == currentBGM ) { return; }
             auto sseqId = SSEQ::BGMIndexForName( p_id );
             if( sseqId != SSEQ::SSEQ_NONE ) {
                 if( p_fade ) {
-                    SSEQ::fadeSwapSequence( sseqId );
+                    BGMLoaded = SSEQ::fadeSwapSequence( sseqId );
                 } else {
-                    SSEQ::playSequence( sseqId );
+                    BGMLoaded = SSEQ::playSequence( sseqId );
                 }
             }
 
-            BGMLoaded  = true;
-            currentBGM = p_id;
+            if( BGMLoaded ) { currentBGM = p_id; }
         } else if( BGMLoaded ) {
             // TODO: Fade seq instead?
             SSEQ::stopSequence( );

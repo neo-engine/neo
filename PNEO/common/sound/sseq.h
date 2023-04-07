@@ -382,7 +382,7 @@ namespace SOUND::SSEQ {
      * @brief: Stops and unloads any currently playing sequence; and then loads and starts
      * to play sequence p_seqId (fading in when p_fadeIn is true).
      */
-    void playSequence( u16 p_seqId, bool p_fadeIn = false );
+    bool playSequence( u16 p_seqId, bool p_fadeIn = false );
 
     /*
      * @brief: Schedules sequence no. p_seqId to be played next, after first fading out of
@@ -390,7 +390,7 @@ namespace SOUND::SSEQ {
      * the next spot in the to-play queue (ensuring that the corresponding sequence is
      * swapped in after the current fade out/in is completed)
      */
-    void fadeSwapSequence( u16 p_seqId );
+    bool fadeSwapSequence( u16 p_seqId );
 
     /*
      * @brief: Stops any currently playing sequence, but keeps it in storage.

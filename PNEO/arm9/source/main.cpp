@@ -6,7 +6,7 @@ file        : main.cpp
 author      : Philip Wellnitz
 description : Main ARM9 entry point
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -281,9 +281,11 @@ int main( int, char** p_argv ) {
     SAVE::startScreen( ).run( );
     IO::clearScreenConsole( false, true );
     IO::clearScreen( false, true );
-    irqSet( IRQ_VBLANK, vblankIRQ );
 
     FADE_TOP( );
+    SOUND::stopBGM( );
+
+    ANIMATE_MAP = false;
 
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
@@ -294,8 +296,12 @@ int main( int, char** p_argv ) {
     MAP::curMap->registerOnLocationChangedHandler( IO::showNewLocation );
     MAP::curMap->draw( OBJPRIORITY_2, false, HAD_NEW_GAME );
 
-    IO::showNewLocation( MAP::curMap->getCurrentLocationId( ), false );
+    // auto curLoc = MAP::curMap->getCurrentLocationId( );
+    // SOUND::onLocationChange( curLoc, false );
+    // for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+    // IO::showNewLocation( curLoc, false );
 
+    irqSet( IRQ_VBLANK, vblankIRQ );
     ANIMATE_MAP = true;
 
     IN_GAME      = true;
@@ -310,7 +316,6 @@ int main( int, char** p_argv ) {
         pressed = keysUp( );
         last    = held;
         held    = keysHeld( );
-
 #ifdef DESQUID
         if( held & KEY_L ) {
 

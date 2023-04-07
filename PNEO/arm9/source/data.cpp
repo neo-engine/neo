@@ -642,8 +642,10 @@ namespace FS {
         if( !p_f ) { return false; }
         fseek( p_f, 0, SEEK_END );
         p_data->m_size = ftell( p_f );
+
         rewind( p_f );
         p_data->m_data = malloc( p_data->m_size );
+
         if( !p_data->m_data ) { return false; }
         fread( p_data->m_data, 1, p_data->m_size, p_f );
         DC_FlushRange( p_data->m_data, p_data->m_size );

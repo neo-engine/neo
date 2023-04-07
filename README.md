@@ -106,6 +106,8 @@ to make; the exact (non-empty) value of a variable is unused.
 * `FLASHCARD` Optimize for flashcards. Uses `argv` parameters to write save game files
   (instead of writing directly to CARD memory). Typically, `FLASHCARD` builds cannot
   create/load save games in an emulator.
+* `NOSOUNDFADE` Disable fade-out/fade-in when switching BGM. Recommended for flashcard and
+  melonDS builds.
 
 Screenshots
 -----------

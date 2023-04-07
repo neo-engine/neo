@@ -221,9 +221,9 @@ static DIR_ITER *nitroFSDirOpen( struct _reent *p_r, DIR_ITER *p_dirState, const
     struct nitroDIRStruct *dirStruct = (struct nitroDIRStruct *) p_dirState->dirStruct;
     struct stat            st;
     char                   dirname[ NITRONAMELENMAX ];
-    char *                 cptr;
+    char                  *cptr;
     char                   mydirpath[ NITROMAXPATHLEN ]; // to hold copy of path string
-    char *                 dirpath = mydirpath;
+    char                  *dirpath = mydirpath;
     bool                   pathfound;
 
     if( ( cptr = strchr( p_path, ':' ) ) ) {
@@ -290,7 +290,7 @@ const char *syspaths[ 2 ] = { ".", ".." };
 static int nitroDirReset( struct _reent *, DIR_ITER *p_dirState ) {
     struct nitroDIRStruct *dirStruct = (struct nitroDIRStruct *) p_dirState->dirStruct;
     struct ROM_FNTDir      dirsubtable;
-    unsigned int *         pos = &dirStruct->pos;
+    unsigned int          *pos = &dirStruct->pos;
     nitroSubSeek(
         pos, fntOffset + ( ( dirStruct->cur_dir_id & NITRODIRMASK ) * sizeof( struct ROM_FNTDir ) ),
         SEEK_SET );
@@ -306,7 +306,7 @@ static int nitroFSDirNext( struct _reent *, DIR_ITER *p_dirState, char *p_filena
                            struct stat *p_st ) {
     unsigned char          next;
     struct nitroDIRStruct *dirStruct = (struct nitroDIRStruct *) p_dirState->dirStruct;
-    unsigned int *         pos       = &dirStruct->pos;
+    unsigned int          *pos       = &dirStruct->pos;
     if( dirStruct->spc <= 1 ) {
         if( p_st ) { p_st->st_mode = S_IFDIR; }
         if( ( dirStruct->spc == 0 )
@@ -412,7 +412,7 @@ static int nitroFSClose( struct _reent *, void * ) {
 
 static int nitroFSRead( struct _reent *, void *p_fd, char *p_data, size_t p_length ) {
     struct nitroFSStruct *fatStruct = (struct nitroFSStruct *) p_fd;
-    unsigned int *        npos      = &fatStruct->pos;
+    unsigned int         *npos      = &fatStruct->pos;
     if( *npos + p_length > fatStruct->end ) {
         p_length = fatStruct->end - *npos; // dont read past the end
     }
@@ -425,7 +425,7 @@ static int nitroFSRead( struct _reent *, void *p_fd, char *p_data, size_t p_leng
 static off_t nitroFSSeek( struct _reent *, void *p_fd, off_t p_pos, int p_dir ) {
     // need check for eof here...
     struct nitroFSStruct *fatStruct = (struct nitroFSStruct *) p_fd;
-    unsigned int *        npos      = &fatStruct->pos;
+    unsigned int         *npos      = &fatStruct->pos;
     if( p_dir == SEEK_SET ) {
         p_pos += fatStruct->start; // add start from .nds file offset
     } else if( p_dir == SEEK_END ) {
