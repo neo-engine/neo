@@ -120,6 +120,8 @@ constexpr u16 RIBBONDSCR_LEN  = 250;
 constexpr u16 BADGENAME_LEN   = 50;
 constexpr u16 ACHIEVEMENT_LEN = 100;
 constexpr u16 PKMNPHRS_LEN    = 150;
+constexpr u16 TRAINERNAME_LEN = 16;
+constexpr u16 TRAINERMSG_LEN  = 200;
 
 #undef RAND_MAX
 #define RAND_MAX 4294967295

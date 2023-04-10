@@ -41,7 +41,6 @@ namespace BATTLE {
         char m_message1[ MSG_LENGTH ];
         char m_message2[ MSG_LENGTH ];
         char m_message3[ MSG_LENGTH ];
-        char m_message4[ MSG_LENGTH ];
     };
 
     struct trainerData {
