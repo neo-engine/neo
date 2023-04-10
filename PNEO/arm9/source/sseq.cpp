@@ -119,9 +119,9 @@ namespace SOUND::SSEQ {
 
     bool playSequence( u16 p_seqId, bool p_fadeIn ) {
         if( !p_fadeIn ) {
+            if( SEQ_SWAP_IN_PROGRESS ) { ANIMATE_MAP = SEQ_SWAP_AM; }
             SEQ_SWAP_IN_PROGRESS  = false;
             NEXT_SEQUENCE_ID[ 0 ] = NEXT_SEQUENCE_ID[ 1 ] = 0;
-            ANIMATE_MAP                                   = SEQ_SWAP_AM;
         }
         auto oa     = ANIMATE_MAP;
         ANIMATE_MAP = false;
@@ -140,7 +140,7 @@ namespace SOUND::SSEQ {
         if( !FS::loadSoundSequence( &CURRENT_SEQUENCE.m_seq, seq.m_sseqId ) ) {
             CURRENT_SEQUENCE_ID  = 0;
             SEQ_SWAP_IN_PROGRESS = false;
-            ANIMATE_MAP = oa;
+            ANIMATE_MAP          = oa;
             return false;
             // DESQUID_LOG( std::string( "Sound sequence " ) + std::to_string( p_seqId )
             // + " failed." );
@@ -151,7 +151,7 @@ namespace SOUND::SSEQ {
         if( !FS::loadSoundBank( &CURRENT_SEQUENCE.m_bnk, seq.m_bank ) ) {
             CURRENT_SEQUENCE_ID  = 0;
             SEQ_SWAP_IN_PROGRESS = false;
-            ANIMATE_MAP = oa;
+            ANIMATE_MAP          = oa;
             return false;
         }
         for( u8 i = 0; i < seq.m_sampleCnt; ++i ) {
@@ -161,7 +161,7 @@ namespace SOUND::SSEQ {
             if( !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ] ) ) {
                 CURRENT_SEQUENCE_ID  = 0;
                 SEQ_SWAP_IN_PROGRESS = false;
-                ANIMATE_MAP = oa;
+                ANIMATE_MAP          = oa;
                 return false;
             }
         }
