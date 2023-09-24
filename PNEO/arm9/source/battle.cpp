@@ -74,19 +74,7 @@ namespace BATTLE {
         _opponentRuns = false;
 
         // adjust difficulty
-
-        switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
-        case 0:
-            _opponentTeamSize = _opponent.m_data.m_numPokemonEasy;
-            if( _AILevel ) { _AILevel--; }
-            break;
-        case 3:
-        default: _opponentTeamSize = _opponent.m_data.m_numPokemonNormal; break;
-        case 6:
-            _opponentTeamSize = _opponent.m_data.m_numPokemonHard;
-            if( _AILevel < 9 ) { _AILevel++; }
-            break;
-        }
+        _opponentTeamSize = _opponent.m_data.m_numPokemon;
 
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
@@ -966,12 +954,12 @@ namespace BATTLE {
                 SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerClass ) );
                 _battleUI.handleBattleEnd( true );
 
-                if( _opponent.m_data.m_moneyEarned ) {
+                if( _opponent.m_data.m_moneyMultiplier ) {
                     snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_WIN_MONEY ),
-                              _opponent.m_data.m_moneyEarned );
+                              _opponent.m_data.m_moneyMultiplier );
                     _battleUI.log( buffer );
                     WAIT( FULL_SEC );
-                    SAVE::SAV.getActiveFile( ).m_money += _opponent.m_data.m_moneyEarned;
+                    SAVE::SAV.getActiveFile( ).m_money += _opponent.m_data.m_moneyMultiplier;
                     if( SAVE::SAV.getActiveFile( ).m_money > 999'999'999 ) {
                         SAVE::SAV.getActiveFile( ).m_money = 999'999'999;
                     }
@@ -980,16 +968,16 @@ namespace BATTLE {
             if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
                 _battleUI.handleBattleEnd( false );
 
-                if( _opponent.m_data.m_moneyEarned ) {
+                if( _opponent.m_data.m_moneyMultiplier ) {
                     snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_LOSE_MONEY ),
-                              _opponent.m_data.m_moneyEarned );
+                              _opponent.m_data.m_moneyMultiplier );
                     _battleUI.log( buffer );
                     WAIT( FULL_SEC );
 
-                    if( SAVE::SAV.getActiveFile( ).m_money < _opponent.m_data.m_moneyEarned ) {
+                    if( SAVE::SAV.getActiveFile( ).m_money < _opponent.m_data.m_moneyMultiplier ) {
                         SAVE::SAV.getActiveFile( ).m_money = 0;
                     } else {
-                        SAVE::SAV.getActiveFile( ).m_money -= _opponent.m_data.m_moneyEarned;
+                        SAVE::SAV.getActiveFile( ).m_money -= _opponent.m_data.m_moneyMultiplier;
                     }
                 }
             }

@@ -76,8 +76,12 @@ namespace FS {
     const char POKEMON_SPECIES_PATH[]  = "nitro:/DATA/PKMN_SPCS/pkmnspcs";
     const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/pkmndxtr";
 
-    const char BATTLE_STRINGS_PATH[]          = "nitro:/DATA/TRNR_STRS/";
-    const char BATTLE_TRAINER_PATH[]          = "nitro:/DATA/TRNR_DATA/";
+    const char BATTLE_STRINGS_PATH[]    = "nitro:/DATA/TRNR_STRS/";
+    const char* BATTLE_TRAINER_PATHS[3] = {
+        "nitro:/DATA/TRNR_DATA/0/",
+        "nitro:/DATA/TRNR_DATA/1/",
+        "nitro:/DATA/TRNR_DATA/2/",
+    };
     const char BATTLE_FACILITY_STRINGS_PATH[] = "nitro:/DATA/BFTR_STRS/";
     const char BATTLE_FACILITY_PKMN_PATH[]    = "nitro:/DATA/BFTR_PKMN/";
     const char TCLASS_NAME_PATH[]             = "nitro:/DATA/TRNR_NAME/trnrname";
@@ -601,8 +605,13 @@ namespace FS {
             return false;
         }
 
-        FILE* f = openSplit( BATTLE_TRAINER_PATH, p_battleTrainerId, ".trnr.data" );
-        if( !f ) return false;
+        FILE* f = openSplit(
+            BATTLE_TRAINER_PATHS[ SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) / 3 ],
+            p_battleTrainerId, ".trnr.data" );
+        if( !f && SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) != 3 ) {
+            f = openSplit( BATTLE_TRAINER_PATHS[ 1 ], p_battleTrainerId, ".trnr.data" );
+        }
+        if( !f ) { return false; }
         fread( &p_out->m_data, sizeof( BATTLE::trainerData ), 1, f );
         fclose( f );
         return true;
