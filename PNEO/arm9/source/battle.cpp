@@ -998,67 +998,69 @@ namespace BATTLE {
         restoreInitialOrder( false );
         resetBattleTransformations( false );
 
-        // Check for evolutions / attack learn
+        if( p_battleEndReason == BATTLE_PLAYER_WON ) {
+            // Check for evolutions / attack learn
 
-        for( u8 i = 0; i < _playerTeamSize; ++i ) {
-            if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
-                // pkmn was elevated to a new level, check for new moves
+            for( u8 i = 0; i < _playerTeamSize; ++i ) {
+                if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
+                    // pkmn was elevated to a new level, check for new moves
 
-                FS::getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerTeam[ i ].getForme( ),
-                                   _playerPkmnOrigLevel[ i ] + 1, _playerTeam[ i ].m_level, 20,
-                                   MOVE_BUFFER );
+                    FS::getLearnMoves( _playerTeam[ i ].getSpecies( ), _playerTeam[ i ].getForme( ),
+                                       _playerPkmnOrigLevel[ i ] + 1, _playerTeam[ i ].m_level, 20,
+                                       MOVE_BUFFER );
 
-                for( u8 j = 0; j < 20; ++j ) {
-                    if( !MOVE_BUFFER[ j ] ) { break; }
-                    bool gd = true;
-                    for( u8 mv = 0; mv < 4; ++mv ) {
-                        if( _playerTeam[ i ].getMove( i ) == MOVE_BUFFER[ j ] ) { gd = false; }
-                    }
-                    if( gd ) {
-                        _battleUI.showTopMessagePkmn( &_playerTeam[ i ] );
-                        _battleUI.printTopMessage( 0, true );
-                        _playerTeam[ i ].learnMove(
-                            MOVE_BUFFER[ j ],
-                            [ & ]( const char* p_message ) {
-                                _battleUI.printTopMessage( p_message, true );
-                                WAIT( THREEHALF_SEC );
-                            },
-                            [ & ]( boxPokemon* p_pkmn, u16 ) -> u8 {
-                                IO::choiceBox cb = IO::choiceBox(
-                                    IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
-                                u8 curSel = 0;
+                    for( u8 j = 0; j < 20; ++j ) {
+                        if( !MOVE_BUFFER[ j ] ) { break; }
+                        bool gd = true;
+                        for( u8 mv = 0; mv < 4; ++mv ) {
+                            if( _playerTeam[ i ].getMove( i ) == MOVE_BUFFER[ j ] ) { gd = false; }
+                        }
+                        if( gd ) {
+                            _battleUI.showTopMessagePkmn( &_playerTeam[ i ] );
+                            _battleUI.printTopMessage( 0, true );
+                            _playerTeam[ i ].learnMove(
+                                MOVE_BUFFER[ j ],
+                                [ & ]( const char* p_message ) {
+                                    _battleUI.printTopMessage( p_message, true );
+                                    WAIT( THREEHALF_SEC );
+                                },
+                                [ & ]( boxPokemon* p_pkmn, u16 ) -> u8 {
+                                    IO::choiceBox cb = IO::choiceBox(
+                                        IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
+                                    u8 curSel = 0;
 
-                                bool canUse[ 4 ] = { 1, 1, 1, 1 };
-                                u8   rs          = cb.getResult(
-                                    [ & ]( u8 ) {
-                                        return _battleUI.showAttackSelection( p_pkmn, canUse,
-                                                                                         false );
-                                    },
-                                    [ & ]( u8 p_selection ) {
-                                        curSel = p_selection;
-                                        _battleUI.showAttackSelection( p_pkmn, canUse, false,
-                                                                                  curSel, false );
-                                    },
-                                    curSel );
+                                    bool canUse[ 4 ] = { 1, 1, 1, 1 };
+                                    u8   rs          = cb.getResult(
+                                        [ & ]( u8 ) {
+                                            return _battleUI.showAttackSelection( p_pkmn, canUse,
+                                                                                             false );
+                                        },
+                                        [ & ]( u8 p_selection ) {
+                                            curSel = p_selection;
+                                            _battleUI.showAttackSelection( p_pkmn, canUse, false,
+                                                                                      curSel, false );
+                                        },
+                                        curSel );
 
-                                if( rs < 4 ) {
-                                    return rs;
-                                } else {
-                                    return 4;
-                                }
-                            },
-                            [ & ]( const char* p_message ) {
-                                IO::yesNoBox yn;
-                                _battleUI.printTopMessage( p_message, true );
-                                return yn.getResult(
-                                           [ & ]( ) { return _battleUI.printYNMessage( 254 ); },
-                                           [ & ]( IO::yesNoBox::selection p_selection ) {
-                                               _battleUI.printYNMessage( p_selection
-                                                                         == IO::yesNoBox::NO );
-                                           } )
-                                       == IO::yesNoBox::YES;
-                            } );
-                        _battleUI.hideTopMessage( );
+                                    if( rs < 4 ) {
+                                        return rs;
+                                    } else {
+                                        return 4;
+                                    }
+                                },
+                                [ & ]( const char* p_message ) {
+                                    IO::yesNoBox yn;
+                                    _battleUI.printTopMessage( p_message, true );
+                                    return yn.getResult(
+                                               [ & ]( ) { return _battleUI.printYNMessage( 254 ); },
+                                               [ & ]( IO::yesNoBox::selection p_selection ) {
+                                                   _battleUI.printYNMessage( p_selection
+                                                                             == IO::yesNoBox::NO );
+                                               } )
+                                           == IO::yesNoBox::YES;
+                                } );
+                            _battleUI.hideTopMessage( );
+                        }
                     }
                 }
             }
@@ -1066,26 +1068,28 @@ namespace BATTLE {
         _battleUI.deinit( );
         SOUND::deinitBattleSound( );
 
-        for( u8 i = 0; i < _playerTeamSize; ++i ) {
-            if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
-                // Check for evolution
+        if( p_battleEndReason == BATTLE_PLAYER_WON ) {
+            for( u8 i = 0; i < _playerTeamSize; ++i ) {
+                if( _playerTeam[ i ].m_level != _playerPkmnOrigLevel[ i ] ) {
+                    // Check for evolution
 
-                auto edata = FS::getPkmnEvolveData( _playerTeam[ i ].getSpecies( ),
-                                                    _playerTeam[ i ].getForme( ) );
+                    auto edata = FS::getPkmnEvolveData( _playerTeam[ i ].getSpecies( ),
+                                                        _playerTeam[ i ].getForme( ) );
 
-                u8 ev = 0;
-                if( _playerTeam[ i ].getItem( ) != I_EVERSTONE
-                    && ( ev = _playerTeam[ i ].canEvolve( 0, EVOMETHOD_LEVEL_UP, &edata ) ) ) {
+                    u8 ev = 0;
+                    if( _playerTeam[ i ].getItem( ) != I_EVERSTONE
+                        && ( ev = _playerTeam[ i ].canEvolve( 0, EVOMETHOD_LEVEL_UP, &edata ) ) ) {
 
-                    u16 oldsp = _playerTeam[ i ].getSpecies( );
-                    u8  oldfm = _playerTeam[ i ].getForme( );
-                    u16 newsp = edata.m_evolutions[ ev - 1 ].m_target;
-                    u8  newfm = edata.m_evolutions[ ev - 1 ].m_targetForme;
+                        u16 oldsp = _playerTeam[ i ].getSpecies( );
+                        u8  oldfm = _playerTeam[ i ].getForme( );
+                        u16 newsp = edata.m_evolutions[ ev - 1 ].m_target;
+                        u8  newfm = edata.m_evolutions[ ev - 1 ].m_targetForme;
 
-                    if( IO::ANIM::evolvePkmn(
-                            oldsp, oldfm, newsp, newfm, _playerTeam[ i ].isShiny( ),
-                            _playerTeam[ i ].isFemale( ), _playerTeam[ i ].getPid( ), true ) ) {
-                        _playerTeam[ i ].evolve( );
+                        if( IO::ANIM::evolvePkmn(
+                                oldsp, oldfm, newsp, newfm, _playerTeam[ i ].isShiny( ),
+                                _playerTeam[ i ].isFemale( ), _playerTeam[ i ].getPid( ), true ) ) {
+                            _playerTeam[ i ].evolve( );
+                        }
                     }
                 }
             }
@@ -1479,16 +1483,16 @@ namespace BATTLE {
             bs.setBoost( SDEF, 2 );
             boost = true;
             break;
-            [[unlikely]] case I_NION_BERRY : {
-                bs = _field.getBoosts( p_target.first, p_target.second );
-                if( bs.negative( ) != boosts( ) ) {
-                    bs    = bs.negative( ).invert( );
-                    boost = true;
-                } else {
-                    _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
-                }
-                break;
+        [[unlikely]] case I_NION_BERRY: {
+            bs = _field.getBoosts( p_target.first, p_target.second );
+            if( bs.negative( ) != boosts( ) ) {
+                bs    = bs.negative( ).invert( );
+                boost = true;
+            } else {
+                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
             }
+            break;
+        }
 
         case I_BLUE_FLUTE:
             remitem = false;
@@ -1514,15 +1518,16 @@ namespace BATTLE {
         case I_YELLOW_FLUTE:
             remitem = false;
             [[fallthrough]];
-            [[unlikely]] case I_RIE_BERRY : case I_PERSIM_BERRY : if( volst & VS_CONFUSION ) {
+        [[unlikely]] case I_RIE_BERRY:
+        case I_PERSIM_BERRY:
+            if( volst & VS_CONFUSION ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              VS_CONFUSION );
                 auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_CONFUSION_HEALED ) );
                 snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                           _battleUI.getPkmnName( pkmn, p_target.first ).c_str( ) );
                 _battleUI.log( buffer );
-            }
-            else {
+            } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
@@ -1530,11 +1535,11 @@ namespace BATTLE {
         case I_RED_FLUTE:
             remitem = false;
             [[fallthrough]];
-            [[unlikely]] case I_GARC_BERRY : if( volst & VS_ATTRACT ) {
+        [[unlikely]] case I_GARC_BERRY:
+            if( volst & VS_ATTRACT ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              VS_ATTRACT );
-            }
-            else {
+            } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
             }
             break;

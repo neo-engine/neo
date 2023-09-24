@@ -884,11 +884,7 @@ namespace MAP {
                 BATTLE::battle bt
                     = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                       SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr, policy );
-                if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
-                    registers[ 0 ] = 0;
-                } else {
-                    registers[ 0 ] = 1;
-                }
+                auto result = bt.start( );
 
                 FADE_TOP_DARK( );
                 IO::init( );
@@ -897,6 +893,14 @@ namespace MAP {
                                          SAVE::SAV.getActiveFile( ).m_playerPriority = playerPrio );
                 SOUND::restartBGM( );
                 ANIMATE_MAP = true;
+
+                // set result register here to avoid weird interactions with the draw call
+                // and level scripts.
+                if( result == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+                    registers[ 0 ] = 0;
+                } else {
+                    registers[ 0 ] = 1;
+                }
                 break;
             }
             case BTRR:
@@ -1847,7 +1851,7 @@ namespace MAP {
                                     ? !( rand( ) & 127 )
                                     : !( rand( ) & 2047 );
                 bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
-                       BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+                    BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
                 wildPkmnType btType
                     = SAVE::SAV.getActiveFile( ).m_player.m_movement == SURF ? WATER : GRASS;
