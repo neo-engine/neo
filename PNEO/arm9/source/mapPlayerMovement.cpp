@@ -6,7 +6,7 @@ file        : mapPlayerMovement.cpp
 author      : Philip Wellnitz
 description : Map drawing engine: functions related to moving the player
 
-Copyright (C) 2022 - 2022
+Copyright (C) 2022 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
