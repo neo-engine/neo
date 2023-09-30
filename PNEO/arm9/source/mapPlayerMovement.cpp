@@ -92,7 +92,8 @@ namespace MAP {
                     for( u8 d = 1;
                          d < dist( p_globX, p_globY, o.second.m_pos.m_posX, o.second.m_pos.m_posY );
                          ++d ) {
-                        if( !canMove( stpos, trainerDir, WALK, true ) ) {
+                        if( !canMove( stpos, trainerDir, WALK, true )
+                            && !canMove( stpos, trainerDir, SURF, true ) ) {
                             pathblocked = true;
                             break;
                         }
