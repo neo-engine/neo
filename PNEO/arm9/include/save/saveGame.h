@@ -83,8 +83,14 @@ namespace SAVE {
     constexpr u8 V_SLATEPORT_BATTLE_TENT_STREAK = 2;
     constexpr u8 V_UNUSED_BATTLE_TENT_STREAK_1  = 3;
     constexpr u8 V_UNUSED_BATTLE_TENT_STREAK_2  = 4;
-    constexpr u8 V_BATTLE_FACTORY_50_STREAK     = 20;
-    constexpr u8 V_BATTLE_FACTORY_100_STREAK    = 21;
+
+    constexpr u8 V_CRYSTAL_CAVERN_1 = 10;
+    constexpr u8 V_CRYSTAL_CAVERN_2 = 11;
+    constexpr u8 V_CRYSTAL_CAVERN_3 = 12;
+    constexpr u8 V_CRYSTAL_CAVERN_4 = 13;
+
+    constexpr u8 V_BATTLE_FACTORY_50_STREAK                   = 20;
+    constexpr u8 V_BATTLE_FACTORY_100_STREAK                  = 21;
     constexpr u8 V_UNUSED_BATTLE_FACILITY_1_50_STREAK         = 22;
     constexpr u8 V_UNUSED_BATTLE_FACILITY_1_100_STREAK        = 23;
     constexpr u8 V_UNUSED_BATTLE_FACILITY_2_50_STREAK         = 24;
@@ -99,6 +105,8 @@ namespace SAVE {
     constexpr u8 V_UNUSED_BATTLE_FACILITY_6_100_STREAK        = 33;
     constexpr u8 V_UNUSED_BATTLE_FACILITY_6_50_DOUBLE_STREAK  = 34;
     constexpr u8 V_UNUSED_BATTLE_FACILITY_6_100_DOUBLE_STREAK = 35;
+    constexpr u8 V_SHOAL_CAVE                                 = 36;
+    constexpr u8 V_HALL_OF_FAME_VICTORIES                     = 37;
 
     enum gameType {
         UNUSED   = 0,
