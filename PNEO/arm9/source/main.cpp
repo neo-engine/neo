@@ -479,6 +479,7 @@ START:
     delete MAP::curMap;
 
     if( RESET_GAME ) {
+        SOUND::stopBGM( );
         RESET_GAME = false;
         goto START;
     }

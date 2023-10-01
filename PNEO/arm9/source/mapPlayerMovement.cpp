@@ -1029,7 +1029,7 @@ namespace MAP {
         if( ( ( oldMapType & INSIDE ) && ( newMapType & INSIDE ) && p_type == CAVE_ENTRY ) ) {
             swiWaitForVBlank( );
             swiWaitForVBlank( );
-            stopPlayer( DOWN );
+            stopPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
             stopPlayer( );
         }
 
@@ -1091,7 +1091,10 @@ namespace MAP {
         }
 
         if( ( ( oldMapType & INSIDE ) && ( newMapType & INSIDE ) && p_type == CAVE_ENTRY ) ) {
-            if( behave != BEH_WARP_ON_WALK_DOWN ) { stopPlayer( DOWN ); }
+            if( behave != BEH_WARP_ON_WALK_DOWN ) {
+                stopPlayer( SAVE::SAV.getActiveFile( ).m_player.m_direction );
+                stopPlayer( );
+            }
         }
 
         bool oldforce  = _forceNoFollow;

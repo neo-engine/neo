@@ -177,6 +177,7 @@ namespace SOUND {
         case TC_MAGMA_ADMIN:
         case TC_TEAM_MAGMA: return BGM_VICTORY_TEAM_AM_GRUNT;
         case TC_FRONTIER_BRAIN: return BGM_VICTORY_FRONTIER_BRAIN;
+        case TC_CHAMPION: return BGM_VICTORY_CHAMPION;
         default: return BGM_VICTORY_TRAINER;
         }
 #endif
