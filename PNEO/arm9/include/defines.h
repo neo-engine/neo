@@ -145,6 +145,7 @@ extern bool SCREENS_SWAPPED;
 extern bool PLAYER_IS_FISHING;
 extern bool INIT_NITROFS;
 extern bool HAD_NEW_GAME;
+extern bool RESET_GAME;
 
 extern char** ARGV;
 

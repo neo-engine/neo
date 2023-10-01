@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2022
+    Copyright (C) 2012 - 2023
     Philip Wellnitz
 
     This file is part of Pokémon neo.
@@ -375,6 +375,10 @@ namespace SAVE {
                 m_caughtPkmn[ p_pokemon / 8 ] |= 1 << ( p_pokemon % 8 );
 
                 if( localDexCompleted( ) ) { m_achievements |= ACHIEVEMENT_DEX; }
+            }
+
+            inline void registerAchievement( u8 p_achievement ) {
+                m_achievements |= p_achievement;
             }
 
             /*

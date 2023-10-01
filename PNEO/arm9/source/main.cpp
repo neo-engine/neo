@@ -86,6 +86,7 @@ bool          TWL_CONFIG        = false;
 bool          IN_GAME           = false;
 bool          RTC_BAD           = false;
 bool          HAD_NEW_GAME      = false;
+bool          RESET_GAME        = false;
 
 char** ARGV;
 
@@ -222,6 +223,7 @@ void vblankIRQ( ) {
 }
 
 int main( int, char** p_argv ) {
+START:
     // TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
     //                && ( *(u8*) 0x02000402 == 0 ) && ( *(u8*) 0x02000404 == 0 ) );
 
@@ -310,6 +312,7 @@ int main( int, char** p_argv ) {
     cooldown     = COOLDOWN_COUNT;
     u8 heldcnt   = 0;
     loop( ) {
+        if( RESET_GAME ) { break; }
         scanKeys( );
         touchRead( &touch );
         swiWaitForVBlank( );
@@ -474,5 +477,11 @@ int main( int, char** p_argv ) {
         // End
     }
     delete MAP::curMap;
+
+    if( RESET_GAME ) {
+        RESET_GAME = false;
+        goto START;
+    }
+
     return 0;
 }

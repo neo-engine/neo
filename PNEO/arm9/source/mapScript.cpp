@@ -6,7 +6,7 @@ file        : mapScript.cpp
 author      : Philip Wellnitz
 description : Map script engine
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -80,6 +80,8 @@ namespace MAP {
     constexpr u8 CLL_HOURS_MOD       = 15; // current time (hours) % par1 (used for
                                            // shoal cave
     constexpr u8 CLL_PLAYTIME_HOURS = 16;
+    constexpr u8 CLL_HALL_OF_FAME   = 17; // register current party in hall of fame, save
+                                          // game, warp home
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;
@@ -1488,6 +1490,84 @@ namespace MAP {
                 case CLL_PLAYTIME_HOURS: {
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_playTime.m_hours;
                     break;
+                }
+                case CLL_HALL_OF_FAME: {
+                    // fade screen
+                    // set current player position to position home
+                    removeFollowPkmn( );
+                    ANIMATE_MAP = false;
+
+                    SAVE::SAV.getActiveFile( ).m_currentMap         = 20;
+                    SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::DOWN;
+
+                    if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                        // TODO: move to FSINFO
+                        SAVE::SAV.getActiveFile( ).m_player = MAP::mapPlayer(
+                            { 0x2b, 0x89, 3 }, u16( 10 * SAVE::SAV.getActiveFile( ).m_appearance ),
+                            MAP::moveMode::WALK );
+                    } else {
+                        // TODO: move to FSINFO
+                        SAVE::SAV.getActiveFile( ).m_player = MAP::mapPlayer(
+                            { 0x31, 0xa9, 3 }, u16( 10 * SAVE::SAV.getActiveFile( ).m_appearance ),
+                            MAP::moveMode::WALK );
+                    }
+
+                    // heal party pkmn
+                    for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+                        auto tmp = SAVE::SAV.getActiveFile( ).getTeamPkmn( i );
+                        if( tmp ) { tmp->heal( ); }
+                    }
+
+                    // add star to trainers card (if it doesn't exist already)
+                    SAVE::SAV.getActiveFile( ).registerAchievement(
+                        SAVE::saveGame::playerInfo::ACHIEVEMENT_HALL_OF_FAME );
+
+                    // add achievement
+                    SAVE::SAV.getActiveFile( ).m_lastAchievementDate  = SAVE::CURRENT_DATE;
+                    SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = 9; // hall of fame
+                                                                           // message
+
+                    // save game
+                    u16 lst = -1;
+                    if( FS::writeSave( ARGV[ 0 ], [ & ]( u16 p_perc, u16 p_total ) {
+                            u16 stat = p_perc * 18 / p_total;
+                            if( stat != lst ) {
+                                lst = stat;
+                                IO::printMessage( 0, MSG_INFO_NOCLOSE );
+                                std::string buf2 = "";
+                                for( u8 i = 0; i < stat; ++i ) {
+                                    buf2 += "\x03";
+                                    if( i % 3 == 2 ) { buf2 += " "; }
+                                }
+                                for( u8 i = stat; i < 18; ++i ) {
+                                    buf2 += "\x04";
+                                    if( i % 3 == 2 ) { buf2 += " "; }
+                                }
+                                snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
+                                IO::printMessage( buffer, MSG_INFO_NOCLOSE, true );
+                            }
+                        } ) ) {
+                        IO::printMessage( 0, MSG_INFO_NOCLOSE );
+                        SOUND::playSoundEffect( SFX_SAVE );
+                        IO::printMessage( GET_STRING( 94 ), MSG_INFO );
+                    } else {
+                        IO::printMessage( 0, MSG_INFO_NOCLOSE );
+                        IO::printMessage( GET_STRING( 95 ), MSG_INFO );
+                    }
+
+                    IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+                    videoSetMode( MODE_5_2D );
+                    IO::clearScreen( true, true, true );
+                    IO::initVideo( true );
+                    IO::initOAMTable( true );
+                    IO::initOAMTable( false );
+                    bgUpdate( );
+
+                    // show hall of fame screen
+                    // show credits
+                    // reset game
+                    RESET_GAME = true;
+                    return;
                 }
                 default: break;
                 }
