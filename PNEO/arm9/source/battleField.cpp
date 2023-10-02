@@ -975,7 +975,12 @@ namespace BATTLE {
                 case A_UNNERVE:
                     p_ui->logAbility( getPkmnOrDisguise( p_opponent, p_slot ), p_opponent );
                     break;
-
+                case A_DISGUISE: {
+                    if( pkmn->getForme( ) == 0 ) {
+                        p_ui->logAbility( getPkmnOrDisguise( p_opponent, p_slot ), p_opponent );
+                    }
+                    break;
+                }
                 // Stat changing abilities
                 case A_DAUNTLESS_SHIELD: {
                     p_ui->logAbility( getPkmnOrDisguise( p_opponent, p_slot ), p_opponent );
@@ -3860,45 +3865,88 @@ namespace BATTLE {
             }
         }
 
-        damagePokemon( p_ui, p_target.first, p_target.second, damage );
+        // check for substitute (TODO) and A_DISGUISE
+        if( !supprAbs && target->getAbility( ) == A_DISGUISE && !target->getForme( ) ) {
+            p_ui->logAbility( getPkmnOrDisguise( p_target.first, p_target.second ),
+                              p_target.first );
+            target->setBattleForme( 1 );
+            p_ui->updatePkmn( p_target.first, p_target.second,
+                              getPkmnOrDisguise( p_target.first, p_target.second ) );
+        } else {
+            damagePokemon( p_ui, p_target.first, p_target.second, damage );
 
-        if( effectiveness > 100 ) {
-            auto fmt = std::string( GET_STRING( 285 ) );
-            snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                      p_ui->getPkmnName( getPkmnOrDisguise( p_target.first, p_target.second ),
-                                         p_target.first, false )
-                          .c_str( ) );
-            p_ui->log( buffer );
-        } else if( effectiveness < 100 ) {
-            auto fmt = std::string( GET_STRING( 286 ) );
-            snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                      p_ui->getPkmnName( getPkmnOrDisguise( p_target.first, p_target.second ),
-                                         p_target.first, false )
-                          .c_str( ) );
-            p_ui->log( buffer );
-        }
-
-        if( p_critical ) { p_ui->log( GET_STRING( 291 ) ); }
-
-        // Calculate recoil / drain
-
-        if( p_move.m_moveData.m_drain ) {
-            u32 amount = damage * p_move.m_moveData.m_drain / 240;
-            if( canUseItem( p_move.m_user.first, p_move.m_user.second )
-                && user->getItem( ) == I_BIG_ROOT ) {
-                amount = 13 * amount / 10;
+            if( effectiveness > 100 ) {
+                auto fmt = std::string( GET_STRING( 285 ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( getPkmnOrDisguise( p_target.first, p_target.second ),
+                                             p_target.first, false )
+                              .c_str( ) );
+                p_ui->log( buffer );
+            } else if( effectiveness < 100 ) {
+                auto fmt = std::string( GET_STRING( 286 ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName( getPkmnOrDisguise( p_target.first, p_target.second ),
+                                             p_target.first, false )
+                              .c_str( ) );
+                p_ui->log( buffer );
             }
-            if( !amount ) { amount = 1; }
 
-            if( !suppressesAbilities( ) && target->getAbility( ) == A_LIQUID_OOZE ) {
-                p_ui->logAbility( getPkmnOrDisguise( p_target.first, p_target.second ),
-                                  p_target.first );
+            if( p_critical ) { p_ui->log( GET_STRING( 291 ) ); }
+
+            // Calculate recoil / drain
+
+            if( p_move.m_moveData.m_drain ) {
+                u32 amount = damage * p_move.m_moveData.m_drain / 240;
+                if( canUseItem( p_move.m_user.first, p_move.m_user.second )
+                    && user->getItem( ) == I_BIG_ROOT ) {
+                    amount = 13 * amount / 10;
+                }
+                if( !amount ) { amount = 1; }
+
+                if( !suppressesAbilities( ) && target->getAbility( ) == A_LIQUID_OOZE ) {
+                    p_ui->logAbility( getPkmnOrDisguise( p_target.first, p_target.second ),
+                                      p_target.first );
+                    damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
+                } else if( !( userVolStat & VS_HEALBLOCK ) ) {
+                    if( user->m_stats.m_curHP < user->m_stats.m_maxHP ) {
+                        healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
+
+                        auto fmt = std::string( GET_STRING( 288 ) );
+                        snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                                  p_ui->getPkmnName( getPkmnOrDisguise( p_move.m_user.first,
+                                                                        p_move.m_user.second ),
+                                                     p_move.m_user.first )
+                                      .c_str( ) );
+                        p_ui->log( buffer );
+                    }
+                }
+            }
+
+            if( p_move.m_moveData.m_recoil ) {
+                u32 amount = damage * p_move.m_moveData.m_recoil / 240;
+                if( !amount ) { amount = 1; }
+
                 damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
-            } else if( !( userVolStat & VS_HEALBLOCK ) ) {
-                if( user->m_stats.m_curHP < user->m_stats.m_maxHP ) {
+
+                auto fmt = std::string( GET_STRING( 287 ) );
+                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                          p_ui->getPkmnName(
+                                  getPkmnOrDisguise( p_move.m_user.first, p_move.m_user.second ),
+                                  p_move.m_user.first )
+                              .c_str( ) );
+                p_ui->log( buffer );
+            }
+
+            // Shell bell
+            if( user->canBattle( ) && canUseItem( p_move.m_user.first, p_move.m_user.second )
+                && user->getItem( ) == I_SHELL_BELL ) {
+                if( !( userVolStat & VS_HEALBLOCK ) ) {
+                    u32 amount = damage / 8;
+                    if( !amount ) { amount = 1; }
+
                     healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
-                    auto fmt = std::string( GET_STRING( 288 ) );
+                    auto fmt = std::string( GET_STRING( 533 ) );
                     snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmnOrDisguise( p_move.m_user.first,
                                                                     p_move.m_user.second ),
@@ -3907,33 +3955,15 @@ namespace BATTLE {
                     p_ui->log( buffer );
                 }
             }
-        }
 
-        if( p_move.m_moveData.m_recoil ) {
-            u32 amount = damage * p_move.m_moveData.m_recoil / 240;
-            if( !amount ) { amount = 1; }
+            // Life orb recoil
+            if( user->canBattle( ) && canUseItem( p_move.m_user.first, p_move.m_user.second )
+                && user->getItem( ) == I_LIFE_ORB ) {
 
-            damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
+                damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
+                               user->m_stats.m_maxHP / 16 );
 
-            auto fmt = std::string( GET_STRING( 287 ) );
-            snprintf(
-                buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                p_ui->getPkmnName( getPkmnOrDisguise( p_move.m_user.first, p_move.m_user.second ),
-                                   p_move.m_user.first )
-                    .c_str( ) );
-            p_ui->log( buffer );
-        }
-
-        // Shell bell
-        if( user->canBattle( ) && canUseItem( p_move.m_user.first, p_move.m_user.second )
-            && user->getItem( ) == I_SHELL_BELL ) {
-            if( !( userVolStat & VS_HEALBLOCK ) ) {
-                u32 amount = damage / 8;
-                if( !amount ) { amount = 1; }
-
-                healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
-
-                auto fmt = std::string( GET_STRING( 533 ) );
+                auto fmt = std::string( GET_STRING( 306 ) );
                 snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                           p_ui->getPkmnName(
                                   getPkmnOrDisguise( p_move.m_user.first, p_move.m_user.second ),
@@ -3941,26 +3971,10 @@ namespace BATTLE {
                               .c_str( ) );
                 p_ui->log( buffer );
             }
+
+            // check for things that trigger when causing damage
+            checkOnTakeDamage( p_ui, p_move, p_target, damage, effectiveness );
         }
-
-        // Life orb recoil
-        if( user->canBattle( ) && canUseItem( p_move.m_user.first, p_move.m_user.second )
-            && user->getItem( ) == I_LIFE_ORB ) {
-
-            damagePokemon( p_ui, p_move.m_user.first, p_move.m_user.second,
-                           user->m_stats.m_maxHP / 16 );
-
-            auto fmt = std::string( GET_STRING( 306 ) );
-            snprintf(
-                buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                p_ui->getPkmnName( getPkmnOrDisguise( p_move.m_user.first, p_move.m_user.second ),
-                                   p_move.m_user.first )
-                    .c_str( ) );
-            p_ui->log( buffer );
-        }
-
-        // check for things that trigger when causing damage
-        checkOnTakeDamage( p_ui, p_move, p_target, damage, effectiveness );
 
         if( !getPkmn( p_target.first, p_target.second )->canBattle( ) ) {
             // pkmn fainted

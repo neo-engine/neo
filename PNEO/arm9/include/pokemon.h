@@ -398,7 +398,7 @@ struct pokemon {
              u8 p_ball = 3, u8 p_pokerus = 0, u8 p_forme = 0 );
 
     inline pkmnSpriteInfo getSpriteInfo( bool p_flipX = false ) {
-        return m_boxdata.getSpriteInfo( p_flipX );
+        return { getSpecies( ), getForme( ), isFemale( ), isShiny( ), p_flipX, getPid( ) };
     }
 
     /*
