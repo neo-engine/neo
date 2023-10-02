@@ -50,12 +50,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
 #define MAX_SCRIPT_SIZE 128
     // opcode : u8, param1 : u8, param2 : u8, param3 : u8
+    // opcode : u8, param1x : u11, param2x : u5, param3x : u8
     // opcode : u8, param1s : u5, param2s : u5, param3s : u14
     // opcode : u8, paramA : u12, paramB : u12
 #define OPCODE( p_ins )  ( ( p_ins ) >> 24 )
 #define PARAM1( p_ins )  ( ( ( p_ins ) >> 16 ) & 0xFF )
 #define PARAM2( p_ins )  ( ( ( p_ins ) >> 8 ) & 0xFF )
 #define PARAM3( p_ins )  ( ( p_ins ) & ( 0xFF ) )
+#define PARAM1X( p_ins ) ( ( ( p_ins ) >> 13 ) & 0x7FF )
+#define PARAM2X( p_ins ) ( ( ( p_ins ) >> 8 ) & 0x1F )
+#define PARAM3X( p_ins ) ( ( p_ins ) & ( 0xFF ) )
 #define PARAM1S( p_ins ) ( ( ( p_ins ) >> 19 ) & 0x1F )
 #define PARAM2S( p_ins ) ( ( ( p_ins ) >> 14 ) & 0x1F )
 #define PARAM3S( p_ins ) ( ( p_ins ) & ( 0x3FFF ) )
@@ -351,6 +355,9 @@ namespace MAP {
             u8   par1  = PARAM1( SCRIPT_INS[ pc ] );
             u8   par2  = PARAM2( SCRIPT_INS[ pc ] );
             u8   par3  = PARAM3( SCRIPT_INS[ pc ] );
+            u16  par1x = PARAM1X( SCRIPT_INS[ pc ] );
+            u8   par2x = PARAM2X( SCRIPT_INS[ pc ] );
+            u8   par3x = PARAM3X( SCRIPT_INS[ pc ] );
             u8   par1s = PARAM1S( SCRIPT_INS[ pc ] );
             u8   par2s = PARAM2S( SCRIPT_INS[ pc ] );
             u16  par3s = PARAM3S( SCRIPT_INS[ pc ] );
@@ -552,21 +559,21 @@ namespace MAP {
                 break;
             }
             case CFL: {
-                if( SAVE::SAV.getActiveFile( ).checkFlag( par1 ) == par2 ) { pc += par3; }
+                if( SAVE::SAV.getActiveFile( ).checkFlag( par1x ) == par2x ) { pc += par3x; }
                 break;
             }
             case SFL: {
-                SAVE::SAV.getActiveFile( ).setFlag( par1, par2 );
+                SAVE::SAV.getActiveFile( ).setFlag( par1x, par2x );
                 break;
             }
             case STF: {
-                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_TRAINER_BATTLED( par1 ), par2 );
+                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_TRAINER_BATTLED( par1x ), par2x );
                 break;
             }
             case CTF: {
-                if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED( par1 ) )
-                    == par2 ) {
-                    pc += par3;
+                if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_TRAINER_BATTLED( par1x ) )
+                    == par2x ) {
+                    pc += par3x;
                 }
                 break;
             }
@@ -725,13 +732,13 @@ namespace MAP {
                 break;
             }
             case CFLR: {
-                if( SAVE::SAV.getActiveFile( ).checkFlag( par1 ) == registers[ par2 ] ) {
-                    pc += par3;
+                if( SAVE::SAV.getActiveFile( ).checkFlag( par1x ) == registers[ par2x ] ) {
+                    pc += par3x;
                 }
                 break;
             }
             case SFLR: {
-                SAVE::SAV.getActiveFile( ).setFlag( par1, registers[ par2 ] );
+                SAVE::SAV.getActiveFile( ).setFlag( par1x, registers[ par2x ] );
                 break;
             }
 
