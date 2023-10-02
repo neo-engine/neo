@@ -262,9 +262,11 @@ namespace MAP {
         u8        _playerFollowPkmnSprite = 255; // id of the pkmn ow sprite that follows the player
         bool      _pkmnFollowsPlayer      = false;
         mapObject _followPkmn;
-        bool      _forceNoFollow         = false;
-        pokemon*  _followPkmnData        = nullptr;
-        pkmnData* _followPkmnSpeciesData = nullptr;
+        bool      _forceNoFollow            = false;
+        pokemon*  _followPkmnData           = nullptr;
+        pkmnData* _followPkmnSpeciesData    = nullptr;
+        bool      _followPkmnIsDisguised    = false;
+        bool      _followPkmnDisguiseBusted = false;
 
         bool _strengthUsed; // Player has used HM Strength and can move boulders
 

@@ -1624,6 +1624,15 @@ namespace MAP {
         direction d = direction( ( SAVE::SAV.getActiveFile( ).m_player.m_direction + 2 ) % 4 );
         _mapSprites.setFrameD( _playerFollowPkmnSprite, d );
 
+        // if follow pkmn is disguised, undisguise it
+        if( _followPkmnIsDisguised ) {
+            _followPkmnIsDisguised    = false;
+            _followPkmnDisguiseBusted = true;
+            updateFollowPkmn( );
+            _followPkmnIsDisguised    = true;
+            _followPkmnDisguiseBusted = false;
+        }
+
         // play pkmn cry
         SOUND::playCry( _followPkmnData->getSpecies( ), _followPkmnData->getForme( ) );
 

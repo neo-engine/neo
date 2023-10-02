@@ -295,7 +295,7 @@ namespace BATTLE {
          * @brief: Faints the specified pokemon. Also deals the necessary damage.
          */
         inline void faintPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot ) {
-            auto pkmn = getPkmn( p_opponent, p_slot );
+            auto pkmn = getPkmnOrDisguise( p_opponent, p_slot );
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].faintPokemon( p_slot );
             p_ui->updatePkmnStats( p_opponent, p_slot, pkmn, false );
             p_ui->faintPkmn( p_opponent, p_slot, pkmn );
@@ -306,7 +306,8 @@ namespace BATTLE {
          */
         inline void recallPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot,
                                    bool p_keepChanges = false, bool p_forced = false ) {
-            p_ui->recallPkmn( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), p_forced );
+            p_ui->recallPkmn( p_opponent, p_slot, getPkmnOrDisguise( p_opponent, p_slot ),
+                              p_forced );
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].recallPokemon( p_slot,
                                                                               p_keepChanges );
         }
@@ -317,7 +318,8 @@ namespace BATTLE {
          */
         inline void damagePokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_damage ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].damagePokemon( p_slot, p_damage );
-            p_ui->updatePkmnStats( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), false );
+            p_ui->updatePkmnStats( p_opponent, p_slot, getPkmnOrDisguise( p_opponent, p_slot ),
+                                   false );
         }
 
         /*
@@ -325,7 +327,8 @@ namespace BATTLE {
          */
         inline void healPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_damage ) {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].healPokemon( p_slot, p_damage );
-            p_ui->updatePkmnStats( p_opponent, p_slot, getPkmn( p_opponent, p_slot ), false );
+            p_ui->updatePkmnStats( p_opponent, p_slot, getPkmnOrDisguise( p_opponent, p_slot ),
+                                   false );
         }
 
         /*
@@ -417,13 +420,34 @@ namespace BATTLE {
             _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setSlot( p_slot, p_pokemon );
         }
 
+        inline void setSlotDisguise( bool p_opponent, u8 p_slot, const pokemon* p_pokemon ) {
+            _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].setSlotDisguise( p_slot, p_pokemon );
+        }
+
+        inline u8 willDisguise( pokemon*      p_pokemon,
+                                const pokemon p_teamContext[ SAVE::NUM_PARTY_SLOTS ] ) {
+            if( p_pokemon->getAbility( ) != A_ILLUSION ) { return 0; }
+
+            for( u8 i = SAVE::NUM_PARTY_SLOTS - 1; i > 0; --i ) {
+                if( p_teamContext[ i ].getAbility( ) == A_ILLUSION ) { return 0; }
+                if( p_teamContext[ i ].getSpecies( ) && p_teamContext[ i ].canBattle( ) ) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
         /*
          * @brief: Sends out a new pokemon to a slot, overriding anything that was there
          * beforehand
          */
-        inline bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, pokemon* p_pokemon ) {
+        inline bool sendPokemon( battleUI* p_ui, bool p_opponent, u8 p_slot, pokemon* p_pokemon,
+                                 const pokemon p_teamContext[ SAVE::NUM_PARTY_SLOTS ] ) {
+            u8 disg = willDisguise( p_pokemon, p_teamContext );
             setSlot( p_opponent, p_slot, p_pokemon );
-            p_ui->sendOutPkmn( p_opponent, p_slot, p_pokemon );
+
+            if( disg ) { setSlotDisguise( p_opponent, p_slot, &p_teamContext[ disg ] ); }
+            p_ui->sendOutPkmn( p_opponent, p_slot, getPkmnOrDisguise( p_opponent, p_slot ) );
             checkOnSendOut( p_ui, p_opponent, p_slot );
             return true;
         }
@@ -527,6 +551,10 @@ namespace BATTLE {
          */
         constexpr pokemon* getPkmn( bool p_opponent, u8 p_slot ) {
             return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getPkmn( p_slot );
+        }
+
+        constexpr pokemon* getPkmnOrDisguise( bool p_opponent, u8 p_slot ) {
+            return _sides[ p_opponent ? OPPONENT_SIDE : PLAYER_SIDE ].getPkmnOrDisguise( p_slot );
         }
 
         /*
@@ -747,80 +775,99 @@ namespace BATTLE {
             switch( item ) {
             case I_CHILAN_BERRY2: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ),
+                    itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( DEF, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                p_ui->logBoosts( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp,
+                                 p_sorceSlot, bt, res );
                 return;
             }
             case I_EGGANT_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ),
+                    itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( SDEF, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                p_ui->logBoosts( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp,
+                                 p_sorceSlot, bt, res );
                 return;
             }
             case I_NUTPEA_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ),
+                    itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( ATK, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                p_ui->logBoosts( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp,
+                                 p_sorceSlot, bt, res );
                 return;
             }
             case I_STRIB_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ),
+                    itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( SATK, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                p_ui->logBoosts( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp,
+                                 p_sorceSlot, bt, res );
                 return;
             }
             case I_YAGO_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ),
+                    itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 WAIT( HALF_SEC );
                 boosts bt = boosts( );
                 bt.setBoost( SPEED, 7 );
                 auto res = addBoosts( p_sourceOpp, p_sorceSlot, bt );
-                p_ui->logBoosts( sc, p_sourceOpp, p_sorceSlot, bt, res );
+                p_ui->logBoosts( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp,
+                                 p_sorceSlot, bt, res );
                 return;
             }
             case I_TOPO_BERRY: {
                 auto itemname = FS::getItemName( item );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ), itemname.c_str( ),
-                          itemname.c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ),
+                    itemname.c_str( ), itemname.c_str( ) );
                 p_ui->log( buffer );
                 WAIT( HALF_SEC );
                 addVolatileStatus( p_ui, p_sourceOpp, p_sorceSlot, VS_PROTECT, 1 );
-                snprintf( buffer, TMP_BUFFER_SIZE,
-                          GET_STRING( IO::STR_UI_BATTLE_PASS_ITEM_PROTECT_PKMN ), itemname.c_str( ),
-                          p_ui->getPkmnName( sc, p_sourceOpp ).c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_PASS_ITEM_PROTECT_PKMN ),
+                    itemname.c_str( ),
+                    p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
+                        .c_str( ) );
                 WAIT( HALF_SEC );
                 return;
             }
@@ -836,9 +883,10 @@ namespace BATTLE {
             constexpr u8 TMP_BUFFER_SIZE = 100;
             char         buffer[ TMP_BUFFER_SIZE + 10 ];
             auto         fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_NO_EFFECT_ON ) );
-            snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                      p_ui->getPkmnName( getPkmn( p_opponent, p_slot ), p_opponent ).c_str( ),
-                      FS::getItemName( p_item ).c_str( ) );
+            snprintf(
+                buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                p_ui->getPkmnName( getPkmnOrDisguise( p_opponent, p_slot ), p_opponent ).c_str( ),
+                FS::getItemName( p_item ).c_str( ) );
             p_ui->log( buffer );
             WAIT( HALF_SEC );
         }
@@ -855,7 +903,7 @@ namespace BATTLE {
 
             if( !suppressesAbilities( ) && p_used && p2->getAbility( ) == A_SYMBIOSIS
                 && p2->getItem( ) ) {
-                p_ui->logAbility( p2, p_opponent );
+                p_ui->logAbility( getPkmnOrDisguise( p_opponent, !p_slot ), p_opponent );
                 moveItem( p_ui, p_opponent, !p_slot, p_opponent, p_slot );
             }
         }

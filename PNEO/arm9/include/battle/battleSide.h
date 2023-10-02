@@ -234,11 +234,19 @@ namespace BATTLE {
             _slots[ p_slot ].setPkmn( p_pokemon );
         }
 
+        inline void setSlotDisguise( u8 p_slot, const pokemon* p_pokemon ) {
+            _slots[ p_slot ].setDisguise( p_pokemon );
+        }
+
         /*
          * @brief: Returns the pkmn in the specified slot or nullptr if the slot is empty.
          */
         constexpr pokemon* getPkmn( u8 p_slot ) {
             return _slots[ p_slot ].getPkmn( );
+        }
+
+        constexpr pokemon* getPkmnOrDisguise( u8 p_slot ) const {
+            return _slots[ p_slot ].getPkmnOrDisguise( );
         }
 
         constexpr u8 getConsecutiveMoveCount( u8 p_slot ) const {

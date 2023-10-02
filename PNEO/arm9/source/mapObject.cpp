@@ -327,13 +327,22 @@ namespace MAP {
     bool mapDrawer::updateFollowPkmn( ) {
         _followPkmnData        = nullptr;
         _followPkmnSpeciesData = nullptr;
-        if( !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) { return false; }
+        auto teamCnt           = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
+        if( !teamCnt ) { return false; }
         if( _forceNoFollow ) { return false; }
 
         // only if first pkmn is not ko, it will follow the player.
         if( !SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].canBattle( ) ) { return false; }
 
-        _followPkmnData = &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ];
+        if( !_followPkmnDisguiseBusted
+            && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].getAbility( ) == A_ILLUSION && teamCnt > 1
+            && SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamCnt - 1 ].canBattle( ) ) {
+            _followPkmnIsDisguised = true;
+            _followPkmnData        = &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ teamCnt - 1 ];
+        } else {
+            _followPkmnIsDisguised = false;
+            _followPkmnData        = &SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ];
+        }
 
         if( _followPkmnData == nullptr ) { return false; }
 
@@ -344,7 +353,13 @@ namespace MAP {
         FS::getPkmnData( species, forme, _followPkmnSpeciesData );
 
         if( species > MAX_PKMN ) { return false; }
-        if( !canFollowPlayer( species, shiny, forme ) ) { return false; }
+        if( !canFollowPlayer( species, shiny, forme ) ) {
+            if( _followPkmnIsDisguised ) {
+                _followPkmnDisguiseBusted = true;
+                return updateFollowPkmn( );
+            }
+            return false;
+        }
 
         _followPkmn.m_picNum = species + PKMN_SPRITE;
         _followPkmn.m_range  = ( forme << 1 ) | shiny;
@@ -360,7 +375,8 @@ namespace MAP {
     }
 
     void mapDrawer::spawnFollowPkmn( u16 p_globX, u16 p_globY, u8 p_z, direction p_direction ) {
-        _followPkmn = mapObject( );
+        _followPkmn               = mapObject( );
+        _followPkmnDisguiseBusted = false;
         if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) && updateFollowPkmn( ) ) {
             _followPkmn.m_pos          = { p_globX, p_globY, p_z };
             _followPkmn.m_movement     = NO_MOVEMENT;

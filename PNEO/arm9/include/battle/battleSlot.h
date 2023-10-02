@@ -57,16 +57,17 @@ namespace BATTLE {
         };
 
       private:
-        status        _status;
-        slotCondition _slotCondition;
-        u8            _slotConditionCounter[ MAX_SLOT_CONDITIONS ];
-        pokemon*      _pokemon;
-        pokemon       _transformedPkmn; // pkmn the pkmn is transformed into
-        bool          _isTransformed;
-        u8            _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
-        u8            _volatileStatusAmount[ MAX_VOLATILE_STATUS ]; // Multiple stockpiles
-        boosts        _boosts;
-        u16           _toxicCount;
+        status         _status;
+        slotCondition  _slotCondition;
+        u8             _slotConditionCounter[ MAX_SLOT_CONDITIONS ];
+        pokemon*       _pokemon;
+        pokemon        _transformedPkmn; // pkmn the pkmn is transformed into
+        bool           _isTransformed;
+        const pokemon* _disguise; // disguise for illusion
+        u8             _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
+        u8             _volatileStatusAmount[ MAX_VOLATILE_STATUS ]; // Multiple stockpiles
+        boosts         _boosts;
+        u16            _toxicCount;
         u16 _turnsInPlay; // Number of turns the pkmn in the slot in participating in the battle
 
         battleMoveSelection _lockedMove; // move that a pkmn is forced to execute (no op if hib)
@@ -129,6 +130,7 @@ namespace BATTLE {
             _boosts               = boosts( );
             _lastMove             = battleMove( );
             _disabledMove         = 0;
+            _disguise             = nullptr;
             _altTypes.clear( );
             std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
             std::memset( _volatileStatusCounter, 0, sizeof( _volatileStatusCounter ) );
@@ -723,14 +725,15 @@ namespace BATTLE {
                         base <<= 1;
                     }
                     break;
-                    [[unlikely]] case I_EVIOLITE
-                        : if( !p_ignorePositive && ( p_stat == SDEF || p_stat == DEF )
-                              && !_pokemon->isFullyEvolved( ) ) {
+                [[unlikely]] case I_EVIOLITE:
+                    if( !p_ignorePositive && ( p_stat == SDEF || p_stat == DEF )
+                        && !_pokemon->isFullyEvolved( ) ) {
                         base = 3 * base / 2;
                     }
                     break;
 
-                    [[likely]] default : break;
+                [[likely]] default:
+                    break;
                 }
             }
 
@@ -876,6 +879,14 @@ namespace BATTLE {
             _status = NORMAL;
         }
 
+        inline void setDisguise( const pokemon* p_pokemon ) {
+            if( !p_pokemon ) {
+                _disguise = nullptr;
+                return;
+            }
+            _disguise = p_pokemon;
+        }
+
         /*
          * @brief: Returns the pkmn currently in the slot (or nullptr if the slot is
          * empty)
@@ -888,6 +899,34 @@ namespace BATTLE {
             } else {
                 return &_transformedPkmn;
             }
+        }
+
+        constexpr pokemon* getPkmnOrDisguise( ) const {
+            if( _status != NORMAL || _pokemon == nullptr ) { return nullptr; }
+
+            static pokemon result;
+
+            if( !_isTransformed ) {
+                result = *_pokemon;
+            } else {
+                result = _transformedPkmn;
+            }
+
+            if( isDisguised( ) ) {
+                result.m_boxdata.m_speciesId = _disguise->getSpecies( );
+                result.m_boxdata.m_altForme  = _disguise->getForme( );
+                result.m_boxdata.m_shinyType = _disguise->m_boxdata.m_shinyType;
+                result.m_boxdata.m_pid       = _disguise->m_boxdata.m_pid;
+                result.m_boxdata.m_oTId      = _disguise->m_boxdata.m_oTId;
+                result.m_boxdata.m_oTSid     = _disguise->m_boxdata.m_oTSid;
+                std::strncpy( result.m_boxdata.m_name, _disguise->m_boxdata.m_name,
+                              PKMN_NAMELENGTH );
+            }
+            return &result;
+        }
+
+        inline bool isDisguised( ) const {
+            return _disguise != nullptr;
         }
 
         inline void revertTransform( ) {
@@ -983,7 +1022,10 @@ namespace BATTLE {
             if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return false; }
             switch( pkmn->getAbility( ) ) {
             case A_AIR_LOCK:
-            case A_CLOUD_NINE: return true; [[likely]] default : return false;
+            case A_CLOUD_NINE:
+                return true;
+            [[likely]] default:
+                return false;
             }
         }
     };

@@ -327,9 +327,10 @@ namespace BATTLE {
                     auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_USE_ITEM_TO_ACT_FIRST ) );
                     snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ), itmnm.c_str( ),
                               _battleUI
-                                  .getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
+                                  .getPkmnName(
+                                      _field.getPkmnOrDisguise( sortedMoves[ i ].m_user.first,
                                                                 sortedMoves[ i ].m_user.second ),
-                                                sortedMoves[ i ].m_user.first, false )
+                                      sortedMoves[ i ].m_user.first, false )
                                   .c_str( ),
                               itmnm.c_str( ) );
                     _battleUI.log( std::string( buffer ) );
@@ -337,10 +338,10 @@ namespace BATTLE {
 
                 // show special messages for special moves
                 if( sortedMoves[ i ].m_type == MT_MESSAGE_MOVE ) [[unlikely]] {
-                    auto pnm = std::string(
-                        _battleUI.getPkmnName( _field.getPkmn( sortedMoves[ i ].m_user.first,
-                                                               sortedMoves[ i ].m_user.second ),
-                                               sortedMoves[ i ].m_user.first, false ) );
+                    auto pnm = std::string( _battleUI.getPkmnName(
+                        _field.getPkmnOrDisguise( sortedMoves[ i ].m_user.first,
+                                                  sortedMoves[ i ].m_user.second ),
+                        sortedMoves[ i ].m_user.first, false ) );
                     switch( sortedMoves[ i ].m_param ) {
                     case M_SHELL_TRAP:
                         snprintf( buffer, TMP_BUFFER_SIZE,
@@ -450,9 +451,16 @@ namespace BATTLE {
                     _field.setSlot( !side, j, nullptr );
                     continue;
                 }
-                _battleUI.sendOutPkmn( !side, j,
-                                       ( side ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
-                _field.setSlot( !side, j, ( side ? &_playerTeam[ j ] : &_opponentTeam[ j ] ) );
+
+                auto pkmn = ( side ? &_playerTeam[ j ] : &_opponentTeam[ j ] );
+                u8   disg = _field.willDisguise( pkmn, ( side ? _playerTeam : _opponentTeam ) );
+                _field.setSlot( !side, j, pkmn );
+
+                if( disg ) {
+                    _field.setSlotDisguise(
+                        !side, j, ( side ? &_playerTeam[ disg ] : &_opponentTeam[ disg ] ) );
+                }
+                _battleUI.sendOutPkmn( !side, j, _field.getPkmnOrDisguise( !side, j ) );
             }
         }
 
@@ -549,15 +557,17 @@ namespace BATTLE {
 
             IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
 
-            auto getPkmn
-                = [ & ]( bool p_opp, u8 p_slot ) { return _field.getPkmn( p_opp, p_slot ); };
+            auto getPkmnOrDisguise = [ & ]( bool p_opp, u8 p_slot ) {
+                return _field.getPkmnOrDisguise( p_opp, p_slot );
+            };
 
             u8 rs = cb.getResult(
                 [ & ]( u8 ) {
-                    return _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmn );
+                    return _battleUI.showTargetSelection( possibleTargets, hasChoice,
+                                                          getPkmnOrDisguise );
                 },
                 [ & ]( u8 p_selection ) {
-                    _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmn,
+                    _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmnOrDisguise,
                                                    p_selection );
                 },
                 initialSel );
@@ -591,14 +601,14 @@ namespace BATTLE {
 
         if( _isMockBattle ) {
             // Always choose Tackle
-            _battleUI.showAttackSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), canUse,
-                                           mega );
+            _battleUI.showAttackSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                           canUse, mega );
             auto curSel = 0;
-            _battleUI.showAttackSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), canUse,
-                                           mega, curSel, res.m_megaEvolve );
+            _battleUI.showAttackSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                           canUse, mega, curSel, res.m_megaEvolve );
             WAIT( HALF_SEC );
-            _battleUI.showAttackSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), canUse,
-                                           mega, curSel = 2, res.m_megaEvolve );
+            _battleUI.showAttackSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                           canUse, mega, curSel = 2, res.m_megaEvolve );
             WAIT( FULL_SEC );
             res.m_param     = _field.getPkmn( field::PLAYER_SIDE, p_slot )->getMove( curSel );
             _lastMoveChoice = curSel;
@@ -618,12 +628,13 @@ namespace BATTLE {
             u8 rs = cb.getResult(
                 [ & ]( u8 ) {
                     return _battleUI.showAttackSelection(
-                        _field.getPkmn( field::PLAYER_SIDE, p_slot ), canUse, mega );
+                        _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), canUse, mega );
                 },
                 [ & ]( u8 p_selection ) {
                     curSel = p_selection;
-                    _battleUI.showAttackSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ),
-                                                   canUse, mega, curSel, res.m_megaEvolve );
+                    _battleUI.showAttackSelection(
+                        _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), canUse, mega,
+                        curSel, res.m_megaEvolve );
                 },
                 curSel );
 
@@ -676,14 +687,15 @@ namespace BATTLE {
                 for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                     auto st = _field.getSlotStatus( side, j2 );
                     if( st == slot::status::NORMAL ) {
-                        _battleUI.updatePkmn( side, j2, _field.getPkmn( side, j2 ) );
+                        _battleUI.updatePkmn( side, j2, _field.getPkmnOrDisguise( side, j2 ) );
                     }
                 }
 
             if( r.getSelectedPkmn( ) < 255 ) {
                 res.m_type  = MT_SWITCH;
                 res.m_param = r.getSelectedPkmn( );
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot );
                 return res;
             }
             break;
@@ -730,12 +742,13 @@ namespace BATTLE {
                 for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                     auto st = _field.getSlotStatus( side, j2 );
                     if( st == slot::status::NORMAL ) {
-                        _battleUI.updatePkmn( side, j2, _field.getPkmn( side, j2 ) );
+                        _battleUI.updatePkmn( side, j2, _field.getPkmnOrDisguise( side, j2 ) );
                     }
                 }
 
             if( itm ) {
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot );
                 return res;
             }
             break;
@@ -755,10 +768,11 @@ namespace BATTLE {
             return _field.getStoredMove( field::PLAYER_SIDE, p_slot );
         }
 
-        auto choices
-            = _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot );
+        auto choices = _battleUI.showMoveSelection(
+            _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot );
         u8 curSel = 0;
-        _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot, curSel );
+        _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot,
+                                     curSel );
 
         if( _isMockBattle ) {
             if( _field.getPkmn( field::PLAYER_SIDE, field::PKMN_0 )->m_stats.m_curHP * 2
@@ -772,8 +786,8 @@ namespace BATTLE {
                 WAIT( FULL_SEC );
 
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot,
-                                             curSel = 3 );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot, curSel = 3 );
                 WAIT( FULL_SEC );
 
                 BAG::bagViewer bv = BAG::bagViewer( _playerTeam, BAG::bagViewer::MOCK_BATTLE );
@@ -787,11 +801,12 @@ namespace BATTLE {
                     for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                         auto st = _field.getSlotStatus( side, j2 );
                         if( st == slot::status::NORMAL ) {
-                            _battleUI.updatePkmn( side, j2, _field.getPkmn( side, j2 ) );
+                            _battleUI.updatePkmn( side, j2, _field.getPkmnOrDisguise( side, j2 ) );
                         }
                     }
 
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot );
                 return res;
             }
         }
@@ -806,8 +821,9 @@ namespace BATTLE {
 
             for( auto i : choices ) {
                 if( i.first.inRange( touch ) ) {
-                    _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ),
-                                                 p_slot, curSel = i.second );
+                    _battleUI.showMoveSelection(
+                        _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot,
+                        curSel = i.second );
 
                     bool bad = false;
                     while( touch.px || touch.py ) {
@@ -823,10 +839,11 @@ namespace BATTLE {
                     if( !bad ) {
                         res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
                         if( res.m_type != MT_CANCEL ) { return res; }
-                        _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ),
-                                                     p_slot );
-                        _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ),
-                                                     p_slot, curSel );
+                        _battleUI.showMoveSelection(
+                            _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot );
+                        _battleUI.showMoveSelection(
+                            _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot,
+                            curSel );
                     }
                 }
             }
@@ -840,9 +857,10 @@ namespace BATTLE {
                 res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
                 if( res.m_type != MT_CANCEL ) { return res; }
 
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot );
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot,
-                                             curSel );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
@@ -856,8 +874,8 @@ namespace BATTLE {
                     curSel = 0;
                 }
 
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot,
-                                             curSel );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
@@ -869,8 +887,8 @@ namespace BATTLE {
                     curSel--;
                 }
 
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot,
-                                             curSel );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) || GET_KEY_COOLDOWN( KEY_UP ) ) {
@@ -882,8 +900,8 @@ namespace BATTLE {
                     curSel = 0;
                 }
 
-                _battleUI.showMoveSelection( _field.getPkmn( field::PLAYER_SIDE, p_slot ), p_slot,
-                                             curSel );
+                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
+                                             p_slot, curSel );
 
                 cooldown = COOLDOWN_COUNT;
             }
@@ -1335,7 +1353,7 @@ namespace BATTLE {
                         for( u8 i2 = 0; i2 < 2; ++i2 )
                             for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
                                 if( i == i2 && j == j2 ) { continue; }
-                                _battleUI.updatePkmn( i2, j2, _field.getPkmn( i2, j2 ) );
+                                _battleUI.updatePkmn( i2, j2, _field.getPkmnOrDisguise( i2, j2 ) );
                             }
 
                         switchPokemon( { i, j }, res.getSelectedPkmn( ) );
@@ -1356,13 +1374,13 @@ namespace BATTLE {
             std::swap( _yieldEXP[ p_toSwitch.second ], _yieldEXP[ p_newIndex ] );
             std::swap( _opponentPkmnPerm[ p_toSwitch.second ], _opponentPkmnPerm[ p_newIndex ] );
             _field.sendPokemon( &_battleUI, p_toSwitch.first, p_toSwitch.second,
-                                &_opponentTeam[ p_toSwitch.second ] );
+                                &_opponentTeam[ p_toSwitch.second ], _opponentTeam );
         } else {
             // player
             std::swap( _playerTeam[ p_toSwitch.second ], _playerTeam[ p_newIndex ] );
             std::swap( _playerPkmnPerm[ p_toSwitch.second ], _playerPkmnPerm[ p_newIndex ] );
             _field.sendPokemon( &_battleUI, p_toSwitch.first, p_toSwitch.second,
-                                &_playerTeam[ p_toSwitch.second ] );
+                                &_playerTeam[ p_toSwitch.second ], _playerTeam );
         }
     }
 
@@ -1442,7 +1460,9 @@ namespace BATTLE {
         case I_HEAL_POWDER:
         case I_FULL_HEAL:
             _field.removeStatusCondition( p_target.first, p_target.second );
-            _battleUI.updatePkmnStats( p_target.first, p_target.second, pkmn );
+            _battleUI.updatePkmnStats(
+                p_target.first, p_target.second,
+                _field.getPkmnOrDisguise( p_target.first, p_target.second ) );
             break;
 
         case I_X_ATTACK:
@@ -1486,7 +1506,9 @@ namespace BATTLE {
             remitem = false;
             if( _field.hasStatusCondition( p_target.first, p_target.second, SLEEP ) ) {
                 _field.removeStatusCondition( p_target.first, p_target.second );
-                _battleUI.updatePkmnStats( p_target.first, p_target.second, pkmn );
+                _battleUI.updatePkmnStats(
+                    p_target.first, p_target.second,
+                    _field.getPkmnOrDisguise( p_target.first, p_target.second ) );
             } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
             }
@@ -1512,8 +1534,12 @@ namespace BATTLE {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              VS_CONFUSION );
                 auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_CONFUSION_HEALED ) );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          _battleUI.getPkmnName( pkmn, p_target.first ).c_str( ) );
+                snprintf(
+                    buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                    _battleUI
+                        .getPkmnName( _field.getPkmnOrDisguise( p_target.first, p_target.second ),
+                                      p_target.first )
+                        .c_str( ) );
                 _battleUI.log( buffer );
             } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
@@ -1538,7 +1564,8 @@ namespace BATTLE {
         if( boost ) {
             auto res = _field.addBoosts( p_target.first, p_target.second, bs );
             if( res != boosts( ) ) {
-                _battleUI.logBoosts( pkmn, p_target.first, p_target.second, bs, res );
+                _battleUI.logBoosts( _field.getPkmnOrDisguise( p_target.first, p_target.second ),
+                                     p_target.first, p_target.second, bs, res );
             } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
             }
@@ -1675,9 +1702,9 @@ namespace BATTLE {
                             }
                             if( i < getBattlingPKMNCount( _policy.m_mode ) ) {
                                 // update battleUI
-                                _battleUI.updatePkmnStats( field::PLAYER_SIDE, i,
-                                                           _field.getPkmn( field::PLAYER_SIDE, i ),
-                                                           true );
+                                _battleUI.updatePkmnStats(
+                                    field::PLAYER_SIDE, i,
+                                    _field.getPkmnOrDisguise( field::PLAYER_SIDE, i ), true );
                             }
                         }
                     }

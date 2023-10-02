@@ -583,7 +583,10 @@ struct pokemon {
         case PKMN_AUDINO: return getItem( ) == I_AUDINITE;
         case PKMN_DIANCIE: return getItem( ) == I_DIANCITE;
         case PKMN_KYOGRE: return getItem( ) == I_BLUE_ORB;
-        case PKMN_GROUDON: return getItem( ) == I_RED_ORB; [[likely]] default : return false;
+        case PKMN_GROUDON:
+            return getItem( ) == I_RED_ORB;
+        [[likely]] default:
+            return false;
         }
     }
 
