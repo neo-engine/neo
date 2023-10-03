@@ -428,16 +428,20 @@ namespace MAP {
                 break;
             }
             case SMO: {
-                mapObject obj         = mapObject( );
-                obj.m_pos             = { u16( mapX * SIZE + par2 ), u16( mapY * SIZE + par3 ), 3 };
-                obj.m_picNum          = par1;
-                obj.m_movement        = NO_MOVEMENT;
-                obj.m_range           = 0;
-                obj.m_direction       = DOWN;
+                mapObject obj   = mapObject( );
+                obj.m_pos       = { u16( mapX * SIZE + par1s ), u16( mapY * SIZE + par2s ), 3 };
+                obj.m_picNum    = par3s;
+                obj.m_movement  = NO_MOVEMENT;
+                obj.m_range     = 0;
+                obj.m_direction = DOWN;
                 obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
                 std::pair<u8, mapObject> cur = { 0, obj };
-                loadMapObject( cur );
+                if( !loadMapObject( cur ) ) {
+#ifdef DESQUID_MORE
+                    IO::printMessage( "SMO fail" );
+#endif
+                }
 
                 // Check if there is some unused map object
 
@@ -1622,6 +1626,10 @@ namespace MAP {
         }
         CURRENT_SCRIPT = -1;
         _scriptRunning = srn;
+
+#ifdef DESQUID_MORE
+        IO::printMessage( "SCRIPT END" );
+#endif
     }
 
     void mapDrawer::interactFollowPkmn( ) {
