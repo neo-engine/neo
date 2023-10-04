@@ -404,9 +404,9 @@ namespace DEX {
             IO::regularFont->printStringC( GET_STRING( 580 ), 128 - 32, y + 21 + 14, true,
                                            IO::font::LEFT );
 
-            snprintf( buffer, 9, "%03hu", SAVE::SAV.getActiveFile( ).getLocalSeenCount( ) );
+            snprintf( buffer, 9, "%hu", SAVE::SAV.getActiveFile( ).getLocalSeenCount( ) );
             IO::regularFont->printStringC( buffer, 128 + 31, y + 21, true, IO::font::RIGHT );
-            snprintf( buffer, 9, "%03hu", SAVE::SAV.getActiveFile( ).getLocalCaughtCount( ) );
+            snprintf( buffer, 9, "%hu", SAVE::SAV.getActiveFile( ).getLocalCaughtCount( ) );
             IO::regularFont->printStringC( buffer, 128 + 31, y + 21 + 14, true, IO::font::RIGHT );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
@@ -445,9 +445,9 @@ namespace DEX {
             IO::regularFont->printStringC( GET_STRING( 580 ), 128 - 32, y + 21 + 14, true,
                                            IO::font::LEFT );
 
-            snprintf( buffer, 9, "%03hu", SAVE::SAV.getActiveFile( ).getSeenCount( ) );
+            snprintf( buffer, 9, "%hu", SAVE::SAV.getActiveFile( ).getSeenCount( ) );
             IO::regularFont->printStringC( buffer, 128 + 31, y + 21, true, IO::font::RIGHT );
-            snprintf( buffer, 9, "%03hu", SAVE::SAV.getActiveFile( ).getCaughtCount( ) );
+            snprintf( buffer, 9, "%hu", SAVE::SAV.getActiveFile( ).getCaughtCount( ) );
             IO::regularFont->printStringC( buffer, 128 + 31, y + 21 + 14, true, IO::font::RIGHT );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
@@ -591,7 +591,7 @@ namespace DEX {
             }
 
             // dex no
-            snprintf( buffer, 99, "%03hu%c",
+            snprintf( buffer, 99, "%04hu%c",
                       _mode ? p_pkmn.m_pkmnIdx : getDexNo( p_pkmn.m_pkmnIdx ),
                       p_pkmn.m_forme ? 'a' + p_pkmn.m_forme - 1 : 0 );
             IO::regularFont->printStringC( buffer, 36, 112, p_bottom, IO::font::LEFT );
@@ -721,7 +721,7 @@ namespace DEX {
             if( !_mode && !p_isHidden && ispkmn ) {
                 // load dex no (only in local dex mode
                 char buffer[ 20 ];
-                snprintf( buffer, 99, "%03hu%c", _mode ? p_pkmnIdx : getDexNo( p_pkmnIdx ),
+                snprintf( buffer, 99, "%04hu%c", _mode ? p_pkmnIdx : getDexNo( p_pkmnIdx ),
                           p_pkmnForme ? 'a' + p_pkmnForme - 1 : 0 );
 
                 std::memset( IO::TEXT_BUF, 0, sizeof( IO::TEXT_BUF ) );
@@ -789,7 +789,7 @@ namespace DEX {
 
             IO::regularFont->setColor( 1, 1 );
             IO::regularFont->setColor( 0, 2 );
-            snprintf( buffer, 9, "%03hu", p_pkmnIdx );
+            snprintf( buffer, 9, "%04hu", p_pkmnIdx );
             IO::regularFont->printStringBC( buffer, TEXT_PAL, IO::TEXT_BUF, 32, IO::font::LEFT, 0,
                                             32 );
             IO::loadSpriteB( oamStart + 5, oam[ oamStart + 5 ].gfxIndex,

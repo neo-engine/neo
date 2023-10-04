@@ -653,9 +653,9 @@ namespace BOX {
             u16 dexno = SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId( p_pokemon->getSpecies( ) );
 
             if( dexno != u16( -1 ) ) {
-                snprintf( buffer, 49, "%03hu", dexno );
+                snprintf( buffer, 49, "%04hu", dexno );
             } else {
-                snprintf( buffer, 49, "???" );
+                snprintf( buffer, 49, "????" );
             }
             IO::regularFont->printStringC( GET_STRING( 337 ), INFO_X + 12, INFO_Y + 27, false );
             if( p_pokemon->isShiny( ) ) {

@@ -355,7 +355,9 @@ namespace IO {
     }
 
     u16 pkmnSpriteHeight( const pkmnSpriteInfo& p_pkmn ) {
-        if( p_pkmn.m_pkmnIdx > MAX_PKMN ) { return 96 - SPECIES_HEIGHTS[ 0 ]; }
+        if( p_pkmn.m_pkmnIdx > MAX_PKMN || p_pkmn.m_pkmnIdx >= SPECIES_HEIGHTS.size( ) ) {
+            return 96 - SPECIES_HEIGHTS[ 0 ];
+        }
         return 96 - SPECIES_HEIGHTS[ p_pkmn.m_pkmnIdx ];
     }
 

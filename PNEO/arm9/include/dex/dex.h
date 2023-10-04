@@ -6,7 +6,7 @@ file        : dex.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -35,7 +35,7 @@ namespace DEX {
     u16 nextEntry( u16 p_current );
     u16 previousEntry( u16 p_current );
 
-    constexpr u16 LOCAL_DEX_SIZE = 277;
+    constexpr u16 LOCAL_DEX_SIZE = 278;
     constexpr u8  MAX_PAGES      = 3;
 
     constexpr u16 MAX_LOCAL_DEX_PAGES = 137;
@@ -65,7 +65,7 @@ namespace DEX {
         PKMN_RALTS, PKMN_KIRLIA, PKMN_GARDEVOIR, PKMN_GALLADE, PKMN_ABRA, PKMN_KADABRA,
         PKMN_ALAKAZAM, PKMN_SPOINK, PKMN_GRUMPIG, PKMN_GOTHITA, PKMN_GOTHORITA, PKMN_GOTHITELLE,
         PKMN_SOLOSIS, PKMN_DUOSION, PKMN_REUNICLUS, PKMN_WYNAUT, PKMN_WOBBUFFET, PKMN_GIRAFARIG,
-        PKMN_MUNNA, PKMN_MUSHARNA,
+        PKMN_FARIGIRAF, PKMN_MUNNA, PKMN_MUSHARNA,
 
         // Plants and stuff from the forest
         PKMN_LOTAD, PKMN_LOMBRE, PKMN_LUDICOLO, PKMN_SEEDOT, PKMN_NUZLEAF, PKMN_SHIFTRY,
@@ -187,7 +187,7 @@ namespace DEX {
         { PKMN_GOTHITA, PKMN_GOTHORITA, PKMN_GOTHITELLE },
         { PKMN_SOLOSIS, PKMN_DUOSION, PKMN_REUNICLUS },
         { PKMN_WYNAUT, PKMN_WOBBUFFET },
-        { EMPTY, PKMN_GIRAFARIG },
+        { PKMN_GIRAFARIG, PKMN_FARIGIRAF },
         { PKMN_MUNNA, PKMN_MUSHARNA },
 
         // Plants and stuff from the forest
