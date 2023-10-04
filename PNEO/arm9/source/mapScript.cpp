@@ -1526,7 +1526,11 @@ namespace MAP {
                     // heal party pkmn
                     for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
                         auto tmp = SAVE::SAV.getActiveFile( ).getTeamPkmn( i );
-                        if( tmp ) { tmp->heal( ); }
+                        if( tmp ) {
+                            tmp->heal( );
+                            // award champion ribbon
+                            tmp->m_boxdata.awardRibbon( 20 );
+                        }
                     }
 
                     // add star to trainers card (if it doesn't exist already)
