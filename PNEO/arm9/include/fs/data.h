@@ -205,9 +205,9 @@ namespace FS {
     bool           getPkmnEvolveData( const u16 p_pkmnId, pkmnEvolveData* p_out );
     bool           getPkmnEvolveData( const u16 p_pkmnId, const u8 p_forme, pkmnEvolveData* p_out );
 
-    const u16 LEARN_TM    = 200;
-    const u16 LEARN_TUTOR = 201;
-    const u16 LEARN_EGG   = 202;
+    constexpr u16 LEARN_TM    = 200;
+    constexpr u16 LEARN_TUTOR = 201;
+    constexpr u16 LEARN_EGG   = 202;
 
     void getLearnMoves( u16 p_pkmnId, u8 p_forme, u16 p_fromLevel, u16 p_toLevel, u16 p_num,
                         u16* p_res );

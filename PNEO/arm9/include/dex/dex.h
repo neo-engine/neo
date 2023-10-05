@@ -6,7 +6,7 @@ file        : dex.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -141,7 +141,7 @@ namespace DEX {
         PKMN_JIRACHI, PKMN_DEOXYS,
 
         // secret
-        PKMN_CHATOT };
+        PKMN_ORICORIO };
 
     constexpr u16 LOCAL_DEX_PAGES[ MAX_LOCAL_DEX_PAGES ][ MAX_LOCAL_DEX_SLOTS ] = {
         { EMPTY, EMPTY, EMPTY },
@@ -321,7 +321,7 @@ namespace DEX {
         { EMPTY, PKMN_DEOXYS },
 
         // secret
-        { EMPTY, PKMN_CHATOT },
+        { EMPTY, PKMN_ORICORIO },
 
         { EMPTY, EMPTY, EMPTY },
         { EMPTY, EMPTY, EMPTY },
