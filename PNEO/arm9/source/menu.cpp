@@ -255,6 +255,12 @@ namespace IO {
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_BLUE_SHARD, 25 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_YELLOW_SHARD, 25 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_GREEN_SHARD, 25 );
+
+            for( u16 i = 0; i < I_EGGANT_BERRY; ++i ) {
+                if( BAG::itemToBerry( i ) ) {
+                    SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::BERRIES, i, 1 );
+                }
+            }
             init( );
             break;
         case DSQ_EDIT_FLAGS: {
@@ -272,6 +278,8 @@ namespace IO {
                 break;
             }
             case 1: { // edit flags
+                init( );
+                for( u8 i = 1; i <= 8; ++i ) { MAP::curMap->awardBadge( 0, i ); }
                 break;
             }
             case 2: { // edit variables
@@ -291,11 +299,11 @@ namespace IO {
             init( );
             IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
             auto          res  = menu.getResult(
-                          GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
-                          std::vector<u16>{ FS::DESQUID_STRING + 56, FS::DESQUID_STRING + 57,
+                GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
+                std::vector<u16>{ FS::DESQUID_STRING + 56, FS::DESQUID_STRING + 57,
                                             FS::DESQUID_STRING + 58, FS::DESQUID_STRING + 59,
                                             FS::DESQUID_STRING + 60 },
-                          true );
+                true );
             switch( res ) {
             case 0: { // daytime to dawn
                 SAVE::CURRENT_TIME.m_hours
