@@ -6,7 +6,7 @@ file        : mapDrawer.cpp
 author      : Philip Wellnitz
 description : Map drawing engine: map object related functions
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -76,7 +76,8 @@ namespace MAP {
         case EVENT_NPC: {
             p_mapObject.first = _mapSprites.loadSprite(
                 curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
-                mapSpriteManager::SPTYPE_NPC, p_mapObject.second.sprite( ) );
+                p_mapObject.second.m_pos.m_posZ, mapSpriteManager::SPTYPE_NPC,
+                p_mapObject.second.sprite( ) );
 
             _mapSprites.setFrameD( p_mapObject.first, p_mapObject.second.m_direction, false );
 
@@ -94,6 +95,7 @@ namespace MAP {
             if( p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
                 p_mapObject.first = _mapSprites.loadSprite(
                     curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
+                    p_mapObject.second.m_pos.m_posZ,
                     p_mapObject.second.m_event.m_data.m_hmObject.m_hmType );
             } else {
                 // HM object got destroyed already
@@ -121,6 +123,7 @@ namespace MAP {
             if( p_mapObject.second.m_event.m_data.m_item.m_itemType ) {
                 p_mapObject.first = _mapSprites.loadSprite(
                     curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
+                    p_mapObject.second.m_pos.m_posZ,
                     p_mapObject.second.m_event.m_data.m_item.m_itemType == 1
                         ? mapSpriteManager::SPR_ITEM
                         : mapSpriteManager::SPR_HMBALL );

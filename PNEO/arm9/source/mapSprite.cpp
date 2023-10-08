@@ -6,7 +6,7 @@ file        : mapSprite.cpp
 author      : Philip Wellnitz
 description : Map Sprites.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -25,11 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "map/mapSprite.h"
 #include "fs/fs.h"
 #include "io/message.h"
 #include "io/uio.h"
 #include "map/mapSlice.h"
+#include "map/mapSprite.h"
 #include "save/saveGame.h"
 
 #define SPR_MAPTILE_OAM( p_idx )         ( 0 + ( p_idx ) )
@@ -282,7 +282,7 @@ namespace MAP {
     /*
      * @brief: Loads the specified sprite at the specified position on the screen.
      */
-    void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+    void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_posZ, u8 p_oamIdx, u16 p_tileCnt,
                        const mapSpriteData& p_data, bool p_hidden = false ) {
         IO::loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_data.m_width, p_data.m_height,
                          p_data.m_palData,
@@ -291,13 +291,13 @@ namespace MAP {
                          p_hidden
                              || !mapSpritePos{ 0, 0, 0, 0, s16( 128 - p_posX ), s16( 92 - p_posY ) }
                                      .isVisible( ),
-                         OBJPRIORITY_2, false );
+                         p_posZ > 3 ? OBJPRIORITY_1 : OBJPRIORITY_2, false );
     }
 
-    void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+    void doLoadSprite( u16 p_posX, u16 p_posY, u8 p_posZ, u8 p_oamIdx, u16 p_tileCnt,
                        const mapSprite& p_sprite, bool p_hidden = false ) {
         auto& data = p_sprite.getData( );
-        doLoadSprite( p_posX, p_posY, p_oamIdx, p_tileCnt, data, p_hidden );
+        doLoadSprite( p_posX, p_posY, p_posZ, p_oamIdx, p_tileCnt, data, p_hidden );
     }
 
     const mapSpriteManager::managedSprite&
@@ -350,7 +350,10 @@ namespace MAP {
             case SPR_HMBALL: return _hmBallData;
             case SPR_STRENGTH: return _strengthData;
             case SPR_ROCKSMASH: return _rockSmashData;
-            case SPR_CUT: return _cutData; [[unlikely]] default : break;
+            case SPR_CUT:
+                return _cutData;
+            [[unlikely]] default:
+                break;
             }
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
@@ -366,7 +369,10 @@ namespace MAP {
             case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
             case SPR_WATER_CIRCLE: return _waterCircleData;
             case SPR_DIVE_BUBBLE: return _diveBubbleData;
-            case SPR_HOT_SPRING_WATER: return _hotSpringWaterData; [[unlikely]] default : break;
+            case SPR_HOT_SPRING_WATER:
+                return _hotSpringWaterData;
+            [[unlikely]] default:
+                break;
             }
         }
 
@@ -380,7 +386,10 @@ namespace MAP {
             case SPR_HMBALL: return _hmBallData;
             case SPR_STRENGTH: return _strengthData;
             case SPR_ROCKSMASH: return _rockSmashData;
-            case SPR_CUT: return _cutData; [[unlikely]] default : break;
+            case SPR_CUT:
+                return _cutData;
+            [[unlikely]] default:
+                break;
             }
         }
         if( p_spriteId >= SPR_MAPTILE_OAM( 0 ) && p_spriteId < SPR_MAPTILE_OAM( MAX_TILE_ANIM ) ) {
@@ -396,7 +405,10 @@ namespace MAP {
             case SPR_FOOTPRINT_BIKE: return _footprintBikeData;
             case SPR_WATER_CIRCLE: return _waterCircleData;
             case SPR_DIVE_BUBBLE: return _diveBubbleData;
-            case SPR_HOT_SPRING_WATER: return _hotSpringWaterData; [[unlikely]] default : break;
+            case SPR_HOT_SPRING_WATER:
+                return _hotSpringWaterData;
+            [[unlikely]] default:
+                break;
             }
         }
         return getManagedSprite( p_spriteId ).m_sprite.getData( );
@@ -474,7 +486,7 @@ namespace MAP {
         reordering = false;
     }
 
-    u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
+    u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_posZ,
                                      spriteType p_type, const mapSprite& p_sprite, bool p_hidden ) {
 
         switch( p_type ) {
@@ -486,13 +498,13 @@ namespace MAP {
                 SPTYPE_DOOR,
                 false };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
-                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), p_posZ,
                           _oamPosition[ SPR_DOOR_OAM ], SPR_DOOR_GFX, p_sprite, p_hidden );
             return SPR_DOOR_OAM;
         case SPTYPE_PLAYER:
             _player = { p_sprite, { p_posX, p_posY, 0, 0, 0, 0 }, SPTYPE_PLAYER, false };
             doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
-                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                          screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), p_posZ,
                           _oamPosition[ SPR_MAIN_PLAYER_OAM ], SPR_MAIN_PLAYER_GFX, p_sprite,
                           p_hidden );
             reorderSprites( false );
@@ -516,7 +528,7 @@ namespace MAP {
                                     p_type,
                                     false } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
-                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), p_posZ,
                               _oamPosition[ SPR_EXTRA_LARGE_NPC_OAM( 0 ) ],
                               SPR_EXTRA_LARGE_NPC_GFX( 0 ), p_sprite, p_hidden );
                 reorderSprites( false );
@@ -539,7 +551,7 @@ namespace MAP {
                                          p_type,
                                          false } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
-                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), p_posZ,
                               _oamPosition[ SPR_LARGE_NPC_OAM( freesp ) ],
                               SPR_LARGE_NPC_GFX( freesp ), p_sprite, p_hidden );
                 reorderSprites( false );
@@ -560,7 +572,7 @@ namespace MAP {
                                            p_type,
                                            false } };
                 doLoadSprite( screenX( p_camX, p_posX, p_sprite.getData( ).m_width ),
-                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ),
+                              screenY( p_camY, p_posY, p_sprite.getData( ).m_height ), p_posZ,
                               _oamPosition[ SPR_SMALL_NPC_OAM( freesp ) ],
                               SPR_SMALL_NPC_GFX( freesp ), p_sprite, p_hidden );
                 reorderSprites( false );
@@ -600,7 +612,8 @@ namespace MAP {
 #endif
             fr = 2 * ( p_stage - 2 );
         }
-        return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_BERRYTREE, mapSprite( f, fr ) );
+        return loadSprite( p_camX, p_camY, p_posX, p_posY, 3, SPTYPE_BERRYTREE,
+                           mapSprite( f, fr ) );
     }
 
     mapSpriteData DOOR_DATA;
@@ -609,11 +622,11 @@ namespace MAP {
                                    u16 p_palette[ 16 ] ) {
         DOOR_DATA          = mapSpriteData( p_doorIdx, p_palette );
         mapSpriteInfo info = { p_doorIdx, 0 };
-        return loadSprite( p_camX, p_camY, p_posX, p_posY, SPTYPE_DOOR,
+        return loadSprite( p_camX, p_camY, p_posX, p_posY, 3, SPTYPE_DOOR,
                            mapSprite( info, DOOR_DATA ) );
     }
 
-    u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY,
+    u8 mapSpriteManager::loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_posZ,
                                      u8 p_particleId, bool p_hidden ) {
 
         bool isTileA = p_particleId >= TILE_ANIM_START;
@@ -648,31 +661,31 @@ namespace MAP {
 #endif
         switch( p_particleId ) {
         case SPR_ITEM:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
                           _itemBallData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_HMBALL:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
                           _hmBallData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_STRENGTH:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
                           _strengthData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_ROCKSMASH:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
                           _rockSmashData, p_hidden );
             reorderSprites( false );
             return SPR_HM_OAM( nextfree );
         case SPR_CUT:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_HM_OAM( nextfree ) ], SPR_HM_GFX( p_particleId ),
                           _cutData, p_hidden );
             reorderSprites( false );
@@ -680,68 +693,68 @@ namespace MAP {
 
         case SPR_GRASS_SHINY:
             _shinyGrassData.updatePalette( 2 );
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_2 ), _shinyGrassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_GRASS:
             _grassData.updatePalette( 2 );
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_1 ), _grassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_LONG_GRASS:
             _longGrassData.updatePalette( 2 );
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _longGrassData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_2 );
             return SPR_MAPTILE_OAM( nextfree );
 
         case SPR_FOOTPRINT_HORIZONTAL:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _footprintData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_FOOTPRINT_VERTICAL:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _footprintData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_FOOTPRINT_BIKE_FRAME_1:
         case SPR_FOOTPRINT_BIKE_FRAME_4:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _footprintBikeData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_FOOTPRINT_BIKE_FRAME_2:
         case SPR_FOOTPRINT_BIKE_FRAME_3:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _footprintBikeData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_WATER_CIRCLE:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_4 ), _waterCircleData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
 
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_DIVE_BUBBLE:
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY - 1, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY - 1, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_3 ), _diveBubbleData, p_hidden );
             setPriority( SPR_MAPTILE_OAM( nextfree ), OBJPRIORITY_3 );
             return SPR_MAPTILE_OAM( nextfree );
         case SPR_HOT_SPRING_WATER:
             _hotSpringWaterData.updatePalette( 8 );
-            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ),
+            doLoadSprite( screenX( p_camX, p_posX, 16 ), screenY( p_camY, p_posY, 16 ), p_posZ,
                           _oamPosition[ SPR_MAPTILE_OAM( nextfree ) ],
                           SPR_MAPTILE_GFX( SPR_MAPTILE_GFX_SLOT_1 ), _hotSpringWaterData,
                           p_hidden );
@@ -750,7 +763,7 @@ namespace MAP {
 
         case SPR_PLATFORM:
             _playerPlatform.m_pos = { p_posX, p_posY, 0, 0, 0, 0 };
-            doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3,
+            doLoadSprite( screenX( p_camX, p_posX, 32 ), screenY( p_camY, p_posY, 32 ) + 3, p_posZ,
                           _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ], SPR_MAIN_PLAYER_PLAT_GFX,
                           _playerPlatform.m_sprite, p_hidden );
             reorderSprites( false );
@@ -961,7 +974,7 @@ namespace MAP {
             auto data = getSpriteData( p_spriteId );
             auto pid  = _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first;
             doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
-                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y, 3,
                           _oamPosition[ p_spriteId ], SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ),
                           data );
             IO::setOWSpriteFrame( p_value, false, _oamPosition[ p_spriteId ], data.m_palData,
@@ -998,7 +1011,7 @@ namespace MAP {
             auto data = getSpriteData( p_spriteId );
             auto pid  = _tileAnimInfo[ p_spriteId - SPR_MAPTILE_OAM( 0 ) ].first;
             doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
-                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y, 3,
                           _oamPosition[ p_spriteId ], SPR_MAPTILE_GFX( 2 * ( pid % 100 ) + 1 ),
                           data, IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].isHidden );
             IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ], data.m_palData,
@@ -1008,14 +1021,14 @@ namespace MAP {
             switch( _hmSpriteInfo[ p_spriteId - SPR_HM_OAM( 0 ) ].first ) {
             case SPR_ROCKSMASH:
                 doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
-                              IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                              IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y, 3,
                               _oamPosition[ p_spriteId ], SPR_HM_GFX( 0 ), _rockSmashData );
                 IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ],
                                       _rockSmashData.m_palData, _rockSmashData.m_frameData );
                 break;
             case SPR_CUT:
                 doLoadSprite( IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x,
-                              IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y,
+                              IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y, 3,
                               _oamPosition[ p_spriteId ], SPR_HM_GFX( 0 ), _cutData );
                 IO::setOWSpriteFrame( p_value, p_hflip, _oamPosition[ p_spriteId ],
                                       _cutData.m_palData, _cutData.m_frameData );

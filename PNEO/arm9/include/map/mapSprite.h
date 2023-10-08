@@ -6,7 +6,7 @@ file        : mapSprite.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -371,7 +371,7 @@ namespace MAP {
          * @param p_camX: x coordinate of the current camera position
          * @param p_camY: y coordinate of the current camera position
          */
-        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, spriteType p_type,
+        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_posZ, spriteType p_type,
                        const mapSprite& p_sprite, bool p_hidden = false );
 
         /*
@@ -380,7 +380,7 @@ namespace MAP {
          * @param p_camX: x coordinate of the current camera position
          * @param p_camY: y coordinate of the current camera position
          */
-        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_partilcleId,
+        u8 loadSprite( u16 p_camX, u16 p_camY, u16 p_posX, u16 p_posY, u8 p_posZ, u8 p_partilcleId,
                        bool p_hidden = false );
 
         /*
@@ -406,11 +406,11 @@ namespace MAP {
          */
         inline u8 loadSprite( u16 p_camX, u16 p_camY, spriteType p_type, const mapSprite& p_sprite,
                               bool p_hidden = false ) {
-            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_type, p_sprite, p_hidden );
+            return loadSprite( p_camX, p_camY, p_camX, p_camY, 3, p_type, p_sprite, p_hidden );
         }
 
         inline u8 loadSprite( u16 p_camX, u16 p_camY, u8 p_partilcleId, bool p_hidden = false ) {
-            return loadSprite( p_camX, p_camY, p_camX, p_camY, p_partilcleId, p_hidden );
+            return loadSprite( p_camX, p_camY, p_camX, p_camY, 3, p_partilcleId, p_hidden );
         }
 
         /*

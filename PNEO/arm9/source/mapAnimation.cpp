@@ -6,7 +6,7 @@ file        : mapDrawer.cpp
 author      : Philip Wellnitz
 description : Map drawing engine: functions related to animating the map
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -89,7 +89,7 @@ namespace MAP {
         u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         if( !p_frame ) {
-            auto res = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation );
+            auto res = _mapSprites.loadSprite( curx, cury, p_globX, p_globY, 3, p_animation );
             _mapSprites.drawFrame( res, 1 );
             if( p_animation == mapSpriteManager::SPR_LONG_GRASS ) {
                 _mapSprites.setPriority( res, OBJPRIORITY_1 );
@@ -196,7 +196,7 @@ namespace MAP {
         }
 
         auto ad = _tileAnimations[ { p_globX, p_globY, 0 } ]
-            = { _mapSprites.loadSprite( curx, cury, p_globX, p_globY, p_animation ),
+            = { _mapSprites.loadSprite( curx, cury, p_globX, p_globY, 3, p_animation ),
                 mapSpriteManager::animationExpiry( p_animation ), p_animation, 0 };
         if( frame || flipX || flipY ) {
             _mapSprites.drawFrame( ad.m_spriteId, frame, flipX, false, flipY );
