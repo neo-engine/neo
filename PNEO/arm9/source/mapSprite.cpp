@@ -25,11 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "map/mapSprite.h"
 #include "fs/fs.h"
 #include "io/message.h"
 #include "io/uio.h"
 #include "map/mapSlice.h"
-#include "map/mapSprite.h"
 #include "save/saveGame.h"
 
 #define SPR_MAPTILE_OAM( p_idx )         ( 0 + ( p_idx ) )
@@ -94,11 +94,11 @@ namespace MAP {
             bool female  = p_female;
 
             if( !forme ) {
-                snprintf( buf, 99, "%02d/%hu%s%s", species / ITEMS_PER_DIR, species,
-                          shiny ? "s" : "", female ? "f" : "" );
+                snprintf( buf, 99, "%d/%hu%s%s", species / ITEMS_PER_DIR, species,
+                          female ? "f" : "", shiny ? "s" : "" );
             } else {
-                snprintf( buf, 99, "%02d/%hu%s%s_%hhu", species / ITEMS_PER_DIR, species,
-                          shiny ? "s" : "", female ? "f" : "", forme );
+                snprintf( buf, 99, "%d/%hu_%hhu%s%s", species / ITEMS_PER_DIR, species, forme,
+                          female ? "f" : "", shiny ? "s" : "" );
             }
             f = FS::open( IO::OWP_PATH, buf, ".rsd" );
 

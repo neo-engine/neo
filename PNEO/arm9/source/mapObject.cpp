@@ -307,11 +307,10 @@ namespace MAP {
 
         char buf[ 100 ];
         if( !p_forme ) {
-            snprintf( buf, 99, "%02d/%hu%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId,
-                      p_shiny ? "s" : "" );
+            snprintf( buf, 99, "%d/%hu%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId, p_shiny ? "s" : "" );
         } else {
-            snprintf( buf, 99, "%02d/%hu%s_%hhu", p_pkmnId / ITEMS_PER_DIR, p_pkmnId,
-                      p_shiny ? "s" : "", p_forme );
+            snprintf( buf, 99, "%d/%hu_%hhu%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId, p_forme,
+                      p_shiny ? "s" : "" );
         }
         FILE* f = FS::open( IO::OWP_PATH, buf, ".rsd" );
         if( !f ) { return lstres = false; }
