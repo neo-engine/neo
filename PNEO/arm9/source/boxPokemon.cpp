@@ -63,6 +63,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_oTId  = p_id;
     m_oTSid = p_sid;
     m_pid   = rand( );
+    m_shinyType = 0;
     if( p_shiny == 2 ) {
         while( !isShiny( ) ) { m_pid = rand( ); }
         m_shinyType = 2;

@@ -171,11 +171,11 @@ namespace IO {
         case DSQ_SPAWN_DEFAULT_TEAM: {
             init( );
             IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-            auto          res  = menu.getResult( GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
-                                                 std::vector<u16>{ FS::DESQUID_STRING + 61,
-                                                                   FS::DESQUID_STRING + 62,
-                                                                   FS::DESQUID_STRING + 63 },
-                                                 true );
+            auto          res  = menu.getResult(
+                GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
+                std::vector<u16>{ FS::DESQUID_STRING + 61, FS::DESQUID_STRING + 64,
+                                            FS::DESQUID_STRING + 62, FS::DESQUID_STRING + 63 },
+                true );
             switch( res ) {
             case 0: { // default team
                 memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
@@ -227,11 +227,22 @@ namespace IO {
 
                 break;
             }
-            case 1: { // repel 9999
+            case 1: { // fill boxes
+                for( u16 pid = 1; pid <= MAX_PKMN; ++pid ) {
+                    auto box    = ( pid - 1 ) / 30;
+                    auto boxpos = ( pid - 1 ) % 30;
+
+                    SAVE::SAV.getActiveFile( ).m_storedPokemon[ box ][ boxpos ]
+                        = boxPokemon( pid, 75, 0, 0, 255 );
+                }
+
+                break;
+            }
+            case 2: { // repel 9999
                 SAVE::SAV.getActiveFile( ).m_repelSteps = 9999;
                 break;
             }
-            case 2: { // repel off
+            case 3: { // repel off
                 SAVE::SAV.getActiveFile( ).m_repelSteps = 0;
                 break;
             }

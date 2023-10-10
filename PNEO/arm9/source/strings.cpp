@@ -145,6 +145,7 @@ namespace FS {
         { "Default Team" },
         { "Repel 9999" },
         { "Repel Off" },
+        { "Fill Boxes" },
     };
 
 #endif
