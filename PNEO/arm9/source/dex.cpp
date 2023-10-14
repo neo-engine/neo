@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "dex/dex.h"
 #include "dex/dexUI.h"
+#include "gen/pokemonFormes.h"
 #include "io/choiceBox.h"
 #include "io/uio.h"
 #include "save/saveGame.h"
@@ -137,6 +138,7 @@ namespace DEX {
         if( SAVE::SAV.getActiveFile( ).seen( p_idx ) ) { SOUND::playCry( p_idx, 0, false ); }
 
         SAVE::SAV.getActiveFile( ).m_lstDex = p_idx;
+        if( formeIdx( p_idx, p_forme ) == -1 ) { p_forme = _currentForme = 0; }
         _dexUI->nationalSelectIndex( SAVE::SAV.getActiveFile( ).m_lstDex, _natDexUB, true, p_forme,
                                      p_shiny, p_female );
     }
@@ -150,6 +152,7 @@ namespace DEX {
         }
         return 255;
     }
+
     u8 getPrevEntryInRow( u16 p_row, u8 p_slot = 0 ) {
         for( u8 i = p_slot + 1; i; --i ) {
             if( LOCAL_DEX_PAGES[ p_row ][ i - 1 ] ) { return i - 1; }
@@ -206,7 +209,10 @@ namespace DEX {
 
         u16 pkmn = LOCAL_DEX_PAGES[ SAVE::SAV.getActiveFile( ).m_lstLocalDexPage ]
                                   [ SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ];
-        if( SAVE::SAV.getActiveFile( ).seen( pkmn ) ) { SOUND::playCry( pkmn, 0, false ); }
+
+        if( formeIdx( pkmn, p_forme ) == -1 ) { p_forme = _currentForme = 0; }
+
+        if( SAVE::SAV.getActiveFile( ).seen( pkmn ) ) { SOUND::playCry( pkmn, p_forme, false ); }
         _dexUI->localSelectPageSlot( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
                                      SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot,
                                      _locLastPage.first, true, p_forme, p_shiny, p_female );
@@ -253,7 +259,8 @@ namespace DEX {
                     // TODO
                 } else if( _mode == mode::LOCAL_DEX ) {
                     selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage + 1,
-                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, 1 );
+                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, 1, false,
+                                 _currentForme );
                 }
 
                 cooldown = COOLDOWN_COUNT;
@@ -264,7 +271,8 @@ namespace DEX {
                     // TODO
                 } else if( _mode == mode::LOCAL_DEX ) {
                     selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage - 1,
-                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, -1 );
+                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, -1, false,
+                                 _currentForme );
                 }
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
@@ -281,9 +289,11 @@ namespace DEX {
                                                          + 1 ),
                              sl != 255 && sl > SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ) ) {
                         selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
-                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot + 1, 1 );
+                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot + 1, 1, false,
+                                     _currentForme );
                     } else {
-                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage + 1, 0, 1 );
+                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage + 1, 0, 1, false,
+                                     _currentForme );
                     }
                 }
                 cooldown = COOLDOWN_COUNT;
@@ -301,10 +311,11 @@ namespace DEX {
                                                          - 1 ),
                              sl != 255 && sl < SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ) ) {
                         selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
-                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot - 1, -1 );
+                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot - 1, -1, false,
+                                     _currentForme );
                     } else {
                         selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage - 1,
-                                     MAX_LOCAL_DEX_SLOTS - 1, -1 );
+                                     MAX_LOCAL_DEX_SLOTS - 1, -1, false, _currentForme );
                     }
                 }
                 cooldown = COOLDOWN_COUNT;
@@ -337,7 +348,27 @@ namespace DEX {
             } else if( GET_KEY_COOLDOWN( KEY_Y ) || GET_KEY_COOLDOWN( KEY_A ) ) {
                 // switch info on current page (next forme, etc)
                 SOUND::playSoundEffect( SFX_SELECT );
-                // TODO
+
+                u16 pkmn = LOCAL_DEX_PAGES[ SAVE::SAV.getActiveFile( ).m_lstLocalDexPage ]
+                                          [ SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ];
+
+                int nforme = _currentForme;
+                if( formeIdx( pkmn, _currentForme + 1 ) != -1 ) {
+                    nforme = _currentForme + 1;
+                } else {
+                    nforme = 0;
+                }
+                if( nforme != _currentForme ) {
+                    _currentForme = nforme;
+                    if( _mode == mode::NATIONAL_DEX ) {
+                        selectNational( SAVE::SAV.getActiveFile( ).m_lstDex, true, _currentForme );
+                    } else if( _mode == mode::LOCAL_DEX ) {
+                        selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
+                                     SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, 0, true,
+                                     _currentForme );
+                    }
+                }
+
                 cooldown = COOLDOWN_COUNT;
             }
 
@@ -371,7 +402,7 @@ namespace DEX {
                             auto slot = getLocSlotForNat( t.second );
                             SAVE::SAV.getActiveFile( ).m_lstLocalDexPage = slot.first;
                             SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot = slot.second;
-                            selectLocal( slot.first, slot.second, 0, true );
+                            selectLocal( slot.first, slot.second, 0, true, _currentForme );
                             break;
                         }
                     }

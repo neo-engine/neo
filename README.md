@@ -22,7 +22,7 @@ _Partially_ implemented features are in _italics_.
     * [x] A working PokéDex, listing for each Pokémon
         * [x] A flavor text
         * [x] Types, simplified base stats, height, and weight
-        * [ ] Different forms, if any
+        * [x] Different forms, if any
         * [ ] Locations where (and when) the Pokémon can be found in-game
     * [x] A working battle engine including
         * [x] Single and double trainer battles
