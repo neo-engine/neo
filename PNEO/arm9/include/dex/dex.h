@@ -188,7 +188,7 @@ namespace DEX {
         { PKMN_GOTHITA, PKMN_GOTHORITA, PKMN_GOTHITELLE },
         { PKMN_SOLOSIS, PKMN_DUOSION, PKMN_REUNICLUS },
         { PKMN_WYNAUT, PKMN_WOBBUFFET },
-        { EMPTY, PKMN_GIRAFARIG, PKMN_FARIGIRAF },
+        { PKMN_GIRAFARIG, PKMN_FARIGIRAF },
         { PKMN_MUNNA, PKMN_MUSHARNA },
 
         // Plants and stuff from the forest

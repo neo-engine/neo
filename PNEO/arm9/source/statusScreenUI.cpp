@@ -948,9 +948,9 @@ namespace STS {
                     = SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId( p_pokemon->getSpecies( ) );
 
                 if( dexno != u16( -1 ) ) {
-                    snprintf( buffer, 49, "%03hu", dexno );
+                    snprintf( buffer, 49, "%04hu", dexno );
                 } else {
-                    snprintf( buffer, 49, "???" );
+                    snprintf( buffer, 49, "????" );
                 }
                 writeLineTop( GET_STRING( IO::STR_UI_STS_SPECIES_IDX ), buffer, 0, IO::WHITE_IDX,
                               p_pokemon->isShiny( ) ? IO::RED2_IDX : IO::BLACK_IDX );

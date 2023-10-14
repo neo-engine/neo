@@ -1,0 +1,86 @@
+v1.0-alpha
+Sound engine:
+- Switched to SSEQ/SWAR/SBNK for BGM playback, rework BGM
+- Added BGM fading on BGM swap
+
+Map engine:
+- Added Dive, Fly
+- Added reflective tiles (water, ice)
+- Implemented berries and time-dependent events
+- Added scriptable warps
+- Added map scripts that are activated by a pkmn move
+- Added PokéRadar
+- Added fishing in sand
+- Added fog, rain
+- Added tile exit animations (traces in water/sand); Fortree bridge anim, Pacifidlog log anim
+[ ] PKMN Contests (currently w/o move animations)
+[ ] Berry Blender, Pokéblock Feeder
+[ ] Mauville Game Corner
+[ ] multi battles
+[ ] call 'n' rebattle
+[ ] fite: battle tents, battle factory
+[ ] "fite": infinity cave
+[~] Added proper desquid menu
+
+Battle engine
+- Added A_ILLUSION and A_DISGUISE
+
+PKMN Status Screen:
+- Added ribbons / contest status screen
+- Added ribbon details screen
+[ ] Added contest move information
+
+Demo Story
+- Added indoor / cave maps
+[~] route 104/105/106/107/108/109/abandoned ship
+[~] route 116/rusturf tunnel
+[~] Slateport city
+[ ] route 110
+[ ] route 103 (east)
+[ ] mauville city
+[ ] route 111/112/jagged path/mt chimney/fiery path
+[ ] route 117
+[ ] verdanturf
+[ ] route 113
+[ ] fallarbor
+[ ] route 114/115/meteor falls
+[ ] lavaridge
+[ ] lilycove city
+[ ] safari zone/safari zone game
+[ ] route 120/121/122/mt pyre/scorched slab
+[ ] new lilycove
+[ ] route 135/136/137/138
+[ ] blossand/cliffelta/infinity cave
+[ ] route 118
+[ ] route 119
+[ ] fortree
+[ ] route 124/125/126/127/128/129/130/131
+[ ] mossdeep
+[ ] sootopolis
+[ ] ever grande
+[ ] pacifidlog
+[ ] victory road
+[~] pkmn league
+[~] shoual cave
+[~] cave of origin/sky pillar
+[ ] Added story until E4
+[ ] battle frontier
+- sealed chamber/golems
+
+General:
+- Fixed Flashcard boot problems
+- Added Spinda spots
+- Added PKMN color variations based on PId
+- Update OW / NavApp Map
+- Added Braille support
+[ ] Added in-game credits
+
+- Ate some squids, had some fun
+
+
+sachi-0.4
+- trainer fully editable
+
+sachi-0.3
+- Maps fully(including tiles, wild pkmn, events, ow map) editable
+- TS / BS fully editable
