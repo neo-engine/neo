@@ -233,6 +233,62 @@ struct pkmnEvolveData {
     pkmnEvolution m_evolutions[ 10 ];
 };
 
+constexpr bool hasBattleTransform( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_VENUSAUR:
+    case PKMN_CHARIZARD:
+    case PKMN_BLASTOISE:
+    case PKMN_ALAKAZAM:
+    case PKMN_GENGAR:
+    case PKMN_KANGASKHAN:
+    case PKMN_PINSIR:
+    case PKMN_GYARADOS:
+    case PKMN_AERODACTYL:
+    case PKMN_MEWTWO:
+    case PKMN_AMPHAROS:
+    case PKMN_SCIZOR:
+    case PKMN_HERACROSS:
+    case PKMN_HOUNDOOM:
+    case PKMN_TYRANITAR:
+    case PKMN_BLAZIKEN:
+    case PKMN_GARDEVOIR:
+    case PKMN_MAWILE:
+    case PKMN_AGGRON:
+    case PKMN_MEDICHAM:
+    case PKMN_MANECTRIC:
+    case PKMN_BANETTE:
+    case PKMN_ABSOL:
+    case PKMN_GARCHOMP:
+    case PKMN_LUCARIO:
+    case PKMN_ABOMASNOW:
+    case PKMN_BEEDRILL:
+    case PKMN_PIDGEOT:
+    case PKMN_SLOWBRO:
+    case PKMN_STEELIX:
+    case PKMN_SCEPTILE:
+    case PKMN_SWAMPERT:
+    case PKMN_SABLEYE:
+    case PKMN_SHARPEDO:
+    case PKMN_CAMERUPT:
+    case PKMN_ALTARIA:
+    case PKMN_GLALIE:
+    case PKMN_SALAMENCE:
+    case PKMN_METAGROSS:
+    case PKMN_LATIAS:
+    case PKMN_LATIOS:
+    case PKMN_RAYQUAZA:
+    case PKMN_LOPUNNY:
+    case PKMN_GALLADE:
+    case PKMN_AUDINO:
+    case PKMN_DIANCIE:
+    case PKMN_KYOGRE:
+    case PKMN_GROUDON:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
 constexpr u8 NatMod[ 25 ][ 5 ] = {
     { 10, 10, 10, 10, 10 }, { 11, 9, 10, 10, 10 }, { 11, 10, 10, 10, 9 },  { 11, 10, 9, 10, 10 },
     { 11, 10, 10, 9, 10 },  { 9, 11, 10, 10, 10 }, { 10, 10, 10, 10, 10 }, { 10, 11, 10, 10, 9 },

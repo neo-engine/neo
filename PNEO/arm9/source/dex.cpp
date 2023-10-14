@@ -138,7 +138,11 @@ namespace DEX {
         if( SAVE::SAV.getActiveFile( ).seen( p_idx ) ) { SOUND::playCry( p_idx, 0, false ); }
 
         SAVE::SAV.getActiveFile( ).m_lstDex = p_idx;
-        if( formeIdx( p_idx, p_forme ) == -1 ) { p_forme = _currentForme = 0; }
+        if( formeIdx( p_idx, p_forme ) == -1
+            || ( hasBattleTransform( p_idx )
+                 && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) ) ) {
+            p_forme = _currentForme = 0;
+        }
         _dexUI->nationalSelectIndex( SAVE::SAV.getActiveFile( ).m_lstDex, _natDexUB, true, p_forme,
                                      p_shiny, p_female );
     }
@@ -210,7 +214,11 @@ namespace DEX {
         u16 pkmn = LOCAL_DEX_PAGES[ SAVE::SAV.getActiveFile( ).m_lstLocalDexPage ]
                                   [ SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ];
 
-        if( formeIdx( pkmn, p_forme ) == -1 ) { p_forme = _currentForme = 0; }
+        if( formeIdx( pkmn, p_forme ) == -1
+            || ( hasBattleTransform( pkmn )
+                 && !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) ) ) {
+            p_forme = _currentForme = 0;
+        }
 
         if( SAVE::SAV.getActiveFile( ).seen( pkmn ) ) { SOUND::playCry( pkmn, p_forme, false ); }
         _dexUI->localSelectPageSlot( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
@@ -353,11 +361,15 @@ namespace DEX {
                                           [ SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot ];
 
                 int nforme = _currentForme;
-                if( formeIdx( pkmn, _currentForme + 1 ) != -1 ) {
+
+                if( formeIdx( pkmn, _currentForme + 1 ) != -1
+                    && ( !hasBattleTransform( pkmn )
+                         || SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_MEGA_EVOLUTION ) ) ) {
                     nforme = _currentForme + 1;
                 } else {
                     nforme = 0;
                 }
+
                 if( nforme != _currentForme ) {
                     _currentForme = nforme;
                     if( _mode == mode::NATIONAL_DEX ) {
