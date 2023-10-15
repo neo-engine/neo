@@ -147,7 +147,7 @@ namespace SOUND {
         case TC_LEADER:
         case TC__LEADER:
         case TC_LEADERS: return BGM_BATTLE_GYM_LEADER;
-        case TC_ELITE_FOUR: return BGM_BATTLE_SHITENOU;
+        case TC_ELITE_FOUR: return BGM_BATTLE_SHITENNO;
         case TC_CHAMPION: return BGM_BATTLE_CHAMPION;
         case TC_FRONTIER_BRAIN: return BGM_BATTLE_FRONTIER_BRAIN;
         case TC_MAGMA_LEADER:
