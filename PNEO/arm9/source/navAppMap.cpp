@@ -217,7 +217,8 @@ namespace IO {
 
             computeCursorLocationId( );
             if( _cursorLocationId != oldl ) {
-                if( _cursorLocationId ) {
+                if( _cursorLocationId
+                    && MAP::MAP_LOCATIONS.m_defaultLocation != _cursorLocationId ) {
                     snprintf( buffer, TMP_BUFFER_SIZE, "%s: %s",
                               FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
                               FS::getLocation( _cursorLocationId ).c_str( ) );

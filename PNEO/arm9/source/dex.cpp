@@ -144,7 +144,7 @@ namespace DEX {
             p_forme = _currentForme = 0;
         }
         _dexUI->nationalSelectIndex( SAVE::SAV.getActiveFile( ).m_lstDex, _natDexUB, true, p_forme,
-                                     p_shiny, p_female );
+                                     p_shiny, p_female, _currentPage );
     }
 
     u8 getNextEntryInRow( u16 p_row, u8 p_slot = 0 ) {
@@ -223,7 +223,8 @@ namespace DEX {
         if( SAVE::SAV.getActiveFile( ).seen( pkmn ) ) { SOUND::playCry( pkmn, p_forme, false ); }
         _dexUI->localSelectPageSlot( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
                                      SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot,
-                                     _locLastPage.first, true, p_forme, p_shiny, p_female );
+                                     _locLastPage.first, true, p_forme, p_shiny, p_female,
+                                     _currentPage );
     }
 
     bool dex::runModeChoice( ) {
@@ -327,18 +328,37 @@ namespace DEX {
                     }
                 }
                 cooldown = COOLDOWN_COUNT;
-            } /* else if( GET_KEY_COOLDOWN( KEY_L ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_L ) ) {
                 // switch to prev page
                 SOUND::playSoundEffect( SFX_SELECT );
-                // TODO
+
+                _currentPage ^= 1;
+
+                if( _mode == mode::NATIONAL_DEX ) {
+                    selectNational( SAVE::SAV.getActiveFile( ).m_lstDex, true, _currentForme );
+                } else if( _mode == mode::LOCAL_DEX ) {
+                    selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
+                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, 0, true,
+                                 _currentForme );
+                }
+
                 cooldown = COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_R ) ) {
                 // switch to next page
                 SOUND::playSoundEffect( SFX_SELECT );
-                // TODO
+
+                _currentPage ^= 1;
+
+                if( _mode == mode::NATIONAL_DEX ) {
+                    selectNational( SAVE::SAV.getActiveFile( ).m_lstDex, true, _currentForme );
+                } else if( _mode == mode::LOCAL_DEX ) {
+                    selectLocal( SAVE::SAV.getActiveFile( ).m_lstLocalDexPage,
+                                 SAVE::SAV.getActiveFile( ).m_lstLocalDexSlot, 0, true,
+                                 _currentForme );
+                }
+
                 cooldown = COOLDOWN_COUNT;
-            } */
-            else if( GET_KEY_COOLDOWN( KEY_SELECT ) ) {
+            } else if( GET_KEY_COOLDOWN( KEY_SELECT ) ) {
                 // switch mode local/national dex
                 if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED )
                     && SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED ) ) {

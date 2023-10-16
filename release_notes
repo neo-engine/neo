@@ -25,22 +25,26 @@ Map engine:
 Battle engine
 - Added A_ILLUSION and A_DISGUISE
 
-PKMN Status Screen:
+PKMN Status Screen
 - Added ribbons / contest status screen
 - Added ribbon details screen
 [ ] Added contest move information
+
+Dex
+- Added toggle for different formes
+- Added habitat viewer
 
 Demo Story
 - Added indoor / cave maps
 [~] route 104/105/106/107/108/109/abandoned ship
 [~] route 116/rusturf tunnel
 [~] Slateport city
-[ ] route 110
-[ ] route 103 (east)
-[ ] mauville city
+[~] route 110
+[~] route 103 (east)
+[~] mauville city
 [ ] route 111/112/jagged path/mt chimney/fiery path
-[ ] route 117
-[ ] verdanturf
+[~] route 117
+[~] verdanturf
 [ ] route 113
 [ ] fallarbor
 [ ] route 114/115/meteor falls
@@ -61,11 +65,12 @@ Demo Story
 [ ] pacifidlog
 [ ] victory road
 [~] pkmn league
-[~] shoual cave
+[~] shoal cave
 [~] cave of origin/sky pillar
 [ ] Added story until E4
 [ ] battle frontier
 - sealed chamber/golems
+- roaming lati@s
 
 General:
 - Fixed Flashcard boot problems

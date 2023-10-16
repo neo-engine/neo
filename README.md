@@ -23,7 +23,7 @@ _Partially_ implemented features are in _italics_.
         * [x] A flavor text
         * [x] Types, simplified base stats, height, and weight
         * [x] Different forms, if any
-        * [ ] Locations where (and when) the Pokémon can be found in-game
+        * [x] Locations where (and when) the Pokémon can be found in-game
     * [x] A working battle engine including
         * [x] Single and double trainer battles
         * [ ] Multi trainer battles

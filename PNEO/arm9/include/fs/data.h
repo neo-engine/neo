@@ -84,6 +84,8 @@ namespace FS {
      */
     bool loadLocationData( u8 p_bank );
 
+    FILE* openHabitatData( u8 p_bank );
+
     // sprite / picture data
 
     // bool readNavScreenData( u16* p_layer, const char* p_name, u8 p_no );

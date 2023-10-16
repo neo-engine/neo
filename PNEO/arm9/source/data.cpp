@@ -76,8 +76,8 @@ namespace FS {
     const char POKEMON_SPECIES_PATH[]  = "nitro:/DATA/PKMN_SPCS/pkmnspcs";
     const char POKEMON_DEXENTRY_PATH[] = "nitro:/DATA/PKMN_DXTR/pkmndxtr";
 
-    const char BATTLE_STRINGS_PATH[]    = "nitro:/DATA/TRNR_STRS/";
-    const char* BATTLE_TRAINER_PATHS[3] = {
+    const char  BATTLE_STRINGS_PATH[]     = "nitro:/DATA/TRNR_STRS/";
+    const char* BATTLE_TRAINER_PATHS[ 3 ] = {
         "nitro:/DATA/TRNR_DATA/0/",
         "nitro:/DATA/TRNR_DATA/1/",
         "nitro:/DATA/TRNR_DATA/2/",
@@ -185,6 +185,10 @@ namespace FS {
 
     FILE* openScript( u16 p_scriptId ) {
         return openSplit( SCRIPT_PATH, p_scriptId, ".mapscr", 10 * 30 );
+    }
+
+    FILE* openHabitatData( u8 p_bank ) {
+        return open( MAPLOCATION_PATH, p_bank, ".wpoke.data" );
     }
 
     bool loadLocationData( u8 p_bank ) {

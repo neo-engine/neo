@@ -41,6 +41,12 @@ namespace DEX {
 
         u16 _localSelectedPage;
 
+        u8 _OWbank;
+
+        u8 _OWmarginTop, _OWmarginLeft, _OWsizeX, _OWsizeY;
+
+        FILE* _OWhabitats = nullptr;
+
         std::vector<std::pair<IO::touchInputTarget, u16>> _touchPositions;
         std::pair<IO::touchInputTarget, u16>              _backChoice;
 
@@ -96,6 +102,10 @@ namespace DEX {
         dexUI( ) {
         }
 
+        ~dexUI( ) {
+            if( _OWhabitats ) { fclose( _OWhabitats ); }
+        }
+
         /*
          * @brief: Initializes the general dex UI. Destroys everything on both screens.
          */
@@ -130,7 +140,8 @@ namespace DEX {
          * @param p_pkmnIdxUB: Entries above this value will be hidden.
          */
         void nationalSelectIndex( u16 p_pkmnIdx, u16 p_pkmnIdxUB = 0, bool p_bottom = true,
-                                  u8 p_forme = 0, bool p_shiny = false, bool p_female = false );
+                                  u8 p_forme = 0, bool p_shiny = false, bool p_female = false,
+                                  u8 p_infoPage = 0 );
 
         /*
          * @brief: Draws the bottom screen of the local pokedex with the specified pkmn
@@ -139,7 +150,8 @@ namespace DEX {
          * @param p_pageUB: Pages above this value will be hidden.
          */
         void localSelectPageSlot( u16 p_page, u8 p_slot, u16 p_pageUB = 0, bool p_bottom = true,
-                                  u8 p_forme = 0, bool p_shiny = false, bool p_female = false );
+                                  u8 p_forme = 0, bool p_shiny = false, bool p_female = false,
+                                  u8 p_infoPage = 0 );
 
         /*
          * @brief: Returns information for the current buttons on the screen.

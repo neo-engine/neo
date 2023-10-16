@@ -53,6 +53,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_PKMN_Y           ( 108 )
 #define SPR_TYPE_X( p_type ) ( 256 - 20 - 64 + 32 * ( p_type ) )
 #define SPR_TYPE_Y( p_type ) ( 112 )
+#define SPR_NAMEBOX_Y        ( 192 - 64 - 18 )
+#define SPR_NAMEBOX_Y2       ( 192 - 18 )
+
+#define SPR_TYPE_Y2( p_type ) ( 176 )
+
+#define SPR_CAUGHT_X  20
+#define SPR_CAUGHT_Y  112
+#define SPR_CAUGHT_Y2 176
 
 #define SPR_BOX_PAL            0
 #define SPR_PKMN_PAL           1
@@ -165,6 +173,26 @@ namespace DEX {
         _nationalSelectedIdx = 0;
         _localSelectedPage   = -1;
 
+        _OWbank = 0;
+        if( FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_currentMap ) ) {
+            _OWbank = SAVE::SAV.getActiveFile( ).m_currentMap;
+        } else if( FSDATA.isOWMap( SAVE::SAV.getActiveFile( ).m_lastOWPos.first ) ) {
+            _OWbank = SAVE::SAV.getActiveFile( ).m_lastOWPos.first;
+        }
+
+        // open and read basic data about habitat map
+        if( _OWhabitats ) { fclose( _OWhabitats ); }
+        _OWhabitats = FS::openHabitatData( _OWbank );
+        if( !_OWhabitats ) {
+            _OWmarginTop = _OWmarginLeft = _OWsizeX = _OWsizeY = 0;
+        } else {
+            fread( &_OWsizeX, sizeof( u8 ), 1, _OWhabitats );
+            fread( &_OWsizeY, sizeof( u8 ), 1, _OWhabitats );
+            fread( &_OWmarginTop, sizeof( u8 ), 1, _OWhabitats ); // skip image res
+            fread( &_OWmarginLeft, sizeof( u8 ), 1, _OWhabitats );
+            fread( &_OWmarginTop, sizeof( u8 ), 1, _OWhabitats );
+        }
+
         videoSetMode( MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE
                       | DISPLAY_SPR_1D );
         vramSetBankD( VRAM_D_SUB_SPRITE );
@@ -255,11 +283,11 @@ namespace DEX {
         // pkmn name box
         for( u8 i = 1; i < 9; ++i ) {
             IO::loadSprite( SPR_NAMEBOX_OAM + i, SPR_NAMEBOX_PAL, tileCnt, 12 + 24 * i,
-                            192 - 64 - 18, 32, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3,
+                            SPR_NAMEBOX_Y, 32, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3,
                             false );
         }
         tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_NAMEBOX_OAM, SPR_NAMEBOX_PAL,
-                                  tileCnt, 12, 192 - 64 - 18, 32, 32, false, false, false,
+                                  tileCnt, 12, SPR_NAMEBOX_Y, 32, 32, false, false, false,
                                   OBJPRIORITY_3, false );
 
         // pkmn base stat stars
@@ -282,8 +310,9 @@ namespace DEX {
         tileCnt += 8;
 
         // init caught ball
-        tileCnt = IO::loadSprite( "DX/caught", SPR_CAUGHT_OAM, SPR_CAUGHT_PAL, tileCnt, 20, 112, 16,
-                                  16, false, false, true, OBJPRIORITY_0, false );
+        tileCnt
+            = IO::loadSprite( "DX/caught", SPR_CAUGHT_OAM, SPR_CAUGHT_PAL, tileCnt, SPR_CAUGHT_X,
+                              SPR_CAUGHT_Y, 16, 16, false, false, true, OBJPRIORITY_0, false );
 
         IO::updateOAM( true );
         IO::updateOAM( false );
@@ -522,6 +551,7 @@ namespace DEX {
             _nationalSelectedIdx = 0;
             _localSelectedPage   = -1;
         }
+        IO::regularFont->printStringC( GET_STRING( 706 ), 32, 176, true );
     }
 
     void dexUI::selectMode( u8 p_newMode ) {
@@ -543,7 +573,142 @@ namespace DEX {
 
         char buffer[ 100 ];
 
-        if( p_page == 0 ) {
+        if( p_page == 1 ) {
+            for( u8 i = 0; i < 30; ++i ) { oamTop[ i + SPR_STAR_START_OAM ].isHidden = true; }
+            for( u8 i = 0; i < 4; ++i ) {
+                oamTop[ i + SPR_TEXTBOX_OAM ].isHidden    = true;
+                oamTop[ SPR_PKMN_START_OAM + i ].isHidden = true;
+            }
+            for( u8 i = 0; i < 9; ++i ) { oamTop[ i + SPR_NAMEBOX_OAM ].y = SPR_NAMEBOX_Y2; }
+
+            // habitats
+
+            // show habitats on current ow map and for current daytime
+
+            auto daytime = getCurrentDaytime( );
+
+            snprintf( buffer, 90, "map%hhu.wp", _OWbank );
+            FS::readPictureData( p_bottom ? bgGetGfxPtr( IO::bg3sub ) : bgGetGfxPtr( IO::bg3 ),
+                                 "nitro:/PICS/DEX/", buffer, 2 * 230, 6, 49152, p_bottom );
+
+            IO::printRectangle( 20, 32, 235, 192, p_bottom, 0 );
+
+            // heading
+            IO::regularFont->printStringC( GET_STRING( 707 + daytime ), 128, 34, p_bottom,
+                                           IO::font::CENTER );
+
+            BG_PALETTE[ IO::RED_IDX ]   = IO::GREEN;
+            BG_PALETTE[ IO::BLUE_IDX ]  = IO::BLUE;
+            BG_PALETTE[ IO::RED2_IDX ]  = IO::GREEN2;
+            BG_PALETTE[ IO::BLUE2_IDX ] = IO::BLUE2;
+
+            // print habitats
+            if( !_OWhabitats || ( !seen && !caught ) ) {
+                IO::regularFont->printStringC( GET_STRING( 711 ), 128, 100, p_bottom,
+                                               IO::font::CENTER );
+            } else {
+                auto res = fseek( _OWhabitats,
+                                  5 + p_pkmn.m_pkmnIdx * ( 1 + u16( _OWsizeX ) * u16( _OWsizeY ) ),
+                                  SEEK_SET );
+
+                u8 hasHabitats = 0;
+                fread( &hasHabitats, 1, 1, _OWhabitats );
+
+                if( res || !hasHabitats ) {
+                    IO::regularFont->printStringC( GET_STRING( 711 ), 128, 100, p_bottom,
+                                                   IO::font::CENTER );
+                } else {
+
+                    // draw habitats
+                    for( u8 y{ 0 }; y < _OWsizeY; ++y ) {
+                        for( u8 x{ 0 }; x < _OWsizeX; ++x ) {
+                            u8 habxy = 0;
+                            fread( &habxy, 1, 1, _OWhabitats );
+                            if( !x || !y ) { continue; }
+
+                            auto color = 0;
+
+                            if( habxy & ( 1 << daytime ) ) {
+                                // pkmn can be caught on this map
+                                color = IO::RED_IDX;
+                            } else if( habxy & ( 1 << ( 4 + daytime ) ) ) {
+                                // pkmn can be caught on this map (underwater)
+                                color = IO::BLUE_IDX;
+                            } else if( habxy & 15 ) {
+                                color = IO::RED2_IDX;
+                            } else if( habxy & ( 15 << 4 ) ) {
+                                color = IO::BLUE2_IDX;
+                            }
+
+                            if( color ) {
+                                IO::printRectangle( _OWmarginLeft + 2 + 8 * x,
+                                                    _OWmarginTop + 2 + 8 * y,
+                                                    _OWmarginLeft + 6 + 8 * x,
+                                                    6 + _OWmarginTop + 8 * y, p_bottom, color );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // load types
+            if( caught ) {
+                IO::loadTypeIcon( data.m_baseForme.m_types[ 1 ], SPR_TYPE_X( 1 ), SPR_TYPE_Y2( 1 ),
+                                  SPR_TYPE_OAM( 1 ), SPR_TYPE_PAL( 1 ),
+                                  oamTop[ SPR_TYPE_OAM( 1 ) ].gfxIndex, p_bottom,
+                                  CURRENT_LANGUAGE );
+                if( data.m_baseForme.m_types[ 0 ] != data.m_baseForme.m_types[ 1 ] ) {
+                    IO::loadTypeIcon( data.m_baseForme.m_types[ 0 ], SPR_TYPE_X( 0 ),
+                                      SPR_TYPE_Y2( 0 ), SPR_TYPE_OAM( 0 ), SPR_TYPE_PAL( 0 ),
+                                      oamTop[ SPR_TYPE_OAM( 0 ) ].gfxIndex, p_bottom,
+                                      CURRENT_LANGUAGE );
+                } else {
+                    oamTop[ SPR_TYPE_OAM( 0 ) ].isHidden = true;
+                }
+            } else {
+                IO::loadTypeIcon( BATTLE::TYPE_UNKNOWN, SPR_TYPE_X( 1 ), SPR_TYPE_Y2( 1 ),
+                                  SPR_TYPE_OAM( 1 ), SPR_TYPE_PAL( 1 ),
+                                  oamTop[ SPR_TYPE_OAM( 1 ) ].gfxIndex, p_bottom,
+                                  CURRENT_LANGUAGE );
+                oamTop[ SPR_TYPE_OAM( 0 ) ].isHidden = true;
+            }
+
+            // dex no
+            if( _mode ) {
+                snprintf( buffer, 99, "%04hu%c", p_pkmn.m_pkmnIdx,
+                          p_pkmn.m_forme ? 'a' + p_pkmn.m_forme - 1 : 0 );
+            } else {
+                snprintf( buffer, 99, "%03hu%c", getDexNo( p_pkmn.m_pkmnIdx ),
+                          p_pkmn.m_forme ? 'a' + p_pkmn.m_forme - 1 : 0 );
+            }
+            IO::regularFont->printStringC( buffer, 36, 176, p_bottom, IO::font::LEFT );
+
+            // pkmn name
+            if( seen || caught ) {
+                IO::regularFont->printStringC( FS::getDisplayName( p_pkmn.m_pkmnIdx, 0 ).c_str( ),
+                                               128, 176, p_bottom, IO::font::CENTER );
+            } else {
+                IO::regularFont->printStringC( GET_STRING( 581 ), 128, 176, p_bottom,
+                                               IO::font::CENTER );
+            }
+
+            // pokeball icon if pkmn caught
+            oamTop[ SPR_CAUGHT_OAM ].y = SPR_CAUGHT_Y2;
+            if( caught ) {
+                oamTop[ SPR_CAUGHT_OAM ].isHidden = false;
+                oamTop[ SPR_CAUGHT_OAM ].palette  = SPR_CAUGHT_PAL;
+            } else if( seen ) {
+                oamTop[ SPR_CAUGHT_OAM ].isHidden = false;
+                oamTop[ SPR_CAUGHT_OAM ].palette  = SPR_SHADOW_PAL;
+            } else {
+                oamTop[ SPR_CAUGHT_OAM ].isHidden = true;
+            }
+        } else if( p_page == 0 ) {
+            for( u8 i = 0; i < 4; ++i ) { oamTop[ i + SPR_TEXTBOX_OAM ].isHidden = false; }
+            for( u8 i = 0; i < 9; ++i ) { oamTop[ i + SPR_NAMEBOX_OAM ].y = SPR_NAMEBOX_Y; }
+
+            FS::readPictureData( p_bottom ? bgGetGfxPtr( IO::bg3sub ) : bgGetGfxPtr( IO::bg3 ),
+                                 "nitro:/PICS/DEX/", "dexsub3", 2 * 230, 49152, p_bottom );
             // load pkmn sprite
             pkmnSpriteInfo pinfo = p_pkmn;
             if( !seen && !caught ) { pinfo = { 0, 0, false, false, false, DEFAULT_SPRITE_PID }; }
@@ -601,6 +766,7 @@ namespace DEX {
             IO::regularFont->printStringC( buffer, 36, 112, p_bottom, IO::font::LEFT );
 
             // pokeball icon if pkmn caught
+            oamTop[ SPR_CAUGHT_OAM ].y = SPR_CAUGHT_Y;
             if( caught ) {
                 oamTop[ SPR_CAUGHT_OAM ].isHidden = false;
                 oamTop[ SPR_CAUGHT_OAM ].palette  = SPR_CAUGHT_PAL;
@@ -725,8 +891,13 @@ namespace DEX {
             if( !_mode && !p_isHidden && ispkmn ) {
                 // load dex no (only in local dex mode
                 char buffer[ 20 ];
-                snprintf( buffer, 99, "%04hu%c", _mode ? p_pkmnIdx : getDexNo( p_pkmnIdx ),
-                          p_pkmnForme ? 'a' + p_pkmnForme - 1 : 0 );
+                if( _mode ) {
+                    snprintf( buffer, 99, "%04hu%c", p_pkmnIdx,
+                              p_pkmnForme ? 'a' + p_pkmnForme - 1 : 0 );
+                } else {
+                    snprintf( buffer, 99, "%03hu%c", getDexNo( p_pkmnIdx ),
+                              p_pkmnForme ? 'a' + p_pkmnForme - 1 : 0 );
+                }
 
                 std::memset( IO::TEXT_BUF, 0, sizeof( IO::TEXT_BUF ) );
 
@@ -948,9 +1119,9 @@ namespace DEX {
     }
 
     void dexUI::nationalSelectIndex( u16 p_pkmnIdx, u16 p_pkmnIdxUB, bool p_bottom, u8 p_forme,
-                                     bool p_shiny, bool p_female ) {
+                                     bool p_shiny, bool p_female, u8 p_infoPage ) {
         pkmnSpriteInfo pinfo = { p_pkmnIdx, p_forme, p_female, p_shiny, false, DEFAULT_SPRITE_PID };
-        drawPkmnInfo( pinfo, 0, !p_bottom );
+        drawPkmnInfo( pinfo, p_infoPage, !p_bottom );
         if( !_nationalSelectedIdx || _nationalSelectedIdx == p_pkmnIdx ) {
             nationalInitSub( p_pkmnIdx, p_pkmnIdxUB, p_bottom );
         } else if( _nationalSelectedIdx > p_pkmnIdx ) {
@@ -1028,14 +1199,14 @@ namespace DEX {
     }
 
     void dexUI::localSelectPageSlot( u16 p_page, u8 p_slot, u16 p_pageUB, bool p_bottom, u8 p_forme,
-                                     bool p_shiny, bool p_female ) {
+                                     bool p_shiny, bool p_female, u8 p_infoPage ) {
         pkmnSpriteInfo pinfo = { LOCAL_DEX_PAGES[ p_page ][ p_slot ],
                                  p_forme,
                                  p_female,
                                  p_shiny,
                                  false,
                                  DEFAULT_SPRITE_PID };
-        drawPkmnInfo( pinfo, 0, !p_bottom );
+        drawPkmnInfo( pinfo, p_infoPage, !p_bottom );
         SpriteEntry* oam   = p_bottom ? IO::Oam->oamBuffer : IO::OamTop->oamBuffer;
         u16          dpage = ( p_page - 1 ) / 4 * 4;
 
