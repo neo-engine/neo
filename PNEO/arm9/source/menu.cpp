@@ -206,12 +206,7 @@ namespace IO {
                     } else {
                         a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
                     }
-
-                    for( u16 j = 1; j <= MAX_PKMN; ++j ) {
-                        SAVE::SAV.getActiveFile( ).registerCaughtPkmn( j );
-                    }
                 }
-
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_FLASH;
                 SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
@@ -228,12 +223,18 @@ namespace IO {
                 break;
             }
             case 1: { // fill boxes
+                memset( SAVE::SAV.getActiveFile( ).m_caughtPkmn, 0,
+                        sizeof( SAVE::SAV.getActiveFile( ).m_caughtPkmn ) );
+                memset( SAVE::SAV.getActiveFile( ).m_seenPkmn, 0,
+                        sizeof( SAVE::SAV.getActiveFile( ).m_seenPkmn ) );
+                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_NAT_DEX_OBTAINED, 1 );
                 for( u16 pid = 1; pid <= MAX_PKMN; ++pid ) {
                     auto box    = ( pid - 1 ) / 30;
                     auto boxpos = ( pid - 1 ) % 30;
 
                     SAVE::SAV.getActiveFile( ).m_storedPokemon[ box ][ boxpos ]
                         = boxPokemon( pid, 75, 0, 0, 255 );
+                    SAVE::SAV.getActiveFile( ).registerCaughtPkmn( pid );
                 }
 
                 break;

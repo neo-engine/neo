@@ -236,9 +236,9 @@ namespace SAVE {
 
             BOX::box m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
 
-            u8 m_caughtPkmn[ 125 ]; // The pkmn the player has caught
-            u8 m_seenPkmn[ 125 ];   // The pkmn the player has seen
-            u8 m_shinyPkmn[ 125 ];  // The pkmn the player has seen as a shiny (unused)
+            u8 m_caughtPkmn[ 185 ]; // The pkmn the player has caught
+            u8 m_seenPkmn[ 185 ];   // The pkmn the player has seen
+            u8 m_reserved2[ 5 ];
 
             /*
              * @brief: tries to register a new fly pos; returns true on success.
@@ -314,7 +314,7 @@ namespace SAVE {
             inline u16 getSeenCount( ) const {
                 if( !checkFlag( F_NAT_DEX_OBTAINED ) ) { return getLocalSeenCount( ); }
                 u16 res = 0;
-                for( u8 i = 0; i < 125; ++i ) {
+                for( u8 i = 0; i < 185; ++i ) {
                     // Count the number of set bits
                     res += std::popcount( m_seenPkmn[ i ] );
                 }
@@ -332,7 +332,7 @@ namespace SAVE {
             inline u16 getCaughtCount( ) const {
                 if( !checkFlag( F_NAT_DEX_OBTAINED ) ) { return getLocalCaughtCount( ); }
                 u16 res = 0;
-                for( u8 i = 0; i < 125; ++i ) {
+                for( u8 i = 0; i < 185; ++i ) {
                     // Count the number of set bits
                     res += std::popcount( m_caughtPkmn[ i ] );
                 }

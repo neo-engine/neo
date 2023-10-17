@@ -256,7 +256,7 @@ namespace SAVE {
 
         std::memset( m_caughtPkmn, 0, sizeof( m_caughtPkmn ) );
         std::memset( m_seenPkmn, 0, sizeof( m_seenPkmn ) );
-        std::memset( m_shinyPkmn, 0, sizeof( m_shinyPkmn ) );
+        std::memset( m_reserved2, 0, sizeof( m_reserved2 ) );
     }
     void saveGame::playerInfo::initialize( ) {
         clear( );

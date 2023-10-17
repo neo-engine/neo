@@ -981,15 +981,15 @@ namespace DEX {
                                                 IO::font::LEFT, 15, 32, 16 );
             }
             IO::loadSpriteB( oamStart + 6, oam[ oamStart + 6 ].gfxIndex,
-                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 70,
                              SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF,
                              32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
             IO::loadSpriteB( oamStart + 7, oam[ oamStart + 7 ].gfxIndex,
-                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64 + 32,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 70 + 32,
                              SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF + 32 * 16,
                              32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
             IO::loadSpriteB( oamStart + 8, oam[ oamStart + 8 ].gfxIndex,
-                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 64 + 64,
+                             SPR_NAT_DX_BG_POS_X( p_OAMslot ) + 70 + 64,
                              SPR_NAT_DX_BG_POS_Y( p_OAMslot ) + 32, 32, 16, IO::TEXT_BUF + 32 * 32,
                              32 * 16 / 2, false, false, false, OBJPRIORITY_3, p_bottom );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
