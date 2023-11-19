@@ -645,6 +645,9 @@ namespace MAP {
                        && SAVE::SAV.getActiveFile( ).checkFlag(
                            o.second.m_event.m_deactivateFlag ) ) {
                 _mapSprites.destroySprite( o.first, false );
+            } else if( ( o.second.m_event.m_route )
+                       && o.second.m_event.m_route != SAVE::SAV.getActiveFile( ).m_route ) {
+                continue;
             } else {
                 res.push_back( o );
                 eventPositions.insert(
@@ -662,6 +665,10 @@ namespace MAP {
             }
             if( p_data.m_events[ i ].m_deactivateFlag
                 && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_deactivateFlag ) ) {
+                continue;
+            }
+            if( ( p_data.m_events[ i ].m_route )
+                && p_data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                 continue;
             }
 

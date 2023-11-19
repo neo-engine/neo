@@ -2082,7 +2082,7 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
-            if( mdata.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+            if( ( mdata.m_events[ i ].m_route )
                 && mdata.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                 continue;
             }
@@ -2151,7 +2151,7 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
-            if( mdata.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+            if( ( mdata.m_events[ i ].m_route )
                 && mdata.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                 continue;
             }
@@ -2372,7 +2372,7 @@ namespace MAP {
                     && SAVE::SAV.getActiveFile( ).checkFlag( m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
-                if( m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                if( ( m_events[ i ].m_route )
                     && m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
@@ -2395,7 +2395,7 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
-            if( p_data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+            if( ( p_data.m_events[ i ].m_route )
                 && p_data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                 continue;
             }
@@ -2432,7 +2432,7 @@ namespace MAP {
                         data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
-                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                if( ( data.m_events[ i ].m_route )
                     && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
@@ -2469,7 +2469,7 @@ namespace MAP {
                         data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
-                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                if( ( data.m_events[ i ].m_route )
                     && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
@@ -2503,7 +2503,7 @@ namespace MAP {
                         data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
-                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                if( ( data.m_events[ i ].m_route )
                     && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
@@ -2533,7 +2533,7 @@ namespace MAP {
                         data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
-                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                if( ( data.m_events[ i ].m_route )
                     && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
