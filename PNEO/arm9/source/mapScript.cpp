@@ -189,6 +189,9 @@ namespace MAP {
         TTMR = 108, // Take item
         UTMR = 109, // Use item
 
+        SRT = 110, // set route
+        CRT = 111, // check route
+
         COUR = 112, // Counter message (make player select number between 0 and reg[ parB ]
         MSC  = 113, // play music (temporary)
         RMS  = 114, // Reset music
@@ -581,6 +584,15 @@ namespace MAP {
                 }
                 break;
             }
+            case SRT: {
+                SAVE::SAV.getActiveFile( ).m_route = par1;
+                break;
+            }
+            case CRT: {
+                if( SAVE::SAV.getActiveFile( ).m_route == par1 ) { pc += par2; }
+                break;
+            }
+
             case CRG: {
                 if( registers[ par1 ] == par2 ) { pc += par3; }
                 break;
