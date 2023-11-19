@@ -2082,6 +2082,11 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
+            if( mdata.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                && mdata.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
+                continue;
+            }
+
             if( mdata.m_events[ i ].m_type == EVENT_FLY_POS ) {
                 // register fly pos
                 SAVE::SAV.getActiveFile( ).registerFlyPos(
@@ -2144,6 +2149,10 @@ namespace MAP {
             }
             if( mdata.m_events[ i ].m_type != EVENT_TRAINER && mdata.m_events[ i ].m_deactivateFlag
                 && SAVE::SAV.getActiveFile( ).checkFlag( mdata.m_events[ i ].m_deactivateFlag ) ) {
+                continue;
+            }
+            if( mdata.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                && mdata.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                 continue;
             }
 
@@ -2363,6 +2372,11 @@ namespace MAP {
                     && SAVE::SAV.getActiveFile( ).checkFlag( m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
+                if( m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                    && m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
+                    continue;
+                }
+
                 return true;
             }
         }
@@ -2381,6 +2395,11 @@ namespace MAP {
                 && SAVE::SAV.getActiveFile( ).checkFlag( p_data.m_events[ i ].m_deactivateFlag ) ) {
                 continue;
             }
+            if( p_data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                && p_data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
+                continue;
+            }
+
             runEvent( p_data.m_events[ i ], u8( 0 ), s16( p_mapX ), s16( p_mapY ) );
         }
     }
@@ -2411,6 +2430,10 @@ namespace MAP {
                 if( data.m_events[ i ].m_deactivateFlag
                     && SAVE::SAV.getActiveFile( ).checkFlag(
                         data.m_events[ i ].m_deactivateFlag ) ) {
+                    continue;
+                }
+                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                    && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
 
@@ -2446,6 +2469,10 @@ namespace MAP {
                         data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
+                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                    && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
+                    continue;
+                }
 
                 res.push_back( data.m_events[ i ].m_data.m_generic.m_triggerMove );
             }
@@ -2476,6 +2503,10 @@ namespace MAP {
                         data.m_events[ i ].m_deactivateFlag ) ) {
                     continue;
                 }
+                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                    && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
+                    continue;
+                }
 
                 res.push_back( data.m_events[ i ].m_data.m_generic.m_triggerMove );
             }
@@ -2500,6 +2531,10 @@ namespace MAP {
                 if( data.m_events[ i ].m_deactivateFlag
                     && SAVE::SAV.getActiveFile( ).checkFlag(
                         data.m_events[ i ].m_deactivateFlag ) ) {
+                    continue;
+                }
+                if( data.m_events[ i ].m_route && SAVE::SAV.getActiveFile( ).m_route
+                    && data.m_events[ i ].m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                     continue;
                 }
 

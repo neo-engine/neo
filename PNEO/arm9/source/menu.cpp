@@ -289,12 +289,19 @@ namespace IO {
                 MAP::curMap->awardBadge( 0, 1 + rand( ) % 8 );
                 break;
             }
-            case 1: { // edit flags
+            case 1: { // all badges
                 init( );
                 for( u8 i = 1; i <= 8; ++i ) { MAP::curMap->awardBadge( 0, i ); }
                 break;
             }
-            case 2: { // edit variables
+            case 2: { // edit route
+                init( );
+                IO::choiceBox menu3 = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                SAVE::SAV.getActiveFile( ).m_route = menu3.getResult(
+                    GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
+                    std::vector<u16>{ FS::DESQUID_STRING + 65, FS::DESQUID_STRING + 66,
+                                      FS::DESQUID_STRING + 67, FS::DESQUID_STRING + 68,
+                                      FS::DESQUID_STRING + 69 } );
                 break;
             }
             default: break;

@@ -238,7 +238,9 @@ namespace SAVE {
 
             u8 m_caughtPkmn[ 185 ]; // The pkmn the player has caught
             u8 m_seenPkmn[ 185 ];   // The pkmn the player has seen
-            u8 m_reserved2[ 5 ];
+            u8 m_reserved2[ 4 ];
+
+            u8 m_route = 0; // current story route
 
             /*
              * @brief: tries to register a new fly pos; returns true on success.

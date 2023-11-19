@@ -131,9 +131,9 @@ namespace FS {
         { "Time" },
         { "Btl Trainer" },
         { "Edit Badges" },
-        { "Edit Flags" },
+        { "All Badges" },
 
-        { "Edit Vars" },
+        { "Edit Route" },
         { "Set Dawn" },
         { "Set Day" },
         { "Set Dusk" },
@@ -146,6 +146,12 @@ namespace FS {
         { "Repel 9999" },
         { "Repel Off" },
         { "Fill Boxes" },
+
+        { "No Route" },
+        { "Route 1 (Std)" },
+        { "Route 2 (Aqu)" },
+        { "Route 3 (Mgm)" },
+        { "Route 4 (Non)" },
     };
 
 #endif

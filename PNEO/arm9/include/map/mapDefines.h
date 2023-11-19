@@ -280,7 +280,7 @@ namespace MAP {
             u8  m_forme;
             u8  m_encounterType;
 
-            u8 m_slot;
+            u8 m_slot;  // num req badges for pkmn to show up
             u8 m_daytime;
             u8 m_encounterRate;
         } m_pokemon[ MAX_PKMN_PER_SLICE ];
@@ -288,6 +288,7 @@ namespace MAP {
             u8  m_posX;
             u8  m_posY;
             u8  m_posZ;
+            u8  m_route = 0; // event activates only for this route
             u16 m_activateFlag;
             u16 m_deactivateFlag;
             u8  m_type;

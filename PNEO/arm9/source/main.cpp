@@ -326,8 +326,8 @@ START:
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
             char buffer[ 100 ];
             snprintf( buffer, 99,
-                      "Cur mappos %hhu-(%hx,%hx,%hhx). Map: %i:%i,"
-                      "(%02u,%02u)\n %hhu %s (%hu) %hx %hx | TM %hhu %02hhu :%02hhu. %02hhu ",
+                      "POS %hhu-(%hx,%hx,%hhx). %i:%i, (%02u,%02u)\n"
+                      "S-Rou %hhu | %6s (%hu) | %hx %hx | TM %hhu %02hhu :%02hhu ",
                       SAVE::SAV.getActiveFile( ).m_currentMap,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY,
@@ -335,7 +335,8 @@ START:
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY / 32,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX / 32,
                       SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX % 32,
-                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32, 0,
+                      SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY % 32,
+                      SAVE::SAV.getActiveFile( ).m_route,
                       FS::getLocation( MAP::curMap->getCurrentLocationId( ) ).c_str( ),
                       MAP::curMap->getCurrentLocationId( ),
                       MAP::curMap
@@ -346,8 +347,7 @@ START:
                           ->at( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
                                 SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY )
                           .m_topbehave,
-                      getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins,
-                      SAVE::CURRENT_TIME.m_secs );
+                      getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins );
             IO::printMessage( buffer );
 
             printf( "#mv %i\n", MAP::curMap->getTriggerMovesForCurPos( ).size( ) );
