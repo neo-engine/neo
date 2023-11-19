@@ -375,6 +375,11 @@ namespace MAP {
         void setBlock( u16 p_globX, u16 p_globY, u16 p_newBlock );
 
         /*
+         * @brief: Sets the movement of the specified block to the specified value.
+         */
+        void setMovement( u16 p_globX, u16 p_globY, u16 p_newMovement );
+
+        /*
          * @brief: Loads permanent tile animations (e.g. first frame of grass, etc)
          */
         void animateField( u16 p_globX, u16 p_globY, u8 p_animation, direction p_enterDir,

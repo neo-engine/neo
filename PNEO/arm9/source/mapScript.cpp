@@ -219,6 +219,7 @@ namespace MAP {
 
         SBC  = 196, // set block
         SBCC = 197, // set block, with player dir correction
+        SMM  = 198, // set movement
     };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
@@ -1034,6 +1035,10 @@ namespace MAP {
                           u16( mapY * SIZE + par2s
                                + dir[ SAVE::SAV.getActiveFile( ).m_player.m_direction ][ 1 ] ),
                           par3s );
+                break;
+            }
+            case SMM: {
+                setMovement( u16( mapX * SIZE + par1s ), u16( mapY * SIZE + par2s ), par3s );
                 break;
             }
             case CBG:

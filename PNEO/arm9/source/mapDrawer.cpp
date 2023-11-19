@@ -297,6 +297,11 @@ namespace MAP {
         bgUpdate( );
     }
 
+    void mapDrawer::setMovement( u16 p_globX, u16 p_globY, u16 p_newMovement ) {
+        if( p_newMovement > 0xff ) [[unlikely]] { return; }
+        atom( p_globX, p_globY ).m_movedata = p_newMovement;
+    }
+
     void mapDrawer::loadNewRow( direction p_direction, bool p_updatePlayer ) {
         _cx += dir[ p_direction ][ 0 ];
         _cy += dir[ p_direction ][ 1 ];
