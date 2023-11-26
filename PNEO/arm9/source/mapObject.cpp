@@ -768,7 +768,7 @@ namespace MAP {
                 obj.m_picNum   = p_data.m_events[ i ].m_data.m_owPkmn.m_speciesId + PKMN_SPRITE;
                 obj.m_movement = NO_MOVEMENT;
                 obj.m_range    = ( ( p_data.m_events[ i ].m_data.m_owPkmn.m_forme & 0x3f ) << 1 )
-                              | !!( p_data.m_events[ i ].m_data.m_owPkmn.m_shiny & 0x3f );
+                              | ( ( p_data.m_events[ i ].m_data.m_owPkmn.m_shiny & 0x3f ) == 2 );
                 obj.m_direction = DOWN;
                 obj.m_event     = p_data.m_events[ i ];
 

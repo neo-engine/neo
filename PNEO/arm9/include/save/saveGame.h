@@ -75,6 +75,17 @@ namespace SAVE {
     constexpr u16 F_BATTLE_FACTORY_100_STREAK_ONGOING    = 222;
 
     constexpr u16 F_ICAVE_LAYER_CLEARED = 327;
+    constexpr u16 F_ICAVE_LAYER_ITEM1   = 328;
+    constexpr u16 F_ICAVE_LAYER_ITEM2   = 329;
+    constexpr u16 F_ICAVE_LAYER_ITEM3   = 330;
+    constexpr u16 F_ICAVE_LAYER_ITEM4   = 331;
+    constexpr u16 F_ICAVE_LAYER_ITEM5   = 332;
+    constexpr u16 F_ICAVE_LAYER_ITEM6   = 333;
+    constexpr u16 F_ICAVE_LAYER_ITEM7   = 334;
+    constexpr u16 F_ICAVE_LAYER_ITEM8   = 335;
+    constexpr u16 F_ICAVE_LAYER_ITEM9   = 336;
+    constexpr u16 F_ICAVE_LAYER_ITEM10  = 337;
+    constexpr u16 F_ICAVE_POKE_CLEARED  = 338;
 
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;

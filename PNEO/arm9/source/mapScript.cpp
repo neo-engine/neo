@@ -48,10 +48,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "spx/specials.h"
 
 namespace MAP {
-    constexpr u8 ICAVE_TSYO_POKE_1 = 33;
-    constexpr u8 ICAVE_TSYO_POKE_2 = 55;
-    constexpr u8 ICAVE_TSYO_POKE_3 = 77;
-    constexpr u8 ICAVE_TSYO_POKE_4 = 99;
+    constexpr u8 ICAVE_TSYO_POKE_1 = 24;
+    constexpr u8 ICAVE_TSYO_POKE_2 = 48;
+    constexpr u8 ICAVE_TSYO_POKE_3 = 72;
+    constexpr u8 ICAVE_TSYO_POKE_4 = 96;
     static u16   CURRENT_SCRIPT    = -1;
     u16          registers[ 10 ]   = { 0 };
 
@@ -984,35 +984,59 @@ namespace MAP {
                         infinityCaveLayer, SAVE::SAV.getActiveFile( ).m_infinityCaveMaxLayer );
 
                     if( infinityCaveLayer == ICAVE_TSYO_POKE_1 ) {
-                        registers[ 0 ] = 3;
-                        registers[ 1 ] = 1;
+                        registers[ 0 ]   = 3;
+                        registers[ 1 ]   = 1;
+                        infinityCaveReqs = 0;
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
                     } else if( infinityCaveLayer == ICAVE_TSYO_POKE_2 ) {
-                        registers[ 0 ] = 5;
-                        registers[ 1 ] = 1;
+                        registers[ 0 ]   = 5;
+                        registers[ 1 ]   = 1;
+                        infinityCaveReqs = 0;
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
                     } else if( infinityCaveLayer == ICAVE_TSYO_POKE_3 ) {
-                        registers[ 0 ] = 7;
-                        registers[ 1 ] = 1;
+                        registers[ 0 ]   = 7;
+                        registers[ 1 ]   = 1;
+                        infinityCaveReqs = 0;
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
                     } else if( infinityCaveLayer == ICAVE_TSYO_POKE_4 ) {
-                        registers[ 0 ] = 9;
-                        registers[ 1 ] = 1;
+                        registers[ 0 ]   = 9;
+                        registers[ 1 ]   = 1;
+                        infinityCaveReqs = 0;
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
                     } else {
                         registers[ 0 ] = 2 * ( rand( ) % 5 ) + 1;
                         registers[ 1 ] = 2 * ( rand( ) % 4 ) + 3;
+
+                        u8 start = rand( ) % 4;
+                        u8 rem   = infinityCaveLayer;
+                        for( u8 i = 1; i < 4; ++i ) {
+                            u8 shift = ( start + i ) % 4;
+                            u8 nx    = rand( ) % rem;
+                            infinityCaveReqs |= nx << ( 8 * shift );
+                            rem -= nx;
+                        }
+                        infinityCaveReqs |= rem << ( 8 * start );
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 0 );
                     }
 
-                    u8 start = rand( ) % 4;
-                    u8 rem   = infinityCaveLayer;
-                    for( u8 i = 1; i < 4; ++i ) {
-                        u8   shift = ( start + i ) % 4;
-                        auto nx    = std::min( rem, u8( rand( ) ) );
-                        infinityCaveReqs |= nx << ( 8 * shift );
-                        rem -= nx;
+                    // reset items
+                    for( u16 i = SAVE::F_ICAVE_LAYER_ITEM1; i <= SAVE::F_ICAVE_LAYER_ITEM10; ++i ) {
+                        SAVE::SAV.getActiveFile( ).setFlag( i, 0 );
                     }
-                    infinityCaveReqs |= rem << ( 8 * start );
-                    SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 0 );
+                    SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_POKE_CLEARED, 0 );
                     break;
                 }
                 case CLL_MAPENTER_INFINITY_CAVE: {
+                    if( !infinityCaveLayer ) {
+                        infinityCaveReqs = 1;
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 0 );
+                        currentData( ).m_pokemon[ 0 ] = { PKMN_ZUBAT, 0, INFINITY_CAVE, 1, 15, 20 };
+                        break;
+                    }
+                    if( infinityCaveReqs ) {
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 0 );
+                    }
+
                     // update stored pkmn
                     u8  base_level = infinityCaveLayer;
                     u16 bst_upper  = 5 * infinityCaveLayer + 300;
@@ -1029,10 +1053,21 @@ namespace MAP {
                         || infinityCaveLayer == ICAVE_TSYO_POKE_3
                         || infinityCaveLayer == ICAVE_TSYO_POKE_4 ) {
                         // spawn a random special pkmn
-                        if( infinityCaveSpecials.empty( ) ) { continue; }
+                        if( infinityCaveSpecials.empty( )
+                            || SAVE::SAV.getActiveFile( ).checkFlag(
+                                SAVE::F_ICAVE_POKE_CLEARED ) ) {
+                            break;
+                        }
                         u16 idx = rand( ) % ( infinityCaveSpecials.size( ) );
                         // create wildPoke
-
+                        if( currentData( ).m_events[ 19 ].m_type == EVENT_OW_PKMN ) {
+                            currentData( ).m_events[ 19 ].m_data.m_owPkmn.m_speciesId
+                                = infinityCaveSpecials[ idx ].first;
+                            currentData( ).m_events[ 19 ].m_data.m_owPkmn.m_forme
+                                = infinityCaveSpecials[ idx ].second;
+                            resetMapSprites( );
+                            constructAndAddNewMapObjects( currentData( ), mapX, mapY );
+                        }
                     } else {
                         u16 nxt_bst  = 0;
                         u16 nxt_idx  = 0;
@@ -1054,7 +1089,8 @@ namespace MAP {
 
                             if( hasBattleTransform( nxt_idx ) ) { nxt_form = 0; }
                             if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED )
-                                && isLegendary( nxt_idx ) && !isSpecial( nxt_idx ) ) {
+                                && ( isLegendary( nxt_idx ) || isUltraBeast( nxt_idx ) )
+                                && !isSpecial( nxt_idx ) ) {
                                 infinityCaveSpecials.push_back(
                                     std::pair<u16, u8>{ nxt_idx, nxt_form } );
                                 continue;
@@ -1118,6 +1154,11 @@ namespace MAP {
                     break;
                 }
                 case CLL_GATECHECK_INFINITY_CAVE: {
+                    if( !infinityCaveLayer ) {
+                        IO::printMessage( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_MET_AFTER ),
+                                          MSG_INFO );
+                        break;
+                    }
                     if( !infinityCaveReqs
                         || SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_ICAVE_LAYER_CLEARED ) ) {
                         SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
@@ -1175,9 +1216,7 @@ namespace MAP {
                         // eq
                         earthquake( );
 
-                        auto mx = curx / SIZE;
-                        auto my = cury / SIZE;
-                        runLevelScripts( _data[ _curX ][ _curY ], mx / SIZE, my / SIZE );
+                        runLevelScripts( _data[ _curX ][ _curY ], p_mapX, p_mapY );
                         // set lamps to green
                         IO::printMessage( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_MET_AFTER ),
                                           MSG_INFO );

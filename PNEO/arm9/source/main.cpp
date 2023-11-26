@@ -349,9 +349,6 @@ START:
                           .m_topbehave,
                       getCurrentDaytime( ), SAVE::CURRENT_TIME.m_hours, SAVE::CURRENT_TIME.m_mins );
             IO::printMessage( buffer );
-
-            printf( "#mv %i\n", MAP::curMap->getTriggerMovesForCurPos( ).size( ) );
-            for( auto m : MAP::curMap->getTriggerMovesForCurPos( ) ) { printf( "%i\n", m ); }
         }
 #endif
 
