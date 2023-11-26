@@ -624,43 +624,7 @@ namespace MAP {
                 break;
             }
             case EQ: {
-                SOUND::playSoundEffect( SFX_HM_STRENGTH );
-                for( u8 k = 0; k < 2; ++k ) {
-                    swiWaitForVBlank( );
-                    moveCamera( RIGHT, false, false );
-                    moveCamera( RIGHT, false, false );
-                    swiWaitForVBlank( );
-                    moveCamera( RIGHT, false, false );
-                    moveCamera( RIGHT, false, false );
-                    swiWaitForVBlank( );
-                    moveCamera( LEFT, false, false );
-                    moveCamera( LEFT, false, false );
-                }
-                for( u8 k = 0; k < 4; ++k ) {
-                    swiWaitForVBlank( );
-                    moveCamera( RIGHT, false, false );
-                    moveCamera( RIGHT, false, false );
-                    swiWaitForVBlank( );
-                    moveCamera( LEFT, false, false );
-                    moveCamera( LEFT, false, false );
-                    swiWaitForVBlank( );
-                    moveCamera( LEFT, false, false );
-                    moveCamera( LEFT, false, false );
-                }
-                for( u8 k = 0; k < 2; ++k ) {
-                    swiWaitForVBlank( );
-                    moveCamera( RIGHT, false, false );
-                    moveCamera( RIGHT, false, false );
-                    swiWaitForVBlank( );
-                    moveCamera( RIGHT, false, false );
-                    moveCamera( RIGHT, false, false );
-                    swiWaitForVBlank( );
-                    moveCamera( LEFT, false, false );
-                    moveCamera( LEFT, false, false );
-                }
-                swiWaitForVBlank( );
-                swiWaitForVBlank( );
-
+                earthquake( );
                 break;
             }
             case BTR: {
@@ -1045,7 +1009,7 @@ namespace MAP {
                         rem -= nx;
                     }
                     infinityCaveReqs |= rem << ( 8 * start );
-
+                    SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 0 );
                     break;
                 }
                 case CLL_MAPENTER_INFINITY_CAVE: {
@@ -1060,10 +1024,15 @@ namespace MAP {
                         bst_upper  = 5 * base_level + 220;
                     }
 
-                    if( infinityCaveLayer == ICAVE_TSYO_POKE_1 ) {
-                    } else if( infinityCaveLayer == ICAVE_TSYO_POKE_2 ) {
-                    } else if( infinityCaveLayer == ICAVE_TSYO_POKE_3 ) {
-                    } else if( infinityCaveLayer == ICAVE_TSYO_POKE_4 ) {
+                    if( infinityCaveLayer == ICAVE_TSYO_POKE_1
+                        || infinityCaveLayer == ICAVE_TSYO_POKE_2
+                        || infinityCaveLayer == ICAVE_TSYO_POKE_3
+                        || infinityCaveLayer == ICAVE_TSYO_POKE_4 ) {
+                        // spawn a random special pkmn
+                        if( infinityCaveSpecials.empty( ) ) { continue; }
+                        u16 idx = rand( ) % ( infinityCaveSpecials.size( ) );
+                        // create wildPoke
+
                     } else {
                         u16 nxt_bst  = 0;
                         u16 nxt_idx  = 0;
@@ -1106,6 +1075,11 @@ namespace MAP {
                                 continue;
                             }
 
+                            if( infinityCaveSpecials.empty( ) ) {
+                                infinityCaveSpecials.push_back(
+                                    std::pair<u16, u8>{ nxt_idx, nxt_form } );
+                            }
+
                             u8 free = MAX_INFINITY_POKE + 1;
                             for( u8 i = 0; i < MAX_INFINITY_POKE; ++i ) {
                                 if( !infinityCavePoke[ i ].first ) {
@@ -1131,8 +1105,6 @@ namespace MAP {
 
                         for( u8 i = 0; i < MAX_INFINITY_POKE; ++i ) {
                             if( infinityCavePoke[ i ].first ) {
-                                printf( "%i to %i-%i\n", i, infinityCavePoke[ i ].first,
-                                        infinityCavePoke[ i ].second );
                                 currentData( ).m_pokemon[ i ] = { infinityCavePoke[ i ].first,
                                                                   infinityCavePoke[ i ].second,
                                                                   INFINITY_CAVE,
@@ -1141,6 +1113,77 @@ namespace MAP {
                                                                   20 };
                             }
                         }
+                    }
+
+                    break;
+                }
+                case CLL_GATECHECK_INFINITY_CAVE: {
+                    if( !infinityCaveReqs
+                        || SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_ICAVE_LAYER_CLEARED ) ) {
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
+                        infinityCaveReqs = 0;
+                        IO::printMessage( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_MET_AFTER ),
+                                          MSG_INFO );
+                        break;
+                    }
+
+                    // report requirements
+                    u8 blue   = infinityCaveReqs & 255;
+                    u8 red    = ( infinityCaveReqs >> 8 ) & 255;
+                    u8 green  = ( infinityCaveReqs >> 16 ) & 255;
+                    u8 yellow = ( infinityCaveReqs >> 24 ) & 255;
+
+                    snprintf( buffer, 199, GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS ), red,
+                              blue, yellow, green );
+                    IO::printMessage( buffer, MSG_INFO );
+
+                    // check if player has required shards
+                    bool clear = blue <= SAVE::SAV.getActiveFile( ).m_bag.count(
+                                     BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_BLUE_SHARD );
+                    clear &= red <= SAVE::SAV.getActiveFile( ).m_bag.count(
+                                 BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_RED_SHARD );
+                    clear &= green <= SAVE::SAV.getActiveFile( ).m_bag.count(
+                                 BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_GREEN_SHARD );
+                    clear &= yellow <= SAVE::SAV.getActiveFile( ).m_bag.count(
+                                 BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_YELLOW_SHARD );
+
+                    if( !clear ) {
+                        IO::printMessage( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_NOT_MET ),
+                                          MSG_INFO );
+                        break;
+                    }
+
+                    // ask if they want to pay the shards (if possible)
+                    IO::yesNoBox yn;
+                    if( yn.getResult( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_MET_Q ),
+                                      MSG_INFO_NOCLOSE )
+                        == IO::yesNoBox::YES ) {
+                        IO::init( );
+                        // remove shards from bag
+                        SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_BLUE_SHARD, blue );
+                        SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_RED_SHARD, red );
+                        SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_GREEN_SHARD, green );
+                        SAVE::SAV.getActiveFile( ).m_bag.erase(
+                            BAG::toBagType( BAG::ITEMTYPE_COLLECTIBLE ), I_YELLOW_SHARD, yellow );
+
+                        // set reqs to 0
+                        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_ICAVE_LAYER_CLEARED, 1 );
+                        infinityCaveReqs = 0;
+                        // eq
+                        earthquake( );
+
+                        auto mx = curx / SIZE;
+                        auto my = cury / SIZE;
+                        runLevelScripts( _data[ _curX ][ _curY ], mx / SIZE, my / SIZE );
+                        // set lamps to green
+                        IO::printMessage( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_MET_AFTER ),
+                                          MSG_INFO );
+                    } else {
+                        IO::init( );
+                        break;
                     }
 
                     break;

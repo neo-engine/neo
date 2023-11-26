@@ -321,6 +321,11 @@ namespace IO {
     constexpr u16 STR_UI_STORAGE_ALL_BOXES_FULL = 178;
     constexpr u16 STR_UI_PKMN_RELEASED          = 179;
 
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS           = 682;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_NOT_MET   = 683;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_MET_Q     = 684;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_MET_AFTER = 685;
+
     constexpr u16 STR_MAP_FISH_SUCCESS       = 8;
     constexpr u16 STR_MAP_FISH_FAIL          = 9;
     constexpr u16 STR_MAP_FISH_FAIL_OLD_BALL = 5;

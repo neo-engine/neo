@@ -67,9 +67,10 @@ namespace MAP {
     constexpr u8 CLL_PLAYTIME_HOURS = 16;
     constexpr u8 CLL_HALL_OF_FAME   = 17; // register current party in hall of fame, save
                                           // game, warp home
-    constexpr u8 CLL_INIT_INFINITY_CAVE     = 18;
-    constexpr u8 CLL_CONTINUE_INFINITY_CAVE = 19;
-    constexpr u8 CLL_MAPENTER_INFINITY_CAVE = 20;
+    constexpr u8 CLL_INIT_INFINITY_CAVE      = 18;
+    constexpr u8 CLL_CONTINUE_INFINITY_CAVE  = 19;
+    constexpr u8 CLL_MAPENTER_INFINITY_CAVE  = 20;
+    constexpr u8 CLL_GATECHECK_INFINITY_CAVE = 21;
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;

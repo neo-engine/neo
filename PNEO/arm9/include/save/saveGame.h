@@ -74,6 +74,8 @@ namespace SAVE {
     constexpr u16 F_BATTLE_FACTORY_50_STREAK_ONGOING     = 221;
     constexpr u16 F_BATTLE_FACTORY_100_STREAK_ONGOING    = 222;
 
+    constexpr u16 F_ICAVE_LAYER_CLEARED = 327;
+
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;
     }

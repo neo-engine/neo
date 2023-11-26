@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2021 - 2022
+    Copyright (C) 2021 - 2023
     Philip Wellnitz
 
     This file is part of Pokémon neo.

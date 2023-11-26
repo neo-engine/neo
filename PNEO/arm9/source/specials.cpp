@@ -6,7 +6,7 @@
     author      : Philip Wellnitz
     description : Various mini games
 
-    Copyright (C) 2021 - 2022
+    Copyright (C) 2021 - 2023
     Philip Wellnitz
 
     This file is part of Pokémon neo.
@@ -611,6 +611,45 @@ namespace SPX {
 } // namespace SPX
 
 namespace MAP {
+    void mapDrawer::earthquake( ) {
+        SOUND::playSoundEffect( SFX_HM_STRENGTH );
+        for( u8 k = 0; k < 2; ++k ) {
+            swiWaitForVBlank( );
+            moveCamera( RIGHT, false, false );
+            moveCamera( RIGHT, false, false );
+            swiWaitForVBlank( );
+            moveCamera( RIGHT, false, false );
+            moveCamera( RIGHT, false, false );
+            swiWaitForVBlank( );
+            moveCamera( MAP::LEFT, false, false );
+            moveCamera( MAP::LEFT, false, false );
+        }
+        for( u8 k = 0; k < 4; ++k ) {
+            swiWaitForVBlank( );
+            moveCamera( RIGHT, false, false );
+            moveCamera( RIGHT, false, false );
+            swiWaitForVBlank( );
+            moveCamera( MAP::LEFT, false, false );
+            moveCamera( MAP::LEFT, false, false );
+            swiWaitForVBlank( );
+            moveCamera( MAP::LEFT, false, false );
+            moveCamera( MAP::LEFT, false, false );
+        }
+        for( u8 k = 0; k < 2; ++k ) {
+            swiWaitForVBlank( );
+            moveCamera( RIGHT, false, false );
+            moveCamera( RIGHT, false, false );
+            swiWaitForVBlank( );
+            moveCamera( RIGHT, false, false );
+            moveCamera( RIGHT, false, false );
+            swiWaitForVBlank( );
+            moveCamera( MAP::LEFT, false, false );
+            moveCamera( MAP::LEFT, false, false );
+        }
+        swiWaitForVBlank( );
+        swiWaitForVBlank( );
+    }
+
     void mapDrawer::runDayCareLady( u8 p_daycare ) {
         char        buffer[ 200 ] = { 0 };
         boxPokemon* dc1           = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 ];

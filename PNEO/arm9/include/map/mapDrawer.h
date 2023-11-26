@@ -577,6 +577,11 @@ namespace MAP {
         bool currentPosAllowsDirectFieldMove( ) const;
 
         /*
+         * @brief: Play strength sound and move picture on screen briefly left and right.
+         */
+        void earthquake( );
+
+        /*
          * @brief: Returns if tracer could be used at given pos (if it is additionally
          * charged.)
          */
