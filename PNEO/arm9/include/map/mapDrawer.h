@@ -468,6 +468,10 @@ namespace MAP {
         void runEvent( mapData::event p_event, u8 p_objectId = 0, s16 p_mapX = -1,
                        s16 p_mapY = -1 );
 
+        void runDayCareLady( u8 p_daycare );
+
+        void runDayCareGuy( u8 p_daycare );
+
         bool executeWarpScript( u16 p_scriptId, warpType& p_targetType, warpPos& p_targetPos );
 
         void executeScript( u16 p_scriptId, u8 p_mapObject = 0, s16 p_mapX = -1, s16 p_mapY = -1 );

@@ -43,6 +43,7 @@
 #include "pokemonData.h"
 #include "sound/sound.h"
 #include "spx/specials.h"
+#include "sts/partyScreen.h"
 
 namespace SPX {
     void runCatchingTutorial( ) {
@@ -231,21 +232,21 @@ namespace SPX {
 
             if( frame % 8 == 2 ) {
                 tileCnt = IO::loadSprite(
-                     "UI/sb1", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                     IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                     false, false, OBJPRIORITY_0, true );
+                    "UI/sb1", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
+                    false, false, OBJPRIORITY_0, true );
             }
             if( frame % 4 == 0 ) {
                 tileCnt = IO::loadSprite(
-                     "UI/sb2", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                     IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                     false, false, OBJPRIORITY_0, true );
+                    "UI/sb2", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
+                    false, false, OBJPRIORITY_0, true );
             }
             if( frame % 8 == 6 ) {
                 tileCnt = IO::loadSprite(
-                     "UI/sb3", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                     IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                     false, false, OBJPRIORITY_0, true );
+                    "UI/sb3", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
+                    false, false, OBJPRIORITY_0, true );
             }
 
             if( frame % 16 == 0 ) {
@@ -526,4 +527,386 @@ namespace SPX {
         }
     }
 
+    void runHallOfFame( ) {
+        char buffer[ 200 ] = { 0 };
+        // fade screen
+        // set current player position to position home
+        ANIMATE_MAP = false;
+
+        SAVE::SAV.getActiveFile( ).m_currentMap         = 20;
+        SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::DOWN;
+
+        if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+            // TODO: move to FSINFO
+            SAVE::SAV.getActiveFile( ).m_player = MAP::mapPlayer(
+                { 0x2b, 0x89, 3 }, u16( 10 * SAVE::SAV.getActiveFile( ).m_appearance ),
+                MAP::moveMode::WALK );
+        } else {
+            // TODO: move to FSINFO
+            SAVE::SAV.getActiveFile( ).m_player = MAP::mapPlayer(
+                { 0x31, 0xa9, 3 }, u16( 10 * SAVE::SAV.getActiveFile( ).m_appearance ),
+                MAP::moveMode::WALK );
+        }
+
+        // heal party pkmn
+        for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+            auto tmp = SAVE::SAV.getActiveFile( ).getTeamPkmn( i );
+            if( tmp ) {
+                tmp->heal( );
+                // award champion ribbon
+                tmp->m_boxdata.awardRibbon( 20 );
+            }
+        }
+
+        // add star to trainers card (if it doesn't exist already)
+        SAVE::SAV.getActiveFile( ).registerAchievement(
+            SAVE::saveGame::playerInfo::ACHIEVEMENT_HALL_OF_FAME );
+
+        // add achievement
+        SAVE::SAV.getActiveFile( ).m_lastAchievementDate  = SAVE::CURRENT_DATE;
+        SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = 9; // hall of fame
+                                                               // message
+
+        // save game
+        u16 lst = -1;
+        if( FS::writeSave( ARGV[ 0 ], [ & ]( u16 p_perc, u16 p_total ) {
+                u16 stat = p_perc * 18 / p_total;
+                if( stat != lst ) {
+                    lst = stat;
+                    IO::printMessage( 0, MSG_INFO_NOCLOSE );
+                    std::string buf2 = "";
+                    for( u8 i = 0; i < stat; ++i ) {
+                        buf2 += "\x03";
+                        if( i % 3 == 2 ) { buf2 += " "; }
+                    }
+                    for( u8 i = stat; i < 18; ++i ) {
+                        buf2 += "\x04";
+                        if( i % 3 == 2 ) { buf2 += " "; }
+                    }
+                    snprintf( buffer, 99, GET_STRING( 93 ), buf2.c_str( ) );
+                    IO::printMessage( buffer, MSG_INFO_NOCLOSE, true );
+                }
+            } ) ) {
+            IO::printMessage( 0, MSG_INFO_NOCLOSE );
+            SOUND::playSoundEffect( SFX_SAVE );
+            IO::printMessage( GET_STRING( 94 ), MSG_INFO );
+        } else {
+            IO::printMessage( 0, MSG_INFO_NOCLOSE );
+            IO::printMessage( GET_STRING( 95 ), MSG_INFO );
+        }
+
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        videoSetMode( MODE_5_2D );
+        IO::clearScreen( true, true, true );
+        IO::initVideo( true );
+        IO::initOAMTable( true );
+        IO::initOAMTable( false );
+        bgUpdate( );
+
+        // show hall of fame screen
+        // show credits
+        // reset game
+        RESET_GAME = true;
+    }
 } // namespace SPX
+
+namespace MAP {
+    void mapDrawer::runDayCareLady( u8 p_daycare ) {
+        char        buffer[ 200 ] = { 0 };
+        boxPokemon* dc1           = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 ];
+        boxPokemon* dc2           = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 + 1 ];
+        boxPokemon* dce           = &SAVE::SAV.getActiveFile( ).m_dayCareEgg[ p_daycare ];
+
+        u8* dcl1 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ p_daycare * 2 ];
+        u8* dcl2 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ p_daycare * 2 + 1 ];
+
+        if( dce->getSpecies( ) ) {
+            // an egg spawned, redirect to jii san
+            printMapMessage( GET_MAP_STRING( 476 ), (style) 0 );
+            return;
+        }
+
+        if( !dc1->getSpecies( ) && dc2->getSpecies( ) ) {
+            std::swap( *dc1, *dc2 );
+            std::swap( *dcl1, *dcl2 );
+        }
+
+        u8 depositpkmn = false;
+
+        if( !dc1->getSpecies( ) ) {
+            // no pkmn deposited, ask if player wants to deposit a pkmn
+            if( IO::yesNoBox::YES
+                == IO::yesNoBox( ).getResult(
+                    convertMapString( GET_MAP_STRING( 477 ), (style) 0 ).c_str( ), (style) 0 ) ) {
+                IO::init( );
+                depositpkmn = true;
+            } else {
+                IO::init( );
+                printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
+                return;
+            }
+        } else {
+            snprintf( buffer, 199, GET_MAP_STRING( 479 ), dc1->m_name );
+            printMapMessage( buffer, (style) 0 );
+
+            if( !dc2->getSpecies( ) ) {
+                // ask if player wants to deposit a second pkmn
+                if( IO::yesNoBox::YES
+                    == IO::yesNoBox( ).getResult(
+                        convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
+                        (style) 0 ) ) {
+                    IO::init( );
+                    depositpkmn = 2;
+                } else {
+                    IO::init( );
+                }
+            }
+
+            if( !depositpkmn ) {
+                // ask if he player wants to take a pkmn back
+                printMapMessage( GET_MAP_STRING( 483 ), MSG_NOCLOSE );
+                loop( ) {
+                    u8 takeback = IO::chooseDaycarePkmn( p_daycare );
+                    IO::init( );
+
+                    if( takeback > 1 ) {
+                        // player doesn't want to get pkmn back
+                        printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
+                        break;
+                    }
+
+                    // check if there is space in the player's team
+                    if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) >= 6 ) {
+                        printMapMessage( GET_MAP_STRING( 487 ), (style) 0 );
+                        break;
+                    }
+
+                    pokemon pk   = pokemon( dc1[ takeback ] );
+                    u32     cost = ( pk.m_level - dcl1[ takeback ] + 1 ) * 100;
+                    snprintf( buffer, 199, GET_MAP_STRING( 488 ), dc1[ takeback ].m_name, cost );
+
+                    if( IO::yesNoBox::YES
+                        == IO::yesNoBox( ).getResult(
+                            convertMapString( buffer, (style) 0 ).c_str( ), (style) 0 ) ) {
+                        IO::init( );
+                        // check if the player has enough money
+                        if( SAVE::SAV.getActiveFile( ).m_money >= cost ) {
+                            SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
+                            SAVE::SAV.getActiveFile( ).m_money -= cost;
+                            snprintf( buffer, 199, GET_MAP_STRING( 490 ), dc1[ takeback ].m_name );
+                            printMapMessage( buffer, (style) 0 );
+
+                            snprintf( buffer, 199, GET_MAP_STRING( 491 ), dc1[ takeback ].m_name );
+                            printMapMessage( buffer, (style) 1 );
+
+                            SAVE::SAV.getActiveFile( ).setTeamPkmn(
+                                SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &pk );
+
+                            dc1[ takeback ]  = boxPokemon( );
+                            dcl1[ takeback ] = 0;
+
+                            if( !takeback ) {
+                                std::swap( *dc1, *dc2 );
+                                std::swap( *dcl1, *dcl2 );
+                            }
+
+                            // check if the player wants to take back the other
+                            // pkmn as well
+                            if( dc1->getSpecies( ) ) {
+                                printMapMessage( GET_MAP_STRING( 492 ), MSG_NOCLOSE );
+                                continue;
+                            }
+                            printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                            break;
+                        } else {
+                            printMapMessage( GET_MAP_STRING( 489 ), (style) 0 );
+                            break;
+                        }
+                    } else {
+                        IO::init( );
+                        printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                        break;
+                    }
+                }
+                return;
+            }
+        }
+
+        while( depositpkmn && depositpkmn <= 2 ) {
+            // check if the player has at least 2 pkmn
+
+            u8 plyerpkmncnt = 0;
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+                if( !SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->isEgg( ) ) { plyerpkmncnt++; }
+            }
+
+            if( plyerpkmncnt < 2 ) {
+                // player has only 1 pkmn
+                printMapMessage( GET_MAP_STRING( 484 ), (style) 0 );
+                break;
+            }
+
+            // make player select a pkmn
+            printMapMessage( GET_MAP_STRING( 481 ), (style) 0 );
+
+            ANIMATE_MAP = false;
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            STS::partyScreen sts = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                     SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
+                                                     false, false, false, 1, true, true, false );
+
+            SOUND::dimVolume( );
+
+            auto res = sts.run( );
+
+            FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            IO::resetScale( true, false );
+            bgUpdate( );
+
+            ANIMATE_MAP = true;
+            SOUND::restoreVolume( );
+
+            IO::init( );
+            MAP::curMap->draw( );
+
+            // check if the player has another pkmn that can battle
+
+            u8 selpkmn = res.getSelectedPkmn( );
+
+            if( selpkmn >= SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+                // player aborted
+                printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                break;
+            }
+
+            plyerpkmncnt = 0;
+            for( u8 i = 0; i < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ); ++i ) {
+                if( i == selpkmn ) { continue; }
+                if( SAVE::SAV.getActiveFile( ).getTeamPkmn( i )->canBattle( ) ) { plyerpkmncnt++; }
+            }
+
+            if( !plyerpkmncnt ) {
+                // no remaining pkmn
+                printMapMessage( GET_MAP_STRING( 485 ), (style) 0 );
+                break;
+            }
+
+            // actually deposit the pkmn
+
+            if( SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn ) != nullptr ) [[likely]] {
+                dc1[ depositpkmn - 1 ]
+                    = SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn )->m_boxdata;
+                dcl1[ depositpkmn - 1 ]
+                    = SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn )->m_level;
+                SAVE::SAV.getActiveFile( ).setTeamPkmn( selpkmn, (boxPokemon*) nullptr );
+                SAVE::SAV.getActiveFile( ).consolidatePkmn( );
+
+                if( selpkmn == 0 ) { MAP::curMap->removeFollowPkmn( ); }
+
+                snprintf( buffer, 199, GET_MAP_STRING( 486 ), dc1[ depositpkmn - 1 ].m_name );
+                printMapMessage( buffer, (style) 0 );
+            } else {
+                break;
+            }
+
+            if( depositpkmn < 2 ) {
+                // ask if player wants to deposit a second pkmn
+                if( IO::yesNoBox::YES
+                    == IO::yesNoBox( ).getResult(
+                        convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
+                        (style) 0 ) ) {
+                    IO::init( );
+                    depositpkmn = 2;
+                } else {
+                    IO::init( );
+                    printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    void mapDrawer::runDayCareGuy( u8 p_daycare ) {
+        char        buffer[ 200 ] = { 0 };
+        boxPokemon* dc1           = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 ];
+        boxPokemon* dc2           = &SAVE::SAV.getActiveFile( ).m_dayCarePkmn[ p_daycare * 2 + 1 ];
+        boxPokemon* dce           = &SAVE::SAV.getActiveFile( ).m_dayCareEgg[ p_daycare ];
+
+        u8* dcl1 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ p_daycare * 2 ];
+        u8* dcl2 = &SAVE::SAV.getActiveFile( ).m_dayCareDepositLevel[ p_daycare * 2 + 1 ];
+
+        if( dce->getSpecies( ) ) {
+            // an egg spawned
+            // ask player if they want to obtain the egg
+            if( IO::yesNoBox::NO
+                == IO::yesNoBox( ).getResult(
+                    convertMapString( GET_MAP_STRING( 464 ), (style) 0 ).c_str( ), (style) 0 ) ) {
+                IO::init( );
+                // ask if they really don't want the egg
+                if( IO::yesNoBox::YES
+                    == IO::yesNoBox( ).getResult(
+                        convertMapString( GET_MAP_STRING( 465 ), (style) 0 ).c_str( ),
+                        (style) 0 ) ) {
+                    IO::init( );
+                    // throw away the egg
+                    *dce = boxPokemon( );
+                    SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_HOENN_DAYCARE_EGG + p_daycare,
+                                                        false );
+                    printMapMessage( GET_MAP_STRING( 466 ), (style) 0 );
+                    return;
+                }
+            }
+            IO::init( );
+            // hand egg to player
+
+            // check if they have space for an egg
+            auto teampkmncnt = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
+            if( teampkmncnt >= 6 ) {
+                // player has no space left
+                printMapMessage( GET_MAP_STRING( 473 ), (style) 0 );
+                return;
+            }
+
+            SOUND::playSoundEffect( SFX_OBTAIN_EGG );
+            printMapMessage( GET_MAP_STRING( 474 ), (style) 1 );
+            printMapMessage( GET_MAP_STRING( 475 ), (style) 0 );
+
+            dce->m_gotPlace = L_DAY_CARE_COUPLE;
+
+            SAVE::SAV.getActiveFile( ).setTeamPkmn( teampkmncnt, dce );
+            SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_HOENN_DAYCARE_EGG + p_daycare, false );
+            *dce = boxPokemon( );
+        } else {
+            // no egg
+            if( !dc1->getSpecies( ) && dc2->getSpecies( ) ) {
+                std::swap( *dc1, *dc2 );
+                std::swap( *dcl1, *dcl2 );
+            }
+
+            if( !dc1->getSpecies( ) ) {
+                printMapMessage( GET_MAP_STRING( 463 ), (style) 0 );
+                return;
+            } else {
+                if( !dc2->getSpecies( ) ) {
+                    snprintf( buffer, 199, GET_MAP_STRING( 467 ), dc1->m_name );
+                    printMapMessage( buffer, (style) 0 );
+                } else {
+                    snprintf( buffer, 199, GET_MAP_STRING( 468 ), dc1->m_name, dc2->m_name );
+                    printMapMessage( buffer, (style) 0 );
+
+                    u8 comp = dc1->getCompatibility( *dc2 );
+                    printMapMessage( GET_MAP_STRING( 469 + comp ), (style) 0 );
+                }
+                return;
+            }
+        }
+    }
+} // namespace MAP

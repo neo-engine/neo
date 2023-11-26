@@ -53,4 +53,6 @@ namespace SPX {
      * @brief: Shows the players Id and badges.
      */
     void runIDViewer( );
+
+    void runHallOfFame( );
 } // namespace SPX
