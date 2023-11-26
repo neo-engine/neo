@@ -109,16 +109,17 @@ namespace MAP {
         for( u8 i = 0; i < MAX_PKMN_PER_SLICE; ++i ) {
             if( !currentData( ).m_pokemon[ i ].m_speciesId ) { continue; }
 
-            if( currentData( ).m_pokemon[ i ].m_encounterType == p_type ) {
+            if( currentData( ).m_pokemon[ i ].m_encounterType == p_type
+                || ( p_type == GRASS
+                     && currentData( ).m_pokemon[ i ].m_encounterType == INFINITY_CAVE ) ) {
+
                 s8 ownedbadge = SAVE::SAV.getActiveFile( ).getBadgeCount( ) + availmod;
                 if( ownedbadge < 0 ) { ownedbadge = 0; }
-
-                if( ownedbadge >= currentData( ).m_pokemon[ i ].m_slot ) {
-
-                    if( currentData( ).m_pokemon[ i ].m_daytime
-                        & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) {
-                        total += currentData( ).m_pokemon[ i ].m_encounterRate;
-                    }
+                if( currentData( ).m_pokemon[ i ].m_encounterType == INFINITY_CAVE
+                    || ( ownedbadge >= currentData( ).m_pokemon[ i ].m_slot
+                         && ( currentData( ).m_pokemon[ i ].m_daytime
+                              & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) ) ) {
+                    total += currentData( ).m_pokemon[ i ].m_encounterRate;
                 }
             }
         }
@@ -135,13 +136,17 @@ namespace MAP {
         for( u8 i = 0; i < MAX_PKMN_PER_SLICE; ++i ) {
             if( !currentData( ).m_pokemon[ i ].m_speciesId ) { continue; }
 
-            if( currentData( ).m_pokemon[ i ].m_encounterType == p_type ) {
+            if( currentData( ).m_pokemon[ i ].m_encounterType == p_type
+                || ( p_type == GRASS
+                     && currentData( ).m_pokemon[ i ].m_encounterType == INFINITY_CAVE ) ) {
+
                 s8 ownedbadge = SAVE::SAV.getActiveFile( ).getBadgeCount( ) + availmod;
                 if( ownedbadge < 0 ) { ownedbadge = 0; }
 
-                if( ownedbadge >= currentData( ).m_pokemon[ i ].m_slot
-                    && ( currentData( ).m_pokemon[ i ].m_daytime
-                         & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) ) {
+                if( currentData( ).m_pokemon[ i ].m_encounterType == INFINITY_CAVE
+                    || ( ownedbadge >= currentData( ).m_pokemon[ i ].m_slot
+                         && ( currentData( ).m_pokemon[ i ].m_daytime
+                              & ( 1 << ( getCurrentDaytime( ) % 4 ) ) ) ) ) {
                     total += currentData( ).m_pokemon[ i ].m_encounterRate;
 
                     // if the player hasn't obtained the nat dex yet, they should only see
@@ -179,24 +184,24 @@ namespace MAP {
 
     pokemon WILD_PKMN;
     void    mapDrawer::prepareBattleWildPkmn( wildPkmnType p_type, u16 p_pkmnId, bool p_luckyEnc ) {
-           (void) p_type;
+        (void) p_type;
 
-           ANIMATE_MAP = false;
-           DRAW_TIME   = false;
-           if( p_luckyEnc ) {
-               SOUND::playBGM( BGM_BATTLE_WILD_ALT );
+        ANIMATE_MAP = false;
+        DRAW_TIME   = false;
+        if( p_luckyEnc ) {
+            SOUND::playBGM( BGM_BATTLE_WILD_ALT );
         } else {
-               SOUND::playBGM( SOUND::BGMforWildBattle( p_pkmnId ) );
+            SOUND::playBGM( SOUND::BGMforWildBattle( p_pkmnId ) );
         }
-           _playerIsFast = false;
-           _fastBike     = false;
-           _mapSprites.setFrameD( _playerSprite, SAVE::SAV.getActiveFile( ).m_player.m_direction );
+        _playerIsFast = false;
+        _fastBike     = false;
+        _mapSprites.setFrameD( _playerSprite, SAVE::SAV.getActiveFile( ).m_player.m_direction );
 
-           IO::fadeScreen( IO::BATTLE );
-           IO::BG_PAL( true )[ 0 ] = 0;
-           IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
-           dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
-           dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
+        IO::fadeScreen( IO::BATTLE );
+        IO::BG_PAL( true )[ 0 ] = 0;
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg3sub ), 256 * 192 );
     }
 
     BATTLE::battle::battleEndReason mapDrawer::battleWildPkmn( wildPkmnType p_type ) {
@@ -303,6 +308,10 @@ namespace MAP {
             return false;
         }
 
+        if( currentData( ).m_pokemon[ 0 ].m_encounterType == INFINITY_CAVE ) {
+            level = currentData( ).m_pokemon[ 0 ].m_slot;
+        }
+
         if( p_type == OLD_ROD || p_type == GOOD_ROD || p_type == SUPER_ROD ) {
             _playerIsFast = false;
             IO::printMessage( GET_STRING( IO::STR_MAP_FISH_SUCCESSS_PKMN ) );
@@ -315,7 +324,7 @@ namespace MAP {
                             ? !( rand( ) & 127 )
                             : !( rand( ) & 2047 );
         bool charm    = SAVE::SAV.getActiveFile( ).m_bag.count(
-               BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
+            BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_SHINY_CHARM );
 
         resetTracerChain( );
         prepareBattleWildPkmn( p_type, pkmnId, luckyenc );
@@ -487,7 +496,7 @@ namespace MAP {
         if( _tracerChain > 40 ) { _tracerChain = 39; }
 
         u8 luckyMod    = SAVE::SAV.getActiveFile( ).m_bag.count(
-                             BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
+                          BAG::toBagType( BAG::ITEMTYPE_KEYITEM ), I_WISHING_CHARM )
                              ? 5
                              : 10;
         u8 shinyFactor = 75;

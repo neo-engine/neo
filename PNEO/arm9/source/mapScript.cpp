@@ -1101,7 +1101,8 @@ namespace MAP {
                                 continue;
                             }
                             if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED )
-                                && DEX::getDexNo( nxt_idx ) == u16( -1 ) ) {
+                                && SAVE::SAV.getActiveFile( ).getPkmnDisplayDexId( nxt_idx )
+                                       == u16( -1 ) ) {
                                 continue;
                             }
 
