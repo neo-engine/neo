@@ -278,6 +278,225 @@ constexpr bool hasBattleTransform( u16 p_speciesId ) {
     }
 }
 
+constexpr bool isTradeEvolution( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_ALAKAZAM:
+    case PKMN_MACHAMP:
+    case PKMN_GOLEM:
+    case PKMN_GENGAR:
+    case PKMN_POLITOED:
+    case PKMN_SLOWKING:
+    case PKMN_STEELIX:
+    case PKMN_KINGDRA:
+    case PKMN_PORYGON2:
+    case PKMN_HUNTAIL:
+    case PKMN_GOREBYSS:
+    case PKMN_RHYPERIOR:
+    case PKMN_ELECTIVIRE:
+    case PKMN_MAGMORTAR:
+    case PKMN_PORYGON_Z:
+        // TODO
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
+
+constexpr bool isMythical( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_MEW:
+    case PKMN_CELEBI:
+    case PKMN_JIRACHI:
+    case PKMN_DEOXYS:
+    case PKMN_PHIONE:
+    case PKMN_MANAPHY:
+    case PKMN_DARKRAI:
+    case PKMN_SHAYMIN:
+    case PKMN_ARCEUS:
+    case PKMN_VICTINI:
+    case PKMN_KELDEO:
+    case PKMN_MELOETTA:
+    case PKMN_GENESECT:
+    case PKMN_DIANCIE:
+    case PKMN_HOOPA:
+    case PKMN_VOLCANION:
+    case PKMN_MAGEARNA:
+    case PKMN_MARSHADOW:
+    case PKMN_ZERAORA:
+    case PKMN_MELTAN:
+    case PKMN_MELMETAL:
+    case PKMN_ZARUDE:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
+constexpr bool isSpecial( u16 p_speciesId ) {
+    if( isMythical( p_speciesId ) ) { return true; }
+    switch( p_speciesId ) {
+    case PKMN_MEWTWO:
+    case PKMN_LUGIA:
+    case PKMN_HO_OH:
+    case PKMN_KYOGRE:
+    case PKMN_GROUDON:
+    case PKMN_RAYQUAZA:
+    case PKMN_DIALGA:
+    case PKMN_PALKIA:
+    case PKMN_GIRATINA:
+    case PKMN_RESHIRAM:
+    case PKMN_ZEKROM:
+    case PKMN_KYUREM:
+    case PKMN_XERNEAS:
+    case PKMN_YVELTAL:
+    case PKMN_ZYGARDE:
+    case PKMN_COSMOG:
+    case PKMN_COSMOEM:
+    case PKMN_SOLGALEO:
+    case PKMN_LUNALA:
+    case PKMN_NECROZMA:
+    case PKMN_ZACIAN:
+    case PKMN_ZAMAZENTA:
+    case PKMN_ETERNATUS:
+    case PKMN_KUBFU:
+    case PKMN_URSHIFU:
+    case PKMN_GLASTRIER:
+    case PKMN_SPECTRIER:
+    case PKMN_CALYREX:
+    case PKMN_MIRAIDON:
+    case PKMN_KORAIDON:
+    case PKMN_OKIDOGI:
+    case PKMN_MUNKIDORI:
+    case PKMN_FEZANDIPITI:
+    case PKMN_OGERPON:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
+constexpr bool isLegendary( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_ARTICUNO:
+    case PKMN_ZAPDOS:
+    case PKMN_MOLTRES:
+    case PKMN_MEWTWO:
+    case PKMN_RAIKOU:
+    case PKMN_ENTEI:
+    case PKMN_SUICUNE:
+    case PKMN_LUGIA:
+    case PKMN_HO_OH:
+    case PKMN_REGIROCK:
+    case PKMN_REGICE:
+    case PKMN_REGISTEEL:
+    case PKMN_LATIAS:
+    case PKMN_LATIOS:
+    case PKMN_KYOGRE:
+    case PKMN_GROUDON:
+    case PKMN_RAYQUAZA:
+    case PKMN_UXIE:
+    case PKMN_MESPRIT:
+    case PKMN_AZELF:
+    case PKMN_DIALGA:
+    case PKMN_PALKIA:
+    case PKMN_HEATRAN:
+    case PKMN_REGIGIGAS:
+    case PKMN_GIRATINA:
+    case PKMN_CRESSELIA:
+    case PKMN_COBALION:
+    case PKMN_TERRAKION:
+    case PKMN_VIRIZION:
+    case PKMN_TORNADUS:
+    case PKMN_THUNDURUS:
+    case PKMN_RESHIRAM:
+    case PKMN_ZEKROM:
+    case PKMN_LANDORUS:
+    case PKMN_KYUREM:
+    case PKMN_XERNEAS:
+    case PKMN_YVELTAL:
+    case PKMN_ZYGARDE:
+    case PKMN_TYPE__NULL:
+    case PKMN_SILVALLY:
+    case PKMN_TAPU_KOKO:
+    case PKMN_TAPU_LELE:
+    case PKMN_TAPU_BULU:
+    case PKMN_TAPU_FINI:
+    case PKMN_COSMOG:
+    case PKMN_COSMOEM:
+    case PKMN_SOLGALEO:
+    case PKMN_LUNALA:
+    case PKMN_NECROZMA:
+    case PKMN_ZACIAN:
+    case PKMN_ZAMAZENTA:
+    case PKMN_ETERNATUS:
+    case PKMN_KUBFU:
+    case PKMN_URSHIFU:
+    case PKMN_REGIELEKI:
+    case PKMN_REGIDRAGO:
+    case PKMN_GLASTRIER:
+    case PKMN_SPECTRIER:
+    case PKMN_CALYREX:
+    case PKMN_ENAMORUS:
+    case PKMN_WO_CHIEN:
+    case PKMN_CHIEN_PAO:
+    case PKMN_TING_LU:
+    case PKMN_CHI_YU:
+    case PKMN_MIRAIDON:
+    case PKMN_KORAIDON:
+    case PKMN_OKIDOGI:
+    case PKMN_MUNKIDORI:
+    case PKMN_FEZANDIPITI:
+    case PKMN_OGERPON:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
+constexpr bool isUltraBeast( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_NIHILEGO:
+    case PKMN_BUZZWOLE:
+    case PKMN_PHEROMOSA:
+    case PKMN_XURKITREE:
+    case PKMN_CELESTEELA:
+    case PKMN_KARTANA:
+    case PKMN_GUZZLORD:
+    case PKMN_POIPOLE:
+    case PKMN_NAGANADEL:
+    case PKMN_STAKATAKA:
+    case PKMN_BLACEPHALON:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
+constexpr bool isParadox( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_IRON_TREADS:
+    case PKMN_IRON_BUNDLE:
+    case PKMN_IRON_HANDS:
+    case PKMN_IRON_JUGULIS:
+    case PKMN_IRON_MOTH:
+    case PKMN_IRON_THORNS:
+    case PKMN_IRON_VALIANT:
+    case PKMN_IRON_LEAVES:
+    case PKMN_GREAT_TUSK:
+    case PKMN_SCREAM_TAIL:
+    case PKMN_BRUTE_BONNET:
+    case PKMN_FLUTTER_MANE:
+    case PKMN_SLITHER_WING:
+    case PKMN_SANDY_SHOCKS:
+    case PKMN_ROARING_MOON:
+    case PKMN_WALKING_WAKE:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
+
 constexpr u8 NatMod[ 25 ][ 5 ] = {
     { 10, 10, 10, 10, 10 }, { 11, 9, 10, 10, 10 }, { 11, 10, 10, 10, 9 },  { 11, 10, 9, 10, 10 },
     { 11, 10, 10, 9, 10 },  { 9, 11, 10, 10, 10 }, { 10, 10, 10, 10, 10 }, { 10, 11, 10, 10, 9 },

@@ -69,6 +69,7 @@ namespace MAP {
                                           // game, warp home
     constexpr u8 CLL_INIT_INFINITY_CAVE     = 18;
     constexpr u8 CLL_CONTINUE_INFINITY_CAVE = 19;
+    constexpr u8 CLL_MAPENTER_INFINITY_CAVE = 20;
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;

@@ -510,7 +510,9 @@ namespace MAP {
         const mapBlockAtom& atom( u16 p_x, u16 p_y ) const;
         mapBlockAtom&       atom( u16 p_x, u16 p_y );
         const mapData&      currentData( ) const;
+        mapData&            currentData( );
         const mapData&      currentData( u16 p_x, u16 p_y ) const;
+        mapData&            currentData( u16 p_x, u16 p_y );
 
         mapDrawer( );
 

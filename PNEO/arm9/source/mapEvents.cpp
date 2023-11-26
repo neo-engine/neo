@@ -697,10 +697,10 @@ namespace MAP {
                     // warp script failed / didn't return
                     return;
                 }
-                if( p_type == LAST_VISITED ) { tg = SAVE::SAV.getActiveFile( ).m_lastWarp; }
+                if( p_type == LAST_VISITED ) { tg = SAVE::SAV.getActiveFile( ).m_lastCaveEntry; }
             } else {
                 if( wdata.second.m_warp.m_warpType == LAST_VISITED ) {
-                    tg = SAVE::SAV.getActiveFile( ).m_lastWarp;
+                    tg = SAVE::SAV.getActiveFile( ).m_lastCaveEntry;
                 } else {
                     tg = warpPos(
                         wdata.second.m_warp.m_bank,
@@ -722,7 +722,7 @@ namespace MAP {
         warpPos current = warpPos{ SAVE::SAV.getActiveFile( ).m_currentMap,
                                    SAVE::SAV.getActiveFile( ).m_player.m_pos };
         if( p_type == LAST_VISITED ) {
-            warpPos target = SAVE::SAV.getActiveFile( ).m_lastWarp;
+            warpPos target = SAVE::SAV.getActiveFile( ).m_lastCaveEntry;
             if( !target.first && !target.second.m_posX && !target.second.m_posY
                 && !target.second.m_posZ )
                 return;

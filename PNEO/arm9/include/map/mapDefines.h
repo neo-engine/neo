@@ -217,6 +217,7 @@ namespace MAP {
         SWEET_SCENT, // unused
         POKE_TORE,
         SWARM,
+        INFINITY_CAVE, // normal grass, but m_slot is the level
     };
 
     enum mapWeather : u16 {

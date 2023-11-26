@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle/battle.h"
 #include "battle/battleTrainer.h"
 #include "defines.h"
+#include "dex/dex.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
 #include "io/choiceBox.h"
@@ -47,16 +48,22 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "spx/specials.h"
 
 namespace MAP {
-    static u16 CURRENT_SCRIPT  = -1;
-    u16        registers[ 10 ] = { 0 };
+    constexpr u8 ICAVE_TSYO_POKE_1 = 33;
+    constexpr u8 ICAVE_TSYO_POKE_2 = 55;
+    constexpr u8 ICAVE_TSYO_POKE_3 = 77;
+    constexpr u8 ICAVE_TSYO_POKE_4 = 99;
+    static u16   CURRENT_SCRIPT    = -1;
+    u16          registers[ 10 ]   = { 0 };
 
-    u8  infinityCaveType  = 0; // (1 + evtype)
-    u8  infinityCaveLayer = 0; // current Infinity Cave layer
-    u32 infinityCaveReqs  = 0; // 8 bit per shard type
+    FILE* icavef            = nullptr;
+    u8    infinityCaveType  = 0; // (1 + evtype)
+    u8    infinityCaveLayer = 0; // current Infinity Cave layer
+    u32   infinityCaveReqs  = 0; // 8 bit per shard type
 
     constexpr u8 MAX_INFINITY_POKE = 5;
 
-    std::pair<u16, u8> infinityCavePoke[ MAX_INFINITY_POKE ];
+    std::pair<u16, u8>              infinityCavePoke[ MAX_INFINITY_POKE ];
+    std::vector<std::pair<u16, u8>> infinityCaveSpecials;
 
     bool mapDrawer::executeWarpScript( u16 p_scriptId, warpType& p_targetType,
                                        warpPos& p_targetPos ) {
@@ -977,6 +984,11 @@ namespace MAP {
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_playTime.m_hours;
                     break;
                 }
+                case CLL_HALL_OF_FAME: {
+                    removeFollowPkmn( );
+                    SPX::runHallOfFame( );
+                    return;
+                }
                 case CLL_INIT_INFINITY_CAVE: {
                     // load bst_ev list for ev stat par2
                     // reset counter
@@ -985,6 +997,13 @@ namespace MAP {
                     infinityCaveLayer = 0;
                     infinityCaveReqs  = 0;
 
+                    for( u8 i = 0; i < MAX_INFINITY_POKE; ++i ) {
+                        infinityCavePoke[ i ] = { 0, 0 };
+                    }
+                    infinityCaveSpecials.clear( );
+
+                    if( icavef ) { fclose( icavef ); }
+                    icavef = FS::openInfinityCave( par2 );
                     break;
                 }
                 case CLL_CONTINUE_INFINITY_CAVE: {
@@ -999,11 +1018,6 @@ namespace MAP {
 
                     SAVE::SAV.getActiveFile( ).m_infinityCaveMaxLayer = std::max(
                         infinityCaveLayer, SAVE::SAV.getActiveFile( ).m_infinityCaveMaxLayer );
-
-                    constexpr u8 ICAVE_TSYO_POKE_1 = 33;
-                    constexpr u8 ICAVE_TSYO_POKE_2 = 55;
-                    constexpr u8 ICAVE_TSYO_POKE_3 = 77;
-                    constexpr u8 ICAVE_TSYO_POKE_4 = 99;
 
                     if( infinityCaveLayer == ICAVE_TSYO_POKE_1 ) {
                         registers[ 0 ] = 3;
@@ -1034,10 +1048,101 @@ namespace MAP {
 
                     break;
                 }
-                case CLL_HALL_OF_FAME: {
-                    removeFollowPkmn( );
-                    SPX::runHallOfFame( );
-                    return;
+                case CLL_MAPENTER_INFINITY_CAVE: {
+                    // update stored pkmn
+                    u8  base_level = infinityCaveLayer;
+                    u16 bst_upper  = 5 * infinityCaveLayer + 300;
+                    if( SAVE::SAV.getActiveFile( ).m_options.m_difficulty == 3 ) {
+                        base_level = std::max( 1, base_level / 2 );
+                        bst_upper  = 5 * base_level + 250;
+                    } else if( SAVE::SAV.getActiveFile( ).m_options.m_difficulty < 3 ) {
+                        base_level = std::max( 1, base_level / 3 );
+                        bst_upper  = 5 * base_level + 220;
+                    }
+
+                    if( infinityCaveLayer == ICAVE_TSYO_POKE_1 ) {
+                    } else if( infinityCaveLayer == ICAVE_TSYO_POKE_2 ) {
+                    } else if( infinityCaveLayer == ICAVE_TSYO_POKE_3 ) {
+                    } else if( infinityCaveLayer == ICAVE_TSYO_POKE_4 ) {
+                    } else {
+                        u16 nxt_bst  = 0;
+                        u16 nxt_idx  = 0;
+                        u8  nxt_form = 0;
+                        u8  nxt_ev   = 0;
+
+                        loop( ) {
+                            if( !icavef ) { break; }
+
+                            nxt_idx  = 0;
+                            nxt_form = 0;
+                            nxt_bst  = 0;
+                            nxt_ev   = 0;
+
+                            if( !fread( &nxt_bst, sizeof( u16 ), 1, icavef ) ) { break; }
+                            fread( &nxt_idx, sizeof( u16 ), 1, icavef );
+                            fread( &nxt_form, sizeof( u8 ), 1, icavef );
+                            if( !fread( &nxt_ev, sizeof( u8 ), 1, icavef ) ) { break; }
+
+                            if( hasBattleTransform( nxt_idx ) ) { nxt_form = 0; }
+                            if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED )
+                                && isLegendary( nxt_idx ) && !isSpecial( nxt_idx ) ) {
+                                infinityCaveSpecials.push_back(
+                                    std::pair<u16, u8>{ nxt_idx, nxt_form } );
+                                continue;
+                            }
+                            if( isLegendary( nxt_idx ) || isMythical( nxt_idx )
+                                || isUltraBeast( nxt_idx ) || isParadox( nxt_idx ) ) {
+                                continue;
+                            }
+                            if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED )
+                                && isTradeEvolution( nxt_idx ) ) {
+                                infinityCaveSpecials.push_back(
+                                    std::pair<u16, u8>{ nxt_idx, nxt_form } );
+                                continue;
+                            }
+                            if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED )
+                                && DEX::getDexNo( nxt_idx ) == u16( -1 ) ) {
+                                continue;
+                            }
+
+                            u8 free = MAX_INFINITY_POKE + 1;
+                            for( u8 i = 0; i < MAX_INFINITY_POKE; ++i ) {
+                                if( !infinityCavePoke[ i ].first ) {
+                                    free = i;
+                                    break;
+                                }
+                            }
+
+                            if( free < MAX_INFINITY_POKE ) {
+                                infinityCavePoke[ free ] = { nxt_idx, nxt_form };
+                            } else {
+                                free = rand( ) % ( 2 * MAX_INFINITY_POKE );
+                                if( free < MAX_INFINITY_POKE ) {
+                                    infinityCavePoke[ free ] = { nxt_idx, nxt_form };
+                                }
+                            }
+
+                            if( nxt_bst >= bst_upper ) { break; }
+                        }
+
+                        currentData( ).m_pokemon[ 0 ]
+                            = { PKMN_ZUBAT, 0, INFINITY_CAVE, base_level, 15, 20 };
+
+                        for( u8 i = 0; i < MAX_INFINITY_POKE; ++i ) {
+                            if( infinityCavePoke[ i ].first ) {
+                                printf( "%i to %i-%i\n", i, infinityCavePoke[ i ].first,
+                                        infinityCavePoke[ i ].second );
+                                currentData( ).m_pokemon[ i ] = { infinityCavePoke[ i ].first,
+                                                                  infinityCavePoke[ i ].second,
+                                                                  INFINITY_CAVE,
+                                                                  base_level,
+                                                                  15,
+                                                                  20 };
+                            }
+                        }
+                    }
+
+                    break;
                 }
                 default: break;
                 }

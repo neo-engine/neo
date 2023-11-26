@@ -71,6 +71,8 @@ namespace FS {
 
     FILE* openScript( u16 p_scriptId );
 
+    FILE* openInfinityCave( u8 p_stat );
+
     u8* readCry( u16 p_pkmnIdx, u8 p_forme, u32& p_len );
     u8* readSFX( u16 p_sfxID, u16& p_len );
 

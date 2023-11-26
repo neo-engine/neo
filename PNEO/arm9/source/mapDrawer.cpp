@@ -90,7 +90,22 @@ namespace MAP {
         u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
         return currentData( curx, cury );
     }
+
+    mapData& mapDrawer::currentData( ) {
+        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        return currentData( curx, cury );
+    }
+
     const mapData& mapDrawer::currentData( u16 p_x, u16 p_y ) const {
+        u16 curx = p_x;
+        u16 cury = p_y;
+
+        bool x = ( curx / SIZE != CUR_SLICE.m_x ), y = ( cury / SIZE != CUR_SLICE.m_y );
+        return _data[ ( _curX + x ) & 1 ][ ( _curY + y ) & 1 ];
+    }
+
+    mapData& mapDrawer::currentData( u16 p_x, u16 p_y ) {
         u16 curx = p_x;
         u16 cury = p_y;
 

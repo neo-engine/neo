@@ -365,31 +365,8 @@ namespace DEX {
     }
 
     constexpr bool requiredForCompletion( u16 p_pkmnIdx, bool p_localDex = false ) {
-        switch( p_pkmnIdx ) {
-        case PKMN_MEW:
-        case PKMN_CELEBI:
-        case PKMN_JIRACHI:
-        case PKMN_DEOXYS:
-        case PKMN_PHIONE:
-        case PKMN_MANAPHY:
-        case PKMN_SHAYMIN:
-        case PKMN_DARKRAI:
-        case PKMN_ARCEUS:
-        case PKMN_VICTINI:
-        case PKMN_KELDEO:
-        case PKMN_MELOETTA:
-        case PKMN_GENESECT:
-        case PKMN_HOOPA:
-        case PKMN_DIANCIE:
-        case PKMN_VOLCANION:
-        case PKMN_MAGEARNA:
-        case PKMN_MARSHADOW:
-        case PKMN_MELTAN:
-        case PKMN_MELMETAL:
-        case PKMN_ZERAORA:
-        case PKMN_ZARUDE: return false;
-        case PKMN_ORICORIO: return !p_localDex;
-        }
+        if( isMythical( p_pkmnIdx ) ) { return false; }
+        if( p_pkmnIdx == PKMN_ORICORIO ) { return !p_localDex; }
         return true;
     }
 

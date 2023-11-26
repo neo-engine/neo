@@ -55,6 +55,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace FS {
     const char PKMNDATA_PATH[]    = "nitro:/PKMNDATA/";
     const char SCRIPT_PATH[]      = "nitro:/DATA/MAP_SCRIPT/";
+    const char ICAVE_PATH[]       = "nitro:/DATA/BST_EV/";
     const char MAPLOCATION_PATH[] = "nitro:/DATA/MAP_LOCATION/";
 
 #ifndef NO_SOUND
@@ -185,6 +186,10 @@ namespace FS {
 
     FILE* openScript( u16 p_scriptId ) {
         return openSplit( SCRIPT_PATH, p_scriptId, ".mapscr", 10 * 30 );
+    }
+
+    FILE* openInfinityCave( u8 p_stat ) {
+        return open( ICAVE_PATH, p_stat, ".data" );
     }
 
     FILE* openHabitatData( u8 p_bank ) {
