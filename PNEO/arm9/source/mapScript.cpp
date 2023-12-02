@@ -1104,6 +1104,7 @@ namespace MAP {
                             if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_NAT_DEX_OBTAINED )
                                 && ( isLegendary( nxt_idx ) || isUltraBeast( nxt_idx ) )
                                 && !isSpecial( nxt_idx ) ) {
+                                if( nxt_idx == PKMN_SILVALLY && nxt_form ) { continue; }
                                 infinityCaveSpecials.push_back(
                                     std::pair<u16, u8>{ nxt_idx, nxt_form } );
                                 continue;
