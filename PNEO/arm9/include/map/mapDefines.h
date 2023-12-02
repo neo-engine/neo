@@ -281,7 +281,7 @@ namespace MAP {
             u8  m_forme;
             u8  m_encounterType;
 
-            u8 m_slot;  // num req badges for pkmn to show up
+            u8 m_slot; // num req badges for pkmn to show up
             u8 m_daytime;
             u8 m_encounterRate;
         } m_pokemon[ MAX_PKMN_PER_SLICE ];
@@ -341,7 +341,9 @@ namespace MAP {
                     u16 m_triggerMove; // only used when event triggered by a pkmn move
                 } m_generic;
                 struct {
-                    u8 m_hmType;
+                    u8  m_hmType;
+                    u16 m_scriptIdOnDestroy; // id of script that is called when object is
+                                             // destroyed
                 } m_hmObject;
                 struct {
                     u8 m_treeIdx; // internal id of this berry tree

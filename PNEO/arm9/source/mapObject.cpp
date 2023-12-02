@@ -827,6 +827,11 @@ namespace MAP {
 
                     o.first                                     = 255;
                     o.second.m_event.m_data.m_hmObject.m_hmType = 0;
+
+                    if( o.second.m_event.m_data.m_hmObject.m_scriptIdOnDestroy ) {
+                        executeScript( o.second.m_event.m_data.m_hmObject.m_scriptIdOnDestroy, 0,
+                                       s16( p_globX / SIZE ), s16( p_globY / SIZE ) );
+                    }
                 }
                 if( o.second.m_event.m_data.m_hmObject.m_hmType == mapSpriteManager::SPR_CUT ) {
                     SOUND::playSoundEffect( SFX_HM_CUT );
@@ -839,6 +844,11 @@ namespace MAP {
 
                     o.first                                     = 255;
                     o.second.m_event.m_data.m_hmObject.m_hmType = 0;
+
+                    if( o.second.m_event.m_data.m_hmObject.m_scriptIdOnDestroy ) {
+                        executeScript( o.second.m_event.m_data.m_hmObject.m_scriptIdOnDestroy, 0,
+                                       s16( p_globX / SIZE ), s16( p_globY / SIZE ) );
+                    }
                 }
             }
         }
