@@ -120,6 +120,8 @@ namespace SAVE {
     constexpr u8 V_UNUSED_BATTLE_FACILITY_6_100_DOUBLE_STREAK = 35;
     constexpr u8 V_SHOAL_CAVE                                 = 36;
     constexpr u8 V_HALL_OF_FAME_VICTORIES                     = 37;
+    constexpr u8 V_INFINITY_CAVE_MAX_LAYER                    = 38;
+    constexpr u8 V_INFINITY_CAVE_CURRENT_LAYER                = 39;
 
     enum gameType {
         UNUSED   = 0,
@@ -251,10 +253,9 @@ namespace SAVE {
 
             u8 m_caughtPkmn[ 185 ]; // The pkmn the player has caught
             u8 m_seenPkmn[ 185 ];   // The pkmn the player has seen
-            u8 m_reserved2[ 3 ];
+            u8 m_reserved2[ 4 ];
 
-            u8 m_infinityCaveMaxLayer = 0;
-            u8 m_route                = 0; // current story route
+            u8 m_route = 0; // current story route
 
             /*
              * @brief: tries to register a new fly pos; returns true on success.
@@ -442,6 +443,38 @@ namespace SAVE {
              * @brief: Sets the specified var to the specified value.
              */
             void setVar( u8 p_idx, u16 p_value );
+
+            /*
+             * @brief: Shortcut for accessing the variable storing the max layer achieved
+             * in the infinity cave.
+             */
+            inline u16& infinityCaveMaxLayer( ) {
+                return m_vars[ V_INFINITY_CAVE_MAX_LAYER ];
+            }
+
+            /*
+             * @brief: Shortcut for accessing the variable storing the max layer achieved
+             * in the infinity cave.
+             */
+            inline const u16& infinityCaveMaxLayer( ) const {
+                return m_vars[ V_INFINITY_CAVE_MAX_LAYER ];
+            }
+
+            /*
+             * @brief: Shortcut for accessing the variable storing the max layer achieved
+             * in the infinity cave.
+             */
+            inline u16& infinityCaveCurrentLayer( ) {
+                return m_vars[ V_INFINITY_CAVE_CURRENT_LAYER ];
+            }
+
+            /*
+             * @brief: Shortcut for accessing the variable storing the max layer achieved
+             * in the infinity cave.
+             */
+            inline const u16& infinityCaveCurrentLayer( ) const {
+                return m_vars[ V_INFINITY_CAVE_CURRENT_LAYER ];
+            }
 
             /*
              * @brief: Increases the variable; does nothing if an overflow would occur.

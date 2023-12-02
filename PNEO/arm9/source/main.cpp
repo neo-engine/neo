@@ -288,6 +288,8 @@ START:
     SOUND::stopBGM( );
 
     ANIMATE_MAP = false;
+    // Reset infinity cave on reload
+    SAVE::SAV.getActiveFile( ).infinityCaveCurrentLayer( ) = 0;
 
     MAP::curMap->registerOnLocationChangedHandler( SOUND::onLocationChange );
     MAP::curMap->registerOnMoveModeChangedHandler( SOUND::onMovementTypeChange );
