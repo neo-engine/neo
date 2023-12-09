@@ -165,6 +165,7 @@ More screenshots are available in the `Screens` subdirectory.
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx01.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx02.png)
 ![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx03.png)
+![](https://github.com/neo-engine/neo/blob/main/PNEO/Screens/dx04.png)
 
 ##### Battles
 ###### Wild Pokémon battles
