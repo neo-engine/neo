@@ -104,6 +104,55 @@ namespace IO {
         }
     }
 
+    void constructMBSprite( style p_style ) {
+        switch( p_style ) {
+        case MSG_NORMAL:
+        case MSG_NOCLOSE:
+        case MSG_NORMAL_CONT:
+        case MSG_BRAILLE: {
+            // construct mb 1, use default gfx addresses
+            IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64, false,
+                             false, false, OBJPRIORITY_0, false );
+            // TODO: 1 sprite for each corner (flipped)
+            // TODO: 1 sprite for each edge (stretched/flipped)
+            // TODO: 1 sprite for interior, stretched to fill area
+            for( u8 i = 0; i < 13; ++i ) {
+                IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46, 32,
+                                 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
+            }
+            break;
+        }
+        case MSG_INFO:
+        case MSG_INFO_NOCLOSE:
+        case MSG_ITEM:
+        case MSG_INFO_CONT:
+        case MSG_SIGN: {
+            // construct mb 2, use default gfx addresses
+            IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64, false,
+                             false, false, OBJPRIORITY_0, false );
+            // TODO: 1 sprite for each corner (flipped)
+            // TODO: 1 sprite for each edge (stretched/flipped)
+            // TODO: 1 sprite for interior, stretched to fill area
+            for( u8 i = 0; i < 13; ++i ) {
+                IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46, 32,
+                                 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
+            }
+            break;
+        }
+        case MSG_MART_ITEM: {
+            // mart uses more elaborate mb design, needs more gxf data
+            IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX_MART, 0, 192 - 51, 32,
+                             64, false, false, false, OBJPRIORITY_0, false );
+            for( u8 i = 0; i < 13; ++i ) {
+                IO::loadSpriteB( SPR_MSGBOX_OAM + i + 1, SPR_MSGBOX_GFX_MART, 32 + 16 * i, 192 - 51,
+                                 32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
+            }
+            break;
+        }
+        default: break;
+        }
+    }
+
     void doPrintMessage( const char* p_message, style p_style, u16 p_item,
                          const BAG::itemData* p_data, bool p_noDelay ) {
         IO::regularFont->setColor( 4, 3 );
@@ -112,24 +161,12 @@ namespace IO {
         if( p_message ) {
             if( LOCATION_TIMER ) { hideLocation( ); }
 
-            if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE || p_style == MSG_NORMAL_CONT ) {
-                IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
-                                 false, false, false, OBJPRIORITY_0, false );
+            constructMBSprite( p_style );
 
-                for( u8 i = 0; i < 13; ++i ) {
-                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46,
-                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
-                }
+            if( p_style == MSG_NORMAL || p_style == MSG_NOCLOSE || p_style == MSG_NORMAL_CONT ) {
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 2, 2 );
             } else if( p_style == MSG_BRAILLE ) {
-                IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64,
-                                 false, false, false, OBJPRIORITY_0, false );
-
-                for( u8 i = 0; i < 13; ++i ) {
-                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 46,
-                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
-                }
                 IO::regularFont->setColor( 1, 1 );
                 IO::regularFont->setColor( 2, 2 );
                 IO::regularFont->setColor( 3, 1 );
@@ -138,15 +175,7 @@ namespace IO {
                 IO::brailleFont->setColor( 1, 1 );
                 IO::brailleFont->setColor( 2, 2 );
             } else if( p_style == MSG_INFO || p_style == MSG_INFO_NOCLOSE || p_style == MSG_ITEM
-                       || p_style == MSG_INFO_CONT ) {
-                IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
-                                 false, false, false, OBJPRIORITY_0, false );
-
-                for( u8 i = 0; i < 13; ++i ) {
-                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 30 + 16 * i, 192 - 46,
-                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
-                }
-
+                       || p_style == MSG_INFO_CONT || p_style == MSG_SIGN ) {
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 2, 2 );
                 u16 lns = IO::regularFont->printBreakingStringC(
@@ -164,12 +193,6 @@ namespace IO {
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
                 std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
                 std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
-                IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 51, 32, 64,
-                                 false, false, false, OBJPRIORITY_0, false );
-                for( u8 i = 0; i < 13; ++i ) {
-                    IO::loadSpriteB( SPR_MSGBOX_OAM + i + 1, SPR_MSGBOX_GFX, 32 + 16 * i, 192 - 51,
-                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
-                }
 
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 0, 2 );
@@ -179,26 +202,6 @@ namespace IO {
                     p_message, 0, 0, 192 - 20, true, IO::font::LEFT, 12, ' ', 0, false, -1 );
                 if( lns == 3 ) { y = 192 - 44; }
                 if( lns <= 2 ) { y = 192 - 38; }
-            } else if( p_style == MSG_SIGN ) {
-                // TODO: Load sign graphics
-
-                std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
-                std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
-                IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 2, 192 - 46, 32, 64,
-                                 false, false, false, OBJPRIORITY_0, false );
-
-                for( u8 i = 0; i < 13; ++i ) {
-                    IO::loadSpriteB( SPR_MSGBOX_OAM + 13 - i, SPR_MSGBOX_GFX, 30 + 16 * i, 192 - 46,
-                                     32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );
-                }
-
-                IO::regularFont->setColor( 3, 1 );
-                IO::regularFont->setColor( 2, 2 );
-                if( p_style == MSG_ITEM ) {
-                    x += 48;
-                    y += 8;
-                }
             }
         }
 
@@ -208,7 +211,7 @@ namespace IO {
             std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         } else {
             u16  cpos    = 0;
-            u16  tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
+            u16  tileCnt = p_style == MSG_MART_ITEM ? SPR_MSG_GFX_MART : SPR_MSG_GFX;
             bool sp      = false;
             IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
             std::memset( TMP_TEXT_BUF, 0, sizeof( TMP_TEXT_BUF ) );
@@ -244,7 +247,7 @@ namespace IO {
                     }
                 }
 
-                tileCnt = hg == 64 ? SPR_MSG_EXT_GFX : SPR_MSG_GFX;
+                tileCnt = p_style == MSG_MART_ITEM ? SPR_MSG_GFX_MART : SPR_MSG_GFX;
                 u8 ln   = 1;
                 if( p_noDelay ) {
                     std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
@@ -349,7 +352,7 @@ namespace IO {
     void useItemFromPlayer( u16 p_itemId, u16 p_amount ) {
         auto data = FS::getItemData( p_itemId );
         auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
-                                            BAG::toBagType( data.m_itemType ), p_itemId ) );
+                                           BAG::toBagType( data.m_itemType ), p_itemId ) );
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
         char buffer[ 100 ];
         auto iname = FS::getItemName( p_itemId );
@@ -371,7 +374,7 @@ namespace IO {
     void takeItemFromPlayer( u16 p_itemId, u16 p_amount ) {
         auto data = FS::getItemData( p_itemId );
         auto cnt  = std::min( p_amount, SAVE::SAV.getActiveFile( ).m_bag.count(
-                                            BAG::toBagType( data.m_itemType ), p_itemId ) );
+                                           BAG::toBagType( data.m_itemType ), p_itemId ) );
         SAVE::SAV.getActiveFile( ).m_bag.erase( BAG::toBagType( data.m_itemType ), p_itemId, cnt );
         char buffer[ 100 ];
         auto iname = FS::getItemName( p_itemId );

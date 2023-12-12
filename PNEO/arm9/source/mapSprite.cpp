@@ -63,7 +63,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // #define SPR_DOOR_GFX               ( SPR_MAPTILE_GFX( MAX_TILE_ANIM_GFX_SLOTS ) )
 #define SPR_DOOR_GFX SPR_MAIN_PLAYER_PLAT_GFX
 
-#define SPR_EXCLM_GFX 303
+#define SPR_EXCLM_GFX 372
+
+// defined in mapObject.cpp
+// #define SPR_PKMN_GFX 352
+// #define SPR_CIRC_GFX 496
 
 namespace MAP {
     void mapSpriteData::readData( FILE* p_f ) {

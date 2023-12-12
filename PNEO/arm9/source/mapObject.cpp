@@ -46,8 +46,8 @@ namespace MAP {
 #define SPR_PKMN_OAM 100
 #define SPR_CIRC_OAM 104
 
-#define SPR_PKMN_GFX 303
-#define SPR_CIRC_GFX 447
+#define SPR_PKMN_GFX 352
+#define SPR_CIRC_GFX 496
 
     direction getRandomLookDirection( moveMode p_movement ) {
         u8 st = rand( ) % 4;
@@ -416,27 +416,51 @@ namespace MAP {
     }
 
     void mapDrawer::showPkmn( const pkmnSpriteInfo& p_pkmn, bool p_cry ) {
+        ANIMATE_MAP = false;
         _mapSprites.setVisibility( _playerSprite, true, false );
-        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
+
+        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 66, 34, 32, 32, false, false, false,
                          OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
+        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 126, 34, 32, 32, 0, 0, 0, false, true,
                          false, OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 64, 96, 64, 64, 0, 0, 0, true, false,
+        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 66, 94, 32, 32, 0, 0, 0, true, false,
                          false, OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
+        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 126, 94, 32, 32, 0, 0, 0, true, true,
                          false, OBJPRIORITY_1, false );
+
+        for( u8 i = 0; i < 4; ++i ) {
+            IO ::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isSizeDouble   = true;
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].rotationIndex  = i;
+
+            if( i & 1 ) {
+                IO::OamTop->matrixBuffer[ i ].hdx = -( 1LL << 7 );
+            } else {
+                IO::OamTop->matrixBuffer[ i ].hdx = ( 1LL << 7 );
+            }
+            IO::OamTop->matrixBuffer[ i ].hdy = ( 0LL << 8 );
+            IO::OamTop->matrixBuffer[ i ].vdx = ( 0LL << 8 );
+            if( i > 1 ) {
+                IO::OamTop->matrixBuffer[ i ].vdy = -( 1LL << 7 );
+            } else {
+                IO::OamTop->matrixBuffer[ i ].vdy = ( 1LL << 7 );
+            }
+        }
 
         if( p_cry ) { SOUND::playCry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ); }
 
         IO::loadPKMNSpriteB( p_pkmn, 80, 48, SPR_PKMN_OAM, SPR_PKMN_GFX, false );
         IO::updateOAM( false );
-        for( u8 i = 0; i < 75; ++i ) swiWaitForVBlank( );
+        for( u8 i = 0; i < 75; ++i ) { swiWaitForVBlank( ); }
 
         for( u8 i = 0; i < 4; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isRotateScale = false;
+            // IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isSizeDouble  = false;
             IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true;
             IO::OamTop->oamBuffer[ SPR_PKMN_OAM + i ].isHidden = true;
         }
         IO::updateOAM( false );
+        ANIMATE_MAP = true;
     }
 
     void mapDrawer::usePkmn( const pkmnSpriteInfo& p_pkmn ) {
@@ -489,7 +513,6 @@ namespace MAP {
     }
 
     void mapDrawer::awardBadge( u8 p_type, u8 p_badge ) {
-
         if( p_type == 0
             && ( SAVE::SAV.getActiveFile( ).m_HOENN_Badges & ( 1 << ( p_badge - 1 ) ) ) ) {
             // player already has this badge/symbol.
@@ -503,20 +526,40 @@ namespace MAP {
             }
         }
 
+        ANIMATE_MAP = false;
+
         if( p_type == 0 ) {
             SOUND::playBGMOneshot( BGM_OS_BADGE );
         } else if( p_type == 1 ) {
             SOUND::playBGMOneshot( BGM_OS_SYMBOL );
         }
 
-        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 64, 32, 64, 64, false, false, false,
+        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 66, 34, 32, 32, false, false, false,
                          OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 128, 32, 64, 64, 0, 0, 0, false, true,
+        IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 126, 34, 32, 32, 0, 0, 0, false, true,
                          false, OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 64, 96, 64, 64, 0, 0, 0, true, false,
+        IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 66, 94, 32, 32, 0, 0, 0, true, false,
                          false, OBJPRIORITY_1, false );
-        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 128, 96, 64, 64, 0, 0, 0, true, true,
+        IO::loadSpriteB( SPR_CIRC_OAM + 3, SPR_CIRC_GFX, 126, 94, 32, 32, 0, 0, 0, true, true,
                          false, OBJPRIORITY_1, false );
+        for( u8 i = 0; i < 4; ++i ) {
+            IO ::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isSizeDouble   = true;
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].rotationIndex  = i;
+
+            if( i & 1 ) {
+                IO::OamTop->matrixBuffer[ i ].hdx = -( 1LL << 7 );
+            } else {
+                IO::OamTop->matrixBuffer[ i ].hdx = ( 1LL << 7 );
+            }
+            IO::OamTop->matrixBuffer[ i ].hdy = ( 0LL << 8 );
+            IO::OamTop->matrixBuffer[ i ].vdx = ( 0LL << 8 );
+            if( i > 1 ) {
+                IO::OamTop->matrixBuffer[ i ].vdy = -( 1LL << 7 );
+            } else {
+                IO::OamTop->matrixBuffer[ i ].vdy = ( 1LL << 7 );
+            }
+        }
 
         if( p_type == 0 ) { // Hoenn badge
             IO::loadSpriteB( ( "BA/b" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
@@ -541,7 +584,10 @@ namespace MAP {
         IO::updateOAM( false );
         for( u16 i = 0; i < 330; ++i ) swiWaitForVBlank( );
 
-        for( u8 i = 0; i < 4; ++i ) { IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden = true; }
+        for( u8 i = 0; i < 4; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isRotateScale = false;
+            IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isHidden      = true;
+        }
         IO::OamTop->oamBuffer[ SPR_PKMN_OAM ].isHidden = true;
         IO::updateOAM( false );
 
@@ -550,6 +596,7 @@ namespace MAP {
                   getBadgeName( p_type, p_badge ) );
         IO::printMessage( buffer, MSG_INFO );
         SOUND::restartBGM( );
+        ANIMATE_MAP = true;
     }
 
     void mapDrawer::runPokeMart( const std::vector<std::pair<u16, u32>>& p_offeredItems,

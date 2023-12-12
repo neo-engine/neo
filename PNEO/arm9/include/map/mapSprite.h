@@ -187,7 +187,7 @@ namespace MAP {
 
     class mapSpriteManager {
       public:
-        static constexpr u8 MAX_SMALL_NPC             = 22;
+        static constexpr u8 MAX_SMALL_NPC             = 28;
         static constexpr u8 MAX_LARGE_NPC             = 5;
         static constexpr u8 MAX_EXTRA_LARGE_NPC       = 1;
         static constexpr u8 MAX_HM_PARTICLE           = 16;

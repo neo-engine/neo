@@ -6,7 +6,7 @@ file        : message.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -41,10 +41,13 @@ namespace IO {
     constexpr u16 SPR_MSGBOX_OAM      = 113;
     constexpr u16 SPR_MSGBOX_OAM_LEN  = 14;
 
-    constexpr u16 SPR_MSG_GFX     = 348;
-    constexpr u16 SPR_MSG_EXT_GFX = 268;
-    constexpr u16 SPR_MSGBOX_GFX  = 476;
-    constexpr u16 SPR_MSGCONT_GFX = 508;
+    constexpr u16 SPR_MSG_GFX    = 352;
+    // this is a hack exploiting that standard message box gfx are only 24px tall
+    constexpr u16 SPR_MSGBOX_GFX = 480;
+
+    constexpr u16 SPR_MSG_GFX_MART    = 268;
+    constexpr u16 SPR_MSGBOX_GFX_MART = 476;
+    constexpr u16 SPR_MSGCONT_GFX     = 508;
 
     extern u8  LOCATION_TIMER;
     extern u16 TEXT_BUF[ 64 * 256 ];
