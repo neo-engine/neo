@@ -278,7 +278,10 @@ namespace SPX {
             for( u8 i = 0; i < 12; ++i ) {
                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + i ].isHidden = true;
             }
-            for( u8 i = 0; i < 8; ++i ) { IO::OamTop->oamBuffer[ i ].isHidden = true; }
+            for( u8 i = 0; i < 8; ++i ) {
+                IO::OamTop->oamBuffer[ i ].isHidden      = true;
+                IO::OamTop->oamBuffer[ i ].isRotateScale = false;
+            }
             IO::updateOAM( false );
             u8 res = cb.getResult(
                 [ & ]( u8 ) {
@@ -303,14 +306,38 @@ namespace SPX {
             // Make the player confirm the choice
 
             tc = 0;
-            tc = IO::loadSprite( "UI/cc", 4, 1, tc, 64, 12, 64, 64, false, false, false,
-                                 OBJPRIORITY_1, false );
-            IO::loadSprite( 5, 1, 0, 128, 12, 64, 64, 0, 0, 0, false, true, false, OBJPRIORITY_1,
-                            false );
-            IO::loadSprite( 6, 1, 0, 64, 64 + 12, 64, 64, 0, 0, 0, true, false, false,
-                            OBJPRIORITY_1, false );
-            IO::loadSprite( 7, 1, 0, 128, 64 + 12, 64, 64, 0, 0, 0, true, true, false,
-                            OBJPRIORITY_1, false );
+
+            u8 SPR_CIRC_OAM = 4;
+            u8 SPR_CIRC_PAL = 1;
+            u8 SPR_CIRC_GFX = tc;
+
+            tc = IO::loadSprite( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 14, 32, 32,
+                                 false, false, false, OBJPRIORITY_1, false );
+            IO::loadSprite( SPR_CIRC_OAM + 1, SPR_CIRC_PAL, SPR_CIRC_GFX, 126, 14, 32, 32, 0, 0, 0,
+                            false, true, false, OBJPRIORITY_1, false );
+            IO::loadSprite( SPR_CIRC_OAM + 2, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 74, 32, 32, 0, 0, 0,
+                            true, false, false, OBJPRIORITY_1, false );
+            IO::loadSprite( SPR_CIRC_OAM + 3, SPR_CIRC_PAL, SPR_CIRC_GFX, 126, 74, 32, 32, 0, 0, 0,
+                            true, true, false, OBJPRIORITY_1, false );
+
+            for( u8 i = 0; i < 4; ++i ) {
+                IO ::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isRotateScale = true;
+                IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].isSizeDouble   = true;
+                IO::OamTop->oamBuffer[ SPR_CIRC_OAM + i ].rotationIndex  = i;
+
+                if( i & 1 ) {
+                    IO::OamTop->matrixBuffer[ i ].hdx = -( 1LL << 7 );
+                } else {
+                    IO::OamTop->matrixBuffer[ i ].hdx = ( 1LL << 7 );
+                }
+                IO::OamTop->matrixBuffer[ i ].hdy = ( 0LL << 8 );
+                IO::OamTop->matrixBuffer[ i ].vdx = ( 0LL << 8 );
+                if( i > 1 ) {
+                    IO::OamTop->matrixBuffer[ i ].vdy = -( 1LL << 7 );
+                } else {
+                    IO::OamTop->matrixBuffer[ i ].vdy = ( 1LL << 7 );
+                }
+            }
 
             tc = IO::loadPKMNSprite( pkmn[ res ].getSpriteInfo( ), 80, 16 + 12, 0, 0, tc, false );
 
