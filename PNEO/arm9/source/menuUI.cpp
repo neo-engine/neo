@@ -732,6 +732,9 @@ namespace IO {
         std::vector<std::pair<IO::inputTarget, s32>> res
             = std::vector<std::pair<IO::inputTarget, s32>>( );
 
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152, true );
+
         auto& oam = IO::Oam->oamBuffer;
         for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
 

@@ -673,20 +673,20 @@ namespace IO {
         } else if( mx > 0 ) {
             snprintf( buffer, 100, GET_STRING( IO::STR_UI_MART_CLERK_HOW_MANY ), p_name.c_str( ) );
 
-            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-
             for( u8 i = 0; i < 10; ++i ) { oam[ SPR_MSGBOX_OAM_SUB + i ].isHidden = false; }
-
-            IO::regularFont->printBreakingStringC( buffer, 40, 38, 256 - 80, true );
-
-            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
 
             IO::counter c   = IO::counter( 0, mx );
             u8          mdg = 0;
             for( auto tmp = mx; tmp > 0; tmp /= 10, ++mdg ) {}
 
             res = c.getResult(
-                [ & ]( ) { return drawCounter( 0, mx ); },
+                [ & ]( ) {
+                    auto res2 = drawCounter( 0, mx );
+                    IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                    IO::regularFont->printBreakingStringC( buffer, 40, 38, 256 - 80, true );
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    return res2;
+                },
                 [ & ]( u32 p_newValue, u8 p_selDig ) {
                     updateCounterValue( p_newValue, p_selDig, mdg );
                 },
