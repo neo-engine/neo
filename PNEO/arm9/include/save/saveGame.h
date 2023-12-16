@@ -37,6 +37,7 @@
 #include "map/mapObject.h"
 #include "pokemon.h"
 #include "save/saveOptions.h"
+#include "save/wonderCard.h"
 
 namespace SAVE {
 #ifdef FLASHCARD
@@ -52,14 +53,11 @@ namespace SAVE {
 
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
-    // #ifdef FLASHCARD
-    //     constexpr u8 MAX_BOXES = 2;
-    // #else
-    constexpr u8  MAX_BOXES              = 35;
+
+    constexpr u8  MAX_BOXES              = 45;
     constexpr u8  MAX_REGISTERED_FLY_POS = 75;
     constexpr u16 MAX_MAPOBJECT          = 256;
-    // #endif
-    constexpr u8 BERRY_SLOTS = 150;
+    constexpr u8  BERRY_SLOTS            = 150;
 
     constexpr u16 F_MEGA_EVOLUTION    = 1;
     constexpr u16 F_NAV_OBTAINED      = 2;
@@ -123,7 +121,7 @@ namespace SAVE {
     constexpr u8 V_INFINITY_CAVE_MAX_LAYER                    = 38;
     constexpr u8 V_INFINITY_CAVE_CURRENT_LAYER                = 39;
 
-    enum gameType {
+    enum gameType : u8 {
         UNUSED   = 0,
         NORMAL   = 1,
         TRANSFER = 2,
@@ -171,7 +169,7 @@ namespace SAVE {
             u8       m_achievements; // Hall of Fame / Dex / Battle Frontier /
                                      // Contest / Berries / Game clear
             u8   m_appearance;       // sprite the player currently uses
-            char m_playername[ 12 ];
+            char m_playername[ OTLENGTH ];
             u16  m_id;
             u16  m_sid;
             time m_playTime;
@@ -202,8 +200,6 @@ namespace SAVE {
             u16            m_lstViewedItem[ 5 ]; // Last viewed item in the bag
 
             ObjPriority m_playerPriority;
-
-            u32 m_good2 = 0;
 
             u16         m_registeredItem; // Item registered for fast-use
             u8          m_lstBag;         // Last sub-bag used by the player
@@ -242,7 +238,7 @@ namespace SAVE {
             u8          m_numRegisteredFlyPos                        = 0;
             MAP::flyPos m_registeredFlyPos[ MAX_REGISTERED_FLY_POS ] = { };
 
-            u32 m_reserved[ 10 ] = { 0 }; // reserved for future things that need to be stored
+            u32 m_reserved[ 100 ] = { 0 }; // reserved for future things that need to be stored
 
             BAG::bag m_bag;
 
@@ -251,11 +247,19 @@ namespace SAVE {
 
             BOX::box m_storedPokemon[ MAX_BOXES ]; // pkmn in the storage system
 
-            u8 m_caughtPkmn[ 185 ]; // The pkmn the player has caught
-            u8 m_seenPkmn[ 185 ];   // The pkmn the player has seen
-            u8 m_reserved2[ 4 ];
+            boxPokemon m_traderPokemon; // pkmn currently owned by pkmn self-trader
+            boxPokemon m_unusedPkmn[ 5 ];
+
+            u8 m_caughtPkmn[ 250 ]; // The pkmn the player has caught
+            u8 m_seenPkmn[ 250 ];   // The pkmn the player has seen
+            u8 m_reserved2[ 300 ];
 
             u8 m_route = 0; // current story route
+
+            wonderCard m_storedWonderCards[ 12 ];
+            u8         m_collectedWonderCards[ 32 ];
+
+            u32 m_good2 = 0;
 
             /*
              * @brief: tries to register a new fly pos; returns true on success.

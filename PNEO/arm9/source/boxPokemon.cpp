@@ -6,7 +6,7 @@ file        : pokemon.cpp
 author      : Philip Wellnitz
 description : The main Pokémon engine
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -60,9 +60,9 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
 
     m_rand = rand( ) & 0xF;
 
-    m_oTId  = p_id;
-    m_oTSid = p_sid;
-    m_pid   = rand( );
+    m_oTId      = p_id;
+    m_oTSid     = p_sid;
+    m_pid       = rand( );
     m_shinyType = 0;
     if( p_shiny == 2 ) {
         while( !isShiny( ) ) { m_pid = rand( ); }
@@ -140,7 +140,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_fateful = p_fatefulEncounter;
 
     if( p_name ) {
-        strcpy( m_name, p_name );
+        memcpy( m_name, p_name, PKMN_NAMELENGTH );
         setIsNicknamed( true );
     } else {
         FS::getDisplayName( p_pkmnId, m_name, CURRENT_LANGUAGE );
@@ -170,27 +170,15 @@ bool boxPokemon::gainExperience( u32 p_amount ) {
 std::vector<u8> boxPokemon::getRibbons( ) const {
     std::vector<u8> res{ };
 
-    for( u8 i = 0; i < 32; ++i ) {
-        if( m_ribbons0[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
-    }
-    for( u8 i = 0; i < 32; ++i ) {
-        if( m_ribbons1[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( 32 + i ); }
-    }
-    for( u8 i = 0; i < 32; ++i ) {
-        if( m_ribbons2[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( 64 + i ); }
+    for( u8 i = 0; i < 3 * 32; ++i ) {
+        if( m_ribbons[ i / 8 ] & ( 1 << ( i % 8 ) ) ) { res.push_back( i ); }
     }
 
     return res;
 }
 
 void boxPokemon::awardRibbon( u8 p_ribbon ) {
-    if( p_ribbon < 32 ) {
-        m_ribbons0[ p_ribbon / 8 ] |= ( 1 << ( p_ribbon % 8 ) );
-    } else if( p_ribbon < 64 ) {
-        m_ribbons1[ ( p_ribbon - 32 ) / 8 ] |= ( 1 << ( ( p_ribbon - 32 ) % 8 ) );
-    } else {
-        m_ribbons2[ ( p_ribbon - 64 ) / 8 ] |= ( 1 << ( ( p_ribbon - 64 ) % 8 ) );
-    }
+    m_ribbons[ p_ribbon / 8 ] |= ( 1 << ( p_ribbon % 8 ) );
 }
 
 bool boxPokemon::isFullyEvolved( ) const {

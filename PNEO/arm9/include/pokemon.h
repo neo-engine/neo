@@ -6,7 +6,7 @@ file        : pokemon.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -66,48 +66,54 @@ struct trainerPokemon {
  * pkmn to the pkmn storage system.
  */
 struct boxPokemon {
-    u32 m_pid      = 0;
-    u16 m_checksum = 0;
+    u32 m_pid = 0;
 
-    u16 m_speciesId         = 0;
-    u16 m_heldItem          = 0;
-    u16 m_oTId              = 0;
-    u16 m_oTSid             = 0;
-    u32 m_experienceGained  = 0;
-    u8  m_steps             = 0; // StepstoHatch/256 // Happiness
-    u16 m_ability           = 0;
-    u8  m_origLang          = 0;
-    u8  m_effortValues[ 6 ] = { 0 }; // HP,Attack,Defense,SAttack,SDefense,Speed
-    u8  m_contestStats[ 6 ] = { 0 }; // Cool, Beauty, Cute, Smart, Tough, Sheen
-    u8  m_ribbons1[ 4 ]     = { 0 };
+    u32 m_experienceGained = 0;
 
-    u16 m_moves[ 4 ]       = { 0 };
-    u8  m_curPP[ 4 ]       = { 0 }; //
-    u8  m_pPUps            = 0;
-    u32 m_iVint            = 0; // hp/5, atk/5, def/5, satk/5, sdef/5, spd/5, nicked/1, isEgg/1
-    u8  m_ribbons0[ 4 ]    = { 0 };
-    u8  m_fateful : 1      = 0;
-    u8  m_isFemale : 1     = 0;
-    u8  m_isGenderless : 1 = 0;
-    u8  m_altForme : 5     = 0;
-    u16 m_hatchPlace       = 0; // PT-like
-    u16 m_gotPlace         = 0; // PT-like
+    u32 m_iVint = 0; // hp/5, atk/5, def/5, satk/5, sdef/5, spd/5, nicked/1, isEgg/1
 
+    u32 m_ability : 12    = 0;
+    u32 m_hatchPlace : 12 = 0; // PT-like
+    u32 m_ball : 8        = 0; //
+
+    u32 m_gotPlace : 12  = 0; // PT-like
+    u32 m_speciesId : 12 = 0;
+    u32 m_pPUps : 8      = 0;
+
+    u16 m_oTId  = 0;
+    u16 m_oTSid = 0;
+
+    u16 m_heldItem : 14     = 0;
+    u16 m_pokerus : 1       = 0; // had pkrs at some point
+    u16 m_pokerusActive : 1 = 0; // currently has pkrs
+
+    u16 m_moves[ 4 ] = { 0 };
+
+    u8 m_origLang : 4 = 0;
+    u8 m_hometown : 4 = 0;
+
+    u8 m_steps            = 0; // StepstoHatch/256 // Happiness
+    u8 m_fateful : 1      = 0;
+    u8 m_isFemale : 1     = 0;
+    u8 m_isGenderless : 1 = 0;
+    u8 m_altForme : 5     = 0;
+
+    u8 m_nature       = 0;
+    u8 m_gotLevel : 7 = 0; //
+    u8 m_unused : 1   = 0; // unused
+
+    u8 m_abilitySlot : 2 = 0;
+    u8 m_shinyType : 2   = 0;
+    u8 m_rand : 4        = 0;
+
+    u8   m_curPP[ 4 ]              = { 0 }; //
+    u8   m_effortValues[ 6 ]       = { 0 }; // HP,Attack,Defense,SAttack,SDefense,Speed
+    u8   m_contestStats[ 6 ]       = { 0 }; // Cool, Beauty, Cute, Smart, Tough, Sheen
+    u8   m_ribbons[ 12 ]           = { 0 };
+    u8   m_gotDate[ 3 ]            = { 0 }; //(EGG)
+    u8   m_hatchDate[ 3 ]          = { 0 }; // gotDate for nonEgg
+    char m_oT[ OTLENGTH ]          = { 0 };
     char m_name[ PKMN_NAMELENGTH ] = { 0 };
-    u16  m_hometown                = 0;
-    u8   m_ribbons2[ 4 ]           = { 0 };
-
-    char m_oT[ OTLENGTH ]  = { 0 };
-    u8   m_gotDate[ 3 ]    = { 0 }; //(EGG)
-    u8   m_hatchDate[ 3 ]  = { 0 }; // gotDate for nonEgg
-    u8   m_pokerus         = 0;     //
-    u8   m_ball            = 0;     //
-    u8   m_gotLevel : 7    = 0;     //
-    u8   m_unused : 1      = 0;     // unused
-    u8   m_nature          = 0;
-    u8   m_abilitySlot : 2 = 0;
-    u8   m_shinyType : 2   = 0;
-    u8   m_rand : 4        = 0;
 
     boxPokemon( ) {
     }

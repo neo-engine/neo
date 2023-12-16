@@ -1,29 +1,29 @@
 /*
-    Pokémon neo
-    ------------------------------
+Pokémon neo
+------------------------------
 
-    file        : animations.cpp
-    author      : Philip Wellnitz
-    description : Various animations.
+file        : animations.cpp
+author      : Philip Wellnitz
+description : Various animations.
 
-    Copyright (C) 2012 - 2022
-    Philip Wellnitz
+Copyright (C) 2012 - 2023
+Philip Wellnitz
 
-    This file is part of Pokémon neo.
+This file is part of Pokémon neo.
 
-    Pokémon neo is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Pokémon neo is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Pokémon neo is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Pokémon neo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
-    */
+You should have received a copy of the GNU General Public License
+along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <nds/ndstypes.h>
 
@@ -88,6 +88,9 @@ namespace IO::ANIM {
 
     bool evolvePkmn( u16 p_startSpecies, u8 p_startForme, u16 p_endSpecies, u8 p_endForme,
                      bool p_shiny, bool p_female, u32 p_pid, bool p_allowAbort ) {
+
+        // TODO: check for moves learnt on level-up
+
         vramSetup( );
         swiWaitForVBlank( );
         clearScreen( true, true, true );
@@ -181,6 +184,37 @@ namespace IO::ANIM {
             SAVE::SAV.getActiveFile( ).registerCaughtPkmn( p_endSpecies );
             return true;
         }
+    }
+
+    void tradePkmn( boxPokemon p_ownToOther, boxPokemon p_otherToMe, const char* p_otherName ) {
+        vramSetup( );
+        swiWaitForVBlank( );
+        clearScreen( true, true, true );
+        resetScale( true, true );
+
+        bgUpdate( );
+        regularFont->setColor( 0, 0 );
+        regularFont->setColor( WHITE_IDX, 1 );
+        regularFont->setColor( GRAY_IDX, 2 );
+
+        BG_PALETTE[ WHITE_IDX ] = WHITE;
+        BG_PALETTE[ GRAY_IDX ]  = GRAY;
+        BG_PALETTE[ BLACK_IDX ] = BLACK;
+
+        initOAMTable( false );
+        initOAMTable( true );
+
+
+        // Show own pkmn on screen
+        // Sending <pkmn> to <p_otherName>.
+        // "Say good bye to <pkmn>"
+        // pkmn enters ball
+        // ball swirls to top
+        // own and other pkmn cross
+        // other pkmn comes down
+        // ball opens, shows other pkmn
+        // "<p_otherName> sent <other pkmn>"
+        // "take good care of <other pkmn>
     }
 
     void hatchEgg( const pkmnSpriteInfo& p_pkmn ) {

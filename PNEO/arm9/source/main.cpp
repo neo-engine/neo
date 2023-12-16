@@ -238,9 +238,10 @@ START:
     irqEnable( IRQ_VBLANK );
     initGraphics( );
 #ifdef DESQUID
-    printf( "\n\nBooting NEO.\n"
+    printf( "\n\nBooting NEO. %u %d\n"
             "- Init Graphics     [ OK ]\n"
-            "- Init FSROOT       " );
+            "- Init FSROOT       ",
+            sizeof( boxPokemon ), sizeof( SAVE::saveGame::playerInfo ) );
 #endif
 #ifdef DESQUID
     if( FS::readFsInfo( ) ) {

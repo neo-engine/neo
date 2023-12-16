@@ -100,7 +100,7 @@ constexpr u16 MAX_LANGUAGES    = 6; // max number of different languages support
 
 constexpr u16 OTLENGTH            = 8;
 constexpr u16 SPECIES_NAMELENGTH  = 30;
-constexpr u16 PKMN_NAMELENGTH     = 15;
+constexpr u16 PKMN_NAMELENGTH     = 14;
 constexpr u16 FORME_NAMELENGTH    = 30;
 constexpr u16 ITEM_NAMELENGTH     = 20;
 constexpr u16 ITEM_DSCRLENGTH     = 200;

@@ -25,7 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "save/gameStart.h"
 #include "bag/bag.h"
 #include "fs/data.h"
 #include "fs/fs.h"
@@ -37,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
+#include "save/gameStart.h"
 #include "save/saveGame.h"
 #include "save/startScreen.h"
 #include "sound/sound.h"
@@ -269,7 +269,7 @@ namespace SAVE {
 
         // run chara creation
         do {
-            std::strncpy( SAV.getActiveFile( ).m_playername, "", 12 );
+            std::memcpy( SAV.getActiveFile( ).m_playername, "", OTLENGTH );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 249 * 2,
                                  256 * 192, true );
@@ -343,7 +343,7 @@ namespace SAVE {
                 name = GET_STRING( IO::STR_UI_INIT_GAME_DEFAULT_NAME0
                                    + SAV.getActiveFile( ).m_appearance );
             }
-            std::strncpy( SAV.getActiveFile( ).m_playername, name.c_str( ), 11 );
+            std::memcpy( SAV.getActiveFile( ).m_playername, name.c_str( ), OTLENGTH );
 
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 249 * 2,
@@ -483,8 +483,8 @@ namespace SAVE {
 
         SAV.getActiveFile( ).m_currentMap = 10;
         SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
-                { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
-                u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
+            { u16( 0xb4 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+            u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
         SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
         IO::clearScreen( true, true, true );
         IO::fadeScreen( IO::fadeType::CLEAR_DARK, true, true );
@@ -506,14 +506,14 @@ namespace SAVE {
         switch( p_episode ) {
         case 0:
             // Initialize character and send them to starting towm
-            std::strncpy( SAV.getActiveFile( ).m_playername, "Test", 11 );
+            std::memcpy( SAV.getActiveFile( ).m_playername, "Test", OTLENGTH );
             SAV.getActiveFile( ).m_appearance = 1;
             SAV.getActiveFile( ).setFlag( F_RIVAL_APPEARANCE,
                                           1 - SAV.getActiveFile( ).m_appearance );
             SAV.getActiveFile( ).m_currentMap = 10;
             SAV.getActiveFile( ).m_player     = MAP::mapPlayer(
-                    { u16( 0xb3 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
-                    u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
+                { u16( 0xb3 + ( 9 * !!SAV.getActiveFile( ).m_appearance ) ), 0x15c, 3 },
+                u16( 10 * SAV.getActiveFile( ).m_appearance ), MAP::moveMode::WALK );
             SAVE::SAV.getActiveFile( ).m_player.m_direction = MAP::RIGHT;
 
             // Hand out badges

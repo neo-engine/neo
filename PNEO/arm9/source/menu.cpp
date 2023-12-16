@@ -180,45 +180,31 @@ namespace IO {
             case 0: { // default team
                 memset( SAVE::SAV.getActiveFile( ).m_pkmnTeam, 0,
                         sizeof( SAVE::SAV.getActiveFile( ).m_pkmnTeam ) );
-                std::vector<u16> tmp = { PKMN_SCEPTILE, PKMN_BLAZIKEN, PKMN_SWAMPERT };
-                for( int i = 0; i < 3; ++i ) {
+                std::vector<u16> tmp
+                    = { PKMN_MIMIKYU, PKMN_SCEPTILE, PKMN_BLAZIKEN, PKMN_SWAMPERT };
+                for( int i = 0; i < 4; ++i ) {
                     pokemon& a = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ i ];
 
                     a = pokemon( tmp[ i ], 50, 0, 0, i );
 
                     // Hand out some ribbons
-                    for( u8 j = 0; j < 4; ++j ) {
-                        a.m_boxdata.m_ribbons0[ j ]     = rand( ) % 255;
-                        a.m_boxdata.m_ribbons1[ j ]     = rand( ) % 255;
-                        a.m_boxdata.m_ribbons2[ j ]     = rand( ) % 255;
+                    for( u8 j = 0; j < 6; ++j ) {
+                        a.m_boxdata.m_ribbons[ j ]      = rand( ) % 255;
                         a.m_boxdata.m_contestStats[ j ] = rand( );
                     }
-                    a.m_boxdata.m_contestStats[ 4 ] = 255;
-                    a.m_boxdata.m_contestStats[ 5 ] = rand( );
-                    a.m_boxdata.m_ribbons1[ 2 ]     = rand( ) % 63;
-                    a.m_boxdata.m_ribbons1[ 3 ]     = 0;
-                    if( a.m_boxdata.m_speciesId == 493 ) {
-                        u8 plate = rand( ) % 17;
-                        if( plate < 16 )
-                            a.giveItem( I_FLAME_PLATE + plate );
-                        else
-                            a.giveItem( I_PIXIE_PLATE );
-                    } else {
-                        a.m_boxdata.m_heldItem = 1 + rand( ) % 400;
-                    }
                 }
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 1 ] = M_FLASH;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata.m_moves[ 3 ] = M_CUT;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_DIG;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_ROCK_SMASH;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_FLY;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_SURF;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 2 ] = M_DIVE;
-                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 3 ] = M_SPLASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 0 ] = M_ROCK_CLIMB;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 1 ] = M_FLASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 2 ] = M_SWEET_SCENT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata.m_moves[ 3 ] = M_CUT;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 0 ] = M_DIG;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 1 ] = M_ROCK_SMASH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 2 ] = M_STRENGTH;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 2 ].m_boxdata.m_moves[ 3 ] = M_FLY;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 0 ] = M_SURF;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 1 ] = M_WATERFALL;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 2 ] = M_DIVE;
+                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 3 ].m_boxdata.m_moves[ 3 ] = M_SPLASH;
 
                 break;
             }
