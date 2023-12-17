@@ -43,6 +43,11 @@ namespace IO {
     constexpr u16 STR_ANIM_EVOLUTION_ABORTED  = 388;
     constexpr u16 STR_ANIM_EGG_HATCH          = 389;
 
+    constexpr u16 STR_ANIM_TRADE_SEND1 = 712;
+    constexpr u16 STR_ANIM_TRADE_SEND2 = 713;
+    constexpr u16 STR_ANIM_TRADE_RECV1 = 714;
+    constexpr u16 STR_ANIM_TRADE_RECV2 = 715;
+
     constexpr u16 STR_UI_CONTINUE        = 71;
     constexpr u16 STR_UI_NEW_GAME        = 72;
     constexpr u16 STR_UI_SPECIAL_EPISODE = 73;

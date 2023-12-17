@@ -136,7 +136,7 @@ namespace BATTLE {
 #define HP_OUTLINE_COL 240
 #define OWN_HP_COL     241
 #define OPP_HP_COL     245
-#define HP_COL( a, b ) ( ( a ) ? ( OPP_HP_COL + (b) *2 ) : ( OWN_HP_COL + (b) *2 ) )
+#define HP_COL( a, b ) ( ( a ) ? ( OPP_HP_COL + ( b ) * 2 ) : ( OWN_HP_COL + ( b ) * 2 ) )
 
     const u16 MOVEBOX3_SPR_PAL[ 6 ] = { 0x5208, 0x294A };
     const u16 MOVEBOX4_SPR_PAL[ 6 ] = { 0x18C6, 0x294A };
@@ -2102,8 +2102,10 @@ namespace BATTLE {
         SOUND::playSoundEffect( SFX_BATTLE_BALLDROP );
         for( ; y < OPP_PLAT_Y + 14; ++y ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y = y;
-            IO::updateOAM( false );
-            if( y & 1 ) { swiWaitForVBlank( ); }
+            if( y & 1 ) {
+                IO::updateOAM( false );
+                swiWaitForVBlank( );
+            }
         }
         for( ; y >= OPP_PLAT_Y; --y ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y = y;
@@ -2113,8 +2115,10 @@ namespace BATTLE {
         SOUND::playSoundEffect( SFX_BATTLE_BALLDROP );
         for( ; y < OPP_PLAT_Y + 14; ++y ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y = y;
-            IO::updateOAM( false );
-            if( y & 1 ) { swiWaitForVBlank( ); }
+            if( y & 1 ) {
+                IO::updateOAM( false );
+                swiWaitForVBlank( );
+            }
         }
 
         // "ticks"
@@ -2132,7 +2136,7 @@ namespace BATTLE {
             IO::updateOAM( false );
             for( u8 j = 0; j < 4; ++j ) { swiWaitForVBlank( ); }
         }
-        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
         if( p_ticks == 1 ) { goto BREAK; }
 
         SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
@@ -2145,7 +2149,7 @@ namespace BATTLE {
             IO::updateOAM( false );
             for( u8 j = 0; j < 4; ++j ) { swiWaitForVBlank( ); }
         }
-        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
         if( p_ticks == 2 ) { goto BREAK; }
 
         SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
@@ -2158,15 +2162,15 @@ namespace BATTLE {
             IO::updateOAM( false );
             for( u8 j = 0; j < 4; ++j ) { swiWaitForVBlank( ); }
         }
-        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
         if( p_ticks == 3 ) { goto BREAK; }
 
         SOUND::playSoundEffect( SFX_CAPTURE_SUCCESSFUL );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].palette = SPR_PKMN_SHADOW_PAL;
         IO::updateOAM( false );
-        for( int i = 0; i < 30; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 30; ++i ) { swiWaitForVBlank( ); }
         SOUND::playBGMOneshot( BGM_OS_PKMN_CAPTURE );
-        for( int i = 0; i < 150; ++i ) swiWaitForVBlank( );
+        for( int i = 0; i < 150; ++i ) { swiWaitForVBlank( ); }
         SOUND::playBGM( BGM_VICTORY_WILD );
         return;
 

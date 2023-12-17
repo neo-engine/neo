@@ -39,6 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/itemNames.h"
 #include "gen/locationNames.h"
 #include "gen/moveNames.h"
+#include "io/animations.h"
 #include "io/choiceBox.h"
 #include "io/counter.h"
 #include "io/keyboard.h"
@@ -174,7 +175,8 @@ namespace IO {
             auto          res  = menu.getResult(
                 GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
                 std::vector<u16>{ FS::DESQUID_STRING + 61, FS::DESQUID_STRING + 64,
-                                            FS::DESQUID_STRING + 62, FS::DESQUID_STRING + 63 },
+                                            FS::DESQUID_STRING + 62, FS::DESQUID_STRING + 63,
+                                            FS::DESQUID_STRING + 70, FS::DESQUID_STRING + 71 },
                 true );
             switch( res ) {
             case 0: { // default team
@@ -231,6 +233,44 @@ namespace IO {
             }
             case 3: { // repel off
                 SAVE::SAV.getActiveFile( ).m_repelSteps = 0;
+                break;
+            }
+            case 4: { // evolution animation
+                ANIMATE_MAP = false;
+                FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
+
+                IO::ANIM::evolvePkmn( PKMN_ZIGZAGOON, 1, PKMN_LINOONE, 1, rand( ) & 1, false, 0,
+                                      true );
+
+                FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
+                MAP::curMap->draw( );
+                ANIMATE_MAP = true;
+
+                break;
+            }
+            case 5: { // trade animation
+                ANIMATE_MAP = false;
+                FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
+
+                IO::ANIM::tradePkmn( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata,
+                                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata, "TEST" );
+
+                FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                bgUpdate( );
+
+                MAP::curMap->draw( );
+                ANIMATE_MAP = true;
+
                 break;
             }
             default: break;

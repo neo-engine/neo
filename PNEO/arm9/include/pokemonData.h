@@ -287,15 +287,25 @@ constexpr bool isTradeEvolution( u16 p_speciesId ) {
     case PKMN_POLITOED:
     case PKMN_SLOWKING:
     case PKMN_STEELIX:
+    case PKMN_SCIZOR:
     case PKMN_KINGDRA:
     case PKMN_PORYGON2:
     case PKMN_HUNTAIL:
     case PKMN_GOREBYSS:
+    case PKMN_MILOTIC:
     case PKMN_RHYPERIOR:
     case PKMN_ELECTIVIRE:
     case PKMN_MAGMORTAR:
+    case PKMN_DUSKNOIR:
     case PKMN_PORYGON_Z:
-        // TODO
+    case PKMN_GIGALITH:
+    case PKMN_CONKELDURR:
+    case PKMN_ESCAVALIER:
+    case PKMN_ACCELGOR:
+    case PKMN_AROMATISSE:
+    case PKMN_SLURPUFF:
+    case PKMN_TREVENANT:
+    case PKMN_GOURGEIST:
         return true;
     [[likely]] default:
         return false;

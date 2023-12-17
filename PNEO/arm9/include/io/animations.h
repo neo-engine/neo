@@ -41,7 +41,8 @@ namespace IO::ANIM {
     /*
      * @brief: Plays the pkmn trade animation. Destroys everything that was on the screen.
      */
-    void tradePkmn( boxPokemon p_ownToOther, boxPokemon p_otherToMe, const char* p_otherName );
+    void tradePkmn( const boxPokemon& p_ownToOther, const boxPokemon& p_otherToMe,
+                    const char* p_otherName );
 
     /*
      * @brief: Plays the egg hatch animation. Destroys everything that was on the

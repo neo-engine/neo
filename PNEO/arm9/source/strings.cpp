@@ -152,6 +152,11 @@ namespace FS {
         { "Route 2 (Aqu)" },
         { "Route 3 (Mgm)" },
         { "Route 4 (Non)" },
+
+        // 70
+
+        { "Evolution anim" },
+        { "Trade anim" },
     };
 
 #endif
