@@ -6,7 +6,7 @@ file        : pokemon.cpp
 author      : Philip Wellnitz
 description : The main Pokémon engine
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2023
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -25,13 +25,14 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "pokemon.h"
 #include "battle/move.h"
 #include "fs/data.h"
 #include "gen/abilityNames.h"
 #include "gen/itemNames.h"
 #include "gen/pokemonNames.h"
+#include "io/animations.h"
 #include "map/mapDrawer.h"
+#include "pokemon.h"
 #include "save/saveGame.h"
 
 pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
@@ -470,7 +471,8 @@ u8 pokemon::canEvolve( u16 p_item, evolutionMethod p_method, pkmnEvolveData* p_e
                 }
                 break;
 
-                [[likely]] default : break;
+            [[likely]] default:
+                break;
             }
         }
 
@@ -493,8 +495,13 @@ void pokemon::evolve( u16 p_item, evolutionMethod p_method ) {
     setSpecies( edata.m_evolutions[ tg ].m_target );
 
     if( !m_boxdata.isNicknamed( ) ) {
-        strncpy( m_boxdata.m_name, FS::getDisplayName( edata.m_evolutions[ tg ].m_target ).c_str( ),
-                 12 );
+        memcpy( m_boxdata.m_name, FS::getDisplayName( edata.m_evolutions[ tg ].m_target ).c_str( ),
+                PKMN_NAMELENGTH );
+    }
+
+    if( edata.m_evolutions[ tg ].m_type == EVOLUTION_TRADE_ITEM ) {
+        // use up item required for trade evo
+        takeItem( );
     }
 
     SAVE::SAV.getActiveFile( ).registerCaughtPkmn( edata.m_evolutions[ tg ].m_target );
@@ -521,6 +528,29 @@ void pokemon::evolve( u16 p_item, evolutionMethod p_method ) {
 
                 SAVE::SAV.getActiveFile( ).registerCaughtPkmn( PKMN_SHEDINJA );
             }
+        }
+    }
+}
+
+void pokemon::trade( const pokemon& p_ownToOther, pokemon& p_otherToMe, const char* p_otherName,
+                     bool p_showAnimation ) {
+    if( p_showAnimation ) {
+        // play animation
+        IO::ANIM::tradePkmn( p_ownToOther.m_boxdata, p_otherToMe.m_boxdata, p_otherName );
+    }
+    // check if pkmn evolves via trade
+
+    if( p_otherToMe.canEvolve( p_ownToOther.getSpecies( ), EVOMETHOD_TRADE ) ) {
+        u16 oldsp = p_otherToMe.getSpecies( );
+        u8  oldfm = p_otherToMe.getForme( );
+
+        p_otherToMe.evolve( p_ownToOther.getSpecies( ), EVOMETHOD_TRADE );
+        u16 newsp = p_otherToMe.getSpecies( );
+        u8  newfm = p_otherToMe.getForme( );
+
+        if( p_showAnimation ) {
+            IO::ANIM::evolvePkmn( oldsp, oldfm, newsp, newfm, p_otherToMe.isShiny( ),
+                                  p_otherToMe.isFemale( ), p_otherToMe.getPid( ), false );
         }
     }
 }

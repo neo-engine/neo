@@ -259,8 +259,8 @@ namespace IO {
                 FADE_TOP_DARK( );
                 FADE_SUB_DARK( );
 
-                IO::ANIM::tradePkmn( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ].m_boxdata,
-                                     SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ].m_boxdata, "TEST" );
+                pokemon::trade( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 0 ],
+                                SAVE::SAV.getActiveFile( ).m_pkmnTeam[ 1 ], "TEST" );
 
                 FADE_TOP_DARK( );
                 FADE_SUB_DARK( );

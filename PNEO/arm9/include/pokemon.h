@@ -622,6 +622,9 @@ struct pokemon {
     u8   canEvolve( u16 p_suppliedItem = 0, evolutionMethod p_method = EVOMETHOD_LEVEL_UP,
                     pkmnEvolveData* p_edata = nullptr );
 
+    static void trade( const pokemon& p_ownToOther, pokemon& p_otherToMe, const char* p_otherName,
+                       bool p_showAnimation = true );
+
     inline void hatch( ) {
         m_boxdata.hatch( );
     }
