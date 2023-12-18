@@ -71,6 +71,8 @@ namespace MAP {
     constexpr u8 CLL_CONTINUE_INFINITY_CAVE  = 19;
     constexpr u8 CLL_MAPENTER_INFINITY_CAVE  = 20;
     constexpr u8 CLL_GATECHECK_INFINITY_CAVE = 21;
+    constexpr u8 CLL_PKMN_SELF_TRADER        = 22;
+    constexpr u8 CLL_PKMN_INGAME_TRADE       = 23;
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;

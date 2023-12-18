@@ -498,6 +498,14 @@ namespace MAP {
          */
         void runLevelScripts( const mapData& p_data, u16 p_mapX, u16 p_mapY );
 
+        void initInfinityCave( u8 p_icavetype );
+
+        bool continueInfinityCave( u16& p_resultX, u16& p_resultY );
+
+        bool mapEnterInfinityCave( );
+
+        bool gateCheckInfinityCave( );
+
         /*
          * @brief: Runs a battle factory challenge, starting at the player standing in the
          * waiting room. Hands out any prizes

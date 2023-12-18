@@ -312,6 +312,18 @@ constexpr bool isTradeEvolution( u16 p_speciesId ) {
     }
 }
 
+/*
+ * @brief: Extra species not appearing in icave.
+ */
+constexpr bool isSecret( u16 p_speciesId ) {
+    switch( p_speciesId ) {
+    case PKMN_MIMIKYU:
+    case PKMN_ORICORIO:
+        return true;
+    [[likely]] default:
+        return false;
+    }
+}
 
 constexpr bool isMythical( u16 p_speciesId ) {
     switch( p_speciesId ) {
