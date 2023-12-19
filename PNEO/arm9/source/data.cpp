@@ -91,6 +91,7 @@ namespace FS {
     const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/locname";
     const char UISTRING_PATH[]      = "nitro:/STRN/UIS/uis";
     const char MAPSTRING_PATH[]     = "nitro:/STRN/MAP/map";
+    const char TRADESTRING_PATH[]   = "nitro:/STRN/TRD/str";
     const char PKMNPHRS_PATH[]      = "nitro:/STRN/PHR/phr";
     const char BADGENAME_PATH[]     = "nitro:/STRN/BDG/bdg";
     const char ACHIEVEMENT_PATH[]   = "nitro:/STRN/AVM/avm";
@@ -740,6 +741,15 @@ namespace FS {
         static FILE* bankfile = nullptr;
         checkOrOpen( bankfile, MAPSTRING_PATH, lastLang, CURRENT_LANGUAGE );
         if( getString( bankfile, MAPSTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "(string failed)";
+    }
+
+    const char* getTradeString( u16 p_stringId ) {
+        static char  st_buffer[ TRADESTRING_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, TRADESTRING_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, TRADESTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "(string failed)";
     }
 

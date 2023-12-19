@@ -170,8 +170,8 @@ namespace MAP {
         ITM  = 102, // Give item
         TTM  = 103, // Take item
         UTM  = 104, // Use item
-        BTRR = 105, // Battle trainer
-        BPKR = 106, // Battle pkmn
+        BTRR = 105, // Battle trainer (TODO)
+        BPKR = 106, // Battle pkmn (TODO)
         ITMR = 107, // Give item
         TTMR = 108, // Take item
         UTMR = 109, // Use item
@@ -185,8 +185,8 @@ namespace MAP {
         CRY  = 115, // Play cry
         SFX  = 116, // Play sound effect
         PMO  = 117, // Play music oneshot
-        SMC  = 118, // Set music
-        SLC  = 119, // Set location
+        SMC  = 118, // Set music (TODO)
+        SLC  = 119, // Set location (TODO)
         SWT  = 120, // Set weather to parA
         WAT  = 121, // Wait
         MBG  = 122, // Pokemart description begin

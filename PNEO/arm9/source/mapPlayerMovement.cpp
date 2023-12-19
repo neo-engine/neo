@@ -311,6 +311,8 @@ namespace MAP {
             if( p_direction == RIGHT ) return true;
             break;
         case BEH_WARP_ON_WALK_LEFT:
+        case BEH_WARP_ESCALATOR_UP:
+        case BEH_WARP_ESCALATOR_DOWN:
             if( p_direction == LEFT ) return true;
             break;
         case BEH_WARP_ON_WALK_UP:
@@ -571,7 +573,7 @@ namespace MAP {
                     break;
                 }
 
-            // Warpy stuff
+                // Warpy stuff
             case BEH_WARP_ON_WALK_RIGHT:
                 if( p_direction == RIGHT ) {
                     walkPlayer( p_direction, p_fast );
@@ -706,6 +708,7 @@ namespace MAP {
                     walkPlayer( DOWN, true );
                     p_direction = DOWN;
                     break;
+
                 case BEH_WARP_ON_WALK_RIGHT:
                     if( p_direction == RIGHT ) {
                         redirectPlayer( RIGHT, p_fast );
@@ -758,9 +761,20 @@ namespace MAP {
                     }
                     switch( newBehave ) {
                     case BEH_SLIDE_ON_ICE:
-                    case BEH_SLIDE_CONTINUE: walkPlayer( p_direction, p_fast ); break;
+                    case BEH_SLIDE_CONTINUE:
+                        walkPlayer( p_direction, p_fast );
+                        break;
 
-                    // Check for warpy stuff
+                        // Check for warpy stuff
+                    case BEH_WARP_ESCALATOR_DOWN:
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( ESCALATOR_DOWN );
+                        return;
+                    case BEH_WARP_ESCALATOR_UP:
+                        walkPlayer( p_direction, p_fast );
+                        handleWarp( ESCALATOR_UP );
+                        return;
+
                     case BEH_WARP_CAVE_ENTRY:
                         walkPlayer( p_direction, p_fast );
                         handleWarp( CAVE_ENTRY );
@@ -989,6 +1003,95 @@ namespace MAP {
         if( SAVE::SAV.getActiveFile( ).m_player.m_movement == DIVE ) { hidePlayer = false; }
 
         switch( p_type ) {
+        case ESCALATOR_DOWN: {
+            // move player slightly to the left and down, while
+            // changing the escalator tiles
+
+            SOUND::playSoundEffect( SFX_SLIDING_DOOR );
+            for( u8 i = 0; i < 15; ++i ) {
+                moveCamera( LEFT, true );
+                swiWaitForVBlank( );
+                if( i > 8 && ( i & 1 ) ) { moveCamera( DOWN, true ); }
+                if( i % 8 == 1 ) {
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x2a3 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x2a2 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 1, 0x2ab );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 1, 0x2aa );
+                }
+                if( i % 8 == 4 ) {
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x2a5 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x2a4 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 1, 0x2ad );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 1, 0x2ac );
+                }
+                if( i % 8 == 6 ) {
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x2a1 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x2a0 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 1, 0x2a9 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY + 1, 0x2a8 );
+                }
+            }
+
+            IO::fadeScreen( IO::CLEAR_DARK );
+            break;
+        }
+        case ESCALATOR_UP: {
+            // move player slightly to the left and down, while
+            // changing the escalator tiles
+
+            SOUND::playSoundEffect( SFX_SLIDING_DOOR );
+            for( u8 i = 0; i < 16; ++i ) {
+                moveCamera( LEFT, true );
+                swiWaitForVBlank( );
+                if( i > 4 && ( i & 1 ) ) { moveCamera( UP, true ); }
+                if( i % 8 == 1 ) {
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x28b );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x28a );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - 1, 0x283 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - 1, 0x282 );
+                }
+                if( i % 8 == 4 ) {
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x28d );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x28c );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - 1, 0x285 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - 1, 0x284 );
+                }
+                if( i % 8 == 6 ) {
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x289 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY, 0x288 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - 1, 0x281 );
+                    setBlock( SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX - 1,
+                              SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY - 1, 0x280 );
+                }
+            }
+
+            IO::fadeScreen( IO::CLEAR_DARK );
+            break;
+        }
+
         case TELEPORT:
             SOUND::playSoundEffect( SFX_WARP );
             for( u8 j = 0; j < 2; ++j ) {
@@ -1036,8 +1139,7 @@ namespace MAP {
         if( crossbank ) { resetMapSprites( ); }
 
         SAVE::SAV.getActiveFile( ).m_player.m_pos = p_target.second;
-        //        if( SAVE::SAV.getActiveFile( ).m_currentMap != p_target.first ) {
-        SAVE::SAV.getActiveFile( ).m_currentMap = p_target.first;
+        SAVE::SAV.getActiveFile( ).m_currentMap   = p_target.first;
 
         auto oldw = SAVE::SAV.getActiveFile( ).m_currentMapWeather;
         if( ndata.m_mapType & mapType::DARK ) {
@@ -1057,7 +1159,16 @@ namespace MAP {
         bool oldsc     = _scriptRunning;
         _scriptRunning = true;
 
-        draw( OBJPRIORITY_2, hidePlayer );
+        if( p_type == ESCALATOR_UP || p_type == ESCALATOR_DOWN ) {
+            redirectPlayer( RIGHT, false, true );
+        }
+        auto posx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        auto posy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        auto posz = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posZ;
+
+        auto priority = posz == 3 ? OBJPRIORITY_2 : OBJPRIORITY_0;
+
+        draw( priority, hidePlayer );
         for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
         auto curLocId = getCurrentLocationId( );
 
@@ -1071,16 +1182,13 @@ namespace MAP {
 
         for( u8 i{ 0 }; i < 25; ++i ) { swiWaitForVBlank( ); }
 
-        auto posx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-        auto posy = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-
         u8 behave = at( posx, posy ).m_bottombehave;
 
         if( behave == BEH_DOOR ) {
             // a door, open it
             openDoor( posx, posy );
         }
-        if( hidePlayer ) { drawPlayer( OBJPRIORITY_2 ); }
+        if( hidePlayer ) { drawPlayer( priority ); }
 
         if( ( currentData( ).m_mapType & INSIDE )
             && ( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::MACH_BIKE
@@ -1100,6 +1208,12 @@ namespace MAP {
         bool oldforce  = _forceNoFollow;
         _forceNoFollow = true;
         bool handleE   = true;
+
+        if( p_type == ESCALATOR_UP || p_type == ESCALATOR_DOWN ) {
+            handleE = false;
+            walkPlayer( RIGHT, false );
+        }
+
         switch( behave ) {
         case BEH_MOSSDEEP_GYM_WARP: handleE = false; break;
         case BEH_WARP_THEN_WALK_UP: walkPlayer( UP, false ); break;

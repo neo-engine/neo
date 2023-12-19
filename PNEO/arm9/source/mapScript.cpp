@@ -201,14 +201,10 @@ namespace MAP {
                 obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
                 std::pair<u8, mapObject> cur = { 0, obj };
-                if( !loadMapObject( cur ) ) {
 #ifdef DESQUID_MORE
-                    IO::printMessage( "SMO fail" );
+                if( !loadMapObject( cur ) ) { IO::printMessage( "SMO fail" ); }
 #endif
-                }
-
                 // Check if there is some unused map object
-
                 u8 found = 255;
                 for( u8 i = _fixedObjectCount; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount;
                      ++i ) {
@@ -217,7 +213,6 @@ namespace MAP {
                         break;
                     }
                 }
-
                 if( found < 255 ) {
                     registers[ 0 ] = found;
                 } else {
@@ -226,7 +221,6 @@ namespace MAP {
 #endif
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
                 }
-
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ 0 ] ] = cur;
                 break;
             }
@@ -319,7 +313,6 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = tmp;
                 break;
             }
-
             case DMO: {
                 _mapSprites.destroySprite( SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].first );
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ]
@@ -358,10 +351,8 @@ namespace MAP {
                 if( registers[ par1 ] == par2 ) { pc += par3; }
                 break;
             }
-
             case MINR: registers[ par3 ] = std::min( registers[ par1 ], registers[ par2 ] ); break;
             case MAXR: registers[ par3 ] = std::max( registers[ par1 ], registers[ par2 ] ); break;
-
             case SUB: registers[ parA ] -= parB; break;
             case ADD: registers[ parA ] += parB; break;
             case DIV:
@@ -369,13 +360,6 @@ namespace MAP {
                 break;
             case ARG: {
                 registers[ par1 ] += registers[ par2 ];
-#ifdef DESQUID_MORE
-                std::string dstr = "";
-                for( u8 q = 0; q < 10; ++q ) { dstr += std::to_string( registers[ q ] ) + " "; }
-                IO::printMessage( dstr, MSG_INFO );
-
-#endif
-
                 break;
             }
             case SUBR: registers[ par1 ] -= registers[ par2 ]; break;
@@ -412,7 +396,6 @@ namespace MAP {
                 loadMapObject( cur );
 
                 // Check if there is some unused map object
-
                 u8 found = 255;
                 for( u8 i = _fixedObjectCount; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount;
                      ++i ) {
@@ -500,7 +483,6 @@ namespace MAP {
                     = tmp;
                 break;
             }
-
             case DMOR: {
                 _mapSprites.destroySprite(
                     SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].first );
@@ -518,7 +500,6 @@ namespace MAP {
                 SAVE::SAV.getActiveFile( ).setFlag( par1x, registers[ par2x ] );
                 break;
             }
-
             case CRGL:
                 if( registers[ par1 ] < par2 ) { pc += par3; }
                 break;
@@ -540,11 +521,9 @@ namespace MAP {
             case CVR:
                 if( SAVE::SAV.getActiveFile( ).getVar( par1 ) == par2 ) { pc += par3; }
                 break;
-
             case GVR: registers[ parB ] = SAVE::SAV.getActiveFile( ).getVar( parA ); break;
             case SVR: SAVE::SAV.getActiveFile( ).setVar( parA, parB ); break;
             case SVRR: SAVE::SAV.getActiveFile( ).setVar( parA, registers[ parB ] ); break;
-
             case CMN:
                 if( SAVE::SAV.getActiveFile( ).m_money >= parA ) { pc += parB; }
                 break;
@@ -556,7 +535,6 @@ namespace MAP {
                     SAVE::SAV.getActiveFile( ).m_money = 0;
                 }
                 break;
-
             case CMO: registers[ 0 ] = p_mapObject; break;
             case LCKR: {
                 tmpmove = SAVE::SAV.getActiveFile( )
@@ -953,6 +931,15 @@ namespace MAP {
                 }
                 case CLL_GATECHECK_INFINITY_CAVE: {
                     gateCheckInfinityCave( );
+                    break;
+                }
+                case CLL_PKMN_SELF_TRADER: {
+                    selfTrader( );
+                    break;
+                }
+                case CLL_PKMN_INGAME_TRADE: {
+                    ingameTrade( par2, registers[ 0 ], registers[ 1 ], registers[ 2 ],
+                                 registers[ 3 ] );
                     break;
                 }
                 default: break;

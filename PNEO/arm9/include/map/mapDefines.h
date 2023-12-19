@@ -256,7 +256,9 @@ namespace MAP {
         LAST_VISITED,
         SLIDING_DOOR,
         FLY,
-        SCRIPT
+        SCRIPT,
+        ESCALATOR_DOWN,
+        ESCALATOR_UP,
     };
 
     constexpr u8 MAX_PKMN_PER_SLICE   = 30;

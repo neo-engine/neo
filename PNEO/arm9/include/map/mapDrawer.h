@@ -124,6 +124,8 @@ namespace MAP {
             BEH_WARP_NO_SPECIAL_2 = 0x68,
             BEH_DOOR              = 0x69,
 
+            BEH_WARP_ESCALATOR_DOWN    = 0x6A,
+            BEH_WARP_ESCALATOR_UP      = 0x6B,
             BEH_WARP_DIVE              = 0x6C,
             BEH_WARP_ON_WALK_DOWN_DIVE = 0x6D,
             BEH_WARP_THEN_WALK_UP      = 0x6E,
@@ -505,6 +507,13 @@ namespace MAP {
         bool mapEnterInfinityCave( );
 
         bool gateCheckInfinityCave( );
+
+      public:
+        void selfTrader( );
+
+      private:
+        void ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme, u16 p_offeredPkmn,
+                          u8 p_offeredForme );
 
         /*
          * @brief: Runs a battle factory challenge, starting at the player standing in the

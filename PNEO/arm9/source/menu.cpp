@@ -255,6 +255,7 @@ namespace IO {
                 break;
             }
             case 5: { // trade animation
+                      /*
                 ANIMATE_MAP = false;
                 FADE_TOP_DARK( );
                 FADE_SUB_DARK( );
@@ -270,7 +271,8 @@ namespace IO {
 
                 MAP::curMap->draw( );
                 ANIMATE_MAP = true;
-
+*/
+                MAP::curMap->selfTrader( );
                 break;
             }
             default: break;
