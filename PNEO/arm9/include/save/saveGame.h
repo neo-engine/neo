@@ -85,6 +85,8 @@ namespace SAVE {
     constexpr u16 F_ICAVE_LAYER_ITEM10  = 337;
     constexpr u16 F_ICAVE_POKE_CLEARED  = 338;
 
+    constexpr u16 F_UNCOLLECTED_MYSTERY_EVENT = 351;
+
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;
     }
