@@ -512,7 +512,10 @@ namespace MAP {
 
         void mysteryGiftClerk( );
 
-        void ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme, u16 p_offeredPkmn,
+        /*
+         * @returns: 0 on success, 1 on cancel, 2 when wrong pkmn offered.
+         */
+        u8 ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme, u16 p_offeredPkmn,
                           u8 p_offeredForme );
 
         /*

@@ -111,10 +111,46 @@ namespace MAP {
         ANIMATE_MAP = true;
     }
 
-    void mapDrawer::ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme,
-                                 u16 p_offeredPkmn, u8 p_offeredForme ) {
-        // load pkmn from rom
-        // ask player for specified pkmn
-        // trade
+    u8 mapDrawer::ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme, u16 p_offeredPkmn,
+                               u8 p_offeredForme ) {
+        ANIMATE_MAP = false;
+
+        STS::partyScreen sts = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                 SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
+                                                 false, false, false, 1 );
+
+        u8   res       = 2;
+        auto selection = sts.run( ).getSelectedPkmn( );
+        if( selection < SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+            auto& pkmn = SAVE::SAV.getActiveFile( ).m_pkmnTeam[ selection ];
+            if( pkmn.getSpecies( ) != p_targetPkmn || pkmn.getForme( ) != p_targetForme ) {
+                res = 2;
+            } else {
+                auto trpkmn = pokemon( p_offeredPkmn, pkmn.m_level, p_offeredForme,
+                                       GET_TRADE_STRING( 2 * p_tradeIdx + 1 ) );
+                memcpy( trpkmn.m_boxdata.m_oT, GET_TRADE_STRING( 2 * p_tradeIdx ), OTLENGTH );
+                trpkmn.m_boxdata.m_oTId
+                    = u16{ trpkmn.m_boxdata.m_oT[ 0 ] } * trpkmn.m_boxdata.m_oT[ 1 ] + p_tradeIdx;
+                trpkmn.m_boxdata.m_oTSid = 2 * p_tradeIdx;
+                std::swap( SAVE::SAV.getActiveFile( ).m_pkmnTeam[ selection ], trpkmn );
+
+                pokemon::trade( trpkmn, SAVE::SAV.getActiveFile( ).m_pkmnTeam[ selection ],
+                                GET_TRADE_STRING( 2 * p_tradeIdx ) );
+                res = 0;
+            }
+        } else {
+            res = 1;
+        }
+        FADE_TOP_DARK( );
+        FADE_SUB_DARK( );
+        IO::clearScreen( false );
+        videoSetMode( MODE_5_2D );
+        IO::resetScale( true, false );
+        bgUpdate( );
+        IO::init( );
+        MAP::curMap->draw( );
+
+        ANIMATE_MAP = true;
+        return res;
     }
 } // namespace MAP
