@@ -105,8 +105,8 @@ void initGraphics( ) {
 
     IO::bg3sub = bgInitSub( 3, BgType_Bmp8, BgSize_B8_256x256, 5, 0 );
     IO::bg2sub = bgInitSub( 2, BgType_Bmp8, BgSize_B8_256x256, 1, 0 );
-    for( u8 i = 0; i < 4; ++i ) bgSetPriority( i, i );
-    for( u8 i = 0; i < 4; ++i ) bgSetPriority( 4 + i, i );
+    for( u8 i = 0; i < 4; ++i ) { bgSetPriority( i, i ); }
+    for( u8 i = 0; i < 4; ++i ) { bgSetPriority( 4 + i, i ); }
     bgUpdate( );
 
     IO::Top = *consoleInit( &IO::Top, 0, BgType_Text4bpp, BgSize_T_256x256, 2, 0, true, true );
@@ -124,6 +124,7 @@ void initGraphics( ) {
     consoleSetFont( &IO::Top, IO::consoleFont );
     consoleSetFont( &IO::Bottom, IO::consoleFont );
 }
+
 void initTimeAndRnd( ) {
     auto ct      = std::time( nullptr );
     auto tStruct = std::gmtime( &ct );

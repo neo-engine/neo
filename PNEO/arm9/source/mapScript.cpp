@@ -942,6 +942,10 @@ namespace MAP {
                                  registers[ 3 ] );
                     break;
                 }
+                case CLL_MYSTERY_GIFT_CLERK: {
+                    mysteryGiftClerk( );
+                    break;
+                }
                 default: break;
                 }
                 break;

@@ -37,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/yesNoBox.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
+#include "save/mysteryGift.h"
 #include "save/startScreen.h"
 #include "sound/sound.h"
 
@@ -78,6 +79,8 @@ namespace SAVE {
     }
 
     void startScreen::drawSplash( ) {
+        FADE_TOP_DARK( );
+        FADE_SUB_DARK( );
         IO::initOAMTable( false );
         IO::initOAMTable( true );
         IO::clearScreen( true, true, false );
@@ -118,6 +121,8 @@ namespace SAVE {
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );
         consoleSelect( &IO::Top );
         u8 frame = 0;
+
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
         loop( ) {
             scanKeys( );
             touchRead( &touch );
@@ -160,11 +165,9 @@ namespace SAVE {
         if( SAVE::SAV.getSpecialEpisodes( ).size( ) ) {
             res.push_back( startScreen::SPECIAL_EPISODE );
         }
+        if( SAV.m_saveFile[ p_slot ].m_gameType ) { res.push_back( startScreen::MYSTERY_GIFT ); }
 #ifdef DESQUID
-        if( gMod == DEVELOPER ) {
-            res.push_back( startScreen::TRANSFER_GAME );
-            res.push_back( startScreen::MYSTERY_GIFT );
-        }
+        // if( gMod == DEVELOPER ) { res.push_back( startScreen::TRANSFER_GAME ); }
 #endif
         return res;
     }
@@ -723,9 +726,6 @@ namespace SAVE {
                         HAD_NEW_GAME = true;
                     }
                     return;
-                case TRANSFER_GAME:
-                    if( !transferGame( ) ) break;
-                    return;
                 case SPECIAL_EPISODE: {
                     u8 ep = runEpisodeChoice( );
                     if( ep == IO::choiceBox::BACK_CHOICE
@@ -737,8 +737,17 @@ namespace SAVE {
                     }
                     return;
                 }
+                case TRANSFER_GAME:
+                    if( !transferGame( ) ) break;
+                    return;
+                case MYSTERY_GIFT: {
+                    SAV.m_activeFile = _currentSlot;
+                    runMysteryGift( );
+                    break;
+                }
                 default: continue;
                 }
+                break;
             }
         }
     }

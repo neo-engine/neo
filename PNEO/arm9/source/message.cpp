@@ -104,6 +104,44 @@ namespace IO {
         }
     }
 
+    void animateMBS( u8 p_frame ) {
+        if( ( p_frame & 31 ) == 0 ) {
+            IO::regularFont->drawContinue( 254 - 12, 192 - 40 + 24, false );
+        }
+        if( ( p_frame & 31 ) == 15 ) {
+            IO::regularFont->hideContinue( 254 - 12, 192 - 40 + 24, 0, false );
+        }
+    }
+
+    void waitForInteractS( ) {
+        scanKeys( );
+        cooldown = COOLDOWN_COUNT;
+        u8 frame = 0;
+        loop( ) {
+            animateMBS( ++frame );
+            scanKeys( );
+            touchRead( &touch );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            pressed = keysUp( );
+            held    = keysHeld( );
+
+            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
+                while( touch.px || touch.py ) {
+                    animateMBS( ++frame );
+                    swiWaitForVBlank( );
+                    scanKeys( );
+                    touchRead( &touch );
+                    swiWaitForVBlank( );
+                }
+
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                cooldown = COOLDOWN_COUNT;
+                break;
+            }
+        }
+    }
+
     void constructMBSprite( style p_style ) {
         switch( p_style ) {
         case MSG_NORMAL:

@@ -69,6 +69,24 @@ namespace IO {
     constexpr u16 STR_UI_MONEY     = 471;
     constexpr u16 STR_UI_NONE      = 690;
 
+    constexpr u16 STR_UI_RECEIVE_GIFT  = 716;
+    constexpr u16 STR_UI_CHECK_WC      = 717;
+    constexpr u16 STR_UI_WELCOME_TO_MG = 718;
+
+    constexpr u16 STR_UI_OBTAIN_FRIEND   = 719;
+    constexpr u16 STR_UI_OBTAIN_WIRELESS = 720;
+    constexpr u16 STR_UI_OBTAIN_INTERNET = 721;
+    constexpr u16 STR_UI_OBTAIN_SEL_MSG  = 722;
+    constexpr u16 STR_UI_NO_SPACE        = 723;
+
+    constexpr u16 STR_UI_SEARCHING_FOR_GIFT     = 724;
+    constexpr u16 STR_UI_NO_GIFT_FOUND          = 725;
+    constexpr u16 STR_UI_ACCEPT_GIFT            = 726;
+    constexpr u16 STR_UI_ACCEPT                 = 727;
+    constexpr u16 STR_UI_DECLINE                = 728;
+    constexpr u16 STR_UI_GIFT_DOWNLOADING       = 729;
+    constexpr u16 STR_UI_GIFT_ALREADY_COLLECTED = 730;
+
     constexpr u16 STR_UI_EP0_TEXT_START = 111;
     constexpr u16 STR_UI_EP0_TEXT_END   = 113;
 

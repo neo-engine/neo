@@ -508,10 +508,10 @@ namespace MAP {
 
         bool gateCheckInfinityCave( );
 
-      public:
         void selfTrader( );
 
-      private:
+        void mysteryGiftClerk( );
+
         void ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme, u16 p_offeredPkmn,
                           u8 p_offeredForme );
 

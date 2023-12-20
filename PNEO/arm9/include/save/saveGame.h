@@ -54,6 +54,8 @@ namespace SAVE {
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
 
+    constexpr u8  MAX_STORED_WC          = 12;
+    constexpr u16 MAX_WC_IDX             = 256; // wc idx 0 to 255
     constexpr u8  MAX_BOXES              = 45;
     constexpr u8  MAX_REGISTERED_FLY_POS = 75;
     constexpr u16 MAX_MAPOBJECT          = 256;
@@ -258,8 +260,8 @@ namespace SAVE {
 
             u8 m_route = 0; // current story route
 
-            wonderCard m_storedWonderCards[ 12 ];
-            u8         m_collectedWonderCards[ 32 ];
+            wonderCard m_storedWonderCards[ MAX_STORED_WC ];
+            u8         m_collectedWonderCards[ MAX_WC_IDX / 8 ];
 
             u32 m_good2 = 0;
 
@@ -380,6 +382,14 @@ namespace SAVE {
             bool localDexCompleted( ) const;
 
             bool localDexSeenCompleted( ) const;
+
+            constexpr bool collectedWC( u16 p_cardId ) const {
+                return !!( m_collectedWonderCards[ p_cardId / 8 ] & ( 1 << ( p_cardId % 8 ) ) );
+            }
+
+            constexpr void registerCollectedWC( u16 p_cardId ) {
+                m_collectedWonderCards[ p_cardId / 8 ] |= 1 << ( p_cardId % 8 );
+            }
 
             constexpr bool seen( u16 p_pokemon ) const {
                 return !!( m_seenPkmn[ p_pokemon / 8 ] & ( 1 << ( p_pokemon % 8 ) ) );
@@ -629,7 +639,7 @@ namespace SAVE {
             }
 #ifdef DESQUID
             // special desquid episode used for testing purposes.
-            res.push_back( 0 );
+            // res.push_back( 0 );
 #endif
             return res;
         }

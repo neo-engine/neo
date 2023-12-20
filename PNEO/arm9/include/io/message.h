@@ -41,7 +41,7 @@ namespace IO {
     constexpr u16 SPR_MSGBOX_OAM      = 113;
     constexpr u16 SPR_MSGBOX_OAM_LEN  = 14;
 
-    constexpr u16 SPR_MSG_GFX    = 352;
+    constexpr u16 SPR_MSG_GFX = 352;
     // this is a hack exploiting that standard message box gfx are only 24px tall
     constexpr u16 SPR_MSGBOX_GFX = 480;
 
@@ -51,12 +51,20 @@ namespace IO {
 
     extern u8  LOCATION_TIMER;
     extern u16 TEXT_BUF[ 64 * 256 ];
+    extern u16 CONT_BUF[ 16 * 16 ];
+    extern u16 TEXT_PAL[ 16 ];
 
     void hideMessageBox( );
 
     void animateMB( u8 p_frame );
 
     void waitForInteract( );
+
+    /*
+     * @brief: Like normal waitForInteract, but doesn't use sprites to draw the continue
+     * character.
+     */
+    void waitForInteractS( );
 
     void doPrintMessage( const char* p_message, style p_style, u16 p_item = 0,
                          const BAG::itemData* p_data = 0, bool p_noDelay = false );
