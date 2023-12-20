@@ -54,12 +54,10 @@ namespace MAP {
         ANIMATE_MAP = false;
 
         if( !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_UNCOLLECTED_MYSTERY_EVENT ) ) {
-            printMapMessage( "We look forward to your next visit.", MSG_NORMAL );
+            printMapMessage( GET_MAP_STRING( IO::STR_MAP_MY_NEXT_VISIT ), MSG_NORMAL );
             return;
         } else {
-            printMapMessage(
-                "Good Day.\nYou must be [PLAYER].\rI've received a gift for you.\nHere you go.",
-                MSG_NORMAL );
+            printMapMessage( GET_MAP_STRING( IO::STR_MAP_MY_GIFT ), MSG_NORMAL );
         }
 
         for( u8 i = 0; i < SAVE::MAX_STORED_WC; ++i ) {
@@ -84,8 +82,7 @@ namespace MAP {
 
                     if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) == 6 ) {
                         // No space
-                        printMapMessage( "Please make room in your party\nto accept this gift.",
-                                         MSG_NORMAL );
+                        printMapMessage( GET_MAP_STRING( IO::STR_MAP_MY_MAKE_SPACE ), MSG_NORMAL );
                         return;
                     }
 
@@ -115,9 +112,9 @@ namespace MAP {
                     SAVE::SAV.getActiveFile( ).setTeamPkmn(
                         SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &giftPkmn );
 
-                    snprintf( buffer, 199, "[PLAYER] received %s.",
+                    snprintf( buffer, 199, GET_MAP_STRING( IO::STR_MAP_MY_RECEIVE ),
                               FS::getDisplayName( wc.m_data.m_pkmn.m_species ).c_str( ) );
-                    printMapMessage( buffer, MSG_NORMAL );
+                    printMapMessage( buffer, MSG_INFO );
                     SAVE::SAV.getActiveFile( ).registerCollectedWC( wc.m_id );
 
                     break;
@@ -132,7 +129,7 @@ namespace MAP {
             }
         }
 
-        printMapMessage( "We look forward to your next visit.", MSG_NORMAL );
+        printMapMessage( GET_MAP_STRING( IO::STR_MAP_MY_NEXT_VISIT ), MSG_NORMAL );
         SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_UNCOLLECTED_MYSTERY_EVENT, 0 );
 
         for( u8 i = 0; i < SAVE::MAX_STORED_WC; ++i ) {

@@ -69,9 +69,12 @@ namespace SAVE {
     wonderCard TMP_WC;
 
 #ifdef DESQUID
-    const u8         RIBBON[ 12 ] = { 0, 0, 0, 0, 0, 0, 0, 0b10 };
-    const u16        MOVES[ 4 ]   = { M_TAKE_DOWN };
-    const u16        ITEMS[ 4 ]   = { I_METAGROSSITE };
+    const u8         RIBBON[ 12 ]  = { 0, 0, 0, 0, 0, 0, 0, 0b10 };   // wishing ribbon
+    const u8         RIBBON2[ 12 ] = { 0, 0, 0, 0, 0, 0, 0, 0b100 }; // classic ribbon
+    const u16        MOVES[ 4 ]    = { M_TAKE_DOWN };
+    const u16        MOVES2[ 4 ]   = { M_ENERGY_BALL, M_ICE_BEAM, M_FLAMETHROWER, M_THUNDERBOLT };
+    const u16        ITEMS[ 4 ]    = { I_METAGROSSITE };
+    const u16        ITEMS2[ 4 ]   = { I_TOPO_BERRY, I_NION_BERRY };
     const wonderCard TEST_WC1{ 0,
                                0,
                                "A test gift Pok\xe9mon.",
@@ -95,7 +98,28 @@ namespace SAVE {
                                ITEMS },
         TEST_WC2{
             0, 1, "A set of test gift items.", I_LANSAT_BERRY, 5, I_STARF_BERRY, 5, I_APICOT_BERRY,
-            5 };
+            5 },
+        TEST_WC3{ 0,
+                  2,
+                  "A nostalgic Pok\xe9mon.",
+                  MOVES2,
+                  PKMN_JUMPLUFF,
+                  0,
+                  50,
+                  10905,
+                  23,
+                  0,
+                  1,
+                  true,
+                  true,
+                  false,
+                  L_FARAWAY_PLACE,
+                  0,
+                  BAG::itemToBall( I_CHERISH_BALL ),
+                  0,
+                  0,
+                  RIBBON2,
+                  ITEMS2 };
 #endif
     void movePkmn( s16 p_dx, s16 p_dy ) {
         for( u8 i = 0; i < 4; ++i ) {
@@ -307,10 +331,13 @@ namespace SAVE {
         for( u8 k = 0; k < 120; ++k ) { swiWaitForVBlank( ); }
 
 #ifdef DESQUID
-        if( rand( ) & 1 ) {
+        u8 r = rand( ) % 3;
+        if( r == 0 ) {
             memcpy( &TMP_WC, &TEST_WC1, sizeof( wonderCard ) );
-        } else {
+        } else if( r == 1 ) {
             memcpy( &TMP_WC, &TEST_WC2, sizeof( wonderCard ) );
+        } else if( r == 2 ) {
+            memcpy( &TMP_WC, &TEST_WC3, sizeof( wonderCard ) );
         }
         return true;
 #else
@@ -380,8 +407,13 @@ namespace SAVE {
         }
         if( !p_reverse ) {
             IO::regularFont->printStringC( GET_STRING( IO::STR_UI_WONDERCARD ), 16, 28, false );
-            IO::regularFont->printStringC( GET_STRING( IO::STR_UI_PLEASE_COLLECT_GIFT ), 16, 85,
-                                           false );
+            if( SAVE::SAV.getActiveFile( ).collectedWC( wc.m_id ) ) {
+                IO::regularFont->printStringC( GET_STRING( IO::STR_UI_THANK_YOU_FOR_PLAYING ), 16,
+                                               85, false );
+            } else {
+                IO::regularFont->printStringC( GET_STRING( IO::STR_UI_PLEASE_COLLECT_GIFT ), 16, 85,
+                                               false );
+            }
             IO::regularFont->printStringC(
                 IO::formatDate( SAVE::date{ wc.m_year, wc.m_month, wc.m_day } ).c_str( ), 144, 150,
                 false );

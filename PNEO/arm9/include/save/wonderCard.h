@@ -103,7 +103,7 @@ namespace SAVE {
                            const u16 p_items[ 4 ] )
             : m_descriptionId{ p_descriptionId }, m_type{ WCTYPE_PKMN }, m_id{ p_cardId } {
             memcpy( m_title, p_title, 96 );
-            memcpy( m_data.m_pkmn.m_moves, p_moves, 4 );
+            memcpy( m_data.m_pkmn.m_moves, p_moves, 8 );
             if( p_name ) { memcpy( m_data.m_pkmn.m_name, p_name, PKMN_NAMELENGTH ); }
             if( p_ot ) { memcpy( m_data.m_pkmn.m_oT, p_ot, OTLENGTH ); }
             if( p_ribbons ) { memcpy( m_data.m_pkmn.m_ribbons, p_ribbons, 12 ); }

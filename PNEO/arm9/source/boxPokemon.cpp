@@ -115,7 +115,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_origLang = 5;
 
     if( p_moves ) {
-        memcpy( m_moves, p_moves, sizeof( m_moves ) );
+        memcpy( m_moves, p_moves, 8 );
     } else {
         FS::getLearnMoves( p_pkmnId, p_forme, 0, p_level, 4, m_moves );
     }
@@ -150,6 +150,8 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     if( p_oT && p_oT[ 0 ] ) {
         memcpy( m_oT, p_oT, OTLENGTH );
     } else {
+        m_oTId  = SAVE::SAV.getActiveFile( ).m_id;
+        m_oTSid = SAVE::SAV.getActiveFile( ).m_sid;
         memcpy( m_oT, SAVE::SAV.getActiveFile( ).m_playername, OTLENGTH );
     }
     m_pokerus  = p_pokerus;

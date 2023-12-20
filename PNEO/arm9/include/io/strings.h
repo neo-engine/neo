@@ -87,6 +87,7 @@ namespace IO {
     constexpr u16 STR_UI_GIFT_DOWNLOADING       = 729;
     constexpr u16 STR_UI_GIFT_ALREADY_COLLECTED = 730;
     constexpr u16 STR_UI_GIFT_RECEIVED          = 731;
+    constexpr u16 STR_UI_THANK_YOU_FOR_PLAYING  = 738;
 
     constexpr u16 STR_UI_PLEASE_COLLECT_GIFT = 732;
     constexpr u16 STR_UI_WONDERCARD          = 733;
@@ -352,6 +353,17 @@ namespace IO {
     constexpr u16 STR_UI_STORAGE_BOX_PICKED     = 177;
     constexpr u16 STR_UI_STORAGE_ALL_BOXES_FULL = 178;
     constexpr u16 STR_UI_PKMN_RELEASED          = 179;
+
+    constexpr u16 STR_MAP_MY_NEXT_VISIT = 701;
+    constexpr u16 STR_MAP_MY_GIFT       = 702;
+    constexpr u16 STR_MAP_MY_MAKE_SPACE = 703;
+    constexpr u16 STR_MAP_MY_RECEIVE    = 704;
+
+    constexpr u16 STR_MAP_ST_INTRO = 705;
+    constexpr u16 STR_MAP_ST_MSG1  = 706;
+    constexpr u16 STR_MAP_ST_MSG2  = 707;
+    constexpr u16 STR_MAP_ST_MSG3  = 708;
+    constexpr u16 STR_MAP_ST_MSG4  = 709;
 
     constexpr u16 STR_MAP_ICAVE_REPORT_REQS           = 682;
     constexpr u16 STR_MAP_ICAVE_REPORT_REQS_NOT_MET   = 683;

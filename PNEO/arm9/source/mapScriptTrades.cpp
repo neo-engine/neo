@@ -65,20 +65,19 @@ namespace MAP {
             memcpy( SAVE::SAV.getActiveFile( ).m_traderPokemon.m_name, GET_TRADE_STRING( 1 ),
                     PKMN_NAMELENGTH );
 
-            printMapMessage( "Hello, I am Trador.\nI like to trade Pokemon.", style{ 0 } );
+            printMapMessage( GET_MAP_STRING( IO::STR_MAP_ST_INTRO ), MSG_NORMAL );
         } else {
-            printMapMessage( "Trador: Hello [PLAYER]!", style{ 0 } );
+            printMapMessage( GET_MAP_STRING( IO::STR_MAP_ST_MSG1 ), MSG_NORMAL );
         }
 
-        snprintf( buffer, 199, "I will trade any Pokemon\nfor my %s.",
+        snprintf( buffer, 199, GET_MAP_STRING( IO::STR_MAP_ST_MSG2 ),
                   FS::getDisplayName( SAVE::SAV.getActiveFile( ).m_traderPokemon.getSpecies( ) )
                       .c_str( ) );
-        printMapMessage( buffer, style{ 0 } );
+        printMapMessage( buffer, MSG_NORMAL );
 
         if( IO::yesNoBox::YES
             == IO::yesNoBox( ).getResult(
-                convertMapString( "Would you like to trade\nPokemon with me?", style{ 0 } )
-                    .c_str( ),
+                convertMapString( GET_MAP_STRING( IO::STR_MAP_ST_MSG3 ), MSG_NORMAL ).c_str( ),
                 MSG_NOCLOSE, false ) ) {
 
             STS::partyScreen sts = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
@@ -107,7 +106,7 @@ namespace MAP {
         } else {
             IO::init( );
         }
-        printMapMessage( "Come back whenever you\nwant to trade with me!", style{ 0 } );
+        printMapMessage( GET_MAP_STRING( IO::STR_MAP_ST_MSG4 ), MSG_NORMAL );
 
         ANIMATE_MAP = true;
     }
