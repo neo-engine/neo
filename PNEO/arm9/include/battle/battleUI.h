@@ -241,6 +241,12 @@ namespace BATTLE {
         void sendOutPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon );
 
         /*
+         * @brief: Sends out the given pkmn at the specified position; instead of a ball
+         * animation, the pkmn slides in from the left.
+         */
+        void sendOutFollowPkmn( u8 p_pos, pokemon* p_pokemon );
+
+        /*
          * @brief: shows the wild pkmn appear
          */
         void startWildBattle( pokemon* p_pokemon );

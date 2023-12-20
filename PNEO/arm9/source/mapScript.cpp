@@ -612,7 +612,7 @@ namespace MAP {
                 BATTLE::battle bt
                     = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                       SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), tr, policy );
-                auto result = bt.start( );
+                auto result = bt.start( _pkmnFollowsPlayer );
 
                 FADE_TOP_DARK( );
                 IO::init( );
@@ -658,7 +658,7 @@ namespace MAP {
                                       SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), wildPkmn,
                                       currentData( ).m_battlePlat1, currentData( ).m_battlePlat2,
                                       currentData( ).m_battleBG, getBattlePolicy( true ) )
-                          .start( );
+                          .start( _pkmnFollowsPlayer );
 
                 FADE_TOP_DARK( );
                 draw( playerPrio );

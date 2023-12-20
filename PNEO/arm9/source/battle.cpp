@@ -138,7 +138,7 @@ namespace BATTLE {
         _opponentRuns = p_wildPkmnRuns;
     }
 
-    battle::battleEndReason battle::start( ) {
+    battle::battleEndReason battle::start( bool p_firstPkmnIsFollowing ) {
         if( !_opponentTeamSize || !_playerTeamSize ) { return battle::BATTLE_NONE; }
 
         constexpr u8 TMP_BUFFER_SIZE = 100;
@@ -148,7 +148,7 @@ namespace BATTLE {
         scanKeys( );
 
         battleEndReason battleEnd = BATTLE_NONE;
-        initBattle( );
+        initBattle( p_firstPkmnIsFollowing );
 
         swiWaitForVBlank( );
         scanKeys( );
@@ -422,7 +422,7 @@ namespace BATTLE {
         return battleEnd;
     }
 
-    void battle::initBattle( ) {
+    void battle::initBattle( bool p_followPkmn ) {
         SOUND::initBattleSound( );
 
         _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
@@ -460,7 +460,11 @@ namespace BATTLE {
                     _field.setSlotDisguise(
                         !side, j, ( side ? &_playerTeam[ disg ] : &_opponentTeam[ disg ] ) );
                 }
-                _battleUI.sendOutPkmn( !side, j, _field.getPkmnOrDisguise( !side, j ) );
+                if( side && j == 0 && p_followPkmn ) {
+                    _battleUI.sendOutFollowPkmn( j, _field.getPkmnOrDisguise( !side, j ) );
+                } else {
+                    _battleUI.sendOutPkmn( !side, j, _field.getPkmnOrDisguise( !side, j ) );
+                }
             }
         }
 

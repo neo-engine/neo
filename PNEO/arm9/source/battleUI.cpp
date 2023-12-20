@@ -1824,6 +1824,123 @@ namespace BATTLE {
         updatePkmnStats( p_opponent, p_pos, p_pokemon );
     }
 
+    void battleUI::sendOutFollowPkmn( u8 p_pos, pokemon* p_pokemon ) {
+        if( p_pokemon != nullptr ) {
+            SAVE::SAV.getActiveFile( ).registerSeenPkmn( p_pokemon->getSpecies( ) );
+        }
+        IO::fadeScreen( IO::UNFADE, true, true );
+        REG_BLDCNT       = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA     = 0xff | ( 0x06 << 8 );
+        REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
+        REG_BLDALPHA_SUB = 0xff | ( 0x02 << 8 );
+        bgUpdate( );
+
+        char buffer[ 100 ];
+        snprintf( buffer, 99, GET_STRING( 395 ), p_pokemon->m_boxdata.m_name );
+        log( std::string( buffer ) );
+
+        // No ball animation, pkmn slides in from left
+
+        constexpr s16 diffx2 = 60;
+
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+
+        u16 x = ( _mode == BM_SINGLE ) ? ( PKMN_OWN_1_X_SINGLE )
+                                       : ( p_pos ? PKMN_OWN_2_X : PKMN_OWN_1_X );
+        u16 y = ( _mode == BM_SINGLE ) ? ( PKMN_OWN_1_Y_SINGLE )
+                                       : ( p_pos ? PKMN_OWN_2_Y : PKMN_OWN_1_Y );
+
+        auto pinfo = p_pokemon->getSpriteInfo( );
+        y += IO::pkmnSpriteHeight( pinfo );
+
+        s16 stx = s16( x ) - diffx2;
+
+        IO::loadPKMNSpriteBack( pinfo, stx, y, SPR_PKMN_START_OAM( 2 + p_pos ),
+                                SPR_PKMN_PAL( 2 + p_pos ), SPR_PKMN_GFX( 2 + p_pos ), false );
+
+        for( u8 i = 0; i < 4; ++i ) {
+            oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + i ].isRotateScale = true;
+            oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + i ].isSizeDouble  = true;
+            oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + i ].rotationIndex = 1;
+        }
+        for( u8 i = 0; i < 4; ++i ) {
+            oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + i ].priority = OBJPRIORITY_3;
+        }
+
+        u16 emptyPal[ 32 ]                = { 0, 0, 0 };
+        IO::OamTop->matrixBuffer[ 2 ].hdx = ( 1LLU << 8 );
+        IO::OamTop->matrixBuffer[ 2 ].hdy = ( 0 << 8 );
+        IO::OamTop->matrixBuffer[ 2 ].vdx = ( 1LLU << 9 );
+        IO::OamTop->matrixBuffer[ 2 ].vdy = ( 1LLU << 10 );
+
+        IO::OamTop->matrixBuffer[ 3 ].hdx = 187;
+        IO::OamTop->matrixBuffer[ 3 ].hdy = ( 0 << 8 );
+        IO::OamTop->matrixBuffer[ 3 ].vdx = 187 << 1;
+        IO::OamTop->matrixBuffer[ 3 ].vdy = 187 << 2;
+
+        u16 sy = oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 0 ].y + 8
+                 - ( IO::pkmnSpriteHeight( pinfo ) / 2 ),
+            sx = oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 0 ].x + 2
+                 - 3 * IO::pkmnSpriteHeight( pinfo ) / 4;
+        s8 diffx = 80, diffy = 44;
+        s8 ske = -23;
+        sy += 4;
+        diffx = 97;
+        diffy = 48;
+        ske   = -36;
+
+        IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + 0, SPR_PKMN_SHADOW_PAL,
+                        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 0 ].gfxIndex, sx, sy, 64, 64,
+                        emptyPal, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                        OBJMODE_BLENDED );
+        IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + 1, SPR_PKMN_SHADOW_PAL,
+                        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 1 ].gfxIndex, diffx + sx, sy, 32, 64,
+                        0, 0, 0, false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + 2, SPR_PKMN_SHADOW_PAL,
+                        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 2 ].gfxIndex, ske + sx, diffy + sy,
+                        64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                        OBJMODE_BLENDED );
+        IO::loadSprite( SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + 3, SPR_PKMN_SHADOW_PAL,
+                        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 3 ].gfxIndex, ske + diffx + sx,
+                        diffy + sy, 32, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
+                        OBJMODE_BLENDED );
+
+        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) ].x -= 48;
+        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) ].y -= 48;
+        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 1 ].y -= 48;
+        oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + 2 ].x -= 48;
+
+        for( u8 i = 0; i < 4; ++i ) {
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + i ].isRotateScale = true;
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + i ].isSizeDouble  = true;
+            oam[ SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + i ].rotationIndex = 3;
+        }
+
+        IO::updateOAM( false );
+
+        // slide by diffx2 px to the right
+
+        for( u8 d = 0; d < diffx2; d += 2 ) {
+            swiWaitForVBlank( );
+            for( u8 i = 0; i < 4; ++i ) {
+                oam[ SPR_PKMN_SHADOW_START_OAM( 2 + p_pos ) + i ].x += 2;
+                oam[ SPR_PKMN_START_OAM( 2 + p_pos ) + i ].x += 2;
+            }
+            IO::updateOAM( false );
+        }
+
+        SOUND::playCry( p_pokemon->getSpecies( ), p_pokemon->getForme( ), p_pokemon->isFemale( ) );
+
+        for( u8 i = 0; i < 45; ++i ) { swiWaitForVBlank( ); }
+
+        if( p_pokemon->isShiny( ) ) {
+            animateShiny( false, p_pos, p_pokemon->m_boxdata.m_shinyType );
+        }
+
+        _curHP[ !false ][ p_pos ] = 0;
+        updatePkmnStats( false, p_pos, p_pokemon );
+    }
+
     void battleUI::recallPkmn( bool p_opponent, u8 p_pos, pokemon* p_pokemon, bool p_forced ) {
         char buffer[ 100 ];
         if( p_opponent && _battleTrainer != nullptr ) {

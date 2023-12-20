@@ -230,7 +230,7 @@ namespace MAP {
         auto result = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
                                       SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), WILD_PKMN,
                                       platform, plat2, battleBack, getBattlePolicy( true ) )
-                          .start( );
+                          .start( _pkmnFollowsPlayer );
 
         if( _tracerChain ) {
             if( ( result != BATTLE::battle::BATTLE_PLAYER_WON

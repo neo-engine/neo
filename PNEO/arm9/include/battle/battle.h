@@ -92,7 +92,7 @@ namespace BATTLE {
         /*
          * @brief: Initializes the battle.
          */
-        void initBattle( );
+        void initBattle( bool p_followPkmn );
 
         /*
          * @brief: Computes the move target for single battles or lets the player choose a
@@ -224,8 +224,10 @@ namespace BATTLE {
          * @brief: Starts the battle.
          * @returns: positive values if the player won the battle; negative value if the
          * player lost.
+         * @param p_firstPkmnIsFollowing: Switch to a different send out animation for the
+         * first pkmn of the player party.
          */
-        battleEndReason start( );
+        battleEndReason start( bool p_firstPkmnIsFollowing = false );
 
         /*
          * @brief: Returns messages of the battle trainer.
