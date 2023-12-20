@@ -86,6 +86,15 @@ namespace IO {
     constexpr u16 STR_UI_DECLINE                = 728;
     constexpr u16 STR_UI_GIFT_DOWNLOADING       = 729;
     constexpr u16 STR_UI_GIFT_ALREADY_COLLECTED = 730;
+    constexpr u16 STR_UI_GIFT_RECEIVED          = 731;
+
+    constexpr u16 STR_UI_PLEASE_COLLECT_GIFT = 732;
+    constexpr u16 STR_UI_WONDERCARD          = 733;
+    constexpr u16 STR_UI_DATE_RECEIVED       = 734;
+
+    constexpr u16 STR_UI_WC_FLIP = 735;
+    constexpr u16 STR_UI_WC_SEND = 736;
+    constexpr u16 STR_UI_WC_TOSS = 737;
 
     constexpr u16 STR_UI_EP0_TEXT_START = 111;
     constexpr u16 STR_UI_EP0_TEXT_END   = 113;

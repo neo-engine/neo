@@ -38,12 +38,17 @@ namespace SAVE {
     };
 
     struct wonderCard {
-        u8          m_descriptionId;
+        u8          m_descriptionId; // 2 * id + 0: before collection, 2 * id + 1: after
         u8          m_targetGameVersion;
         wcEventType m_type;
         u8          m_id;
 
-        char m_title[ 100 ];
+        u8 m_year;
+        u8 m_month;
+        u8 m_day;
+        u8 m_reserved;
+
+        char m_title[ 96 ];
 
         union data {
             struct {
@@ -80,7 +85,7 @@ namespace SAVE {
                            u8 p_itemCount1 = 1, u16 p_itemId2 = 0, u8 p_itemCount2 = 0,
                            u16 p_itemId3 = 0, u8 p_itemCount3 = 0 )
             : m_descriptionId{ p_descriptionId }, m_type{ WCTYPE_ITEM }, m_id{ p_cardId } {
-            memcpy( m_title, p_title, 100 );
+            memcpy( m_title, p_title, 96 );
             m_data.m_item.m_itemId[ 0 ] = p_itemId1;
             m_data.m_item.m_itemId[ 1 ] = p_itemId2;
             m_data.m_item.m_itemId[ 2 ] = p_itemId3;
@@ -97,7 +102,7 @@ namespace SAVE {
                            u8 p_ball, u8 p_pokerus, u8 p_forme, const u8 p_ribbons[ 12 ],
                            const u16 p_items[ 4 ] )
             : m_descriptionId{ p_descriptionId }, m_type{ WCTYPE_PKMN }, m_id{ p_cardId } {
-            memcpy( m_title, p_title, 100 );
+            memcpy( m_title, p_title, 96 );
             memcpy( m_data.m_pkmn.m_moves, p_moves, 4 );
             if( p_name ) { memcpy( m_data.m_pkmn.m_name, p_name, PKMN_NAMELENGTH ); }
             if( p_ot ) { memcpy( m_data.m_pkmn.m_oT, p_ot, OTLENGTH ); }

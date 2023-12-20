@@ -139,7 +139,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     setIsEgg( p_isEgg );
     m_fateful = p_fatefulEncounter;
 
-    if( p_name ) {
+    if( p_name && p_name[ 0 ] ) {
         memcpy( m_name, p_name, PKMN_NAMELENGTH );
         setIsNicknamed( true );
     } else {
@@ -147,7 +147,11 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         setIsNicknamed( false );
     }
     m_hometown = 4;
-    strcpy( m_oT, p_oT );
+    if( p_oT && p_oT[ 0 ] ) {
+        memcpy( m_oT, p_oT, OTLENGTH );
+    } else {
+        memcpy( m_oT, SAVE::SAV.getActiveFile( ).m_playername, OTLENGTH );
+    }
     m_pokerus  = p_pokerus;
     m_ball     = p_ball;
     m_gotLevel = p_level;

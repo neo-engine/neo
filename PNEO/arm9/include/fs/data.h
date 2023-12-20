@@ -123,6 +123,7 @@ namespace FS {
 
 #define GET_MAP_STRING( p_stringId )           FS::getMapString( p_stringId )
 #define GET_TRADE_STRING( p_stringId )         FS::getTradeString( p_stringId )
+#define GET_WC_STRING( p_stringId )            FS::getWCString( p_stringId )
 #define GET_STRING_L( p_stringId, p_language ) FS::getUIString( p_stringId, p_language )
 
 #ifdef DESQUID
@@ -147,6 +148,7 @@ namespace FS {
     const char* getUIString( u16 p_stringId, u8 p_language );
     const char* getMapString( u16 p_stringId );
     const char* getTradeString( u16 p_stringId );
+    const char* getWCString( u16 p_stringId );
     const char* getPkmnPhrase( u16 p_stringId );
     const char* getBadge( u16 p_badgeId );
     const char* getAchievement( u16 p_badgeId, u8 p_language );

@@ -70,9 +70,9 @@ namespace MAP {
                     // hand player the items
 
                     for( u8 j = 0; j < 3; ++j ) {
-                        if( wc.m_data.m_item.m_itemId[ i ] && wc.m_data.m_item.m_itemCount[ i ] ) {
-                            IO::giveItemToPlayer( wc.m_data.m_item.m_itemId[ i ],
-                                                  wc.m_data.m_item.m_itemCount[ i ] );
+                        if( wc.m_data.m_item.m_itemId[ j ] && wc.m_data.m_item.m_itemCount[ j ] ) {
+                            IO::giveItemToPlayer( wc.m_data.m_item.m_itemId[ j ],
+                                                  wc.m_data.m_item.m_itemCount[ j ] );
                         }
                     }
                     SAVE::SAV.getActiveFile( ).registerCollectedWC( wc.m_id );
@@ -104,8 +104,13 @@ namespace MAP {
                                          wc.m_data.m_pkmn.m_ball,
                                          wc.m_data.m_pkmn.m_pokerus,
                                          wc.m_data.m_pkmn.m_forme };
-
                     memcpy( giftPkmn.m_ribbons, wc.m_data.m_pkmn.m_ribbons, 12 );
+
+                    u8 ic = 0;
+                    for( ; ic < 4; ++ic ) {
+                        if( !wc.m_data.m_pkmn.m_items[ ic ] ) { break; }
+                    }
+                    if( ic ) { giftPkmn.giveItem( wc.m_data.m_pkmn.m_items[ rand( ) % ic ] ); }
 
                     SAVE::SAV.getActiveFile( ).setTeamPkmn(
                         SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &giftPkmn );
@@ -113,6 +118,7 @@ namespace MAP {
                     snprintf( buffer, 199, "[PLAYER] received %s.",
                               FS::getDisplayName( wc.m_data.m_pkmn.m_species ).c_str( ) );
                     printMapMessage( buffer, MSG_NORMAL );
+                    SAVE::SAV.getActiveFile( ).registerCollectedWC( wc.m_id );
 
                     break;
                 }
@@ -129,6 +135,12 @@ namespace MAP {
         printMapMessage( "We look forward to your next visit.", MSG_NORMAL );
         SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_UNCOLLECTED_MYSTERY_EVENT, 0 );
 
+        for( u8 i = 0; i < SAVE::MAX_STORED_WC; ++i ) {
+            auto& wc = SAVE::SAV.getActiveFile( ).m_storedWonderCards[ i ];
+            if( !SAVE::SAV.getActiveFile( ).collectedWC( wc.m_id ) ) {
+                SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_UNCOLLECTED_MYSTERY_EVENT, 1 );
+            }
+        }
         ANIMATE_MAP = true;
     }
 } // namespace MAP

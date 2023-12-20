@@ -51,6 +51,7 @@ namespace SAVE {
 #define SPR_PAGE_LEFT_OAM_SUB          7
 #define SPR_PAGE_RIGHT_OAM_SUB         8
 #define SPR_CHOICE_OAM_SUB( p_choice ) ( 30 + 10 * ( p_choice ) )
+#define SPR_PKMN_OAM_SUB               120
 
     constexpr u8 SPR_MBOX_PAL_TOP        = 3;
     constexpr u8 SPR_MBOX_OAM_START_TOP  = 8;
@@ -63,16 +64,17 @@ namespace SAVE {
 #define SPR_BOX_PAL_SUB      0
 #define SPR_SELECTED_PAL_SUB 1
 #define SPR_ARROW_X_PAL_SUB  2
+#define SPR_PKMN_PAL_SUB     15
 
     wonderCard TMP_WC;
 
 #ifdef DESQUID
-    const u8         RIBBON[ 12 ] = { 0, 0, 0, 0, 0, 0, 1 };
+    const u8         RIBBON[ 12 ] = { 0, 0, 0, 0, 0, 0, 0, 0b10 };
     const u16        MOVES[ 4 ]   = { M_TAKE_DOWN };
     const u16        ITEMS[ 4 ]   = { I_METAGROSSITE };
     const wonderCard TEST_WC1{ 0,
                                0,
-                               "A test gift Pokémon.",
+                               "A test gift Pok\xe9mon.",
                                MOVES,
                                PKMN_BELDUM,
                                0,
@@ -95,6 +97,12 @@ namespace SAVE {
             0, 1, "A set of test gift items.", I_LANSAT_BERRY, 5, I_STARF_BERRY, 5, I_APICOT_BERRY,
             5 };
 #endif
+    void movePkmn( s16 p_dx, s16 p_dy ) {
+        for( u8 i = 0; i < 4; ++i ) {
+            IO::Oam->oamBuffer[ SPR_PKMN_OAM_SUB + i ].x += p_dx;
+            IO::Oam->oamBuffer[ SPR_PKMN_OAM_SUB + i ].y += p_dy;
+        }
+    }
 
     void clearText( ) {
         IO::regularFont->setColor( 0, 0 );
@@ -123,11 +131,79 @@ namespace SAVE {
         for( u8 j = 0; j < 6; ++j ) {
             for( u8 i = 0; i < 10; ++i ) { oam[ SPR_CHOICE_OAM_SUB( j ) + i ].isHidden = true; }
         }
+        for( u8 i = 0; i < 4; ++i ) { IO::Oam->oamBuffer[ SPR_PKMN_OAM_SUB + i ].isHidden = true; }
         IO::updateOAM( true );
     }
 
+    void initTopSprites( bool p_showMbox = true ) {
+        // Sprites
+        // top screen
+
+        u16 START = 128;
+        u16 tcTop = IO::loadSprite( "UI/mbox2", SPR_MBOX_OAM_START_TOP, SPR_MBOX_PAL_TOP, START, 2,
+                                    192 - 46, 32, 64, false, false, !p_showMbox, OBJPRIORITY_3,
+                                    false, OBJMODE_BLENDED );
+
+        for( u8 i = 0; i < SPR_MBOX_OAM_LENGTH; ++i ) {
+            IO::loadSprite( SPR_MBOX_OAM_START_TOP + SPR_MBOX_OAM_LENGTH - i, SPR_MBOX_PAL_TOP,
+                            START, 30 + 16 * i, 192 - 46, 32, 64, 0, 0, 0, false, true, !p_showMbox,
+                            OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        }
+
+        IO::loadSprite( "UI/mbox1", SPR_MBOX_OAM_START_TOP2, SPR_MBOX_PAL_TOP2, tcTop, 2, 6, 32, 64,
+                        false, false, true, OBJPRIORITY_3, false );
+
+        for( u8 i = 0; i < SPR_MBOX_OAM_LENGTH; ++i ) {
+            IO::loadSprite( SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i, SPR_MBOX_PAL_TOP2,
+                            tcTop, 30 + 16 * i, 6, 32, 64, 0, 0, 0, false, true, true,
+                            OBJPRIORITY_3, false );
+        }
+
+        IO::updateOAM( false );
+    }
+
+    void initBottomSprites( ) {
+        SpriteEntry* oam     = IO::Oam->oamBuffer;
+        u16          tileCnt = 0;
+        tileCnt = IO::loadPKMNSprite( pkmnSpriteInfo{ }, 128 - 48, -30, SPR_PKMN_OAM_SUB,
+                                      SPR_PKMN_PAL_SUB, tileCnt, true );
+        for( u8 i = 0; i < 4; ++i ) { IO::Oam->oamBuffer[ SPR_PKMN_OAM_SUB + i ].isHidden = true; }
+        IO::updateOAM( true );
+
+        tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_LARGE_CHOICE_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", SPR_LARGE_CHOICE_OAM_SUB + 1,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_SMALL_CHOICE_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        // Arrows
+        tileCnt
+            = IO::loadSprite( "UI/arrow", SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4,
+                              76, 16, 16, false, false, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        IO::loadSprite( SPR_ARROW_RIGHT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
+                        oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, 0, 0, 0, false,
+                        true, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+
+        // page windows
+        tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB,
+                                  tileCnt, 0 - 8, 57 - 12, 32, 64, true, true, true, OBJPRIORITY_2,
+                                  true, OBJMODE_BLENDED );
+        IO::loadSprite( SPR_PAGE_RIGHT_OAM_SUB, SPR_BOX_PAL_SUB,
+                        oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * 2, 32, 64, 0, 0,
+                        0, false, false, true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
+
+        // Pals
+        // IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, true );
+        IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
+    }
+
     std::vector<std::pair<IO::inputTarget, startScreen::choice>>
-    drawChoice( u16 p_message, const std::vector<u16>& p_choices, bool p_init = true ) {
+    drawChoice( u16 p_message, const std::vector<u16>& p_choices, bool p_init = true,
+                bool p_left = false, bool p_right = false ) {
         if( p_init ) {
             REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;
             REG_BLDALPHA_SUB = 0xff | ( 0x04 << 8 );
@@ -137,74 +213,40 @@ namespace SAVE {
             IO::initOAMTable( false );
             IO::initOAMTable( true );
 
-            // Sprites
-            // top screen
-
-            u16 START = 128;
-            u16 tcTop = IO::loadSprite( "UI/mbox2", SPR_MBOX_OAM_START_TOP, SPR_MBOX_PAL_TOP, START,
-                                        2, 192 - 46, 32, 64, false, false, false, OBJPRIORITY_3,
-                                        false, OBJMODE_BLENDED );
-
-            for( u8 i = 0; i < SPR_MBOX_OAM_LENGTH; ++i ) {
-                IO::loadSprite( SPR_MBOX_OAM_START_TOP + SPR_MBOX_OAM_LENGTH - i, SPR_MBOX_PAL_TOP,
-                                START, 30 + 16 * i, 192 - 46, 32, 64, 0, 0, 0, false, true, false,
-                                OBJPRIORITY_3, false, OBJMODE_BLENDED );
-            }
-
-            IO::loadSprite( "UI/mbox1", SPR_MBOX_OAM_START_TOP2, SPR_MBOX_PAL_TOP2, tcTop, 2, 6, 32,
-                            64, false, false, true, OBJPRIORITY_3, false );
-
-            for( u8 i = 0; i < SPR_MBOX_OAM_LENGTH; ++i ) {
-                IO::loadSprite( SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i,
-                                SPR_MBOX_PAL_TOP2, tcTop, 30 + 16 * i, 6, 32, 64, 0, 0, 0, false,
-                                true, true, OBJPRIORITY_3, false );
-            }
-
-            IO::updateOAM( false );
+            initTopSprites( );
         }
-        message( GET_STRING( p_message ), p_init );
+        if( p_message ) { message( GET_STRING( p_message ), p_init ); }
 
         // bottom screen
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
-        u16 tileCnt = 0;
-
-        if( p_init ) {
-            tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_LARGE_CHOICE_OAM_SUB,
-                                      SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
-                                      OBJPRIORITY_3, true, OBJMODE_BLENDED );
-            tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", SPR_LARGE_CHOICE_OAM_SUB + 1,
-                                      SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
-                                      OBJPRIORITY_3, true, OBJMODE_BLENDED );
-            tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_SMALL_CHOICE_OAM_SUB,
-                                      SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, true,
-                                      OBJPRIORITY_3, true, OBJMODE_BLENDED );
-
-            // Arrows
-            tileCnt = IO::loadSprite( "UI/arrow", SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                                      tileCnt, 4, 76, 16, 16, false, false, true, OBJPRIORITY_1,
-                                      true, OBJMODE_NORMAL );
-            IO::loadSprite( SPR_ARROW_RIGHT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                            oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, 0, 0, 0, false,
-                            true, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
-
-            // page windows
-            tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB,
-                                      SPR_BOX_PAL_SUB, tileCnt, 0 - 8, 57 - 12, 32, 64, true, true,
-                                      true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
-            IO::loadSprite( SPR_PAGE_RIGHT_OAM_SUB, SPR_BOX_PAL_SUB,
-                            oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * 2, 32, 64, 0,
-                            0, 0, false, false, true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
-
-            // Pals
-            // IO::copySpritePal( arrowPal, SPR_ARROW_X_PAL_SUB, 0, 2 * 4, true );
-            IO::copySpritePal( IO::SELECTED_SPR_PAL, SPR_SELECTED_PAL_SUB, 0, 2 * 8, true );
-        }
+        if( p_init ) { initBottomSprites( ); }
 
         std::vector<std::pair<IO::inputTarget, startScreen::choice>> res
             = std::vector<std::pair<IO::inputTarget, startScreen::choice>>( );
 
         hideSpritesSub( );
+
+        if( p_left ) {
+            // prev slot button
+            res.push_back( std::pair( IO::inputTarget( 1, oam[ SPR_PAGE_LEFT_OAM_SUB ].y + 8, 24,
+                                                       oam[ SPR_PAGE_LEFT_OAM_SUB ].y + 48 ),
+                                      IO::choiceBox::PREV_PAGE_CHOICE ) );
+
+            oam[ SPR_PAGE_LEFT_OAM_SUB ].isHidden  = false;
+            oam[ SPR_ARROW_LEFT_OAM_SUB ].isHidden = false;
+        }
+        if( p_right ) {
+            // next slot button
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_PAGE_RIGHT_OAM_SUB ].x,
+                                                       oam[ SPR_PAGE_RIGHT_OAM_SUB ].y + 8,
+                                                       oam[ SPR_PAGE_RIGHT_OAM_SUB ].x + 23,
+                                                       oam[ SPR_PAGE_RIGHT_OAM_SUB ].y + 48 ),
+                                      IO::choiceBox::NEXT_PAGE_CHOICE ) );
+
+            oam[ SPR_PAGE_RIGHT_OAM_SUB ].isHidden  = false;
+            oam[ SPR_ARROW_RIGHT_OAM_SUB ].isHidden = false;
+        }
 
         u16 cury = 32;
         u8  ln   = 0;
@@ -305,6 +347,173 @@ namespace SAVE {
         return false;
     }
 
+    void displayWonderCard( u8 p_cardIdx, bool p_reverse = false ) {
+        bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
+        bgSetScroll( IO::bg3, 0, 0 );
+        bgUpdate( );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "wcbg", 0, 256 * 256 / 2,
+                             false );
+        if( p_reverse ) {
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "wc2", 200, 3, 256 * 192,
+                                 false );
+        } else {
+            FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "wc1", 200, 3, 256 * 192,
+                                 false );
+        }
+
+        BG_PALETTE[ 1 ]     = 0xfbba;
+        BG_PALETTE[ 2 ]     = 0xf775;
+        BG_PALETTE_SUB[ 1 ] = 0xfbba;
+        BG_PALETTE_SUB[ 2 ] = 0xf775;
+
+        initTopSprites( false );
+
+        const auto& wc = SAVE::SAV.getActiveFile( ).m_storedWonderCards[ p_cardIdx ];
+
+        BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK2;
+        BG_PALETTE[ IO::GRAY_IDX ]  = IO::STEEL_COLOR;
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        for( u8 i = 0; i < 3; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_CARD_ICON_OAM + i ].isHidden = true;
+        }
+        if( !p_reverse ) {
+            IO::regularFont->printStringC( GET_STRING( IO::STR_UI_WONDERCARD ), 16, 28, false );
+            IO::regularFont->printStringC( GET_STRING( IO::STR_UI_PLEASE_COLLECT_GIFT ), 16, 85,
+                                           false );
+            IO::regularFont->printStringC(
+                IO::formatDate( SAVE::date{ wc.m_year, wc.m_month, wc.m_day } ).c_str( ), 144, 150,
+                false );
+
+#ifdef DESQUID
+            IO::regularFont->printStringC( std::to_string( wc.m_id ).c_str( ), 16, 149, false );
+#endif
+
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            IO::regularFont->printStringC( wc.m_title, 16, 62, false );
+            IO::regularFont->printStringC( GET_STRING( IO::STR_UI_DATE_RECEIVED ), 48, 149, false );
+
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+            // depending on wc type, load icon
+            switch( wc.m_type ) {
+            case SAVE::WCTYPE_ITEM: {
+                u8  idx   = 0;
+                u16 tccnt = 0;
+                for( u8 i = 0; i < 3; ++i ) {
+                    if( !wc.m_data.m_item.m_itemId[ 2 - i ] ) { continue; }
+                    tccnt = IO::loadItemIcon(
+                        wc.m_data.m_item.m_itemId[ 2 - i ], 256 - 24 * ( idx + 1 ) - 20, 18,
+                        SPR_CARD_ICON_OAM + idx, SPR_CARD_ICON_PAL + idx, tccnt, false );
+                    ++idx;
+                }
+                IO::updateOAM( false );
+                break;
+            }
+            case SAVE::WCTYPE_PKMN: {
+                if( wc.m_data.m_pkmn.m_isEgg ) {
+                    IO::loadEggIcon( 256 - 32 - 24 - 14, 14, SPR_CARD_ICON_OAM, SPR_CARD_ICON_PAL,
+                                     0, false, wc.m_data.m_pkmn.m_species == PKMN_MANAPHY );
+                } else {
+                    auto sInfo = pkmnSpriteInfo{ wc.m_data.m_pkmn.m_species,
+                                                 wc.m_data.m_pkmn.m_forme,
+                                                 wc.m_data.m_pkmn.m_female,
+                                                 wc.m_data.m_pkmn.m_shiny == 2,
+                                                 false,
+                                                 DEFAULT_SPRITE_PID };
+                    IO::loadPKMNIcon( sInfo, 256 - 32 - 24 - 14, 14, SPR_CARD_ICON_OAM,
+                                      SPR_CARD_ICON_PAL, 0, false );
+                }
+                IO::updateOAM( false );
+                break;
+            }
+            default: break;
+            }
+        } else {
+            IO::updateOAM( false );
+
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+            IO::regularFont->printStringC(
+                GET_WC_STRING( SAVE::SAV.getActiveFile( ).collectedWC( wc.m_id )
+                               + 2 * wc.m_descriptionId ),
+                16, 36, false );
+        }
+    }
+
+    void wcAlbum( ) {
+        u8   currentCard = 0;
+        bool reverse     = false;
+
+        loop( ) {
+            // TODO: "Details" (flips card)
+            // "Delete card" (deletes card)
+            // "Back"
+            // "left" / "right"
+
+            IO::choiceBox    cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+            std::vector<u16> wcopts;
+            auto             res = cb.getResult(
+                [ & ]( u8 p_slot ) {
+                    currentCard = p_slot;
+                    auto& wc = SAVE::SAV.getActiveFile( ).m_storedWonderCards[ currentCard ];
+
+                    dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+                    wcopts.clear( );
+                    wcopts.push_back( IO::STR_UI_WC_FLIP );
+                    if( SAVE::SAV.getActiveFile( ).collectedWC( wc.m_id ) ) {
+                        wcopts.push_back( IO::STR_UI_WC_TOSS );
+                    }
+                    wcopts.push_back( IO::STR_UI_CANCEL );
+
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                    auto rs = drawChoice( 0, wcopts, false, currentCard > 0,
+                                                      currentCard + 1 < SAVE::MAX_STORED_WC
+                                                          && SAVE::SAV.getActiveFile( )
+                                                                     .m_storedWonderCards[ currentCard + 1 ]
+                                                                     .m_type
+                                                                 != SAVE::WCTYPE_NONE );
+                    displayWonderCard( currentCard, reverse );
+                    return rs;
+                },
+                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, 0,
+                [ & ]( ) {
+                    // ++frame;
+                    // IO::animateBG( frame, IO::bg3 );
+                    // IO::animateBG( frame, IO::bg3sub );
+                    // bgUpdate( );
+                },
+                currentCard );
+
+            if( res == wcopts.size( ) - 1 || res == IO::choiceBox::BACK_CHOICE ) {
+                clearText( );
+                hideSpritesSub( );
+                return;
+            } else if( res == 0 ) {
+                reverse = !reverse;
+            } else if( res == 1 && res == wcopts.size( ) - 2 ) {
+                for( u8 i = currentCard; i + 1 < SAVE::MAX_STORED_WC; ++i ) {
+                    memcpy( &SAVE::SAV.getActiveFile( ).m_storedWonderCards[ i ],
+                            &SAVE::SAV.getActiveFile( ).m_storedWonderCards[ i + 1 ],
+                            sizeof( wonderCard ) );
+                }
+                memset( &SAVE::SAV.getActiveFile( ).m_storedWonderCards[ SAVE::MAX_STORED_WC - 1 ],
+                        0, sizeof( wonderCard ) );
+
+                if( SAVE::SAV.getActiveFile( ).m_storedWonderCards[ 0 ].m_type
+                    == SAVE::WCTYPE_NONE ) {
+                    clearText( );
+                    hideSpritesSub( );
+                    return;
+                }
+            }
+        }
+    }
+
     bool acceptWC( ) {
         if( TMP_WC.m_type == SAVE::WCTYPE_NONE ) { return false; }
 
@@ -321,6 +530,8 @@ namespace SAVE {
         IO::regularFont->printStringC( TMP_WC.m_title, 12, 12, false );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        pkmnSpriteInfo sInfo{ };
 
         // depending on wc type, load icon
         switch( TMP_WC.m_type ) {
@@ -341,14 +552,16 @@ namespace SAVE {
             if( TMP_WC.m_data.m_pkmn.m_isEgg ) {
                 IO::loadEggIcon( 256 - 32 - 6, 24, SPR_CARD_ICON_OAM, SPR_CARD_ICON_PAL, 0, false,
                                  TMP_WC.m_data.m_pkmn.m_species == PKMN_MANAPHY );
-
+                sInfo = pkmnSpriteInfo{ 0,     1 + TMP_WC.m_data.m_pkmn.m_species == PKMN_MANAPHY,
+                                        false, false,
+                                        false, DEFAULT_SPRITE_PID };
             } else {
-                pkmnSpriteInfo sInfo{ TMP_WC.m_data.m_pkmn.m_species,
-                                      TMP_WC.m_data.m_pkmn.m_forme,
-                                      TMP_WC.m_data.m_pkmn.m_female,
-                                      TMP_WC.m_data.m_pkmn.m_shiny == 2,
-                                      false,
-                                      DEFAULT_SPRITE_PID };
+                sInfo = pkmnSpriteInfo{ TMP_WC.m_data.m_pkmn.m_species,
+                                        TMP_WC.m_data.m_pkmn.m_forme,
+                                        TMP_WC.m_data.m_pkmn.m_female,
+                                        TMP_WC.m_data.m_pkmn.m_shiny == 2,
+                                        false,
+                                        DEFAULT_SPRITE_PID };
                 IO::loadPKMNIcon( sInfo, 256 - 32 - 6, 24, SPR_CARD_ICON_OAM, SPR_CARD_ICON_PAL, 0,
                                   false );
             }
@@ -374,11 +587,12 @@ namespace SAVE {
             }
         }
 
-        if( freespace == SAVE::MAX_STORED_WC ) {
-            // player has no space. abort
-            message( GET_STRING( IO::STR_UI_NO_SPACE ) );
+        if( hasWC || SAVE::SAV.getActiveFile( ).collectedWC( TMP_WC.m_id ) ) {
+            // player owns/owned the gift, decline
+            message( GET_STRING( IO::STR_UI_GIFT_ALREADY_COLLECTED ), false );
             IO::waitForInteractS( );
 
+            clearText( );
             hideSpritesSub( );
             for( u8 i = 0; i <= SPR_MBOX_OAM_LENGTH; ++i ) {
                 oam[ SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i ].isHidden = true;
@@ -386,11 +600,13 @@ namespace SAVE {
             IO::updateOAM( false );
             return false;
         }
-        if( hasWC || SAVE::SAV.getActiveFile( ).collectedWC( TMP_WC.m_id ) ) {
-            // player owns/owned the gift, decline
-            message( GET_STRING( IO::STR_UI_GIFT_ALREADY_COLLECTED ), false );
+
+        if( freespace == SAVE::MAX_STORED_WC ) {
+            // player has no space. abort
+            message( GET_STRING( IO::STR_UI_NO_SPACE ), false );
             IO::waitForInteractS( );
 
+            clearText( );
             hideSpritesSub( );
             for( u8 i = 0; i <= SPR_MBOX_OAM_LENGTH; ++i ) {
                 oam[ SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i ].isHidden = true;
@@ -400,7 +616,7 @@ namespace SAVE {
         }
 
         IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
-        if( !cb.getResult(
+        if( cb.getResult(
                 [ & ]( u8 ) {
                     return drawChoice( IO::STR_UI_ACCEPT_GIFT,
                                        { IO::STR_UI_ACCEPT, IO::STR_UI_DECLINE }, false );
@@ -413,6 +629,7 @@ namespace SAVE {
                     // bgUpdate( );
                 } ) ) {
             // player declined the gift
+            clearText( );
             hideSpritesSub( );
             for( u8 i = 0; i <= SPR_MBOX_OAM_LENGTH; ++i ) {
                 oam[ SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i ].isHidden = true;
@@ -423,22 +640,57 @@ namespace SAVE {
         }
 
         IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         message( GET_STRING( IO::STR_UI_GIFT_DOWNLOADING ), false );
         hideSpritesSub( );
         // play obtain animation
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "wc3", 300, 256 * 192 / 2,
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "wc3", 300, 256 * 192,
                              true );
-
+        bgSetScale( IO::bg3sub, 1 << 8, 1 << 8 );
+        bgUpdate( );
         memcpy( &SAVE::SAV.getActiveFile( ).m_storedWonderCards[ freespace ], &TMP_WC,
                 sizeof( wonderCard ) );
+
+        SAVE::SAV.getActiveFile( ).m_storedWonderCards[ freespace ].m_year
+            = SAVE::CURRENT_DATE.m_year;
+        SAVE::SAV.getActiveFile( ).m_storedWonderCards[ freespace ].m_month
+            = SAVE::CURRENT_DATE.m_month;
+        SAVE::SAV.getActiveFile( ).m_storedWonderCards[ freespace ].m_day
+            = SAVE::CURRENT_DATE.m_day;
+        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_UNCOLLECTED_MYSTERY_EVENT, 1 );
+
+        IO::loadPKMNSprite( sInfo, 128 - 48, -30, SPR_PKMN_OAM_SUB, SPR_PKMN_PAL_SUB,
+                            IO::Oam->oamBuffer[ SPR_PKMN_OAM_SUB ].gfxIndex, true );
+
+        for( u8 y = 0; y <= 110; ++y ) {
+            movePkmn( 0, 1 );
+            IO::updateOAM( true );
+            swiWaitForVBlank( );
+        }
+
         // save game
         FS::writeSave( ARGV[ 0 ], []( u16, u16 ) {} );
+        IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
+        message( GET_STRING( IO::STR_UI_GIFT_RECEIVED ), false );
+        IO::waitForInteractS( );
+
+        IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
+        message( GET_STRING( IO::STR_UI_PLEASE_COLLECT_GIFT ), false );
+        IO::waitForInteractS( );
+
+        // display wonder card
+
+        IO::clearScreen( true, true, true );
+
+        bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
+        bgSetScroll( IO::bg3sub, 0, 0 );
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "wcbg", 0, 256 * 256 / 2,
                              true );
-        for( u8 i = 0; i <= SPR_MBOX_OAM_LENGTH; ++i ) {
-            oam[ SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i ].isHidden = true;
-        }
-        IO::updateOAM( false );
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+        hideSpritesSub( );
+
+        displayWonderCard( freespace );
+        IO::waitForInteractS( );
         return true;
     }
 
@@ -558,6 +810,10 @@ namespace SAVE {
                 }
             } else if( res == 1 && res == mainChoices.size( ) - 2 ) {
                 // check wonder cards
+                clearText( );
+                hideSpritesSub( );
+                initTopSprites( false );
+                wcAlbum( );
             }
         }
         FADE_TOP_DARK( );
