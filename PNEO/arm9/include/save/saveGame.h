@@ -242,7 +242,9 @@ namespace SAVE {
             u8          m_numRegisteredFlyPos                        = 0;
             MAP::flyPos m_registeredFlyPos[ MAX_REGISTERED_FLY_POS ] = { };
 
-            u32 m_reserved[ 100 ] = { 0 }; // reserved for future things that need to be stored
+            u32 m_reserved[ 88 ] = { 0 }; // reserved for future things that need to be stored
+
+            u16 m_pokeblockCount[ 24 ] = { 0 };
 
             BAG::bag m_bag;
 
