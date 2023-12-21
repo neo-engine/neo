@@ -66,9 +66,9 @@ namespace IO {
     constexpr u16 BLUE          = RGB( 0, 10, 31 );
     constexpr u16 BLUE2         = RGB( 0, 0, 15 );
     constexpr u16 WHITE         = RGB( 30, 30, 30 );
-    constexpr u16 GRAY          = RGB( 15, 15, 15 );
+    constexpr u16 GRAY          = RGB( 20, 20, 20 );
     constexpr u16 NORMAL_COLOR  = RGB( 27, 27, 27 );
-    constexpr u16 BLACK         = RGB( 0, 0, 0 );
+    constexpr u16 BLACK         = RGB( 2, 2, 4 );
     constexpr u16 BLACK2        = RGB( 5, 5, 5 );
     constexpr u16 YELLOW        = RGB( 30, 30, 12 );
     constexpr u16 YELLOW2       = RGB( 23, 23, 5 );

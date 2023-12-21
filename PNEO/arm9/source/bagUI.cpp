@@ -321,7 +321,34 @@ namespace BAG {
             }
 
             if( p_data->m_itemType & ITEMTYPE_BERRY ) {
-                // TODO: print extra berry data
+                berry data = FS::getBerryData( itemToBerry( p_itemId ) );
+
+                IO::regularFont->setColor( IO::RED_IDX, 1 );
+                if( data.m_firmness ) {
+                    std::string firmness = GET_STRING( 16 + data.m_firmness );
+                    snprintf( buffer, 99, GET_STRING( 16 ), firmness.c_str( ) );
+                    IO::regularFont->printStringC( buffer, 24, 145, false );
+                }
+                IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                snprintf( buffer, 99, GET_STRING( 23 ), data.m_size / 10.0 );
+                IO::regularFont->printStringC( buffer, 140, 145, false );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+
+                u8 poses[ 5 ] = { 18, 66, 124, 150, 194 };
+                u8 mx         = 0;
+                for( u8 i = 0; i < 5; ++i ) mx = std::max( mx, data.m_flavor[ i ] );
+                for( u8 i = 0; i < 5; ++i ) {
+                    if( data.m_flavor[ i ] != mx ) {
+                        IO::regularFont->setColor( IO::GRAY_IDX, 1 );
+                        IO::regularFont->setColor( 0, 2 );
+                    } else {
+                        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                    }
+                    IO::regularFont->printStringC( GET_STRING( 24 + i ), poses[ i ], 160, false );
+                }
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             }
         } else {
             if( p_data->m_effect == 2 ) { // TR
@@ -1162,7 +1189,8 @@ namespace BAG {
             return std::pair( IO::inputTarget( oam[ SPR_ARROW_UP_OAM_SUB ].x + 16,
                                                oam[ SPR_ARROW_UP_OAM_SUB ].y + 16, 16 ),
                               p_button );
-            [[unlikely]] default : break;
+        [[unlikely]] default:
+            break;
         }
 
         return std::pair( IO::inputTarget( 0, 0, 0 ), 0 );
