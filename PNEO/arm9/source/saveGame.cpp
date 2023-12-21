@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <nds.h>
 
+#include "bag/berry.h"
 #include "bag/item.h"
 #include "battle/battleTrainer.h"
 #include "dex/dex.h"
@@ -47,20 +48,6 @@ namespace SAVE {
     saveGame   SAV;
     SAVE::date CURRENT_DATE;
     SAVE::time CURRENT_TIME;
-
-    // Time (in playtime h) for a berry to grow to the next stage.
-    constexpr u8 BERRY_GROWTH_TIME[ 80 ]
-        = { 0,  3,  3,  3,  3,  3,  4,  3,  3,  9,  6,  6,  6,  6,  6,  6,  1,
-            1,  1,  1,  1,  3,  3,  3,  3,  3,  6,  6,  6,  6,  6,  12, 12, 12,
-            12, 12, 7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,
-
-            7,  7,  7,  7,  16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-            16, 20, 20, 20, 20, 20, 20, 20, 20, 24, 24, 24, 24 };
-    constexpr u8 BERRY_YIELD[ 80 ] = {
-        0, 4, 4, 4, 4, 4, 6, 4, 4, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 6, 6, 6, 6,
-        6, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-
-        3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 
     void saveGame::playerInfo::drawTrainersCard( bool p_bottom, bool p_dummy ) {
         IO::initVideo( true );
@@ -541,7 +528,7 @@ namespace SAVE {
     }
 
     u8 saveGame::playerInfo::getBerryYield( u8 p_berrySlot ) const {
-        auto base = BERRY_YIELD[ m_berryTrees[ p_berrySlot ] ];
+        auto base = FS::getBerryData( m_berryTrees[ p_berrySlot ] ).m_yield;
         if( m_berryHealth[ p_berrySlot ] == 255 ) {
             base = 2;
         } else if( m_berryHealth[ p_berrySlot ] > 180 ) {
@@ -565,14 +552,17 @@ namespace SAVE {
         auto bptime = berryTimeSincePlanted( p_berrySlot );
 
         for( u8 i = BAG::BERRY_STAGES; i; --i ) {
-            if( bptime > i * BERRY_GROWTH_TIME[ m_berryTrees[ p_berrySlot ] ] ) { return i; }
+            if( bptime > i * FS::getBerryData( m_berryTrees[ p_berrySlot ] ).m_growthTime ) {
+                return i;
+            }
         }
         return 0;
     }
 
     void saveGame::playerInfo::plantBerry( u8 p_berrySlot, u16 p_berry ) {
         m_berryHealth[ p_berrySlot ]
-            = ( 1 + BAG::BERRY_STAGES ) * BERRY_GROWTH_TIME[ BAG::itemToBerry( p_berry ) ];
+            = ( 1 + BAG::BERRY_STAGES )
+              * FS::getBerryData( BAG::itemToBerry( p_berry ) ).m_growthTime;
         m_berryTrees[ p_berrySlot ] = BAG::itemToBerry( p_berry );
         // m_berryPlantedDate[ p_berrySlot ] = CURRENT_DATE;
         m_berryPlantedTime[ p_berrySlot ] = m_playTime;

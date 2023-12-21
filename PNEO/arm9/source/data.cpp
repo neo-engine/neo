@@ -106,6 +106,7 @@ namespace FS {
     const char LOCDATA_PATH[]        = "nitro:/DATA/location.datab";
     const char MOVE_DATA_PATH[]      = "nitro:/DATA/move.datab";
     const char ITEM_DATA_PATH[]      = "nitro:/DATA/item.datab";
+    const char BERRY_DATA_PATH[]     = "nitro:/DATA/berry.datab";
     const char POKEMON_DATA_PATH[]   = "nitro:/DATA/pkmn.datab";
     const char PKMN_LEARNSET_PATH[]  = "nitro:/DATA/pkmn.learnset.datab";
     const char POKEMON_EVOS_PATH[]   = "nitro:/DATA/pkmn.evolve.datab";
@@ -506,6 +507,20 @@ namespace FS {
         if( !checkOrOpen( bankfile, ITEM_DATA_PATH ) ) { return false; }
         if( std::fseek( bankfile, p_itemId * sizeof( BAG::itemData ), SEEK_SET ) ) { return false; }
         fread( p_out, sizeof( BAG::itemData ), 1, bankfile );
+        return true;
+    }
+
+    BAG::berry getBerryData( const u8 p_berryId ) {
+        BAG::berry res;
+        if( getBerryData( p_berryId, &res ) ) { return res; }
+        getBerryData( 0, &res );
+        return res;
+    }
+    bool getBerryData( const u8 p_berryId, BAG::berry* p_out ) {
+        static FILE* bankfile = nullptr;
+        if( !checkOrOpen( bankfile, BERRY_DATA_PATH ) ) { return false; }
+        if( std::fseek( bankfile, p_berryId * sizeof( BAG::berry ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( BAG::berry ), 1, bankfile );
         return true;
     }
 

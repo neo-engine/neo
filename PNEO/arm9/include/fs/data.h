@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+#include "bag/berry.h"
 #include "bag/item.h"
 #include "battle/battleDefines.h"
 #include "battle/battleTrainer.h"
@@ -233,6 +234,9 @@ namespace FS {
 
     BAG::itemData getItemData( const u16 p_itemId );
     bool          getItemData( const u16 p_itemId, BAG::itemData* p_out );
+
+    BAG::berry getBerryData( const u8 p_berryId );
+    bool       getBerryData( const u8 p_berryId, BAG::berry* p_out );
 
     const char* getRibbonName( const u16 p_ribbonId );
 
