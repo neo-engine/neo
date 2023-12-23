@@ -124,6 +124,7 @@ namespace IO {
     void initVideo( bool p_noFade = false );
     void initVideoSub( bool p_noFade = false );
     void vramSetup( bool p_noFade = false );
+    void initColors( bool p_sub = true, bool p_top = true, bool p_font = true );
 
     void swapScreens( );
     void animateBG( u8 p_frame, int p_bg );
@@ -236,8 +237,6 @@ namespace IO {
     bool waitForKeysUp( inputTarget p_inputTarget );
 
     bool waitForInput( inputTarget p_inputTarget );
-
-    void initTextField( );
 
     void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer = 1 );
 

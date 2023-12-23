@@ -56,8 +56,14 @@ namespace BAG {
         _view = p_view;
         switch( _view ) {
         default:
-        case 0: _ui->initBlockView( ); break;
-        case 1: _ui->initPkmnView( ); break;
+        case 0:
+            _ui->initBlockView( );
+            _ui->selectBlock( _selectedBlock );
+            break;
+        case 1:
+            _ui->initPkmnView( );
+            _ui->selectPkmn( _selectedPkmn, _selectedBlock );
+            break;
         case 2: {
             _playerTeam[ _selectedPkmn ].eatPokeblock( _selectedBlock );
             _pokeblockCount[ _selectedBlock ]--;

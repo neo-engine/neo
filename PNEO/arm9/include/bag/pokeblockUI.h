@@ -44,8 +44,6 @@ namespace BAG {
         pokeblockUI( pokemon* p_playerTeam ) : _playerTeam( p_playerTeam ) {
         }
 
-        u16 drawPkmnIcons( );
-
         /*
          * @brief: Returns positions and types of all buttons currently visible on the
          * screen.

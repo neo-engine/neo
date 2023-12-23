@@ -60,23 +60,11 @@ namespace BAG {
     constexpr u8 SPR_BAG_ICON_SEL_OAM_SUB  = 120;
     constexpr u8 SPR_BAG_ICON_OAM_SUB      = 121;
 
-    constexpr u8 SPR_BOX_PAL_SUB          = 0;
-    constexpr u8 SPR_SELECTED_PAL_SUB     = 1;
-    constexpr u8 SPR_PKMN_PAL_SUB         = 2;
-    constexpr u8 SPR_BAG_ICON_PAL_SUB     = 8;
-    constexpr u8 SPR_BAG_ICON_SEL_PAL_SUB = 9;
-    // constexpr u8 SPR_ITEM_ICON_PAL_SUB    = 10;
-    constexpr u8 SPR_ARROW_X_PAL_SUB  = 11;
-    constexpr u8 SPR_BACK_PAL_SUB     = 12;
-    constexpr u8 SPR_DOWN_PAL_SUB     = 13;
-    constexpr u8 SPR_TRANSFER_PAL_SUB = 15;
-    // constexpr u8 SPR_TYPE_PAL_SUB( u8 p_type ) {
-    //     return 10 + ( p_type )
-    // }
-
-    u16 pokeblockUI::drawPkmnIcons( ) {
-        return 0;
-    }
+    constexpr u8 SPR_SELECTED_PAL_SUB = 0;
+    constexpr u8 SPR_PKMN_PAL_SUB     = 1;
+    constexpr u8 SPR_ARROW_X_PAL_SUB  = 7;
+    constexpr u8 SPR_BACK_PAL_SUB     = 8;
+    constexpr u8 SPR_DOWN_PAL_SUB     = 9;
 
     std::vector<std::pair<IO::inputTarget, u8>> pokeblockUI::getTouchPositions( ) {
         return { };
@@ -94,7 +82,21 @@ namespace BAG {
 
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
-        u16 tileCnt = drawPkmnIcons( );
+        u16 tileCnt = 0;
+
+        for( u8 i = 0; i < MAX_PARTY_PKMN; ++i ) {
+            auto acPkmn = _playerTeam[ i ];
+            if( !acPkmn.getSpecies( ) ) break;
+            if( acPkmn.isEgg( ) ) {
+                tileCnt = IO::loadEggIcon( 10, 23 + i * 26, SPR_PKMN_START_OAM_SUB + i,
+                                           SPR_PKMN_PAL_SUB + i, tileCnt );
+            } else {
+                tileCnt = IO::loadPKMNIcon( acPkmn.getSpriteInfo( ), 9, 25 + i * 26,
+                                            SPR_PKMN_START_OAM_SUB + i, SPR_PKMN_PAL_SUB + i,
+                                            tileCnt, true );
+            }
+            IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + i ].priority = OBJPRIORITY_3;
+        }
 
         tileCnt = IO::loadSprite( "BG/Back", SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB, tileCnt,
                                   SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, false, false,
@@ -106,6 +108,29 @@ namespace BAG {
         tileCnt = IO::loadSprite( "BG/Up", SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
                                   SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, false, false,
                                   false, OBJPRIORITY_3, true );
+
+        // Pkmn selection
+
+        for( u8 i = 1; i < 5; ++i ) {
+            IO::loadSprite( SPR_MSG_PKMN_SEL_OAM_SUB + i, SPR_SELECTED_PAL_SUB, tileCnt,
+                            4 + 24 * ( 5 - i ), 33, 32, 32, 0, 0, 0, false, false, true,
+                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        }
+        tileCnt = IO::loadSprite( "SEL/noselection_blank_32_24", SPR_MSG_PKMN_SEL_OAM_SUB,
+                                  SPR_SELECTED_PAL_SUB, tileCnt, 8, 33, 32, 32, false, false, true,
+                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+
+        IO::updateOAM( true );
+
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PokeblockUpper" );
+        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "PokeblockLower", 512,
+                             49152, true );
+
+        IO::initColors( );
+
+        IO::regularFont->printString( "PokeBlocks", 128, 5, false, IO::font::CENTER );
+
+        bgUpdate( );
     }
 
     void pokeblockUI::initBlockView( ) {

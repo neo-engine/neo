@@ -186,20 +186,29 @@ namespace IO {
         return waitForTouchUp( p_inputTarget );
     }
 
-    void initTextField( ) {
-        regularFont->setColor( 0, 0 );
-        regularFont->setColor( BLACK_IDX, 1 );
-        regularFont->setColor( GRAY_IDX, 2 );
-        boldFont->setColor( 0, 0 );
-        boldFont->setColor( GRAY_IDX, 1 );
-        boldFont->setColor( WHITE_IDX, 2 );
-
-        BG_PALETTE_SUB[ WHITE_IDX ] = WHITE;
-        BG_PALETTE_SUB[ GRAY_IDX ]  = GRAY;
-        BG_PALETTE_SUB[ BLACK_IDX ] = BLACK;
-        BG_PALETTE_SUB[ RED_IDX ]   = RED;
-        BG_PALETTE_SUB[ BLUE_IDX ]  = BLUE;
-        printRectangle( (u8) 0, (u8) 0, (u8) 255, (u8) 63, true, WHITE_IDX );
+    void initColors( bool p_sub, bool p_top, bool p_font ) {
+        if( p_font ) {
+            regularFont->setColor( 0, 0 );
+            regularFont->setColor( IO::BLACK_IDX, 1 );
+            regularFont->setColor( IO::GRAY_IDX, 2 );
+            boldFont->setColor( 0, 0 );
+            boldFont->setColor( IO::GRAY_IDX, 1 );
+            boldFont->setColor( IO::WHITE_IDX, 2 );
+        }
+        if( p_sub ) {
+            BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+            BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+            BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+            BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
+            BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
+        }
+        if( p_top ) {
+            BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
+            BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
+            BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
+            BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
+            BG_PALETTE[ IO::BLUE_IDX ]  = IO::BLUE;
+        }
     }
 
     /*

@@ -88,26 +88,6 @@ namespace BAG {
                         0, 32, 32, false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
     }
 
-    void initColors( ) {
-        IO::regularFont->setColor( 0, 0 );
-        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::boldFont->setColor( 0, 0 );
-        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
-        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-
-        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
-        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
-        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
-        BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
-        BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
-        BG_PALETTE[ IO::WHITE_IDX ]     = IO::WHITE;
-        BG_PALETTE[ IO::GRAY_IDX ]      = IO::GRAY;
-        BG_PALETTE[ IO::BLACK_IDX ]     = IO::BLACK;
-        BG_PALETTE[ IO::RED_IDX ]       = IO::RED;
-        BG_PALETTE[ IO::BLUE_IDX ]      = IO::BLUE;
-    }
-
     void bagUI::init( ) {
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
         IO::initOAMTable( false );
@@ -270,7 +250,7 @@ namespace BAG {
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "BagLower", 512, 49152,
                              true );
 
-        initColors( );
+        IO::initColors( );
         bgUpdate( );
     }
 
@@ -1137,7 +1117,7 @@ namespace BAG {
         showActiveBag( p_page );
 
         drawTop( p_page );
-        initColors( );
+        IO::initColors( );
 
         if( p_selection < p_items.size( ) ) {
             auto& idat = p_items[ p_selection ].second;
