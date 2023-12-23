@@ -196,8 +196,8 @@ namespace BAG {
     u8 bagViewer::chooseMove( const boxPokemon* p_pokemon, u16 p_extraMove ) {
         IO::choiceBox cb  = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
         auto          res = cb.getResult(
-                     [ & ]( u8 ) { return _bagUI->drawMoveChoice( p_pokemon, p_extraMove ); },
-                     [ & ]( u8 p_selection ) { _bagUI->selectMoveChoice( p_selection ); } );
+            [ & ]( u8 ) { return _bagUI->drawMoveChoice( p_pokemon, p_extraMove ); },
+            [ & ]( u8 p_selection ) { _bagUI->selectMoveChoice( p_selection ); } );
         _bagUI->drawBagPage( (bag::bagType) SAVE::SAV.getActiveFile( ).m_lstBag, _view,
                              _currSelectedIdx );
 
@@ -355,13 +355,13 @@ namespace BAG {
             if( ( p_data->m_itemType & 15 ) == ITEMTYPE_MEDICINE ) {
                 IO::choiceBox cb2    = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
                 auto          tgpkmn = cb2.getResult(
-                             [ & ]( u8 ) {
+                    [ & ]( u8 ) {
                         _bagUI->drawPkmnChoice( );
                         auto tmp = _bagUI->getPkmnInputTarget( );
                         tmp.push_back( _bagUI->getButtonInputTarget( IO::choiceBox::BACK_CHOICE ) );
                         return tmp;
-                             },
-                             [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
+                    },
+                    [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
                 _bagUI->undrawPkmnChoice( );
 
                 if( tgpkmn == IO::choiceBox::BACK_CHOICE ) { return false; }
@@ -780,6 +780,7 @@ namespace BAG {
                     _bagUI->printMessage( p_message );
                     waitForInteract( );
                 } );
+
                 if( idata.m_itemType != ITEMTYPE_KEYITEM
                     && idata.m_itemType != ITEMTYPE_FORMECHANGE ) {
                     SAVE::SAV.getActiveFile( ).m_bag.erase(
@@ -793,6 +794,11 @@ namespace BAG {
                     }
                 }
                 initView( );
+
+                if( hasInterface( targetItem ) ) {
+                    // item destroyed screen content, redraw
+                    initUI( );
+                }
             }
             return 0;
         }
@@ -807,13 +813,13 @@ namespace BAG {
 
             IO::choiceBox cb2 = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
             tgpkmn            = cb2.getResult(
-                           [ & ]( u8 ) {
+                [ & ]( u8 ) {
                     _bagUI->drawPkmnChoice( );
                     auto tmp = _bagUI->getPkmnInputTarget( );
                     tmp.push_back( _bagUI->getButtonInputTarget( IO::choiceBox::BACK_CHOICE ) );
                     return tmp;
-                           },
-                           [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
+                },
+                [ & ]( u8 p_selection ) { _bagUI->selectPkmn( p_selection ); } );
             _bagUI->undrawPkmnChoice( );
 
             if( tgpkmn == IO::choiceBox::BACK_CHOICE ) { return 0; }

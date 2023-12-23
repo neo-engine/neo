@@ -125,6 +125,12 @@ struct boxPokemon {
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
 
+    constexpr bool canEatPokeblock( ) const {
+        return m_contestStats[ 5 ] < 255;
+    }
+
+    void eatPokeblock( u8 p_blockType );
+
     inline pkmnSpriteInfo getSpriteInfo( bool p_flipX = false ) {
         return { getSpecies( ), getForme( ), isFemale( ), isShiny( ), p_flipX, getPid( ) };
     }
@@ -402,6 +408,14 @@ struct pokemon {
              const char* p_ot, u8 p_shiny = 0, bool p_hiddenAbility = false,
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
              u8 p_ball = 3, u8 p_pokerus = 0, u8 p_forme = 0 );
+
+    constexpr bool canEatPokeblock( ) const {
+        return m_boxdata.canEatPokeblock( );
+    }
+
+    inline void eatPokeblock( u8 p_blockType ) {
+        m_boxdata.eatPokeblock( p_blockType );
+    }
 
     inline pkmnSpriteInfo getSpriteInfo( bool p_flipX = false ) {
         return { getSpecies( ), getForme( ), isFemale( ), isShiny( ), p_flipX, getPid( ) };

@@ -198,19 +198,29 @@ namespace BAG {
         }
     }
 
-    bool isUsable( const u16 p_itemId );
+    /*
+     * @brief: Returns true if using the specified item opens a new submenu/interface that
+     * destroys screen content.
+     */
+    constexpr bool hasInterface( u16 p_itemId ) {
+        switch( p_itemId ) {
+        default: return false;
+        case I_POKEBLOCK_KIT: return true;
+        }
+    }
+
+    bool isUsable( u16 p_itemId );
 
     /*
      * @brief: Uses a usable item/ key item. Returns false if the item needs to be used in
      * the OW.
      */
-    bool use( const u16 p_itemId, std::function<void( const char* )> p_message,
-              bool p_dryRun = false );
+    bool use( u16 p_itemId, std::function<void( const char* )> p_message, bool p_dryRun = false );
 
     /*
      * @brief: Use specified item on given pokemon. (Item needs to be either medicine,
      * formeChange).
      */
-    bool use( const u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
+    bool use( u16 p_itemId, const itemData& p_data, pokemon& p_pokemon,
               std::function<u8( u8 )> p_callback, bool p_inbattle = false );
 } // namespace BAG

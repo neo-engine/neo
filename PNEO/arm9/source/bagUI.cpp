@@ -125,6 +125,8 @@ namespace BAG {
                                              FS::getItemName( _playerTeam[ i ].getItem( ) ) );
         }
 
+        _lastPkmnItemType = 255;
+
         SpriteEntry* oam = IO::Oam->oamBuffer;
 
         u16 tileCnt = drawPkmnIcons( );

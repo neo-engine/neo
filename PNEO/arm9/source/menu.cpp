@@ -108,9 +108,30 @@ namespace IO {
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::SAV.getActiveFile( ).m_registeredItem ) {
                 if( BAG::isUsable( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                    if( BAG::hasInterface( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                        ANIMATE_MAP = false;
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        bgUpdate( );
+
+                        SOUND::dimVolume( );
+                    }
+
                     BAG::use( SAVE::SAV.getActiveFile( ).m_registeredItem,
                               []( const char* p_msg ) { printMessage( p_msg ); } );
-                    //  updateItems( );
+
+                    if( BAG::hasInterface( SAVE::SAV.getActiveFile( ).m_registeredItem ) ) {
+                        FADE_TOP_DARK( );
+                        FADE_SUB_DARK( );
+                        IO::clearScreen( false );
+                        videoSetMode( MODE_5_2D );
+                        bgUpdate( );
+
+                        MAP::curMap->draw( );
+                        SOUND::restoreVolume( );
+                        init( );
+                        ANIMATE_MAP = true;
+                    }
                 } else {
                     printMessage( GET_STRING( IO::STR_UI_CANNOT_USE_FIELD_ITEM ) );
                 }
@@ -288,6 +309,7 @@ namespace IO {
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_SUPER_ROD, 1 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_GO_GOGGLES, 1 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_DEVON_SCOPE, 1 );
+            SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::KEY_ITEMS, I_POKEBLOCK_KIT, 1 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_RED_SHARD, 999 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_BLUE_SHARD, 999 );
             SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::ITEMS, I_YELLOW_SHARD, 999 );
@@ -451,11 +473,10 @@ namespace IO {
             IO::resetScale( true, false );
             bgUpdate( );
 
+            MAP::curMap->draw( );
             ANIMATE_MAP = true;
             SOUND::restoreVolume( );
-
             init( );
-            MAP::curMap->draw( );
             if( res.m_selectedMove ) {
                 // check if selected move is a move that triggers some map event
                 bool maptg = false;
@@ -510,9 +531,9 @@ namespace IO {
             videoSetMode( MODE_5_2D );
             bgUpdate( );
 
+            MAP::curMap->draw( );
             ANIMATE_MAP = true;
             SOUND::restoreVolume( );
-            MAP::curMap->draw( );
             init( );
             return;
         }

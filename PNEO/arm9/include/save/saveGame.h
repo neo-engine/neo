@@ -33,6 +33,7 @@
 #include <vector>
 #include <nds.h>
 #include "bag/bag.h"
+#include "bag/pokeblock.h"
 #include "box/box.h"
 #include "map/mapObject.h"
 #include "pokemon.h"
@@ -46,6 +47,8 @@ namespace SAVE {
     constexpr u8 MAX_SAVE_FILES = 3;
 #endif
     constexpr u8 MAX_SPECIAL_EPISODES = 0;
+
+    constexpr u8 POKEBLOCK_TYPES = 24;
 
     constexpr u8  NUM_PARTY_SLOTS = 6;
     constexpr u16 NUM_FLAGS       = 256;
@@ -244,7 +247,7 @@ namespace SAVE {
 
             u32 m_reserved[ 88 ] = { 0 }; // reserved for future things that need to be stored
 
-            u16 m_pokeblockCount[ 24 ] = { 0 };
+            u16 m_pokeblockCount[ POKEBLOCK_TYPES ] = { 0 };
 
             BAG::bag m_bag;
 

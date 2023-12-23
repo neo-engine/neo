@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "bag/item.h"
+#include "bag/pokeblockViewer.h"
 #include "battle/move.h"
 #include "gen/moveNames.h"
 #include "gen/pokemonNames.h"
@@ -298,6 +299,15 @@ namespace BAG {
             }
         }
         switch( p_itemId ) {
+        case I_POKEBLOCK_KIT: {
+            if( !p_dryRun ) {
+                // run pokeblock viewer
+                pokeblockViewer pbv( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                     SAVE::SAV.getActiveFile( ).m_pokeblockCount );
+                pbv.run( );
+            }
+            return true;
+        }
         case I_POKE_RADAR: {
             bool tracerUsable
                 = MAP::curMap->tracerUsable( SAVE::SAV.getActiveFile( ).m_player.m_pos );
@@ -463,6 +473,7 @@ namespace BAG {
         switch( p_itemId ) {
         case I_POKE_RADAR:
             return MAP::curMap->tracerUsable( SAVE::SAV.getActiveFile( ).m_player.m_pos );
+        case I_POKEBLOCK_KIT: return SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
         case I_REPEL:
         case I_SUPER_REPEL:
         case I_MAX_REPEL:

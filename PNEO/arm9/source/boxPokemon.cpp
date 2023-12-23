@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
+#include "bag/pokeblock.h"
 #include "battle/battleDefines.h"
 #include "battle/move.h"
 #include "fs/data.h"
@@ -161,6 +162,24 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
     setSpecies( p_pkmnId, &data );
     setForme( p_forme );
+}
+
+void boxPokemon::eatPokeblock( u8 p_type ) {
+    if( m_contestStats[ 5 ] == 255 ) { return; }
+    for( u8 i = 0; i < BAG::NUM_BERRYSTATS; ++i ) {
+        if( m_contestStats[ i ]
+            > 255 - BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i ) ) {
+            m_contestStats[ i ] = 255;
+        } else {
+            m_contestStats[ i ]
+                += BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i );
+        }
+    }
+    if( m_contestStats[ 5 ] > 255 - BAG::pokeblock::smoothness( BAG::pokeblockType{ p_type } ) ) {
+        m_contestStats[ 5 ] = 255;
+    } else {
+        m_contestStats[ 5 ] += BAG::pokeblock::smoothness( BAG::pokeblockType{ p_type } );
+    }
 }
 
 bool boxPokemon::gainExperience( u32 p_amount ) {

@@ -64,22 +64,22 @@ namespace BAG {
         BY_SOUR   = 4,
     };
 
-    constexpr PB_LIGHT_THRESHOLD    = 25;  // level < 25 ~> light block
-    constexpr PB_GOLD_THRESHOLD     = 50;  // level > 50 ~> gold block
-    constexpr PB_ULTIMATE_THRESHOLD = 100; // level > 100 ~> ultimate block
+    constexpr u8 PB_LIGHT_THRESHOLD    = 25;  // level < 25 ~> light block
+    constexpr u8 PB_GOLD_THRESHOLD     = 50;  // level > 50 ~> gold block
+    constexpr u8 PB_ULTIMATE_THRESHOLD = 100; // level > 100 ~> ultimate block
 
-    constexpr PB_DX_THRESHOLD = 25; // smooth < 25 ~> dx block
+    constexpr u8 PB_DX_THRESHOLD = 25; // smooth < 25 ~> dx block
 
-    constexpr PB_BLACK_LEVEL  = 1;
-    constexpr PB_LIGHT_LEVEL  = 25;
-    constexpr PB_NORMAL_LEVEL = 40;
-    constexpr PB_GOLD_LEVEL   = 50;
+    constexpr u8 PB_BLACK_LEVEL  = 1;
+    constexpr u8 PB_LIGHT_LEVEL  = 25;
+    constexpr u8 PB_NORMAL_LEVEL = 40;
+    constexpr u8 PB_GOLD_LEVEL   = 50;
 
-    constexpr PB_DX_SMOOTH       = 10;
-    constexpr PB_NORMAL_SMOOTH   = 20;
-    constexpr PB_GOLD_SMOOTH     = 100;
-    constexpr PB_GOLD_DX_SMOOTH  = 75;
-    constexpr PB_ULTIMATE_SMOOTH = 50;
+    constexpr u8 PB_DX_SMOOTH       = 10;
+    constexpr u8 PB_NORMAL_SMOOTH   = 20;
+    constexpr u8 PB_GOLD_SMOOTH     = 100;
+    constexpr u8 PB_GOLD_DX_SMOOTH  = 75;
+    constexpr u8 PB_ULTIMATE_SMOOTH = 50;
 
     struct pokeblock {
         inline static constexpr pokeblockType fromLevelSmoothness( u8 p_level[ NUM_BERRYSTATS ],
@@ -106,10 +106,10 @@ namespace BAG {
             if( isGold && isDX ) { return PB_GOLD_DX; }
             if( isGold ) { return PB_GOLD; }
 
-            return PB_LIGHT_RED + 4 * mx + isDX + 2 * !isLight;
+            return static_cast<pokeblockType>( PB_LIGHT_RED + 4 * argmx + isDX + 2 * !isLight );
         }
 
-        inline static constexpr flavorStrength( pokeblockType p_type, u8 p_flavor ) {
+        inline static constexpr u8 flavorStrength( pokeblockType p_type, u8 p_flavor ) {
             switch( p_type ) {
             default:
             case PB_BLACK: return PB_BLACK_LEVEL;
@@ -139,7 +139,7 @@ namespace BAG {
             }
         };
 
-        inline static constexpr smoothness( pokeblockType p_type ) {
+        inline static constexpr u8 smoothness( pokeblockType p_type ) {
             switch( p_type ) {
             case PB_GOLD: return PB_GOLD_SMOOTH;
             case PB_GOLD_DX: return PB_GOLD_DX_SMOOTH;
@@ -156,5 +156,6 @@ namespace BAG {
             case PB_GREEN_DX: return PB_DX_SMOOTH;
             default: return PB_NORMAL_SMOOTH;
             }
-        };
-    } // namespace BAG
+        }
+    };
+} // namespace BAG
