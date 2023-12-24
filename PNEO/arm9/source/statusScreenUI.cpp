@@ -25,7 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "sts/statusScreenUI.h"
 #include "battle/ability.h"
 #include "defines.h"
 #include "fs/data.h"
@@ -38,6 +37,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/strings.h"
 #include "io/uio.h"
 #include "sound/sound.h"
+#include "sts/statusScreenUI.h"
 
 #include "NoItem.h"
 
@@ -1377,9 +1377,6 @@ namespace STS {
                 u16 y2
                     = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
 
-                IO::drawLine( x - 1, y + 1, x2 - 1, y2 + 1, false, IO::GRAY_IDX );
-                IO::drawLine( x + 1, y - 1, x2 + 1, y2 - 1, false, IO::GRAY_IDX );
-                IO::drawLine( x + 1, y + 1, x2 + 1, y2 + 1, false, IO::GRAY_IDX );
                 IO::drawLine( x, y, x2, y2, false, IO::BLACK_IDX );
                 IO::drawLine( x, y, COND_CENTER_X + 32, COND_CENTER_Y + 16, false, IO::GRAY_IDX );
 
@@ -1392,6 +1389,41 @@ namespace STS {
                     x2 = 32 + COND_CENTER_X + s2 * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
                     y2 = 16 + COND_CENTER_Y + s2 * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
                     IO::drawLine( x, y, x2, y2, false, 241 );
+                    IO::drawLine( x, y, x2 + 1, y2, false, 241 );
+                    IO::drawLine( x, y, x2, y2 + 1, false, 241 );
+                    IO::drawLine( x, y + 1, x2, y2, false, 241 );
+                    IO::drawLine( x + 1, y, x2, y2, false, 241 );
+                    IO::drawLine( x, y, x2 - 1, y2, false, 241 );
+                    IO::drawLine( x, y, x2, y2 - 1, false, 241 );
+                    IO::drawLine( x, y - 1, x2, y2, false, 241 );
+                    IO::drawLine( x - 1, y, x2, y2, false, 241 );
+
+                    if( s1 + 1 <= st1 ) { s1++; }
+                    if( s2 + 1 <= st2 ) { s2++; }
+                }
+            }
+            for( u8 i = 0; i < 5; ++i ) {
+                IO::loadContestTypeIcon( (BATTLE::contestType) i, oam[ SPR_CTYPE_OAM( i ) ].x,
+                                         oam[ SPR_CTYPE_OAM( i ) ].y, SPR_CTYPE_OAM( i ),
+                                         SPR_CTYPE_PAL( i ), oam[ SPR_CTYPE_OAM( i ) ].gfxIndex,
+                                         false, CURRENT_LANGUAGE );
+                oam[ SPR_CTYPE_OAM( i ) ].isHidden = false;
+
+                u16 x = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+                u16 y = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+                u16 x2
+                    = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                u16 y2
+                    = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+
+                auto st1 = ( p_pokemon->m_boxdata.m_contestStats[ i ] >> 3 ) + 5;
+                auto st2 = ( p_pokemon->m_boxdata.m_contestStats[ ( i + 1 ) % 5 ] >> 3 ) + 5;
+
+                for( auto s1 = 1, s2 = 1; s1 < st1 || s2 < st2; ) {
+                    x  = 32 + COND_CENTER_X + s1 * CONTEST_TYPE_POS_X[ i ] / 100;
+                    y  = 16 + COND_CENTER_Y + s1 * CONTEST_TYPE_POS_Y[ i ] / 100;
+                    x2 = 32 + COND_CENTER_X + s2 * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                    y2 = 16 + COND_CENTER_Y + s2 * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
 
                     if( s1 + 1 <= st1 ) { s1++; }
                     if( s2 + 1 <= st2 ) { s2++; }

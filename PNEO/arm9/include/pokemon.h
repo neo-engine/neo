@@ -125,9 +125,7 @@ struct boxPokemon {
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
 
-    constexpr bool canEatPokeblock( ) const {
-        return m_contestStats[ 5 ] < 255;
-    }
+    bool canEatPokeblock( u8 p_blockType ) const;
 
     void eatPokeblock( u8 p_blockType );
 
@@ -409,8 +407,8 @@ struct pokemon {
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
              u8 p_ball = 3, u8 p_pokerus = 0, u8 p_forme = 0 );
 
-    constexpr bool canEatPokeblock( ) const {
-        return m_boxdata.canEatPokeblock( );
+    bool canEatPokeblock( u8 p_blockType ) const {
+        return m_boxdata.canEatPokeblock( p_blockType );
     }
 
     inline void eatPokeblock( u8 p_blockType ) {

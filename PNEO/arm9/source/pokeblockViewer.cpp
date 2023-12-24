@@ -170,7 +170,7 @@ namespace BAG {
                 if( !_playerTeam[ 0 ].getSpecies( ) ) { continue; }
                 if( _view
                     && ( !_pokeblockCount[ _selectedBlock ]
-                         || !_playerTeam[ _selectedPkmn ].canEatPokeblock( ) ) ) {
+                         || !_playerTeam[ _selectedPkmn ].canEatPokeblock( _selectedBlock ) ) ) {
                     continue;
                 }
                 SOUND::playSoundEffect( SFX_CHOOSE );

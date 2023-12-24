@@ -164,6 +164,19 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     setForme( p_forme );
 }
 
+bool boxPokemon::canEatPokeblock( u8 p_type ) const {
+    if( m_contestStats[ 5 ] == 255 ) { return false; }
+    for( u8 i = 0; i < BAG::NUM_BERRYSTATS; ++i ) {
+        if( m_contestStats[ i ] == 255 ) { continue; }
+        auto str = BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i )
+                   * BAG::pokeblock::strengthModifier( BAG::pokeblockType{ p_type }, getNature( ) )
+                   / 10;
+        if( BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i ) && !str ) { str = 1; }
+        if( str ) { return true; }
+    }
+    return false;
+}
+
 void boxPokemon::eatPokeblock( u8 p_type ) {
     if( m_contestStats[ 5 ] == 255 ) { return; }
     for( u8 i = 0; i < BAG::NUM_BERRYSTATS; ++i ) {

@@ -48,6 +48,7 @@ namespace BAG {
     constexpr u8 SPR_PKMN_START_OAM_SUB    = 105;
     constexpr u8 SPR_MSG_PKMN_SEL_OAM_SUB  = 111;
     constexpr u8 SPR_POKEBLOCK_SEL_OAM_SUB = 127;
+#define SPR_CTYPE_OAM( p_type ) ( 0 + ( p_type ) )
 
     constexpr u8 SPR_POKEBLOCK_PAL_TOP = 0;
 
@@ -58,6 +59,7 @@ namespace BAG {
     constexpr u8 SPR_POKEBLOCK_BLACK_PAL_SUB = 9;
     constexpr u8 SPR_POKEBLOCK_RED_PAL_SUB   = 10;
     constexpr u8 SPR_POKEBLOCK_PAL_SUB       = 11;
+#define SPR_CTYPE_PAL( p_type ) ( 9 + ( p_type ) )
 
     constexpr u8 POKEBLOCK_X      = 136;
     constexpr u8 POKEBLOCK_Y      = 4;
@@ -68,6 +70,15 @@ namespace BAG {
     constexpr u16 RED_PAL[ 16 ]
         = { 0,      0x151f, 0x151f, 0x151f, 0x151f, 0x151f, 0x151f, 0x151f,
             0x151f, 0x151f, 0x151f, 0x151f, 0x151f, 0x151f, 0x151f, 0x151f };
+
+    constexpr s16 CONTEST_TYPE_POS_X[ 5 ] = { 0, 95, 58, -58, -95 };
+    constexpr s16 CONTEST_TYPE_POS_Y[ 5 ] = { -90, -20, 90, 90, -20 };
+
+#define INFO_X        130
+#define INFO_Y        6
+#define COND_CENTER_X ( INFO_X + 32 )
+#define COND_CENTER_Y ( INFO_Y + 54 )
+#define COND_RADIUS   40
 
     std::vector<std::pair<IO::inputTarget, u8>> pokeblockUI::getTouchPositions( ) {
         return { };
@@ -91,6 +102,16 @@ namespace BAG {
 
         // bottom
         u16 tileCnt = 0;
+
+        for( u8 i = 0; i < 5; ++i ) {
+            u16 x = COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+            u16 y = COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+
+            tileCnt = IO::loadContestTypeIcon( (BATTLE::contestType) i, x + 16, y + 8,
+                                               SPR_CTYPE_OAM( i ), SPR_CTYPE_PAL( i ), tileCnt,
+                                               true, CURRENT_LANGUAGE );
+            IO::Oam->oamBuffer[ SPR_CTYPE_OAM( i ) ].isHidden = true;
+        }
 
         for( u8 i = 0; i < MAX_PARTY_PKMN; ++i ) {
             auto acPkmn = _playerTeam[ i ];
@@ -228,13 +249,13 @@ namespace BAG {
         // hide pkmn selection sprite
         for( u8 i = 0; i < 5; ++i ) {
             IO::Oam->oamBuffer[ SPR_MSG_PKMN_SEL_OAM_SUB + i ].isHidden = true;
+            IO::Oam->oamBuffer[ SPR_CTYPE_OAM( i ) ].isHidden           = true;
         }
         IO::updateOAM( true );
         IO::updateOAM( false );
     }
 
     void pokeblockUI::initPkmnView( ) {
-        IO::printRectangle( 141, 0, 255, 192, true, 0 );
         IO::printRectangle( 0, 0, 140, 27, true, 0 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -249,6 +270,16 @@ namespace BAG {
             IO::Oam->oamBuffer[ SPR_POKEBLOCK_BG_OAM_SUB + i ].isHidden      = true;
         }
         IO::Oam->oamBuffer[ SPR_POKEBLOCK_SEL_OAM_SUB ].isHidden = true;
+
+        for( u8 i = 0; i < 5; ++i ) {
+            u16 x = COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+            u16 y = COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+
+            IO::loadContestTypeIcon(
+                (BATTLE::contestType) i, x + 16, y + 8, SPR_CTYPE_OAM( i ), SPR_CTYPE_PAL( i ),
+                IO::Oam->oamBuffer[ SPR_CTYPE_OAM( i ) ].gfxIndex, true, CURRENT_LANGUAGE );
+            IO::Oam->oamBuffer[ SPR_CTYPE_OAM( i ) ].isHidden = true;
+        }
 
         IO::updateOAM( true );
         IO::updateOAM( false );
@@ -350,7 +381,7 @@ namespace BAG {
                     IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45,
                                                    FIRST_LINE, true );
                     IO::regularFont->setColor( 0, 2 );
-                    if( _playerTeam[ i ].m_boxdata.m_contestStats[ 5 ] == 255 ) {
+                    if( !_playerTeam[ i ].canEatPokeblock( p_blockType ) ) {
                         // pkmn is full
                         IO::regularFont->setColor( IO::BLUE_IDX, 1 );
                         IO::regularFont->printStringC( GET_STRING( 796 ), 45, SECOND_LINE, true );
@@ -381,8 +412,13 @@ namespace BAG {
     }
 
     void pokeblockUI::selectPkmn( u8 p_pkmnIdx, u8 p_blockType ) {
-        // highlight selected pkmn
+        char buffer[ 50 ];
+        BG_PALETTE_SUB[ 241 ] = IO::RGB( 12, 30, 12 ); // hp bar green 1
+        BG_PALETTE_SUB[ 242 ] = IO::RGB( 3, 23, 4 );   // hp bar green 2
+        BG_PALETTE_SUB[ 245 ] = IO::RGB( 30, 15, 12 ); // hp bar red 1
+        BG_PALETTE_SUB[ 246 ] = IO::RGB( 20, 7, 7 );   // hp bar red 2
 
+        // highlight selected pkmn
         auto& oam = IO::Oam->oamBuffer;
         if( p_pkmnIdx < MAX_PARTY_PKMN ) {
             for( u8 i = 0; i < 5; ++i ) {
@@ -392,8 +428,168 @@ namespace BAG {
         } else {
             for( u8 i = 0; i < 5; ++i ) { oam[ SPR_MSG_PKMN_SEL_OAM_SUB + i ].isHidden = true; }
         }
-        IO::updateOAM( true );
 
         // update condition preview
+        IO::printRectangle( 141, 0, 255, 192, true, 0 );
+
+        // Contest type icon
+        for( u8 i = 0; i < 5; ++i ) { IO::Oam->oamBuffer[ SPR_CTYPE_OAM( i ) ].isHidden = false; }
+
+        // new stats
+        for( u8 i = 0; i < 5; ++i ) {
+            u16 x  = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+            u16 y  = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+            u16 x2 = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+            u16 y2 = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+
+            IO::drawLine( x, y, x2, y2, true, IO::BLACK_IDX );
+            IO::drawLine( x, y, COND_CENTER_X + 32, COND_CENTER_Y + 16, true, IO::GRAY_IDX );
+        }
+
+        if( _playerTeam[ p_pkmnIdx ].canEatPokeblock( p_blockType ) ) {
+            for( u8 i = 0; i < 5; ++i ) {
+                u16 x = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+                u16 y = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+                u16 x2
+                    = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                u16 y2
+                    = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+                auto str1 = pokeblock::flavorStrength( pokeblockType{ p_blockType }, i )
+                            * pokeblock::strengthModifier( pokeblockType{ p_blockType },
+                                                           _playerTeam[ p_pkmnIdx ].getNature( ) )
+                            / 10;
+                if( !str1 ) { str1 = 1; }
+                auto st1n = std::min( 255, _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ i ]
+                                               + str1 );
+
+                auto str2 = pokeblock::flavorStrength( pokeblockType{ p_blockType }, ( i + 1 ) % 5 )
+                            * pokeblock::strengthModifier( pokeblockType{ p_blockType },
+                                                           _playerTeam[ p_pkmnIdx ].getNature( ) )
+                            / 10;
+                if( !str2 ) { str2 = 1; }
+                auto st2n = std::min(
+                    255,
+                    _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ ( i + 1 ) % 5 ] + str2 );
+
+                auto st1 = ( st1n >> 3 ) + 5;
+                auto st2 = ( st2n >> 3 ) + 5;
+
+                for( auto s1 = 1, s2 = 1; s1 < st1 || s2 < st2; ) {
+                    x  = 32 + COND_CENTER_X + s1 * CONTEST_TYPE_POS_X[ i ] / 100;
+                    y  = 16 + COND_CENTER_Y + s1 * CONTEST_TYPE_POS_Y[ i ] / 100;
+                    x2 = 32 + COND_CENTER_X + s2 * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                    y2 = 16 + COND_CENTER_Y + s2 * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+                    IO::drawLine( x, y, x2, y2, true, 245 );
+                    IO::drawLine( x, y, x2, y2 + 1, true, 245 );
+                    IO::drawLine( x, y, x2 + 1, y2, true, 245 );
+                    IO::drawLine( x, y + 1, x2, y2, true, 245 );
+                    IO::drawLine( x + 1, y, x2, y2, true, 245 );
+
+                    if( s1 + 1 <= st1 ) { s1++; }
+                    if( s2 + 1 <= st2 ) { s2++; }
+                }
+            }
+            for( u8 i = 0; i < 5; ++i ) {
+                u16 x = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+                u16 y = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+                u16 x2
+                    = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                u16 y2
+                    = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+                auto str1 = pokeblock::flavorStrength( pokeblockType{ p_blockType }, i )
+                            * pokeblock::strengthModifier( pokeblockType{ p_blockType },
+                                                           _playerTeam[ p_pkmnIdx ].getNature( ) )
+                            / 10;
+                if( !str1 ) { str1 = 1; }
+                auto st1n = std::min( 255, _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ i ]
+                                               + str1 );
+
+                auto str2 = pokeblock::flavorStrength( pokeblockType{ p_blockType }, ( i + 1 ) % 5 )
+                            * pokeblock::strengthModifier( pokeblockType{ p_blockType },
+                                                           _playerTeam[ p_pkmnIdx ].getNature( ) )
+                            / 10;
+                if( !str2 ) { str2 = 1; }
+                auto st2n = std::min(
+                    255,
+                    _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ ( i + 1 ) % 5 ] + str2 );
+
+                auto st1 = ( st1n >> 3 ) + 5;
+                auto st2 = ( st2n >> 3 ) + 5;
+
+                for( auto s1 = 1, s2 = 1; s1 < st1 || s2 < st2; ) {
+                    x  = 32 + COND_CENTER_X + s1 * CONTEST_TYPE_POS_X[ i ] / 100;
+                    y  = 16 + COND_CENTER_Y + s1 * CONTEST_TYPE_POS_Y[ i ] / 100;
+                    x2 = 32 + COND_CENTER_X + s2 * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                    y2 = 16 + COND_CENTER_Y + s2 * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+                    if( s1 + 1 <= st1 ) { s1++; }
+                    if( s2 + 1 <= st2 ) { s2++; }
+                }
+                IO::drawLine( x, y, x2, y2, true, 246 );
+                IO::drawLine( x + 1, y, x2 + 1, y2, true, 246 );
+                IO::drawLine( x, y + 1, x2, y2 + 1, true, 246 );
+                IO::drawLine( x - 1, y, x2 - 1, y2, true, 246 );
+                IO::drawLine( x, y - 1, x2, y2 - 1, true, 246 );
+            }
+        }
+
+        // old stats
+        for( u8 i = 0; i < 5; ++i ) {
+            u16 x  = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+            u16 y  = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+            u16 x2 = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+            u16 y2 = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+
+            auto st1 = ( _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ i ] >> 3 ) + 5;
+            auto st2
+                = ( _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ ( i + 1 ) % 5 ] >> 3 ) + 5;
+
+            for( auto s1 = 1, s2 = 1; s1 < st1 || s2 < st2; ) {
+                x  = 32 + COND_CENTER_X + s1 * CONTEST_TYPE_POS_X[ i ] / 100;
+                y  = 16 + COND_CENTER_Y + s1 * CONTEST_TYPE_POS_Y[ i ] / 100;
+                x2 = 32 + COND_CENTER_X + s2 * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                y2 = 16 + COND_CENTER_Y + s2 * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+                IO::drawLine( x, y, x2, y2, true, 241 );
+                IO::drawLine( x + 1, y, x2, y2, true, 241 );
+                IO::drawLine( x, y, x2 + 1, y2, true, 241 );
+                IO::drawLine( x, y, x2, y2 + 1, true, 241 );
+                IO::drawLine( x, y + 1, x2, y2, true, 241 );
+
+                if( s1 + 1 <= st1 ) { s1++; }
+                if( s2 + 1 <= st2 ) { s2++; }
+            }
+        }
+        for( u8 i = 0; i < 5; ++i ) {
+            u16 x  = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ i ] / 100;
+            u16 y  = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ i ] / 100;
+            u16 x2 = 32 + COND_CENTER_X + COND_RADIUS * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+            u16 y2 = 16 + COND_CENTER_Y + COND_RADIUS * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+
+            auto st1 = ( _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ i ] >> 3 ) + 5;
+            auto st2
+                = ( _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ ( i + 1 ) % 5 ] >> 3 ) + 5;
+
+            for( auto s1 = 1, s2 = 1; s1 < st1 || s2 < st2; ) {
+                x  = 32 + COND_CENTER_X + s1 * CONTEST_TYPE_POS_X[ i ] / 100;
+                y  = 16 + COND_CENTER_Y + s1 * CONTEST_TYPE_POS_Y[ i ] / 100;
+                x2 = 32 + COND_CENTER_X + s2 * CONTEST_TYPE_POS_X[ ( i + 1 ) % 5 ] / 100;
+                y2 = 16 + COND_CENTER_Y + s2 * CONTEST_TYPE_POS_Y[ ( i + 1 ) % 5 ] / 100;
+
+                if( s1 + 1 <= st1 ) { s1++; }
+                if( s2 + 1 <= st2 ) { s2++; }
+            }
+            IO::drawLine( x, y, x2, y2, true, 242 );
+            IO::drawLine( x + 1, y, x2 + 1, y2, true, 242 );
+            IO::drawLine( x, y + 1, x2, y2 + 1, true, 242 );
+            IO::drawLine( x - 1, y, x2 - 1, y2, true, 242 );
+            IO::drawLine( x, y - 1, x2, y2 - 1, true, 242 );
+        }
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        snprintf( buffer, 49, GET_STRING( IO::STR_UI_STS_SHEEN ),
+                  _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ 5 ] );
+        IO::regularFont->printStringC( buffer, INFO_X - 7 + 128, INFO_Y + 20 + 15 * 7, true,
+                                       IO::font::RIGHT );
+        IO::updateOAM( true );
     }
 } // namespace BAG
