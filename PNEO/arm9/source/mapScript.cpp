@@ -946,6 +946,10 @@ namespace MAP {
                     mysteryGiftClerk( );
                     break;
                 }
+                case CLL_POKEBLOCK_BLENDER: {
+                    pokeblockBlender( par2 );
+                    break;
+                }
                 default: break;
                 }
                 break;

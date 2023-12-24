@@ -316,8 +316,8 @@ namespace BAG {
                 IO::regularFont->printStringC( buffer, 140, 145, false );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
-                u8 poses[ 5 ] = { 18, 66, 124, 150, 194 };
-                u8 mx         = 0;
+                u8 poses[ 2 ][ 5 ] = { { 18, 66, 104, 150, 194 }, { 18, 66, 124, 150, 194 } };
+                u8 mx              = 0;
                 for( u8 i = 0; i < 5; ++i ) mx = std::max( mx, data.m_flavor[ i ] );
                 for( u8 i = 0; i < 5; ++i ) {
                     if( data.m_flavor[ i ] != mx ) {
@@ -327,7 +327,8 @@ namespace BAG {
                         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                     }
-                    IO::regularFont->printStringC( GET_STRING( 24 + i ), poses[ i ], 160, false );
+                    IO::regularFont->printStringC( GET_STRING( 24 + i ),
+                                                   poses[ CURRENT_LANGUAGE ][ i ], 160, false );
                 }
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );

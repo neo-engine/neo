@@ -95,13 +95,15 @@ namespace BAG {
             u8 mx = 0, argmx = NUM_BERRYSTATS, tie = 0;
             for( u8 i = 0; i < NUM_BERRYSTATS; ++i ) {
                 if( p_level[ i ] > mx ) {
-                    tie   = 0;
+                    tie   = 1;
                     mx    = p_level[ i ];
                     argmx = i;
                 } else if( p_level[ i ] == mx ) {
                     tie++;
                 }
             }
+
+            if( argmx == NUM_BERRYSTATS ) { return PB_BLACK; }
 
             bool isLight    = mx < PB_LIGHT_THRESHOLD;
             bool isGold     = tie > 1 && mx > PB_GOLD_THRESHOLD;

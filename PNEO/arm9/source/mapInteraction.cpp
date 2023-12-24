@@ -242,7 +242,7 @@ namespace MAP {
         u8 behave = at( tx, ty ).m_bottombehave;
 
         switch( behave ) {
-        case 0x83: { // PC
+        case BEH_INTERACT_PC: { // PC
             SOUND::playSoundEffect( SFX_PC_OPEN );
             atom( tx, ty ).m_blockidx = 0x5;
             loadBlock( at( tx, ty ), ( _lastcol + NUM_COLS / 2 ) % NUM_COLS,
@@ -281,43 +281,47 @@ namespace MAP {
 
             return;
         }
-        case 0x85: { // Map
+        case BEH_INTERACT_MAP: { // Map
             // TODO
             printMapMessage( GET_STRING( 560 ), MSG_NORMAL );
             return;
         }
-        case 0x86: { // TV
+        case BEH_INTERACT_TV: { // TV
             printMapMessage( GET_MAP_STRING( 26 ), MSG_NORMAL );
             return;
         }
 
-        case 0xe0: { // picture books
+        case BEH_INTERACT_S133: { // picture books
             printMapMessage( GET_MAP_STRING( 133 ), MSG_NORMAL );
             break;
         }
-        case 0xe1: { // picture books
+        case BEH_INTERACT_S134: { // picture books
             printMapMessage( GET_MAP_STRING( 134 ), MSG_NORMAL );
             break;
         }
-        case 0xe2: { // PokeCenter magazines
+        case BEH_INTERACT_S30: { // PokeCenter magazines
             printMapMessage( GET_MAP_STRING( 30 ), MSG_NORMAL );
             break;
         }
-        case 0xe4: { // trash bin is empty
+        case BEH_INTERACT_S710: { // Slateport empty vase
+            printMapMessage( GET_MAP_STRING( 710 ), MSG_NORMAL );
+            break;
+        }
+        case BEH_INTERACT_TRASH: { // trash bin is empty
             if( !currentData( ).hasEvent( EVENT_ITEM, px, py, pz ) ) {
                 printMapMessage( GET_MAP_STRING( 404 ), MSG_NORMAL );
             }
             break;
         }
-        case 0xe5: { // Pokemart shelves
+        case BEH_INTERACT_S127: { // Pokemart shelves
             printMapMessage( GET_MAP_STRING( 127 ), MSG_NORMAL );
             break;
         }
-        case 0xe6: { // blue prints
+        case BEH_INTERACT_S396: { // blue prints
             printMapMessage( GET_MAP_STRING( 396 ), MSG_NORMAL );
             break;
         }
-        case 0x80: { // load script one block behind
+        case BEH_INTERACT_BEHIND: { // load script one block behind
             handleEvents( tx, ty, pz, d );
             return;
         }

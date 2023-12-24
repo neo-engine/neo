@@ -43,10 +43,10 @@ namespace MAP {
     class mapDrawer {
       public:
         enum tileBehavior : u8 {
-            BEH_NONE = 0x00,
-
-            BEH_GRASS      = 0x02,
-            BEH_LONG_GRASS = 0x03,
+            BEH_NONE              = 0x00,
+            BEH_SECRETBASE_UNUSED = 0x01,
+            BEH_GRASS             = 0x02,
+            BEH_LONG_GRASS        = 0x03,
 
             BEH_SAND_WITH_ENCOUNTER_AND_FISH = 0x06,
             BEH_SHORT_GRASS                  = 0x07, // TODO: animation
@@ -56,18 +56,18 @@ namespace MAP {
             BEH_INDOOR_WITH_ENCOUNTER        = 0x0B,
             BEH_MOSSDEEP_GYM_WARP            = 0x0E,
 
-            BEH_REFLECTION      = 0x10,
-            BEH_DIVE            = 0x11,
-            BEH_ROCK_CLIMB      = 0x12,
-            BEH_WATERFALL       = 0x13,
-            BEH_DIVE_REFLECTION = 0x14,
+            BEH_ABANDONED_SHIP_FALLTHROUGH_UNUSED = 0x0F,
 
+            BEH_REFLECTION               = 0x10,
+            BEH_DIVE                     = 0x11,
+            BEH_ROCK_CLIMB               = 0x12,
+            BEH_WATERFALL                = 0x13,
+            BEH_DIVE_REFLECTION          = 0x14,
+            BEH_JUMP_SPLASH_WATER_UNUSED = 0x15,
             BEH_REFLECTION_FOLLOW_CIRCLE = 0x16,
             BEH_SHALLOW_WATER            = 0x17,
-
-            BEH_NO_DIRECT_FIELD_MOVE = 0x18,
-
-            BEH_UNDERWATER_NO_RESURFACE = 0x19,
+            BEH_NO_DIRECT_FIELD_MOVE     = 0x18,
+            BEH_UNDERWATER_NO_RESURFACE  = 0x19,
 
             BEH_SLIDE_ON_ICE     = 0x20,
             BEH_SAND_FOOTPRINTS  = 0x21,
@@ -78,7 +78,7 @@ namespace MAP {
             BEH_THIN_ICE                      = 0x26, // TODO
             BEH_CRACKED_ICE                   = 0x27, // TODO
             BEH_HOT_SPRING_WATER              = 0x28,
-            BEH_WARP_TELEPORT                 = 0x29,
+            BEH_WARP_TELEPORT                 = 0x29, // lavaridge gym warp
             BEH_GRASS_UNDERWATER_NO_RESURFACE = 0x2A,
             BEH_REFLECTION_UNDER_BRIDGE       = 0x2B, // TODO / unused
 
@@ -121,6 +121,8 @@ namespace MAP {
             BEH_WARP_ON_WALK_DOWN  = 0x65,
             BEH_FALL_THROUGH       = 0x66, // fall through ground
 
+            BEH_ABANDONED_SHIP_TELEPORT_WARP_UNUSED = 0x67,
+
             BEH_WARP_NO_SPECIAL_2 = 0x68,
             BEH_DOOR              = 0x69,
 
@@ -130,11 +132,34 @@ namespace MAP {
             BEH_WARP_ON_WALK_DOWN_DIVE = 0x6D,
             BEH_WARP_THEN_WALK_UP      = 0x6E,
 
+            BEH_ALLOW_10_to_3C_WITHOUT_0_UNUSED = 0x72,  // originally used for wooden
+                                                         // bridges
+            BEH_ALLOW_10_to_3C_WITHOUT_0_UNUSED2 = 0x73, // originally used for wooden
+                                                         // bridges
+
             BEH_PACIFIDLOG_LOG_VERTICAL_TOP     = 0x74,
             BEH_PACIFIDLOG_LOG_VERTICAL_BOTTOM  = 0x75,
             BEH_PACIFIDLOG_LOG_HORIZONTAL_LEFT  = 0x76,
             BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT = 0x77,
             BEH_FORTREE_BRIDGE_BIKE_BELOW       = 0x78,
+
+            BEH_INTERACT_BEHIND = 0x80,
+            BEH_INTERACT_PC     = 0x83,
+            BEH_INTERACT_MAP    = 0x85,
+            BEH_INTERACT_TV     = 0x86,
+
+            BEH_POKEBLOCK_FEEDER_UNUSED                = 0x87,
+            BEH_SLOT_MACHINE_UNUSED                    = 0x89,
+            BEH_ROULETTE_UNUSED                        = 0x8A,
+            BEH_DOOR_CLOSED_MESSAGE_SOOTOPOLIS_UNUSED  = 0x8B, // "The door is closed."
+            BEH_DOOR_CLOSED_MESSAGE_SECRET_CODE_UNUSED = 0x8C, // "The door is locked.
+                                                               // ...On closer inspection,
+                                                               // this is written on it:
+                                                               // "Write the secret code
+                                                               // here.""
+
+            BEH_EXIT_OUT_OF_CAVE_WARP_UNUSED = 0x8D,
+            BEH_QUESTIONNAIRE_UNUSED         = 0x8F,
 
             BEH_WALK_ONLY = 0xA0,
 
@@ -150,6 +175,18 @@ namespace MAP {
             BEH_BIKE_BRIDGE_VERTICAL_NO_JUMP   = 0xD5,
             BEH_BIKE_BRIDGE_HORIZONTAL_NO_JUMP = 0xD6,
             BEH_OBSTACLE                       = 0xD7,
+
+            BEH_INTERACT_S133                 = 0xE0,
+            BEH_INTERACT_S134                 = 0xE1,
+            BEH_INTERACT_S30                  = 0xE2,
+            BEH_INTERACT_S710                 = 0xE3,
+            BEH_INTERACT_TRASH                = 0xE4,
+            BEH_INTERACT_S127                 = 0xE5,
+            BEH_INTERACT_S396                 = 0xE6,
+            BEH_BATTLE_RESULTS_UNUSED         = 0xE7,
+            BEH_UNDERGOING_ADJUSTMENTS_UNUSED = 0xE8,
+            BEH_BIKEROAD_TIME_UNUSED          = 0xE9,
+            BEH_DOOR_LOCKED_UNUSED            = 0xEA,
         };
         enum moveDataType : u8 {
             MVD_ANY    = 0x00,
@@ -512,11 +549,13 @@ namespace MAP {
 
         void mysteryGiftClerk( );
 
+        void pokeblockBlender( u8 p_numNPC );
+
         /*
          * @returns: 0 on success, 1 on cancel, 2 when wrong pkmn offered.
          */
         u8 ingameTrade( u8 p_tradeIdx, u16 p_targetPkmn, u8 p_targetForme, u16 p_offeredPkmn,
-                          u8 p_offeredForme );
+                        u8 p_offeredForme );
 
         /*
          * @brief: Runs a battle factory challenge, starting at the player standing in the

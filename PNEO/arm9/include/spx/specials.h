@@ -45,9 +45,9 @@ namespace SPX {
     void runSlotMachine( );
 
     /*
-     * @brief: Runs the pokeblock blender mini game. (TODO)
+     * @brief: Runs the pokeblock blender mini game.
      */
-    void runPokeBlockMaker( );
+    void runPokeblockBlender( u8 p_numNPC, bool p_rotom = false, bool p_blendMaster = false );
 
     /*
      * @brief: Shows the players Id and badges.
