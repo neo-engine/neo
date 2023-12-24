@@ -139,6 +139,14 @@ namespace BAG {
             }
         };
 
+        inline static constexpr u8 flavorStrength( pokeblockType p_type ) {
+            u8 mx = 0;
+            for( u8 i = 0; i < NUM_BERRYSTATS; ++i ) {
+                mx = std::max( flavorStrength( p_type, i ), mx );
+            }
+            return mx;
+        }
+
         inline static constexpr u8 smoothness( pokeblockType p_type ) {
             switch( p_type ) {
             case PB_GOLD: return PB_GOLD_SMOOTH;

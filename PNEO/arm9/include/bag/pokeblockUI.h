@@ -34,8 +34,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/yesNoBox.h"
 
 namespace BAG {
-    constexpr u8 BLOCKS_PER_PAGE = 12;
-    constexpr u8 BLOCKS_PER_ROW  = 3;
+    constexpr u8 BLOCKS_PER_PAGE = 24;
+    constexpr u8 BLOCKS_PER_ROW  = 4;
     class pokeblockUI {
       private:
         pokemon* _playerTeam;
@@ -52,13 +52,13 @@ namespace BAG {
 
         void init( );
 
-        void initBlockView( );
+        void initBlockView( u16* p_pokeblockCount );
 
         void initPkmnView( );
 
         void animateFeedBlockToPkmn( u8 p_pkmnIdx, u8 p_blockType );
 
-        void selectBlock( u8 p_blockType );
+        void selectBlock( u8 p_blockType, u16 p_blockOwned );
 
         void selectPkmn( u8 p_pkmnIdx, u8 p_blockType );
     };

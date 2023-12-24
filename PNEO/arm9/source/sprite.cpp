@@ -52,6 +52,9 @@ namespace IO {
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/item.icon.rawb";
     FILE*       ITEM_ICON_FILE = nullptr;
 
+    const char* POKEBLOCK_PATH      = "nitro:/PICS/SPRITES/pokeblock.icon.rawb";
+    FILE*       POKEBLOCK_ICON_FILE = nullptr;
+
     const char* TM_PATH      = "nitro:/PICS/SPRITES/tmhm.icon.rawb";
     FILE*       TM_ICON_FILE = nullptr;
 
@@ -192,11 +195,10 @@ namespace IO {
                               p_spriteDataLen );
     }
 
-    u16 setSpriteData( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileCnt, const s16 p_posX,
-                       const s16 p_posY, const u8 p_width, const u8 p_height,
-                       const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
-                       ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode,
-                       ObjColMode p_colorMode ) {
+    u16 setSpriteData( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileCnt, s16 p_posX,
+                       s16 p_posY, const u8 p_width, const u8 p_height, const u32 p_spriteDataLen,
+                       bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority,
+                       bool p_bottom, ObjBlendMode p_blendMode, ObjColMode p_colorMode ) {
         IO::SpriteInfo* sInfo = ( p_bottom ? spriteInfo : spriteInfoTop ) + p_oamIdx;
         OAMTable*       oam   = ( p_bottom ? Oam : OamTop );
 
@@ -236,8 +238,8 @@ namespace IO {
         return p_tileCnt + ( p_spriteDataLen / BYTES_PER_16_COLOR_TILE );
     }
 
-    u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileCnt, const s16 p_posX,
-                    const s16 p_posY, const u8 p_width, const u8 p_height,
+    u16 loadSprite( const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileCnt, s16 p_posX,
+                    s16 p_posY, const u8 p_width, const u8 p_height,
                     const unsigned short* p_spritePal, const unsigned int* p_spriteData,
                     const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                     ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode ) {
@@ -249,7 +251,7 @@ namespace IO {
         return res;
     }
 
-    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileCnt, const s16 p_posX, const s16 p_posY,
+    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX, s16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spriteData,
                      const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom, u8 p_transparency ) {
@@ -266,9 +268,9 @@ namespace IO {
     }
 
     u16 loadSprite( const char* p_name, const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileCnt,
-                    const s16 p_posX, const s16 p_posY, const u8 p_width, const u8 p_height,
-                    bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority,
-                    bool p_bottom, ObjBlendMode p_blendMode ) {
+                    s16 p_posX, s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX,
+                    bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
+                    ObjBlendMode p_blendMode ) {
         if( FS::readData( ICON_PATH, p_name, (unsigned int) p_width * p_height / 8, TEMP,
                           (unsigned short) 16, TEMP_PAL ) ) {
             return loadSprite( p_oamIdx, p_palIdx, p_tileCnt, p_posX, p_posY, p_width, p_height,
@@ -279,7 +281,7 @@ namespace IO {
     }
 
     u16 BITMAP_SPRITE[ 64 * 64 * 2 ] = { 0 };
-    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileCnt, const s16 p_posX, const s16 p_posY,
+    u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX, s16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
                      const unsigned int* p_spriteData, const u32 p_spriteDataLen, bool p_flipX,
                      bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
@@ -343,10 +345,10 @@ namespace IO {
                             p_flipX, p_flipY, p_hidden, p_priority, p_bottom, p_transparency );
     }
 
-    u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileCnt, const s16 p_posX,
-                     const s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX,
-                     bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
-                     bool p_outline, u16 p_outlineColor, bool p_tiled, u8 p_transparency ) {
+    u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX,
+                     s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX, bool p_flipY,
+                     bool p_hidden, ObjPriority p_priority, bool p_bottom, bool p_outline,
+                     u16 p_outlineColor, bool p_tiled, u8 p_transparency ) {
         if( FS::readData( ICON_PATH, p_name, (unsigned int) p_width * p_height / 8, TEMP,
                           (unsigned short) 16, TEMP_PAL ) ) {
             return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_width, p_height, TEMP_PAL,
@@ -545,7 +547,7 @@ namespace IO {
         return true;
     }
 
-    u16 loadPKMNSprite( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+    u16 loadPKMNSprite( s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
                         bool p_bottom, bool p_flipx ) {
         loadSprite( p_oamIdx++, p_palCnt, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY, 64, 64,
                     TEMP_PAL, TEMP, 96 * 96 / 2, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
@@ -559,8 +561,8 @@ namespace IO {
         return p_tileCnt + 144;
     }
 
-    u16 loadPKMNSpriteB( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
-                         bool p_bottom, bool p_flipx ) {
+    u16 loadPKMNSpriteB( s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
+                         bool p_flipx ) {
         loadSpriteB( p_oamIdx++, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY, 64, 64,
                      TEMP_PAL, TEMP, 64 * 64 / 2, false, p_flipx, false, OBJPRIORITY_1, p_bottom );
         loadSpriteB( p_oamIdx++, p_tileCnt + 64, p_flipx ? p_posX : 64 + p_posX, p_posY, 32, 64,
@@ -586,7 +588,7 @@ namespace IO {
     }
 
     u16 loadPKMNSprite( FILE* p_files[ 4 ], const char* p_path, const pkmnSpriteInfo& p_pkmn,
-                        const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+                        s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
                         bool p_bottom, bool p_blackOverlay ) {
         bool           fx = false;
         pkmnSpriteInfo pi = p_pkmn;
@@ -598,8 +600,8 @@ namespace IO {
     }
 
     u16 loadPKMNSpriteB( FILE* p_files[ 4 ], const char* p_path, const pkmnSpriteInfo& p_pkmn,
-                         const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
-                         bool p_bottom, bool p_blackOverlay ) {
+                         s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
+                         bool p_blackOverlay ) {
         bool           fx = false;
         pkmnSpriteInfo pi = p_pkmn;
         updateFlipX( pi, fx );
@@ -609,9 +611,8 @@ namespace IO {
         return 0;
     }
 
-    u16 loadPKMNSprite( const pkmnSpriteInfo& p_pkmn, const s16 p_posX, const s16 p_posY,
-                        u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
-                        bool p_blackOverlay ) {
+    u16 loadPKMNSprite( const pkmnSpriteInfo& p_pkmn, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                        u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_blackOverlay ) {
         u16 res = 0;
         if( ( res = loadPKMNSprite( PKMN_SPRITE_FRNT_FILES, PKMN_PATH, p_pkmn, p_posX, p_posY,
                                     p_oamIdx, p_palCnt, p_tileCnt, p_bottom, p_blackOverlay ) ) ) {
@@ -624,8 +625,8 @@ namespace IO {
                                p_palCnt, p_tileCnt, p_bottom, p_blackOverlay );
     }
 
-    u16 loadPKMNSpriteB( const pkmnSpriteInfo& p_pkmn, const s16 p_posX, const s16 p_posY,
-                         u8 p_oamIdx, u16 p_tileCnt, bool p_bottom, bool p_blackOverlay ) {
+    u16 loadPKMNSpriteB( const pkmnSpriteInfo& p_pkmn, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                         u16 p_tileCnt, bool p_bottom, bool p_blackOverlay ) {
         u16 res = 0;
         if( ( res = loadPKMNSpriteB( PKMN_SPRITE_FRNT_FILES, PKMN_PATH, p_pkmn, p_posX, p_posY,
                                      p_oamIdx, p_tileCnt, p_bottom, p_blackOverlay ) ) ) {
@@ -638,9 +639,8 @@ namespace IO {
                                 p_tileCnt, p_bottom, p_blackOverlay );
     }
 
-    u16 loadPKMNSpriteBack( const pkmnSpriteInfo& p_pkmn, const s16 p_posX, const s16 p_posY,
-                            u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
-                            bool p_blackOverlay ) {
+    u16 loadPKMNSpriteBack( const pkmnSpriteInfo& p_pkmn, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                            u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_blackOverlay ) {
         u16 res = 0;
         if( ( res = loadPKMNSprite( PKMN_SPRITE_BACK_FILES, PKMN_BACK_PATH, p_pkmn, p_posX, p_posY,
                                     p_oamIdx, p_palCnt, p_tileCnt, p_bottom, p_blackOverlay ) ) ) {
@@ -653,14 +653,14 @@ namespace IO {
                                p_palCnt, p_tileCnt, p_bottom, p_blackOverlay );
     }
 
-    u16 loadEggSprite( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+    u16 loadEggSprite( s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
                        bool p_bottom, bool p_manaphy ) {
         pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false, DEFAULT_SPRITE_PID };
         return loadPKMNSprite( pinfo, p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt, p_bottom );
     }
 
     u16 loadPKMNIcon( FILE* p_files[ 4 ], const char* p_path, const pkmnSpriteInfo& p_pkmn,
-                      const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+                      s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
                       bool p_bottom, bool p_blackOverlay ) {
         bool           fx = false;
         pkmnSpriteInfo pi = p_pkmn;
@@ -674,8 +674,8 @@ namespace IO {
     }
 
     u16 loadPKMNIconB( FILE* p_files[ 4 ], const char* p_path, const pkmnSpriteInfo& p_pkmn,
-                       const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
-                       bool p_bottom, bool p_outline, u16 p_outlineColor, bool p_blackOverlay ) {
+                       s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
+                       bool p_outline, u16 p_outlineColor, bool p_blackOverlay ) {
         bool           fx = false;
         pkmnSpriteInfo pi = p_pkmn;
         updateFlipX( pi, fx );
@@ -687,7 +687,7 @@ namespace IO {
         return 0;
     }
 
-    u16 loadPKMNIcon( const pkmnSpriteInfo& p_pkmn, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
+    u16 loadPKMNIcon( const pkmnSpriteInfo& p_pkmn, s16 p_posX, s16 p_posY, u8 p_oamIdx,
                       u8 p_palCnt, u16 p_tileCnt, bool p_bottom, bool p_blackOverlay ) {
         u16 res = 0;
         if( ( res = loadPKMNIcon( PKMN_SPRITE_ICON_FILES, PKMN_ICON_PATH, p_pkmn, p_posX, p_posY,
@@ -701,9 +701,9 @@ namespace IO {
                              p_palCnt, p_tileCnt, p_bottom, p_blackOverlay );
     }
 
-    u16 loadPKMNIconB( const pkmnSpriteInfo& p_pkmn, const s16 p_posX, const s16 p_posY,
-                       u8 p_oamIdx, u16 p_tileCnt, bool p_bottom, bool p_outline,
-                       u16 p_outlineColor, bool p_blackOverlay ) {
+    u16 loadPKMNIconB( const pkmnSpriteInfo& p_pkmn, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                       u16 p_tileCnt, bool p_bottom, bool p_outline, u16 p_outlineColor,
+                       bool p_blackOverlay ) {
         u16 res = 0;
         if( ( res = loadPKMNIconB( PKMN_SPRITE_ICON_FILES, PKMN_ICON_PATH, p_pkmn, p_posX, p_posY,
                                    p_oamIdx, p_tileCnt, p_bottom, p_outline, p_outlineColor,
@@ -717,21 +717,21 @@ namespace IO {
                               p_tileCnt, p_bottom, p_outline, p_outlineColor, p_blackOverlay );
     }
 
-    u16 loadEggIcon( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
-                     bool p_bottom, bool p_manaphy ) {
+    u16 loadEggIcon( s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom,
+                     bool p_manaphy ) {
         pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false, DEFAULT_SPRITE_PID };
         return loadPKMNIcon( pinfo, p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt, p_bottom );
     }
 
-    u16 loadEggIconB( const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
+    u16 loadEggIconB( s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
                       bool p_manaphy, bool p_outline, u16 p_outlineColor ) {
         pkmnSpriteInfo pinfo = { 0, u8( 1 + p_manaphy ), false, false, false, DEFAULT_SPRITE_PID };
         return loadPKMNIconB( pinfo, p_posX, p_posY, p_oamIdx, p_tileCnt, p_bottom, p_outline,
                               p_outlineColor );
     }
 
-    u16 loadTrainerSprite( u8 p_trainerId, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                           u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadTrainerSprite( u8 p_trainerId, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+                           u16 p_tileCnt, bool p_bottom ) {
         FILE* f = FS::openSplit( "nitro:/PICS/SPRITES/TRAINER/", p_trainerId, ".raw", 255 );
         if( !f ) {
             return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
@@ -746,8 +746,8 @@ namespace IO {
                            64 * 64 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadAnimatedSprite( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                            u8 p_palCnt, u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
+    u16 loadAnimatedSprite( FILE* p_file, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+                            u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
         FS::read( p_file, TEMP_PAL, sizeof( u16 ), 16 );
         u8 frameCount, width, height;
         FS::read( p_file, &frameCount, sizeof( u8 ), 1 );
@@ -760,8 +760,8 @@ namespace IO {
                            TEMP, width * height * frameCount / 2, false, false, false, p_priority,
                            p_bottom );
     }
-    u16 loadAnimatedSpriteB( FILE* p_file, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                             u16 p_tileCnt, ObjPriority p_priority, bool p_bottom, bool p_outline,
+    u16 loadAnimatedSpriteB( FILE* p_file, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+                             ObjPriority p_priority, bool p_bottom, bool p_outline,
                              u16 p_outlineColor, bool p_blackOverlay ) {
         FS::read( p_file, TEMP_PAL, sizeof( u16 ), 16 );
         u8 frameCount, width, height;
@@ -778,15 +778,15 @@ namespace IO {
                             p_bottom, p_outline, p_outlineColor );
     }
 
-    u16 loadOWSprite( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                      u8 p_palCnt, u16 p_tileCnt ) {
+    u16 loadOWSprite( const u16 p_picnum, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+                      u16 p_tileCnt ) {
         FILE* f = FS::open( OW_PATH, p_picnum, ".rsd" );
         return loadAnimatedSprite( f, p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt, OBJPRIORITY_2,
                                    false );
     }
 
-    u16 loadOWSpriteB( const u16 p_picnum, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                       u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
+    u16 loadOWSpriteB( const u16 p_picnum, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+                       u16 p_palData[ 16 ], u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
         FILE* f = FS::open( OW_PATH, p_picnum, ".rsd" );
 
         FS::read( f, p_palData, sizeof( u16 ), 16 );
@@ -802,8 +802,8 @@ namespace IO {
                             false, false, false, OBJPRIORITY_2, false );
     }
 
-    u16 loadDoorSpriteB( const u16 p_doorNum, const s16 p_posX, const s16 p_posY, u8 p_oamIndex,
-                         u16 p_tileCnt, u16 p_palData[ 16 ], u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
+    u16 loadDoorSpriteB( const u16 p_doorNum, s16 p_posX, s16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
+                         u16 p_palData[ 16 ], u32 p_dataBuffer[ 32 * 4 * 9 ] ) {
         FILE* f = FS::openSplit( DOOR_PATH, p_doorNum, ".door", 255 );
         FS::read( f, p_dataBuffer, sizeof( u32 ), 32 * 16 * 3 / 8 );
         FS::close( f );
@@ -836,8 +836,8 @@ namespace IO {
         OamTop->oamBuffer[ p_oamIdx ].gfxIndex = p_tileCnt + p_frame * width * height / 64;
     }
 
-    u16 loadIcon( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
-                  u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadIcon( const char* p_path, const char* p_name, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                  u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         if( FS::readData( p_path, p_name, (unsigned int) 128, TEMP, (unsigned short) 16,
                           TEMP_PAL ) ) {
             return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL,
@@ -849,8 +849,8 @@ namespace IO {
                                p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
     }
-    u16 loadIconB( const char* p_path, const char* p_name, const s16 p_posX, const s16 p_posY,
-                   u8 p_oamIdx, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadIconB( const char* p_path, const char* p_name, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                   u16 p_tileCnt, bool p_bottom ) {
         if( FS::readData( p_path, p_name, (unsigned int) 128, TEMP, (unsigned short) 16,
                           TEMP_PAL ) ) {
             return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512,
@@ -863,8 +863,8 @@ namespace IO {
         }
     }
 
-    u16 loadItemIcon( u16 p_itemId, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
-                      u16 p_tileCnt, bool p_bottom ) {
+    u16 loadItemIcon( u16 p_itemId, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+                      bool p_bottom ) {
         if( !FS::checkOrOpen( ITEM_ICON_FILE, ITEM_PATH )
             || !seekSpriteData( ITEM_ICON_FILE, p_itemId, 32 * 32 / 8 )
             || !fread( TEMP_PAL, 16, sizeof( u16 ), ITEM_ICON_FILE )
@@ -879,7 +879,7 @@ namespace IO {
                            p_bottom );
     }
 
-    u16 loadItemIconB( u16 p_itemId, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+    u16 loadItemIconB( u16 p_itemId, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                        bool p_bottom ) {
         if( !FS::checkOrOpen( ITEM_ICON_FILE, ITEM_PATH )
             || !seekSpriteData( ITEM_ICON_FILE, p_itemId, 32 * 32 / 8 )
@@ -893,8 +893,38 @@ namespace IO {
                             false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadTMIcon( BATTLE::type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY,
-                    u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadPokeblockIcon( u8 p_blockType, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+                           u16 p_tileCnt, bool p_bottom ) {
+        if( !FS::checkOrOpen( POKEBLOCK_ICON_FILE, POKEBLOCK_PATH )
+            || !seekSpriteData( POKEBLOCK_ICON_FILE, p_blockType, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), POKEBLOCK_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), POKEBLOCK_ICON_FILE ) ) {
+            return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
+                               NoItemTiles, NoItemTilesLen, false, false, false,
+                               p_bottom ? OBJPRIORITY_3 : OBJPRIORITY_2, p_bottom );
+        }
+
+        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP,
+                           512, false, false, false, p_bottom ? OBJPRIORITY_3 : OBJPRIORITY_2,
+                           p_bottom );
+    }
+
+    u16 loadPokeblockIconB( u16 p_blockType, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+                            bool p_bottom ) {
+        if( !FS::checkOrOpen( POKEBLOCK_ICON_FILE, POKEBLOCK_PATH )
+            || !seekSpriteData( POKEBLOCK_ICON_FILE, p_blockType, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), POKEBLOCK_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), POKEBLOCK_ICON_FILE ) ) {
+            return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal, NoItemTiles,
+                                NoItemTilesLen, false, false, false,
+                                p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+        }
+        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512, false,
+                            false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+    }
+
+    u16 loadTMIcon( BATTLE::type p_type, u8 p_tmtype, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                    u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         if( !FS::checkOrOpen( TM_ICON_FILE, TM_PATH )
             || !seekSpriteData( TM_ICON_FILE, 3 * p_type + p_tmtype, 32 * 32 / 8 )
             || !fread( TEMP_PAL, 16, sizeof( u16 ), TM_ICON_FILE )
@@ -909,8 +939,8 @@ namespace IO {
                            p_bottom );
     }
 
-    u16 loadTMIconB( BATTLE::type p_type, u8 p_tmtype, const s16 p_posX, const s16 p_posY,
-                     u8 p_oamIdx, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadTMIconB( BATTLE::type p_type, u8 p_tmtype, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                     u16 p_tileCnt, bool p_bottom ) {
         if( !FS::checkOrOpen( TM_ICON_FILE, TM_PATH )
             || !seekSpriteData( TM_ICON_FILE, 3 * p_type + p_tmtype, 32 * 32 / 8 )
             || !fread( TEMP_PAL, 16, sizeof( u16 ), TM_ICON_FILE )
@@ -926,8 +956,8 @@ namespace IO {
     FILE* TYPE_ICON_FILE          = nullptr;
     u8    LAST_TYPE_ICON_LANGUAGE = 0;
 
-    u16 loadTypeIcon( BATTLE::type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                      u8 p_palIdx, u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
+    u16 loadTypeIcon( BATTLE::type p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palIdx,
+                      u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
         if( !FS::checkOrOpen( TYPE_ICON_FILE, TYPE_ICON_PATH, LAST_TYPE_ICON_LANGUAGE,
                               p_language ) ) {
             return false;
@@ -940,8 +970,8 @@ namespace IO {
                            16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadTypeIconB( BATTLE::type p_type, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                       u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
+    u16 loadTypeIconB( BATTLE::type p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+                       bool p_bottom, const SAVE::language p_language ) {
         if( !FS::checkOrOpen( TYPE_ICON_FILE, TYPE_ICON_PATH, LAST_TYPE_ICON_LANGUAGE,
                               p_language ) ) {
             return false;
@@ -957,8 +987,8 @@ namespace IO {
     FILE* CONTEST_TYPE_ICON_FILE          = nullptr;
     u8    LAST_CONTEST_TYPE_ICON_LANGUAGE = 0;
 
-    u16 loadContestTypeIcon( BATTLE::contestType p_type, const s16 p_posX, const s16 p_posY,
-                             u8 p_oamIdx, u8 p_palIdx, u16 p_tileCnt, bool p_bottom,
+    u16 loadContestTypeIcon( BATTLE::contestType p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                             u8 p_palIdx, u16 p_tileCnt, bool p_bottom,
                              const SAVE::language p_language ) {
         if( !FS::checkOrOpen( CONTEST_TYPE_ICON_FILE, CONTEST_TYPE_ICON_PATH,
                               LAST_CONTEST_TYPE_ICON_LANGUAGE, p_language ) ) {
@@ -972,9 +1002,8 @@ namespace IO {
                            16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadContestTypeIconB( BATTLE::contestType p_type, const s16 p_posX, const s16 p_posY,
-                              u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
-                              const SAVE::language p_language ) {
+    u16 loadContestTypeIconB( BATTLE::contestType p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                              u16 p_tileCnt, bool p_bottom, const SAVE::language p_language ) {
         if( !FS::checkOrOpen( CONTEST_TYPE_ICON_FILE, CONTEST_TYPE_ICON_PATH,
                               LAST_CONTEST_TYPE_ICON_LANGUAGE, p_language ) ) {
             return false;
@@ -987,7 +1016,7 @@ namespace IO {
                             16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadLocationBackB( u8 p_idx, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
+    u16 loadLocationBackB( u8 p_idx, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                            bool p_bottom ) {
         if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/LOC/",
                                                         ( std::to_string( p_idx ) ).c_str( ), 16,
@@ -1001,7 +1030,7 @@ namespace IO {
             return loadLocationBackB( 0, p_posX, p_posY, p_oamIdx, p_tileCnt, p_bottom );
         }
     }
-    u16 loadPlatform( u8 p_platform, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+    u16 loadPlatform( u8 p_platform, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                       u16 p_tileCnt, bool p_bottom ) {
         snprintf( BUFFER, 99, "plat%hhu", p_platform );
         if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/PLAT/", BUFFER, 16,
@@ -1017,8 +1046,8 @@ namespace IO {
         }
     }
 
-    u16 loadRibbonIcon( u8 p_ribbonIdx, const s16 p_posX, const s16 p_posY, u8 p_oamIdx,
-                        u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadRibbonIcon( u8 p_ribbonIdx, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+                        u16 p_tileCnt, bool p_bottom ) {
 
         if( FS::readData( "nitro:/PICS/SPRITES/RIBBON/",
                           ( "r" + std::to_string( p_ribbonIdx ) ).c_str( ),
@@ -1029,7 +1058,7 @@ namespace IO {
         return p_tileCnt + ( 32 * 16 ) / BYTES_PER_16_COLOR_TILE;
     }
 
-    u16 loadShapeIcon( u8 p_shapeIdx, const s16 p_posX, const s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+    u16 loadShapeIcon( u8 p_shapeIdx, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
                        u16 p_tileCnt, bool p_bottom ) {
 
         if( FS::readData( "nitro:/PICS/SPRITES/SHAPES/", std::to_string( p_shapeIdx ).c_str( ),
@@ -1040,16 +1069,16 @@ namespace IO {
         return p_tileCnt + ( 32 * 16 ) / BYTES_PER_16_COLOR_TILE;
     }
 
-    u16 loadDamageCategoryIcon( BATTLE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
-                                u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadDamageCategoryIcon( BATTLE::moveHitTypes p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                                u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 30 ];
         snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
         return loadSprite( buffer, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, false,
                            false, false, OBJPRIORITY_0, p_bottom );
     }
 
-    u16 loadDamageCategoryIconB( BATTLE::moveHitTypes p_type, const s16 p_posX, const s16 p_posY,
-                                 u8 p_oamIdx, u16 p_tileCnt, bool p_bottom ) {
+    u16 loadDamageCategoryIconB( BATTLE::moveHitTypes p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                                 u16 p_tileCnt, bool p_bottom ) {
         char buffer[ 30 ];
         snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
         return loadSpriteB( buffer, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, false, false,

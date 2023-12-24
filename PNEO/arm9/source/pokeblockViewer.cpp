@@ -57,8 +57,8 @@ namespace BAG {
         switch( _view ) {
         default:
         case 0:
-            _ui->initBlockView( );
-            _ui->selectBlock( _selectedBlock );
+            _ui->initBlockView( _pokeblockCount );
+            _ui->selectBlock( _selectedBlock, _pokeblockCount[ _selectedBlock ] );
             break;
         case 1:
             _ui->initPkmnView( );
@@ -68,6 +68,9 @@ namespace BAG {
             _playerTeam[ _selectedPkmn ].eatPokeblock( _selectedBlock );
             _pokeblockCount[ _selectedBlock ]--;
             _ui->animateFeedBlockToPkmn( _selectedPkmn, _selectedBlock );
+            _ui->initPkmnView( );
+            _ui->selectBlock( _selectedBlock, _pokeblockCount[ _selectedBlock ] );
+            _ui->selectPkmn( _selectedPkmn, _selectedBlock );
             _view = 1;
             break;
         }
@@ -76,7 +79,7 @@ namespace BAG {
 
     void pokeblockViewer::selectBlock( u8 p_blockIdx ) {
         _selectedBlock = p_blockIdx;
-        _ui->selectBlock( _selectedBlock );
+        _ui->selectBlock( _selectedBlock, _pokeblockCount[ _selectedBlock ] );
     }
 
     void pokeblockViewer::selectPkmn( u8 p_pkmnIdx ) {
@@ -213,7 +216,8 @@ namespace BAG {
                         }
                     }
                 } else {
-                    selectBlock( ( _selectedBlock + BLOCKS_PER_ROW ) % SAVE::POKEBLOCK_TYPES );
+                    selectBlock( ( _selectedBlock + SAVE::POKEBLOCK_TYPES - BLOCKS_PER_ROW )
+                                 % SAVE::POKEBLOCK_TYPES );
                 }
                 cooldown = COOLDOWN_COUNT;
             }
