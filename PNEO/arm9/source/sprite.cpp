@@ -561,6 +561,19 @@ namespace IO {
         return p_tileCnt + 144;
     }
 
+    u16 preloadPKMNSprite( s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+                           bool p_bottom ) {
+        loadSprite( p_oamIdx++, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL, TEMP,
+                    96 * 96 / 2, false, false, true, OBJPRIORITY_1, p_bottom );
+        loadSprite( p_oamIdx++, p_palCnt, p_tileCnt + 64, 64 + p_posX, p_posY, 32, 64, 0, 0, 0,
+                    false, false, true, OBJPRIORITY_1, p_bottom );
+        loadSprite( p_oamIdx++, p_palCnt, p_tileCnt + 96, p_posX, p_posY + 64, 64, 32, 0, 0, 0,
+                    false, false, true, OBJPRIORITY_1, p_bottom );
+        loadSprite( p_oamIdx, p_palCnt, p_tileCnt + 128, 64 + p_posX, p_posY + 64, 32, 32, 0, 0, 0,
+                    false, false, true, OBJPRIORITY_1, p_bottom );
+        return p_tileCnt + 144;
+    }
+
     u16 loadPKMNSpriteB( s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt, bool p_bottom,
                          bool p_flipx ) {
         loadSpriteB( p_oamIdx++, p_tileCnt, p_flipx ? 32 + p_posX : p_posX, p_posY, 64, 64,

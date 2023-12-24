@@ -151,6 +151,9 @@ namespace IO {
     u16 loadEggSprite( s16 p_posX, s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
                        bool p_bottom = false, bool p_manaphy = false );
 
+    u16 preloadPKMNSprite( s16 p_posX, s16 p_posY, u8 p_oamIndex, u8 p_palCnt, u16 p_tileCnt,
+                           bool p_bottom = false );
+
     u16 loadTrainerSprite( u8 p_trainerId, s16 p_posX, s16 p_posY, u8 p_oamIndex, u8 p_palCnt,
                            u16 p_tileCnt, bool p_bottom );
 

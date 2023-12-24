@@ -33,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "io/screenFade.h"
 #include "io/strings.h"
+#include "sound/sound.h"
 
 // Sprites
 #include "NoItem.h"
@@ -40,7 +41,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace BAG {
     constexpr u8 MAX_PARTY_PKMN = SAVE::NUM_PARTY_SLOTS;
 
-    constexpr u8 SPR_POKEBLOCK_OAM_TOP = 0;
+    constexpr u8 SPR_POKEBLOCK_OAM_TOP   = 0;
+    constexpr u8 SPR_PKMN_BLOCK_OAM_TOP  = 19;
+    constexpr u8 SPR_PKMN_OAM_TOP        = 20;
+    constexpr u8 SPR_PKMN_FEEDER_OAM_TOP = 24;
 
     constexpr u8 SPR_ARROW_BACK_OAM_SUB    = 53;
     constexpr u8 SPR_POKEBLOCK_OAM_SUB     = 55;
@@ -50,7 +54,10 @@ namespace BAG {
     constexpr u8 SPR_POKEBLOCK_SEL_OAM_SUB = 127;
 #define SPR_CTYPE_OAM( p_type ) ( 0 + ( p_type ) )
 
-    constexpr u8 SPR_POKEBLOCK_PAL_TOP = 0;
+    constexpr u8 SPR_POKEBLOCK_PAL_TOP   = 0;
+    constexpr u8 SPR_PKMN_PAL_TOP        = 1;
+    constexpr u8 SPR_PKMN_BLOCK_PAL_TOP  = 2;
+    constexpr u8 SPR_PKMN_FEEDER_PAL_TOP = 3;
 
     constexpr u8 SPR_SELECTED_PAL_SUB        = 0;
     constexpr u8 SPR_PKMN_PAL_SUB            = 1;
@@ -74,11 +81,16 @@ namespace BAG {
     constexpr s16 CONTEST_TYPE_POS_X[ 5 ] = { 0, 95, 58, -58, -95 };
     constexpr s16 CONTEST_TYPE_POS_Y[ 5 ] = { -90, -20, 90, 90, -20 };
 
+#define ANIM_FUNC( p_x ) ( u8( 0.007 * ( p_x ) * (p_x) -1.73 * ( p_x ) + 120 ) )
+
 #define INFO_X        130
 #define INFO_Y        6
 #define COND_CENTER_X ( INFO_X + 32 )
 #define COND_CENTER_Y ( INFO_Y + 54 )
 #define COND_RADIUS   40
+
+#define BLOCK_ANIM_START_X 196
+#define BLOCK_ANIM_START_Y 64
 
     std::vector<std::pair<IO::inputTarget, u8>> pokeblockUI::getTouchPositions( ) {
         return { };
@@ -99,6 +111,31 @@ namespace BAG {
 
         tileCntT = IO::loadPokeblockIcon( 0, 16, 134, SPR_POKEBLOCK_OAM_TOP, SPR_POKEBLOCK_PAL_TOP,
                                           tileCntT, false );
+
+        tileCntT
+            = IO::preloadPKMNSprite( 0, 24, SPR_PKMN_OAM_TOP, SPR_PKMN_PAL_TOP, tileCntT, false );
+        tileCntT = IO::loadPokeblockIcon( 0, BLOCK_ANIM_START_X, BLOCK_ANIM_START_Y,
+                                          SPR_PKMN_BLOCK_OAM_TOP, SPR_PKMN_BLOCK_PAL_TOP, tileCntT,
+                                          false );
+
+        IO::loadSprite( "UI/device", SPR_PKMN_FEEDER_OAM_TOP, SPR_PKMN_FEEDER_PAL_TOP, tileCntT,
+                        BLOCK_ANIM_START_X + 16, BLOCK_ANIM_START_Y + 16, 64, 64, false, false,
+                        false, OBJPRIORITY_3, false );
+        tileCntT = IO::loadSprite( "UI/device", 1 + SPR_PKMN_FEEDER_OAM_TOP,
+                                   SPR_PKMN_FEEDER_PAL_TOP, tileCntT, 128 - 32 - 32, 40 - 32, 64,
+                                   64, false, false, false, OBJPRIORITY_3, false );
+        for( u8 i = 0; i < 6; ++i ) {
+            IO::OamTop->oamBuffer[ i + SPR_PKMN_BLOCK_OAM_TOP ].isHidden = true;
+        }
+
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isSizeDouble  = true;
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].rotationIndex = 0;
+
+        IO::OamTop->matrixBuffer[ 0 ].vdx = ( 0LL << 8 );
+        IO::OamTop->matrixBuffer[ 0 ].vdy = ( 1LL << 8 );
+        IO::OamTop->matrixBuffer[ 0 ].hdx = ( 1LL << 8 );
+        IO::OamTop->matrixBuffer[ 0 ].hdy = ( 0LL << 8 );
 
         // bottom
         u16 tileCnt = 0;
@@ -160,7 +197,7 @@ namespace BAG {
         FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "PokeblockLower", 512,
                              49152, true );
 
-        IO::initColors( );
+        IO::initColors( true, true, true );
 
         // "PokeBlocks"
         IO::regularFont->printString( GET_STRING( 739 ), 128, 5, false, IO::font::CENTER );
@@ -289,6 +326,70 @@ namespace BAG {
         // load pkmn sprite
         // load block sprite
         // load dispenser sprite
+
+        SpriteEntry* oam = IO::OamTop->oamBuffer;
+
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isRotateScale = false;
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isSizeDouble  = false;
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isHidden      = true;
+
+        IO::loadPKMNSprite( _playerTeam[ p_pkmnIdx ].getSpriteInfo( true ),
+                            oam[ SPR_PKMN_OAM_TOP ].x, oam[ SPR_PKMN_OAM_TOP ].y, SPR_PKMN_OAM_TOP,
+                            SPR_PKMN_PAL_TOP, oam[ SPR_PKMN_OAM_TOP ].gfxIndex, false );
+
+        IO::OamTop->oamBuffer[ SPR_PKMN_FEEDER_OAM_TOP ].isHidden = false;
+        IO::updateOAM( false );
+        // shake with feeder
+
+        // move block to pkmn
+        IO::loadPokeblockIcon( p_blockType, BLOCK_ANIM_START_X, BLOCK_ANIM_START_Y,
+                               SPR_PKMN_BLOCK_OAM_TOP, SPR_PKMN_BLOCK_PAL_TOP,
+                               oam[ SPR_PKMN_BLOCK_OAM_TOP ].gfxIndex, false );
+        oam[ SPR_PKMN_BLOCK_OAM_TOP ].priority = OBJPRIORITY_0;
+        IO::updateOAM( false );
+
+        for( u8 x = BLOCK_ANIM_START_X - 16; x >= oam[ SPR_PKMN_OAM_TOP ].x + 32; --x ) {
+            oam[ SPR_PKMN_BLOCK_OAM_TOP ].x = x;
+            oam[ SPR_PKMN_BLOCK_OAM_TOP ].y = ANIM_FUNC( x );
+            IO::updateOAM( false );
+            if( x & 1 ) { swiWaitForVBlank( ); }
+        }
+        oam[ SPR_PKMN_BLOCK_OAM_TOP ].isHidden = true;
+        IO::updateOAM( false );
+
+        // play Cry
+        SOUND::playCry( _playerTeam[ p_pkmnIdx ].getSpecies( ),
+                        _playerTeam[ p_pkmnIdx ].getForme( ) );
+
+        // Display message
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        char buffer[ 200 ];
+        auto str = pokeblock::strengthModifier( pokeblockType{ p_blockType },
+                                                _playerTeam[ p_pkmnIdx ].getNature( ) );
+        if( str == LIKED_FALVOR ) {
+            snprintf( buffer, 199, GET_STRING( 797 ), _playerTeam[ p_pkmnIdx ].m_boxdata.m_name );
+        } else if( str == NORMAL_FALVOR ) {
+            snprintf( buffer, 199, GET_STRING( 798 ), _playerTeam[ p_pkmnIdx ].m_boxdata.m_name );
+        } else if( str == DISLIKED_FALVOR ) {
+            snprintf( buffer, 199, GET_STRING( 799 ), _playerTeam[ p_pkmnIdx ].m_boxdata.m_name );
+        }
+
+        IO::regularFont->printStringC( buffer, 128, 108, false, IO::font::CENTER );
+
+        for( u8 i = 0; i < 90; ++i ) { swiWaitForVBlank( ); }
+
+        for( u8 i = 0; i < 6; ++i ) {
+            IO::OamTop->oamBuffer[ i + SPR_PKMN_BLOCK_OAM_TOP ].isHidden = true;
+        }
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isRotateScale = true;
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].isSizeDouble  = true;
+        IO::OamTop->oamBuffer[ 1 + SPR_PKMN_FEEDER_OAM_TOP ].rotationIndex = 0;
+
+        IO::updateOAM( false );
+        IO::printRectangle( 0, 108, 255, IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y, false,
+                            0 );
     }
 
     void pokeblockUI::selectBlock( u8 p_blockType, u16 p_blockOwned ) {
