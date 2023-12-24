@@ -93,7 +93,40 @@ namespace BAG {
 #define BLOCK_ANIM_START_Y 64
 
     std::vector<std::pair<IO::inputTarget, u8>> pokeblockUI::getTouchPositions( ) {
-        return { };
+        auto         res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+
+        // back
+        if( !oam[ SPR_ARROW_BACK_OAM_SUB ].isHidden ) {
+            res.push_back( std::pair<IO::inputTarget, u8>{
+                IO::inputTarget( oam[ SPR_ARROW_BACK_OAM_SUB ].x, oam[ SPR_ARROW_BACK_OAM_SUB ].y,
+                                 oam[ SPR_ARROW_BACK_OAM_SUB ].x + 24,
+                                 oam[ SPR_ARROW_BACK_OAM_SUB ].y + 24 ),
+                0 } );
+        }
+
+        // select
+        res.push_back( std::pair<IO::inputTarget, u8>{ IO::inputTarget( 4, 4, 130, 26 ), 50 } );
+
+        // pkmn
+        for( u8 i = 0; i < MAX_PARTY_PKMN; ++i ) {
+            if( !_playerTeam[ i ].getSpecies( ) ) { break; }
+            res.push_back(
+                std::pair( IO::inputTarget( 0, 28 + 26 * i, 128, 28 + 26 * i + 26 ), 150 + i ) );
+        }
+
+        // pokeblocks
+        for( u8 i = 0; i < BLOCKS_PER_PAGE; ++i ) {
+            if( !oam[ SPR_POKEBLOCK_OAM_SUB + i ].isHidden ) {
+                res.push_back( std::pair<IO::inputTarget, u8>{
+                    IO::inputTarget( oam[ SPR_POKEBLOCK_OAM_SUB + i ].x,
+                                     oam[ SPR_POKEBLOCK_OAM_SUB + i ].y,
+                                     oam[ SPR_POKEBLOCK_OAM_SUB + i ].x + 24,
+                                     oam[ SPR_POKEBLOCK_OAM_SUB + i ].y + 24 ),
+                    100 + i } );
+            }
+        }
+        return res;
     }
 
     void pokeblockUI::init( ) {
@@ -207,10 +240,6 @@ namespace BAG {
 
     void pokeblockUI::initBlockView( u16* p_pokeblockCount ) {
         char buffer[ 100 ];
-#ifdef DESQUID
-        p_pokeblockCount[ 6 ] = 0;
-        // for( u8 i = 0; i < 24; ++i ) { p_pokeblockCount[ i ] = rand( ) % 999; }
-#endif
 
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );

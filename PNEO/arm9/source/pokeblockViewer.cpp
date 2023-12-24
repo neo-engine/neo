@@ -88,9 +88,6 @@ namespace BAG {
     }
 
     u8 pokeblockViewer::handleTouch( ) {
-        // TODO
-        return 0;
-        /*
         auto tpos = _ui->getTouchPositions( );
 
         bool bad = false;
@@ -109,36 +106,30 @@ namespace BAG {
                 }
 
                 if( !bad ) {
-                    // TODO
-
                     if( !t.second ) { return 1; } // Back
 
-                    if( t.second < 6 ) { // select page
-                        _selectedBlock = 0;
-                        selectPage( t.second - 1 );
-                        return 0;
+                    if( t.second == 50 ) { // select
+                        return 2;
                     }
 
-                    if( t.second == 90 ) { // forward
-                        selectItem( _selectedBlock + 1 );
-                        return 0;
-                    }
-                    if( t.second == 91 ) { // backward
-                        selectItem( _selectedBlock - 1 );
-                        return 0;
-                    }
-
-                    if( t.second >= 100 ) { // select item
+                    if( t.second >= 100 && t.second < 150 ) { // select pokeblock
                         u8 res = 0;
                         if( _selectedBlock == t.second - 100 ) { res = 2; }
-                        selectItem( t.second - 100 );
+                        selectBlock( t.second - 100 );
+                        return res;
+                    }
+
+                    if( t.second >= 150 ) { // select pkmn
+                        u8 res = 0;
+                        if( _view && _selectedPkmn == t.second - 150 ) { res = 2; }
+                        if( !_view ) { selectView( _view + 1 ); }
+                        selectPkmn( t.second - 150 );
                         return res;
                     }
                 }
             }
         }
         return 0;
-        */
     }
 
     void pokeblockViewer::run( ) {
