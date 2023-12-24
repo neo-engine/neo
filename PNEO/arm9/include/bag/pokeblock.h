@@ -27,6 +27,8 @@
 
 #pragma once
 #include "bag/berry.h"
+#include "battle/battleDefines.h"
+#include "pokemonData.h"
 
 namespace BAG {
     enum pokeblockType : u8 {
@@ -79,7 +81,11 @@ namespace BAG {
     constexpr u8 PB_NORMAL_SMOOTH   = 20;
     constexpr u8 PB_GOLD_SMOOTH     = 100;
     constexpr u8 PB_GOLD_DX_SMOOTH  = 75;
-    constexpr u8 PB_ULTIMATE_SMOOTH = 50;
+    constexpr u8 PB_ULTIMATE_SMOOTH = 51;
+
+    constexpr u8 DISLIKED_FALVOR = 9;
+    constexpr u8 NORMAL_FALVOR   = 10;
+    constexpr u8 LIKED_FALVOR    = 11;
 
     struct pokeblock {
         inline static constexpr pokeblockType fromLevelSmoothness( u8 p_level[ NUM_BERRYSTATS ],
@@ -163,6 +169,36 @@ namespace BAG {
             case PB_LIGHT_GREEN_DX:
             case PB_GREEN_DX: return PB_DX_SMOOTH;
             default: return PB_NORMAL_SMOOTH;
+            }
+        }
+
+        inline static constexpr u8 strengthModifier( pokeblockType p_type, u8 p_nature ) {
+            switch( p_type ) {
+            case PB_BLACK: return DISLIKED_FALVOR;
+            default:
+            case PB_GOLD:
+            case PB_GOLD_DX: return NORMAL_FALVOR;
+            case PB_ULTIMATE: return LIKED_FALVOR;
+            case PB_LIGHT_RED:
+            case PB_LIGHT_RED_DX:
+            case PB_RED:
+            case PB_RED_DX: return NatMod[ p_nature ][ BATTLE::ATK - 1 ];
+            case PB_LIGHT_BLUE:
+            case PB_LIGHT_BLUE_DX:
+            case PB_BLUE:
+            case PB_BLUE_DX: return NatMod[ p_nature ][ BATTLE::SATK - 1 ];
+            case PB_LIGHT_PINK:
+            case PB_LIGHT_PINK_DX:
+            case PB_PINK:
+            case PB_PINK_DX: return NatMod[ p_nature ][ BATTLE::SPEED - 1 ];
+            case PB_LIGHT_YELLOW:
+            case PB_LIGHT_YELLOW_DX:
+            case PB_YELLOW:
+            case PB_YELLOW_DX: return NatMod[ p_nature ][ BATTLE::DEF - 1 ];
+            case PB_LIGHT_GREEN:
+            case PB_LIGHT_GREEN_DX:
+            case PB_GREEN:
+            case PB_GREEN_DX: return NatMod[ p_nature ][ BATTLE::SDEF - 1 ];
             }
         }
     };

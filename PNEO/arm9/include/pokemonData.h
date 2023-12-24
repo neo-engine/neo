@@ -32,6 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <nds.h>
 #include "battle/type.h"
+#include "gen/pokemonNames.h"
 
 enum pkmnLevelUpType {
     LEVELUP_TYPE_MEDIUM_FAST = 0,

@@ -167,12 +167,14 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
 void boxPokemon::eatPokeblock( u8 p_type ) {
     if( m_contestStats[ 5 ] == 255 ) { return; }
     for( u8 i = 0; i < BAG::NUM_BERRYSTATS; ++i ) {
-        if( m_contestStats[ i ]
-            > 255 - BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i ) ) {
+        auto str = BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i )
+                   * BAG::pokeblock::strengthModifier( BAG::pokeblockType{ p_type }, getNature( ) )
+                   / 10;
+        if( !str ) { str = 1; }
+        if( m_contestStats[ i ] > 255 - str ) {
             m_contestStats[ i ] = 255;
         } else {
-            m_contestStats[ i ]
-                += BAG::pokeblock::flavorStrength( BAG::pokeblockType{ p_type }, i );
+            m_contestStats[ i ] += str;
         }
     }
     if( m_contestStats[ 5 ] > 255 - BAG::pokeblock::smoothness( BAG::pokeblockType{ p_type } ) ) {
