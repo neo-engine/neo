@@ -48,12 +48,48 @@
 
 namespace SPX {
     struct pokeblockNPC {
-        u16 m_name;      // mapstring idx, if 0 then rotom
-        u8  m_skill;     // chance in % to hit circle
-        u8  m_berryTier; // 0 - selected by player,
+        u16 m_name;        // mapstring idx, if 0 then rotom
+        u8  m_percPerfect; // chance in /255 to hit perfect
+        u8  m_percHit;     // chance in /255 to hit
+        u8  m_percMiss;    // chance in /255 to miss
+        u8  m_berryTier;   // 0 - selected by player,
+    };
+
+    struct berryPathInfo {
+        s16 m_startX;
+        s16 m_startY;
+        s8  m_speedX;
+        s8  m_speedY;
+    };
+
+    constexpr berryPathInfo BERRY_START_DATA[ 4 ] = {
+        { 242, 20, -2, 1 },
+        { -18, 140, 2, -1 },
+        { 242, 140, -2, -1 },
+        { -18, 20, 2, 1 },
     };
 
     constexpr u8 BERRY_TIER_LENGTH = 5;
+    constexpr u8 HITBONUS_MODIFIER = 12;
+    constexpr u8 MASTER_TIER       = 0;
+    constexpr u8 ROTOM_TIER        = 4;
+
+    constexpr u16 TEXTFIELD_COLOR     = 0x8c68;
+    constexpr u8  TEXTFIELD_COLOR_IDX = 20;
+
+    constexpr u16 TEXT_COLOR      = 0x8856;
+    constexpr u8  TEXT_COLOR_IDX  = 21;
+    constexpr u16 TEXT_COLOR2     = 0x9ddd;
+    constexpr u8  TEXT_COLOR_IDX2 = 22;
+
+    constexpr u8 SPR_ACTIVE_SUB_OAM_START = 0;
+    constexpr u8 SPR_ACTIVE_SUB_OAM_END   = 3;
+    constexpr u8 SPR_BERRY_SUB_OAM        = 4;
+    constexpr u8 SPR_LID_SUB_OAM          = 4;
+
+    constexpr u8 SPR_ACTIVE_SUB_PAL = 0;
+    constexpr u8 SPR_BERRY_SUB_PAL  = 1;
+    constexpr u8 SPR_LID_SUB_PAL    = 1;
 
     u16 BERRY_TIER_1[ BERRY_TIER_LENGTH ]
         = { I_CHERI_BERRY, I_PECHA_BERRY, I_RAWST_BERRY, I_ASPEAR_BERRY, I_CHESTO_BERRY };
@@ -61,15 +97,15 @@ namespace SPX {
         = { I_SPELON_BERRY, I_PAMTRE_BERRY, I_WATMEL_BERRY, I_DURIN_BERRY, I_BELUE_BERRY };
 
     // used by master if player chose tier 2 berry
-    u16 BERRY_TIER_2b[ BERRY_TIER_LENGTH + 1 ] = { I_GREPA_BERRY,  I_TAMATO_BERRY, I_CORNN_BERRY,
-                                                   I_MAGOST_BERRY, I_RABUTA_BERRY, I_NOMEL_BERRY };
+    u16 BERRY_TIER_2b[ BERRY_TIER_LENGTH ]
+        = { I_TAMATO_BERRY, I_CORNN_BERRY, I_MAGOST_BERRY, I_RABUTA_BERRY, I_NOMEL_BERRY };
 
     pokeblockNPC BLENDER_NPC[ 5 ][ 3 ] = {
-        { { 717, 100, 2 } }, // berry master
-        { { 711, 50, 1 } },
-        { { 712, 60, 1 }, { 713, 80, 1 } },
-        { { 714, 70, 1 }, { 715, 40, 1 }, { 716, 20, 1 } },
-        { { 0, 100, 0 }, { 0, 100, 0 }, { 0, 100, 0 } }, // rotom
+        { { 717, 100, 0, 0, 2 } }, // berry master
+        { { 711, 30, 70, 40, 1 } },
+        { { 712, 40, 60, 20, 1 }, { 713, 60, 70, 40, 1 } },
+        { { 714, 60, 90, 30, 1 }, { 715, 20, 80, 10, 1 }, { 716, 30, 60, 40, 1 } },
+        { { 0, 100, 0, 0, 0 }, { 0, 100, 0, 0, 0 }, { 0, 100, 0, 0, 0 } }, // rotom
     };
 
     u8 computeBaseSmoothness( u8 p_chosenBerries[ 4 ], u16 p_rpm ) {
@@ -155,11 +191,8 @@ namespace SPX {
         }
 
         for( u8 j = 0; j < BAG::NUM_BERRYSTATS; ++j ) {
-            flavor[ j ] = static_cast<u8>(
-                std::min( s32( 255 ), s32( flavor_reduced[ j ] ) * p_hitbonus / 10 ) );
-#ifdef DESQUID
-            IO::printMessage( std::to_string( flavor[ j ] ), MSG_INFO );
-#endif
+            flavor[ j ] = static_cast<u8>( std::min(
+                s32( 255 ), s32( flavor_reduced[ j ] ) * ( 1 + p_hitbonus / HITBONUS_MODIFIER ) ) );
         }
         return BAG::pokeblock::fromLevelSmoothness(
             flavor, computeBaseSmoothness( p_chosenBerries, p_rpm ) );
@@ -218,7 +251,7 @@ namespace SPX {
             }
 
             u8 mxlv = 0, argmx = BAG::itemToBerry( repl ? BERRY_TIER_2b[ 0 ] : BERRY_TIER_2[ 0 ] );
-            for( u8 i = 0; i < BERRY_TIER_LENGTH + repl; ++i ) {
+            for( u8 i = 0; i < BERRY_TIER_LENGTH; ++i ) {
                 u8 cbr = BAG::itemToBerry( repl ? BERRY_TIER_2b[ i ] : BERRY_TIER_2[ i ] );
 
                 p_chosenBerries[ fr ] = cbr;
@@ -236,27 +269,399 @@ namespace SPX {
         return 0;
     }
 
-    std::pair<u8, u16> blenderMinigame( ) {
+#define PROGRESSBAR_START 94
+#define PROGRESSBAR_END   162
+    void drawProgressBar( u8 p_progress ) {
+        IO::printRectangle( PROGRESSBAR_START, 2, PROGRESSBAR_START + 3 * p_progress - 1, 16, true,
+                            0 );
+    }
+
+#define PLAYERNAME_TOPY   54
+#define PLAYERNAME_BOTY   120
+#define PLAYERNAME_LEFTX  37
+#define PLAYERNAME_RIGHTX 216
+
+    void initBlender( u8 p_npctier ) {
+        IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );
+        IO::initOAMTable( false );
+        IO::initOAMTable( true );
+        IO::vramSetup( true );
+        swiWaitForVBlank( );
+        IO::clearScreen( true, true );
+        IO::resetScale( true, true );
+
+        // bottom: blander and actual mini game
+        // top: score board and result prediction
+
+        // load sprites
+
+        u16 tileCnt = 0;
+        IO::loadSprite( "BB/player_active", SPR_ACTIVE_SUB_OAM_START, SPR_ACTIVE_SUB_PAL, tileCnt,
+                        173, 46 - 32, 32, 32, false, false, false, OBJPRIORITY_3, true );
+        IO::loadSprite( "BB/player_active", SPR_ACTIVE_SUB_OAM_START + 1, SPR_ACTIVE_SUB_PAL,
+                        tileCnt, 83 - 32, 146, 32, 32, true, true, false, OBJPRIORITY_3, true );
+        IO::loadSprite( "BB/player_active", SPR_ACTIVE_SUB_OAM_START + 2, SPR_ACTIVE_SUB_PAL,
+                        tileCnt, 173, 146, 32, 32, true, false, false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadSprite( "BB/player_active", SPR_ACTIVE_SUB_OAM_START + 3,
+                                  SPR_ACTIVE_SUB_PAL, tileCnt, 83 - 32, 46 - 32, 32, 32, false,
+                                  true, false, OBJPRIORITY_3, true );
+
+        tileCnt = IO::loadSprite( "BB/lid", SPR_LID_SUB_OAM, SPR_LID_SUB_PAL, tileCnt, 128 - 64,
+                                  96 - 64, 64, 64, false, true, true, OBJPRIORITY_3, true );
+
+        tileCnt = IO::loadItemIcon( 0, 0, 0, SPR_BERRY_SUB_OAM, SPR_BERRY_SUB_PAL, tileCnt );
+        IO::Oam->oamBuffer[ SPR_BERRY_SUB_OAM ].isHidden = true;
+
+        IO::boldFont->setColor( 0, 0 );
+        IO::boldFont->setColor( 0, 1 );
+        IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
+
+        // load bg graphic
+        if( p_npctier == ROTOM_TIER ) {
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "blendersub_rotom", 512,
+                                 49152, true );
+            BG_PALETTE_SUB[ TEXTFIELD_COLOR_IDX ] = TEXTFIELD_COLOR;
+            BG_PALETTE_SUB[ TEXT_COLOR_IDX ]      = TEXT_COLOR;
+            BG_PALETTE_SUB[ TEXT_COLOR_IDX2 ]     = TEXT_COLOR2;
+
+            // initialize progress bar
+            IO::printRectangle( PROGRESSBAR_START, 2, PROGRESSBAR_END, 16, true,
+                                TEXTFIELD_COLOR_IDX );
+
+            // print player names and load active sprite
+            IO::boldFont->setColor( TEXT_COLOR_IDX2, 2 );
+            IO::boldFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, PLAYERNAME_RIGHTX,
+                                        PLAYERNAME_TOPY, true, IO::font::CENTER );
+
+            IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
+            IO::boldFont->printStringC(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 )->m_boxdata.m_name, PLAYERNAME_LEFTX,
+                PLAYERNAME_BOTY, true, IO::font::CENTER );
+            IO::boldFont->printStringC(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 )->m_boxdata.m_name, PLAYERNAME_RIGHTX,
+                PLAYERNAME_BOTY, true, IO::font::CENTER );
+            IO::boldFont->printStringC(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 )->m_boxdata.m_name, PLAYERNAME_LEFTX,
+                PLAYERNAME_TOPY, true, IO::font::CENTER );
+        } else {
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "blendersub", 512,
+                                 49152, true );
+            BG_PALETTE_SUB[ TEXTFIELD_COLOR_IDX ] = TEXTFIELD_COLOR;
+            BG_PALETTE_SUB[ TEXT_COLOR_IDX ]      = TEXT_COLOR;
+            BG_PALETTE_SUB[ TEXT_COLOR_IDX2 ]     = TEXT_COLOR2;
+
+            // initialize progress bar
+            IO::printRectangle( PROGRESSBAR_START, 2, PROGRESSBAR_END, 16, true,
+                                TEXTFIELD_COLOR_IDX );
+
+            // print player names and load active sprite
+            IO::boldFont->setColor( TEXT_COLOR_IDX2, 2 );
+            IO::boldFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, PLAYERNAME_RIGHTX,
+                                        PLAYERNAME_TOPY, true, IO::font::CENTER );
+            IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
+
+            if( BLENDER_NPC[ p_npctier ][ 0 ].m_name ) {
+                IO::boldFont->printStringC( GET_MAP_STRING( BLENDER_NPC[ p_npctier ][ 0 ].m_name ),
+                                            PLAYERNAME_LEFTX, PLAYERNAME_BOTY, true,
+                                            IO::font::CENTER );
+            } else {
+                IO::Oam->oamBuffer[ SPR_ACTIVE_SUB_OAM_START + 1 ].isHidden = true;
+            }
+            if( BLENDER_NPC[ p_npctier ][ 1 ].m_name ) {
+                IO::boldFont->printStringC( GET_MAP_STRING( BLENDER_NPC[ p_npctier ][ 1 ].m_name ),
+                                            PLAYERNAME_RIGHTX, PLAYERNAME_BOTY, true,
+                                            IO::font::CENTER );
+            } else {
+                IO::Oam->oamBuffer[ SPR_ACTIVE_SUB_OAM_START + 2 ].isHidden = true;
+            }
+            if( BLENDER_NPC[ p_npctier ][ 2 ].m_name ) {
+                IO::boldFont->printStringC( GET_MAP_STRING( BLENDER_NPC[ p_npctier ][ 2 ].m_name ),
+                                            PLAYERNAME_LEFTX, PLAYERNAME_TOPY, true,
+                                            IO::font::CENTER );
+            } else {
+                IO::Oam->oamBuffer[ SPR_ACTIVE_SUB_OAM_START + 3 ].isHidden = true;
+            }
+        }
+
+        IO::updateOAM( true );
+
+        IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
+    }
+
+    void updateLid( u16 p_position ) {
+        // These are faster but produce noticeable wobble due to precision issues.
+        // s16 s = IO::isin( p_position / 2 ) >> 4;
+        // s16 c = IO::isin( ( 1 << 13 ) + p_position / 2 ) >> 4;
+
+        s16 s = sinLerp( p_position / 2 ) >> 4;
+        s16 c = cosLerp( p_position / 2 ) >> 4;
+
+        IO::Oam->matrixBuffer[ 0 ].hdx = c / 2;
+        IO::Oam->matrixBuffer[ 0 ].hdy = s / 2;
+        IO::Oam->matrixBuffer[ 0 ].vdx = ( -s ) / 2;
+        IO::Oam->matrixBuffer[ 0 ].vdy = c / 2;
+
+        IO::updateOAM( true );
+    }
+
+    void animateThrowInBerry( u8 p_berries[ 4 ] ) {
+        SpriteEntry* oam = IO::Oam->oamBuffer;
+        for( u8 i = 0; i < 4; ++i ) {
+            if( !p_berries[ i ] ) { break; }
+            // load sprite
+            IO::loadItemIcon( BAG::berryToItem( p_berries[ i ] ), BERRY_START_DATA[ i ].m_startX,
+                              BERRY_START_DATA[ i ].m_startY, SPR_BERRY_SUB_OAM, SPR_BERRY_SUB_PAL,
+                              oam[ SPR_BERRY_SUB_OAM ].gfxIndex );
+
+            oam[ SPR_BERRY_SUB_OAM ].isSizeDouble  = true;
+            oam[ SPR_BERRY_SUB_OAM ].isRotateScale = true;
+            oam[ SPR_BERRY_SUB_OAM ].rotationIndex = 0;
+
+            IO::Oam->matrixBuffer[ 0 ].vdx = ( 0LL << 8 );
+            IO::Oam->matrixBuffer[ 0 ].vdy = ( 1LL << 7 );
+            IO::Oam->matrixBuffer[ 0 ].hdx = ( 1LL << 7 );
+            IO::Oam->matrixBuffer[ 0 ].hdy = ( 0LL << 8 );
+
+            // move berry to center
+
+            s16  sy      = oam[ SPR_BERRY_SUB_OAM ].y; // need s16 due to overflow
+            auto targety = oam[ SPR_BERRY_SUB_OAM ].y;
+            u16  angle   = 0;
+            // perform 3 bounces upward, while maintaining x and y speed); results in
+            // berry being at center screen
+            for( u8 j = 0, bounce = 10; j < 4; ++j, --bounce ) {
+                s16 upspeed = bounce;
+                do {
+                    targety += BERRY_START_DATA[ i ].m_speedY;
+                    oam[ SPR_BERRY_SUB_OAM ].x += BERRY_START_DATA[ i ].m_speedX;
+                    sy += BERRY_START_DATA[ i ].m_speedY - upspeed;
+                    oam[ SPR_BERRY_SUB_OAM ].y = sy;
+                    upspeed--;
+                    IO::updateOAM( true );
+                    swiWaitForVBlank( );
+                    swiWaitForVBlank( );
+                    swiWaitForVBlank( );
+                    angle += -( BERRY_START_DATA[ i ].m_speedX ) * 1280;
+                    updateLid( angle );
+                    IO::updateOAM( true );
+                } while( targety >= sy );
+                SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
+                swiWaitForVBlank( );
+                swiWaitForVBlank( );
+            }
+            oam[ SPR_BERRY_SUB_OAM ].isSizeDouble  = false;
+            oam[ SPR_BERRY_SUB_OAM ].isRotateScale = false;
+            oam[ SPR_BERRY_SUB_OAM ].isHidden      = true;
+            IO::updateOAM( true );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+            swiWaitForVBlank( );
+        }
+    }
+
+    void animateCloseLid( u8 p_npctier ) {
+        // for now, load correct lid
+        if( p_npctier == ROTOM_TIER ) {
+            IO::loadSprite( "BB/lid_rotom", SPR_LID_SUB_OAM, SPR_LID_SUB_PAL,
+                            IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].gfxIndex, 128 - 64, 96 - 64, 64,
+                            64, false, true, true, OBJPRIORITY_3, true );
+        } else {
+            IO::loadSprite( "BB/lid", SPR_LID_SUB_OAM, SPR_LID_SUB_PAL,
+                            IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].gfxIndex, 128 - 64, 96 - 64, 64,
+                            64, false, true, true, OBJPRIORITY_3, true );
+        }
+
+        IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].isSizeDouble  = true;
+        IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].isRotateScale = true;
+        IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].rotationIndex = 0;
+
+        IO::Oam->matrixBuffer[ 0 ].vdx = ( 0LL << 8 );
+        IO::Oam->matrixBuffer[ 0 ].vdy = ( 1LL << 7 );
+        IO::Oam->matrixBuffer[ 0 ].hdx = ( 1LL << 7 );
+        IO::Oam->matrixBuffer[ 0 ].hdy = ( 0LL << 8 );
+        IO::updateOAM( true );
+    }
+
+    u16 speedToRPM100( u16 p_speed ) {
+        u32 res = p_speed;
+        res *= 360 * 1000;
+        return ( res >> 16 );
+    }
+
+    void updateStats( u8 p_miss_count[ 4 ], u8 p_hit_count[ 4 ], u8 perfect_count[ 4 ],
+                      u16 p_speed ) {
+        char buffer[ 100 ];
+        // update statistics on top and rpm counter on bottom
+
+        // rpm counter on bottom:
+
+        static u16 last_speed = 0;
+        if( p_speed != last_speed ) {
+            IO::printRectangle( 128 - 25, 155, 128 + 25, 190, true, 0 );
+            last_speed = p_speed;
+            IO::boldFont->setColor( 0, 1 );
+            IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
+            snprintf( buffer, 99, "%06.2f", speedToRPM100( p_speed ) / 100.0 );
+            IO::boldFont->printStringC( buffer, 148, 161, true, IO::font::RIGHT );
+        }
+    }
+
+    const u16 ARROW_POS[ 4 ] = {
+        0xE000, // player
+        0x6000, // npc1
+        0xA000, // npc2
+        0x2000  // npc3
+    };
+
+    constexpr bool inNPCDist( u16 p_speed, u16 p_pos1, u16 p_pos2 ) {
+        if( p_pos2 < p_pos1 ) { std::swap( p_pos1, p_pos2 ); }
+        return p_pos2 - p_pos1 < 5 * p_speed;
+    }
+
+    constexpr bool inGoodDist( u16 p_speed, u16 p_pos1, u16 p_pos2 ) {
+        if( p_pos2 < p_pos1 ) { std::swap( p_pos1, p_pos2 ); }
+        return p_pos2 - p_pos1 < 3 * p_speed;
+    }
+
+    constexpr bool inPerfectDist( u16 p_speed, u16 p_pos1, u16 p_pos2 ) {
+        if( p_pos2 < p_pos1 ) { std::swap( p_pos1, p_pos2 ); }
+        return p_pos2 - p_pos1 < p_speed;
+    }
+
+    constexpr u16 FASTSPEED_THRESHOLD = 1500;
+
+    std::pair<u8, u16> blenderMinigame( u8 p_berries[ 4 ], u8 p_npctier ) {
         // runs the blender mini game, returns (hitbonus, max rpm * 100),
-        // returns rpm = 0 if the machine overheated (when reaching > 655 rpm)
+        // returns rpm = 0 if the machine overheated (when reaching > 300 rpm)
         // hitbonus is # of perfect hits - # of misses
 
-        return { 20, 100 * 650 };
-        // return 100 * ( rand( ) % 655 );
+        // center piece rotates 12 times, on exact hit: oo (once per rev)
+        // ~> max hitbonus is 48
+
+        initBlender( p_npctier );
+        animateThrowInBerry( p_berries );
+        animateCloseLid( p_npctier );
+
+        u8 miss_count[ 4 ]    = { 0 };
+        u8 hit_count[ 4 ]     = { 0 };
+        u8 perfect_count[ 4 ] = { 0 };
+
+        u16 currentPosition = 0;
+        u16 currentSpeed    = 128;
+        u32 progress        = 0;
+        u8  lstcnt          = 0;
+
+        u16 mxSpeed = 0;
+        updateStats( miss_count, hit_count, perfect_count, mxSpeed );
+
+        bool overheat = false;
+
+        loop( ) {
+            if( p_npctier == ROTOM_TIER ) {
+                currentPosition += currentSpeed;
+            } else {
+                currentPosition -= currentSpeed;
+            }
+            progress += currentSpeed;
+
+            // stop game after 12 full turns, update progress bar every half turn
+            if( ( progress >> 15 ) > lstcnt ) {
+                lstcnt = ( progress >> 15 );
+                if( lstcnt < 24 ) {
+                    drawProgressBar( lstcnt );
+                } else {
+                    break;
+                }
+            }
+
+            updateLid( currentPosition );
+
+            // check for button presses/ touch input
+            // if close to own position
+            // oo increases speed by 3 * 128 if speed is < 1500, by 128 ow
+            // o increases speed by 2 * 128 is speed is < 1500, by 0 ow
+            // x decreases speed by 2 * 128
+            // numbers devided by number of players (if playing with a non-rotom)
+            // if speed is larger than 4642, the machine overheats
+
+            // check if arrow is close to arrow of an NPC
+
+            for( u8 i = 1; i < 4; ++i ) {
+                if( !p_berries[ i ] ) { break; }
+                if( inPerfectDist( currentSpeed, currentPosition, ARROW_POS[ i ] ) ) {
+
+                } else if( inGoodDist( currentSpeed, currentPosition, ARROW_POS[ i ] ) ) {
+                } else if( inNPCDist( currentSpeed, currentPosition, ARROW_POS[ i ] ) ) {
+                }
+            }
+
+            if( currentSpeed > 4642 ) {
+                mxSpeed  = 0;
+                overheat = true;
+                break;
+            }
+
+            if( currentSpeed > mxSpeed ) { mxSpeed = currentSpeed; }
+            updateStats( miss_count, hit_count, perfect_count, mxSpeed );
+
+            // speed decreases by 2 every frame
+            if( currentSpeed - 2 >= 128 ) { currentSpeed -= 2; }
+            swiWaitForVBlank( );
+        }
+
+        u8 hitbonus = 0;
+        if( !overheat ) {
+            for( u8 i = 0; i < 4; ++i ) { hitbonus += perfect_count[ i ]; }
+            for( u8 i = 0; i < 4; ++i ) {
+                if( hitbonus > miss_count[ i ] ) {
+                    hitbonus -= miss_count[ i ];
+                } else {
+                    hitbonus = 0;
+                }
+            }
+        }
+        return { hitbonus, speedToRPM100( mxSpeed ) };
+    }
+
+    void displayResult( BAG::pokeblockType p_type, u8 p_amount ) {
+        // add p_numNPC pokeblocks of type result to bag
+        char buffer[ 200 ];
+
+        snprintf(
+            buffer, 199,
+            "You obtained %hhu PokeBlock %s.\nYou stored the PokeBlocks\nin your PokeBlock Case.",
+            p_amount, GET_STRING( u8( p_type ) + 742 ) );
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+
+        IO::regularFont->printStringC( buffer, 6, 140, false );
+
+        // remove lid, show resulting block
+        IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].isSizeDouble  = false;
+        IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].isRotateScale = false;
+        IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].isHidden      = true;
+
+        // reset the blending machine
+        IO::printRectangle( PROGRESSBAR_START, 2, PROGRESSBAR_END, 16, true, TEXTFIELD_COLOR_IDX );
+        IO::printRectangle( 128 - 25, 155, 128 + 25, 190, true, 0 );
+
+        IO::updateOAM( true );
+
+        IO::loadPokeblockIcon( p_type, 128 - 16, 96 - 16, SPR_BERRY_SUB_OAM, SPR_BERRY_SUB_PAL,
+                               IO::Oam->oamBuffer[ SPR_BERRY_SUB_OAM ].gfxIndex );
+        IO::updateOAM( true );
+
+        IO::waitForInteractS( );
     }
 
     void runPokeblockBlender( u8 p_numNPC, bool p_rotom, bool p_blendMater ) {
-#ifdef DESQUID
-        for( u8 i = 0; i < 24; ++i ) { SAVE::SAV.getActiveFile( ).m_pokeblockCount[ i ] = 0; }
-#endif
-        char buffer[ 200 ];
         // when playing with npc, need to pick 1 berry, when playing with rotom, need to
         // pick 4 berries
 
         SOUND::dimVolume( );
 
-        u8 npctier = p_rotom ? 4 : p_numNPC;
-        if( p_blendMater ) { npctier = 0; }
+        u8 npctier = p_rotom ? ROTOM_TIER : p_numNPC;
+        if( p_blendMater ) { npctier = MASTER_TIER; }
         u8 berriesFormNPC = p_numNPC;
         if( !berriesFormNPC ) { berriesFormNPC = 1; }
         if( p_rotom ) { berriesFormNPC = 0; }
@@ -272,6 +677,12 @@ namespace SPX {
 
             if( !itm ) {
                 // player didn't pick a berry, abort
+                // return berries
+                for( u8 i = 0; i < requiredBerries; ++i ) {
+                    SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::BERRIES,
+                                                             BAG::berryToItem( berries[ i ] ), 1 );
+                }
+
                 SOUND::restoreVolume( );
                 return;
             }
@@ -289,26 +700,9 @@ namespace SPX {
             }
         }
 
-#ifdef DESQUID
-        FADE_TOP_DARK( );
-        FADE_SUB_DARK( );
-        IO::clearScreen( false );
-        videoSetMode( MODE_5_2D );
-        IO::resetScale( true, false );
-        bgUpdate( );
-        IO::init( );
-        MAP::curMap->draw( );
-
-        for( u8 i = 0; i < 4; ++i ) {
-            IO::takeItemFromPlayer( BAG::berryToItem( berries[ i ] ), 1 );
-        }
-#endif
-
-        // initialize ui
-        // throw in berries
         // start rotating, allow pressing A
 
-        auto [ hitbonus, rpm ] = blenderMinigame( );
+        auto [ hitbonus, rpm ] = blenderMinigame( berries, npctier );
 
         // compute resulting pokeblocks
 
@@ -317,10 +711,7 @@ namespace SPX {
         if( p_rotom && result == BAG::PB_ULTIMATE ) { result = BAG::PB_GOLD_DX; }
         if( p_blendMater && result == BAG::PB_GOLD_DX ) { result = BAG::PB_ULTIMATE; }
 
-        // add p_numNPC pokeblocks of type result to bag
-
-        snprintf( buffer, 199, "You obtained %hhu PokeBlock %s.", p_numNPC + 1,
-                  GET_STRING( u8( result ) + 742 ) );
+        displayResult( result, p_numNPC + 1 );
 
         // add pokeblocks to bag
         SAVE::SAV.getActiveFile( ).m_pokeblockCount[ u8( result ) ] += p_numNPC + 1;
