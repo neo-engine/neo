@@ -62,6 +62,8 @@ namespace SPX {
         s8  m_speedY;
     };
 
+    char NAME_CACHE[ 3 ][ 20 ];
+
     constexpr berryPathInfo BERRY_START_DATA[ 4 ] = {
         { 242, 20, -2, 1 },
         { -18, 140, 2, -1 },
@@ -70,7 +72,7 @@ namespace SPX {
     };
 
     constexpr u8 BERRY_TIER_LENGTH = 5;
-    constexpr u8 HITBONUS_MODIFIER = 12;
+    constexpr u8 HITBONUS_MODIFIER = 1;
     constexpr u8 MASTER_TIER       = 0;
     constexpr u8 ROTOM_TIER        = 4;
 
@@ -86,10 +88,20 @@ namespace SPX {
     constexpr u8 SPR_ACTIVE_SUB_OAM_END   = 3;
     constexpr u8 SPR_BERRY_SUB_OAM        = 4;
     constexpr u8 SPR_LID_SUB_OAM          = 4;
+    constexpr u8 SPR_CNT_SUB_OAM          = 5;
+
+    constexpr u8 SPR_PERFECT_SUB_OAM = 10;
+    constexpr u8 SPR_MISS_SUB_OAM    = 20;
+    constexpr u8 SPR_GOOD_SUB_OAM    = 30;
 
     constexpr u8 SPR_ACTIVE_SUB_PAL = 0;
     constexpr u8 SPR_BERRY_SUB_PAL  = 1;
     constexpr u8 SPR_LID_SUB_PAL    = 1;
+    constexpr u8 SPR_CNT_SUB_PAL    = 2;
+
+    constexpr u8 SPR_PERFECT_SUB_PAL = 3;
+    constexpr u8 SPR_MISS_SUB_PAL    = 4;
+    constexpr u8 SPR_GOOD_SUB_PAL    = 5;
 
     u16 BERRY_TIER_1[ BERRY_TIER_LENGTH ]
         = { I_CHERI_BERRY, I_PECHA_BERRY, I_RAWST_BERRY, I_ASPEAR_BERRY, I_CHESTO_BERRY };
@@ -101,11 +113,11 @@ namespace SPX {
         = { I_TAMATO_BERRY, I_CORNN_BERRY, I_MAGOST_BERRY, I_RABUTA_BERRY, I_NOMEL_BERRY };
 
     pokeblockNPC BLENDER_NPC[ 5 ][ 3 ] = {
-        { { 717, 100, 0, 0, 2 } }, // berry master
-        { { 711, 30, 70, 40, 1 } },
-        { { 712, 40, 60, 20, 1 }, { 713, 60, 70, 40, 1 } },
-        { { 714, 60, 90, 30, 1 }, { 715, 20, 80, 10, 1 }, { 716, 30, 60, 40, 1 } },
-        { { 0, 100, 0, 0, 0 }, { 0, 100, 0, 0, 0 }, { 0, 100, 0, 0, 0 } }, // rotom
+        { { 717, 255, 0, 0, 2 } }, // berry master
+        { { 711, 60, 140, 80, 1 } },
+        { { 712, 80, 120, 40, 1 }, { 713, 120, 140, 80, 1 } },
+        { { 714, 120, 180, 60, 1 }, { 715, 40, 160, 10, 1 }, { 716, 60, 120, 80, 1 } },
+        { { 0, 255, 0, 0, 0 }, { 0, 255, 0, 0, 0 }, { 0, 255, 0, 0, 0 } }, // rotom
     };
 
     u8 computeBaseSmoothness( u8 p_chosenBerries[ 4 ], u16 p_rpm ) {
@@ -121,7 +133,7 @@ namespace SPX {
         }
         if( cnt == 0 ) { return 0; }
         smooth /= cnt;
-        return static_cast<u8>( std::min( 255, int( smooth - cnt ) * 22000 / p_rpm ) );
+        return static_cast<u8>( std::min( 255, int( smooth - cnt ) * 10000 / p_rpm ) );
     }
 
     u8 computeBaseLevel( u8 p_chosenBerries[ 4 ] ) {
@@ -155,6 +167,8 @@ namespace SPX {
     }
 
     BAG::pokeblockType computeBlockType( u8 p_chosenBerries[ 4 ], u8 p_hitbonus, u16 p_rpm ) {
+        if( !p_rpm ) { return BAG::PB_BLACK; }
+
         // for each berry, compute smoothness values
         u8 flavor[ BAG::NUM_BERRYSTATS ] = { 0 };
 
@@ -309,6 +323,28 @@ namespace SPX {
         tileCnt = IO::loadSprite( "BB/lid", SPR_LID_SUB_OAM, SPR_LID_SUB_PAL, tileCnt, 128 - 64,
                                   96 - 64, 64, 64, false, true, true, OBJPRIORITY_3, true );
 
+        tileCnt = IO::loadSprite( "BB/start", SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL, tileCnt, 83 - 32,
+                                  46 - 32, 64, 32, false, true, true, OBJPRIORITY_1, true );
+
+        tileCnt = IO::loadSprite( "BB/perfect", SPR_PERFECT_SUB_OAM, SPR_PERFECT_SUB_PAL, tileCnt,
+                                  0, 0, 16, 16, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = IO::loadSprite( "BB/miss", SPR_MISS_SUB_OAM, SPR_MISS_SUB_PAL, tileCnt, 0, 0, 16,
+                                  16, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = IO::loadSprite( "BB/good", SPR_GOOD_SUB_OAM, SPR_GOOD_SUB_PAL, tileCnt, 0, 0, 16,
+                                  16, false, false, true, OBJPRIORITY_1, true );
+
+        for( u8 i = 1; i < 10; ++i ) {
+            IO::loadSprite( "BB/perfect", SPR_PERFECT_SUB_OAM + i, SPR_PERFECT_SUB_PAL,
+                            IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM ].gfxIndex, 0, 0, 16, 16, false,
+                            false, true, OBJPRIORITY_1, true );
+            IO::loadSprite( "BB/miss", SPR_MISS_SUB_OAM + i, SPR_MISS_SUB_PAL,
+                            IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM ].gfxIndex, 0, 0, 16, 16, false,
+                            false, true, OBJPRIORITY_1, true );
+            IO::loadSprite( "BB/good", SPR_GOOD_SUB_OAM + i, SPR_GOOD_SUB_PAL,
+                            IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM ].gfxIndex, 0, 0, 16, 16, false,
+                            false, true, OBJPRIORITY_1, true );
+        }
+
         tileCnt = IO::loadItemIcon( 0, 0, 0, SPR_BERRY_SUB_OAM, SPR_BERRY_SUB_PAL, tileCnt );
         IO::Oam->oamBuffer[ SPR_BERRY_SUB_OAM ].isHidden = true;
 
@@ -360,6 +396,12 @@ namespace SPX {
                                         PLAYERNAME_TOPY, true, IO::font::CENTER );
             IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
 
+            for( u8 i = 0; i < 3; ++i ) {
+                if( BLENDER_NPC[ p_npctier ][ i ].m_name ) {
+                    snprintf( NAME_CACHE[ i ], 19,
+                              GET_MAP_STRING( BLENDER_NPC[ p_npctier ][ i ].m_name ) );
+                }
+            }
             if( BLENDER_NPC[ p_npctier ][ 0 ].m_name ) {
                 IO::boldFont->printStringC( GET_MAP_STRING( BLENDER_NPC[ p_npctier ][ 0 ].m_name ),
                                             PLAYERNAME_LEFTX, PLAYERNAME_BOTY, true,
@@ -488,13 +530,182 @@ namespace SPX {
         return ( res >> 16 );
     }
 
-    void updateStats( u8 p_miss_count[ 4 ], u8 p_hit_count[ 4 ], u8 perfect_count[ 4 ],
-                      u16 p_speed ) {
+    char* toString( int p_num ) {
+        static char buffer[ 50 ];
+        snprintf( buffer, 19, "%i", p_num );
+        return buffer;
+    }
+
+    void scoreBoard( u8 p_miss_count[ 4 ], u8 p_hit_count[ 4 ], u8 p_perfect_count[ 4 ],
+                     u16 p_mxSpeed, u8 p_npctier, u8 p_berries[ 4 ] ) {
         char buffer[ 100 ];
         // update statistics on top and rpm counter on bottom
 
-        // rpm counter on bottom:
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
 
+        // print names and stats
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+
+        IO::regularFont->printStringC( "Player", 32, 12, false, IO::font::CENTER );
+        IO::regularFont->printStringC( "Perfect", 96, 12, false, IO::font::CENTER );
+        IO::regularFont->printStringC( "Hit", 128, 12, false, IO::font::CENTER );
+        IO::regularFont->printStringC( "Miss", 160, 12, false, IO::font::CENTER );
+        // IO::regularFont->printStringC( "Rank", 192, 12, false, IO::font::CENTER );
+        if( p_mxSpeed ) {
+            IO::regularFont->printStringC( "Bonus", 224, 12, false, IO::font::CENTER );
+        }
+
+        u8 bonus = 0;
+
+        if( p_npctier != ROTOM_TIER ) {
+            for( u8 i = 0; i < 4; ++i ) {
+                if( !p_berries[ i ] ) { break; }
+                if( !i ) {
+                    IO::regularFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, 32,
+                                                   30 + 16 * i, false, IO::font::CENTER );
+                } else {
+                    IO::regularFont->printStringC( NAME_CACHE[ i - 1 ], 32, 30 + 16 * i, false,
+                                                   IO::font::CENTER );
+                }
+
+                IO::regularFont->printStringC( toString( p_perfect_count[ i ] ), 96, 30 + 16 * i,
+                                               false, IO::font::CENTER );
+                IO::regularFont->printStringC( toString( p_hit_count[ i ] ), 128, 30 + 16 * i,
+                                               false, IO::font::CENTER );
+                IO::regularFont->printStringC( toString( p_miss_count[ i ] ), 160, 30 + 16 * i,
+                                               false, IO::font::CENTER );
+
+                if( p_mxSpeed ) {
+                    if( p_perfect_count[ i ] > p_miss_count[ i ] ) {
+                        bonus += p_perfect_count[ i ] - p_miss_count[ i ];
+                        IO::regularFont->printStringC(
+                            toString( p_perfect_count[ i ] - p_miss_count[ i ] ), 224, 30 + 16 * i,
+                            false, IO::font::CENTER );
+                    }
+                }
+            }
+        } else {
+            IO::regularFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, 32, 30 + 16 * 0,
+                                           false, IO::font::CENTER );
+            IO::regularFont->printStringC( toString( p_perfect_count[ 0 ] ), 96, 30 + 16 * 0, false,
+                                           IO::font::CENTER );
+            IO::regularFont->printStringC( toString( p_hit_count[ 0 ] ), 128, 30 + 16 * 0, false,
+                                           IO::font::CENTER );
+            IO::regularFont->printStringC( toString( p_miss_count[ 0 ] ), 160, 30 + 16 * 0, false,
+                                           IO::font::CENTER );
+
+            if( p_mxSpeed ) {
+                if( p_perfect_count[ 0 ] > p_miss_count[ 0 ] ) {
+                    bonus += p_perfect_count[ 0 ] - p_miss_count[ 0 ];
+                    IO::regularFont->printStringC(
+                        toString( p_perfect_count[ 0 ] - p_miss_count[ 0 ] ), 224, 30 + 16 * 0,
+                        false, IO::font::CENTER );
+                }
+            }
+
+            IO::regularFont->printStringC(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 )->m_boxdata.m_name, 32, 30 + 16 * 1,
+                false, IO::font::CENTER );
+            IO::regularFont->printStringC(
+                toString( p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ] ), 96,
+                30 + 16 * 1, false, IO::font::CENTER );
+            IO::regularFont->printStringC(
+                toString( p_hit_count[ 1 ] + p_hit_count[ 2 ] + p_hit_count[ 3 ] ), 128,
+                30 + 16 * 1, false, IO::font::CENTER );
+            IO::regularFont->printStringC(
+                toString( p_miss_count[ 1 ] + p_miss_count[ 2 ] + p_miss_count[ 3 ] ), 160,
+                30 + 16 * 1, false, IO::font::CENTER );
+
+            u8 bo  = p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ];
+            u8 bo2 = p_miss_count[ 1 ] + p_miss_count[ 2 ] + p_miss_count[ 3 ];
+
+            if( p_mxSpeed ) {
+                if( bo > bo2 ) {
+                    bonus += bo - bo2;
+                    IO::regularFont->printStringC( toString( bo - bo2 ), 224, 30 + 16 * 1, false,
+                                                   IO::font::CENTER );
+                }
+            }
+        }
+
+        if( p_mxSpeed ) {
+            snprintf( buffer, 199, "Bonus: %hhu", bonus );
+            IO::regularFont->printStringC( buffer, 250, 104, false, IO::font::RIGHT );
+        }
+        // max RPM
+        snprintf( buffer, 199, "Max RPM: %06.2f", speedToRPM100( p_mxSpeed ) / 100.0 );
+        IO::regularFont->printStringC( buffer, 6, 104, false );
+    }
+
+    void updateStats( u8 p_miss_count[ 4 ], u8 p_perfect_count[ 4 ], u16 p_mxSpeed, u8 p_npctier,
+                      u8 p_berries[ 4 ] ) {
+        char buffer[ 100 ];
+        // update statistics on top and rpm counter on bottom
+
+        dmaFillWords( 0, bgGetGfxPtr( IO::bg2 ), 256 * 192 );
+
+        // print names and stats
+
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
+        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+
+        u8 player = 4;
+        u8 bonus  = 0;
+        if( p_npctier != ROTOM_TIER ) {
+            for( u8 i = 0; i < 4; ++i ) {
+                if( !p_berries[ i ] ) {
+                    player = i;
+                    break;
+                }
+                if( p_perfect_count[ i ] > p_miss_count[ i ] ) {
+                    bonus += p_perfect_count[ i ] - p_miss_count[ i ];
+                }
+            }
+        } else {
+            if( p_perfect_count[ 0 ] > p_miss_count[ 0 ] ) {
+                bonus += p_perfect_count[ 0 ] - p_miss_count[ 0 ];
+            }
+            u8 bo  = p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ];
+            u8 bo2 = p_miss_count[ 1 ] + p_miss_count[ 2 ] + p_miss_count[ 3 ];
+            if( bo > bo2 ) { bonus += bo - bo2; }
+        }
+
+#ifdef DESQUID_MORE
+        snprintf( buffer, 199, "Berry Strength: %hhu", computeBaseLevel( p_berries ) );
+        IO::regularFont->printStringC( buffer, 6, 26, false );
+
+        if( bonus ) {
+            // bonus
+            snprintf( buffer, 199, "Bonus: %hhu", bonus );
+            IO::regularFont->printStringC( buffer, 128, 26, false );
+        }
+
+        // max RPM
+        snprintf( buffer, 199, "Max RPM: %06.2f", speedToRPM100( p_mxSpeed ) / 100.0 );
+        IO::regularFont->printStringC( buffer, 6, 6, false );
+
+        snprintf( buffer, 199, "Sheen: %hhu",
+                  computeBaseSmoothness( p_berries, speedToRPM100( p_mxSpeed ) ) );
+        IO::regularFont->printStringC( buffer, 128, 6, false );
+#endif
+
+        // compute expected output
+        auto result = computeBlockType( p_berries, bonus, speedToRPM100( p_mxSpeed ) );
+        char sbuffer[ 60 ];
+        snprintf( sbuffer, 59, GET_STRING( u8( result ) + 742 ) );
+        snprintf( buffer, 199, "Predicted Result: %hhux PokeBlock %s", player, sbuffer );
+        IO::regularFont->printStringC( buffer, 6, 140, false );
+    }
+
+    void updateRPM( u16 p_speed ) {
+        char buffer[ 100 ];
+        // rpm counter on bottom:
         static u16 last_speed = 0;
         if( p_speed != last_speed ) {
             IO::printRectangle( 128 - 25, 155, 128 + 25, 190, true, 0 );
@@ -515,20 +726,109 @@ namespace SPX {
 
     constexpr bool inNPCDist( u16 p_speed, u16 p_pos1, u16 p_pos2 ) {
         if( p_pos2 < p_pos1 ) { std::swap( p_pos1, p_pos2 ); }
-        return p_pos2 - p_pos1 < 5 * p_speed;
+        return p_pos2 - p_pos1 < 6 * p_speed;
     }
 
     constexpr bool inGoodDist( u16 p_speed, u16 p_pos1, u16 p_pos2 ) {
         if( p_pos2 < p_pos1 ) { std::swap( p_pos1, p_pos2 ); }
-        return p_pos2 - p_pos1 < 3 * p_speed;
+        return p_pos2 - p_pos1 < 4 * p_speed;
     }
 
     constexpr bool inPerfectDist( u16 p_speed, u16 p_pos1, u16 p_pos2 ) {
         if( p_pos2 < p_pos1 ) { std::swap( p_pos1, p_pos2 ); }
-        return p_pos2 - p_pos1 < p_speed;
+        return p_pos2 - p_pos1 < 2 * p_speed;
+    }
+
+    u8   FREE_PERFECT = 0;
+    void animatePerfectHit( u16 p_position ) {
+        p_position -= ( 1 << 14 );
+        IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + FREE_PERFECT ].isHidden = false;
+        IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + FREE_PERFECT ].x
+            = rand( ) % 4 + 126
+              + ( ( ( rand( ) % 8 + 64 ) * ( IO::isin( p_position / 2 - ( 1 << 13 ) ) ) ) >> 12 );
+        IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + FREE_PERFECT ].y
+            = rand( ) % 4 + 94
+              + ( ( ( rand( ) % 8 + 64 ) * ( IO::isin( p_position / 2 ) ) ) >> 12 );
+        IO::updateOAM( true );
+
+        FREE_PERFECT = ( FREE_PERFECT + 1 ) % 10;
+    }
+
+    u8   FREE_GOOD = 0;
+    void animateGoodHit( u16 p_position ) {
+        p_position -= ( 1 << 14 );
+        IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + FREE_GOOD ].isHidden = false;
+        IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + FREE_GOOD ].x
+            = rand( ) % 4 + 126
+              + ( ( ( rand( ) % 8 + 64 ) * ( IO::isin( p_position / 2 - ( 1 << 13 ) ) ) ) >> 12 );
+        IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + FREE_GOOD ].y
+            = rand( ) % 4 + 94
+              + ( ( ( rand( ) % 8 + 64 ) * ( IO::isin( p_position / 2 ) ) ) >> 12 );
+        IO::updateOAM( true );
+
+        FREE_GOOD = ( FREE_GOOD + 1 ) % 10;
+    }
+
+    u8   FREE_MISS = 0;
+    void animateMiss( u16 p_position ) {
+        p_position -= ( 1 << 14 );
+        IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + FREE_MISS ].isHidden = false;
+        IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + FREE_MISS ].x
+            = rand( ) % 4 + 126
+              + ( ( ( rand( ) % 8 + 64 ) * ( IO::isin( p_position / 2 - ( 1 << 13 ) ) ) ) >> 12 );
+        IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + FREE_MISS ].y
+            = rand( ) % 4 + 94
+              + ( ( ( rand( ) % 8 + 64 ) * ( IO::isin( p_position / 2 ) ) ) >> 12 );
+        IO::updateOAM( true );
+
+        FREE_MISS = ( FREE_MISS + 1 ) % 10;
+    }
+
+    void animateCountDown( ) {
+        // "3"
+        IO::loadSprite( "BB/3", SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+                        IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 16, 96 - 16, 32, 32,
+                        false, false, false, OBJPRIORITY_1, true );
+        IO::updateOAM( true );
+        SOUND::playSoundEffect( SFX_CHOOSE );
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        // "2"
+        IO::loadSprite( "BB/2", SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+                        IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 16, 96 - 16, 32, 32,
+                        false, false, false, OBJPRIORITY_1, true );
+        IO::updateOAM( true );
+        SOUND::playSoundEffect( SFX_CHOOSE );
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        // "1"
+        IO::loadSprite( "BB/1", SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+                        IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 16, 96 - 16, 32, 32,
+                        false, false, false, OBJPRIORITY_1, true );
+        IO::updateOAM( true );
+        SOUND::playSoundEffect( SFX_CHOOSE );
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        // "START"
+        IO::loadSprite( "BB/start", SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+                        IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 32, 96 - 16, 64, 32,
+                        false, false, false, OBJPRIORITY_1, true );
+        IO::updateOAM( true );
+        SOUND::playSoundEffect( SFX_CHOOSE );
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
+        IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].isHidden = true;
+        IO::updateOAM( true );
     }
 
     constexpr u16 FASTSPEED_THRESHOLD = 1500;
+    constexpr u16 PERFECT_GAIN        = 3 * 128;
+    constexpr u16 GOOD_GAIN           = 2 * 128;
+    constexpr u16 PERFECT_GAIN_FAST   = 128;
+    constexpr u16 GOOD_GAIN_FAST      = 0;
+    constexpr u16 MISS_LOSS           = 2 * 128;
+    constexpr u16 MIN_SPEED           = 128;
+    constexpr u16 OVERHEAT_SPEED      = 4642;
 
     std::pair<u8, u16> blenderMinigame( u8 p_berries[ 4 ], u8 p_npctier ) {
         // runs the blender mini game, returns (hitbonus, max rpm * 100),
@@ -542,6 +842,8 @@ namespace SPX {
         animateThrowInBerry( p_berries );
         animateCloseLid( p_npctier );
 
+        animateCountDown( );
+
         u8 miss_count[ 4 ]    = { 0 };
         u8 hit_count[ 4 ]     = { 0 };
         u8 perfect_count[ 4 ] = { 0 };
@@ -552,11 +854,26 @@ namespace SPX {
         u8  lstcnt          = 0;
 
         u16 mxSpeed = 0;
-        updateStats( miss_count, hit_count, perfect_count, mxSpeed );
+        updateStats( miss_count, perfect_count, mxSpeed, p_npctier, p_berries );
 
         bool overheat = false;
 
+        scanKeys( );
+        cooldown = COOLDOWN_COUNT;
+
+        u8 numPlayer = 0;
+        for( ; numPlayer < 4; ++numPlayer ) {
+            if( !p_berries[ numPlayer ] ) { break; }
+        }
+        u8 adj = p_npctier == ROTOM_TIER ? 1 : numPlayer;
+
+        u32 cooldownNPC[ 4 ] = { 0 };
+
         loop( ) {
+            scanKeys( );
+            touchRead( &touch );
+            pressed = keysUp( );
+
             if( p_npctier == ROTOM_TIER ) {
                 currentPosition += currentSpeed;
             } else {
@@ -569,9 +886,28 @@ namespace SPX {
                 lstcnt = ( progress >> 15 );
                 if( lstcnt < 24 ) {
                     drawProgressBar( lstcnt );
+                    updateStats( miss_count, perfect_count, mxSpeed, p_npctier, p_berries );
+                    if( currentSpeed - 32 >= MIN_SPEED ) { currentSpeed -= 32; }
                 } else {
                     break;
                 }
+            }
+
+            if( inNPCDist( currentSpeed, currentPosition, currentPosition / 0x1000 * 0x1000 ) ) {
+                // clean up old sprites
+                for( u8 i = 0; i < 5; ++i ) {
+                    IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + ( FREE_GOOD + i + 2 ) % 10 ].isHidden
+                        = true;
+                    IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + ( FREE_PERFECT + i + 2 ) % 10 ]
+                        .isHidden
+                        = true;
+                    IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + ( FREE_MISS + i + 2 ) % 10 ].isHidden
+                        = true;
+                }
+                IO::updateOAM( true );
+                FREE_GOOD    = ( FREE_GOOD + 1 ) % 10;
+                FREE_MISS    = ( FREE_MISS + 1 ) % 10;
+                FREE_PERFECT = ( FREE_PERFECT + 1 ) % 10;
             }
 
             updateLid( currentPosition );
@@ -584,56 +920,135 @@ namespace SPX {
             // numbers devided by number of players (if playing with a non-rotom)
             // if speed is larger than 4642, the machine overheats
 
+            if( ( pressed & KEY_A ) || touch.px || touch.py ) {
+                if( inPerfectDist( currentSpeed, currentPosition, ARROW_POS[ 0 ] ) ) {
+                    // perfect hit
+                    animatePerfectHit( ARROW_POS[ 0 ] );
+                    perfect_count[ 0 ]++;
+                    if( currentSpeed < FASTSPEED_THRESHOLD ) {
+                        currentSpeed += PERFECT_GAIN / adj;
+                    } else {
+                        currentSpeed += PERFECT_GAIN_FAST / adj;
+                    }
+                } else if( inGoodDist( currentSpeed, currentPosition, ARROW_POS[ 0 ] ) ) {
+                    animateGoodHit( ARROW_POS[ 0 ] );
+                    hit_count[ 0 ]++;
+                    if( currentSpeed < FASTSPEED_THRESHOLD ) {
+                        currentSpeed += GOOD_GAIN / adj;
+                    } else {
+                        currentSpeed += GOOD_GAIN_FAST / adj;
+                    }
+
+                } else {
+                    animateMiss( ARROW_POS[ 0 ] );
+                    miss_count[ 0 ]++;
+                    if( currentSpeed - MISS_LOSS / adj > MIN_SPEED ) {
+                        currentSpeed -= MISS_LOSS / adj;
+                    } else {
+                        currentSpeed = MIN_SPEED;
+                    }
+                }
+
+                scanKeys( );
+                cooldown = 2;
+            }
+
             // check if arrow is close to arrow of an NPC
+            for( u8 i = 1; i < numPlayer; ++i ) {
+                auto npc = BLENDER_NPC[ p_npctier ][ i - 1 ];
+                u8   rnd = rand( );
 
-            for( u8 i = 1; i < 4; ++i ) {
-                if( !p_berries[ i ] ) { break; }
+                if( inNPCDist( currentSpeed, currentPosition, cooldownNPC[ i ] ) ) {
+                    continue;
+                } else {
+                    cooldownNPC[ i ] = -1;
+                }
+
                 if( inPerfectDist( currentSpeed, currentPosition, ARROW_POS[ i ] ) ) {
-
+                    if( npc.m_percPerfect == 255 || rnd < npc.m_percPerfect ) {
+                        // perfect hit
+                        animatePerfectHit( ARROW_POS[ i ] );
+                        cooldownNPC[ i ] = currentPosition;
+                        perfect_count[ i ]++;
+                        if( currentSpeed < FASTSPEED_THRESHOLD ) {
+                            currentSpeed += PERFECT_GAIN / adj;
+                        } else {
+                            currentSpeed += PERFECT_GAIN_FAST / adj;
+                        }
+                    }
                 } else if( inGoodDist( currentSpeed, currentPosition, ARROW_POS[ i ] ) ) {
+                    if( rnd < npc.m_percHit ) {
+                        animateGoodHit( ARROW_POS[ i ] );
+                        cooldownNPC[ i ] = currentPosition;
+                        hit_count[ i ]++;
+                        if( currentSpeed < FASTSPEED_THRESHOLD ) {
+                            currentSpeed += GOOD_GAIN / adj;
+                        } else {
+                            currentSpeed += GOOD_GAIN_FAST / adj;
+                        }
+                    }
                 } else if( inNPCDist( currentSpeed, currentPosition, ARROW_POS[ i ] ) ) {
+                    if( rnd < npc.m_percMiss ) {
+                        animateMiss( ARROW_POS[ i ] );
+                        cooldownNPC[ i ] = currentPosition;
+                        miss_count[ i ]++;
+                        if( currentSpeed - MISS_LOSS / adj > MIN_SPEED ) {
+                            currentSpeed -= MISS_LOSS / adj;
+                        } else {
+                            currentSpeed = MIN_SPEED;
+                        }
+                    }
                 }
             }
 
-            if( currentSpeed > 4642 ) {
+            if( currentSpeed > OVERHEAT_SPEED ) {
                 mxSpeed  = 0;
                 overheat = true;
                 break;
             }
 
             if( currentSpeed > mxSpeed ) { mxSpeed = currentSpeed; }
-            updateStats( miss_count, hit_count, perfect_count, mxSpeed );
+            updateRPM( currentSpeed );
 
-            // speed decreases by 2 every frame
-            if( currentSpeed - 2 >= 128 ) { currentSpeed -= 2; }
             swiWaitForVBlank( );
         }
 
+        for( u8 i = 0; i < 10; ++i ) {
+            IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + ( FREE_GOOD + i + 2 ) % 10 ].isHidden = true;
+            IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + ( FREE_PERFECT + i + 2 ) % 10 ].isHidden
+                = true;
+            IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + ( FREE_MISS + i + 2 ) % 10 ].isHidden = true;
+        }
+        IO::updateOAM( true );
+
+        swiWaitForVBlank( );
+        scoreBoard( miss_count, hit_count, perfect_count, mxSpeed, p_npctier, p_berries );
+        swiWaitForVBlank( );
         u8 hitbonus = 0;
         if( !overheat ) {
-            for( u8 i = 0; i < 4; ++i ) { hitbonus += perfect_count[ i ]; }
             for( u8 i = 0; i < 4; ++i ) {
-                if( hitbonus > miss_count[ i ] ) {
-                    hitbonus -= miss_count[ i ];
-                } else {
-                    hitbonus = 0;
+                if( perfect_count[ i ] > miss_count[ i ] ) {
+                    hitbonus += perfect_count[ i ] - miss_count[ i ];
                 }
             }
         }
         return { hitbonus, speedToRPM100( mxSpeed ) };
     }
 
-    void displayResult( BAG::pokeblockType p_type, u8 p_amount ) {
+    void displayResult( BAG::pokeblockType p_type, u8 p_amount, bool p_overheat ) {
         // add p_numNPC pokeblocks of type result to bag
         char buffer[ 200 ];
-
-        snprintf(
-            buffer, 199,
-            "You obtained %hhu PokeBlock %s.\nYou stored the PokeBlocks\nin your PokeBlock Case.",
-            p_amount, GET_STRING( u8( p_type ) + 742 ) );
-
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
 
+        if( p_overheat ) {
+            IO::regularFont->printStringC( GET_STRING( 800 ), 6, 140, false );
+            IO::waitForInteractS( );
+            IO::printRectangle( 0, 140, 255, 192, false, 0 );
+        }
+
+        char sbuffer[ 60 ];
+        snprintf( sbuffer, 59, GET_STRING( u8( p_type ) + 742 ) );
+        snprintf( buffer, 199, GET_STRING( 801 ), p_amount, sbuffer );
         IO::regularFont->printStringC( buffer, 6, 140, false );
 
         // remove lid, show resulting block
@@ -711,7 +1126,7 @@ namespace SPX {
         if( p_rotom && result == BAG::PB_ULTIMATE ) { result = BAG::PB_GOLD_DX; }
         if( p_blendMater && result == BAG::PB_GOLD_DX ) { result = BAG::PB_ULTIMATE; }
 
-        displayResult( result, p_numNPC + 1 );
+        displayResult( result, p_numNPC + 1, rpm == 0 );
 
         // add pokeblocks to bag
         SAVE::SAV.getActiveFile( ).m_pokeblockCount[ u8( result ) ] += p_numNPC + 1;
