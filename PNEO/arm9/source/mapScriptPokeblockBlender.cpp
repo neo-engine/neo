@@ -37,21 +37,20 @@ namespace MAP {
         char buffer[ 200 ];
         ANIMATE_MAP = false;
 
-        printMapMessage( "It's a Berry Blender!", MSG_INFO );
+        printMapMessage( GET_MAP_STRING( 736 ), MSG_INFO );
 
         // check for pokeblock kit
 
         if( !SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                      I_POKEBLOCK_KIT ) ) {
-            printMapMessage( "You need a PokeBlock Kit to\nuse the Berry Blender.", MSG_INFO );
+            printMapMessage( GET_MAP_STRING( 735 ), MSG_INFO );
 
             ANIMATE_MAP = true;
             return;
         }
 
         if( !p_numNPC ) {
-            printMapMessage(
-                "You need at least two participants\nto blend berries into PokeBlocks|", MSG_INFO );
+            printMapMessage( GET_MAP_STRING( 737 ), MSG_INFO );
 
             // check if rotom (base forme) is following the player, if so ask if player
             // would like to let rotom enter the machine
@@ -59,14 +58,10 @@ namespace MAP {
                                && _followPkmnData->getForme( ) == 0;
 
             if( canUseRotom ) {
-                snprintf(
-                    buffer, 199,
-                    "| | |\r%s looks like it would like to\ntake control of the Berry Blender.",
-                    _followPkmnData->m_boxdata.m_name );
+                snprintf( buffer, 199, GET_MAP_STRING( 738 ), _followPkmnData->m_boxdata.m_name );
                 printMapMessage( buffer, MSG_INFO );
 
-                snprintf( buffer, 199, "Would you like to create PokeBlocks\ntogether with %s?",
-                          _followPkmnData->m_boxdata.m_name );
+                snprintf( buffer, 199, GET_MAP_STRING( 739 ), _followPkmnData->m_boxdata.m_name );
 
                 if( IO::yesNoBox::YES
                     == IO::yesNoBox( ).getResult( convertMapString( buffer, MSG_INFO ).c_str( ),
@@ -100,8 +95,8 @@ namespace MAP {
 
         if( IO::yesNoBox::YES
             == IO::yesNoBox( ).getResult(
-                convertMapString( "Would you like to create PokeBlocks?", MSG_INFO ).c_str( ),
-                MSG_INFO_NOCLOSE, false ) ) {
+                convertMapString( GET_MAP_STRING( 740 ), MSG_INFO ).c_str( ), MSG_INFO_NOCLOSE,
+                false ) ) {
             // start minigame
             SPX::runPokeblockBlender( p_numNPC, false );
 
