@@ -25,6 +25,8 @@
     along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     */
 
+#include <algorithm>
+#include <tuple>
 #include <vector>
 #include <nds.h>
 
@@ -84,21 +86,32 @@ namespace SPX {
     constexpr u16 TEXT_COLOR2     = 0x9ddd;
     constexpr u8  TEXT_COLOR_IDX2 = 22;
 
+    constexpr u8 SPR_PERFECT_OAM = 0;
+    constexpr u8 SPR_MISS_OAM    = 1;
+    constexpr u8 SPR_GOOD_OAM    = 2;
+    constexpr u8 SPR_BERRY_OAM   = 3;
+    constexpr u8 BERRY_Y         = 64;
+    constexpr u8 BERRY_MIN_Y     = 24;
+    constexpr u8 BERRY_MAX_Y     = 84;
+
+    constexpr u8 SPR_PERFECT_PAL = 0;
+    constexpr u8 SPR_MISS_PAL    = 1;
+    constexpr u8 SPR_GOOD_PAL    = 2;
+    constexpr u8 SPR_BERRY_PAL   = 3;
+
     constexpr u8 SPR_ACTIVE_SUB_OAM_START = 0;
     constexpr u8 SPR_ACTIVE_SUB_OAM_END   = 3;
     constexpr u8 SPR_BERRY_SUB_OAM        = 4;
     constexpr u8 SPR_LID_SUB_OAM          = 4;
     constexpr u8 SPR_CNT_SUB_OAM          = 5;
+    constexpr u8 SPR_PERFECT_SUB_OAM      = 10;
+    constexpr u8 SPR_MISS_SUB_OAM         = 20;
+    constexpr u8 SPR_GOOD_SUB_OAM         = 30;
 
-    constexpr u8 SPR_PERFECT_SUB_OAM = 10;
-    constexpr u8 SPR_MISS_SUB_OAM    = 20;
-    constexpr u8 SPR_GOOD_SUB_OAM    = 30;
-
-    constexpr u8 SPR_ACTIVE_SUB_PAL = 0;
-    constexpr u8 SPR_BERRY_SUB_PAL  = 1;
-    constexpr u8 SPR_LID_SUB_PAL    = 1;
-    constexpr u8 SPR_CNT_SUB_PAL    = 2;
-
+    constexpr u8 SPR_ACTIVE_SUB_PAL  = 0;
+    constexpr u8 SPR_BERRY_SUB_PAL   = 1;
+    constexpr u8 SPR_LID_SUB_PAL     = 1;
+    constexpr u8 SPR_CNT_SUB_PAL     = 2;
     constexpr u8 SPR_PERFECT_SUB_PAL = 3;
     constexpr u8 SPR_MISS_SUB_PAL    = 4;
     constexpr u8 SPR_GOOD_SUB_PAL    = 5;
@@ -156,8 +169,8 @@ namespace SPX {
         flavor_reduced[ BAG::BY_SPICY ]  = flavor[ BAG::BY_SPICY ] - flavor[ BAG::BY_DRY ];
         flavor_reduced[ BAG::BY_DRY ]    = flavor[ BAG::BY_DRY ] - flavor[ BAG::BY_SWEET ];
         flavor_reduced[ BAG::BY_SWEET ]  = flavor[ BAG::BY_SWEET ] - flavor[ BAG::BY_BITTER ];
-        flavor_reduced[ BAG::BY_BITTER ] = flavor[ BAG::BY_BITTER ] - flavor[ BAG::BY_SPICY ];
-        flavor_reduced[ BAG::BY_SOUR ]   = flavor[ BAG::BY_SOUR ] - flavor[ BAG::BY_SOUR ];
+        flavor_reduced[ BAG::BY_BITTER ] = flavor[ BAG::BY_BITTER ] - flavor[ BAG::BY_SOUR ];
+        flavor_reduced[ BAG::BY_SOUR ]   = flavor[ BAG::BY_SOUR ] - flavor[ BAG::BY_SPICY ];
 
         u8 mx = 0;
         for( u8 j = 0; j < BAG::NUM_BERRYSTATS; ++j ) {
@@ -193,9 +206,8 @@ namespace SPX {
         flavor_reduced[ BAG::BY_SPICY ] = s16{ flavor[ BAG::BY_SPICY ] } - flavor[ BAG::BY_DRY ];
         flavor_reduced[ BAG::BY_DRY ]   = s16{ flavor[ BAG::BY_DRY ] } - flavor[ BAG::BY_SWEET ];
         flavor_reduced[ BAG::BY_SWEET ] = s16{ flavor[ BAG::BY_SWEET ] } - flavor[ BAG::BY_BITTER ];
-        flavor_reduced[ BAG::BY_BITTER ]
-            = s16{ flavor[ BAG::BY_BITTER ] } - flavor[ BAG::BY_SPICY ];
-        flavor_reduced[ BAG::BY_SOUR ] = s16{ flavor[ BAG::BY_SOUR ] } - flavor[ BAG::BY_SOUR ];
+        flavor_reduced[ BAG::BY_BITTER ] = s16{ flavor[ BAG::BY_BITTER ] } - flavor[ BAG::BY_SOUR ];
+        flavor_reduced[ BAG::BY_SOUR ]   = s16{ flavor[ BAG::BY_SOUR ] } - flavor[ BAG::BY_SPICY ];
 
         u8 numneg = 0;
         for( u8 j = 0; j < BAG::NUM_BERRYSTATS; ++j ) { numneg += flavor_reduced[ j ] < 0; }
@@ -304,9 +316,30 @@ namespace SPX {
         IO::clearScreen( true, true );
         IO::resetScale( true, true );
 
-        // bottom: blander and actual mini game
         // top: score board and result prediction
+        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "PokeblockUpper", 512, 49152,
+                             false );
+        IO::initColors( false, true, true );
+        // "Berry blender"
+        IO::regularFont->printString( GET_STRING( 802 ), 128, 5, false, IO::font::CENTER );
 
+        u16 tileCntT = 0;
+        tileCntT = IO::loadSprite( "BB/perfect", SPR_PERFECT_OAM, SPR_PERFECT_PAL, tileCntT, 0, 0,
+                                   16, 16, false, false, true, OBJPRIORITY_1, false );
+        tileCntT = IO::loadSprite( "BB/miss", SPR_MISS_OAM, SPR_MISS_PAL, tileCntT, 0, 0, 16, 16,
+                                   false, false, true, OBJPRIORITY_1, false );
+        tileCntT = IO::loadSprite( "BB/good", SPR_GOOD_OAM, SPR_GOOD_PAL, tileCntT, 0, 0, 16, 16,
+                                   false, false, true, OBJPRIORITY_1, false );
+
+        for( u8 i = 0; i < 4; ++i ) {
+            tileCntT = IO::loadItemIcon( 0, 64 + 32 * ( ( i + 1 ) % 4 ), BERRY_Y, SPR_BERRY_OAM + i,
+                                         SPR_BERRY_PAL + i, tileCntT, false );
+            IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].isHidden = true;
+        }
+        IO::updateOAM( false );
+        // load all types of pokeblocks and display the predicted one9
+
+        // bottom: blander and actual mini game
         // load sprites
 
         u16 tileCnt = 0;
@@ -447,7 +480,8 @@ namespace SPX {
     }
 
     void animateThrowInBerry( u8 p_berries[ 4 ] ) {
-        SpriteEntry* oam = IO::Oam->oamBuffer;
+        SpriteEntry* oam  = IO::Oam->oamBuffer;
+        SpriteEntry* oamT = IO::OamTop->oamBuffer;
         for( u8 i = 0; i < 4; ++i ) {
             if( !p_berries[ i ] ) { break; }
             // load sprite
@@ -498,6 +532,10 @@ namespace SPX {
             swiWaitForVBlank( );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
+            IO::loadItemIcon( BAG::berryToItem( p_berries[ i ] ), oamT[ SPR_BERRY_OAM + i ].x,
+                              oamT[ SPR_BERRY_OAM + i ].y, SPR_BERRY_OAM + i, SPR_BERRY_PAL + i,
+                              oamT[ SPR_BERRY_OAM + i ].gfxIndex, false );
+            IO::updateOAM( false );
         }
     }
 
@@ -547,78 +585,117 @@ namespace SPX {
 
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-        IO::boldFont->setColor( IO::GRAY_IDX, 1 );
+        IO::boldFont->setColor( IO::WHITE_IDX, 1 );
+        IO::boldFont->setColor( IO::BLACK_IDX, 2 );
 
-        IO::regularFont->printStringC( "Player", 32, 12, false, IO::font::CENTER );
-        IO::regularFont->printStringC( "Perfect", 96, 12, false, IO::font::CENTER );
-        IO::regularFont->printStringC( "Hit", 128, 12, false, IO::font::CENTER );
-        IO::regularFont->printStringC( "Miss", 160, 12, false, IO::font::CENTER );
-        // IO::regularFont->printStringC( "Rank", 192, 12, false, IO::font::CENTER );
-        if( p_mxSpeed ) {
-            IO::regularFont->printStringC( "Bonus", 224, 12, false, IO::font::CENTER );
-        }
+        constexpr u8 TOP_Y = 26;
+
+        IO::boldFont->printStringC( GET_STRING( 804 ), 32, TOP_Y, false );
+
+        IO::OamTop->oamBuffer[ SPR_PERFECT_OAM ].y        = TOP_Y;
+        IO::OamTop->oamBuffer[ SPR_PERFECT_OAM ].x        = 128 - 6;
+        IO::OamTop->oamBuffer[ SPR_PERFECT_OAM ].isHidden = false;
+
+        IO::OamTop->oamBuffer[ SPR_GOOD_OAM ].y        = TOP_Y;
+        IO::OamTop->oamBuffer[ SPR_GOOD_OAM ].x        = 160 - 6;
+        IO::OamTop->oamBuffer[ SPR_GOOD_OAM ].isHidden = false;
+
+        IO::OamTop->oamBuffer[ SPR_MISS_OAM ].y        = TOP_Y;
+        IO::OamTop->oamBuffer[ SPR_MISS_OAM ].x        = 192 - 6;
+        IO::OamTop->oamBuffer[ SPR_MISS_OAM ].isHidden = false;
 
         u8 bonus = 0;
 
+        constexpr u8 LINE_Y   = 42;
+        constexpr u8 LINE_SEP = 18;
+
+        u8 rank[ 4 ] = { 0 };
+
+        std::vector<std::tuple<u8, u8, s8, u8>> scores{ };
+        for( u8 i = 0; i < 4; ++i ) {
+            if( !p_berries[ i ] ) { break; }
+            scores.push_back( { p_perfect_count[ i ], p_hit_count[ i ], -p_miss_count[ i ], i } );
+        }
+        std::sort( scores.rbegin( ), scores.rend( ) );
+        for( u8 i = 0; i < 4; ++i ) {
+            if( !p_berries[ i ] ) { break; }
+            auto [ p, h, m, r ] = scores[ i ];
+            rank[ r ]           = i;
+        }
+
         if( p_npctier != ROTOM_TIER ) {
             for( u8 i = 0; i < 4; ++i ) {
-                if( !p_berries[ i ] ) { break; }
                 if( !i ) {
-                    IO::regularFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, 32,
-                                                   30 + 16 * i, false, IO::font::CENTER );
+                    IO::boldFont->setColor( IO::RED_IDX, 2 );
                 } else {
-                    IO::regularFont->printStringC( NAME_CACHE[ i - 1 ], 32, 30 + 16 * i, false,
-                                                   IO::font::CENTER );
+                    IO::boldFont->setColor( IO::BLACK_IDX, 2 );
                 }
 
-                IO::regularFont->printStringC( toString( p_perfect_count[ i ] ), 96, 30 + 16 * i,
-                                               false, IO::font::CENTER );
-                IO::regularFont->printStringC( toString( p_hit_count[ i ] ), 128, 30 + 16 * i,
-                                               false, IO::font::CENTER );
-                IO::regularFont->printStringC( toString( p_miss_count[ i ] ), 160, 30 + 16 * i,
-                                               false, IO::font::CENTER );
+                u8 y = rank[ i ];
+
+                IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y = LINE_Y + LINE_SEP * y - 8;
+                IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].x = 0;
+                if( !p_berries[ i ] ) { break; }
+                if( !i ) {
+                    IO::boldFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, 32,
+                                                LINE_Y + LINE_SEP * y, false );
+                } else {
+                    IO::boldFont->printStringC( NAME_CACHE[ i - 1 ], 32, LINE_Y + LINE_SEP * y,
+                                                false );
+                }
+
+                IO::boldFont->printStringC( toString( p_perfect_count[ i ] ), 128,
+                                            LINE_Y + LINE_SEP * y, false, IO::font::CENTER );
+                IO::boldFont->printStringC( toString( p_hit_count[ i ] ), 160,
+                                            LINE_Y + LINE_SEP * y, false, IO::font::CENTER );
+                IO::boldFont->printStringC( toString( p_miss_count[ i ] ), 192,
+                                            LINE_Y + LINE_SEP * y, false, IO::font::CENTER );
 
                 if( p_mxSpeed ) {
                     if( p_perfect_count[ i ] > p_miss_count[ i ] ) {
                         bonus += p_perfect_count[ i ] - p_miss_count[ i ];
-                        IO::regularFont->printStringC(
-                            toString( p_perfect_count[ i ] - p_miss_count[ i ] ), 224, 30 + 16 * i,
-                            false, IO::font::CENTER );
+                        IO::boldFont->printStringC(
+                            toString( p_perfect_count[ i ] - p_miss_count[ i ] ), 224,
+                            LINE_Y + LINE_SEP * y, false, IO::font::CENTER );
                     }
                 }
             }
         } else {
-            IO::regularFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, 32, 30 + 16 * 0,
-                                           false, IO::font::CENTER );
-            IO::regularFont->printStringC( toString( p_perfect_count[ 0 ] ), 96, 30 + 16 * 0, false,
-                                           IO::font::CENTER );
-            IO::regularFont->printStringC( toString( p_hit_count[ 0 ] ), 128, 30 + 16 * 0, false,
-                                           IO::font::CENTER );
-            IO::regularFont->printStringC( toString( p_miss_count[ 0 ] ), 160, 30 + 16 * 0, false,
-                                           IO::font::CENTER );
+            for( u8 i = 0; i < 4; ++i ) {
+                IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y = LINE_Y + LINE_SEP * 5 / 2;
+                IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].x = 64 + i * 32;
+            }
+
+            IO::boldFont->printStringC( SAVE::SAV.getActiveFile( ).m_playername, 32,
+                                        LINE_Y + LINE_SEP * 0, false );
+            IO::boldFont->printStringC( toString( p_perfect_count[ 0 ] ), 128,
+                                        LINE_Y + LINE_SEP * 0, false, IO::font::CENTER );
+            IO::boldFont->printStringC( toString( p_hit_count[ 0 ] ), 160, LINE_Y + LINE_SEP * 0,
+                                        false, IO::font::CENTER );
+            IO::boldFont->printStringC( toString( p_miss_count[ 0 ] ), 192, LINE_Y + LINE_SEP * 0,
+                                        false, IO::font::CENTER );
 
             if( p_mxSpeed ) {
                 if( p_perfect_count[ 0 ] > p_miss_count[ 0 ] ) {
                     bonus += p_perfect_count[ 0 ] - p_miss_count[ 0 ];
-                    IO::regularFont->printStringC(
-                        toString( p_perfect_count[ 0 ] - p_miss_count[ 0 ] ), 224, 30 + 16 * 0,
-                        false, IO::font::CENTER );
+                    IO::boldFont->printStringC(
+                        toString( p_perfect_count[ 0 ] - p_miss_count[ 0 ] ), 224,
+                        LINE_Y + LINE_SEP * 0, false, IO::font::CENTER );
                 }
             }
 
-            IO::regularFont->printStringC(
-                SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 )->m_boxdata.m_name, 32, 30 + 16 * 1,
-                false, IO::font::CENTER );
-            IO::regularFont->printStringC(
-                toString( p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ] ), 96,
-                30 + 16 * 1, false, IO::font::CENTER );
-            IO::regularFont->printStringC(
-                toString( p_hit_count[ 1 ] + p_hit_count[ 2 ] + p_hit_count[ 3 ] ), 128,
-                30 + 16 * 1, false, IO::font::CENTER );
-            IO::regularFont->printStringC(
-                toString( p_miss_count[ 1 ] + p_miss_count[ 2 ] + p_miss_count[ 3 ] ), 160,
-                30 + 16 * 1, false, IO::font::CENTER );
+            IO::boldFont->printStringC(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 )->m_boxdata.m_name, 32,
+                LINE_Y + LINE_SEP * 1, false );
+            IO::boldFont->printStringC(
+                toString( p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ] ), 128,
+                LINE_Y + LINE_SEP * 1, false, IO::font::CENTER );
+            IO::boldFont->printStringC(
+                toString( p_hit_count[ 1 ] + p_hit_count[ 2 ] + p_hit_count[ 3 ] ), 160,
+                LINE_Y + LINE_SEP * 1, false, IO::font::CENTER );
+            IO::boldFont->printStringC(
+                toString( p_miss_count[ 1 ] + p_miss_count[ 2 ] + p_miss_count[ 3 ] ), 192,
+                LINE_Y + LINE_SEP * 1, false, IO::font::CENTER );
 
             u8 bo  = p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ];
             u8 bo2 = p_miss_count[ 1 ] + p_miss_count[ 2 ] + p_miss_count[ 3 ];
@@ -626,23 +703,26 @@ namespace SPX {
             if( p_mxSpeed ) {
                 if( bo > bo2 ) {
                     bonus += bo - bo2;
-                    IO::regularFont->printStringC( toString( bo - bo2 ), 224, 30 + 16 * 1, false,
-                                                   IO::font::CENTER );
+                    IO::boldFont->printStringC( toString( bo - bo2 ), 224, LINE_Y + LINE_SEP * 1,
+                                                false, IO::font::CENTER );
                 }
             }
         }
 
-        if( p_mxSpeed ) {
-            snprintf( buffer, 199, "Bonus: %hhu", bonus );
-            IO::regularFont->printStringC( buffer, 250, 104, false, IO::font::RIGHT );
+        if( p_mxSpeed && bonus ) {
+            IO::boldFont->printStringC( GET_STRING( 805 ), 224, TOP_Y, false, IO::font::CENTER );
+
+            snprintf( buffer, 199, GET_STRING( 806 ), bonus );
+            IO::boldFont->printStringC( buffer, 250, 112, false, IO::font::RIGHT );
         }
         // max RPM
-        snprintf( buffer, 199, "Max RPM: %06.2f", speedToRPM100( p_mxSpeed ) / 100.0 );
-        IO::regularFont->printStringC( buffer, 6, 104, false );
+        snprintf( buffer, 199, GET_STRING( 807 ), speedToRPM100( p_mxSpeed ) / 100.0 );
+        IO::boldFont->printStringC( buffer, 6, 112, false );
+        IO::updateOAM( false );
     }
 
-    void updateStats( u8 p_miss_count[ 4 ], u8 p_perfect_count[ 4 ], u16 p_mxSpeed, u8 p_npctier,
-                      u8 p_berries[ 4 ] ) {
+    void updateStats( u8 p_miss_count[ 4 ], u8 p_hit_count[ 4 ], u8 p_perfect_count[ 4 ],
+                      u16 p_mxSpeed, u8 p_npctier, u8 p_berries[ 4 ] ) {
         char buffer[ 100 ];
         // update statistics on top and rpm counter on bottom
 
@@ -676,6 +756,18 @@ namespace SPX {
             if( bo > bo2 ) { bonus += bo - bo2; }
         }
 
+        for( u8 i = 0; i < 4; ++i ) {
+            IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y
+                = BERRY_Y - 3 * p_perfect_count[ i ] - p_hit_count[ i ] + 3 * p_miss_count[ i ];
+            if( IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y < BERRY_MIN_Y ) {
+                IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y = BERRY_MIN_Y;
+            }
+            if( IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y > BERRY_MAX_Y ) {
+                IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].y = BERRY_MAX_Y;
+            }
+        }
+        IO::updateOAM( false );
+
 #ifdef DESQUID_MORE
         snprintf( buffer, 199, "Berry Strength: %hhu", computeBaseLevel( p_berries ) );
         IO::regularFont->printStringC( buffer, 6, 26, false );
@@ -695,12 +787,13 @@ namespace SPX {
         IO::regularFont->printStringC( buffer, 128, 6, false );
 #endif
 
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         // compute expected output
         auto result = computeBlockType( p_berries, bonus, speedToRPM100( p_mxSpeed ) );
         char sbuffer[ 60 ];
         snprintf( sbuffer, 59, GET_STRING( u8( result ) + 742 ) );
-        snprintf( buffer, 199, "Predicted Result: %hhux PokeBlock %s", player, sbuffer );
-        IO::regularFont->printStringC( buffer, 6, 140, false );
+        snprintf( buffer, 199, GET_STRING( 808 ), player, sbuffer );
+        IO::regularFont->printStringC( buffer, 16, 133, false );
     }
 
     void updateRPM( u16 p_speed ) {
@@ -741,6 +834,7 @@ namespace SPX {
 
     u8   FREE_PERFECT = 0;
     void animatePerfectHit( u16 p_position ) {
+        SOUND::playSoundEffect( SFX_SHINY );
         p_position -= ( 1 << 14 );
         IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + FREE_PERFECT ].isHidden = false;
         IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM + FREE_PERFECT ].x
@@ -756,6 +850,7 @@ namespace SPX {
 
     u8   FREE_GOOD = 0;
     void animateGoodHit( u16 p_position ) {
+        SOUND::playSoundEffect( SFX_SELECT );
         p_position -= ( 1 << 14 );
         IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + FREE_GOOD ].isHidden = false;
         IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM + FREE_GOOD ].x
@@ -771,6 +866,7 @@ namespace SPX {
 
     u8   FREE_MISS = 0;
     void animateMiss( u16 p_position ) {
+        SOUND::playSoundEffect( SFX_CANCEL );
         p_position -= ( 1 << 14 );
         IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + FREE_MISS ].isHidden = false;
         IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM + FREE_MISS ].x
@@ -814,9 +910,9 @@ namespace SPX {
                         IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 32, 96 - 16, 64, 32,
                         false, false, false, OBJPRIORITY_1, true );
         IO::updateOAM( true );
-        SOUND::playSoundEffect( SFX_CHOOSE );
-        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
-
+        SOUND::playSoundEffect( SFX_EXMARK );
+        for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+        SOUND::playBGM( BGM_CYCLING );
         IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].isHidden = true;
         IO::updateOAM( true );
     }
@@ -854,7 +950,7 @@ namespace SPX {
         u8  lstcnt          = 0;
 
         u16 mxSpeed = 0;
-        updateStats( miss_count, perfect_count, mxSpeed, p_npctier, p_berries );
+        updateStats( miss_count, hit_count, perfect_count, mxSpeed, p_npctier, p_berries );
 
         bool overheat = false;
 
@@ -886,7 +982,8 @@ namespace SPX {
                 lstcnt = ( progress >> 15 );
                 if( lstcnt < 24 ) {
                     drawProgressBar( lstcnt );
-                    updateStats( miss_count, perfect_count, mxSpeed, p_npctier, p_berries );
+                    updateStats( miss_count, hit_count, perfect_count, mxSpeed, p_npctier,
+                                 p_berries );
                     if( currentSpeed - 32 >= MIN_SPEED ) { currentSpeed -= 32; }
                 } else {
                     break;
@@ -1021,6 +1118,24 @@ namespace SPX {
         }
         IO::updateOAM( true );
 
+        // stop blender
+        while( currentSpeed ) {
+            if( p_npctier == ROTOM_TIER ) {
+                currentPosition += currentSpeed;
+            } else {
+                currentPosition -= currentSpeed;
+            }
+            if( currentSpeed > 10 ) {
+                currentSpeed -= 10;
+            } else {
+                currentSpeed = 0;
+            }
+            swiWaitForVBlank( );
+            updateLid( currentPosition );
+            updateRPM( currentSpeed );
+        }
+        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+
         swiWaitForVBlank( );
         scoreBoard( miss_count, hit_count, perfect_count, mxSpeed, p_npctier, p_berries );
         swiWaitForVBlank( );
@@ -1038,18 +1153,20 @@ namespace SPX {
     void displayResult( BAG::pokeblockType p_type, u8 p_amount, bool p_overheat ) {
         // add p_numNPC pokeblocks of type result to bag
         char buffer[ 200 ];
-        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
         if( p_overheat ) {
-            IO::regularFont->printStringC( GET_STRING( 800 ), 6, 140, false );
+            IO::regularFont->printStringC( GET_STRING( 800 ), 16, 133, false );
             IO::waitForInteractS( );
-            IO::printRectangle( 0, 140, 255, 192, false, 0 );
+            IO::printRectangle( 0, 132, 255, 192, false, 0 );
         }
 
+        IO::printRectangle( 0, 0, 255, 24, false, 0 );
+        IO::regularFont->printString( GET_STRING( 803 ), 128, 5, false, IO::font::CENTER );
         char sbuffer[ 60 ];
         snprintf( sbuffer, 59, GET_STRING( u8( p_type ) + 742 ) );
         snprintf( buffer, 199, GET_STRING( 801 ), p_amount, sbuffer );
-        IO::regularFont->printStringC( buffer, 6, 140, false );
+        IO::regularFont->printStringC( buffer, 16, 133, false );
 
         // remove lid, show resulting block
         IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].isSizeDouble  = false;
@@ -1065,7 +1182,8 @@ namespace SPX {
         IO::loadPokeblockIcon( p_type, 128 - 16, 96 - 16, SPR_BERRY_SUB_OAM, SPR_BERRY_SUB_PAL,
                                IO::Oam->oamBuffer[ SPR_BERRY_SUB_OAM ].gfxIndex );
         IO::updateOAM( true );
-
+        SOUND::playSoundEffect( SFX_OBTAIN_ITEM );
+        SOUND::restartBGM( );
         IO::waitForInteractS( );
     }
 
@@ -1116,7 +1234,7 @@ namespace SPX {
         }
 
         // start rotating, allow pressing A
-
+        SOUND::restoreVolume( );
         auto [ hitbonus, rpm ] = blenderMinigame( berries, npctier );
 
         // compute resulting pokeblocks
@@ -1130,7 +1248,5 @@ namespace SPX {
 
         // add pokeblocks to bag
         SAVE::SAV.getActiveFile( ).m_pokeblockCount[ u8( result ) ] += p_numNPC + 1;
-
-        SOUND::restoreVolume( );
     }
 } // namespace SPX

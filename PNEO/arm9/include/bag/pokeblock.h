@@ -48,14 +48,14 @@ namespace BAG {
         PB_LIGHT_PINK_DX   = 13,
         PB_PINK            = 14,
         PB_PINK_DX         = 15,
-        PB_LIGHT_YELLOW    = 16,
-        PB_LIGHT_YELLOW_DX = 17,
-        PB_YELLOW          = 18,
-        PB_YELLOW_DX       = 19,
-        PB_LIGHT_GREEN     = 20,
-        PB_LIGHT_GREEN_DX  = 21,
-        PB_GREEN           = 22,
-        PB_GREEN_DX        = 23,
+        PB_LIGHT_GREEN     = 16,
+        PB_LIGHT_GREEN_DX  = 17,
+        PB_GREEN           = 18,
+        PB_GREEN_DX        = 19,
+        PB_LIGHT_YELLOW    = 20,
+        PB_LIGHT_YELLOW_DX = 21,
+        PB_YELLOW          = 22,
+        PB_YELLOW_DX       = 23,
     };
 
     enum berryFlavor : u8 {
@@ -137,13 +137,13 @@ namespace BAG {
             case PB_PINK:
             case PB_PINK_DX: return ( p_flavor == BY_SWEET ) * PB_NORMAL_LEVEL;
             case PB_LIGHT_YELLOW:
-            case PB_LIGHT_YELLOW_DX: return ( p_flavor == BY_BITTER ) * PB_LIGHT_LEVEL;
+            case PB_LIGHT_YELLOW_DX: return ( p_flavor == BY_SOUR ) * PB_LIGHT_LEVEL;
             case PB_YELLOW:
-            case PB_YELLOW_DX: return ( p_flavor == BY_BITTER ) * PB_NORMAL_LEVEL;
+            case PB_YELLOW_DX: return ( p_flavor == BY_SOUR ) * PB_NORMAL_LEVEL;
             case PB_LIGHT_GREEN:
-            case PB_LIGHT_GREEN_DX: return ( p_flavor == BY_SOUR ) * PB_LIGHT_LEVEL;
+            case PB_LIGHT_GREEN_DX: return ( p_flavor == BY_BITTER ) * PB_LIGHT_LEVEL;
             case PB_GREEN:
-            case PB_GREEN_DX: return ( p_flavor == BY_SOUR ) * PB_NORMAL_LEVEL;
+            case PB_GREEN_DX: return ( p_flavor == BY_BITTER ) * PB_NORMAL_LEVEL;
             }
         };
 
