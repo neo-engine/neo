@@ -205,7 +205,7 @@ namespace BAG {
     constexpr bool hasInterface( u16 p_itemId ) {
         switch( p_itemId ) {
         default: return false;
-        case I_POKEBLOCK_KIT: return true;
+        case I_POKEBLOCK_CASE: return true;
         }
     }
 

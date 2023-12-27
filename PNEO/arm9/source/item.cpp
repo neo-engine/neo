@@ -299,7 +299,7 @@ namespace BAG {
             }
         }
         switch( p_itemId ) {
-        case I_POKEBLOCK_KIT: {
+        case I_POKEBLOCK_CASE: {
             if( !p_dryRun ) {
                 // run pokeblock viewer
                 pokeblockViewer pbv( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
@@ -473,7 +473,7 @@ namespace BAG {
         switch( p_itemId ) {
         case I_POKE_RADAR:
             return MAP::curMap->tracerUsable( SAVE::SAV.getActiveFile( ).m_player.m_pos );
-        case I_POKEBLOCK_KIT: return SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
+        case I_POKEBLOCK_CASE: return SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
         case I_REPEL:
         case I_SUPER_REPEL:
         case I_MAX_REPEL:

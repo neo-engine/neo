@@ -947,7 +947,7 @@ namespace MAP {
                     break;
                 }
                 case CLL_POKEBLOCK_BLENDER: {
-                    pokeblockBlender( par2 );
+                    pokeblockBlender( par2, par3 );
                     break;
                 }
                 default: break;

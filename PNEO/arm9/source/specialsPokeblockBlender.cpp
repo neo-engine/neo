@@ -1187,14 +1187,14 @@ namespace SPX {
         IO::waitForInteractS( );
     }
 
-    void runPokeblockBlender( u8 p_numNPC, bool p_rotom, bool p_blendMater ) {
+    void runPokeblockBlender( u8 p_numNPC, bool p_rotom, bool p_blendMaster ) {
         // when playing with npc, need to pick 1 berry, when playing with rotom, need to
         // pick 4 berries
 
         SOUND::dimVolume( );
 
         u8 npctier = p_rotom ? ROTOM_TIER : p_numNPC;
-        if( p_blendMater ) { npctier = MASTER_TIER; }
+        if( p_blendMaster ) { npctier = MASTER_TIER; }
         u8 berriesFormNPC = p_numNPC;
         if( !berriesFormNPC ) { berriesFormNPC = 1; }
         if( p_rotom ) { berriesFormNPC = 0; }
@@ -1242,7 +1242,7 @@ namespace SPX {
         auto result = computeBlockType( berries, hitbonus, rpm );
 
         if( p_rotom && result == BAG::PB_ULTIMATE ) { result = BAG::PB_GOLD_DX; }
-        if( p_blendMater && result == BAG::PB_GOLD_DX ) { result = BAG::PB_ULTIMATE; }
+        if( p_blendMaster && result == BAG::PB_GOLD_DX ) { result = BAG::PB_ULTIMATE; }
 
         displayResult( result, p_numNPC + 1, rpm == 0 );
 

@@ -54,6 +54,8 @@ namespace IO {
     extern u16 CONT_BUF[ 16 * 16 ];
     extern u16 TEXT_PAL[ 16 ];
 
+    std::string parseLogCmd( const std::string& p_cmd );
+
     void hideMessageBox( );
 
     void animateMB( u8 p_frame );

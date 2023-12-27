@@ -33,7 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "spx/specials.h"
 
 namespace MAP {
-    void mapDrawer::pokeblockBlender( u8 p_numNPC ) {
+    void mapDrawer::pokeblockBlender( u8 p_numNPC, bool p_blendMaster ) {
         char buffer[ 200 ];
         ANIMATE_MAP = false;
 
@@ -42,7 +42,7 @@ namespace MAP {
         // check for pokeblock kit
 
         if( !SAVE::SAV.getActiveFile( ).m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
-                                                     I_POKEBLOCK_KIT ) ) {
+                                                     I_POKEBLOCK_CASE ) ) {
             printMapMessage( GET_MAP_STRING( 735 ), MSG_INFO );
 
             ANIMATE_MAP = true;
@@ -98,7 +98,7 @@ namespace MAP {
                 convertMapString( GET_MAP_STRING( 740 ), MSG_INFO ).c_str( ), MSG_INFO_NOCLOSE,
                 false ) ) {
             // start minigame
-            SPX::runPokeblockBlender( p_numNPC, false );
+            SPX::runPokeblockBlender( p_numNPC, false, p_blendMaster );
 
             FADE_TOP_DARK( );
             FADE_SUB_DARK( );

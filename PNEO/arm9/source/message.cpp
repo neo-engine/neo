@@ -52,6 +52,31 @@ namespace IO {
     char TEXT_CACHE_1[ 256 ]  = { 0 }; // top line
     char TEXT_CACHE_2[ 256 ]  = { 0 }; // bottom line
 
+    std::string parseLogCmd( const std::string& p_cmd ) {
+        u16 tmp = -1;
+
+        if( p_cmd == "PLAYER" ) { return SAVE::SAV.getActiveFile( ).m_playername; }
+        if( p_cmd == "RIVAL" ) {
+            if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
+                return std::string( GET_STRING( 461 ) );
+            } else {
+                return std::string( GET_STRING( 460 ) );
+            }
+        }
+        if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp != u16( -1 ) ) {
+            SOUND::playCry( tmp );
+            return "";
+        }
+        if( sscanf( p_cmd.c_str( ), "VAR:%hu", &tmp ) && tmp != u16( -1 ) ) {
+            return std::to_string( SAVE::SAV.getActiveFile( ).getVar( tmp ) );
+        }
+        if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
+            return FS::getDisplayName(
+                SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
+        }
+        return std::string( "[" ) + p_cmd + "]";
+    }
+
     void hideMessageBox( ) {
         for( u8 i = 0; i < SPR_MSGBOX_OAM_LEN; ++i ) {
             IO::OamTop->oamBuffer[ SPR_MSGBOX_OAM + i ].isHidden = true;

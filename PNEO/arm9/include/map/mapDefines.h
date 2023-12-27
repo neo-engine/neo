@@ -85,7 +85,6 @@ namespace MAP {
 
     extern mapLocation MAP_LOCATIONS;
 
-    std::string parseLogCmd( const std::string& p_cmd );
     std::string convertMapString( const std::string& p_text, style p_style );
     void        printMapMessage( const std::string& p_text, style p_style );
     void        printMapYNMessage( const std::string& p_text, style p_style );

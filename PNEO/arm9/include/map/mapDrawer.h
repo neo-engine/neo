@@ -549,7 +549,7 @@ namespace MAP {
 
         void mysteryGiftClerk( );
 
-        void pokeblockBlender( u8 p_numNPC );
+        void pokeblockBlender( u8 p_numNPC, bool p_blendMaster );
 
         /*
          * @returns: 0 on success, 1 on cancel, 2 when wrong pkmn offered.

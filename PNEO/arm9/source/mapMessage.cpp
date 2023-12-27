@@ -49,38 +49,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sts/partyScreen.h"
 
 namespace MAP {
-    std::string parseLogCmd( const std::string& p_cmd ) {
-        u16 tmp = -1;
-
-        if( p_cmd == "PLAYER" ) { return SAVE::SAV.getActiveFile( ).m_playername; }
-        if( p_cmd == "RIVAL" ) {
-            if( SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
-                return std::string( GET_STRING( 461 ) );
-            } else {
-                return std::string( GET_STRING( 460 ) );
-            }
-        }
-        if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp != u16( -1 ) ) {
-            SOUND::playCry( tmp );
-            return "";
-        }
-        if( sscanf( p_cmd.c_str( ), "VAR:%hu", &tmp ) && tmp != u16( -1 ) ) {
-            return std::to_string( SAVE::SAV.getActiveFile( ).getVar( tmp ) );
-        }
-        if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
-            return FS::getDisplayName(
-                SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
-        }
-        return std::string( "[" ) + p_cmd + "]";
-    }
-
     std::string convertMapString( const std::string& p_text, style p_style ) {
         std::string res = "";
         for( size_t i = 0; i < p_text.size( ); ++i ) {
             if( p_text[ i ] == '[' ) {
                 std::string accmd = "";
                 while( p_text[ ++i ] != ']' ) { accmd += p_text[ i ]; }
-                res += parseLogCmd( accmd );
+                res += IO::parseLogCmd( accmd );
                 continue;
             } else if( p_text[ i ] == '\r' ) {
                 if( p_style == MSG_NORMAL ) {

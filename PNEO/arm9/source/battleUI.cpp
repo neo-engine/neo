@@ -40,6 +40,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/pokemonNames.h"
 #include "io/choiceBox.h"
 #include "io/keyboard.h"
+#include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/uio.h"
@@ -1170,9 +1171,9 @@ namespace BATTLE {
         for( u8 i = 0; i < 75; ++i ) { swiWaitForVBlank( ); }
 
         for( u8 i = 0; i < 3; ++i ) { oam[ SPR_ABILITY_OAM( !p_opponent ) + i ].isHidden = true; }
-        dmaFillWords(
-            0, bgGetGfxPtr( IO::bg2 ) + ( oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1 ) * 128,
-            30 * 256 );
+        IO::printRectangle( ( p_opponent ? 128 : 0 ), oam[ SPR_ABILITY_OAM( !p_opponent ) ].y,
+                            ( p_opponent ? 255 : 127 ),
+                            oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 32, false, 0 );
         IO::updateOAM( false );
 
         for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
@@ -1199,9 +1200,9 @@ namespace BATTLE {
         for( u8 i = 0; i < 75; ++i ) { swiWaitForVBlank( ); }
 
         for( u8 i = 0; i < 3; ++i ) { oam[ SPR_ABILITY_OAM( !p_opponent ) + i ].isHidden = true; }
-        dmaFillWords(
-            0, bgGetGfxPtr( IO::bg2 ) + ( oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1 ) * 128,
-            30 * 256 );
+        IO::printRectangle( ( p_opponent ? 128 : 0 ), oam[ SPR_ABILITY_OAM( !p_opponent ) ].y,
+                            ( p_opponent ? 255 : 127 ),
+                            oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 32, false, 0 );
         IO::updateOAM( false );
 
         for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
@@ -2901,21 +2902,30 @@ namespace BATTLE {
         }
         IO::updateOAM( false );
 
-        // Cut the message after the first "page"
+        std::string msg = "";
         for( char* pos = p_playerWon ? _battleTrainer->m_strings.m_message2
                                      : _battleTrainer->m_strings.m_message3;
              *pos; ++pos ) {
-            if( *pos == '\r' ) {
-                *pos = 0;
-                break;
+            if( *pos == '[' ) {
+                std::string accmd = "";
+                while( *( ++pos ) != ']' ) { accmd += pos; }
+                msg += IO::parseLogCmd( accmd );
+                continue;
+            } else if( *pos == '\r' ) {
+                printTopMessage( msg.c_str( ), false );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::waitForInteractS( );
+                msg = "";
+                continue;
+            } else {
+                msg += *pos;
             }
         }
 
-        printTopMessage( p_playerWon ? _battleTrainer->m_strings.m_message2
-                                     : _battleTrainer->m_strings.m_message3,
-                         false );
-
-        for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
+        printTopMessage( msg.c_str( ), false );
+        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+        IO::waitForInteractS( );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
 
         IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
         for( u8 i = 0; i <= 13; ++i ) { oam[ SPR_MBOX_START_OAM + 13 - i ].isHidden = true; }
