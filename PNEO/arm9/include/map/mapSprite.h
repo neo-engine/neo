@@ -111,7 +111,7 @@ namespace MAP {
         /*
          * @brief: Read mapSpriteData from the specified file.
          */
-        void readData( FILE* p_f );
+        void readData( FILE* p_f, bool p_close = true );
 
         /*
          * @brief: Copies BG_PALETE[ 16 * p_bgPalIdx, .., 16 * p_bgPalIdx + 15 ] to this

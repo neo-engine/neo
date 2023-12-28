@@ -43,7 +43,6 @@ namespace IO {
     const char* OW_PATH                = "nitro:/PICS/SPRITES/OW/";
     const char* DOOR_PATH              = "nitro:/PICS/SPRITES/DOOR/";
     const char* OWP_PATH               = "nitro:/PICS/SPRITES/NPCP/";
-    const char* TRAINER_PATH           = "nitro:/PICS/SPRITES/NPC/";
     const char* BERRY_PATH             = "nitro:/PICS/SPRITES/BERRIES/";
     const char* ICON_PATH              = "nitro:/PICS/SPRITES/ICONS/";
     const char* TYPE_ICON_PATH         = "nitro:/PICS/SPRITES/ICONS/TP/type";

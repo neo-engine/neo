@@ -25,11 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "map/mapSprite.h"
 #include "fs/fs.h"
 #include "io/message.h"
 #include "io/uio.h"
 #include "map/mapSlice.h"
+#include "map/mapSprite.h"
 #include "save/saveGame.h"
 
 #define SPR_MAPTILE_OAM( p_idx )         ( 0 + ( p_idx ) )
@@ -70,17 +70,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // #define SPR_CIRC_GFX 496
 
 namespace MAP {
-    void mapSpriteData::readData( FILE* p_f ) {
-        if( !p_f ) {
-            // empty!
-        } else {
+    void mapSpriteData::readData( FILE* p_f, bool p_close ) {
+        if( p_f ) {
             FS::read( p_f, m_palData, sizeof( u16 ), 16 );
             FS::read( p_f, &m_frameCount, sizeof( u8 ), 1 );
             FS::read( p_f, &m_width, sizeof( u8 ), 1 );
             FS::read( p_f, &m_height, sizeof( u8 ), 1 );
             if( m_width >= 64 ) { m_frameCount = m_frameCount > 3 ? 3 : m_frameCount; }
             FS::read( p_f, m_frameData, sizeof( u32 ), m_width * m_height * m_frameCount / 8 );
-            FS::close( p_f );
+            if( p_close ) { FS::close( p_f ); }
         }
     }
 
@@ -91,6 +89,7 @@ namespace MAP {
     char buf[ 100 ];
     mapSpriteData::mapSpriteData( u16 p_imageId, u8 p_forme, bool p_shiny, bool p_female ) {
         FILE* f;
+        bool  cl = true;
         if( p_imageId > PKMN_SPRITE ) {
             u16  species = p_imageId - PKMN_SPRITE;
             u8   forme   = p_forme;
@@ -131,7 +130,8 @@ namespace MAP {
             } else {
                 p_imageId &= 255;
             }
-            f = FS::openSplit( IO::TRAINER_PATH, p_imageId, ".rsd", 255 );
+            f  = FS::openNPCBank( p_imageId );
+            cl = false;
 #ifdef DESQUID
             if( !f ) {
                 IO::printMessage( std::string( "Sprite failed: Trainer/" )
@@ -139,7 +139,7 @@ namespace MAP {
             }
 #endif
         }
-        readData( f );
+        readData( f, cl );
     }
 
     mapSpriteData::mapSpriteData( u8 p_door, u16 p_palData[ 16 ] ) {

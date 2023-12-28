@@ -37,7 +37,6 @@ namespace IO {
     extern const char* OW_PATH;
     extern const char* DOOR_PATH;
     extern const char* OWP_PATH;
-    extern const char* TRAINER_PATH;
     extern const char* BERRY_PATH;
 
     struct SpriteInfo {

@@ -325,7 +325,7 @@ namespace SOUND::SSEQ {
     int getSoundSine( int p_arg );
 
     // This function was obtained through disassembly of Ninty's sound driver
-    constexpr u16 adjustFreq( u16 p_baseFreq, int p_pitch ) {
+    inline u16 adjustFreq( u16 p_baseFreq, int p_pitch ) {
         int shift = 0;
         p_pitch   = -p_pitch;
         while( p_pitch < 0 ) {
@@ -352,11 +352,11 @@ namespace SOUND::SSEQ {
         return (u16) freq;
     }
 
-    constexpr u16 adjustFreq( u16 p_baseFreq, int p_noteN, int p_baseN ) {
+    inline u16 adjustFreq( u16 p_baseFreq, int p_noteN, int p_baseN ) {
         return adjustFreq( p_baseFreq, ( p_noteN - p_baseN ) * 64 );
     }
 
-    constexpr u16 adjustPitchBend( u16 p_baseFreq, int p_pitchb, int p_pitchr ) {
+    inline u16 adjustPitchBend( u16 p_baseFreq, int p_pitchb, int p_pitchr ) {
         if( !p_pitchb ) { return p_baseFreq; }
         return adjustFreq( p_baseFreq, ( p_pitchb * p_pitchr ) >> 1 );
     }

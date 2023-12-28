@@ -172,7 +172,7 @@ namespace MAP {
                                             : SAVE::F_SLATEPORT_BATTLE_TENT_STREAK_ONGOING );
         u16  currentStreak    = SAVE::SAV.getActiveFile( ).getVar( streakVar );
         bool streakOngoing    = SAVE::SAV.getActiveFile( ).checkFlag( streakActiveFlag );
-        auto battlePolicy     = getBattlePolicy( false, p_rules.m_battleMode, false );
+        // auto battlePolicy     = getBattlePolicy( false, p_rules.m_battleMode, false );
 
         if( !streakOngoing ) {
             currentStreak = 0;

@@ -53,6 +53,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace FS {
+    const char* OW_NPC_BANK_PATH     = "nitro:/PICS/SPRITES/npc.rsdb";
+    FILE*       NPC_BANK_FILE        = nullptr;
+    u32         NPC_BANK_FILE_HEADER = 0;
+
     char TMP_BUFFER[ 100 ];
 
     bool checkOrOpen( FILE*& p_f, const char* p_path ) {
@@ -124,6 +128,19 @@ namespace FS {
     FILE* openBank( const char* p_path, u8 p_lang, const char* p_ext, const char* p_mode ) {
         snprintf( TMP_BUFFER, 99, "%s.%hhu%s", p_path, p_lang, p_ext );
         return fopen( TMP_BUFFER, p_mode );
+    }
+
+    FILE* openNPCBank( u16 p_imageId ) {
+        if( !NPC_BANK_FILE || !NPC_BANK_FILE_HEADER ) {
+            NPC_BANK_FILE = fopen( OW_NPC_BANK_PATH, "rb" );
+            fread( &NPC_BANK_FILE_HEADER, 1, sizeof( u32 ), NPC_BANK_FILE );
+        }
+
+        if( NPC_BANK_FILE ) {
+            fseek( NPC_BANK_FILE, 4 + p_imageId * NPC_BANK_FILE_HEADER, SEEK_SET );
+            return NPC_BANK_FILE;
+        }
+        return nullptr;
     }
 
     void close( FILE* p_file ) {

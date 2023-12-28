@@ -30,8 +30,8 @@ ARCH	:=	-mthumb -mthumb-interwork
 CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
-			-Wfloat-equal -Wformat=1 -Wlogical-op\
-			-Wno-analyzer-possible-null-dereference\
+			-Wfloat-equal -Wformat=1 -Wlogical-op -Werror\
+			-Wno-analyzer-possible-null-dereference -Wno-stringop-overflow\
 			-Wno-analyzer-possible-null-argument -Wno-stringop-overread\
 			-Wno-array-bounds -Wno-analyzer-null-dereference\
 			-Wno-analyzer-use-of-uninitialized-value -Wno-restrict\
@@ -42,7 +42,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" $(ARCH) \
 
 ifdef DESQUID
-CFLAGS	+=	-DDESQUID -fanalyzer
+CFLAGS	+=	-DDESQUID
 endif
 ifdef NOSOUND
 CFLAGS	+=	-DNO_SOUND

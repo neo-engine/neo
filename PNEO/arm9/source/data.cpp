@@ -656,6 +656,8 @@ namespace FS {
 
     bool loadBattleFacilityPkmn( u16 p_species, u8 p_variant, u8 p_level, u16 p_streak,
                                  trainerPokemon* p_out ) {
+        (void) p_variant;
+
         u16 streak = p_streak >= MAP::IV_MAX_STREAK ? MAP::IV_MAX_STREAK - 1 : p_streak;
         u8  iv     = MAP::IV_FOR_STREAK[ streak ];
 

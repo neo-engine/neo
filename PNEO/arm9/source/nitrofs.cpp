@@ -101,7 +101,7 @@ devoptab_t nitroFSdevoptab = {
     NULL, //	void *deviceData;
     NULL, //	int (*chmod_r)(struct _reent *p_r, const char *p_path, mode_t mode);
     NULL, //	int (*fchmod_r)(struct _reent *p_r, int p_fd, mode_t mode);
-    NULL, NULL, NULL };
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 char NITRO_PATH[ PATH_MAX ] = { 0 };
 

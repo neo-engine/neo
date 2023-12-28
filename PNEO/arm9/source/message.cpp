@@ -497,7 +497,7 @@ namespace IO {
     u8   LOCATION_TIMER   = 0;
     void showNewLocation( u16 p_newLocation, bool ) {
         if( p_newLocation == CURRENT_LOCATION ) { return; }
-
+        if( SAVE::SAV.getActiveFile( ).m_player.m_movement == MAP::moveMode::DIVE ) { return; }
         if( p_newLocation == L_POKEMON_CENTER || p_newLocation == L_POKEMON_MART ) { return; }
 
         CURRENT_LOCATION = p_newLocation;
