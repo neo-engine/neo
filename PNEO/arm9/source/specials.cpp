@@ -554,7 +554,8 @@ namespace SPX {
         }
     }
 
-    void runHallOfFame( ) {
+    constexpr u8 RIBBON_HOENN_CHAMP = 20;
+    void         runHallOfFame( ) {
         char buffer[ 200 ] = { 0 };
         // fade screen
         // set current player position to position home
@@ -581,7 +582,7 @@ namespace SPX {
             if( tmp ) {
                 tmp->heal( );
                 // award champion ribbon
-                tmp->m_boxdata.awardRibbon( 20 );
+                tmp->m_boxdata.awardRibbon( RIBBON_HOENN_CHAMP );
             }
         }
 
@@ -688,7 +689,7 @@ namespace MAP {
 
         if( dce->getSpecies( ) ) {
             // an egg spawned, redirect to jii san
-            printMapMessage( GET_MAP_STRING( 476 ), (style) 0 );
+            printMapMessage( GET_MAP_STRING( 476 ), MSG_NORMAL );
             return;
         }
 
@@ -703,24 +704,24 @@ namespace MAP {
             // no pkmn deposited, ask if player wants to deposit a pkmn
             if( IO::yesNoBox::YES
                 == IO::yesNoBox( ).getResult(
-                    convertMapString( GET_MAP_STRING( 477 ), (style) 0 ).c_str( ), (style) 0 ) ) {
+                    convertMapString( GET_MAP_STRING( 477 ), MSG_NORMAL ).c_str( ), MSG_NORMAL ) ) {
                 IO::init( );
                 depositpkmn = true;
             } else {
                 IO::init( );
-                printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
+                printMapMessage( GET_MAP_STRING( 478 ), MSG_NORMAL );
                 return;
             }
         } else {
             snprintf( buffer, 199, GET_MAP_STRING( 479 ), dc1->m_name );
-            printMapMessage( buffer, (style) 0 );
+            printMapMessage( buffer, MSG_NORMAL );
 
             if( !dc2->getSpecies( ) ) {
                 // ask if player wants to deposit a second pkmn
                 if( IO::yesNoBox::YES
                     == IO::yesNoBox( ).getResult(
-                        convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
-                        (style) 0 ) ) {
+                        convertMapString( GET_MAP_STRING( 480 ), MSG_NORMAL ).c_str( ),
+                        MSG_NORMAL ) ) {
                     IO::init( );
                     depositpkmn = 2;
                 } else {
@@ -737,13 +738,13 @@ namespace MAP {
 
                     if( takeback > 1 ) {
                         // player doesn't want to get pkmn back
-                        printMapMessage( GET_MAP_STRING( 478 ), (style) 0 );
+                        printMapMessage( GET_MAP_STRING( 478 ), MSG_NORMAL );
                         break;
                     }
 
                     // check if there is space in the player's team
                     if( SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) >= 6 ) {
-                        printMapMessage( GET_MAP_STRING( 487 ), (style) 0 );
+                        printMapMessage( GET_MAP_STRING( 487 ), MSG_NORMAL );
                         break;
                     }
 
@@ -753,17 +754,17 @@ namespace MAP {
 
                     if( IO::yesNoBox::YES
                         == IO::yesNoBox( ).getResult(
-                            convertMapString( buffer, (style) 0 ).c_str( ), (style) 0 ) ) {
+                            convertMapString( buffer, MSG_NORMAL ).c_str( ), MSG_NORMAL ) ) {
                         IO::init( );
                         // check if the player has enough money
                         if( SAVE::SAV.getActiveFile( ).m_money >= cost ) {
                             SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
                             SAVE::SAV.getActiveFile( ).m_money -= cost;
                             snprintf( buffer, 199, GET_MAP_STRING( 490 ), dc1[ takeback ].m_name );
-                            printMapMessage( buffer, (style) 0 );
+                            printMapMessage( buffer, MSG_NORMAL );
 
                             snprintf( buffer, 199, GET_MAP_STRING( 491 ), dc1[ takeback ].m_name );
-                            printMapMessage( buffer, (style) 1 );
+                            printMapMessage( buffer, MSG_INFO );
 
                             SAVE::SAV.getActiveFile( ).setTeamPkmn(
                                 SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), &pk );
@@ -782,15 +783,15 @@ namespace MAP {
                                 printMapMessage( GET_MAP_STRING( 492 ), MSG_NOCLOSE );
                                 continue;
                             }
-                            printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                            printMapMessage( GET_MAP_STRING( 482 ), MSG_NORMAL );
                             break;
                         } else {
-                            printMapMessage( GET_MAP_STRING( 489 ), (style) 0 );
+                            printMapMessage( GET_MAP_STRING( 489 ), MSG_NORMAL );
                             break;
                         }
                     } else {
                         IO::init( );
-                        printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                        printMapMessage( GET_MAP_STRING( 482 ), MSG_NORMAL );
                         break;
                     }
                 }
@@ -808,12 +809,12 @@ namespace MAP {
 
             if( plyerpkmncnt < 2 ) {
                 // player has only 1 pkmn
-                printMapMessage( GET_MAP_STRING( 484 ), (style) 0 );
+                printMapMessage( GET_MAP_STRING( 484 ), MSG_NORMAL );
                 break;
             }
 
             // make player select a pkmn
-            printMapMessage( GET_MAP_STRING( 481 ), (style) 0 );
+            printMapMessage( GET_MAP_STRING( 481 ), MSG_NORMAL );
 
             ANIMATE_MAP = false;
             IO::clearScreen( false );
@@ -847,7 +848,7 @@ namespace MAP {
 
             if( selpkmn >= SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
                 // player aborted
-                printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                printMapMessage( GET_MAP_STRING( 482 ), MSG_NORMAL );
                 break;
             }
 
@@ -859,7 +860,7 @@ namespace MAP {
 
             if( !plyerpkmncnt ) {
                 // no remaining pkmn
-                printMapMessage( GET_MAP_STRING( 485 ), (style) 0 );
+                printMapMessage( GET_MAP_STRING( 485 ), MSG_NORMAL );
                 break;
             }
 
@@ -876,7 +877,7 @@ namespace MAP {
                 if( selpkmn == 0 ) { MAP::curMap->removeFollowPkmn( ); }
 
                 snprintf( buffer, 199, GET_MAP_STRING( 486 ), dc1[ depositpkmn - 1 ].m_name );
-                printMapMessage( buffer, (style) 0 );
+                printMapMessage( buffer, MSG_NORMAL );
             } else {
                 break;
             }
@@ -885,13 +886,13 @@ namespace MAP {
                 // ask if player wants to deposit a second pkmn
                 if( IO::yesNoBox::YES
                     == IO::yesNoBox( ).getResult(
-                        convertMapString( GET_MAP_STRING( 480 ), (style) 0 ).c_str( ),
-                        (style) 0 ) ) {
+                        convertMapString( GET_MAP_STRING( 480 ), MSG_NORMAL ).c_str( ),
+                        MSG_NORMAL ) ) {
                     IO::init( );
                     depositpkmn = 2;
                 } else {
                     IO::init( );
-                    printMapMessage( GET_MAP_STRING( 482 ), (style) 0 );
+                    printMapMessage( GET_MAP_STRING( 482 ), MSG_NORMAL );
                     break;
                 }
             } else {
@@ -914,19 +915,19 @@ namespace MAP {
             // ask player if they want to obtain the egg
             if( IO::yesNoBox::NO
                 == IO::yesNoBox( ).getResult(
-                    convertMapString( GET_MAP_STRING( 464 ), (style) 0 ).c_str( ), (style) 0 ) ) {
+                    convertMapString( GET_MAP_STRING( 464 ), MSG_NORMAL ).c_str( ), MSG_NORMAL ) ) {
                 IO::init( );
                 // ask if they really don't want the egg
                 if( IO::yesNoBox::YES
                     == IO::yesNoBox( ).getResult(
-                        convertMapString( GET_MAP_STRING( 465 ), (style) 0 ).c_str( ),
-                        (style) 0 ) ) {
+                        convertMapString( GET_MAP_STRING( 465 ), MSG_NORMAL ).c_str( ),
+                        MSG_NORMAL ) ) {
                     IO::init( );
                     // throw away the egg
                     *dce = boxPokemon( );
                     SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_HOENN_DAYCARE_EGG + p_daycare,
                                                         false );
-                    printMapMessage( GET_MAP_STRING( 466 ), (style) 0 );
+                    printMapMessage( GET_MAP_STRING( 466 ), MSG_NORMAL );
                     return;
                 }
             }
@@ -937,13 +938,13 @@ namespace MAP {
             auto teampkmncnt = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
             if( teampkmncnt >= 6 ) {
                 // player has no space left
-                printMapMessage( GET_MAP_STRING( 473 ), (style) 0 );
+                printMapMessage( GET_MAP_STRING( 473 ), MSG_NORMAL );
                 return;
             }
 
             SOUND::playSoundEffect( SFX_OBTAIN_EGG );
-            printMapMessage( GET_MAP_STRING( 474 ), (style) 1 );
-            printMapMessage( GET_MAP_STRING( 475 ), (style) 0 );
+            printMapMessage( GET_MAP_STRING( 474 ), MSG_INFO );
+            printMapMessage( GET_MAP_STRING( 475 ), MSG_NORMAL );
 
             dce->m_gotPlace = L_DAY_CARE_COUPLE;
 
@@ -958,18 +959,18 @@ namespace MAP {
             }
 
             if( !dc1->getSpecies( ) ) {
-                printMapMessage( GET_MAP_STRING( 463 ), (style) 0 );
+                printMapMessage( GET_MAP_STRING( 463 ), MSG_NORMAL );
                 return;
             } else {
                 if( !dc2->getSpecies( ) ) {
                     snprintf( buffer, 199, GET_MAP_STRING( 467 ), dc1->m_name );
-                    printMapMessage( buffer, (style) 0 );
+                    printMapMessage( buffer, MSG_NORMAL );
                 } else {
                     snprintf( buffer, 199, GET_MAP_STRING( 468 ), dc1->m_name, dc2->m_name );
-                    printMapMessage( buffer, (style) 0 );
+                    printMapMessage( buffer, MSG_NORMAL );
 
                     u8 comp = dc1->getCompatibility( *dc2 );
-                    printMapMessage( GET_MAP_STRING( 469 + comp ), (style) 0 );
+                    printMapMessage( GET_MAP_STRING( 469 + comp ), MSG_NORMAL );
                 }
                 return;
             }

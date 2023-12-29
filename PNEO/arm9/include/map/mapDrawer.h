@@ -549,6 +549,10 @@ namespace MAP {
 
         void mysteryGiftClerk( );
 
+        void effortRibbonGirl( );
+
+        void nameRater( );
+
         void pokeblockBlender( u8 p_numNPC, bool p_blendMaster );
 
         /*

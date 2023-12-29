@@ -71,8 +71,7 @@ namespace IO {
             return std::to_string( SAVE::SAV.getActiveFile( ).getVar( tmp ) );
         }
         if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
-            return FS::getDisplayName(
-                SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->getSpecies( ) );
+            return SAVE::SAV.getActiveFile( ).getTeamPkmn( tmp )->m_boxdata.m_name;
         }
         return std::string( "[" ) + p_cmd + "]";
     }

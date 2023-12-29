@@ -221,6 +221,10 @@ void boxPokemon::awardRibbon( u8 p_ribbon ) {
     m_ribbons[ p_ribbon / 8 ] |= ( 1 << ( p_ribbon % 8 ) );
 }
 
+bool boxPokemon::hasRibbon( u8 p_ribbon ) const {
+    return !!( m_ribbons[ p_ribbon / 8 ] & ( 1 << ( p_ribbon % 8 ) ) );
+}
+
 bool boxPokemon::isFullyEvolved( ) const {
     auto edata = FS::getPkmnEvolveData( getSpecies( ), getForme( ) );
     return !!edata.m_evolutionCount;

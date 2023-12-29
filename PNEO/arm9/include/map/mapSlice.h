@@ -82,16 +82,16 @@ namespace MAP {
     };
 
     struct door {
-        u8  m_tileset : 8;
-        u8  m_doorIdx : 8;
-        u8  m_palette : 4;
-        u16 m_blockIdx : 12;
+        u32 m_tileset : 8;
+        u32 m_doorIdx : 8;
+        u32 m_palette : 4;
+        u32 m_blockIdx : 12;
     };
 
     constexpr u8     TILE_ANIMATION_COUNT = 60;
     extern animation TILE_ANIMATIONS[ TILE_ANIMATION_COUNT ];
 
-    constexpr u8 DOOR_ANIMATION_COUNT = 50;
+    constexpr u8 DOOR_ANIMATION_COUNT = 80;
     extern door  DOOR_ANIMATIONS[ DOOR_ANIMATION_COUNT ];
 
     struct tileSet {

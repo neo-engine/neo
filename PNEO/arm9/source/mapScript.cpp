@@ -790,7 +790,10 @@ namespace MAP {
                     break;
                 }
                 case CLL_RUN_POKE_MART: { // run pokemart
+                    bool oldAM  = ANIMATE_MAP;
+                    ANIMATE_MAP = false;
                     runPokeMart( martItems, 0, martSell, pmartCurr );
+                    ANIMATE_MAP = oldAM;
                     break;
                 }
                 case CLL_GET_BADGE_COUNT: {
@@ -948,6 +951,14 @@ namespace MAP {
                 }
                 case CLL_POKEBLOCK_BLENDER: {
                     pokeblockBlender( par2, par3 );
+                    break;
+                }
+                case CLL_EFFORT_RIBBON_GIRL: {
+                    effortRibbonGirl( );
+                    break;
+                }
+                case CLL_NAME_RATER: {
+                    nameRater( );
                     break;
                 }
                 default: break;

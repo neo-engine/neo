@@ -141,6 +141,8 @@ struct boxPokemon {
 
     void awardRibbon( u8 p_ribbon );
 
+    bool hasRibbon( u8 p_ribbon ) const;
+
     /*
      * @brief: Adds the specified amount of exp. Uses a fast, but very basic overflow
      * protection.

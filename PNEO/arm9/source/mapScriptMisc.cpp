@@ -2,9 +2,9 @@
 Pokémon neo
 ------------------------------
 
-file        : mapScriptMysteryGift.cpp
+file        : mapScriptMisc.cpp
 author      : Philip Wellnitz
-description : Map script engine (mystery gift)
+description : Map script engine (special npc that the player can interact with)
 
 Copyright (C) 2023 - 2023
 Philip Wellnitz
@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/locationNames.h"
 #include "io/choiceBox.h"
 #include "io/counter.h"
+#include "io/keyboard.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
@@ -49,6 +50,122 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sts/partyScreen.h"
 
 namespace MAP {
+
+    constexpr u8 RIBBON_EFFORT = 24;
+    void         mapDrawer::effortRibbonGirl( ) {
+        // Oh your "pkmn1"
+        printMapMessage( GET_MAP_STRING( 799 ), MSG_NORMAL );
+
+        // if pkmn is following the player, make it come forward
+        useFollowPkmn( );
+
+        auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( 0 );
+
+        // check if pkmn has an effort ribbon
+        if( pkmn->m_boxdata.hasRibbon( RIBBON_EFFORT ) ) {
+            printMapMessage( GET_MAP_STRING( 800 ), MSG_NORMAL );
+            return;
+        }
+
+        // compute ev sum
+        auto sum = 0;
+        for( auto i = 0; i < 6; ++i ) { sum += pkmn->m_boxdata.m_effortValues[ i ]; }
+        if( sum == 510 ) {
+            // hand out ribbon
+            printMapMessage( GET_MAP_STRING( 802 ), MSG_NORMAL );
+            SOUND::playSoundEffect( SFX_OBTAIN_ITEM );
+            printMapMessage( GET_MAP_STRING( 803 ), MSG_INFO );
+            printMapMessage( GET_MAP_STRING( 804 ), MSG_INFO );
+            pkmn->m_boxdata.awardRibbon( RIBBON_EFFORT );
+        } else {
+            printMapMessage( GET_MAP_STRING( 801 ), MSG_NORMAL );
+        }
+    }
+
+    void mapDrawer::nameRater( ) {
+        ANIMATE_MAP = false;
+        char buffer[ 200 ];
+        // I am the NAME RATER
+        printMapMessage( GET_MAP_STRING( 817 ), MSG_NORMAL );
+        // Which pkmn should I rename
+        printMapMessage( GET_MAP_STRING( 818 ), MSG_NORMAL );
+
+        // select pkmn
+        STS::partyScreen sts = STS::partyScreen( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                                 SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
+                                                 false, false, false, 1, false, true );
+        SOUND::dimVolume( );
+
+        auto res = sts.run( );
+        FADE_TOP_DARK( );
+        FADE_SUB_DARK( );
+        IO::clearScreen( false );
+        videoSetMode( MODE_5_2D );
+        IO::resetScale( true, false );
+        bgUpdate( );
+
+        ANIMATE_MAP = true;
+        SOUND::restoreVolume( );
+
+        IO::init( );
+        MAP::curMap->draw( );
+
+        u8 selpkmn = res.getSelectedPkmn( );
+
+        if( selpkmn >= SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+            // player aborted
+            printMapMessage( GET_MAP_STRING( 822 ), MSG_NORMAL );
+            ANIMATE_MAP = true;
+            return;
+        }
+
+        auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn );
+        // check if player is OT
+        if( pkmn->isForeign( ) ) {
+            // no rename possible
+            snprintf( buffer, 199, GET_MAP_STRING( 824 ), pkmn->m_boxdata.m_name,
+                      pkmn->m_boxdata.m_name );
+            printMapMessage( buffer, MSG_NORMAL );
+            ANIMATE_MAP = true;
+            return;
+        } else {
+            // list old name
+            snprintf( buffer, 199, GET_MAP_STRING( 819 ), pkmn->m_boxdata.m_name,
+                      pkmn->m_boxdata.m_name );
+            printMapMessage( buffer, MSG_NORMAL );
+            // ask for rename
+            if( IO::yesNoBox::YES
+                == IO::yesNoBox( ).getResult(
+                    convertMapString( GET_MAP_STRING( 825 ), MSG_NORMAL ).c_str( ),
+                    MSG_NOCLOSE ) ) {
+
+                // ask for new nickname
+                IO::keyboard kbd;
+                auto         nick = kbd.getText( 10 );
+                IO::init( );
+                if( strcmp( nick.c_str( ), pkmn->m_boxdata.m_name )
+                    && strcmp( "", nick.c_str( ) ) ) {
+                    strcpy( pkmn->m_boxdata.m_name, nick.c_str( ) );
+                    pkmn->m_boxdata.setIsNicknamed( true );
+                    // pkmn got new nickname
+                    snprintf( buffer, 199, GET_MAP_STRING( 821 ), pkmn->m_boxdata.m_name,
+                              pkmn->m_boxdata.m_name );
+                    printMapMessage( buffer, MSG_NORMAL );
+                } else {
+                    // pkmn got same nickname
+                    snprintf( buffer, 199, GET_MAP_STRING( 823 ), pkmn->m_boxdata.m_name,
+                              pkmn->m_boxdata.m_name );
+                    printMapMessage( buffer, MSG_NORMAL );
+                }
+            } else {
+                // aborted
+                IO::init( );
+                printMapMessage( GET_MAP_STRING( 822 ), MSG_NORMAL );
+            }
+        }
+        ANIMATE_MAP = true;
+    }
+
     void mapDrawer::mysteryGiftClerk( ) {
         char buffer[ 200 ];
         ANIMATE_MAP = false;
