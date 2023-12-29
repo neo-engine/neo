@@ -25,7 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "sts/partyScreen.h"
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "dex/dex.h"
@@ -36,6 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
+#include "sts/partyScreen.h"
 #include "sts/statusScreen.h"
 
 #ifdef DESQUID
@@ -47,7 +47,7 @@ namespace STS {
     partyScreen::partyScreen( pokemon p_team[ 6 ], u8 p_teamLength, bool p_allowMoves,
                               bool p_allowItems, bool p_allowDex, u8 p_toSelect,
                               bool p_confirmSelection, bool p_faintSelect, bool p_eggSelect,
-                              bool p_allowCancel, u8 p_inBattle, u8 p_toSwap ) {
+                              bool p_allowCancel, u8 p_inBattle, u8 p_toSwap, u16 p_move ) {
         _team               = p_team;
         _teamLength         = p_teamLength;
         _allowMoveSelection = p_allowMoves;
@@ -62,8 +62,14 @@ namespace STS {
         _allowCancel        = p_allowCancel;
         _inBattle           = p_inBattle;
         _toSwap             = p_toSwap;
+        _moveToTeach        = p_move;
         _partyUI = new partyScreenUI( p_team, p_teamLength, _toSelect, _allowCancel, _inBattle,
-                                      _toSwap );
+                                      _toSwap, _moveToTeach );
+    }
+
+    partyScreen::partyScreen( u16 p_move, pokemon p_team[ 6 ], u8 p_teamLength )
+        : partyScreen( p_team, p_teamLength, false, false, false, 1, false, false, false, true, 0,
+                       255, p_move ) {
     }
 
     partyScreen::~partyScreen( ) {
@@ -104,8 +110,8 @@ namespace STS {
         bool secondPage         = p_choice >= 6;
         _currentChoiceSelection = p_choice;
         _ranges                 = _partyUI->drawPartyPkmnChoice(
-                            _currentSelection, 0, std::min( 6, p_numChoices - ( 6 * secondPage ) ),
-                            !secondPage && p_numChoices > 6, secondPage, p_choice % 6 );
+            _currentSelection, 0, std::min( 6, p_numChoices - ( 6 * secondPage ) ),
+            !secondPage && p_numChoices > 6, secondPage, p_choice % 6 );
     }
 
 #ifdef DESQUID
@@ -951,6 +957,7 @@ namespace STS {
 
     void partyScreen::swap( u8 p_idx1, u8 p_idx2 ) {
         std::swap( _team[ p_idx1 ], _team[ p_idx2 ] );
+        std::swap( _canLearn[ p_idx1 ], _canLearn[ p_idx2 ] );
         u8 marks = _currentMarksOrMove.getMark( p_idx1 );
         _currentMarksOrMove.setMark( p_idx1, _currentMarksOrMove.getMark( p_idx2 ) );
         _currentMarksOrMove.setMark( p_idx2, marks );
@@ -961,10 +968,14 @@ namespace STS {
     void partyScreen::computeSelectionChoices( ) {
         _currentChoices = std::vector<choice>( );
         if( _swapSelection == 255 ) {
-            if( _toSelect && !_currentMarksOrMove.getMark( _currentSelection )
-                && _team[ _currentSelection ].isEgg( ) == _eggSelect
-                && ( _team[ _currentSelection ].m_stats.m_curHP || _faintSelect )
-                && _currentSelection >= _inBattle ) {
+            if( !_moveToTeach ) {
+                if( _toSelect && !_currentMarksOrMove.getMark( _currentSelection )
+                    && _team[ _currentSelection ].isEgg( ) == _eggSelect
+                    && ( _team[ _currentSelection ].m_stats.m_curHP || _faintSelect )
+                    && _currentSelection >= _inBattle ) {
+                    _currentChoices.push_back( SELECT );
+                }
+            } else if( _canLearn[ _currentSelection ] ) {
                 _currentChoices.push_back( SELECT );
             }
             if( _toSelect && _currentMarksOrMove.getMark( _currentSelection ) ) {
@@ -1312,6 +1323,23 @@ namespace STS {
         _currentMarksOrMove.m_selectedMove = 0;
 
         if( MAP::curMap ) { _mapTriggerMoves = MAP::curMap->getTriggerMovesForCurPos( ); }
+
+        if( _moveToTeach ) {
+            for( auto j = 0; j < 6; ++j ) {
+                if( j > _teamLength ) {
+                    _canLearn[ j ] = false;
+                    continue;
+                }
+                _canLearn[ j ] = FS::canLearn( _team[ j ].getSpecies( ), _team[ j ].getForme( ),
+                                               _moveToTeach, FS::LEARN_TUTOR );
+                for( auto i = 0; i < 4; ++i ) {
+                    if( _team[ j ].m_boxdata.m_moves[ i ] == _moveToTeach ) {
+                        _canLearn[ j ] = false;
+                        break;
+                    }
+                }
+            }
+        }
 
         select( p_initialSelection );
         cooldown = COOLDOWN_COUNT;

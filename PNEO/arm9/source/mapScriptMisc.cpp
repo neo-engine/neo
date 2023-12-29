@@ -34,8 +34,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dex/dex.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/keyboard.h"
 #include "io/menuUI.h"
 #include "io/message.h"

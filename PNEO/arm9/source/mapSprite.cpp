@@ -193,7 +193,7 @@ namespace MAP {
                 }
             }
         } else {
-            drawFrame( p_oamIdx, getFrame( p_direction ) );
+            drawFrame( p_oamIdx, getFrameForDir( p_direction ) );
         }
     }
 
@@ -214,6 +214,10 @@ namespace MAP {
     void mapSprite::setFrameD( u8 p_oamIdx, direction p_direction ) {
         _info.m_curFrame = getFrameForDir( p_direction );
         drawFrame( p_oamIdx, _info.m_curFrame );
+    }
+
+    u8 mapSprite::getFrame( ) const {
+        return _info.m_curFrame;
     }
 
     void mapSprite::currentFrame( u8 p_oamIdx ) {
@@ -1080,6 +1084,17 @@ namespace MAP {
         }
 
         if( p_update ) { update( ); }
+    }
+
+    u8 mapSpriteManager::getFrame( u8 p_spriteId ) const {
+        if( p_spriteId == 255 ) { return 0; }
+
+        if( p_spriteId >= SPR_HM_OAM( 0 ) && p_spriteId < SPR_HM_OAM( MAX_HM_PARTICLE ) )
+            [[unlikely]] {
+            return 0;
+        }
+        const auto& spr = getManagedSprite( p_spriteId );
+        return spr.m_sprite.getFrame( );
     }
 
     void mapSpriteManager::currentFrame( u8 p_spriteId, bool p_update ) {

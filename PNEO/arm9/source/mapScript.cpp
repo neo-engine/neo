@@ -46,6 +46,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "save/saveGame.h"
 #include "sound/sound.h"
 #include "spx/specials.h"
+#include "sts/partyScreen.h"
 
 namespace MAP {
     static u16 CURRENT_SCRIPT  = -1;
@@ -278,6 +279,10 @@ namespace MAP {
                     registers[ 0 ] = pkmn->m_boxdata.m_steps;
                     break;
                 }
+                if( par1 == PDT_EGG ) {
+                    registers[ 0 ] = pkmn->m_boxdata.isEgg( );
+                    break;
+                }
                 break;
             }
 
@@ -374,6 +379,62 @@ namespace MAP {
             }
             case CRT: {
                 if( SAVE::SAV.getActiveFile( ).m_route == par1 ) { pc += par2; }
+                break;
+            }
+
+            case MVT: {
+                u16 move    = parA;
+                ANIMATE_MAP = false;
+
+                auto oldframe = _mapSprites.getFrame(
+                    SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ].first );
+
+                STS::partyScreen sts
+                    = STS::partyScreen( move, SAVE::SAV.getActiveFile( ).m_pkmnTeam,
+                                        SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) );
+                SOUND::dimVolume( );
+
+                auto res = sts.run( );
+                FADE_TOP_DARK( );
+                FADE_SUB_DARK( );
+                IO::clearScreen( false );
+                videoSetMode( MODE_5_2D );
+                IO::resetScale( true, false );
+                bgUpdate( );
+
+                SOUND::restoreVolume( );
+
+                IO::init( );
+                MAP::curMap->draw( );
+                _mapSprites.setFrame( SAVE::SAV.getActiveFile( ).m_mapObjects[ p_mapObject ].first,
+                                      oldframe );
+
+                auto selpkmn = res.getSelectedPkmn( );
+
+                if( selpkmn >= SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ) ) {
+                    registers[ 0 ] = 0;
+                    ANIMATE_MAP    = true;
+                    break;
+                }
+
+                registers[ 0 ] = SAVE::SAV.getActiveFile( ).getTeamPkmn( selpkmn )->learnMove(
+                    move,
+                    [ & ]( const char* p_message ) {
+                        IO::init( );
+                        IO::printMessage( p_message, MSG_NORMAL );
+                    },
+                    [ & ]( boxPokemon* p_pok, u16 p_extraMove ) {
+                        IO::choiceBox menu3
+                            = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                        return menu3.getResult( 0, MSG_NOCLOSE, p_pok->m_moves, p_extraMove );
+                    },
+                    [ & ]( const char* p_message ) {
+                        IO::yesNoBox yn;
+                        return yn.getResult( p_message, MSG_NOCLOSE ) == IO::yesNoBox::YES;
+                    } );
+                IO::init( );
+
+                ANIMATE_MAP = true;
                 break;
             }
 

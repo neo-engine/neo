@@ -88,6 +88,7 @@ namespace MAP {
     constexpr u8 PDT_CONDITION_END   = 35;
     constexpr u8 PDT_PKRS            = 40;
     constexpr u8 PDT_FRIENDSHIP      = 41;
+    constexpr u8 PDT_EGG             = 42;
 
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;
@@ -221,6 +222,7 @@ namespace MAP {
         EQ  = 141, // earthquake animation
 
         DES = 150, // register pkmn as seen in pkdex
+        MVT = 151, // move tutor
 
         SBC  = 196, // set block
         SBCC = 197, // set block, with player dir correction

@@ -724,6 +724,10 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                         } else {
                             m_moves[ res ] = p_move;
                             m_curPP[ res ] = std::min( m_curPP[ res ], mdata.m_pp );
+
+                            snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_LEARNED_MOVE ),
+                                      m_name, FS::getMoveName( p_move ).c_str( ) );
+                            p_message( buffer );
                         }
                         return true;
                     }

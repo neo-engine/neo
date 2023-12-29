@@ -183,6 +183,9 @@ namespace STS {
         bool     _allowCancel;         // player may close the screen without selecting anything
         u8       _inBattle;            // number of pkmn currently in battle
         u8       _toSwap;              // Pokemon to swap
+        u16      _moveToTeach;         // move that should be taught to the pkmn
+
+        bool _canLearn[ 6 ] = { }; // stores if the _moveToTeach can be learnt by pkmn i
 
         u8             _frame;
         partyScreenUI* _partyUI;
@@ -276,7 +279,7 @@ namespace STS {
          * @param p_teamLenth: Num Pkmn in team (max 6)
          * @param p_allowMoves: Allow to select a field move
          * @param p_allowItems: Allow to interact with items
-         * @param p_allowMoves: Allow to show dex entry
+         * @param p_allowDex: Allow to show dex entry
          * @param p_toSelect: Number of Pkmn the player has to select. Any value > 0 makes field
          * moves unselectable
          */
@@ -284,7 +287,12 @@ namespace STS {
                      bool p_allowItems = true, bool p_allowDex = true, u8 p_toSelect = 0,
                      bool p_confirmSelection = true, bool p_faintSelect = false,
                      bool p_eggSelect = false, bool p_allowCancel = true, u8 p_inBattle = 0,
-                     u8 p_toSwap = 255 );
+                     u8 p_toSwap = 255, u16 p_move = 0 );
+
+        /*
+         * @brief: Creates a new party screen initializ
+         */
+        partyScreen( u16 p_move, pokemon p_team[ 6 ], u8 p_teamLength );
 
         ~partyScreen( );
 

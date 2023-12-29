@@ -168,6 +168,8 @@ namespace MAP {
 
         void setFrameD( u8 p_oamIdx, direction p_direction );
 
+        u8 getFrame( ) const;
+
         /*
          * @brief: Draws the current frame of the sprite.
          */
@@ -472,6 +474,8 @@ namespace MAP {
         void setFrame( u8 p_spriteId, u8 p_value, bool p_update = true );
 
         void setFrameD( u8 p_spriteId, direction p_direction, bool p_update = true );
+
+        u8 getFrame( u8 p_spriteId ) const;
 
         void currentFrame( u8 p_spriteId, bool p_update = true );
         void nextFrame( u8 p_spriteId, bool p_update = true );

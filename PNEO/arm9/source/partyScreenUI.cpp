@@ -25,7 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "sts/partyScreenUI.h"
 #include "defines.h"
 #include "fs/data.h"
 #include "fs/fs.h"
@@ -34,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/uio.h"
 #include "save/saveGame.h"
+#include "sts/partyScreenUI.h"
 
 #include "NoPkmn.h"
 
@@ -98,13 +98,14 @@ namespace STS {
     };
 
     partyScreenUI::partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength, u8 p_toSelect,
-                                  bool p_allowCancel, u8 p_inBattle, u8 p_toSwap ) {
+                                  bool p_allowCancel, u8 p_inBattle, u8 p_toSwap, u16 p_move ) {
         _team        = p_team;
         _teamLength  = p_teamLength;
         _toSelect    = p_toSelect;
         _allowCancel = p_allowCancel;
         _inBattle    = p_inBattle;
         _toSwap      = p_toSwap;
+        _move        = p_move;
     }
 
 #ifdef DESQUID
@@ -547,8 +548,18 @@ namespace STS {
         if( _team[ p_pos ].isEgg( ) ) {
             if( p_redraw ) {
                 // general data
+                if( _move ) {
+                    // eggs cannot be taught a move, write name in red
+                    IO::regularFont->setColor( IO::RED_IDX, 1 );
+                    IO::regularFont->setColor( IO::RED2_IDX, 2 );
+                } else {
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                }
                 IO::regularFont->printString( GET_STRING( 34 ), anchor_x + 32, anchor_y + 12,
                                               false );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 IO::loadEggIcon( oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
                                  oam[ SPR_PKMN_ICON_OAM( p_pos ) ].y, SPR_PKMN_ICON_OAM( p_pos ),
                                  SPR_PKMN_ICON_PAL( p_pos ),
@@ -557,6 +568,36 @@ namespace STS {
             }
         } else {
             if( p_redraw ) {
+                if( _move ) {
+                    // check if pkmn could learn _move:
+                    // - if yes, write name in green
+                    // - if yes, but pkmn knows the move already, write name in blue
+                    // - if no, write name in red
+                    bool knowsMove = false;
+                    bool canLearnm = _canLearn[ p_pos ];
+
+                    for( auto i = 0; i < 4; ++i ) {
+                        if( _team[ p_pos ].m_boxdata.m_moves[ i ] == _move ) {
+                            knowsMove = true;
+                            break;
+                        }
+                    }
+
+                    if( !canLearnm ) {
+                        IO::regularFont->setColor( IO::RED_IDX, 1 );
+                        IO::regularFont->setColor( IO::RED2_IDX, 2 );
+                    } else if( knowsMove ) {
+                        IO::regularFont->setColor( IO::BLUE_IDX, 1 );
+                        IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
+                    } else {
+                        IO::regularFont->setColor( 241, 1 );
+                        IO::regularFont->setColor( 242, 2 );
+                    }
+                } else {
+                    IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                    IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+                }
+
                 // general data
                 if( p_pos < _inBattle ) {
                     IO::regularFont->printString( GET_STRING( 150 ), anchor_x + 32, anchor_y + 12,
@@ -568,6 +609,9 @@ namespace STS {
                     IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
                                                   anchor_y + 12, false );
                 }
+
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+                IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
                 if( _team[ p_pos ].getSpecies( ) != PKMN_NIDORAN_F
                     && _team[ p_pos ].getSpecies( ) != PKMN_NIDORAN_M ) {
@@ -1174,6 +1218,17 @@ namespace STS {
         initTopScreen( );
         initBottomScreen( );
 
+        if( _move ) {
+            // precompute if pkmn can learn the move
+            for( auto i = 0; i < 6; ++i ) {
+                _canLearn[ i ] = false;
+                if( _team[ i ].getSpecies( ) ) {
+                    _canLearn[ i ] = FS::canLearn( _team[ i ].getSpecies( ), _team[ i ].getForme( ),
+                                                   _move, FS::LEARN_TUTOR );
+                }
+            }
+        }
+
         for( u8 i = 0; i < 6; i++ ) { drawPartyPkmn( i, i == _selectedIdx ); }
         _needsInit = true;
         if( _toSwap != 255 ) { mark( _toSwap, SWAP_COLOR, false ); }
@@ -1244,6 +1299,7 @@ namespace STS {
     }
 
     void partyScreenUI::swap( u8 p_idx1, u8 p_idx2, bool p_bottom ) {
+        std::swap( _canLearn[ p_idx1 ], _canLearn[ p_idx2 ] );
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
         REG_BLDCNT       = BLEND_ALPHA;
         REG_BLDCNT_SUB   = BLEND_ALPHA;

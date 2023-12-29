@@ -54,6 +54,9 @@ namespace STS {
         bool     _allowCancel = true;
         u8       _inBattle    = 0;
         u8       _toSwap      = 255;
+        u16      _move        = 0;
+
+        bool _canLearn[ 6 ] = { };
 
         constexpr u16 partyTopScreenPkmnIconPosY( u8 p_pos ) {
             return ( p_pos & 1 ) * 8 + 8 + 61 * ( p_pos >> 1 );
@@ -75,7 +78,8 @@ namespace STS {
          * moves unselectable
          */
         partyScreenUI( pokemon p_team[ 6 ], u8 p_teamLength, u8 p_toSelect = 0,
-                       bool p_allowCancel = true, u8 p_inBattle = 0, u8 p_toSwap = 255 );
+                       bool p_allowCancel = true, u8 p_inBattle = 0, u8 p_toSwap = 255,
+                       u16 p_move = 0 );
 
 #ifdef DESQUID
         void updateTeamLength( u8 p_newLength );
