@@ -251,6 +251,36 @@ namespace MAP {
                 break;
             }
 
+            case PDT: {
+                auto pkmn = SAVE::SAV.getActiveFile( ).getTeamPkmn( par2 );
+                if( !pkmn ) { break; }
+                if( par1 >= PDT_STAT_START && par1 <= PDT_STAT_END ) {
+                    registers[ 0 ] = pkmn->getStat( par1 - PDT_STAT_START );
+                    break;
+                }
+                if( par1 >= PDT_EV_START && par1 <= PDT_EV_END ) {
+                    registers[ 0 ] = pkmn->m_boxdata.EVget( par1 - PDT_EV_START );
+                    break;
+                }
+                if( par1 >= PDT_IV_START && par1 <= PDT_IV_END ) {
+                    registers[ 0 ] = pkmn->m_boxdata.IVget( par1 - PDT_IV_START );
+                    break;
+                }
+                if( par1 >= PDT_CONDITION_START && par1 <= PDT_CONDITION_END ) {
+                    registers[ 0 ] = pkmn->m_boxdata.m_contestStats[ par1 - PDT_CONDITION_START ];
+                    break;
+                }
+                if( par1 == PDT_PKRS ) {
+                    registers[ 0 ] = pkmn->m_boxdata.m_pokerusActive;
+                    break;
+                }
+                if( par1 == PDT_FRIENDSHIP ) {
+                    registers[ 0 ] = pkmn->m_boxdata.m_steps;
+                    break;
+                }
+                break;
+            }
+
             case CMM: {
                 if( SAVE::SAV.getActiveFile( ).m_player.m_movement != parA ) {
                     changeMoveMode( moveMode( parA ) );

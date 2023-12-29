@@ -78,6 +78,17 @@ namespace MAP {
     constexpr u8 CLL_EFFORT_RIBBON_GIRL      = 26;
     constexpr u8 CLL_NAME_RATER              = 27;
 
+    constexpr u8 PDT_STAT_START      = 0;
+    constexpr u8 PDT_STAT_END        = 5;
+    constexpr u8 PDT_EV_START        = 10;
+    constexpr u8 PDT_EV_END          = 15;
+    constexpr u8 PDT_IV_START        = 20;
+    constexpr u8 PDT_IV_END          = 25;
+    constexpr u8 PDT_CONDITION_START = 30;
+    constexpr u8 PDT_CONDITION_END   = 35;
+    constexpr u8 PDT_PKRS            = 40;
+    constexpr u8 PDT_FRIENDSHIP      = 41;
+
     // battle zone facilities
     constexpr u8 BTZ_BATTLE_FACTORY = 0;
 
@@ -154,6 +165,9 @@ namespace MAP {
         PRM  = 54, // check pkmn <param3s> at party slot <p1s>, skip <p2s> if true
         PRMA = 55, // check pkmn <param3s> appears at least <p1s> times in total in any party slot,
                    // skip <p2s> if true
+
+        PDT = 56, // write data from party pkmn par2 to register 0;
+                  // par1 specifies the data to be read
 
         HPK = 60, // Hide following pkmn
 
