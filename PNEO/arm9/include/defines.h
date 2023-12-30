@@ -112,6 +112,8 @@ constexpr u16 ABILITY_DSCRLENGTH  = 200;
 constexpr u16 LOCATION_NAMELENGTH = 25;
 constexpr u16 BGM_NAMELENGTH      = 25;
 constexpr u16 DEXENTRY_NAMELENGTH = 200;
+constexpr u16 EASYPHRS_LEN        = 200;
+constexpr u16 EASYWORD_LEN        = 40;
 
 constexpr u16 UISTRING_LEN    = 250;
 constexpr u16 MAPSTRING_LEN   = 800;

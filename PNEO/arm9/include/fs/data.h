@@ -154,6 +154,9 @@ namespace FS {
     const char* getBadge( u16 p_badgeId );
     const char* getAchievement( u16 p_badgeId, u8 p_language );
 
+    const char* getEasyChatMessage( u16 p_messageId );
+    const char* getEasyChatWord( u16 p_wordId );
+
     std::string getBGMName( u16 p_locationId );
     std::string getBGMName( u16 p_locationId, u8 p_language );
     bool        getBGMName( u16 p_locationId, u8 p_language, char* p_out );

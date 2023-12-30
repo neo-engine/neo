@@ -90,6 +90,8 @@ namespace FS {
     const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
     const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/locname";
     const char UISTRING_PATH[]      = "nitro:/STRN/UIS/uis";
+    const char EASYW_PATH[]         = "nitro:/STRN/EAS/easw";
+    const char EASYP_PATH[]         = "nitro:/STRN/EAS/easp";
     const char MAPSTRING_PATH[]     = "nitro:/STRN/MAP/map";
     const char TRADESTRING_PATH[]   = "nitro:/STRN/TRD/str";
     const char WCSTRING_PATH[]      = "nitro:/STRN/UIS/mys";
@@ -742,6 +744,24 @@ namespace FS {
         checkOrOpen( bankfile, UISTRING_PATH, lastLang, p_language );
         if( getString( bankfile, UISTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "(uistring failed)";
+    }
+
+    const char* getEasyChatMessage( u16 p_stringId ) {
+        static char  st_buffer[ EASYPHRS_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, EASYP_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, EASYPHRS_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "";
+    }
+
+    const char* getEasyChatWord( u16 p_stringId ) {
+        static char  st_buffer[ EASYWORD_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, EASYW_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, EASYWORD_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "";
     }
 
     const char* getPkmnPhrase( u16 p_stringId ) {

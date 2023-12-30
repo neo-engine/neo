@@ -2,9 +2,9 @@
 Pokémon neo
 ------------------------------
 
-file        : easyChat.h
+file        : easyChat.cpp
 author      : Philip Wellnitz
-description : Header file. Consult the corresponding source file for details.
+description : Simple translatable message system.
 
 Copyright (C) 2023 - 2023
 Philip Wellnitz
@@ -24,19 +24,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
-#pragma once
-
 #include <string>
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-#include "defines.h"
+#include "fs/data.h"
+#include "io/easyChat.h"
 
 namespace IO {
-    struct easyChatMessage {
-        u32         m_sentenceId : 8;
-        u32         m_word1Id : 12;
-        u32         m_word2Id : 12;
-        std::string construct( );
-    };
+    std::string easyChatMessage::construct( ) {
+        char bufferM[ 200 ];
+        char bufferW1[ 30 ];
+        char bufferW2[ 30 ];
+
+        snprintf( bufferW1, 29, "%s", FS::getEasyChatWord( m_word1Id ) );
+        snprintf( bufferW2, 29, "%s", FS::getEasyChatWord( m_word2Id ) );
+        snprintf( bufferM, 199, FS::getEasyChatMessage( m_sentenceId ), bufferW1, bufferW2 );
+
+        return std::string( bufferM );
+    }
 } // namespace IO
