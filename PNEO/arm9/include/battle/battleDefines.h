@@ -297,9 +297,9 @@ namespace BATTLE {
     constexpr battlePolicy DEFAULT_WILD_POLICY
         = { BM_SINGLE, true, true, true, true, WE_NONE, 0, 0 };
     constexpr battlePolicy FACILITY_TRAINER_POLICY
-        = { BM_SINGLE, true, false, false, false, WE_NONE, 5, 0 };
+        = { BM_SINGLE, true, false, false, false, WE_NONE, 7, 0 };
     constexpr battlePolicy FACILITY_DOUBLE_TRAINER_POLICY
-        = { BM_DOUBLE, true, false, false, false, WE_NONE, 5, 0 };
+        = { BM_DOUBLE, true, false, false, false, WE_NONE, 7, 0 };
 
     enum moveFlags : long long unsigned {
         /** Ignores a target's substitute. */

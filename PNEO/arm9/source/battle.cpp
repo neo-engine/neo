@@ -49,6 +49,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sts/partyScreen.h"
 
 namespace BATTLE {
+    constexpr u8 FACILITY_BG       = 32;
+    constexpr u8 FACILITY_PLATFORM = 10;
+
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponentId,
                     battlePolicy p_policy ) {
         _playerTeam     = p_playerTeam;
@@ -108,6 +111,51 @@ namespace BATTLE {
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
                     battlePolicy p_policy )
         : battle( p_playerTeam, p_playerTeamSize, FS::getBattleTrainer( p_opponentId ), p_policy ) {
+    }
+
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const bfTrainer& p_opponent,
+                    const bfPokemon p_opponentTeam[ 6 ], u8 p_opponentTeamSize, u8 p_level, u8 p_iv,
+                    battlePolicy p_policy ) {
+        _playerTeam     = p_playerTeam;
+        _playerTeamSize = p_playerTeamSize;
+
+        _opponent = battleTrainer{ };
+
+        snprintf( _opponent.m_strings.m_name, trainerStrings::NAME_LENGTH - 1, "%s",
+                  FS::getBFTrainerName( p_opponent.m_trainerNameIdx ) );
+        snprintf( _opponent.m_strings.m_message1, trainerStrings::MSG_LENGTH - 1, "%s",
+                  p_opponent.m_beforeBattle.construct( ).c_str( ) );
+        snprintf( _opponent.m_strings.m_message2, trainerStrings::MSG_LENGTH - 1, "%s",
+                  p_opponent.m_onWinAgainstPlayer.construct( ).c_str( ) );
+        snprintf( _opponent.m_strings.m_message3, trainerStrings::MSG_LENGTH - 1, "%s",
+                  p_opponent.m_onLoseAgainstPlayer.construct( ).c_str( ) );
+
+        _opponent.m_data.m_trainerClass = p_opponent.m_trainerClass;
+        _opponent.m_data.m_trainerBG    = p_opponent.m_trainerBG;
+
+        _policy = p_policy;
+
+        if( _policy.m_mode == BM_MOCK ) {
+            _policy.m_mode = BM_SINGLE;
+            _isMockBattle  = true;
+        } else {
+            _isMockBattle = false;
+        }
+        _isWildBattle = false;
+        _AILevel = _opponent.m_data.m_AILevel = p_policy.m_aiLevel;
+
+        _field = field( _policy.m_mode, false, p_policy.m_weather );
+        _battleUI
+            = battleUI( FACILITY_PLATFORM, FACILITY_PLATFORM, FACILITY_BG, _policy.m_mode, false );
+
+        _opponentRuns = false;
+
+        _opponentTeamSize = _opponent.m_data.m_numPokemon = p_opponentTeamSize;
+
+        for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+            _opponentTeam[ i ] = pokemon( p_opponentTeam[ i ], p_level, p_iv );
+            _yieldEXP[ i ]     = std::set<u8>( );
+        }
     }
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform,

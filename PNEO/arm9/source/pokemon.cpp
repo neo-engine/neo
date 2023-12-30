@@ -35,9 +35,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 #include "save/saveGame.h"
 
-pokemon::pokemon( boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
+pokemon::pokemon( const boxPokemon& p_boxPokemon ) : m_boxdata( p_boxPokemon ) {
     pkmnData data = FS::getPkmnData( p_boxPokemon.m_speciesId, p_boxPokemon.getForme( ) );
-    m_level       = calcLevel( p_boxPokemon, &data );
+    m_level       = calcLevel( m_boxdata, &data );
     if( m_level == 100 ) { m_boxdata.m_experienceGained = EXP[ 99 ][ data.getExpType( ) ]; }
     m_stats             = calcStats( m_boxdata, m_level, &data );
     m_battleForme       = 0;
@@ -56,6 +56,7 @@ pokemon::pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_name, u8 
     m_battleTimeAbility = 0;
     m_statusint         = 0;
 }
+
 pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
                   const char* p_oT, u8 p_shiny, bool p_hiddenAbility, bool p_fatefulEncounter,
                   bool p_isEgg, u16 p_gotPlace, u8 p_ball, u8 p_pokerus, u8 p_forme ) {
@@ -69,7 +70,8 @@ pokemon::pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u
     m_battleTimeAbility = 0;
     m_statusint         = 0;
 }
-pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
+
+pokemon::pokemon( const trainerPokemon& p_trainerPokemon ) {
     pkmnData data
         = FS::getPkmnData( p_trainerPokemon.m_speciesId, p_trainerPokemon.m_forme & 0x3f );
     m_level   = p_trainerPokemon.m_level;
@@ -86,6 +88,36 @@ pokemon::pokemon( trainerPokemon& p_trainerPokemon ) {
     memcpy( m_boxdata.m_effortValues, p_trainerPokemon.m_ev, sizeof( m_boxdata.m_effortValues ) );
     for( u8 i = 0; i < 6; ++i ) { m_boxdata.IVset( i, p_trainerPokemon.m_iv[ i ] ); }
     m_boxdata.setNature( (pkmnNatures) p_trainerPokemon.m_nature );
+    m_stats             = calcStats( m_boxdata, m_level, &data );
+    m_battleForme       = 0;
+    m_battleTimeAbility = 0;
+    m_statusint         = 0;
+}
+
+pokemon::pokemon( const bfPokemon& p_frontierPokemon, u8 p_level, u8 p_iv ) {
+    pkmnData data
+        = FS::getPkmnData( p_frontierPokemon.m_speciesId, p_frontierPokemon.m_forme & 31 );
+    m_level   = p_level;
+    m_boxdata = boxPokemon( p_frontierPokemon.m_speciesId, p_level, p_frontierPokemon.m_forme & 31,
+                            0, 0, false, false, 3, 0, false, &data );
+
+    while( !m_boxdata.m_ability ) {
+        m_boxdata.m_ability = data.m_baseForme.m_abilities[ rand( ) % 4 ];
+    }
+    m_boxdata.m_heldItem = p_frontierPokemon.m_heldItem;
+    memcpy( m_boxdata.m_moves, p_frontierPokemon.m_moves, sizeof( m_boxdata.m_moves ) );
+
+    auto evcnt = 0;
+    for( auto i = 0; i < 6; ++i ) {
+        if( p_frontierPokemon.m_ev & ( 1 << i ) ) { evcnt++; }
+    }
+    for( auto i = 0; i < 6; ++i ) {
+        if( p_frontierPokemon.m_ev & ( 1 << i ) ) {
+            m_boxdata.m_effortValues[ i ] = std::min( 252, 510 / evcnt );
+        }
+        m_boxdata.IVset( i, p_iv );
+    }
+    m_boxdata.setNature( (pkmnNatures) p_frontierPokemon.m_nature );
     m_stats             = calcStats( m_boxdata, m_level, &data );
     m_battleForme       = 0;
     m_battleTimeAbility = 0;
@@ -453,7 +485,7 @@ u8 pokemon::canEvolve( u16 p_item, evolutionMethod p_method, pkmnEvolveData* p_e
                 case NATURE_HARDY:
                 case NATURE_BRAVE:
                 case NATURE_ADAMANT:
-                case NATURE_NAUGHY:
+                case NATURE_NAUGHTY:
                 case NATURE_DOCILE:
                 case NATURE_IMPISH:
                 case NATURE_LAX:

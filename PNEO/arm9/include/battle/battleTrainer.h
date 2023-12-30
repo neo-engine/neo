@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 #include "defines.h"
 #include "gen/trainerClassNames.h"
+#include "io/easyChat.h"
 #include "pokemon.h"
 
 namespace BATTLE {
@@ -71,6 +72,16 @@ namespace BATTLE {
         constexpr u8 getClass( ) const {
             return m_data.m_trainerClass;
         }
+    };
+
+    struct bfTrainer {
+        IO::easyChatMessage m_beforeBattle;
+        IO::easyChatMessage m_onWinAgainstPlayer;
+        IO::easyChatMessage m_onLoseAgainstPlayer;
+        u16                 m_trainerClass : 6;
+        u16                 m_trainerNameIdx : 10;
+        u16                 m_trainerBG : 8; // in-battle pic
+        u16                 m_picnum : 8;    // ow sprite num
     };
 
     constexpr bool isDoubleBattleTrainerClass( u16 p_trainerClass ) {

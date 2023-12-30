@@ -84,7 +84,7 @@ namespace FS {
         "nitro:/DATA/TRNR_DATA/2/",
     };
     const char BATTLE_FACILITY_STRINGS_PATH[] = "nitro:/DATA/BFTR_STRS/";
-    const char BATTLE_FACILITY_PKMN_PATH[]    = "nitro:/DATA/BFTR_PKMN/";
+    const char BFPOKE_PATH[]                  = "nitro:/DATA/BFTR_PKMN/bfpoke.datab";
     const char TCLASS_NAME_PATH[]             = "nitro:/DATA/TRNR_NAME/trnrname";
 
     const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
@@ -100,6 +100,7 @@ namespace FS {
     const char ACHIEVEMENT_PATH[]   = "nitro:/STRN/AVM/avm";
     const char RIBBONNAME_PATH[]    = "nitro:/STRN/RBN/rbn";
     const char RIBBONDSCR_PATH[]    = "nitro:/STRN/RBN/rbd";
+    const char BFTRAINER_PATH[]     = "nitro:/STRN/TRN/bfname";
     const char TRAINERNAME_PATH[]   = "nitro:/STRN/TRN/name";
     const char TRAINERMSG1_PATH[]   = "nitro:/STRN/TRN/msg1";
     const char TRAINERMSG2_PATH[]   = "nitro:/STRN/TRN/msg2";
@@ -645,61 +646,6 @@ namespace FS {
         return true;
     }
 
-    bool loadBattleFacilityTrainerStrings( u8 p_trainerClass, u8 p_trainer,
-                                           BATTLE::battleTrainer* p_out ) {
-        FILE* f = openSplit(
-            BATTLE_FACILITY_STRINGS_PATH, MAP::TRAINERS_PER_CLASS * p_trainerClass + p_trainer,
-            ( "_" + std::to_string( 1 + CURRENT_LANGUAGE ) + ".trnr.str" ).c_str( ) );
-        if( !f ) return false;
-        fread( &p_out->m_strings, sizeof( BATTLE::trainerStrings ), 1, f );
-        fclose( f );
-        return true;
-    }
-
-    bool loadBattleFacilityPkmn( u16 p_species, u8 p_variant, u8 p_level, u16 p_streak,
-                                 trainerPokemon* p_out ) {
-        (void) p_variant;
-
-        u16 streak = p_streak >= MAP::IV_MAX_STREAK ? MAP::IV_MAX_STREAK - 1 : p_streak;
-        u8  iv     = MAP::IV_FOR_STREAK[ streak ];
-
-        // TODO: actually load these pkmn from ROM
-        p_out->m_speciesId  = p_species;
-        p_out->m_forme      = 0;
-        p_out->m_ability    = 0;
-        p_out->m_heldItem   = 0;
-        p_out->m_moves[ 0 ] = 1;
-        p_out->m_moves[ 1 ] = 0;
-        p_out->m_moves[ 2 ] = 0;
-        p_out->m_moves[ 3 ] = 0;
-        p_out->m_ev[ 0 ]    = 0;
-        p_out->m_ev[ 1 ]    = 0;
-        p_out->m_ev[ 2 ]    = 0;
-        p_out->m_ev[ 3 ]    = 0;
-        p_out->m_ev[ 4 ]    = 0;
-        p_out->m_ev[ 5 ]    = 0;
-        p_out->m_shiny      = 0;
-        p_out->m_nature     = 0;
-
-        // adjust pkmn to given parameters
-        p_out->m_level   = p_level;
-        p_out->m_iv[ 0 ] = p_out->m_iv[ 1 ] = p_out->m_iv[ 2 ] = iv;
-        p_out->m_iv[ 3 ] = p_out->m_iv[ 4 ] = p_out->m_iv[ 5 ] = iv;
-
-        return true;
-    }
-
-    bool loadBattleFacilityTrainerTeam( const MAP::ruleSet& p_rules, u8 p_trainerClass, u8 p_team,
-                                        u16 p_streak, BATTLE::battleTrainer* p_out ) {
-        (void) p_rules;
-        (void) p_trainerClass;
-        (void) p_team;
-        (void) p_streak;
-        (void) p_out;
-        // TODO
-        return false;
-    }
-
 #ifndef NO_SOUND
     bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f ) {
         if( !p_f ) { return false; }
@@ -737,6 +683,22 @@ namespace FS {
     }
 #endif
 
+    bool loadBFTrainer( BATTLE::bfTrainer* p_out, u16 p_idx ) {
+        // TODO
+        (void) p_out;
+        (void) p_idx;
+        return false;
+    }
+
+    bool loadBFPokemon( bfPokemon* p_out, u16 p_idx ) {
+        static FILE* bankfile = nullptr;
+        if( !checkOrOpen( bankfile, BFPOKE_PATH ) ) { return false; }
+
+        if( std::fseek( bankfile, p_idx * sizeof( bfPokemon ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( bfPokemon ), 1, bankfile );
+        return true;
+    }
+
     const char* getUIString( u16 p_stringId, u8 p_language ) {
         static char  st_buffer[ UISTRING_LEN + 10 ];
         static u8    lastLang = -1;
@@ -761,6 +723,15 @@ namespace FS {
         static FILE* bankfile = nullptr;
         checkOrOpen( bankfile, EASYW_PATH, lastLang, CURRENT_LANGUAGE );
         if( getString( bankfile, EASYWORD_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "";
+    }
+
+    const char* getBFTrainerName( u16 p_stringId ) {
+        static char  st_buffer[ TRAINERNAME_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, BFTRAINER_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, TRAINERNAME_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "";
     }
 

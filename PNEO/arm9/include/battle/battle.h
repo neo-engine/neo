@@ -208,6 +208,13 @@ namespace BATTLE {
                 battlePolicy = DEFAULT_TRAINER_POLICY );
 
         /*
+         * @brief: Creates a new trainer battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const bfTrainer& p_opponent,
+                const bfPokemon p_opponentTeam[ 6 ], u8 p_opponentTeamSize, u8 p_level, u8 p_iv,
+                battlePolicy = FACILITY_TRAINER_POLICY );
+
+        /*
          * @brief: Creates a new trainer battle, reads trainer data from FS.
          */
         battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,

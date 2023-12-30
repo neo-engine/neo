@@ -57,9 +57,9 @@ namespace STS {
                 m_selectedPkmn &= ~( 0xf << ( 4 * p_pos ) );
                 m_selectedPkmn |= ( p_mark << ( 4 * p_pos ) );
             }
-            constexpr u8 getSelectedPkmn( ) const {
+            constexpr u8 getSelectedPkmn( u8 p_idx = 1 ) const {
                 for( u8 i = 0; i < 6; ++i ) {
-                    if( getMark( i ) == 1 ) { return i; }
+                    if( getMark( i ) == p_idx ) { return i; }
                 }
                 return 255;
             }

@@ -156,6 +156,7 @@ namespace FS {
 
     const char* getEasyChatMessage( u16 p_messageId );
     const char* getEasyChatWord( u16 p_wordId );
+    const char* getBFTrainerName( u16 p_trainerId );
 
     std::string getBGMName( u16 p_locationId );
     std::string getBGMName( u16 p_locationId, u8 p_language );
@@ -181,10 +182,8 @@ namespace FS {
     BATTLE::battleTrainer getBattleTrainer( u16 p_battleTrainerId, u8 p_language );
     bool getBattleTrainer( u16 p_battleTrainerId, u8 p_language, BATTLE::battleTrainer* p_out );
 
-    bool getBattleFacilityTrainer( u16 p_battleTrainerId, u8 p_language,
-                                   BATTLE::battleTrainer* p_out );
-    bool getBattleFacilityTrainerTeam( u8 p_rulesId, u16 p_battleTrainerId,
-                                       BATTLE::battleTrainer* p_out );
+    bool loadBFTrainer( BATTLE::bfTrainer* p_out, u16 p_idx );
+    bool loadBFPokemon( bfPokemon* p_out, u16 p_idx );
 
     bool        getMoveName( const u16 p_moveId, const u8 p_language, char* p_out );
     std::string getMoveName( const u16 p_moveId, const u8 p_language );

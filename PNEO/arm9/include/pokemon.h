@@ -61,6 +61,15 @@ struct trainerPokemon {
     }
 };
 
+struct bfPokemon {
+    u16 m_speciesId;
+    u16 m_heldItem;
+    u8  m_forme;
+    u8  m_nature;
+    u16 m_moves[ 4 ];
+    u8  m_ev; // evs are either 0 or 252
+};
+
 /*
  * @brief: stores non-volatile data of a pkmn, i.e., data preserved even when depositing a
  * pkmn to the pkmn storage system.
@@ -399,11 +408,16 @@ struct pokemon {
 
     pokemon( ) {
     }
-    pokemon( boxPokemon& p_boxPokemon );
-    pokemon( trainerPokemon& p_trainerPokemon );
+    pokemon( const boxPokemon& p_boxPokemon );
+
+    pokemon( const trainerPokemon& p_trainerPokemon );
+
+    pokemon( const bfPokemon& p_frontierPokemon, u8 p_level, u8 p_iv );
+
     pokemon( u16 p_pkmnId, u16 p_level, u8 p_forme = 0, const char* p_name = 0, u8 p_shiny = 0,
              bool p_hiddenAbility = false, bool p_isEgg = false, u8 p_ball = 3, u8 p_pokerus = 0,
              bool p_fatefulEncounter = false );
+
     pokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id, u16 p_sid,
              const char* p_ot, u8 p_shiny = 0, bool p_hiddenAbility = false,
              bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,

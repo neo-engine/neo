@@ -32,7 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/easyChat.h"
 
 namespace IO {
-    std::string easyChatMessage::construct( ) {
+    std::string easyChatMessage::construct( ) const {
         char bufferM[ 200 ];
         char bufferW1[ 30 ];
         char bufferW2[ 30 ];

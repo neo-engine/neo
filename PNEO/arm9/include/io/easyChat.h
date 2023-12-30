@@ -37,6 +37,6 @@ namespace IO {
         u32         m_sentenceId : 8;
         u32         m_word1Id : 12;
         u32         m_word2Id : 12;
-        std::string construct( );
+        std::string construct( ) const;
     };
 } // namespace IO
