@@ -848,13 +848,13 @@ namespace MAP {
             case BTZ: {
                 // par 1: battle facility
                 // par 2: ruleset (max level, num pkmn, battle mode, num battles, fixed
-                // encounters, etc); each
-                // ruleset has a corresponding set of possible teams/pkmn to pick from
+                // encounters, etc)
                 switch( par1 ) {
                 case BTZ_BATTLE_FACTORY: {
                     runBattleFactory( FACILITY_RULE_SETS[ par2 ] );
                     break;
                 }
+                default: break;
                 }
                 break;
             }

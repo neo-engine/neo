@@ -106,6 +106,10 @@ namespace IO {
     printChoiceMessage( const char* p_message, style p_style, const std::vector<u16>& p_choices,
                         u8 p_selection = 255 );
 
+    std::vector<std::pair<IO::inputTarget, u8>>
+    printChoiceMessage( const char* p_message, style p_style,
+                        const std::vector<std::string>& p_choices, u8 p_selection = 255 );
+
     inline std::vector<std::pair<IO::inputTarget, u8>>
     printChoiceMessage( const std::string& p_message, style p_style,
                         const std::vector<u16>& p_choices, u8 p_selection = 255 ) {

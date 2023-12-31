@@ -27,6 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <string>
 #include <nds.h>
 #include "defines.h"
 #include "io/uio.h"
@@ -83,8 +84,18 @@ namespace IO {
                              const std::vector<u16>& p_choices, bool p_showExitButton = false );
 
         /*
+         * @brief: Simplified choice box using the default drawing functions from the NAV
+         * namespace. (Works only while the player is in the OW and no menu/application is currently
+         * opened.)
+         */
+        selection getResult( const char* p_message, style p_style,
+                             const std::vector<std::string>& p_choices,
+                             bool                            p_showExitButton = false );
+
+        /*
          * @brief: Makes the player select one from 5 moves.
          */
-        selection getResult( const char* p_message, style p_style, u16 p_moves[ 4 ], u16 p_extraMove );
+        selection getResult( const char* p_message, style p_style, u16 p_moves[ 4 ],
+                             u16 p_extraMove );
     };
 } // namespace IO

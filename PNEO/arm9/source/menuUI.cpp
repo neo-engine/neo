@@ -503,6 +503,73 @@ namespace IO {
         return res;
     }
 
+    std::vector<std::pair<IO::inputTarget, u8>>
+    printChoiceMessage( const char* p_message, style p_style,
+                        const std::vector<std::string>& p_choices, u8 p_selection ) {
+        doPrintMessage( p_message, p_style );
+
+        BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
+        BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
+        BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
+        IO::regularFont->setColor( 0, 0 );
+        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        IO::regularFont->setColor( IO::GRAY_IDX, 2 );
+
+        std::vector<std::pair<IO::inputTarget, u8>> res
+            = std::vector<std::pair<IO::inputTarget, u8>>( );
+
+        auto& oam = IO::Oam->oamBuffer;
+
+        for( u8 i = 0; i < NUM_CB_CHOICES; i++ ) {
+            for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].palette
+                    = ( i == p_selection ) ? SPR_BOX_SEL_PAL_SUB : SPR_BOX_PAL_SUB;
+            }
+        }
+
+        if( p_message || p_selection >= 254 ) {
+
+            dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), 256 * 192 );
+            FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "subbg", 12, 49152,
+                                 true );
+            for( u8 i = 0; i < 7; ++i ) { oam[ SPR_MENU_OAM_SUB( i ) ].isHidden = true; }
+            for( u8 i = SPR_NAV_APP_ICON_SUB( 0 ); i < 128; ++i ) { oam[ i ].isHidden = true; }
+
+            for( u8 i = 0; i < p_choices.size( ); i++ ) {
+                for( u8 j = 0; j < SPRITES_PER_CB_WINDOW; j++ ) {
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) + j ].isHidden = false;
+                }
+
+                IO::regularFont->printString(
+                    p_choices[ i ].c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
+
+                res.push_back(
+                    std::pair( IO::inputTarget( oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 96,
+                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 32 ),
+                               i ) );
+            }
+
+            if( p_selection == 1 ) {
+                oam[ SPR_X_OAM_SUB ].isHidden = false;
+                res.push_back( std::pair(
+                    IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                     oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                    IO::choiceBox::EXIT_CHOICE ) );
+                res.push_back( std::pair(
+                    IO::inputTarget( oam[ SPR_X_OAM_SUB ].x - 8, oam[ SPR_X_OAM_SUB ].y - 8,
+                                     oam[ SPR_X_OAM_SUB ].x + 32, oam[ SPR_X_OAM_SUB ].y + 32 ),
+                    IO::choiceBox::BACK_CHOICE ) );
+            }
+        }
+
+        IO::updateOAM( true );
+
+        return res;
+    }
+
     std::vector<std::pair<IO::inputTarget, menuOption>> getTouchPositions( bool p_bottom ) {
         auto  res = std::vector<std::pair<IO::inputTarget, menuOption>>( );
         auto& oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;

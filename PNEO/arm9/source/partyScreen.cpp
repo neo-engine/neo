@@ -1011,7 +1011,7 @@ namespace STS {
                 }
             }
         }
-        if( _teamLength > 1 && !_inBattle ) { _currentChoices.push_back( SWAP ); }
+        if( _teamLength > 1 && !_inBattle && !_toSelect ) { _currentChoices.push_back( SWAP ); }
         if( _swapSelection == 255 ) {
             if( _allowDex && !_team[ _currentSelection ].isEgg( ) ) {
                 _currentChoices.push_back( DEX_ENTRY );

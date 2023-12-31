@@ -61,6 +61,16 @@ namespace IO {
     }
 
     choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
+                                               const std::vector<std::string>& p_choices,
+                                               bool                            p_showExitButton ) {
+        return getResult(
+            [ & ]( u8 ) {
+                return printChoiceMessage( p_message, p_style, p_choices, p_showExitButton );
+            },
+            [ & ]( u8 p_selection ) { printChoiceMessage( 0, p_style, p_choices, p_selection ); } );
+    }
+
+    choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
                                                u16 p_moves[ 4 ], u16 p_extraMove ) {
         return getResult(
             [ & ]( u8 ) { return printChoiceMessage( p_message, p_style, p_moves, p_extraMove ); },

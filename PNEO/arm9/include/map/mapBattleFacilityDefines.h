@@ -41,8 +41,12 @@ namespace MAP {
         u8                 m_numBattles;
         BATTLE::battleMode m_battleMode;
     };
-
-    constexpr u8         NUM_RULESETS = 5;
+    constexpr u8         RSID_SINGLE_LV50  = 0;
+    constexpr u8         RSID_SINGLE_LV100 = 1;
+    constexpr u8         RSID_SINGLE_LV30  = 2;
+    constexpr u8         RSID_DOUBLE_LV50  = 3;
+    constexpr u8         RSID_DOUBLE_LV100 = 4;
+    constexpr u8         NUM_RULESETS      = 5;
     extern const ruleSet FACILITY_RULE_SETS[ NUM_RULESETS ];
 
     constexpr int IV_MAX_STREAK                  = 8;
@@ -73,4 +77,10 @@ namespace MAP {
                        + 1 ) );
     }
 
+    bool createNextOpponentTrainer( const ruleSet& p_rules, u16 p_streak,
+                                    bool p_ignoreClassLimits );
+
+    extern pokemon           PLAYER_TEMP_TEAM[ 6 ];
+    extern BATTLE::bfTrainer NEXT_OPPONENT;
+    extern bfPokemon         NEXT_OPPONENT_TEAM[ 6 ];
 } // namespace MAP
