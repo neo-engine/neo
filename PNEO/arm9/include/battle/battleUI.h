@@ -43,6 +43,7 @@ namespace BATTLE {
         u8             _background;
         battleMode     _mode;
         bool           _isWildBattle;
+        bool           _allowItems;
         battleTrainer* _battleTrainer = nullptr;
 
         u8 _currentLogLine = 0;
@@ -97,9 +98,9 @@ namespace BATTLE {
         }
 
         battleUI( u8 p_platform, u8 p_platform2, u8 p_background, battleMode p_mode,
-                  bool p_isWildBattle )
+                  bool p_isWildBattle, bool p_allowItems = true )
             : _platform( p_platform ), _platform2( p_platform2 ), _background( p_background ),
-              _mode( p_mode ), _isWildBattle( p_isWildBattle ) {
+              _mode( p_mode ), _isWildBattle( p_isWildBattle ), _allowItems( p_allowItems ) {
         }
 
         /*

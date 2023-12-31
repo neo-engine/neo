@@ -105,6 +105,7 @@ pokemon::pokemon( const bfPokemon& p_frontierPokemon, u8 p_level, u8 p_iv ) {
         m_boxdata.m_ability = data.m_baseForme.m_abilities[ rand( ) % 4 ];
     }
     m_boxdata.m_heldItem = p_frontierPokemon.m_heldItem;
+    m_boxdata.m_steps    = 0;
     memcpy( m_boxdata.m_moves, p_frontierPokemon.m_moves, sizeof( m_boxdata.m_moves ) );
 
     auto evcnt = 0;

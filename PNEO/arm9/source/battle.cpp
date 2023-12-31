@@ -72,7 +72,8 @@ namespace BATTLE {
 
         _field    = field( _policy.m_mode, false, p_policy.m_weather );
         _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
-                              _opponent.m_data.m_battleBG, _policy.m_mode, false );
+                              _opponent.m_data.m_battleBG, _policy.m_mode, false,
+                              _policy.m_distributeEXP );
 
         _opponentRuns = false;
 
@@ -144,9 +145,9 @@ namespace BATTLE {
         _isWildBattle = false;
         _AILevel = _opponent.m_data.m_AILevel = p_policy.m_aiLevel;
 
-        _field = field( _policy.m_mode, false, p_policy.m_weather );
-        _battleUI
-            = battleUI( FACILITY_PLATFORM, FACILITY_PLATFORM, FACILITY_BG, _policy.m_mode, false );
+        _field    = field( _policy.m_mode, false, p_policy.m_weather );
+        _battleUI = battleUI( FACILITY_PLATFORM, FACILITY_PLATFORM, FACILITY_BG, _policy.m_mode,
+                              false, _policy.m_distributeEXP );
 
         _opponentRuns = false;
 
@@ -181,7 +182,7 @@ namespace BATTLE {
         // Initialize the field with the wild pkmn
         _field    = field( _policy.m_mode, true, p_policy.m_weather, PW_NONE, TR_NONE );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
-                              p_background, _policy.m_mode, true );
+                              p_background, _policy.m_mode, true, _policy.m_distributeEXP );
 
         _opponentRuns = p_wildPkmnRuns;
     }
@@ -765,43 +766,49 @@ namespace BATTLE {
             }
             return res;
         case 3: { // Choose item
-            SOUND::playSoundEffect( SFX_CHOOSE );
+            if( _policy.m_distributeEXP ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
 
-            BAG::bagViewer bv = BAG::bagViewer(
-                _playerTeam, _isWildBattle ? BAG::bagViewer::WILD_BATTLE : BAG::bagViewer::BATTLE );
-            u16 itm = bv.getItem( );
+                BAG::bagViewer bv
+                    = BAG::bagViewer( _playerTeam, _isWildBattle ? BAG::bagViewer::WILD_BATTLE
+                                                                 : BAG::bagViewer::BATTLE );
+                u16 itm = bv.getItem( );
 
-            if( itm ) {
-                auto idata = FS::getItemData( itm );
+                if( itm ) {
+                    auto idata = FS::getItemData( itm );
 
-                if( idata.m_itemType == BAG::ITEMTYPE_POKEBALL ) {
-                    // Player throws a ball
-                    res.m_type  = MT_CAPTURE;
-                    res.m_param = itm;
-                } else if( ( idata.m_itemType & 15 ) == 2 ) {
-                    // Already used
-                    res.m_type  = MT_NO_OP_NO_CANCEL;
-                    res.m_param = 0;
-                } else {
-                    res.m_type  = MT_USE_ITEM;
-                    res.m_param = itm;
-                }
-            }
-
-            _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
-
-            for( u8 side = 0; side < field::NUM_SIDES; ++side )
-                for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
-                    auto st = _field.getSlotStatus( side, j2 );
-                    if( st == slot::status::NORMAL ) {
-                        _battleUI.updatePkmn( side, j2, _field.getPkmnOrDisguise( side, j2 ) );
+                    if( idata.m_itemType == BAG::ITEMTYPE_POKEBALL ) {
+                        // Player throws a ball
+                        res.m_type  = MT_CAPTURE;
+                        res.m_param = itm;
+                    } else if( ( idata.m_itemType & 15 ) == 2 ) {
+                        // Already used
+                        res.m_type  = MT_NO_OP_NO_CANCEL;
+                        res.m_param = 0;
+                    } else {
+                        res.m_type  = MT_USE_ITEM;
+                        res.m_param = itm;
                     }
                 }
 
-            if( itm ) {
-                _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
-                                             p_slot );
-                return res;
+                _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
+
+                for( u8 side = 0; side < field::NUM_SIDES; ++side )
+                    for( u8 j2 = 0; j2 < getBattlingPKMNCount( _policy.m_mode ); ++j2 ) {
+                        auto st = _field.getSlotStatus( side, j2 );
+                        if( st == slot::status::NORMAL ) {
+                            _battleUI.updatePkmn( side, j2, _field.getPkmnOrDisguise( side, j2 ) );
+                        }
+                    }
+
+                if( itm ) {
+                    _battleUI.showMoveSelection(
+                        _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot );
+                    return res;
+                }
+            } else {
+                cooldown = COOLDOWN_COUNT;
+                break;
             }
             break;
         }

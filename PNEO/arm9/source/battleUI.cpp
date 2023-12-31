@@ -2166,24 +2166,42 @@ namespace BATTLE {
         }
 
         if( p_highlightedButton == 3 ) {
-            IO::loadSprite( "BT/bg2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
-                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            if( _allowItems ) {
+                IO::loadSprite( "BT/bg2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            } else {
+                IO::loadSprite( "BT/in2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
         } else {
-            IO::loadSprite( "BT/bg", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
-                            oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
-                            OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            if( _allowItems ) {
+                IO::loadSprite( "BT/bg", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            } else {
+                IO::loadSprite( "BT/in", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
+                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
+                                OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            }
         }
 
-        res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_BAG_OAM_SUB ].x,
-                                                   oam[ SPR_BATTLE_BAG_OAM_SUB ].y,
-                                                   oam[ SPR_BATTLE_BAG_OAM_SUB ].x + 64,
-                                                   oam[ SPR_BATTLE_BAG_OAM_SUB ].y + 32 ),
-                                  3 ) );
+        if( _allowItems ) {
+            res.push_back( std::pair( IO::inputTarget( oam[ SPR_BATTLE_BAG_OAM_SUB ].x,
+                                                       oam[ SPR_BATTLE_BAG_OAM_SUB ].y,
+                                                       oam[ SPR_BATTLE_BAG_OAM_SUB ].x + 64,
+                                                       oam[ SPR_BATTLE_BAG_OAM_SUB ].y + 32 ),
+                                      3 ) );
+        }
         return res;
     }
 
