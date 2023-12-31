@@ -60,6 +60,8 @@ namespace BATTLE {
         side( ) {
             std::memset( _sideConditionAmount, 0, sizeof( _sideConditionAmount ) );
             std::memset( _sideConditionCounter, 0, sizeof( _sideConditionCounter ) );
+
+            for( auto i = 0; i < MAX_PKMN_PER_SIDE; ++i ) { _slots[ i ] = slot( ); }
         }
 
         constexpr u16 getAndIncreaseToxicCount( u8 p_slot ) {

@@ -80,32 +80,60 @@ namespace BATTLE {
         // adjust difficulty
         _opponentTeamSize = _opponent.m_data.m_numPokemon;
 
+        auto playermaxlv = 0;
+        for( auto i = 0; i < p_playerTeamSize; ++i ) {
+            if( p_playerTeam[ i ].getLevel( ) > playermaxlv ) {
+                playermaxlv = p_playerTeam[ i ].getLevel( );
+            }
+        }
+        auto oppmaxlv = 0;
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
             _yieldEXP[ i ]     = std::set<u8>( );
+            if( _opponentTeam[ i ].getLevel( ) > oppmaxlv ) {
+                oppmaxlv = _opponentTeam[ i ].getLevel( );
+            }
         }
+
         switch( SAVE::SAV.getActiveFile( ).m_options.getDifficulty( ) ) {
-        case 0:
+        case 0: {
+            // easy
+            auto targetlv = std::max( int( MIN_OPP_LEVEL ),
+                                      playermaxlv - DIFF_EASY_LEVEL_DEC - DIFF_HARD_LEVEL_INC );
+            if( targetlv > MAX_PKMN_LEVEL ) { targetlv = MAX_PKMN_LEVEL; }
+            auto leveladjust = 0;
+            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+
             for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-                if( _opponentTeam[ i ].m_level <= DIFF_EASY_LEVEL_DEC + MIN_OPP_LEVEL ) {
-                    _opponentTeam[ i ].setLevel( MIN_OPP_LEVEL );
-                } else {
-                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level - DIFF_EASY_LEVEL_DEC );
-                }
+                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
                 _opponentTeam[ i ].m_boxdata.m_moves[ 3 ] = 0;
             }
             break;
+        }
         case 3:
-        default: break;
-        case 6:
+        default: {
+            // normal
+            auto targetlv = std::max( int( MIN_OPP_LEVEL ), playermaxlv - DIFF_HARD_LEVEL_INC );
+            if( targetlv > MAX_PKMN_LEVEL ) { targetlv = MAX_PKMN_LEVEL; }
+            auto leveladjust = 0;
+            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+
             for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-                if( _opponentTeam[ i ].m_level > MAX_PKMN_LEVEL - DIFF_HARD_LEVEL_INC ) {
-                    _opponentTeam[ i ].setLevel( MAX_PKMN_LEVEL );
-                } else {
-                    _opponentTeam[ i ].setLevel( _opponentTeam[ i ].m_level + DIFF_HARD_LEVEL_INC );
-                }
+                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
             }
             break;
+        }
+        case 6: {
+            // hard
+            auto targetlv    = playermaxlv;
+            auto leveladjust = 0;
+            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+
+            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
+            }
+            break;
+        }
         }
     }
 

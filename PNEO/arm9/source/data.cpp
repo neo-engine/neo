@@ -85,6 +85,7 @@ namespace FS {
     };
     const char BATTLE_FACILITY_STRINGS_PATH[] = "nitro:/DATA/BFTR_STRS/";
     const char BFPOKE_PATH[]                  = "nitro:/DATA/BFTR_PKMN/bfpoke.datab";
+    const char BFPOKET_PATH[]                 = "nitro:/DATA/BFTR_PKMN/bfpoket.datab";
     const char TCLASS_NAME_PATH[]             = "nitro:/DATA/TRNR_NAME/trnrname";
 
     const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
@@ -693,6 +694,15 @@ namespace FS {
     bool loadBFPokemon( bfPokemon* p_out, u16 p_idx ) {
         static FILE* bankfile = nullptr;
         if( !checkOrOpen( bankfile, BFPOKE_PATH ) ) { return false; }
+
+        if( std::fseek( bankfile, p_idx * sizeof( bfPokemon ), SEEK_SET ) ) { return false; }
+        fread( p_out, sizeof( bfPokemon ), 1, bankfile );
+        return true;
+    }
+
+    bool loadBFPokemonTent( bfPokemon* p_out, u16 p_idx ) {
+        static FILE* bankfile = nullptr;
+        if( !checkOrOpen( bankfile, BFPOKET_PATH ) ) { return false; }
 
         if( std::fseek( bankfile, p_idx * sizeof( bfPokemon ), SEEK_SET ) ) { return false; }
         fread( p_out, sizeof( bfPokemon ), 1, bankfile );

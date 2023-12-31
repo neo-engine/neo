@@ -270,6 +270,8 @@ namespace MAP {
         bool streakOngoing    = SAVE::SAV.getActiveFile( ).checkFlag( streakActiveFlag );
         auto battlePolicy     = getBattlePolicy( false, p_rules.m_battleMode, false );
 
+        bool isTentMode = p_rules.m_id == RSID_SINGLE_LV30;
+
         auto streakfortier
             = p_rules.m_id == RSID_SINGLE_LV30 ? 0 : std::min( IV_MAX_STREAK, currentStreak / 7 );
 
@@ -286,9 +288,13 @@ namespace MAP {
         // initial pkmn selection
         memset( PLAYER_TEMP_TEAM, 0, sizeof( PLAYER_TEMP_TEAM ) );
         for( auto i = 0; i < 6; ) {
-            auto      idx = bfPkmnForStreak( streakfortier );
+            auto      idx = bfPkmnForStreak( streakfortier, isTentMode );
             bfPokemon tmp;
-            FS::loadBFPokemon( &tmp, idx );
+            if( isTentMode ) {
+                FS::loadBFPokemonTent( &tmp, idx );
+            } else {
+                FS::loadBFPokemon( &tmp, idx );
+            }
 
             PLAYER_TEMP_TEAM[ i ] = pokemon( tmp, p_rules.m_level, IV_FOR_STREAK[ streakfortier ] );
 
@@ -352,7 +358,7 @@ namespace MAP {
                 picnum = 19; // frontier brain
                 printMapMessage( GET_MAP_STRING( 869 ), MSG_NORMAL );
             } else {
-                if( !createNextOpponentTrainer( p_rules, streakfortier, true ) ) {
+                if( !createNextOpponentTrainer( p_rules, streakfortier, true, isTentMode ) ) {
                     SAVE::SAV.getActiveFile( ).setFlag( streakActiveFlag, false );
                     break;
                 }
@@ -632,7 +638,7 @@ namespace MAP {
             if( p_rules.m_id == RSID_SINGLE_LV30 ) {
                 // hand out full heal
                 printMapMessage( GET_MAP_STRING( 871 ), MSG_NORMAL );
-                IO::giveItemToPlayer( I_FULL_HEAL, 1 );
+                IO::giveItemToPlayer( I_PREMIER_BALL, 1 );
             } else {
                 // hand out bp
                 printMapMessage( GET_MAP_STRING( 872 ), MSG_NORMAL );

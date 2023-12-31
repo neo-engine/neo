@@ -627,6 +627,10 @@ struct pokemon {
     void battleTransform( );
     void revertBattleTransform( );
 
+    constexpr u8 getLevel( ) const {
+        return m_level;
+    }
+
     bool        setLevel( u8 p_newLevel );
     bool        setExperience( u32 p_amount );
     bool        gainExperience( u32 p_amount );

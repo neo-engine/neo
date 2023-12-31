@@ -84,7 +84,8 @@ namespace BATTLE {
       public:
         slot( ) {
             reset( );
-            _pokemon = nullptr;
+            _pokemon  = nullptr;
+            _pkmnData = pkmnData( );
         }
 
         constexpr u16 getAndIncreaseToxicCount( ) {

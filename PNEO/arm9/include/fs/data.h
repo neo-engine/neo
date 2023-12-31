@@ -184,6 +184,7 @@ namespace FS {
 
     bool loadBFTrainer( BATTLE::bfTrainer* p_out, u16 p_idx );
     bool loadBFPokemon( bfPokemon* p_out, u16 p_idx );
+    bool loadBFPokemonTent( bfPokemon* p_out, u16 p_idx );
 
     bool        getMoveName( const u16 p_moveId, const u8 p_language, char* p_out );
     std::string getMoveName( const u16 p_moveId, const u8 p_language );

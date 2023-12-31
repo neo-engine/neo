@@ -52,6 +52,9 @@ namespace MAP {
     constexpr int IV_MAX_STREAK                  = 8;
     constexpr u8  IV_FOR_STREAK[ IV_MAX_STREAK ] = { 3, 6, 9, 12, 15, 18, 21, 31 };
 
+    // battle tents have a separate pool of pkmn
+    constexpr u16 MAX_BFT_PKMN = 80;
+
     constexpr u16 MAX_BF_PKMN = 1073;
     constexpr u16 MAX_BF_PKMN_FOR_STREAK[ IV_MAX_STREAK ]
         = { 50, 125, 200, 300, 400, 600, 800, MAX_BF_PKMN };
@@ -70,15 +73,16 @@ namespace MAP {
                        + 1 ) );
     }
 
-    constexpr u16 bfPkmnForStreak( u16 p_streak ) {
+    constexpr u16 bfPkmnForStreak( u16 p_streak, bool p_tent ) {
+        if( p_tent ) { return 1 + ( rand( ) % MAX_BFT_PKMN ); }
         return MIN_BF_PKMN_FOR_STREAK[ p_streak ]
                + ( rand( )
                    % ( MAX_BF_PKMN_FOR_STREAK[ p_streak ] - MIN_BF_PKMN_FOR_STREAK[ p_streak ]
                        + 1 ) );
     }
 
-    bool createNextOpponentTrainer( const ruleSet& p_rules, u16 p_streak,
-                                    bool p_ignoreClassLimits );
+    bool createNextOpponentTrainer( const ruleSet& p_rules, u16 p_streak, bool p_ignoreClassLimits,
+                                    bool p_tentMode );
 
     extern pokemon           PLAYER_TEMP_TEAM[ 6 ];
     extern BATTLE::bfTrainer NEXT_OPPONENT;

@@ -197,8 +197,8 @@ namespace MAP {
     BATTLE::bfTrainer NEXT_OPPONENT;
     bfPokemon         NEXT_OPPONENT_TEAM[ 6 ];
 
-    bool createNextOpponentTrainer( const ruleSet& p_rules, u16 p_streak,
-                                    bool p_ignoreClassLimits ) {
+    bool createNextOpponentTrainer( const ruleSet& p_rules, u16 p_streak, bool p_ignoreClassLimits,
+                                    bool p_tentPkmn ) {
         if( p_streak > IV_MAX_STREAK ) { p_streak = IV_MAX_STREAK; }
         std::memset( &NEXT_OPPONENT, 0, sizeof( BATTLE::bfTrainer ) );
         std::memset( &NEXT_OPPONENT_TEAM, 0, 6 * sizeof( bfPokemon ) );
@@ -214,16 +214,20 @@ namespace MAP {
 
         while( found < numPokemon ) {
             u16 idx = 0;
-            if( !p_ignoreClassLimits ) {
-                // just pick numPokemon different pkmn
+            if( !p_ignoreClassLimits && !p_tentPkmn ) {
+                // pick according to tclass
                 idx = bfPkmnForClassAndStreak( NEXT_OPPONENT.m_trainerClass, p_streak );
             } else {
-                // pick according to tclass
-                idx = bfPkmnForStreak( p_streak );
+                // just pick numPokemon different pkmn
+                idx = bfPkmnForStreak( p_streak, p_tentPkmn );
             }
 
             // load pkmn
-            FS::loadBFPokemon( &NEXT_OPPONENT_TEAM[ found ], idx );
+            if( p_tentPkmn ) {
+                FS::loadBFPokemonTent( &NEXT_OPPONENT_TEAM[ found ], idx );
+            } else {
+                FS::loadBFPokemon( &NEXT_OPPONENT_TEAM[ found ], idx );
+            }
 
             bool bad = false;
             // check that pkmn is different from the remaining pkmn and does not violate

@@ -82,6 +82,8 @@ namespace BATTLE {
 
         _terrain      = p_initialTerrain;
         _terrainTimer = u8( -1 ); // Initial terrain stays forever
+
+        for( auto i = 0; i < NUM_SIDES; ++i ) { _sides[ i ] = side( ); }
     }
 
     void field::checkOnEatBerry( battleUI* p_ui, bool p_opponent, u8 p_slot, u16 p_berry ) {
@@ -3946,7 +3948,7 @@ namespace BATTLE {
 
                     healPokemon( p_ui, p_move.m_user.first, p_move.m_user.second, amount );
 
-                    auto fmt = std::string( GET_STRING( 533 ) );
+                    auto fmt = std::string( GET_STRING( 532 ) );
                     snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                               p_ui->getPkmnName( getPkmnOrDisguise( p_move.m_user.first,
                                                                     p_move.m_user.second ),
