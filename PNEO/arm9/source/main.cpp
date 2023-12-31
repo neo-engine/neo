@@ -442,6 +442,7 @@ START:
             stopped = false;
             if( MAP::curMap->canMove( SAVE::SAV.getActiveFile( ).m_player.m_pos, curDir,
                                       SAVE::SAV.getActiveFile( ).m_player.m_movement ) ) {
+                MAP::curMap->allowFollowPokemon( );
                 MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
                 bmp = false;
             } else if( !bmp ) {

@@ -870,6 +870,10 @@ namespace MAP {
         bool requestWildPkmn( bool p_forceHighGrass = false );
 
         u16 getCurrentLocationId( ) const;
+
+        inline void allowFollowPokemon( ) {
+            _forceNoFollow = false;
+        }
     };
     extern mapDrawer* curMap;
     extern pokemon    WILD_PKMN;
