@@ -163,12 +163,12 @@ namespace BAG {
             }
             if( _context == WILD_BATTLE ) {
                 constexpr u16 POKEBALLS[ 30 ] = {
-                    I_MASTER_BALL,  I_ULTRA_BALL,   I_GREAT_BALL, I_POKE_BALL,   I_SAFARI_BALL,
-                    I_NET_BALL,     I_DIVE_BALL,    I_NEST_BALL,  I_REPEAT_BALL, I_TIMER_BALL,
-                    I_LUXURY_BALL,  I_PREMIER_BALL, I_DUSK_BALL,  I_HEAL_BALL,   I_QUICK_BALL,
-                    I_CHERISH_BALL, I_FAST_BALL,    I_LEVEL_BALL, I_LURE_BALL,   I_HEAVY_BALL,
-                    I_LOVE_BALL,    I_FRIEND_BALL,  I_MOON_BALL,  I_SPORT_BALL,  I_PARK_BALL,
-                    I_DREAM_BALL,   I_BEAST_BALL,
+                    I_MASTER_BALL, I_ULTRA_BALL,   I_GREAT_BALL,    I_POKE_BALL,   I_SAFARI_BALL,
+                    I_NET_BALL,    I_DIVE_BALL,    I_NEST_BALL,     I_REPEAT_BALL, I_TIMER_BALL,
+                    I_LUXURY_BALL, I_PREMIER_BALL, I_DUSK_BALL,     I_HEAL_BALL,   I_QUICK_BALL,
+                    I_FAST_BALL,   I_LEVEL_BALL,   I_LURE_BALL,     I_HEAVY_BALL,  I_LOVE_BALL,
+                    I_FRIEND_BALL, I_MOON_BALL,    I_INFINITY_BALL, I_SPORT_BALL,  I_PARK_BALL,
+                    I_DREAM_BALL,  I_BEAST_BALL,
                 };
 
                 for( u8 i = 0; i < 30; ++i ) {

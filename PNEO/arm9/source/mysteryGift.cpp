@@ -69,7 +69,7 @@ namespace SAVE {
     wonderCard TMP_WC;
 
 #ifdef DESQUID
-    const u8         RIBBON[ 12 ]  = { 0, 0, 0, 0, 0, 0, 0, 0b10 };   // wishing ribbon
+    const u8         RIBBON[ 12 ]  = { 0, 0, 0, 0, 0, 0, 0, 0b10 };  // wishing ribbon
     const u8         RIBBON2[ 12 ] = { 0, 0, 0, 0, 0, 0, 0, 0b100 }; // classic ribbon
     const u16        MOVES[ 4 ]    = { M_TAKE_DOWN };
     const u16        MOVES2[ 4 ]   = { M_ENERGY_BALL, M_ICE_BEAM, M_FLAMETHROWER, M_THUNDERBOLT };
@@ -91,7 +91,7 @@ namespace SAVE {
                                false,
                                L_LOVELY_PLACE,
                                0,
-                               BAG::itemToBall( I_CHERISH_BALL ),
+                               BAG::itemToBall( I_INFINITY_BALL ),
                                0,
                                0,
                                RIBBON,
@@ -115,7 +115,7 @@ namespace SAVE {
                   false,
                   L_FARAWAY_PLACE,
                   0,
-                  BAG::itemToBall( I_CHERISH_BALL ),
+                  BAG::itemToBall( I_INFINITY_BALL ),
                   0,
                   0,
                   RIBBON2,

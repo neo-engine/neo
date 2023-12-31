@@ -147,7 +147,7 @@ namespace BAG {
         case I_DUSK_BALL: return 12;
         case I_HEAL_BALL: return 13;
         case I_QUICK_BALL: return 14;
-        case I_CHERISH_BALL: return 15;
+        case I_INFINITY_BALL: return 15;
         case I_FAST_BALL: return 16;
         case I_LEVEL_BALL: return 17;
         case I_LURE_BALL: return 18;
@@ -183,7 +183,7 @@ namespace BAG {
         case 12: return I_DUSK_BALL;
         case 13: return I_HEAL_BALL;
         case 14: return I_QUICK_BALL;
-        case 15: return I_CHERISH_BALL;
+        case 15: return I_INFINITY_BALL;
         case 16: return I_FAST_BALL;
         case 17: return I_LEVEL_BALL;
         case 18: return I_LURE_BALL;

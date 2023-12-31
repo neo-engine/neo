@@ -43,6 +43,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/strings.h"
 #include "io/uio.h"
 #include "io/yesNoBox.h"
+#include "map/mapDrawer.h"
 #include "pokemon.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -1225,11 +1226,27 @@ namespace BATTLE {
 
         auto p = _field.getPkmnData( field::OPPONENT_SIDE, field::PKMN_0 );
 
+        bool forceFail = false;
+
+        if( MAP::curMap->getCurrentLocationId( ) == L_INFINITY_CAVE ) {
+            forceFail = p_pokeball != I_INFINITY_BALL;
+        } else {
+            forceFail = p_pokeball == I_INFINITY_BALL;
+        }
+
+        if( forceFail ) {
+            _battleUI.animateCapturePkmn( p_pokeball, 0 );
+            _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_FORCED_FAIL ) );
+
+            return false;
+        }
+
         switch( p_pokeball ) {
         case I_SAFARI_BALL:
         case I_SPORT_BALL:
         case I_GREAT_BALL: ballCatchRate = 3; break;
         case I_ULTRA_BALL: ballCatchRate = 4; break;
+        case I_INFINITY_BALL:
         case I_MASTER_BALL: ballCatchRate = 512; break;
 
         case I_LEVEL_BALL:

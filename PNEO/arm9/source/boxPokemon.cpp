@@ -402,7 +402,7 @@ bool boxPokemon::breed( const boxPokemon& p_other, boxPokemon& p_result ) const 
 
     // compute the pball the egg should be caught in
     u8 pball = mom.getBall( );
-    if( BAG::ballToItem( pball ) == I_CHERISH_BALL || BAG::ballToItem( pball ) == I_MASTER_BALL
+    if( BAG::ballToItem( pball ) == I_INFINITY_BALL || BAG::ballToItem( pball ) == I_MASTER_BALL
         || BAG::ballToItem( pball ) == I_PREMIER_BALL ) [[unlikely]] {
         // these balls can't be inherited
         pball = BAG::itemToBall( I_POKE_BALL );

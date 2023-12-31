@@ -14,7 +14,7 @@
 #define I_DUSK_BALL 13
 #define I_HEAL_BALL 14
 #define I_QUICK_BALL 15
-#define I_CHERISH_BALL 16
+#define I_INFINITY_BALL 16
 #define I_POTION 17
 #define I_ANTIDOTE 18
 #define I_BURN_HEAL 19
