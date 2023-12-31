@@ -25,6 +25,8 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <map>
+#include <vector>
 #include "battle/battle.h"
 #include "battle/battleTrainer.h"
 #include "fs/data.h"
@@ -48,143 +50,61 @@ namespace MAP {
         { RSID_DOUBLE_LV100, 100, 4, true, 7, BATTLE::BM_DOUBLE }, // battle tower
     };
 
-    constexpr u8 MAX_BF_TRAINER_CLASS = 40;
-
-    /*
-     * @brief: Possible trainer classes for (random) opponents in any of the battle
-     * facilities.
-     */
-    constexpr u8 BATTLE_FACILITY_TRAINER_CLASSES[ MAX_BF_TRAINER_CLASS ] = { TC_AROMA_LADY,
-                                                                             TC_BATTLE_GIRL,
-                                                                             TC_BEAUTY,
-                                                                             TC_BIRD_KEEPER,
-                                                                             TC_BLACK_BELT,
-                                                                             TC_BUG_CATCHER,
-                                                                             TC_BUG_MANIAC,
-                                                                             TC_CAMPER,
-                                                                             TC_COLLECTOR,
-                                                                             TC_ACE_TRAINER,
-                                                                             TC_DRAGON_TAMER,
-                                                                             TC_EXPERT,
-                                                                             TC_FISHERMAN,
-                                                                             TC_GENTLEMAN,
-                                                                             TC_GUITARIST,
-                                                                             TC_HEX_MANIAC,
-                                                                             TC_HIKER,
-                                                                             TC_KINDLER,
-                                                                             TC_LADY,
-                                                                             TC_LASS,
-                                                                             TC_NINJA_BOY,
-                                                                             TC_PARASOL_LADY,
-                                                                             TC_PICNICKER,
-                                                                             TC_POKE_FAN,
-                                                                             TC_POKE_MANIAC,
-                                                                             TC_POKEMON_BREEDER,
-                                                                             TC__POKEMON_BREEDER,
-                                                                             TC_POKEMON_RANGER,
-                                                                             TC_PSYCHIC,
-                                                                             TC_RICH_BOY,
-                                                                             TC_RUIN_MANIAC,
-                                                                             TC_SAILOR,
-                                                                             TC_SCHOOLBOY,
-                                                                             TC_SCHOOLGIRL,
-                                                                             TC_SWIMMER,
-                                                                             TC__SWIMMER,
-                                                                             TC_TRIATHLETE,
-                                                                             TC_TUBER,
-                                                                             TC__TUBER,
-                                                                             TC_YOUNGSTER };
-
-    constexpr u16 MAX_PKMN_PER_CLASS = 200;
-
-    constexpr u16 BF_PKMN_IDX_FOR_TCLASS[ MAX_BF_TRAINER_CLASS ][ MAX_PKMN_PER_CLASS ] = {
-        // AROMA_LADY
-        { },
-        // BATTLE_GIRL
-        { },
-        // BEAUTY
-        { },
-        // BIRD_KEEPER
-        { },
-        // BLACK_BELT
-        { },
-        // BUG_CATCHER
-        { },
-        // BUG_MANIAC
-        { },
-        // CAMPER
-        { },
-        // COLLECTOR
-        { },
-        // ACE_TRAINER
-        { },
-        // DRAGON_TAMER
-        { },
-        // EXPERT
-        { },
-        // FISHERMAN
-        { },
-        // GENTLEMAN
-        { },
-        // GUITARIST
-        { },
-        // HEX_MANIAC
-        { },
-        // HIKER
-        { },
-        // KINDLER
-        { },
-        // LADY
-        { },
-        // LASS
-        { },
-        // NINJA_BOY
-        { },
-        // PARASOL_LADY
-        { },
-        // PICNICKER
-        { },
-        // POKE_FAN
-        { },
-        // POKE_MANIAC
-        { },
-        // POKEMON_BREEDER
-        { },
-        // _POKEMON_BREEDER
-        { },
-        // POKEMON_RANGER
-        { },
-        // PSYCHIC
-        { },
-        // RICH_BOY
-        { },
-        // RUIN_MANIAC
-        { },
-        // SAILOR
-        { },
-        // SCHOOLBOY
-        { },
-        // SCHOOLGIRL
-        { },
-        // SWIMMER
-        { },
-        // _SWIMMER
-        { },
-        // TRIATHLETE
-        { },
-        // TUBER
-        { },
-        // _TUBER
-        { },
-        // YOUNGSTER
-        { },
+    const std::map<u8, std::vector<u16>> BF_PKMN_IDX_FOR_TCLASS = {
+        { TC_AROMA_LADY, { } },
+        { TC_BATTLE_GIRL, { } },
+        { TC_BEAUTY, { } },
+        { TC_BIRD_KEEPER, { } },
+        { TC_BLACK_BELT, { } },
+        { TC_BUG_CATCHER, { } },
+        { TC_BUG_MANIAC, { } },
+        { TC_CAMPER, { } },
+        { TC_COLLECTOR, { } },
+        { TC_ACE_TRAINER, { } },
+        { TC_DRAGON_TAMER, { } },
+        { TC_EXPERT, { } },
+        { TC_FISHERMAN, { } },
+        { TC_GENTLEMAN, { } },
+        { TC_GUITARIST, { } },
+        { TC_HEX_MANIAC, { } },
+        { TC_HIKER, { } },
+        { TC_KINDLER, { } },
+        { TC_LADY, { } },
+        { TC_LASS, { } },
+        { TC_NINJA_BOY, { } },
+        { TC_PARASOL_LADY, { } },
+        { TC_PICNICKER, { } },
+        { TC_POKE_FAN, { } },
+        { TC_POKE_MANIAC, { } },
+        { TC_POKEMON_BREEDER, { } },
+        { TC__POKEMON_BREEDER, { } },
+        { TC_POKEMON_RANGER, { } },
+        { TC_PSYCHIC, { } },
+        { TC_RICH_BOY, { } },
+        { TC_RUIN_MANIAC, { } },
+        { TC_SAILOR, { } },
+        { TC_SCHOOLBOY, { } },
+        { TC_SCHOOLGIRL, { } },
+        { TC_SWIMMER, { } },
+        { TC__SWIMMER, { } },
+        { TC_TRIATHLETE, { } },
+        { TC_TUBER, { } },
+        { TC__TUBER, { } },
+        { TC_YOUNGSTER, { } },
     };
 
     constexpr u16 bfPkmnForClassAndStreak( u8 p_trainerClass, u16 p_streak ) {
         u16 choice = 0;
+
+        if( !BF_PKMN_IDX_FOR_TCLASS.count( p_trainerClass ) ) { return choice; }
+
+        const auto& choices = BF_PKMN_IDX_FOR_TCLASS.at( p_trainerClass );
+
+        if( !choices.size( ) ) { return choice; }
+
         while( !choice ) {
-            choice = rand( ) % MAX_PKMN_PER_CLASS;
-            choice = BF_PKMN_IDX_FOR_TCLASS[ p_trainerClass ][ choice ];
+            choice = rand( ) % choices.size( );
+            choice = choices[ choice ];
             if( choice > MAX_BF_PKMN_FOR_STREAK[ p_streak ]
                 || choice < MIN_BF_PKMN_FOR_STREAK[ p_streak ] ) {
                 choice = 0;
@@ -204,9 +124,7 @@ namespace MAP {
         std::memset( &NEXT_OPPONENT_TEAM, 0, 6 * sizeof( bfPokemon ) );
 
         NEXT_OPPONENT.m_trainerNameIdx = bfTrainerForStreak( p_streak );
-        // TODO
-        // if( !FS::loadBFTrainer( &NEXT_OPPONENT, NEXT_OPPONENT.m_trainerNameIdx ) ) { return
-        // false; }
+        if( !FS::loadBFTrainer( &NEXT_OPPONENT, NEXT_OPPONENT.m_trainerNameIdx ) ) { return false; }
 
         auto numPokemon = p_rules.m_battleMode == BATTLE::BM_SINGLE ? 3 : 4;
 

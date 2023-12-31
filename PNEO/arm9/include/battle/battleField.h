@@ -44,6 +44,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 namespace BATTLE {
+    class battle;
+
     /*
      * @brief: The overall field where the battle takes place.
      */
@@ -72,8 +74,10 @@ namespace BATTLE {
         bool       _isWildBattle;
         battleMode _mode;
 
+        battle* _battle;
+
       public:
-        field( battleMode p_battleMode = BM_SINGLE, bool p_isWildBattle = false,
+        field( battle* p_battle, battleMode p_battleMode = BM_SINGLE, bool p_isWildBattle = false,
                weather p_initialWeather = WE_NONE, pseudoWeather p_initialPseudoWeather = PW_NONE,
                terrain p_initialTerrain = TR_NONE );
 
@@ -300,6 +304,8 @@ namespace BATTLE {
             p_ui->updatePkmnStats( p_opponent, p_slot, pkmn, false );
             p_ui->faintPkmn( p_opponent, p_slot, pkmn );
         }
+
+        bool canRecallPokemon( bool p_opponent );
 
         /*
          * @brief: Recalls the pokemon at the specified position.

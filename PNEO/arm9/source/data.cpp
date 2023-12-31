@@ -83,10 +83,10 @@ namespace FS {
         "nitro:/DATA/TRNR_DATA/1/",
         "nitro:/DATA/TRNR_DATA/2/",
     };
-    const char BATTLE_FACILITY_STRINGS_PATH[] = "nitro:/DATA/BFTR_STRS/";
-    const char BFPOKE_PATH[]                  = "nitro:/DATA/BFTR_PKMN/bfpoke.datab";
-    const char BFPOKET_PATH[]                 = "nitro:/DATA/BFTR_PKMN/bfpoket.datab";
-    const char TCLASS_NAME_PATH[]             = "nitro:/DATA/TRNR_NAME/trnrname";
+    const char BFT_PATH[]         = "nitro:/DATA/BFTR_PKMN/bftrainer.datab";
+    const char BFPOKE_PATH[]      = "nitro:/DATA/BFTR_PKMN/bfpoke.datab";
+    const char BFPOKET_PATH[]     = "nitro:/DATA/BFTR_PKMN/bfpoket.datab";
+    const char TCLASS_NAME_PATH[] = "nitro:/DATA/TRNR_NAME/trnrname";
 
     const char BGM_NAME_PATH[]      = "nitro:/DATA/BGM_NAME/bgmnames";
     const char LOCATION_NAME_PATH[] = "nitro:/DATA/LOC_NAME/locname";
@@ -685,10 +685,14 @@ namespace FS {
 #endif
 
     bool loadBFTrainer( BATTLE::bfTrainer* p_out, u16 p_idx ) {
-        // TODO
-        (void) p_out;
-        (void) p_idx;
-        return false;
+        static FILE* bankfile = nullptr;
+        if( !checkOrOpen( bankfile, BFT_PATH ) ) { return false; }
+
+        if( std::fseek( bankfile, p_idx * sizeof( BATTLE::bfTrainer ), SEEK_SET ) ) {
+            return false;
+        }
+        fread( p_out, sizeof( BATTLE::bfTrainer ), 1, bankfile );
+        return true;
     }
 
     bool loadBFPokemon( bfPokemon* p_out, u16 p_idx ) {

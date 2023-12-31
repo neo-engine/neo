@@ -53,7 +53,8 @@ namespace BATTLE {
     constexpr u8 FACILITY_PLATFORM = 10;
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponentId,
-                    battlePolicy p_policy ) {
+                    battlePolicy p_policy )
+        : _field{ this, p_policy.m_mode, false, p_policy.m_weather } {
         _playerTeam     = p_playerTeam;
         _playerTeamSize = p_playerTeamSize;
 
@@ -70,7 +71,6 @@ namespace BATTLE {
         _isWildBattle = false;
         _AILevel      = _opponent.m_data.m_AILevel;
 
-        _field    = field( _policy.m_mode, false, p_policy.m_weather );
         _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
                               _opponent.m_data.m_battleBG, _policy.m_mode, false,
                               _policy.m_distributeEXP );
@@ -144,7 +144,8 @@ namespace BATTLE {
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const bfTrainer& p_opponent,
                     const bfPokemon p_opponentTeam[ 6 ], u8 p_opponentTeamSize, u8 p_level, u8 p_iv,
-                    battlePolicy p_policy ) {
+                    battlePolicy p_policy )
+        : _field{ this, p_policy.m_mode, false, p_policy.m_weather } {
         _playerTeam     = p_playerTeam;
         _playerTeamSize = p_playerTeamSize;
 
@@ -155,9 +156,9 @@ namespace BATTLE {
         snprintf( _opponent.m_strings.m_message1, trainerStrings::MSG_LENGTH - 1, "%s",
                   p_opponent.m_beforeBattle.construct( ).c_str( ) );
         snprintf( _opponent.m_strings.m_message2, trainerStrings::MSG_LENGTH - 1, "%s",
-                  p_opponent.m_onWinAgainstPlayer.construct( ).c_str( ) );
-        snprintf( _opponent.m_strings.m_message3, trainerStrings::MSG_LENGTH - 1, "%s",
                   p_opponent.m_onLoseAgainstPlayer.construct( ).c_str( ) );
+        snprintf( _opponent.m_strings.m_message3, trainerStrings::MSG_LENGTH - 1, "%s",
+                  p_opponent.m_onWinAgainstPlayer.construct( ).c_str( ) );
 
         _opponent.m_data.m_trainerClass = p_opponent.m_trainerClass;
         _opponent.m_data.m_trainerBG    = p_opponent.m_trainerBG;
@@ -173,7 +174,6 @@ namespace BATTLE {
         _isWildBattle = false;
         _AILevel = _opponent.m_data.m_AILevel = p_policy.m_aiLevel;
 
-        _field    = field( _policy.m_mode, false, p_policy.m_weather );
         _battleUI = battleUI( FACILITY_PLATFORM, FACILITY_PLATFORM, FACILITY_BG, _policy.m_mode,
                               false, _policy.m_distributeEXP );
 
@@ -188,7 +188,8 @@ namespace BATTLE {
     }
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform,
-                    u8 p_platform2, u8 p_background, battlePolicy p_policy, bool p_wildPkmnRuns ) {
+                    u8 p_platform2, u8 p_background, battlePolicy p_policy, bool p_wildPkmnRuns )
+        : _field{ this, p_policy.m_mode, false, p_policy.m_weather, PW_NONE, TR_NONE } {
         _playerTeam     = p_playerTeam;
         _playerTeamSize = p_playerTeamSize;
 
@@ -208,7 +209,6 @@ namespace BATTLE {
         _isWildBattle = true;
 
         // Initialize the field with the wild pkmn
-        _field    = field( _policy.m_mode, true, p_policy.m_weather, PW_NONE, TR_NONE );
         _battleUI = battleUI( p_platform, p_platform2 == u8( -1 ) ? p_platform : p_platform2,
                               p_background, _policy.m_mode, true, _policy.m_distributeEXP );
 
@@ -1416,7 +1416,8 @@ namespace BATTLE {
                     } else if( !i ) {
                         // Check if the player has something to send out
                         bool good = false;
-                        for( u8 k = j + 1; k < _playerTeamSize; ++k ) {
+                        for( u8 k = getBattlingPKMNCount( _policy.m_mode ); k < _playerTeamSize;
+                             ++k ) {
                             if( _playerTeam[ k ].canBattle( ) ) { good = true; }
                         }
                         if( !good ) { continue; }
@@ -1809,5 +1810,16 @@ namespace BATTLE {
         default: break;
         }
         return 0;
+    }
+
+    bool battle::canRecallPokemon( bool p_opponent ) {
+        auto start = getBattlingPKMNCount( _policy.m_mode );
+        auto bound = p_opponent ? _opponentTeamSize : _playerTeamSize;
+        auto team  = p_opponent ? _opponentTeam : _playerTeam;
+
+        for( auto i = start; i < bound; ++i ) {
+            if( team[ i ].canBattle( ) ) { return true; }
+        }
+        return false;
     }
 } // namespace BATTLE

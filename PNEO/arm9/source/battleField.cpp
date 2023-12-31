@@ -66,8 +66,10 @@ seeds / when enter terrain
    */
 
 namespace BATTLE {
-    field::field( battleMode p_battleMode, bool p_isWildBattle, weather p_initialWeather,
-                  pseudoWeather p_initialPseudoWeather, terrain p_initialTerrain ) {
+    field::field( battle* p_battle, battleMode p_battleMode, bool p_isWildBattle,
+                  weather p_initialWeather, pseudoWeather p_initialPseudoWeather,
+                  terrain p_initialTerrain ) {
+        _battle       = p_battle;
         _mode         = p_battleMode;
         _weather      = p_initialWeather;
         _weatherTimer = u8( -1 ); // Initial weather stays forever
@@ -763,19 +765,22 @@ namespace BATTLE {
                 removeItem( p_ui, p_target.first, p_target.second );
                 break;
             }
-            case I_EJECT_BUTTON:
-                p_ui->logItem( getPkmnOrDisguise( p_target.first, p_target.second ),
-                               p_target.first );
-                snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
-                          p_ui->getPkmnName( getPkmnOrDisguise( p_target.first, p_target.second ),
-                                             p_target.first )
-                              .c_str( ),
-                          FS::getItemName( target->getItem( ) ).c_str( ) );
-                p_ui->log( buffer );
-                removeItem( p_ui, p_target.first, p_target.second );
-                // TODO: should only work if opponent has > 1 pkmn that can battle
-                recallPokemon( p_ui, p_target.first, p_target.second );
+            case I_EJECT_BUTTON: {
+                if( canRecallPokemon( p_target.first ) ) {
+                    p_ui->logItem( getPkmnOrDisguise( p_target.first, p_target.second ),
+                                   p_target.first );
+                    snprintf(
+                        buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
+                        p_ui->getPkmnName( getPkmnOrDisguise( p_target.first, p_target.second ),
+                                           p_target.first )
+                            .c_str( ),
+                        FS::getItemName( target->getItem( ) ).c_str( ) );
+                    p_ui->log( buffer );
+                    removeItem( p_ui, p_target.first, p_target.second );
+                    recallPokemon( p_ui, p_target.first, p_target.second );
+                }
                 break;
+            }
             default: break;
             }
         }
@@ -1803,6 +1808,10 @@ namespace BATTLE {
         p_ui->log( std::string( buffer ) );
 
         checkOnSendOut( p_ui, p_opponent, p_slot );
+    }
+
+    bool field::canRecallPokemon( bool p_opponent ) {
+        return _battle->canRecallPokemon( p_opponent );
     }
 
     std::vector<battleMove>
@@ -4280,9 +4289,10 @@ namespace BATTLE {
                         recallPokemon( p_ui, OPPONENT_SIDE, 0 );
                         break;
                     }
-
-                    // TODO: should only work if opponent has > 1 pkmn that can battle
-                    recallPokemon( p_ui, p_move.m_target[ i ].first, p_move.m_target[ i ].second );
+                    if( canRecallPokemon( p_move.m_target[ i ].first ) ) {
+                        recallPokemon( p_ui, p_move.m_target[ i ].first,
+                                       p_move.m_target[ i ].second );
+                    }
                     break;
                 }
 
@@ -4393,10 +4403,14 @@ namespace BATTLE {
             addVolatileStatus( p_ui, opponent, slot, VS_BURNUP, 255 );
         }
 
-        if( p_move.m_moveData.m_flags & MF_SELFSWITCH ) { recallPokemon( p_ui, opponent, slot ); }
+        if( canRecallPokemon( opponent ) ) {
+            if( p_move.m_moveData.m_flags & MF_SELFSWITCH ) {
+                recallPokemon( p_ui, opponent, slot );
+            }
 
-        if( p_move.m_moveData.m_flags & MF_BATONPASS ) {
-            recallPokemon( p_ui, opponent, slot, true );
+            if( p_move.m_moveData.m_flags & MF_BATONPASS ) {
+                recallPokemon( p_ui, opponent, slot, true );
+            }
         }
 
         if( p_move.m_moveData.m_flags & MF_SELFDESTRUCT ) { faintPokemon( p_ui, opponent, slot ); }

@@ -78,8 +78,8 @@ namespace BATTLE {
         IO::easyChatMessage m_beforeBattle;
         IO::easyChatMessage m_onWinAgainstPlayer;
         IO::easyChatMessage m_onLoseAgainstPlayer;
-        u16                 m_trainerClass : 6;
-        u16                 m_trainerNameIdx : 10;
+        u16                 m_trainerClass : 7;
+        u16                 m_trainerNameIdx : 9;
         u16                 m_trainerBG : 8; // in-battle pic
         u16                 m_picnum : 8;    // ow sprite num
     };

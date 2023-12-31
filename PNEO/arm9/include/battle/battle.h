@@ -240,5 +240,7 @@ namespace BATTLE {
          * @brief: Returns messages of the battle trainer.
          */
         const char* getMessage( u8 p_stringId );
+
+        bool canRecallPokemon( bool p_opponent );
     };
 } // namespace BATTLE
