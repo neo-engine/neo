@@ -13,13 +13,16 @@ Map engine:
 - Added fishing in sand
 - Added fog, rain
 - Added tile exit animations (traces in water/sand); Fortree bridge anim, Pacifidlog log anim
+- Added Berry Blender, Pokéblock Case
+- Added EV training mechanism (infinity cave)
+- Added Slateport Battle Tent (Battle Factory light)
+- Added in-game trades
+- Added initial Wonder Card support
 [ ] PKMN Contests (currently w/o move animations)
-[ ] Berry Blender, Pokéblock Feeder
 [ ] Mauville Game Corner
 [ ] multi battles
 [ ] call 'n' rebattle
-[ ] fite: battle tents, battle factory
-[ ] "fite": infinity cave
+[~] fite: battle tents, battle factory
 [~] Added proper desquid menu
 
 Battle engine
@@ -31,25 +34,32 @@ PKMN Status Screen
 [ ] Added contest move information
 
 Dex
-- Added toggle for different formes
+- Added toggle for different forms
 - Added habitat viewer
 
 Demo Story
 - Added indoor / cave maps
-[~] route 104/105/106/107/108/109/abandoned ship
+- Slateport: added PKMN Fan Club, Battle Tent, Name Rater, Market, Seashore House
+- Mauville: added Gym, Wally battle
+- Verdanturf: added Friendship Checker, Rusturf Tunnel scripts
+- Routes 104 - 109: added Trainer
+- Lilycove: added Contest Lobby
+- Added PKMN League
+- Added Shoal Cave
+- Added Sealed Chamber / Golems
+[ ] abandoned ship
 [~] route 116/rusturf tunnel
-[~] Slateport city
 [~] route 110
 [~] route 103 (east)
 [~] mauville city
-[ ] route 111/112/jagged path/mt chimney/fiery path
+[~] route 111/112/jagged path/mt chimney/fiery path
 [~] route 117
 [~] verdanturf
-[ ] route 113
-[ ] fallarbor
-[ ] route 114/115/meteor falls
-[ ] lavaridge
-[ ] lilycove city
+[~] route 113
+[~] fallarbor
+[~] route 114/115/meteor falls
+[~] lavaridge
+[~] lilycove city
 [ ] safari zone/safari zone game
 [ ] route 120/121/122/mt pyre/scorched slab
 [ ] new lilycove
@@ -64,13 +74,10 @@ Demo Story
 [ ] ever grande
 [ ] pacifidlog
 [ ] victory road
-[~] pkmn league
-[~] shoal cave
 [~] cave of origin/sky pillar
 [ ] Added story until E4
 [ ] battle frontier
-- sealed chamber/golems
-- roaming lati@s
+[ ] roaming lati@s
 
 General:
 - Fixed Flashcard boot problems
