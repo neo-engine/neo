@@ -594,6 +594,7 @@ namespace SPX {
         SAVE::SAV.getActiveFile( ).m_lastAchievementDate  = SAVE::CURRENT_DATE;
         SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = 9; // hall of fame
                                                                // message
+        SAVE::SAV.getActiveFile( ).setFlag( SAVE::F_GAME_CLEAR, 1 );
 
         // save game
         u16 lst = -1;

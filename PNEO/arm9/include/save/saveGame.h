@@ -92,6 +92,8 @@ namespace SAVE {
 
     constexpr u16 F_UNCOLLECTED_MYSTERY_EVENT = 351;
 
+    constexpr u16 F_GAME_CLEAR = 385;
+
     constexpr u16 F_TRAINER_BATTLED( u8 p_trainer ) {
         return p_trainer + 2048;
     }
