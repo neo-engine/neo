@@ -778,7 +778,9 @@ namespace IO {
                                                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true,
                                                IO::font::RIGHT );
             }
-            snprintf( buffer, 90, "$%lu", p_offeredItems[ p_firstItem + i ].second );
+
+            snprintf( buffer, 90, GET_STRING( IO::STR_UI_MONEYTYPE_START_PAY + p_paymentMethod ),
+                      p_offeredItems[ p_firstItem + i ].second );
             IO::regularFont->setColor( 0, 2 );
             IO::regularFont->printStringC( buffer, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 114,
                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 16, true,

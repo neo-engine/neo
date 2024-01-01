@@ -172,7 +172,7 @@ namespace MAP {
                 break;
             }
             case FIXR: {
-                if( par1 < 10 ) { fixMapObject( registers[ par1 ] ); }
+                if( par1 < 10 ) { registers[ 0 ] = fixMapObject( registers[ par1 ] ); }
                 break;
             }
             case UFXR: {
@@ -620,12 +620,67 @@ namespace MAP {
                 break;
             case PMN:
                 SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
-                if( SAVE::SAV.getActiveFile( ).m_money >= parA ) {
-                    SAVE::SAV.getActiveFile( ).m_money -= parA;
-                } else {
-                    SAVE::SAV.getActiveFile( ).m_money = 0;
+
+                switch( parB ) {
+                default:
+                case 0:
+                    // money
+                    if( SAVE::SAV.getActiveFile( ).m_money >= parA ) {
+                        SAVE::SAV.getActiveFile( ).m_money -= parA;
+                    } else {
+                        SAVE::SAV.getActiveFile( ).m_money = 0;
+                    }
+                    break;
+                case 1:
+                    // battle points
+                    if( SAVE::SAV.getActiveFile( ).m_battlePoints >= parA ) {
+                        SAVE::SAV.getActiveFile( ).m_battlePoints -= parA;
+                    } else {
+                        SAVE::SAV.getActiveFile( ).m_battlePoints = 0;
+                    }
+                    break;
+                case 2:
+                    // coins
+                    if( SAVE::SAV.getActiveFile( ).m_coins >= parA ) {
+                        SAVE::SAV.getActiveFile( ).m_coins -= parA;
+                    } else {
+                        SAVE::SAV.getActiveFile( ).m_coins = 0;
+                    }
+                    break;
+                case 3:
+                    // ash
+                    if( SAVE::SAV.getActiveFile( ).m_ashCount >= parA ) {
+                        SAVE::SAV.getActiveFile( ).m_ashCount -= parA;
+                    } else {
+                        SAVE::SAV.getActiveFile( ).m_ashCount = 0;
+                    }
+                    break;
                 }
                 break;
+
+                break;
+            case RMN: {
+                switch( parB ) {
+                default:
+                case 0:
+                    // money
+                    SAVE::SAV.getActiveFile( ).m_money += parA;
+                    break;
+                case 1:
+                    // battle points
+                    SAVE::SAV.getActiveFile( ).m_battlePoints += parA;
+                    break;
+                case 2:
+                    // coins
+                    SAVE::SAV.getActiveFile( ).m_coins += parA;
+                    break;
+                case 3:
+                    // ash
+                    SAVE::SAV.getActiveFile( ).m_ashCount += parA;
+                    break;
+                }
+                break;
+            }
             case CMO: registers[ 0 ] = p_mapObject; break;
             case LCKR: {
                 tmpmove = SAVE::SAV.getActiveFile( )

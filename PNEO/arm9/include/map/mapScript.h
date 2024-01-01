@@ -174,6 +174,7 @@ namespace MAP {
 
         CMN = 70, // check money >=
         PMN = 71, // pay money
+        RMN = 72, // receive money parB is money type, register 0 is success
 
         EXM  = 87, // Exclamation mark
         EXMR = 88, // Exclamation mark (register)
