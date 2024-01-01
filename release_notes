@@ -78,6 +78,31 @@ Demo Story:
 General:
 - Ate some squids, had some fun
 
+- Lamp Squid of this release:
+Breaking map scripts by commenting out to much. Idea: Have a handy output when a script
+doesn't work as intended, but make said output appear only in times when one is searching
+really hard for that nasty squid.
+
+Attempt:
+```
+#ifdef DESQUID_MORE
+if( !loadMapObject( cur ) ) {
+    IO::printMessage( "SMO fail" );
+}
+#endif
+```
+
+Result: Scripts magically cannot load new map objects anymore. Turns out, "loading" a map
+object is very beneficial to it actually appearing on-screen. Fix:
+
+```
+if( !loadMapObject( cur ) ) {
+#ifdef DESQUID_MORE
+    IO::printMessage( "SMO fail" );
+#endif
+}
+```
+
 
 
 v1.0-alpha

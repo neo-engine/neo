@@ -202,9 +202,11 @@ namespace MAP {
                 obj.m_currentMovement = movement{ obj.m_direction, 0 };
 
                 std::pair<u8, mapObject> cur = { 0, obj };
+                if( !loadMapObject( cur ) ) {
 #ifdef DESQUID_MORE
-                if( !loadMapObject( cur ) ) { IO::printMessage( "SMO fail" ); }
+                    IO::printMessage( "SMO fail" );
 #endif
+                }
                 // Check if there is some unused map object
                 u8 found = 255;
                 for( u8 i = _fixedObjectCount; i < SAVE::SAV.getActiveFile( ).m_mapObjectCount;
@@ -218,7 +220,10 @@ namespace MAP {
                     registers[ 0 ] = found;
                 } else {
 #ifdef DESQUID_MORE
-                    IO::printMessage( ( std::to_string( cur.first ) ).c_str( ) );
+                    IO::printMessage(
+                        ( std::to_string( cur.first ) + " "
+                          + std::to_string( SAVE::SAV.getActiveFile( ).m_mapObjectCount ) )
+                            .c_str( ) );
 #endif
                     registers[ 0 ] = SAVE::SAV.getActiveFile( ).m_mapObjectCount++;
                 }
@@ -324,6 +329,8 @@ namespace MAP {
                         SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_direction
+                    = direction( par2 );
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = tmp;
                 break;
             }
@@ -345,6 +352,8 @@ namespace MAP {
                         SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_direction
+                    = direction( par2 );
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ par1 ].second.m_movement = tmp;
                 break;
             }
@@ -535,6 +544,8 @@ namespace MAP {
                         SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_direction
+                    = direction( par2 );
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
                     = tmp;
                 break;
@@ -570,6 +581,8 @@ namespace MAP {
                         SAVE::SAV.getActiveFile( ).m_player.m_direction = direction( par2 );
                     }
                 }
+                SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_direction
+                    = direction( par2 );
                 SAVE::SAV.getActiveFile( ).m_mapObjects[ registers[ par1 ] ].second.m_movement
                     = tmp;
                 break;
