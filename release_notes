@@ -57,6 +57,7 @@ Map engine:
 - Added EV training mechanism (infinity cave)
 - Added Slateport Battle Tent (Battle Factory light)
 - Added in-game trades
+- Added gift pkmn
 - Added initial Wonder Card support
 
 Dex:
@@ -64,9 +65,11 @@ Dex:
 - Added habitat viewer
 
 Battle engine:
+- Auto-scale levels in trainer battles
 - Added A_ILLUSION and A_DISGUISE
 
 Demo Story:
+- Added support for different story routes
 [~] Fully playable up to Badge 3.
 - Slateport: added PKMN Fan Club, Battle Tent, Name Rater, Market, Seashore House
 - Mauville: added Gym, Wally battle
