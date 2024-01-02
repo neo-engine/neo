@@ -36,6 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/locationNames.h"
 #include "io/choiceBox.h"
 #include "io/counter.h"
+#include "io/keyboard.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
@@ -845,6 +846,73 @@ namespace MAP {
 
                 // TODO
                 break;
+            case GPK: {
+                pokemon giftPkmn = pokemon( parA, parB );
+
+                // Player obtained <pkmn>
+
+                snprintf( buffer, 99, GET_STRING( 814 ), SAVE::SAV.getActiveFile( ).m_playername,
+                          giftPkmn.m_boxdata.m_name );
+
+                SOUND::playSoundEffect( SFX_CAPTURE_SUCCESSFUL );
+                printMapMessage( buffer, MSG_INFO );
+
+                // would you like to nickname <pkmn>?
+
+                IO::yesNoBox yn;
+                snprintf( buffer, 99, GET_STRING( 141 ), giftPkmn.m_boxdata.m_name );
+                if( IO::yesNoBox::YES
+                    == IO::yesNoBox( ).getResult(
+                        convertMapString( buffer, MSG_INFO_NOCLOSE ).c_str( ), MSG_INFO ) ) {
+                    ANIMATE_MAP = false;
+                    IO::init( );
+                    IO::keyboard kbd;
+                    printMapMessage( GET_STRING( 142 ), MSG_INFO_NOCLOSE );
+                    auto nick = kbd.getText( 10 );
+                    if( strcmp( nick.c_str( ), giftPkmn.m_boxdata.m_name )
+                        && strcmp( "", nick.c_str( ) ) ) {
+                        strcpy( giftPkmn.m_boxdata.m_name, nick.c_str( ) );
+                        giftPkmn.m_boxdata.setIsNicknamed( true );
+                    }
+                    ANIMATE_MAP = true;
+                }
+
+                IO::init( );
+
+                auto cnt = SAVE::SAV.getActiveFile( ).getTeamPkmnCount( );
+
+                if( cnt < 6 ) {
+                    SAVE::SAV.getActiveFile( ).setTeamPkmn( cnt, &giftPkmn );
+                    registers[ 0 ] = 1;
+                } else {
+                    u8 oldbx = SAVE::SAV.getActiveFile( ).m_curBox;
+                    u8 nb    = SAVE::SAV.getActiveFile( ).storePkmn( giftPkmn );
+                    if( nb != u8( -1 ) ) {
+                        snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_SENT_TO_STORAGE ),
+                                  giftPkmn.m_boxdata.m_name );
+                        printMapMessage( buffer, MSG_INFO );
+
+                        if( oldbx != nb ) {
+                            snprintf( buffer, 99, GET_STRING( IO::STR_UI_STORAGE_BOX_FULL ),
+                                      SAVE::SAV.getActiveFile( ).m_storedPokemon[ oldbx ].m_name );
+                            printMapMessage( buffer, MSG_INFO );
+                        }
+                        snprintf( buffer, 99, GET_STRING( IO::STR_UI_STORAGE_BOX_PICKED ),
+                                  giftPkmn.m_boxdata.m_name,
+                                  SAVE::SAV.getActiveFile( ).m_storedPokemon[ nb ].m_name );
+                        printMapMessage( buffer, MSG_INFO );
+                        registers[ 0 ] = 1;
+                    } else {
+                        printMapMessage( GET_STRING( IO::STR_UI_STORAGE_ALL_BOXES_FULL ),
+                                         MSG_INFO );
+                        snprintf( buffer, 99, GET_STRING( IO::STR_UI_PKMN_RELEASED ),
+                                  giftPkmn.m_boxdata.m_name );
+                        printMapMessage( buffer, MSG_INFO );
+                        registers[ 0 ] = 0;
+                    }
+                }
+                break;
+            }
             case ITM: IO::giveItemToPlayer( parA, parB ); break;
             case TTM: IO::takeItemFromPlayer( parA, parB ); break;
             case UTM: IO::useItemFromPlayer( parA, parB ); break;

@@ -224,6 +224,7 @@ namespace MAP {
 
         DES = 150, // register pkmn as seen in pkdex
         MVT = 151, // move tutor
+        GPK = 152, // gift pkmn
 
         SBC  = 196, // set block
         SBCC = 197, // set block, with player dir correction

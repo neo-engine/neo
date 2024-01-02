@@ -1403,9 +1403,9 @@ namespace BATTLE {
                               SAVE::SAV.getActiveFile( ).m_storedPokemon[ oldbx ].m_name );
                     _battleUI.log( buffer );
                 }
-                sprintf( buffer, GET_STRING( IO::STR_UI_STORAGE_BOX_PICKED ),
-                         pkmn->m_boxdata.m_name,
-                         SAVE::SAV.getActiveFile( ).m_storedPokemon[ nb ].m_name );
+                snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_STORAGE_BOX_PICKED ),
+                          pkmn->m_boxdata.m_name,
+                          SAVE::SAV.getActiveFile( ).m_storedPokemon[ nb ].m_name );
                 _battleUI.log( buffer );
             } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_STORAGE_ALL_BOXES_FULL ) );
