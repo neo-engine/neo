@@ -66,76 +66,94 @@ namespace MAP {
     bool mapDrawer::loadMapObject( std::pair<u8, mapObject>& p_mapObject ) {
         if( !p_mapObject.second.valid( ) ) { return false; }
 
-        u16 curx = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
-        u16 cury = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
-        switch( p_mapObject.second.m_event.m_type ) {
-        default:
-        case EVENT_OW_PKMN:
-        case EVENT_TRAINER:
-        case EVENT_NPC_MESSAGE:
-        case EVENT_NPC: {
-            p_mapObject.first = _mapSprites.loadSprite(
-                curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
-                p_mapObject.second.m_pos.m_posZ, mapSpriteManager::SPTYPE_NPC,
-                p_mapObject.second.sprite( ) );
-
-            _mapSprites.setFrameD( p_mapObject.first, p_mapObject.second.m_direction, false );
-
-            // check for reflection
-            u8 behave = at( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY + 1 )
-                            .m_bottombehave;
-            if( isReflective( behave ) ) { _mapSprites.enableReflection( p_mapObject.first ); }
-            behave = at( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY + 2 )
-                         .m_bottombehave;
-            if( isReflective( behave ) ) { _mapSprites.enableReflection( p_mapObject.first ); }
-
-            break;
+        bool fakeload = false;
+        u16  curx     = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posX;
+        u16  cury     = SAVE::SAV.getActiveFile( ).m_player.m_pos.m_posY;
+        auto dx       = int( curx ) - p_mapObject.second.m_pos.m_posX;
+        auto dy       = int( cury ) - p_mapObject.second.m_pos.m_posY;
+        if( dx < -12 || dx > 12 || dy < -9 || dy > 9 ) {
+            // ignore sprites that are invisible
+            fakeload          = true;
+            p_mapObject.first = 255;
         }
-        case EVENT_HMOBJECT: {
-            if( p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
+
+        if( !fakeload ) {
+            switch( p_mapObject.second.m_event.m_type ) {
+            default:
+            case EVENT_OW_PKMN:
+            case EVENT_TRAINER:
+            case EVENT_NPC_MESSAGE:
+            case EVENT_NPC: {
                 p_mapObject.first = _mapSprites.loadSprite(
                     curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
-                    p_mapObject.second.m_pos.m_posZ,
-                    p_mapObject.second.m_event.m_data.m_hmObject.m_hmType );
-            } else {
-                // HM object got destroyed already
-                p_mapObject.first = 255;
+                    p_mapObject.second.m_pos.m_posZ, mapSpriteManager::SPTYPE_NPC,
+                    p_mapObject.second.sprite( ) );
+
+                _mapSprites.setFrameD( p_mapObject.first, p_mapObject.second.m_direction, false );
+
+                // check for reflection
+                u8 behave
+                    = at( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY + 1 )
+                          .m_bottombehave;
+                if( isReflective( behave ) ) { _mapSprites.enableReflection( p_mapObject.first ); }
+                behave = at( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY + 2 )
+                             .m_bottombehave;
+                if( isReflective( behave ) ) { _mapSprites.enableReflection( p_mapObject.first ); }
+
+                if( p_mapObject.second.m_movement == KECLEON_FIGHT
+                    || p_mapObject.second.m_movement == KECLEON_FLEE ) {
+                    // hide object
+                    _mapSprites.setVisibility( p_mapObject.first, false );
+                }
+
+                break;
             }
-            break;
-        }
-        case EVENT_BERRYTREE: {
-            // Check the growth of the specified berry tree
-            if( SAVE::SAV.getActiveFile( ).berryIsAlive(
-                    p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx ) ) {
-                u8 stage = SAVE::SAV.getActiveFile( ).getBerryStage(
-                    p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx );
-                u8 berryType = SAVE::SAV.getActiveFile( ).getBerry(
-                    p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx );
-                p_mapObject.first = _mapSprites.loadBerryTree(
-                    curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
-                    berryType, stage );
-            } else {
-                p_mapObject.first = 255;
+            case EVENT_HMOBJECT: {
+                if( p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
+                    p_mapObject.first = _mapSprites.loadSprite(
+                        curx, cury, p_mapObject.second.m_pos.m_posX,
+                        p_mapObject.second.m_pos.m_posY, p_mapObject.second.m_pos.m_posZ,
+                        p_mapObject.second.m_event.m_data.m_hmObject.m_hmType );
+                } else {
+                    // HM object got destroyed already
+                    p_mapObject.first = 255;
+                }
+                break;
             }
-            break;
-        }
-        case EVENT_ITEM: {
-            if( p_mapObject.second.m_event.m_data.m_item.m_itemType ) {
-                p_mapObject.first = _mapSprites.loadSprite(
-                    curx, cury, p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY,
-                    p_mapObject.second.m_pos.m_posZ,
-                    p_mapObject.second.m_event.m_data.m_item.m_itemType == 1
-                        ? mapSpriteManager::SPR_ITEM
-                        : mapSpriteManager::SPR_HMBALL );
-            } else {
-                // No item icon for hidden items (otherwise the "hidden" part would be
-                // pointless, right)
-                p_mapObject.first = 255;
+            case EVENT_BERRYTREE: {
+                // Check the growth of the specified berry tree
+                if( SAVE::SAV.getActiveFile( ).berryIsAlive(
+                        p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx ) ) {
+                    u8 stage = SAVE::SAV.getActiveFile( ).getBerryStage(
+                        p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx );
+                    u8 berryType = SAVE::SAV.getActiveFile( ).getBerry(
+                        p_mapObject.second.m_event.m_data.m_berryTree.m_treeIdx );
+                    p_mapObject.first = _mapSprites.loadBerryTree(
+                        curx, cury, p_mapObject.second.m_pos.m_posX,
+                        p_mapObject.second.m_pos.m_posY, berryType, stage );
+                } else {
+                    p_mapObject.first = 255;
+                }
+                break;
             }
-        }
-        }
-        if( p_mapObject.first != 255 ) {
-            animateField( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY );
+            case EVENT_ITEM: {
+                if( p_mapObject.second.m_event.m_data.m_item.m_itemType ) {
+                    p_mapObject.first = _mapSprites.loadSprite(
+                        curx, cury, p_mapObject.second.m_pos.m_posX,
+                        p_mapObject.second.m_pos.m_posY, p_mapObject.second.m_pos.m_posZ,
+                        p_mapObject.second.m_event.m_data.m_item.m_itemType == 1
+                            ? mapSpriteManager::SPR_ITEM
+                            : mapSpriteManager::SPR_HMBALL );
+                } else {
+                    // No item icon for hidden items (otherwise the "hidden" part would be
+                    // pointless, right)
+                    p_mapObject.first = 255;
+                }
+            }
+            }
+            if( p_mapObject.first != 255 ) {
+                animateField( p_mapObject.second.m_pos.m_posX, p_mapObject.second.m_pos.m_posY );
+            }
         }
         return true;
     }
@@ -294,7 +312,7 @@ namespace MAP {
      * @brief: Returns which pkmn should be allowed to follow the player.
      * Currently, a pkmn needs to have a 16x32, 16x16 or 32x32 ow sprite.
      */
-    bool canFollowPlayer( u16 p_pkmnId, bool p_shiny, u8 p_forme ) {
+    bool canFollowPlayer( u16 p_pkmnId, bool p_shiny, bool p_female, u8 p_forme ) {
         static u16  lstid  = 0;
         static bool lstsh  = 0;
         static u8   fm     = 0;
@@ -305,14 +323,17 @@ namespace MAP {
         lstsh = p_shiny;
         fm    = p_forme;
 
-        char buf[ 100 ];
+        char  buf[ 100 ];
+        FILE* f  = nullptr;
+        bool  cl = true;
         if( !p_forme ) {
-            snprintf( buf, 99, "%d/%hu%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId, p_shiny ? "s" : "" );
+            f  = FS::openNPCPBank( p_pkmnId, p_shiny, p_female );
+            cl = false;
         } else {
-            snprintf( buf, 99, "%d/%hu_%hhu%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId, p_forme,
-                      p_shiny ? "s" : "" );
+            snprintf( buf, 99, "%d/%hu_%hhu%s%s", p_pkmnId / ITEMS_PER_DIR, p_pkmnId, p_forme,
+                      p_shiny ? "s" : "", p_female ? "f" : "" );
+            f = FS::open( IO::OWP_PATH, buf, ".rsd" );
         }
-        FILE* f = FS::open( IO::OWP_PATH, buf, ".rsd" );
         if( !f ) { return lstres = false; }
 
         FS::readNop( f, 16 * sizeof( u16 ) );
@@ -321,7 +342,7 @@ namespace MAP {
         u8 sx = 0, sy = 0;
         FS::read( f, &sx, sizeof( u8 ), 1 );
         FS::read( f, &sy, sizeof( u8 ), 1 );
-        FS::close( f );
+        if( cl ) { FS::close( f ); }
         if( sx > 32 || sy > 32 ) { return lstres = false; }
         return lstres = true;
     }
@@ -350,12 +371,12 @@ namespace MAP {
 
         u16  species = _followPkmnData->getSpecies( );
         bool shiny   = _followPkmnData->isShiny( );
-        //        bool female  = _followPkmnData->isFemale( );
-        u8 forme = _followPkmnData->getForme( );
+        bool female  = _followPkmnData->isFemale( );
+        u8   forme   = _followPkmnData->getForme( );
         FS::getPkmnData( species, forme, _followPkmnSpeciesData );
 
         if( species > MAX_PKMN ) { return false; }
-        if( !canFollowPlayer( species, shiny, forme ) ) {
+        if( !canFollowPlayer( species, shiny, female, forme ) ) {
             if( _followPkmnIsDisguised ) {
                 _followPkmnDisguiseBusted = true;
                 return updateFollowPkmn( );
@@ -682,7 +703,7 @@ namespace MAP {
             auto o = SAVE::SAV.getActiveFile( ).m_mapObjects[ i ];
             if( o.first == UNUSED_MAPOBJECT ) { continue; }
 
-            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 24 ) {
+            if( dist( o.second.m_pos.m_posX, o.second.m_pos.m_posY, curx, cury ) > 10 ) {
                 _mapSprites.destroySprite( o.first, false );
             } else if( o.second.m_event.m_activateFlag
                        && !SAVE::SAV.getActiveFile( ).checkFlag(
@@ -696,9 +717,11 @@ namespace MAP {
                        && o.second.m_event.m_route != SAVE::SAV.getActiveFile( ).m_route ) {
                 continue;
             } else {
-                res.push_back( o );
-                eventPositions.insert(
-                    { o.second.m_event.m_posX, o.second.m_event.m_posY, o.second.m_event.m_posZ } );
+                if( o.first != 255 ) {
+                    res.push_back( o );
+                    eventPositions.insert( { o.second.m_event.m_posX, o.second.m_event.m_posY,
+                                             o.second.m_event.m_posZ } );
+                }
             }
         }
 

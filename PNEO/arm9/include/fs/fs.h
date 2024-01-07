@@ -47,6 +47,8 @@ namespace FS {
                     const char* p_mode = "rb" );
 
     FILE* openNPCBank( u16 p_imageId );
+    FILE* openBerryBank( u16 p_imageId );
+    FILE* openNPCPBank( u16 p_imageId, bool p_shiny, bool p_female );
 
     void   close( FILE* p_file );
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count );

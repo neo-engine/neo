@@ -346,10 +346,11 @@ namespace MAP {
         }
 
         // Check if map objects should be updated
-        if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 16 == 8 )
-            || ( dir[ p_direction ][ 0 ] == -1 && _cx % 16 == 7 )
-            || ( dir[ p_direction ][ 1 ] == 1 && _cy % 16 == 8 )
-            || ( dir[ p_direction ][ 1 ] == -1 && _cy % 16 == 7 ) ) {
+        // if( ( dir[ p_direction ][ 0 ] == 1 && _cx % 4 == 3 )
+        //    || ( dir[ p_direction ][ 0 ] == -1 && _cx % 4 == 3 )
+        //    || ( dir[ p_direction ][ 1 ] == 1 && _cy % 4 == 3 )
+        //    || ( dir[ p_direction ][ 1 ] == -1 && _cy % 4 == 3 ) ) {
+        if( true ) {
             ANIMATE_MAP = false;
             for( u8 i = 0; i < 4; ++i ) {
                 constructAndAddNewMapObjects( _data[ i % 2 ][ i / 2 ],

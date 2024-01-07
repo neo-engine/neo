@@ -80,7 +80,7 @@ namespace MAP {
          */
         constexpr bool isVisible( ) const {
             if( m_camDisY < -120 || m_camDisY > 120 ) { return false; }
-            if( m_camDisX < -160 || m_camDisX > 160 ) { return false; }
+            if( m_camDisX < -180 || m_camDisX > 180 ) { return false; }
             return true;
         }
     };
@@ -131,7 +131,7 @@ namespace MAP {
         mapSprite( u16 p_imageId, u8 p_startFrame, u8 p_forme = 0, bool p_shiny = false,
                    bool p_female = false );
 
-        mapSprite( FILE* p_f, u8 p_startFrame );
+        mapSprite( FILE* p_f, u8 p_startFrame, bool p_close = true );
 
         mapSprite( mapSpriteInfo p_info, const mapSpriteData& p_data )
             : _info( p_info ), _data( p_data ) {
@@ -322,7 +322,7 @@ namespace MAP {
         bool _hasExtraLargeSprite = false;
 
         constexpr s16 camShift( u16 p_cam, u16 p_pos ) const {
-            return ( p_pos - p_cam ) * 16;
+            return ( s16( p_pos ) - p_cam ) * 16;
         }
 
         constexpr u16 screenX( u16 p_camX, u16 p_posX, u8 p_width = 16 ) const {

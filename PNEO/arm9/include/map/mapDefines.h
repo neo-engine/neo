@@ -162,6 +162,11 @@ namespace MAP {
         WALK_CONT_UP_DOWN       = 22,
         WALK_AROUND_SQUARE      = 23, // randomly walks around in a 3x3 square
         WALK_CONT_FOLLOW_OBJECT = 24, // walks along the edge of an object, touching w/ right hand
+        KECLEON_FIGHT           = 25, // hidden kecleon that will fight once silph scope is used
+        KECLEON_FLEE            = 26, // hidden kecleon that will flee once silph scope is used
+        NINJA_ASH               = 27, // ninja hidden in ash
+        NINJA_TREE              = 28, // ninja hidden behind tree
+        NINJA_ROCK              = 29, // ninja hidden behind rock
     };
 
     direction getRandomLookDirection( moveMode p_movement );

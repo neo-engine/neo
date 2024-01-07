@@ -79,6 +79,12 @@ namespace MAP {
             if( m_width >= 64 ) { m_frameCount = m_frameCount > 3 ? 3 : m_frameCount; }
             FS::read( p_f, m_frameData, sizeof( u32 ), m_width * m_height * m_frameCount / 8 );
             if( p_close ) { FS::close( p_f ); }
+        } else {
+            memset( m_palData, 0, sizeof( u16 ) * 16 );
+            m_frameCount = 9;
+            m_width      = 16;
+            m_height     = 16;
+            memset( m_frameData, 0, sizeof( u32 ) * m_width * m_height * m_frameCount / 8 );
         }
     }
 
@@ -88,7 +94,7 @@ namespace MAP {
 
     char buf[ 100 ];
     mapSpriteData::mapSpriteData( u16 p_imageId, u8 p_forme, bool p_shiny, bool p_female ) {
-        FILE* f;
+        FILE* f  = nullptr;
         bool  cl = true;
         if( p_imageId > PKMN_SPRITE ) {
             u16  species = p_imageId - PKMN_SPRITE;
@@ -97,15 +103,17 @@ namespace MAP {
             bool female  = p_female;
 
             if( !forme ) {
-                snprintf( buf, 99, "%d/%hu%s%s", species / ITEMS_PER_DIR, species,
-                          female ? "f" : "", shiny ? "s" : "" );
+                // snprintf( buf, 99, "%d/%hu%s%s", species / ITEMS_PER_DIR, species,
+                //          female ? "f" : "", shiny ? "s" : "" );
+                f  = FS::openNPCPBank( species, shiny, female );
+                cl = false;
             } else {
                 snprintf( buf, 99, "%d/%hu_%hhu%s%s", species / ITEMS_PER_DIR, species, forme,
                           female ? "f" : "", shiny ? "s" : "" );
+                f = FS::open( IO::OWP_PATH, buf, ".rsd" );
             }
-            f = FS::open( IO::OWP_PATH, buf, ".rsd" );
 
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             if( !f ) {
                 printf( "sf %s %hu\n", buf, p_imageId );
                 IO::printMessage( std::string( "Sprite failed: " ) + buf );
@@ -113,7 +121,7 @@ namespace MAP {
 #endif
         } else if( p_imageId < 250 ) {
             f = FS::open( IO::OW_PATH, p_imageId, ".rsd" );
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             if( !f ) {
                 IO::printMessage( std::string( "Sprite failed: OW/" )
                                   + std::to_string( p_imageId ) );
@@ -132,7 +140,7 @@ namespace MAP {
             }
             f  = FS::openNPCBank( p_imageId );
             cl = false;
-#ifdef DESQUID
+#ifdef DESQUID_MORE
             if( !f ) {
                 IO::printMessage( std::string( "Sprite failed: Trainer/" )
                                   + std::to_string( p_imageId ) );
@@ -163,8 +171,8 @@ namespace MAP {
         _info.m_curFrame = p_startFrame;
     }
 
-    mapSprite::mapSprite( FILE* p_f, u8 p_startFrame ) {
-        _data.readData( p_f );
+    mapSprite::mapSprite( FILE* p_f, u8 p_startFrame, bool p_close ) {
+        _data.readData( p_f, p_close );
         _info.m_picNum   = -1;
         _info.m_curFrame = p_startFrame;
     }
@@ -198,11 +206,6 @@ namespace MAP {
     }
 
     void mapSprite::drawFrame( u8 p_oamIdx, u8 p_value, bool p_hFlip ) {
-
-#ifdef DESQUID
-//        IO::printMessage( ( std::string( " Draw Frame " ) + std::to_string( p_value ) ).c_str( )
-//        );
-#endif
         IO::setOWSpriteFrame( p_value, p_hFlip, p_oamIdx, _data.m_palData, _data.m_frameData );
     }
 
@@ -440,14 +443,6 @@ namespace MAP {
 
         val1 += IO::spriteInfoTop[ p_idx1 ].m_height;
         val2 += IO::spriteInfoTop[ p_idx2 ].m_height;
-        /*
-                if( debug ) {
-                    IO::printMessage( ( std::to_string( p_idx1 ) + ": " + std::to_string( val1 ) +
-           "\n"
-                                         + std::to_string( p_idx2 ) + " : " + std::to_string( val2 )
-           ) .c_str( ) );
-                }
-                */
 
         if( val1 < val2 )
             return -1;
@@ -467,14 +462,6 @@ namespace MAP {
         for( u8 i = 0; i < MAX_OAM; ++i ) {
             bool swp = false;
             for( u8 j = 1; j < MAX_OAM - i; ++j ) {
-                //                IO::printMessage( ( std::to_string( j - 1 ) + " sw " +
-                //                std::to_string( j ) + " : "
-                //                                     + std::to_string( IO::OamTop->oamBuffer[ j -
-                //                                     1 ].y ) + " vs "
-                //                                     + std::to_string( IO::OamTop->oamBuffer[ j
-                //                                     ].y ) )
-                //                                      .c_str( ) );
-
                 // take care of potentially negative coordinates
                 auto cmp = cmpSprY( j - 1, j );
                 if( cmp < 0 || ( cmp == 0 && _oamPositionR[ j - 1 ] > _oamPositionR[ j ] ) ) {
@@ -483,11 +470,6 @@ namespace MAP {
                 }
             }
             if( !swp ) { break; }
-        }
-
-        if( _oamPosition[ SPR_MAIN_PLAYER_OAM ] > _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ] ) {
-            //            swapSprites( _oamPosition[ SPR_MAIN_PLAYER_OAM ],
-            //                         _oamPosition[ SPR_MAIN_PLAYER_PLAT_OAM ], false );
         }
 
         if( p_update ) { update( ); }
@@ -598,21 +580,24 @@ namespace MAP {
         FILE* f;
         u8    fr = 0;
         if( p_stage == 0 ) { // generic sprite for all berries
-            f = FS::open( IO::BERRY_PATH, 998, ".rsd" );
-#ifdef DESQUID
-            if( !f ) { IO::printMessage( std::string( "Sprite failed: Berry/998" ) ); }
+            f = FS::openBerryBank( 98 );
+            // f = FS::open( IO::BERRY_PATH, 98, ".rsd" );
+#ifdef DESQUID_MORE
+            if( !f ) { IO::printMessage( std::string( "Sprite failed: Berry/98" ) ); }
 #endif
             fr = 0;
         } else if( p_stage == 1 ) { // generic sprite for all berries
-            f = FS::open( IO::BERRY_PATH, 999, ".rsd" );
-#ifdef DESQUID
-            if( !f ) { IO::printMessage( std::string( "Sprite failed: Berry/999" ) ); }
+            f = FS::openBerryBank( 99 );
+            // f = FS::open( IO::BERRY_PATH, 99, ".rsd" );
+#ifdef DESQUID_MORE
+            if( !f ) { IO::printMessage( std::string( "Sprite failed: Berry/99" ) ); }
 #endif
             fr = 0;
         } else { // custom sprite
-            f = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
-            if( !f ) { f = FS::open( IO::BERRY_PATH, u16( 0 ), ".rsd" ); }
-#ifdef DESQUID
+            f = FS::openBerryBank( p_berryIdx );
+            // f = FS::open( IO::BERRY_PATH, p_berryIdx, ".rsd" );
+            // if( !f ) { f = FS::open( IO::BERRY_PATH, u16( 0 ), ".rsd" ); }
+#ifdef DESQUID_MORE
             if( !f ) {
                 IO::printMessage( std::string( "Sprite failed: Berry/" )
                                   + std::to_string( p_berryIdx ) );
@@ -621,7 +606,7 @@ namespace MAP {
             fr = 2 * ( p_stage - 2 );
         }
         return loadSprite( p_camX, p_camY, p_posX, p_posY, 3, SPTYPE_BERRYTREE,
-                           mapSprite( f, fr ) );
+                           mapSprite( f, fr, false ) );
     }
 
     mapSpriteData DOOR_DATA;

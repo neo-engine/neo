@@ -57,6 +57,19 @@ namespace FS {
     FILE*       NPC_BANK_FILE        = nullptr;
     u32         NPC_BANK_FILE_HEADER = 0;
 
+    const char* BERRY_BANK_PATH        = "nitro:/PICS/SPRITES/berry.rsdb";
+    FILE*       BERRY_BANK_FILE        = nullptr;
+    u32         BERRY_BANK_FILE_HEADER = 0;
+
+    const char* NPCP_BANK_PATH[ 4 ] = {
+        "nitro:/PICS/SPRITES/NPCP.rsdb",
+        "nitro:/PICS/SPRITES/NPCPs.rsdb",
+        "nitro:/PICS/SPRITES/NPCPf.rsdb",
+        "nitro:/PICS/SPRITES/NPCPfs.rsdb",
+    };
+    FILE* NPCP_BANK_FILE[ 4 ]        = { nullptr, nullptr, nullptr, nullptr };
+    u32   NPCP_BANK_FILE_HEADER[ 4 ] = { 0, 0, 0, 0 };
+
     char TMP_BUFFER[ 100 ];
 
     bool checkOrOpen( FILE*& p_f, const char* p_path ) {
@@ -139,6 +152,33 @@ namespace FS {
         if( NPC_BANK_FILE ) {
             fseek( NPC_BANK_FILE, 4 + p_imageId * NPC_BANK_FILE_HEADER, SEEK_SET );
             return NPC_BANK_FILE;
+        }
+        return nullptr;
+    }
+
+    FILE* openBerryBank( u16 p_imageId ) {
+        if( !BERRY_BANK_FILE || !BERRY_BANK_FILE_HEADER ) {
+            BERRY_BANK_FILE = fopen( BERRY_BANK_PATH, "rb" );
+            fread( &BERRY_BANK_FILE_HEADER, 1, sizeof( u32 ), BERRY_BANK_FILE );
+        }
+
+        if( BERRY_BANK_FILE ) {
+            fseek( BERRY_BANK_FILE, 4 + p_imageId * BERRY_BANK_FILE_HEADER, SEEK_SET );
+            return BERRY_BANK_FILE;
+        }
+        return nullptr;
+    }
+
+    FILE* openNPCPBank( u16 p_imageId, bool p_shiny, bool p_female ) {
+        auto idx = 2 * p_female + p_shiny;
+        if( !NPCP_BANK_FILE[ idx ] || !NPCP_BANK_FILE_HEADER[ idx ] ) {
+            NPCP_BANK_FILE[ idx ] = fopen( NPCP_BANK_PATH[ idx ], "rb" );
+            fread( &NPCP_BANK_FILE_HEADER[ idx ], 1, sizeof( u32 ), NPCP_BANK_FILE[ idx ] );
+        }
+
+        if( NPCP_BANK_FILE[ idx ] ) {
+            fseek( NPCP_BANK_FILE[ idx ], 4 + p_imageId * NPCP_BANK_FILE_HEADER[ idx ], SEEK_SET );
+            return NPCP_BANK_FILE[ idx ];
         }
         return nullptr;
     }
