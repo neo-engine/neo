@@ -24,8 +24,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <sys/select.h>
 
+#include <nds.h>
 #include <nds/system.h>
+
+#include <dswifi9.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 #include "defines.h"
 #include "fs/fs.h"
@@ -367,11 +374,71 @@ namespace SAVE {
     }
 
     bool checkAndDownloadWCInternet( ) {
+        static bool WIFI_INITIALIZED = false;
+
         // search for wc, download into TMP_WC
         TMP_WC = wonderCard{ };
         message( GET_STRING( IO::STR_UI_SEARCHING_FOR_GIFT ) );
+
+        if( !WIFI_INITIALIZED && !Wifi_InitDefault( WFC_CONNECT ) ) { return false; }
+        WIFI_INITIALIZED = true;
+
+        const char*   url          = "localhost";
+        const char*   request_text = "GET / HTTP/1.1\r\n"
+                                     "Host: localhost\r\n"
+                                     "User-Agent: Nintendo DS\r\n"
+                                     "Accept: */*\r\n\r\n";
+        constexpr u32 port         = 8000;
+
+        // Find the IP address of the server, with gethostbyname
+        struct hostent* myhost = gethostbyname( url );
+
+        // Create a TCP socket
+        int my_socket;
+        my_socket = socket( AF_INET, SOCK_STREAM, 0 );
+
+        // Tell the socket to connect to the IP address we found, on port 80 (HTTP)
+        struct sockaddr_in sain;
+        sain.sin_family      = AF_INET;
+        sain.sin_port        = htons( port );
+        sain.sin_addr.s_addr = *( (unsigned long*) ( myhost->h_addr_list[ 0 ] ) );
+        connect( my_socket, (struct sockaddr*) &sain, sizeof( sain ) );
+
+        // send our request
+        send( my_socket, request_text, strlen( request_text ), 0 );
+
+        int  recvd_len;
+        char incoming_buffer[ 256 ];
+
+        char result[ 250 ];
+        int  respos = 0;
+
+        const char endm[ 5 ] = "\r\n\r\n";
+        int        endmpos   = 0;
+
+        // skip header
+        while( ( recvd_len = recv( my_socket, incoming_buffer, 1, 0 ) ) != 0 ) {
+            if( recvd_len > 0 ) {
+                if( incoming_buffer[ 0 ] == endm[ endmpos ] ) {
+                    if( ++endmpos == 4 ) { break; }
+                } else {
+                    endmpos = 0;
+                }
+            }
+        }
+        while( ( recvd_len = recv( my_socket, incoming_buffer, 1, 0 ) ) != 0 && respos < 204 ) {
+            if( recvd_len > 0 ) {
+                for( int k = 0; k < recvd_len; ++k ) { result[ respos++ ] = incoming_buffer[ k ]; }
+            }
+        }
+
+        shutdown( my_socket, 0 ); // good practice to shutdown the socket.
+        closesocket( my_socket ); // remove the socket.
+
+        memcpy( &TMP_WC, &result, sizeof( wonderCard ) );
+
         for( u8 k = 0; k < 250; ++k ) { swiWaitForVBlank( ); }
-        return false;
+        return true;
     }
 
     void displayWonderCard( u8 p_cardIdx, bool p_reverse = false ) {
