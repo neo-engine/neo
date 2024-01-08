@@ -75,6 +75,13 @@ namespace MAP {
                       .c_str( ) );
         printMapMessage( buffer, MSG_NORMAL );
 
+        // check if player has at least two pkmn that are not eggs
+        if( SAVE::SAV.getActiveFile( ).countAlivePkmn( ) < 2 ) {
+            printMapMessage( GET_MAP_STRING( 1106 ), MSG_NORMAL );
+            ANIMATE_MAP = true;
+            return;
+        }
+
         if( IO::yesNoBox::YES
             == IO::yesNoBox( ).getResult(
                 convertMapString( GET_MAP_STRING( IO::STR_MAP_ST_MSG3 ), MSG_NORMAL ).c_str( ),
