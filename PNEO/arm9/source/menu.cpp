@@ -318,6 +318,7 @@ namespace IO {
             for( u16 i = 0; i < I_EGGANT_BERRY; ++i ) {
                 if( BAG::itemToBerry( i ) ) {
                     SAVE::SAV.getActiveFile( ).m_bag.insert( BAG::bag::BERRIES, i, 1 );
+                    SAVE::SAV.getActiveFile( ).registerCollectedBerry( BAG::itemToBerry( i ) );
                 }
             }
             init( );

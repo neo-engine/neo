@@ -467,6 +467,10 @@ namespace IO {
             iname += " " + FS::getMoveName( data.m_param2 );
         }
 
+        if( data.m_itemType == BAG::ITEMTYPE_BERRY ) {
+            SAVE::SAV.getActiveFile( ).registerCollectedBerry( BAG::itemToBerry( p_itemId ) );
+        }
+
         if( p_amount > 1 ) {
             snprintf( buffer, 99, GET_STRING( IO::STR_UI_OBTAINED_ITEM_X_TIMES ), p_amount,
                       iname.c_str( ) );

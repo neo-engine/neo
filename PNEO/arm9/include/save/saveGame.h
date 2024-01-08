@@ -54,6 +54,8 @@ namespace SAVE {
     constexpr u16 NUM_FLAGS       = 256;
     constexpr u16 NUM_VARS        = 256;
 
+    constexpr u16 NUM_BERRIES = 78;
+
     constexpr u32 GOOD_MAGIC1 = 0x01234567;
     constexpr u32 GOOD_MAGIC2 = 0xFEDCBA98;
 
@@ -247,7 +249,10 @@ namespace SAVE {
             u8          m_numRegisteredFlyPos                        = 0;
             MAP::flyPos m_registeredFlyPos[ MAX_REGISTERED_FLY_POS ] = { };
 
-            u32 m_reserved[ 88 ] = { 0 }; // reserved for future things that need to be stored
+            u32 m_reserved[ 80 ] = { 0 }; // reserved for future things that need to be stored
+
+            u8 m_collectedBerryTypes[ 32 ] = { 0 }; // collected berry types for
+                                                    // I_BERRY_DEX
 
             u16 m_pokeblockCount[ POKEBLOCK_TYPES ] = { 0 };
 
@@ -340,6 +345,15 @@ namespace SAVE {
                 return res;
             }
 
+            inline u16 getCollectedBerryTypes( ) const {
+                u16 res = 0;
+                for( u8 i = 0; i < 32; ++i ) {
+                    // Count the number of set bits
+                    res += std::popcount( m_collectedBerryTypes[ i ] );
+                }
+                return res;
+            }
+
             /*
              * @brief: Returns the number of seen pkmn.
              */
@@ -404,6 +418,14 @@ namespace SAVE {
 
             constexpr bool caught( u16 p_pokemon ) const {
                 return !!( m_caughtPkmn[ p_pokemon / 8 ] & ( 1 << ( p_pokemon % 8 ) ) );
+            }
+
+            constexpr void registerCollectedBerry( u8 p_berry ) {
+                m_collectedBerryTypes[ p_berry / 8 ] |= 1 << ( p_berry % 8 );
+
+                if( getCollectedBerryTypes( ) == NUM_BERRIES ) {
+                    m_achievements |= ACHIEVEMENT_BERRY;
+                }
             }
 
             constexpr void registerSeenPkmn( u16 p_pokemon ) {
