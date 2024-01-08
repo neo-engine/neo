@@ -317,6 +317,10 @@ namespace MAP {
         bool _playerIsFast = false;
         s8   _fastBike     = false;
 
+        // set of (globx, globy) positions of mapObjects that the player destroyed.
+        // gets reset whenever a new map bank is loaded
+        std::set<std::pair<u16, u16>> _destroyedMapObjects{ };
+
         std::vector<std::function<void( u16, bool )>> _newLocationCallbacks
             = std::vector<std::function<void( u16, bool )>>( ); // Called whenever player makes a
                                                                 // step

@@ -1136,6 +1136,9 @@ namespace MAP {
             stopPlayer( );
         }
 
+        // reset hm objects
+        _destroyedMapObjects.clear( );
+
         if( crossbank ) { resetMapSprites( ); }
 
         SAVE::SAV.getActiveFile( ).m_player.m_pos = p_target.second;
@@ -1170,6 +1173,7 @@ namespace MAP {
 
         draw( priority, hidePlayer );
         for( const auto& fn : _newBankCallbacks ) { fn( SAVE::SAV.getActiveFile( ).m_currentMap ); }
+
         auto curLocId = getCurrentLocationId( );
 
         if( curLocId == L_POKEMON_CENTER && oldMapType != newMapType && p_type == SLIDING_DOOR ) {

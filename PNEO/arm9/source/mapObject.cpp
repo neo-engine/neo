@@ -109,7 +109,11 @@ namespace MAP {
                 break;
             }
             case EVENT_HMOBJECT: {
-                if( p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
+                auto gx = p_mapObject.second.m_pos.m_posX;
+                auto gy = p_mapObject.second.m_pos.m_posY;
+
+                if( !_destroyedMapObjects.count( { gx, gy } )
+                    && p_mapObject.second.m_event.m_data.m_hmObject.m_hmType ) {
                     p_mapObject.first = _mapSprites.loadSprite(
                         curx, cury, p_mapObject.second.m_pos.m_posX,
                         p_mapObject.second.m_pos.m_posY, p_mapObject.second.m_pos.m_posZ,
@@ -885,6 +889,8 @@ namespace MAP {
 
             if( o.second.m_pos.m_posX != p_globX || o.second.m_pos.m_posY != p_globY ) { continue; }
             if( o.second.m_event.m_type == MAP::EVENT_HMOBJECT ) {
+                _destroyedMapObjects.insert( std::pair<u16, u16>( p_globX, p_globY ) );
+
                 if( o.second.m_event.m_data.m_hmObject.m_hmType
                     == mapSpriteManager::SPR_ROCKSMASH ) {
                     SOUND::playSoundEffect( SFX_HM_ROCKSMASH );
