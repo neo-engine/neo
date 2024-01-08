@@ -374,6 +374,7 @@ namespace SAVE {
     }
 
     bool checkAndDownloadWCInternet( ) {
+#ifdef DESQUID
         static bool WIFI_INITIALIZED = false;
 
         // search for wc, download into TMP_WC
@@ -439,6 +440,12 @@ namespace SAVE {
 
         for( u8 k = 0; k < 250; ++k ) { swiWaitForVBlank( ); }
         return true;
+#else
+        TMP_WC = wonderCard{ };
+        message( GET_STRING( IO::STR_UI_SEARCHING_FOR_GIFT ) );
+        for( u8 k = 0; k < 250; ++k ) { swiWaitForVBlank( ); }
+        return false;
+#endif
     }
 
     void displayWonderCard( u8 p_cardIdx, bool p_reverse = false ) {
