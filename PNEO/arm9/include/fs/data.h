@@ -259,10 +259,9 @@ namespace FS {
                                            BATTLE::battleTrainer* p_out );
 
 #ifndef NO_SOUND
-    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f );
     bool loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId );
     bool loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId );
-    bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId );
+    bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId, u8 p_slot );
 #endif
 
 } // namespace FS

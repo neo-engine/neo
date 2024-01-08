@@ -114,7 +114,7 @@ int main( ) {
     setPowerButtonCB( powerButtonCB );
 
 #ifndef NO_SOUND
-    u32 fadeCounter = 0;
+    s32 fadeCounter = 0;
 #endif
 
     // Keep the ARM7 mostly idle
@@ -133,6 +133,7 @@ int main( ) {
                 if( SOUND::SSEQ::ADSR_MASTER_VOLUME <= FADE_SPEED ) {
                     SOUND::SSEQ::ADSR_MASTER_VOLUME = 0;
                     SOUND::SSEQ::stopSequence( );
+                    fadeCounter = 0;
                 } else {
                     SOUND::SSEQ::ADSR_MASTER_VOLUME -= FADE_SPEED;
                 }
@@ -147,6 +148,7 @@ int main( ) {
                     >= SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME ) {
                     SOUND::SSEQ::ADSR_MASTER_VOLUME = SOUND::SSEQ::ADSR_FADE_TARGET_VOLUME;
                     SOUND::SSEQ::setSequenceStatus( SOUND::SSEQ::STATUS_PLAYING );
+                    fadeCounter = 0;
                 } else {
                     SOUND::SSEQ::ADSR_MASTER_VOLUME += FADE_SPEED;
                 }

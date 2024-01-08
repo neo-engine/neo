@@ -19,7 +19,7 @@ namespace SOUND::SSEQ {
         = { 0, 0, 0, 0, 0, 0 }; // To save reloading stuff that is already loaded.
 
     u16  CURRENT_SEQUENCE_ID   = 0;
-    u16  NEXT_SEQUENCE_ID[ 2 ] = { 0 };
+    u16  NEXT_SEQUENCE_ID[ 2 ] = { 0, 0 };
     bool SEQ_SWAP_IN_PROGRESS  = false;
 
     bool SEQ_SWAP_AM = false;
@@ -52,9 +52,10 @@ namespace SOUND::SSEQ {
         }
         case returnMessage::MSG_SEQUENCE_STOPPED: {
             if( SEQ_SWAP_IN_PROGRESS ) {
+                // printf( "\nFADE COMPLETE NEXT: %u", NEXT_SEQUENCE_ID[ 0 ] );
                 // start queued bgm
                 if( NEXT_SEQUENCE_ID[ 0 ] ) {
-                    playSequence( NEXT_SEQUENCE_ID[ 0 ], true );
+                    playSequence( NEXT_SEQUENCE_ID[ 0 ], false );
                 } else {
                     SEQ_SWAP_IN_PROGRESS = false;
                 }
@@ -79,7 +80,7 @@ namespace SOUND::SSEQ {
     }
 
     void freeSequenceData( sequenceData *p_userdata ) {
-        if( p_userdata->m_size > 0 ) {
+        if( p_userdata->m_size > 0 && p_userdata->m_data ) {
             free( p_userdata->m_data );
             p_userdata->m_size = 0;
         }
@@ -99,13 +100,16 @@ namespace SOUND::SSEQ {
             // if no sequence is currently playing, just start playing
             return playSequence( p_seqId, true );
         }
+
+        // DESQUID_LOG( "FADESWAP REQUEST " + std::to_string( SEQ_SWAP_IN_PROGRESS ) );
+
         if( NEXT_SEQUENCE_ID[ 0 ] == p_seqId ) {
             // cancel previously enqueued swap
             NEXT_SEQUENCE_ID[ 1 ] = 0;
             return true;
         }
         if( NEXT_SEQUENCE_ID[ SEQ_SWAP_IN_PROGRESS ] == p_seqId ) {
-            // sequence halready queued, do nothing
+            // sequence already queued, do nothing
             return true;
         }
         NEXT_SEQUENCE_ID[ SEQ_SWAP_IN_PROGRESS ] = p_seqId;
@@ -125,17 +129,12 @@ namespace SOUND::SSEQ {
         }
         auto oa     = ANIMATE_MAP;
         ANIMATE_MAP = false;
-        swiWaitForVBlank( );
 
         if( !p_fadeIn && CURRENT_SEQUENCE_ID ) { stopSequence( ); }
 
         CURRENT_SEQUENCE.m_message = SNDSYS_PLAYSEQ;
 
         const auto &seq = SSEQ_LIST[ p_seqId ];
-
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
 
         if( !FS::loadSoundSequence( &CURRENT_SEQUENCE.m_seq, seq.m_sseqId ) ) {
             CURRENT_SEQUENCE_ID  = 0;
@@ -145,9 +144,7 @@ namespace SOUND::SSEQ {
             // DESQUID_LOG( std::string( "Sound sequence " ) + std::to_string( p_seqId )
             // + " failed." );
         }
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
+
         if( !FS::loadSoundBank( &CURRENT_SEQUENCE.m_bnk, seq.m_bank ) ) {
             CURRENT_SEQUENCE_ID  = 0;
             SEQ_SWAP_IN_PROGRESS = false;
@@ -155,25 +152,20 @@ namespace SOUND::SSEQ {
             return false;
         }
         for( u8 i = 0; i < seq.m_sampleCnt; ++i ) {
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            if( !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ] ) ) {
+            if( seq.m_samplesId[ i ]
+                && !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ], i ) ) {
                 CURRENT_SEQUENCE_ID  = 0;
                 SEQ_SWAP_IN_PROGRESS = false;
                 ANIMATE_MAP          = oa;
                 return false;
             }
         }
-        CURRENT_SEQUENCE.m_fadeIn = p_fadeIn;
+        CURRENT_SEQUENCE.m_fadeIn = false; // p_fadeIn;
         CURRENT_SEQUENCE_ID       = p_seqId;
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
-        swiWaitForVBlank( );
-        fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
-        swiWaitForVBlank( );
-        ANIMATE_MAP = oa;
+        // printf( "\n PLAY %i %i", p_seqId, p_fadeIn );
 
+        fifoSendDatamsg( FIFO_SNDSYS, sizeof( CURRENT_SEQUENCE ), (u8 *) &CURRENT_SEQUENCE );
+        ANIMATE_MAP = oa;
         return true;
     }
 

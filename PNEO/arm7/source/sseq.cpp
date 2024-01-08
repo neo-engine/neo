@@ -238,6 +238,10 @@ namespace SOUND::SSEQ {
             SEQ_STATUS              = STATUS_FADE_IN;
         } else {
             SEQ_STATUS = STATUS_PLAYING;
+            returnMessage ret;
+            ret.m_count     = 1;
+            ret.m_data[ 0 ] = returnMessage::MSG_SEQUENCE_UNFADED;
+            fifoSendDatamsg( FIFO_RETURN, sizeof( ret ), (u8*) &ret );
         }
     }
 

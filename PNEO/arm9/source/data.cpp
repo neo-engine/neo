@@ -59,11 +59,14 @@ namespace FS {
     const char MAPLOCATION_PATH[] = "nitro:/DATA/MAP_LOCATION/";
 
 #ifndef NO_SOUND
-    const char CRY_PATH[]  = "nitro:/SOUND/CRIES/";
-    const char SFX_PATH[]  = "nitro:/SOUND/SFX/";
-    const char SSEQ_PATH[] = "nitro:/SOUND/BGM/SSEQ/";
-    const char SBNK_PATH[] = "nitro:/SOUND/BGM/SBNK/";
-    const char SWAR_PATH[] = "nitro:/SOUND/BGM/SWAR/";
+    const char CRY_PATH[]       = "nitro:/SOUND/CRIES/";
+    const char SFX_PATH[]       = "nitro:/SOUND/SFX/";
+    const char SSEQ_INFO_BANK[] = "nitro:/SOUND/BGM/sseq.i.data";
+    const char SBNK_INFO_BANK[] = "nitro:/SOUND/BGM/sbnk.i.data";
+    const char SWAR_INFO_BANK[] = "nitro:/SOUND/BGM/swar.i.data";
+    const char SSEQ_DATA_BANK[] = "nitro:/SOUND/BGM/sseq.c.data";
+    const char SBNK_DATA_BANK[] = "nitro:/SOUND/BGM/sbnk.c.data";
+    const char SWAR_DATA_BANK[] = "nitro:/SOUND/BGM/swar.c.data";
 #endif
 
     const char ITEM_NAME_PATH[]        = "nitro:/DATA/ITEM_NAME/itemname";
@@ -648,38 +651,65 @@ namespace FS {
     }
 
 #ifndef NO_SOUND
-    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, FILE* p_f ) {
+    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, u32 p_start, u32 p_size, FILE* p_f ) {
         if( !p_f ) { return false; }
-        fseek( p_f, 0, SEEK_END );
-        p_data->m_size = ftell( p_f );
+        fseek( p_f, p_start, SEEK_SET );
 
-        rewind( p_f );
-        p_data->m_data = malloc( p_data->m_size );
+        p_data->m_data = malloc( p_size );
 
-        if( !p_data->m_data ) { return false; }
+        if( !p_data->m_data ) {
+            p_data->m_size = 0;
+            return false;
+        }
+
+        p_data->m_size = p_size;
         fread( p_data->m_data, 1, p_data->m_size, p_f );
         DC_FlushRange( p_data->m_data, p_data->m_size );
         return true;
     }
 
-    bool loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId ) {
-        FILE* f   = openSplit( SSEQ_PATH, p_sseqId, ".sseq", 9 * ITEMS_PER_DIR, "rb" );
-        auto  res = loadSequenceData( p_data, f );
-        fclose( f );
+    FILE* SSEQ_INFO_BANK_FILE = nullptr;
+    FILE* SSEQ_DATA_BANK_FILE = nullptr;
+    bool  loadSoundSequence( SOUND::SSEQ::sequenceData* p_data, u16 p_sseqId ) {
+        if( !SSEQ_INFO_BANK_FILE ) { SSEQ_INFO_BANK_FILE = fopen( SSEQ_INFO_BANK, "rb" ); }
+        if( !SSEQ_DATA_BANK_FILE ) { SSEQ_DATA_BANK_FILE = fopen( SSEQ_DATA_BANK, "rb" ); }
+        if( !SSEQ_INFO_BANK_FILE ) { return false; }
+
+        fseek( SSEQ_INFO_BANK_FILE, 8 * u32( p_sseqId ), SEEK_SET );
+        u32 index, size;
+        if( !fread( &index, 4, 1, SSEQ_INFO_BANK_FILE ) ) { return false; }
+        fread( &size, 4, 1, SSEQ_INFO_BANK_FILE );
+        auto res = loadSequenceData( p_data, index, size, SSEQ_DATA_BANK_FILE );
         return res;
     }
 
-    bool loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId ) {
-        FILE* f   = openSplit( SBNK_PATH, p_sbnkId, ".sbnk", 9 * ITEMS_PER_DIR, "rb" );
-        auto  res = loadSequenceData( p_data, f );
-        fclose( f );
+    FILE* SBNK_INFO_BANK_FILE = nullptr;
+    FILE* SBNK_DATA_BANK_FILE = nullptr;
+    bool  loadSoundBank( SOUND::SSEQ::sequenceData* p_data, u16 p_sbnkId ) {
+        if( !SBNK_INFO_BANK_FILE ) { SBNK_INFO_BANK_FILE = fopen( SBNK_INFO_BANK, "rb" ); }
+        if( !SBNK_DATA_BANK_FILE ) { SBNK_DATA_BANK_FILE = fopen( SBNK_DATA_BANK, "rb" ); }
+        if( !SBNK_INFO_BANK_FILE ) { return false; }
+
+        fseek( SBNK_INFO_BANK_FILE, 8 * u32( p_sbnkId ), SEEK_SET );
+        u32 index, size;
+        if( !fread( &index, 4, 1, SBNK_INFO_BANK_FILE ) ) { return false; }
+        fread( &size, 4, 1, SBNK_INFO_BANK_FILE );
+        auto res = loadSequenceData( p_data, index, size, SBNK_DATA_BANK_FILE );
         return res;
     }
 
-    bool loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId ) {
-        FILE* f   = openSplit( SWAR_PATH, p_swarId, ".swar", 9 * ITEMS_PER_DIR, "rb" );
-        auto  res = loadSequenceData( p_data, f );
-        fclose( f );
+    FILE* SWAR_INFO_BANK_FILE = nullptr;
+    FILE* SWAR_DATA_BANK_FILE = nullptr;
+    bool  loadSoundSample( SOUND::SSEQ::sequenceData* p_data, u16 p_swarId, u8 ) {
+        if( !SWAR_INFO_BANK_FILE ) { SWAR_INFO_BANK_FILE = fopen( SWAR_INFO_BANK, "rb" ); }
+        if( !SWAR_DATA_BANK_FILE ) { SWAR_DATA_BANK_FILE = fopen( SWAR_DATA_BANK, "rb" ); }
+        if( !SWAR_INFO_BANK_FILE ) { return false; }
+
+        fseek( SWAR_INFO_BANK_FILE, 8 * u32( p_swarId ), SEEK_SET );
+        u32 index, size;
+        if( !fread( &index, 4, 1, SWAR_INFO_BANK_FILE ) ) { return false; }
+        fread( &size, 4, 1, SWAR_INFO_BANK_FILE );
+        auto res = loadSequenceData( p_data, index, size, SWAR_DATA_BANK_FILE );
         return res;
     }
 #endif
