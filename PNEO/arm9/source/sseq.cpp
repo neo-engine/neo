@@ -126,6 +126,7 @@ namespace SOUND::SSEQ {
             if( SEQ_SWAP_IN_PROGRESS ) { ANIMATE_MAP = SEQ_SWAP_AM; }
             SEQ_SWAP_IN_PROGRESS  = false;
             NEXT_SEQUENCE_ID[ 0 ] = NEXT_SEQUENCE_ID[ 1 ] = 0;
+            SEQ_SWAP_AM                                   = ANIMATE_MAP;
         }
         auto oa     = ANIMATE_MAP;
         ANIMATE_MAP = false;
@@ -152,8 +153,9 @@ namespace SOUND::SSEQ {
             return false;
         }
         for( u8 i = 0; i < seq.m_sampleCnt; ++i ) {
-            if( seq.m_samplesId[ i ]
-                && !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ], i ) ) {
+            if( // seq.m_samplesId[ i ]
+                //&&
+                !FS::loadSoundSample( CURRENT_SEQUENCE.m_war + i, seq.m_samplesId[ i ], i ) ) {
                 CURRENT_SEQUENCE_ID  = 0;
                 SEQ_SWAP_IN_PROGRESS = false;
                 ANIMATE_MAP          = oa;

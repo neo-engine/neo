@@ -128,6 +128,7 @@ namespace MAP {
 
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
+                ANIMATE_MAP = false;
                 SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
 
                 // Check the trainer class, for some classes start a double battle
@@ -136,7 +137,6 @@ namespace MAP {
                                   : BATTLE::DEFAULT_TRAINER_POLICY;
 
                 FADE_TOP_DARK( );
-                ANIMATE_MAP = false;
                 swiWaitForVBlank( );
 
                 BATTLE::battle bt

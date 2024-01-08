@@ -764,9 +764,9 @@ namespace MAP {
                 auto tr         = FS::getBattleTrainer( parA );
                 auto playerPrio = _mapSprites.getPriority( _playerSprite );
 
+                ANIMATE_MAP = false;
                 SOUND::playBGM( SOUND::BGMforTrainerBattle( tr.m_data.m_trainerClass ) );
                 FADE_TOP_DARK( );
-                ANIMATE_MAP = false;
                 swiWaitForVBlank( );
 
                 BATTLE::battle bt

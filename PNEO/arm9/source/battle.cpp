@@ -219,6 +219,8 @@ namespace BATTLE {
     battle::battleEndReason battle::start( bool p_firstPkmnIsFollowing ) {
         if( !_opponentTeamSize || !_playerTeamSize ) { return battle::BATTLE_NONE; }
 
+        ANIMATE_MAP = false;
+
         constexpr u8 TMP_BUFFER_SIZE = 100;
         char         buffer[ TMP_BUFFER_SIZE + 10 ];
 
