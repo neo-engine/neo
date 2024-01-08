@@ -225,6 +225,8 @@ namespace MAP {
             break;
         }
 
+        ANIMATE_MAP     = false;
+        DRAW_TIME       = false;
         auto playerPrio = _mapSprites.getPriority( _playerSprite );
         swiWaitForVBlank( );
         auto result = BATTLE::battle( SAVE::SAV.getActiveFile( ).m_pkmnTeam,
