@@ -116,6 +116,8 @@ namespace SAVE {
             printf( "   " __DATE__ " " __TIME__ " v%hhu.%hhu-emu\n", VERSION / 10, VERSION % 10 );
         else if( gMod == FCARD )
             printf( " " __DATE__ " " __TIME__ " v%hhu.%hhu-flash\n", VERSION / 10, VERSION % 10 );
+        else if( gMod == RELEASE )
+            printf( "       " __DATE__ " " __TIME__ " v%hhu.%hhu\n", VERSION / 10, VERSION % 10 );
         printf( "%32s", VERSION_NAME );
 
         consoleSetWindow( &IO::Top, 0, 23, 32, 1 );

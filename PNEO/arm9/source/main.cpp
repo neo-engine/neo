@@ -65,7 +65,7 @@ GameMod gMod = GameMod::FCARD;
 #elif DESQUID
 GameMod gMod = GameMod::DEVELOPER;
 #else
-GameMod gMod = GameMod::ALPHA;
+GameMod gMod = GameMod::RELEASE;
 #endif
 
 fsdataInfo FSDATA;
