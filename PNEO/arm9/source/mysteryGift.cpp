@@ -36,7 +36,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "defines.h"
 #include "fs/fs.h"
-#include "gen/movenames.h"
+#include "gen/moveNames.h"
 #include "gen/pokemonNames.h"
 #include "io/choiceBox.h"
 #include "io/message.h"
