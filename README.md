@@ -120,7 +120,7 @@ Feel free to open an issue if _neo_ does not run on your emulator or hardware, b
 | [melonDS](https://github.com/melonDS-emu/melonDS) | OK, minor slowdowns | not tested recently |
 | [desmume](https://github.com/TASEmulators/desmume) | OK, slowdowns | not tested recently |
 | woodR4 | OK, sound effects broken | compile with FLASHCARD=1 |
-| [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap) | FAT broken | (compile with FLASHCARD=1) |
+| [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap) | ROMFS broken | (compile with FLASHCARD=1) |
 
 Screenshots
 -----------
