@@ -50,7 +50,7 @@ ifneq ($(strip $(NITRO_FILES)),)
 _ADDFILES	:=	-d $(NITRO_FILES)
 endif
 
-ifdef NDSTOOL
+ifdef VANILLA
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 	ndstool -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN_2);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
 else

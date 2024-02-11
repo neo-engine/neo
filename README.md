@@ -105,12 +105,13 @@ to make; the exact (non-empty) value of a variable is unused.
 * `FLASHCARD` Optimize for flashcards. Uses `argv` parameters to write save game files
   (instead of writing directly to CARD memory). Typically, `FLASHCARD` builds cannot
   create/load save games in an emulator.
+* `VANILLA` Use default ndstool shipped with devkitPro to bundle the nds binary.
 * `NOSOUNDFADE` Disable fade-out/fade-in when switching BGM. No longer needed.
 
 Compatibility
 -------------
 
-In general, _neo_ tries to be compatible with most emulators and flashcards. 
+In general, _neo_ tries to be compatible with most emulators and flashcards.
 Below, there is a list of known compatibility issues for select emulators.
 Feel free to open an issue if _neo_ does not run on your emulator or hardware, but you think it should.
 
@@ -120,7 +121,7 @@ Feel free to open an issue if _neo_ does not run on your emulator or hardware, b
 | [melonDS](https://github.com/melonDS-emu/melonDS) | OK, minor slowdowns | not tested recently |
 | [desmume](https://github.com/TASEmulators/desmume) | OK, slowdowns | not tested recently |
 | woodR4 | OK, sound effects broken | compile with FLASHCARD=1 |
-| [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap) | ROMFS broken | (compile with FLASHCARD=1) |
+| [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap) | OK | compile with FLASHCARD=1 VANILLA=1 |
 
 Screenshots
 -----------
