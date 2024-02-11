@@ -5,7 +5,7 @@ An experimental Pokémon engine for Nintendo DS. For demonstration purposes only
 _neo_ includes some (updated) maps from Pokémon Emerald, as well as images from other
 mainline Pokémon games. These are not part of _neo_.
 
-This engine is intended to be run on real hardware, but [DeSmuME 0.9.11](http://desmume.org/) and melonDS seem to be capable of emulating most of real hardware's features, too.
+Consult the compatibilty section for more or less up-to-date information on supported hardware and emulators.
 
 Features
 --------
@@ -105,8 +105,22 @@ to make; the exact (non-empty) value of a variable is unused.
 * `FLASHCARD` Optimize for flashcards. Uses `argv` parameters to write save game files
   (instead of writing directly to CARD memory). Typically, `FLASHCARD` builds cannot
   create/load save games in an emulator.
-* `NOSOUNDFADE` Disable fade-out/fade-in when switching BGM. Recommended for flashcard and
-  melonDS builds.
+* `NOSOUNDFADE` Disable fade-out/fade-in when switching BGM. No longer needed.
+
+Compatibility
+-------------
+
+In general, _neo_ tries to be compatible with most emulators and flashcards. 
+Below, there is a list of known compatibility issues for select emulators.
+Feel free to open an issue if _neo_ does not run on your emulator or hardware, but you think it should.
+
+| Emulator/HW | Status | Notes |
+|-|-|-|
+| [NooDS](https://github.com/Hydr8gon/NooDS) | OK | |
+| [melonDS](https://github.com/melonDS-emu/melonDS) | OK, minor slowdowns | not tested recently |
+| [desmume](https://github.com/TASEmulators/desmume) | OK, slowdowns | not tested recently |
+| woodR4 | OK, sound effects broken | compile with FLASHCARD=1 |
+| [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap) | FAT broken | (compile with FLASHCARD=1) |
 
 Screenshots
 -----------
