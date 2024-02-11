@@ -9,6 +9,8 @@ GAME_TITLE_JP	    :=  ポケットモンスター
 GAME_SUBTITLE1_JP	:=  ネオ
 GAME_SUBTITLE2_JP	:=  Homebrew
 
+GAME_TITLE_EN_2	    :=	Pokemon
+
 GAME_TITLE_EN	    :=	Pokémon
 GAME_SUBTITLE1_EN	:=  neo Version
 GAME_SUBTITLE2_EN	:=  Homebrew
@@ -48,6 +50,10 @@ ifneq ($(strip $(NITRO_FILES)),)
 _ADDFILES	:=	-d $(NITRO_FILES)
 endif
 
+ifdef NDSTOOL
+$(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
+	ndstool -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN_2);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
+else
 ifdef FLASHCARD
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
@@ -63,6 +69,7 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 		-bt5 "$(GAME_TITLE_ES);$(GAME_SUBTITLE1_ES);$(GAME_SUBTITLE2_ES)" $(_ADDFILES) \
 		-g $(GAME_CODE) $(DEV_CODE) "$(GAME_TITLE)" $(VERSION)
 	padbin 0x8000000 $(TARGET).nds
+endif
 endif
 
 arm7/$(TARGET).elf: FORCE
