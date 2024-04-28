@@ -118,7 +118,8 @@ Feel free to open an issue if _neo_ does not run on your emulator or hardware, b
 | Emulator/HW | Status | Notes |
 |-|-|-|
 | [NooDS](https://github.com/Hydr8gon/NooDS) | OK | |
-| [melonDS](https://github.com/melonDS-emu/melonDS) | OK, minor slowdowns | not tested recently |
+| [melonDS](https://github.com/melonDS-emu/melonDS) | OK, minor slowdowns | |
+| [Delta](https://github.com/rileytestut/Delta) | OK, minor slowdowns | (uses/same as melonDS) |
 | [desmume](https://github.com/TASEmulators/desmume) | OK, slowdowns | not tested recently |
 | woodR4 | OK, sound effects broken | compile with FLASHCARD=1 |
 | [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap) | OK, sound effects broken | compile with FLASHCARD=1 VANILLA=1 |
