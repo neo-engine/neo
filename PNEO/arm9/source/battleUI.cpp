@@ -575,108 +575,115 @@ namespace BATTLE {
         IO::OamTop->matrixBuffer[ 7 ].hdy = 0;
         IO::OamTop->matrixBuffer[ 7 ].vdy = 1LLU << 9;
 
-        char buffer[ 50 ];
-        snprintf( buffer, 49, "PB/%hhu/%hhu_", p_ballId, p_ballId );
+        IO::loadPokeBallIcon( p_ballId, 0, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
 
-        IO::loadSprite( ( std::string( buffer ) + "0" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x, y, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "1" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x - 1, y - 2, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
-        if( p_opponent ) {
-            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
-            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
-        }
-        IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "2" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x - 2, y - 1, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
-        if( p_opponent ) {
-            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
-            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
-        }
-        IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "3" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x - 3, y, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
-        if( p_opponent ) {
-            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
-            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
-        }
-        IO::updateOAM( false );
-        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
 
-        IO::loadSprite( ( std::string( buffer ) + "4" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x - 3, y + 1, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        IO::loadPokeBallIcon( p_ballId, 1, x - 1, y - 2, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "5" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x - 2, y + 2, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 2, x - 2, y - 1, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
+
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "6" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x - 1, y + 4, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 3, x - 3, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
+
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "7" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x, y + 7, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 4, x - 3, y + 1, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 5, x - 2, y + 2, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 6, x - 1, y + 4, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 7, x, y + 7, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
+        if( p_opponent ) {
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
+            IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
+        }
+        IO::updateOAM( false );
+        for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
+
         SOUND::playSoundEffect( SFX_BATTLE_RECALL );
 
-        IO::loadSprite( ( std::string( buffer ) + "8" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        IO::loadPokeBallIcon( p_ballId, 8, x, y + 10, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "9" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 9, x, y + 10, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        IO::loadSprite( ( std::string( buffer ) + "10" ).c_str( ), SPR_BALL_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 4 ), x, y + 10, 32, 32, false, false, false, OBJPRIORITY_0,
-                        false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
+
+        IO::loadPokeBallIcon( p_ballId, 10, x, y + 10, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         if( p_opponent ) {
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         }
         IO::updateOAM( false );
-        for( u8 i = 0; i < 5; ++i ) { swiWaitForVBlank( ); }
+        for( u8 i = 0; i < 8; ++i ) { swiWaitForVBlank( ); }
 
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = false;
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 0;
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isHidden      = true;
         IO::updateOAM( false );
+        for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
     }
 
     void battleUI::animateBallThrow( u8 p_slot, u8 p_ballId ) const {
@@ -686,8 +693,6 @@ namespace BATTLE {
 
         u16 x = 0, y = 0;
 
-        char buffer[ 50 ];
-        snprintf( buffer, 49, "PB/%hhu/%hhu_", p_ballId, p_ballId );
         IO::OamTop->matrixBuffer[ 7 ].hdx = 1LLU << 8;
         IO::OamTop->matrixBuffer[ 7 ].vdy = 1LLU << 8;
         IO::OamTop->matrixBuffer[ 7 ].vdx = 0;
@@ -703,13 +708,12 @@ namespace BATTLE {
             }
 
             if( ( f % 6 ) == 0 ) {
-                IO::loadSprite(
-                    ( std::string( buffer ) + std::to_string( ( f / 3 + 6 ) % 9 ) ).c_str( ),
-                    SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false, false,
-                    false, OBJPRIORITY_0, false );
+                IO::loadPokeBallIcon( p_ballId, ( f / 3 + 6 ) % 9, x, y, SPR_BALL_START_OAM,
+                                      SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
                 IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
                 IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
                 IO::updateOAM( false );
+                for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
             }
 
             if( x % 4 == 2 ) {
@@ -722,17 +726,15 @@ namespace BATTLE {
         IO::OamTop->matrixBuffer[ 7 ].vdy = 1LLU << 9;
 
         SOUND::playSoundEffect( SFX_BATTLE_JUMPTOBALL );
-        IO::loadSprite( ( std::string( buffer ) + std::to_string( 9 ) ).c_str( ),
-                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
-                        false, false, OBJPRIORITY_0, false );
+        IO::loadPokeBallIcon( p_ballId, 9, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         IO::updateOAM( false );
         for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
 
-        IO::loadSprite( ( std::string( buffer ) + std::to_string( 10 ) ).c_str( ),
-                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
-                        false, false, OBJPRIORITY_0, false );
+        IO::loadPokeBallIcon( p_ballId, 10, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                              SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         IO::updateOAM( false );
@@ -2207,9 +2209,7 @@ namespace BATTLE {
 
     void battleUI::animateCapturePkmn( u16 p_pokeball, u8 p_ticks ) {
         animateBallThrow( 0, BAG::itemToBall( p_pokeball ) );
-        char buffer[ 50 ];
-        snprintf( buffer, 49, "PB/%hhu/%hhu_", BAG::itemToBall( p_pokeball ),
-                  BAG::itemToBall( p_pokeball ) );
+        auto pball = BAG::itemToBall( p_pokeball );
 
         u16 x = IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].x;
         u16 y = IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].y;
@@ -2217,18 +2217,17 @@ namespace BATTLE {
         hidePkmn( true, 0 );
 
         x += 3;
-        IO::loadSprite( ( std::string( buffer ) + std::to_string( 9 ) ).c_str( ),
-                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
-                        false, false, OBJPRIORITY_0, false );
+
+        IO::loadPokeBallIcon( pball, 9, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ),
+                              OBJPRIORITY_0, false );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         IO::updateOAM( false );
         for( u8 i = 0; i < 4; ++i ) { swiWaitForVBlank( ); }
 
         x += 3;
-        IO::loadSprite( ( std::string( buffer ) + std::to_string( 0 ) ).c_str( ),
-                        SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32, false,
-                        false, false, OBJPRIORITY_0, false );
+        IO::loadPokeBallIcon( pball, 0, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ),
+                              OBJPRIORITY_0, false );
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
         IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
         IO::updateOAM( false );
@@ -2264,9 +2263,8 @@ namespace BATTLE {
 
         SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
         for( auto i : { 11, 12, 13, 12, 11, 0 } ) {
-            IO::loadSprite( ( std::string( buffer ) + std::to_string( i ) ).c_str( ),
-                            SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32,
-                            false, false, false, OBJPRIORITY_0, false );
+            IO::loadPokeBallIcon( pball, i, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                                  SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
             IO::updateOAM( false );
@@ -2277,9 +2275,8 @@ namespace BATTLE {
 
         SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
         for( auto i : { 14, 15, 16, 15, 14, 0 } ) {
-            IO::loadSprite( ( std::string( buffer ) + std::to_string( i ) ).c_str( ),
-                            SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32,
-                            false, false, false, OBJPRIORITY_0, false );
+            IO::loadPokeBallIcon( pball, i, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                                  SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
             IO::updateOAM( false );
@@ -2290,9 +2287,8 @@ namespace BATTLE {
 
         SOUND::playSoundEffect( SFX_BATTLE_BALLSHAKE );
         for( auto i : { 11, 12, 13, 12, 11, 0 } ) {
-            IO::loadSprite( ( std::string( buffer ) + std::to_string( i ) ).c_str( ),
-                            SPR_BALL_START_OAM, SPR_BALL_PAL, SPR_PKMN_GFX( 4 ), x, y, 32, 32,
-                            false, false, false, OBJPRIORITY_0, false );
+            IO::loadPokeBallIcon( pball, i, x, y, SPR_BALL_START_OAM, SPR_BALL_PAL,
+                                  SPR_PKMN_GFX( 4 ), OBJPRIORITY_0, false );
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].isRotateScale = true;
             IO::OamTop->oamBuffer[ SPR_BALL_START_OAM ].rotationIndex = 7;
             IO::updateOAM( false );

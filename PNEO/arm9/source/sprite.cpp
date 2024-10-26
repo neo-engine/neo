@@ -6,7 +6,7 @@ file        : sprite.cpp
 author      : Philip Wellnitz
 description : Some sprite code.
 
-Copyright (C) 2012 - 2023
+Copyright (C) 2012 - 2024
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -56,6 +56,9 @@ namespace IO {
 
     const char* TM_PATH      = "nitro:/PICS/SPRITES/tmhm.icon.rawb";
     FILE*       TM_ICON_FILE = nullptr;
+
+    const char* POKEB_PATH      = "nitro:/PICS/SPRITES/pb.icon.rawb";
+    FILE*       POKEB_ICON_FILE = nullptr;
 
     const char* PKMN_ICON_PATH = "nitro:/PICS/SPRITES/icon";
     const char* PKMN_PATH      = "nitro:/PICS/SPRITES/frnt";
@@ -933,6 +936,34 @@ namespace IO {
         }
         return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512, false,
                             false, false, p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
+    }
+
+    u16 loadPokeBallIcon( u8 p_type, u8 p_frame, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
+                          u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
+        if( !FS::checkOrOpen( POKEB_ICON_FILE, POKEB_PATH )
+            || !seekSpriteData( POKEB_ICON_FILE, 17 * p_type + p_frame, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), POKEB_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), POKEB_ICON_FILE ) ) {
+            return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal,
+                               NoItemTiles, NoItemTilesLen, false, false, false, p_priority,
+                               p_bottom );
+        }
+
+        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP,
+                           512, false, false, false, p_priority, p_bottom );
+    }
+
+    u16 loadPokeBallIconB( u8 p_type, u8 p_frame, s16 p_posX, s16 p_posY, u8 p_oamIdx,
+                           u16 p_tileCnt, ObjPriority p_priority, bool p_bottom ) {
+        if( !FS::checkOrOpen( POKEB_ICON_FILE, POKEB_PATH )
+            || !seekSpriteData( POKEB_ICON_FILE, 17 * p_type + p_frame, 32 * 32 / 8 )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), POKEB_ICON_FILE )
+            || !fread( TEMP, 32 * 32 / 8, sizeof( u32 ), POKEB_ICON_FILE ) ) {
+            return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, NoItemPal, NoItemTiles,
+                                NoItemTilesLen, false, false, false, p_priority, p_bottom );
+        }
+        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 32, TEMP_PAL, TEMP, 512, false,
+                            false, false, p_priority, p_bottom );
     }
 
     u16 loadTMIcon( BATTLE::type p_type, u8 p_tmtype, s16 p_posX, s16 p_posY, u8 p_oamIdx,

@@ -6,7 +6,7 @@
  author : Philip Wellnitz
  description : Header file. Consult the corresponding source file for details.
 
- Copyright (C) 2012 - 2022
+ Copyright (C) 2012 - 2024
  Philip Wellnitz
 
  This file is part of Pokémon neo.
@@ -197,6 +197,11 @@ namespace IO {
                            u16 p_tileCnt, bool p_bottom = true );
     u16 loadPokeblockIconB( u8 p_blockType, s16 p_posX, s16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
                             bool p_bottom = true );
+
+    u16 loadPokeBallIcon( u8 p_type, u8 p_frame, s16 p_posX, s16 p_posY, u8 p_oamIndex, u8 p_palCnt,
+                          u16 p_tileCnt, ObjPriority p_priority, bool p_bottom = true );
+    u16 loadPokeBallIconB( u8 p_type, u8 p_frame, s16 p_posX, s16 p_posY, u8 p_oamIndex,
+                           u16 p_tileCnt, ObjPriority p_priority, bool p_bottom = true );
 
     u16 loadTMIcon( BATTLE::type p_type, u8 p_tmtype, s16 p_posX, s16 p_posY, u8 p_oamIndex,
                     u8 p_palCnt, u16 p_tileCnt, bool p_bottom = true );

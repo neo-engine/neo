@@ -322,11 +322,9 @@ namespace IO::ANIM {
                                   p_otherToMe.m_pid };
 
         for( u8 i = 0; i <= 10; ++i ) {
-            snprintf( buffer, 49, "PB/%hhu/%hhu_%hhu", p_ownToOther.m_ball, p_ownToOther.m_ball,
-                      i );
-            tileCnt
-                = IO::loadSprite( buffer, ownpb_oam_start + i, ownpb_pal + i, tileCnt, PKMN_X + 40,
-                                  PKMN_Y + 40, 32, 32, false, false, false, OBJPRIORITY_0, false );
+            tileCnt = IO::loadPokeBallIcon( p_ownToOther.m_ball, i, PKMN_X + 40, PKMN_Y + 40,
+                                            ownpb_oam_start + i, ownpb_pal + i, tileCnt,
+                                            OBJPRIORITY_0, false );
             OamTop->oamBuffer[ ownpb_oam_start + i ].isHidden = true;
         }
 
@@ -454,10 +452,9 @@ namespace IO::ANIM {
         updateOAM( false );
 
         for( u8 i = 0; i <= 10; ++i ) {
-            snprintf( buffer, 49, "PB/%hhu/%hhu_%hhu", p_otherToMe.m_ball, p_otherToMe.m_ball, i );
-            tileCnt
-                = IO::loadSprite( buffer, ownpb_oam_start + i, ownpb_pal + i, tileCnt, PKMN_X + 40,
-                                  -32, 32, 32, false, false, false, OBJPRIORITY_0, false );
+            tileCnt = IO::loadPokeBallIcon( p_otherToMe.m_ball, i, PKMN_X + 40, -32,
+                                            ownpb_oam_start + i, ownpb_pal + i, tileCnt,
+                                            OBJPRIORITY_0, false );
             OamTop->oamBuffer[ ownpb_oam_start + i ].isHidden = true;
         }
 

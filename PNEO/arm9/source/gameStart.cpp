@@ -6,7 +6,7 @@ file        : gameStart.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2024
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -164,96 +164,100 @@ namespace SAVE {
         }
 
         // poke ball demo animation
-        tileCnt = IO::loadSprite( "PB/3/3_0", 22, 3, tileCnt + 32, 76, 46, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
+        auto pb_oam  = 22;
+        auto pb_pal  = 3;
+        auto pb_tc   = tileCnt + 32;
+        auto pb_type = 3;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 0, 76, 46, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
 
         IO::Oam->matrixBuffer[ 0 ].hdx         = 1 << 9;
         IO::Oam->matrixBuffer[ 0 ].vdx         = 0;
         IO::Oam->matrixBuffer[ 0 ].hdy         = 0;
         IO::Oam->matrixBuffer[ 0 ].vdy         = 1 << 9;
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
 
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        IO::Oam->oamBuffer[ 22 ].x -= 2;
-        IO::Oam->oamBuffer[ 22 ].y -= 2;
+        IO::Oam->oamBuffer[ pb_oam ].x -= 2;
+        IO::Oam->oamBuffer[ pb_oam ].y -= 2;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_1", 22, 3, tileCnt + 32, 72, 44, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 1, 72, 44, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_2", 22, 3, tileCnt + 32, 72, 45, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 2, 72, 45, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_3", 22, 3, tileCnt + 32, 72, 46, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 3, 72, 46, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_4", 22, 3, tileCnt + 32, 72, 47, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 4, 72, 47, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_5", 22, 3, tileCnt + 32, 72, 48, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 5, 72, 48, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_6", 22, 3, tileCnt + 32, 72, 49, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 6, 72, 49, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_7", 22, 3, tileCnt + 32, 72, 50, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 7, 72, 50, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         SOUND::playSoundEffect( SFX_BATTLE_RECALL );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_8", 22, 3, tileCnt + 32, 72, 52, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 8, 72, 52, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_9", 22, 3, tileCnt + 32, 72, 54, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 9, 72, 54, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 1; ++i ) { swiWaitForVBlank( ); }
-        tileCnt = IO::loadSprite( "PB/3/3_10", 22, 3, tileCnt + 32, 72, 56, 32, 32, false, false,
-                                  false, OBJPRIORITY_0, true );
-        IO::Oam->oamBuffer[ 22 ].rotationIndex = 0;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = true;
+        tileCnt = IO::loadPokeBallIcon( pb_type, 10, 72, 56, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
+                                        true );
+        IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
         IO::Oam->oamBuffer[ 0 ].x += 1;
         IO::updateOAM( true );
         for( u8 i = 0; i < 2; ++i ) { swiWaitForVBlank( ); }
 
-        IO::Oam->oamBuffer[ 22 ].isHidden      = true;
-        IO::Oam->oamBuffer[ 22 ].isRotateScale = false;
+        IO::Oam->oamBuffer[ pb_oam ].isHidden      = true;
+        IO::Oam->oamBuffer[ pb_oam ].isRotateScale = false;
 
         // pball opened, load pkmn sprite
         pkmnSpriteInfo pinfo
