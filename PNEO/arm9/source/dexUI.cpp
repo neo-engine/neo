@@ -131,8 +131,8 @@ namespace DEX {
         u16 tileCnt = 0;
 
         // x
-        tileCnt = IO::loadSpriteB( "UI/x_16_16", SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16, false,
-                                   false, false, OBJPRIORITY_2, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, tileCnt, 236, 172, 16,
+                                   16, false, false, false, OBJPRIORITY_2, true );
 
         // no entry
         tileCnt = IO::loadSpriteB( "DX/dexsp1", SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, false,
@@ -408,8 +408,9 @@ namespace DEX {
 
         // Back/exit choice
 
-        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16,
-                                  16, false, false, false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt,
+                                  236, 172, 16, 16, false, false, false, OBJPRIORITY_1, true,
+                                  OBJMODE_NORMAL );
 
         y       = 48;
         tileCnt = IO::loadSprite( "SEL/noselection_64_20", 1, 1, tileCnt, x, y, 32, 32, false,

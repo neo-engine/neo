@@ -1,11 +1,95 @@
 #pragma once
-#define BB_GOOD_START 0
-#define BB_LID_START 160
-#define BB_LID_ROTOM_START 2240
-#define BB_MISS_START 4320
-#define BB_ONE_START 4480
-#define BB_PERFECT_START 5024
-#define BB_START_START 5184
-#define BB_THREE_START 6240
-#define BB_TWO_START 6784
-#define BB_PLAYER_ACTIVE_START 7328
+
+namespace IO::ICON {
+    constexpr u32 DAMAGE_0_START = 0;
+    constexpr u32 DAMAGE_1_START = 288;
+    constexpr u32 DAMAGE_2_START = 576;
+    constexpr u32 PARTY_1_START = 864;
+    constexpr u32 PARTY_2_START = 1152;
+    constexpr u32 PARTY_3_START = 1440;
+    constexpr u32 PARTY_4_START = 1728;
+    constexpr u32 PARTY_5_START = 2016;
+    constexpr u32 PARTY_6_START = 2304;
+    constexpr u32 ICON_BAG_START = 2592;
+    constexpr u32 ICON_ID_START = 3136;
+    constexpr u32 ICON_PARTY_START = 3680;
+    constexpr u32 ICON_SAVE_START = 4224;
+    constexpr u32 ICON_SETTINGS_START = 4768;
+    constexpr u32 MBOX1_START = 5312;
+    constexpr u32 MBOX2_START = 6368;
+    constexpr u32 MBOXMART_START = 7424;
+    constexpr u32 MOVEBOX1_START = 8480;
+    constexpr u32 MOVEBOX2_START = 8768;
+    constexpr u32 MOVEBOX3_START = 9056;
+    constexpr u32 MOVEBOX4_START = 9344;
+    constexpr u32 ICON_DEX_START = 9632;
+    constexpr u32 ICON_SELECT_START = 10176;
+    constexpr u32 BATTLE_ABILITY_START = 10720;
+    constexpr u32 NOSELECTION_128_32_1_START = 11776;
+    constexpr u32 NOSELECTION_128_32_2_START = 12832;
+    constexpr u32 NOSELECTION_160_64_1_START = 13888;
+    constexpr u32 NOSELECTION_160_64_2_START = 14944;
+    constexpr u32 NOSELECTION_32_32_START = 16000;
+    constexpr u32 NOSELECTION_32_64_START = 16544;
+    constexpr u32 NOSELECTION_64_20_START = 17600;
+    constexpr u32 NOSELECTION_64_32_START = 18144;
+    constexpr u32 NOSELECTION_96_32_1_START = 19200;
+    constexpr u32 NOSELECTION_96_32_2_START = 19488;
+    constexpr u32 NOSELECTION_96_32_3_START = 19776;
+    constexpr u32 NOSELECTION_96_32_4_START = 20064;
+    constexpr u32 NOSELECTION_BLANK_32_24_START = 20352;
+    constexpr u32 NOSELECTION_BLANK_32_32_START = 20896;
+    constexpr u32 NOSELECTION_FAINT_32_32_START = 21440;
+    constexpr u32 SELECTION_32_32_START = 21984;
+    constexpr u32 ARROW_START = 22528;
+    constexpr u32 ARROW_UP_START = 22688;
+    constexpr u32 BACKARROW_START = 22848;
+    constexpr u32 X_16_16_START = 23008;
+    constexpr u32 POKERUS_ICON_START = 23168;
+    constexpr u32 SELECTION_FAINT_32_32_START = 24224;
+    constexpr u32 STAT_DOWN_START = 24768;
+    constexpr u32 BB_GOOD_START = 24832;
+    constexpr u32 BB_LID_START = 24992;
+    constexpr u32 BB_LID_ROTOM_START = 27072;
+    constexpr u32 BB_MISS_START = 29152;
+    constexpr u32 BB_ONE_START = 29312;
+    constexpr u32 BB_PERFECT_START = 29856;
+    constexpr u32 BB_START_START = 30016;
+    constexpr u32 BB_THREE_START = 31072;
+    constexpr u32 BB_TWO_START = 31616;
+    constexpr u32 BB_PLAYER_ACTIVE_START = 32160;
+    constexpr u32 NOITEM_START = 32704;
+    constexpr u32 NOPKMN_START = 33248;
+    constexpr u32 ANTI_POKERUS_ICON_START = 33792;
+    constexpr u32 BOX_ARROW_START = 33856;
+    constexpr u32 BOX_ARROW2_START = 34016;
+    constexpr u32 HPBAR_START = 34176;
+    constexpr u32 HPBAR_BATTLE_START = 35232;
+    constexpr u32 HPBAR_BATTLE_OPP_START = 35776;
+    constexpr u32 ITEMICON_START = 36320;
+    constexpr u32 KEY_START = 36384;
+    constexpr u32 PARTY_BLANK1_START = 36448;
+    constexpr u32 PARTY_BLANK2_START = 38528;
+    constexpr u32 PARTY_BOX1_START = 40608;
+    constexpr u32 PARTY_BOX2_START = 42688;
+    constexpr u32 PARTY_BOX_SEL1_START = 44768;
+    constexpr u32 PARTY_BOX_SEL2_START = 46848;
+    constexpr u32 PARTY_FNT1_START = 48928;
+    constexpr u32 PARTY_FNT2_START = 51008;
+    constexpr u32 PARTY_FNT_SEL1_START = 53088;
+    constexpr u32 PARTY_FNT_SEL2_START = 55168;
+    constexpr u32 PARTY_MARK1_START = 57248;
+    constexpr u32 PARTY_MARK2_START = 58304;
+    constexpr u32 SHINY_BIG_START = 60384;
+    constexpr u32 SHINY_BIG_ALT_START = 60544;
+    constexpr u32 SHINY_BIG_ALT2_START = 60704;
+    constexpr u32 STAR_START = 60864;
+    constexpr u32 STARTERBALL1_START = 61024;
+    constexpr u32 STARTERBALL2_START = 61568;
+    constexpr u32 STARTERBALL3_START = 62112;
+    constexpr u32 STARTERHAND_START = 62656;
+    constexpr u32 STAT_UP_START = 63200;
+    constexpr u32 STATUS_CONTEST_START = 63264;
+    constexpr u32 STATUS_MOVES_START = 63424;
+    constexpr u32 STATUS_PKMN_START = 63584;
+}

@@ -263,8 +263,9 @@ namespace SAVE {
         u16 tileCnt = 0;
 
         // x
-        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16,
-                                  16, false, false, false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172,
+                              16, 16, false, false, false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
 
         // Choice boxes
         for( u8 i = 0; i < MAX_SETTINGS; ++i ) {

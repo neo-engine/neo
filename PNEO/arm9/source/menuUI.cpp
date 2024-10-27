@@ -96,35 +96,36 @@ namespace IO {
         u16 tileCnt = 32; // some space for nav apps
 
         // Main menu icons
-        tileCnt = IO::loadSprite( "MM/party", SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt,
-                                  256 - 29, 192 - 6 * 29, 32, 32, false, false,
-                                  p_noPic || !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ),
-                                  OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite(
-            "MM/dex", SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt, 256 - 29, 192 - 5 * 29,
-            32, 32, false, false,
+        tileCnt = IO::loadUIIcon(
+            IO::ICON::ICON_PARTY_START, SPR_MENU_OAM_SUB( 0 ), SPR_MENU_PAL_SUB( 0 ), tileCnt,
+            256 - 29, 192 - 6 * 29, 32, 32, false, false,
+            p_noPic || !SAVE::SAV.getActiveFile( ).getTeamPkmnCount( ), OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadUIIcon(
+            IO::ICON::ICON_DEX_START, SPR_MENU_OAM_SUB( 1 ), SPR_MENU_PAL_SUB( 1 ), tileCnt,
+            256 - 29, 192 - 5 * 29, 32, 32, false, false,
             p_noPic || !SAVE::SAV.getActiveFile( ).checkFlag( SAVE::F_DEX_OBTAINED ), OBJPRIORITY_2,
             p_bottom );
-        tileCnt = IO::loadSprite( "MM/bag", SPR_MENU_OAM_SUB( 2 ), SPR_MENU_PAL_SUB( 2 ), tileCnt,
-                                  256 - 29, 192 - 4 * 29, 32, 32, false, false, p_noPic,
-                                  OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( "MM/id", SPR_MENU_OAM_SUB( 3 ), SPR_MENU_PAL_SUB( 3 ), tileCnt,
-                                  256 - 29, 192 - 3 * 29, 32, 32, false, false, p_noPic,
-                                  OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( "MM/save", SPR_MENU_OAM_SUB( 4 ), SPR_MENU_PAL_SUB( 4 ), tileCnt,
-                                  256 - 29, 192 - 2 * 29, 32, 32, false, false, p_noPic,
-                                  OBJPRIORITY_2, p_bottom );
-        tileCnt = IO::loadSprite( "MM/settings", SPR_MENU_OAM_SUB( 5 ), SPR_MENU_PAL_SUB( 5 ),
-                                  tileCnt, 256 - 29, 192 - 1 * 29, 32, 32, false, false, p_noPic,
-                                  OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadUIIcon( IO::ICON::ICON_BAG_START, SPR_MENU_OAM_SUB( 2 ),
+                                  SPR_MENU_PAL_SUB( 2 ), tileCnt, 256 - 29, 192 - 4 * 29, 32, 32,
+                                  false, false, p_noPic, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadUIIcon( IO::ICON::ICON_ID_START, SPR_MENU_OAM_SUB( 3 ),
+                                  SPR_MENU_PAL_SUB( 3 ), tileCnt, 256 - 29, 192 - 3 * 29, 32, 32,
+                                  false, false, p_noPic, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadUIIcon( IO::ICON::ICON_SAVE_START, SPR_MENU_OAM_SUB( 4 ),
+                                  SPR_MENU_PAL_SUB( 4 ), tileCnt, 256 - 29, 192 - 2 * 29, 32, 32,
+                                  false, false, p_noPic, OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadUIIcon( IO::ICON::ICON_SETTINGS_START, SPR_MENU_OAM_SUB( 5 ),
+                                  SPR_MENU_PAL_SUB( 5 ), tileCnt, 256 - 29, 192 - 1 * 29, 32, 32,
+                                  false, false, p_noPic, OBJPRIORITY_2, p_bottom );
 
-        tileCnt = IO::loadSprite( "MM/select", SPR_MENU_SEL_OAM_SUB, SPR_MENU_SEL_PAL_SUB, tileCnt,
-                                  256 - 31, 192 - 1 * 31, 32, 32, false, false, true, OBJPRIORITY_2,
-                                  p_bottom );
+        tileCnt = IO::loadUIIcon( IO::ICON::ICON_SELECT_START, SPR_MENU_SEL_OAM_SUB,
+                                  SPR_MENU_SEL_PAL_SUB, tileCnt, 256 - 31, 192 - 1 * 31, 32, 32,
+                                  false, false, true, OBJPRIORITY_2, p_bottom );
 
         // x
-        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172, 16,
-                                  16, false, false, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt,
+                                  236, 172, 16, 16, false, false, true, OBJPRIORITY_1, p_bottom,
+                                  OBJMODE_NORMAL );
 
         // arrows
         for( u8 i = 0; i < 6; ++i ) {
@@ -133,17 +134,18 @@ namespace IO {
             IO::loadSprite( SPR_ARROW_DOWN_OAM_SUB( i ), SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16, 0, 0,
                             0, true, true, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
         }
-        tileCnt = IO::loadSprite( "UI/arrow_up", SPR_ARROW_UP_OAM_SUB( 0 ), SPR_X_PAL_SUB, tileCnt,
-                                  0, 0, 16, 16, false, false, true, OBJPRIORITY_1, p_bottom,
-                                  OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::ARROW_UP_START, SPR_ARROW_UP_OAM_SUB( 0 ),
+                                  SPR_X_PAL_SUB, tileCnt, 0, 0, 16, 16, false, false, true,
+                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // mbox
         for( u8 i = 0; i < 9; ++i ) {
             IO::loadSprite( SPR_MSGBOX_OAM_SUB + 9 - i, SPR_MSGBOX_PAL_SUB, tileCnt, 64 + 16 * i,
                             32, 32, 64, 0, 0, 0, false, true, true, OBJPRIORITY_3, true );
         }
-        tileCnt = IO::loadSprite( "UI/mbox1", SPR_MSGBOX_OAM_SUB, SPR_MSGBOX_PAL_SUB, tileCnt, 32,
-                                  32, 32, 64, false, false, true, OBJPRIORITY_3, true );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::MBOX1_START, SPR_MSGBOX_OAM_SUB, SPR_MSGBOX_PAL_SUB,
+                              tileCnt, 32, 32, 32, 64, false, false, true, OBJPRIORITY_3, true );
 
         // Choice boxes
 
@@ -151,11 +153,11 @@ namespace IO {
             u8 pos = 2 * i;
 
             if( !i ) {
-                tileCnt
-                    = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM_SUB( pos ),
-                                      SPR_BOX_PAL_SUB, tileCnt, 29, 42 + i * 36, 16, 32, false,
-                                      false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-                tileCnt = IO::loadSprite( "SEL/noselection_96_32_2",
+                tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START,
+                                          SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt,
+                                          29, 42 + i * 36, 16, 32, false, false, true,
+                                          OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+                tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START,
                                           SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
                                           tileCnt, 29 + 11, 42 + i * 36, 16, 32, false, false, true,
                                           OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
@@ -216,10 +218,10 @@ namespace IO {
         oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x = 128 + 64 - 16;
         oam[ SPR_PAGE_BG_OAM_SUB + 3 ].x = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x + 16;
 
-        tileCnt
-            = IO::loadSprite( "UI/arrow", SPR_PAGE_BG_OAM_SUB + 4, SPR_X_PAL_SUB, tileCnt,
-                              oam[ SPR_PAGE_BG_OAM_SUB ].x + 8, oam[ SPR_PAGE_BG_OAM_SUB ].y + 8,
-                              16, 16, false, false, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::ARROW_START, SPR_PAGE_BG_OAM_SUB + 4, SPR_X_PAL_SUB,
+                                  tileCnt, oam[ SPR_PAGE_BG_OAM_SUB ].x + 8,
+                                  oam[ SPR_PAGE_BG_OAM_SUB ].y + 8, 16, 16, false, false, true,
+                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         oam[ SPR_PAGE_BG_OAM_SUB + 5 ]   = oam[ SPR_PAGE_BG_OAM_SUB + 4 ];
         oam[ SPR_PAGE_BG_OAM_SUB + 5 ].x = oam[ SPR_PAGE_BG_OAM_SUB + 2 ].x + 8;

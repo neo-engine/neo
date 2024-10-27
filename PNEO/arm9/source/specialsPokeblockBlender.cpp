@@ -325,12 +325,13 @@ namespace SPX {
         IO::regularFont->printString( GET_STRING( 802 ), 128, 5, false, IO::font::CENTER );
 
         u16 tileCntT = 0;
-        tileCntT = IO::loadUIIcon( BB_PERFECT_START, SPR_PERFECT_OAM, SPR_PERFECT_PAL, tileCntT, 0,
+        tileCntT
+            = IO::loadUIIcon( IO::ICON::BB_PERFECT_START, SPR_PERFECT_OAM, SPR_PERFECT_PAL,
+                              tileCntT, 0, 0, 16, 16, false, false, true, OBJPRIORITY_1, false );
+        tileCntT = IO::loadUIIcon( IO::ICON::BB_MISS_START, SPR_MISS_OAM, SPR_MISS_PAL, tileCntT, 0,
                                    0, 16, 16, false, false, true, OBJPRIORITY_1, false );
-        tileCntT = IO::loadUIIcon( BB_MISS_START, SPR_MISS_OAM, SPR_MISS_PAL, tileCntT, 0, 0, 16,
-                                   16, false, false, true, OBJPRIORITY_1, false );
-        tileCntT = IO::loadUIIcon( BB_GOOD_START, SPR_GOOD_OAM, SPR_GOOD_PAL, tileCntT, 0, 0, 16,
-                                   16, false, false, true, OBJPRIORITY_1, false );
+        tileCntT = IO::loadUIIcon( IO::ICON::BB_GOOD_START, SPR_GOOD_OAM, SPR_GOOD_PAL, tileCntT, 0,
+                                   0, 16, 16, false, false, true, OBJPRIORITY_1, false );
 
         for( u8 i = 0; i < 4; ++i ) {
             tileCntT = IO::loadItemIcon( 0, 64 + 32 * ( ( i + 1 ) % 4 ), BERRY_Y, SPR_BERRY_OAM + i,
@@ -344,38 +345,43 @@ namespace SPX {
         // load sprites
 
         u16 tileCnt = 0;
-        IO::loadUIIcon( BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START, SPR_ACTIVE_SUB_PAL,
-                        tileCnt, 173, 46 - 32, 32, 32, false, false, false, OBJPRIORITY_3, true );
-        IO::loadUIIcon( BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START + 1, SPR_ACTIVE_SUB_PAL,
-                        tileCnt, 83 - 32, 146, 32, 32, true, true, false, OBJPRIORITY_3, true );
-        IO::loadUIIcon( BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START + 2, SPR_ACTIVE_SUB_PAL,
-                        tileCnt, 173, 146, 32, 32, true, false, false, OBJPRIORITY_3, true );
-        tileCnt = IO::loadUIIcon( BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START + 3,
+        IO::loadUIIcon( IO::ICON::BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START,
+                        SPR_ACTIVE_SUB_PAL, tileCnt, 173, 46 - 32, 32, 32, false, false, false,
+                        OBJPRIORITY_3, true );
+        IO::loadUIIcon( IO::ICON::BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START + 1,
+                        SPR_ACTIVE_SUB_PAL, tileCnt, 83 - 32, 146, 32, 32, true, true, false,
+                        OBJPRIORITY_3, true );
+        IO::loadUIIcon( IO::ICON::BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START + 2,
+                        SPR_ACTIVE_SUB_PAL, tileCnt, 173, 146, 32, 32, true, false, false,
+                        OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::BB_PLAYER_ACTIVE_START, SPR_ACTIVE_SUB_OAM_START + 3,
                                   SPR_ACTIVE_SUB_PAL, tileCnt, 83 - 32, 46 - 32, 32, 32, false,
                                   true, false, OBJPRIORITY_3, true );
 
-        tileCnt = IO::loadUIIcon( BB_LID_START, SPR_LID_SUB_OAM, SPR_LID_SUB_PAL, tileCnt, 128 - 64,
-                                  96 - 64, 64, 64, false, true, true, OBJPRIORITY_3, true );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::BB_LID_START, SPR_LID_SUB_OAM, SPR_LID_SUB_PAL, tileCnt,
+                              128 - 64, 96 - 64, 64, 64, false, true, true, OBJPRIORITY_3, true );
 
         tileCnt
-            = IO::loadUIIcon( BB_START_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL, tileCnt, 83 - 32,
-                              46 - 32, 64, 32, false, true, true, OBJPRIORITY_1, true );
+            = IO::loadUIIcon( IO::ICON::BB_START_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL, tileCnt,
+                              83 - 32, 46 - 32, 64, 32, false, true, true, OBJPRIORITY_1, true );
 
-        tileCnt = IO::loadUIIcon( BB_PERFECT_START, SPR_PERFECT_SUB_OAM, SPR_PERFECT_SUB_PAL,
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::BB_PERFECT_START, SPR_PERFECT_SUB_OAM, SPR_PERFECT_SUB_PAL,
+                              tileCnt, 0, 0, 16, 16, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::BB_MISS_START, SPR_MISS_SUB_OAM, SPR_MISS_SUB_PAL,
                                   tileCnt, 0, 0, 16, 16, false, false, true, OBJPRIORITY_1, true );
-        tileCnt = IO::loadUIIcon( BB_MISS_START, SPR_MISS_SUB_OAM, SPR_MISS_SUB_PAL, tileCnt, 0, 0,
-                                  16, 16, false, false, true, OBJPRIORITY_1, true );
-        tileCnt = IO::loadUIIcon( BB_GOOD_START, SPR_GOOD_SUB_OAM, SPR_GOOD_SUB_PAL, tileCnt, 0, 0,
-                                  16, 16, false, false, true, OBJPRIORITY_1, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::BB_GOOD_START, SPR_GOOD_SUB_OAM, SPR_GOOD_SUB_PAL,
+                                  tileCnt, 0, 0, 16, 16, false, false, true, OBJPRIORITY_1, true );
 
         for( u8 i = 1; i < 10; ++i ) {
-            IO::loadUIIcon( BB_PERFECT_START, SPR_PERFECT_SUB_OAM + i, SPR_PERFECT_SUB_PAL,
-                            IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM ].gfxIndex, 0, 0, 16, 16, false,
-                            false, true, OBJPRIORITY_1, true );
-            IO::loadUIIcon( BB_MISS_START, SPR_MISS_SUB_OAM + i, SPR_MISS_SUB_PAL,
+            IO::loadUIIcon( IO::ICON::BB_PERFECT_START, SPR_PERFECT_SUB_OAM + i,
+                            SPR_PERFECT_SUB_PAL, IO::Oam->oamBuffer[ SPR_PERFECT_SUB_OAM ].gfxIndex,
+                            0, 0, 16, 16, false, false, true, OBJPRIORITY_1, true );
+            IO::loadUIIcon( IO::ICON::BB_MISS_START, SPR_MISS_SUB_OAM + i, SPR_MISS_SUB_PAL,
                             IO::Oam->oamBuffer[ SPR_MISS_SUB_OAM ].gfxIndex, 0, 0, 16, 16, false,
                             false, true, OBJPRIORITY_1, true );
-            IO::loadUIIcon( BB_GOOD_START, SPR_GOOD_SUB_OAM + i, SPR_GOOD_SUB_PAL,
+            IO::loadUIIcon( IO::ICON::BB_GOOD_START, SPR_GOOD_SUB_OAM + i, SPR_GOOD_SUB_PAL,
                             IO::Oam->oamBuffer[ SPR_GOOD_SUB_OAM ].gfxIndex, 0, 0, 16, 16, false,
                             false, true, OBJPRIORITY_1, true );
         }
@@ -544,11 +550,11 @@ namespace SPX {
     void animateCloseLid( u8 p_npctier ) {
         // for now, load correct lid
         if( p_npctier == ROTOM_TIER ) {
-            IO::loadUIIcon( BB_LID_ROTOM_START, SPR_LID_SUB_OAM, SPR_LID_SUB_PAL,
+            IO::loadUIIcon( IO::ICON::BB_LID_ROTOM_START, SPR_LID_SUB_OAM, SPR_LID_SUB_PAL,
                             IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].gfxIndex, 128 - 64, 96 - 64, 64,
                             64, false, true, true, OBJPRIORITY_3, true );
         } else {
-            IO::loadUIIcon( BB_LID_START, SPR_LID_SUB_OAM, SPR_LID_SUB_PAL,
+            IO::loadUIIcon( IO::ICON::BB_LID_START, SPR_LID_SUB_OAM, SPR_LID_SUB_PAL,
                             IO::Oam->oamBuffer[ SPR_LID_SUB_OAM ].gfxIndex, 128 - 64, 96 - 64, 64,
                             64, false, true, true, OBJPRIORITY_3, true );
         }
@@ -884,7 +890,7 @@ namespace SPX {
 
     void animateCountDown( ) {
         // "3"
-        IO::loadUIIcon( BB_THREE_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+        IO::loadUIIcon( IO::ICON::BB_THREE_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
                         IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 16, 96 - 16, 32, 32,
                         false, false, false, OBJPRIORITY_1, true );
         IO::updateOAM( true );
@@ -892,7 +898,7 @@ namespace SPX {
         for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
         // "2"
-        IO::loadUIIcon( BB_TWO_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+        IO::loadUIIcon( IO::ICON::BB_TWO_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
                         IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 16, 96 - 16, 32, 32,
                         false, false, false, OBJPRIORITY_1, true );
         IO::updateOAM( true );
@@ -900,7 +906,7 @@ namespace SPX {
         for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
         // "1"
-        IO::loadUIIcon( BB_ONE_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+        IO::loadUIIcon( IO::ICON::BB_ONE_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
                         IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 16, 96 - 16, 32, 32,
                         false, false, false, OBJPRIORITY_1, true );
         IO::updateOAM( true );
@@ -908,7 +914,7 @@ namespace SPX {
         for( u8 i = 0; i < 60; ++i ) { swiWaitForVBlank( ); }
 
         // "START"
-        IO::loadUIIcon( BB_START_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
+        IO::loadUIIcon( IO::ICON::BB_START_START, SPR_CNT_SUB_OAM, SPR_CNT_SUB_PAL,
                         IO::Oam->oamBuffer[ SPR_CNT_SUB_OAM ].gfxIndex, 128 - 32, 96 - 16, 64, 32,
                         false, false, false, OBJPRIORITY_1, true );
         IO::updateOAM( true );

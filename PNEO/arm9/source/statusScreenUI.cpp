@@ -362,8 +362,8 @@ namespace STS {
                                   tileCnt, 102 + 56 + 32, 192 - 19, 16, 16, false, false, false,
                                   OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
         // x
-        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 236,
-                                  172, 16, 16, false, false, false, OBJPRIORITY_1, p_bottom,
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
+                                  236, 172, 16, 16, false, false, false, OBJPRIORITY_1, p_bottom,
                                   OBJMODE_NORMAL );
         // page windows
         tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB,

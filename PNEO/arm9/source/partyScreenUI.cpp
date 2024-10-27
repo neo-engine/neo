@@ -368,9 +368,9 @@ namespace STS {
                         true, true, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // x
-        tileCnt = IO::loadSprite( "UI/x_16_16", SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 236,
-                                  172, 16, 16, false, false, !_allowCancel, OBJPRIORITY_1, p_bottom,
-                                  OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB,
+                                  tileCnt, 236, 172, 16, 16, false, false, !_allowCancel,
+                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // page windows
         tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB,
@@ -1195,8 +1195,7 @@ namespace STS {
                                       33 + p_idx * height, p_bottom );
 
         u8 dg = 0;
-        for( u32 tmp = p_maxValue; tmp > 0; ++dg, tmp /= 10 )
-            ;
+        for( u32 tmp = p_maxValue; tmp > 0; ++dg, tmp /= 10 );
 
         IO::regularFont->printCounter(
             p_value, dg, 256 - oam[ SPR_MSG_BOX_OAM_SUB ].x - ( dg + 1 ) * 8, 33 + p_idx * height,

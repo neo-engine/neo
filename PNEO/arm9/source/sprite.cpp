@@ -881,9 +881,9 @@ namespace IO {
         }
     }
 
-    u16 loadUIIcon( u16 p_dataPos, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, s16 p_posX, s16 p_posY,
+    u16 loadUIIcon( u32 p_dataPos, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, s16 p_posX, s16 p_posY,
                     u8 p_width, u8 p_height, bool p_flipX, bool p_flipY, bool p_hidden,
-                    ObjPriority p_priority, bool p_bottom ) {
+                    ObjPriority p_priority, bool p_bottom, ObjBlendMode p_blendMode ) {
         if( !FS::checkOrOpen( UI_ICON_FILE, UI_PATH ) || fseek( UI_ICON_FILE, p_dataPos, SEEK_SET )
             || !fread( TEMP_PAL, 16, sizeof( u16 ), UI_ICON_FILE )
             || !fread( TEMP, u16( p_width ) * u16( p_height ) / 8, sizeof( u32 ), UI_ICON_FILE ) ) {
@@ -892,10 +892,10 @@ namespace IO {
 
         return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, p_width, p_height,
                            TEMP_PAL, TEMP, u16( p_width ) * u16( p_height ) / 2, p_flipX, p_flipY,
-                           p_hidden, p_priority, p_bottom );
+                           p_hidden, p_priority, p_bottom, p_blendMode );
     }
 
-    u16 loadUIIconB( u16 p_dataPos, u8 p_oamIdx, u16 p_tileCnt, u8 p_width, s16 p_posX, s16 p_posY,
+    u16 loadUIIconB( u32 p_dataPos, u8 p_oamIdx, u16 p_tileCnt, s16 p_posX, s16 p_posY, u8 p_width,
                      u8 p_height, bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority,
                      bool p_bottom ) {
         if( !FS::checkOrOpen( UI_ICON_FILE, UI_PATH ) || fseek( UI_ICON_FILE, p_dataPos, SEEK_SET )

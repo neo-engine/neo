@@ -173,8 +173,8 @@ namespace IO {
         case MSG_NORMAL_CONT:
         case MSG_BRAILLE: {
             // construct mb 1, use default gfx addresses
-            IO::loadSpriteB( "UI/mbox1", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64, false,
-                             false, false, OBJPRIORITY_0, false );
+            IO::loadUIIconB( IO::ICON::MBOX1_START, SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32,
+                             64, false, false, false, OBJPRIORITY_0, false );
             // TODO: 1 sprite for each corner (flipped)
             // TODO: 1 sprite for each edge (stretched/flipped)
             // TODO: 1 sprite for interior, stretched to fill area
@@ -190,8 +190,8 @@ namespace IO {
         case MSG_INFO_CONT:
         case MSG_SIGN: {
             // construct mb 2, use default gfx addresses
-            IO::loadSpriteB( "UI/mbox2", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32, 64, false,
-                             false, false, OBJPRIORITY_0, false );
+            IO::loadUIIconB( IO::ICON::MBOX2_START, SPR_MSGBOX_OAM, SPR_MSGBOX_GFX, 0, 192 - 46, 32,
+                             64, false, false, false, OBJPRIORITY_0, false );
             // TODO: 1 sprite for each corner (flipped)
             // TODO: 1 sprite for each edge (stretched/flipped)
             // TODO: 1 sprite for interior, stretched to fill area
@@ -203,8 +203,8 @@ namespace IO {
         }
         case MSG_MART_ITEM: {
             // mart uses more elaborate mb design, needs more gxf data
-            IO::loadSpriteB( "UI/mboxmart", SPR_MSGBOX_OAM, SPR_MSGBOX_GFX_MART, 0, 192 - 51, 32,
-                             64, false, false, false, OBJPRIORITY_0, false );
+            IO::loadUIIconB( IO::ICON::MBOXMART_START, SPR_MSGBOX_OAM, SPR_MSGBOX_GFX_MART, 0,
+                             192 - 51, 32, 64, false, false, false, OBJPRIORITY_0, false );
             for( u8 i = 0; i < 13; ++i ) {
                 IO::loadSpriteB( SPR_MSGBOX_OAM + i + 1, SPR_MSGBOX_GFX_MART, 32 + 16 * i, 192 - 51,
                                  32, 64, 0, 0, 0, false, true, false, OBJPRIORITY_0, false );

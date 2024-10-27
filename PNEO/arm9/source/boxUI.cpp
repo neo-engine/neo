@@ -115,8 +115,8 @@ namespace BOX {
         u16          tileCnt = 0;
 
         // x
-        tileCnt = IO::loadSpriteB( "UI/x_16_16", SPR_X_OAM_SUB, tileCnt, 236, 172, 16, 16, false,
-                                   false, false, OBJPRIORITY_2, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, tileCnt, 236, 172, 16,
+                                   16, false, false, false, OBJPRIORITY_2, true );
 
         // prev / box name / next
         tileCnt = IO::loadSpriteB( "SEL/noselection_64_32", SPR_PREV_BG_OAM_SUB, tileCnt, 2, -4, 64,

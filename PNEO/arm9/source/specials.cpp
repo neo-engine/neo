@@ -31,6 +31,7 @@
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
+#include "gen/sprites.raw.h"
 #include "io/choiceBox.h"
 #include "io/menuUI.h"
 #include "io/message.h"
@@ -137,12 +138,12 @@ namespace SPX {
         std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>> ynpos
             = std::vector<std::pair<IO::inputTarget, IO::yesNoBox::selection>>( );
 
-        tileCnt = IO::loadSprite( "UI/sb2", 0, 0, tileCnt, 70, 86, 32, 32, false, false, false,
-                                  OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( "UI/sb2", 1, 1, tileCnt, 112, 100, 32, 32, false, false, false,
-                                  OBJPRIORITY_0, true );
-        tileCnt = IO::loadSprite( "UI/sb2", 2, 2, tileCnt, 154, 86, 32, 32, false, false, false,
-                                  OBJPRIORITY_0, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL2_START, 0, 0, tileCnt, 70, 86, 32, 32,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL2_START, 1, 1, tileCnt, 112, 100, 32, 32,
+                                  false, false, false, OBJPRIORITY_0, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL2_START, 2, 2, tileCnt, 154, 86, 32, 32,
+                                  false, false, false, OBJPRIORITY_0, true );
 
         for( u8 i = 0; i < 3; ++i ) {
             tpos.push_back( std::pair( IO::inputTarget( IO::Oam->oamBuffer[ i ].x + 16,
@@ -150,8 +151,8 @@ namespace SPX {
                                        i ) );
         }
 
-        tileCnt = IO::loadSprite( "UI/sh", 3, 4, tileCnt, 154, 86, 32, 32, false, false, true,
-                                  OBJPRIORITY_0, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::STARTERHAND_START, 3, 4, tileCnt, 154, 86, 32, 32,
+                                  false, false, true, OBJPRIORITY_0, true );
 
         // Choice boxes
 
@@ -231,22 +232,25 @@ namespace SPX {
             ++frame;
 
             if( frame % 8 == 2 ) {
-                tileCnt = IO::loadSprite(
-                    "UI/sb1", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                    false, false, OBJPRIORITY_0, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL1_START, curSel, curSel,
+                                           IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                                           IO::Oam->oamBuffer[ curSel ].x,
+                                           IO::Oam->oamBuffer[ curSel ].y, 32, 32, false, false,
+                                           false, OBJPRIORITY_0, true );
             }
             if( frame % 4 == 0 ) {
-                tileCnt = IO::loadSprite(
-                    "UI/sb2", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                    false, false, OBJPRIORITY_0, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL2_START, curSel, curSel,
+                                           IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                                           IO::Oam->oamBuffer[ curSel ].x,
+                                           IO::Oam->oamBuffer[ curSel ].y, 32, 32, false, false,
+                                           false, OBJPRIORITY_0, true );
             }
             if( frame % 8 == 6 ) {
-                tileCnt = IO::loadSprite(
-                    "UI/sb3", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                    IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32, false,
-                    false, false, OBJPRIORITY_0, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL3_START, curSel, curSel,
+                                           IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                                           IO::Oam->oamBuffer[ curSel ].x,
+                                           IO::Oam->oamBuffer[ curSel ].y, 32, 32, false, false,
+                                           false, OBJPRIORITY_0, true );
             }
 
             if( frame % 16 == 0 ) {
@@ -289,10 +293,11 @@ namespace SPX {
                     return tpos;
                 },
                 [ & ]( u8 p_selection ) {
-                    tileCnt = IO::loadSprite(
-                        "UI/sb2", curSel, curSel, IO::Oam->oamBuffer[ curSel ].gfxIndex,
-                        IO::Oam->oamBuffer[ curSel ].x, IO::Oam->oamBuffer[ curSel ].y, 32, 32,
-                        false, false, false, OBJPRIORITY_0, true );
+                    tileCnt = IO::loadUIIcon( IO::ICON::STARTERBALL2_START, curSel, curSel,
+                                              IO::Oam->oamBuffer[ curSel ].gfxIndex,
+                                              IO::Oam->oamBuffer[ curSel ].x,
+                                              IO::Oam->oamBuffer[ curSel ].y, 32, 32, false, false,
+                                              false, OBJPRIORITY_0, true );
 
                     curSel = p_selection;
 
@@ -438,8 +443,8 @@ namespace SPX {
         IO::regularFont->setColor( 0, 2 );
         u16 tileCnt = 0;
         // x
-        tileCnt = IO::loadSprite( "UI/x_16_16", 9, 15, tileCnt, 236, 172, 16, 16, false, false,
-                                  false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, 9, 15, tileCnt, 236, 172, 16, 16, false,
+                                  false, false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
 
         for( u8 i = 0; i < 8; ++i ) { IO::Oam->oamBuffer[ i ].isHidden = true; }
 
