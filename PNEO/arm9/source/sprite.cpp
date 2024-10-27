@@ -48,6 +48,9 @@ namespace IO {
     const char* TYPE_ICON_PATH         = "nitro:/PICS/SPRITES/ICONS/TP/type";
     const char* CONTEST_TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/ctype";
 
+    const char* UI_PATH      = "nitro:/PICS/SPRITES/sprites.raw.ar";
+    FILE*       UI_ICON_FILE = nullptr;
+
     const char* ITEM_PATH      = "nitro:/PICS/SPRITES/item.icon.rawb";
     FILE*       ITEM_ICON_FILE = nullptr;
 
@@ -876,6 +879,34 @@ namespace IO {
                                 NoItemTilesLen, false, false, false,
                                 p_bottom ? OBJPRIORITY_1 : OBJPRIORITY_0, p_bottom );
         }
+    }
+
+    u16 loadUIIcon( u16 p_dataPos, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, s16 p_posX, s16 p_posY,
+                    u8 p_width, u8 p_height, bool p_flipX, bool p_flipY, bool p_hidden,
+                    ObjPriority p_priority, bool p_bottom ) {
+        if( !FS::checkOrOpen( UI_ICON_FILE, UI_PATH ) || fseek( UI_ICON_FILE, p_dataPos, SEEK_SET )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), UI_ICON_FILE )
+            || !fread( TEMP, u16( p_width ) * u16( p_height ) / 8, sizeof( u32 ), UI_ICON_FILE ) ) {
+            return p_tileCnt + ( u16( p_width ) * u16( p_height ) / 2 ) / BYTES_PER_16_COLOR_TILE;
+        }
+
+        return loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, p_width, p_height,
+                           TEMP_PAL, TEMP, u16( p_width ) * u16( p_height ) / 2, p_flipX, p_flipY,
+                           p_hidden, p_priority, p_bottom );
+    }
+
+    u16 loadUIIconB( u16 p_dataPos, u8 p_oamIdx, u16 p_tileCnt, u8 p_width, s16 p_posX, s16 p_posY,
+                     u8 p_height, bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority,
+                     bool p_bottom ) {
+        if( !FS::checkOrOpen( UI_ICON_FILE, UI_PATH ) || fseek( UI_ICON_FILE, p_dataPos, SEEK_SET )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), UI_ICON_FILE )
+            || !fread( TEMP, u16( p_width ) * u16( p_height ) / 8, sizeof( u32 ), UI_ICON_FILE ) ) {
+            return p_tileCnt + ( u16( p_width ) * u16( p_height ) / 2 ) / BYTES_PER_16_COLOR_TILE;
+        }
+
+        return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_width, p_height, TEMP_PAL, TEMP,
+                            u16( p_width ) * u16( p_height ) / 2, p_flipX, p_flipY, p_hidden,
+                            p_priority, p_bottom );
     }
 
     u16 loadItemIcon( u16 p_itemId, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,

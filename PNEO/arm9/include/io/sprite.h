@@ -188,6 +188,13 @@ namespace IO {
     u16 loadIconB( const char* p_path, const char* p_name, s16 p_posX, s16 p_posY, u8 p_oamIndex,
                    u16 p_tileCnt, bool p_bottom );
 
+    u16 loadUIIcon( u16 p_dataPos, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt, s16 p_posX, s16 p_posY,
+                    u8 p_width, u8 p_height, bool p_flipX, bool p_flipY, bool p_hidden,
+                    ObjPriority p_priority, bool p_bottom );
+    u16 loadUIIconB( u16 p_dataPos, u8 p_oamIdx, u16 p_tileCnt, u8 p_width, s16 p_posX, s16 p_posY,
+                     u8 p_height, bool p_flipX, bool p_flipY, bool p_hidden, ObjPriority p_priority,
+                     bool p_bottom );
+
     u16 loadItemIcon( u16 p_itemId, s16 p_posX, s16 p_posY, u8 p_oamIndex, u8 p_palcnt,
                       u16 p_tileCnt, bool p_bottom = true );
     u16 loadItemIconB( u16 p_itemId, s16 p_posX, s16 p_posY, u8 p_oamIndex, u16 p_tileCnt,
