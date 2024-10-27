@@ -40,6 +40,18 @@ namespace IO {
     extern const char* OWP_PATH;
     extern const char* BERRY_PATH;
 
+    constexpr u32 BADGE_ICON_START[] = {
+        IO::ICON::B1_START, IO::ICON::B2_START, IO::ICON::B3_START, IO::ICON::B4_START,
+        IO::ICON::B5_START, IO::ICON::B6_START, IO::ICON::B7_START, IO::ICON::B8_START,
+    };
+
+    constexpr u32 SILVER_SYMBOL_ICON_START[]
+        = { IO::ICON::S11_START, IO::ICON::S21_START, IO::ICON::S31_START, IO::ICON::S41_START,
+            IO::ICON::S51_START, IO::ICON::S61_START, IO::ICON::S71_START };
+    constexpr u32 GOLD_SYMBOL_ICON_START[]
+        = { IO::ICON::S12_START, IO::ICON::S22_START, IO::ICON::S32_START, IO::ICON::S42_START,
+            IO::ICON::S52_START, IO::ICON::S62_START, IO::ICON::S72_START };
+
     struct SpriteInfo {
         u8           m_oamId;
         u8           m_width;
@@ -98,13 +110,9 @@ namespace IO {
                      const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom, u8 p_transparency = 15 );
 
-    /*
-     * @brief: Loads the sprite with the given name from the FS. Assumes bitmap mode.
-     */
     u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileIdx, s16 p_posX,
                      s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX, bool p_flipY,
-                     bool p_hidden, ObjPriority p_priority, bool p_bottom, bool p_outline = false,
-                     u16 p_outlineColor = 0xFFFF, bool p_tiled = true, u8 p_transparency = 15 );
+                     bool p_hidden, ObjPriority p_priority, bool p_bottom );
 
     /*
      * @brief: Returns the number of empty pixels below the pkmn in its sprite.

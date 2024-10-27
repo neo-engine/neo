@@ -293,8 +293,8 @@ namespace SAVE {
             tileCnt = IO::loadTrainerSprite( 0, 32, 88, 14, 0, tileCnt + 32, true );
             tileCnt = IO::loadTrainerSprite( 1, 128 + 32, 88, 15, 1, tileCnt, true );
 
-            IO::loadSprite( "UI/sel_64_64", 50, 4, tileCnt, 32, 88, 64, 64, false, false, false,
-                            OBJPRIORITY_3, true );
+            IO::loadUIIcon( IO::ICON::SEL_64_64_START, 50, 4, tileCnt, 32, 88, 64, 64, false, false,
+                            false, OBJPRIORITY_3, true );
 
             IO::updateOAM( true );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );

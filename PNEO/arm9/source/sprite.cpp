@@ -285,6 +285,18 @@ namespace IO {
         return p_tileCnt + ( p_width * p_height / 2 ) / BYTES_PER_16_COLOR_TILE;
     }
 
+    u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX,
+                     s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX, bool p_flipY,
+                     bool p_hidden, ObjPriority p_priority, bool p_bottom ) {
+        if( FS::readData( ICON_PATH, p_name, (unsigned int) p_width * p_height / 8, TEMP,
+                          (unsigned short) 16, TEMP_PAL ) ) {
+            return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_width, p_height, TEMP_PAL,
+                                TEMP, p_width * p_height / 2, p_flipX, p_flipY, p_hidden,
+                                p_priority, p_bottom );
+        }
+        return p_tileCnt + ( p_width * p_height / 2 ) / BYTES_PER_16_COLOR_TILE;
+    }
+
     u16 BITMAP_SPRITE[ 64 * 64 * 2 ] = { 0 };
     u16 loadSpriteB( const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX, s16 p_posY,
                      const u8 p_width, const u8 p_height, const unsigned short* p_spritePal,
@@ -348,20 +360,6 @@ namespace IO {
         return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_width, p_height,
                             ( p_spritePal && p_spriteData ) ? BITMAP_SPRITE : 0, p_spriteDataLen,
                             p_flipX, p_flipY, p_hidden, p_priority, p_bottom, p_transparency );
-    }
-
-    u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX,
-                     s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX, bool p_flipY,
-                     bool p_hidden, ObjPriority p_priority, bool p_bottom, bool p_outline,
-                     u16 p_outlineColor, bool p_tiled, u8 p_transparency ) {
-        if( FS::readData( ICON_PATH, p_name, (unsigned int) p_width * p_height / 8, TEMP,
-                          (unsigned short) 16, TEMP_PAL ) ) {
-            return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_width, p_height, TEMP_PAL,
-                                TEMP, p_width * p_height / 2, p_flipX, p_flipY, p_hidden,
-                                p_priority, p_bottom, p_outline, p_outlineColor, p_tiled,
-                                p_transparency );
-        }
-        return p_tileCnt + ( p_width * p_height / 2 ) / BYTES_PER_16_COLOR_TILE;
     }
 
     u16 pkmnSpriteHeight( const pkmnSpriteInfo& p_pkmn ) {
@@ -1143,20 +1141,19 @@ namespace IO {
         return p_tileCnt + ( 32 * 16 ) / BYTES_PER_16_COLOR_TILE;
     }
 
+    constexpr u32 DAMAGE_CAT_START[]
+        = { IO::ICON::DAMAGE_0_START, IO::ICON::DAMAGE_1_START, IO::ICON::DAMAGE_2_START };
+
     u16 loadDamageCategoryIcon( BATTLE::moveHitTypes p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx,
                                 u8 p_palCnt, u16 p_tileCnt, bool p_bottom ) {
-        char buffer[ 30 ];
-        snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
-        return loadSprite( buffer, p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 32, 16, false,
-                           false, false, OBJPRIORITY_0, p_bottom );
+        return loadUIIcon( DAMAGE_CAT_START[ p_type - 1 ], p_oamIdx, p_palCnt, p_tileCnt, p_posX,
+                           p_posY, 32, 16, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
     u16 loadDamageCategoryIconB( BATTLE::moveHitTypes p_type, s16 p_posX, s16 p_posY, u8 p_oamIdx,
                                  u16 p_tileCnt, bool p_bottom ) {
-        char buffer[ 30 ];
-        snprintf( buffer, 29, "BT/damage_%hhu", u8( p_type ) - 1 );
-        return loadSpriteB( buffer, p_oamIdx, p_tileCnt, p_posX, p_posY, 32, 16, false, false,
-                            false, OBJPRIORITY_0, p_bottom );
+        return loadUIIconB( DAMAGE_CAT_START[ p_type - 1 ], p_oamIdx, p_tileCnt, p_posX, p_posY, 32,
+                            16, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
 } // namespace IO

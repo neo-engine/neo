@@ -587,18 +587,21 @@ namespace MAP {
         }
 
         if( p_type == 0 ) { // Hoenn badge
-            IO::loadSpriteB( ( "BA/b" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
-                             SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
-                             false );
+            IO::loadUIIconB( IO::BADGE_ICON_START[ p_badge - 1 ], SPR_PKMN_OAM, SPR_PKMN_GFX, 96,
+                             64, 64, 64, false, false, false, OBJPRIORITY_0, false );
             SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = p_badge;
             SAVE::SAV.getActiveFile( ).m_HOENN_Badges |= ( 1 << ( p_badge - 1 ) );
         } else if( p_type == 1 ) { // Frontier symbol
-            IO::loadSpriteB( ( "BA/s" + std::to_string( p_badge ) ).c_str( ), SPR_PKMN_OAM,
-                             SPR_PKMN_GFX, 96, 64, 64, 64, false, false, false, OBJPRIORITY_0,
-                             false );
-
             auto sym = ( p_badge / 10 ) - 1;
             auto tp  = ( p_badge % 10 ) - 1;
+
+            if( tp == 0 ) {
+                IO::loadUIIconB( IO::SILVER_SYMBOL_ICON_START[ sym ], SPR_PKMN_OAM, SPR_PKMN_GFX,
+                                 96, 64, 64, 64, false, false, false, OBJPRIORITY_0, false );
+            } else if( tp == 1 ) {
+                IO::loadUIIconB( IO::GOLD_SYMBOL_ICON_START[ sym ], SPR_PKMN_OAM, SPR_PKMN_GFX, 96,
+                                 64, 64, 64, false, false, false, OBJPRIORITY_0, false );
+            }
 
             SAVE::SAV.getActiveFile( ).m_lastAchievementEvent = 10 + 2 * sym + tp;
             SAVE::SAV.getActiveFile( ).m_FRONTIER_Badges |= ( 1 << ( 7 * tp + sym ) );
