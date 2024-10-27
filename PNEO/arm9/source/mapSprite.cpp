@@ -58,7 +58,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #define SPR_LARGE_NPC_GFX( p_idx )       ( 32 + 16 * ( p_idx ) )
 #define SPR_EXTRA_LARGE_NPC_GFX( p_idx ) ( SPR_LARGE_NPC_GFX( 4 * ( p_idx ) + 1 ) )
 #define SPR_SMALL_NPC_GFX( p_idx )       ( SPR_LARGE_NPC_GFX( MAX_LARGE_NPC ) + 8 * ( p_idx ) )
-#define SPR_HM_GFX( p_idx )              ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC - 6 ) + 4 * ( (p_idx) -1 ) )
+#define SPR_HM_GFX( p_idx )              ( SPR_SMALL_NPC_GFX( MAX_SMALL_NPC - 6 ) + 4 * ( ( p_idx ) - 1 ) )
 #define SPR_MAPTILE_GFX( p_idx )         ( SPR_HM_GFX( MAX_HM_PARTICLE_GFX_SLOTS ) + 4 * ( p_idx ) )
 // #define SPR_DOOR_GFX               ( SPR_MAPTILE_GFX( MAX_TILE_ANIM_GFX_SLOTS ) )
 #define SPR_DOOR_GFX SPR_MAIN_PLAYER_PLAT_GFX
@@ -68,6 +68,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 // defined in mapObject.cpp
 // #define SPR_PKMN_GFX 352
 // #define SPR_CIRC_GFX 496
+
+constexpr u32 EMO_ICON_START[] = {
+    IO::ICON::EMO_0_START,  IO::ICON::EMO_1_START,  IO::ICON::EMO_2_START,  IO::ICON::EMO_3_START,
+    IO::ICON::EMO_4_START,  IO::ICON::EMO_5_START,  IO::ICON::EMO_6_START,  IO::ICON::EMO_7_START,
+    IO::ICON::EMO_8_START,  IO::ICON::EMO_9_START,  IO::ICON::EMO_10_START, IO::ICON::EMO_11_START,
+    IO::ICON::EMO_12_START, IO::ICON::EMO_13_START, IO::ICON::EMO_14_START, IO::ICON::EMO_15_START,
+    IO::ICON::EMO_16_START, IO::ICON::EMO_17_START, IO::ICON::EMO_18_START, IO::ICON::EMO_19_START,
+    IO::ICON::EMO_20_START, IO::ICON::EMO_21_START, IO::ICON::EMO_22_START, IO::ICON::EMO_23_START,
+};
 
 namespace MAP {
     void mapSpriteData::readData( FILE* p_f, bool p_close ) {
@@ -1116,9 +1125,7 @@ namespace MAP {
 
     void mapSpriteManager::showExclamation( u8 p_spriteId, u8 p_emote ) {
         auto spr = getManagedSprite( p_spriteId );
-        char buffer[ 10 ];
-        snprintf( buffer, 9, "EMO/%hhu", p_emote );
-        IO::loadSpriteB( buffer, SPR_EXCLM_OAM, SPR_EXCLM_GFX,
+        IO::loadUIIconB( EMO_ICON_START[ p_emote ], SPR_EXCLM_OAM, SPR_EXCLM_GFX,
                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].x
                              + ( ( spr.m_sprite.getData( ).m_width - 16 ) >> 1 ),
                          IO::OamTop->oamBuffer[ _oamPosition[ p_spriteId ] ].y - 8, 16, 16, false,

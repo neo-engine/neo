@@ -84,15 +84,6 @@ namespace IO {
                     ObjBlendMode p_blendMode = OBJMODE_NORMAL );
 
     /*
-     * @brief: Loads the given tiles and pal to the specified position in the OAM(Sub)
-     * (Assumes 1D tiled sprites w/ 16 colors per palette)
-     */
-    u16 loadSprite( const char* p_name, const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileIdx,
-                    s16 p_posX, s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX,
-                    bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
-                    ObjBlendMode p_blendMode = OBJMODE_NORMAL );
-
-    /*
      * @brief: Loads the given tiles and pals to the OAM(Sub); assumes bitmap mode.
      * @param p_tiled: Specifies whether the given p_spriteData is tiled (default: true)
      */
@@ -109,10 +100,6 @@ namespace IO {
                      const u8 p_width, const u8 p_height, const unsigned short* p_spriteData,
                      const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom, u8 p_transparency = 15 );
-
-    u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileIdx, s16 p_posX,
-                     s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX, bool p_flipY,
-                     bool p_hidden, ObjPriority p_priority, bool p_bottom );
 
     /*
      * @brief: Returns the number of empty pixels below the pkmn in its sprite.

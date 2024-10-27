@@ -155,18 +155,18 @@ namespace BATTLE {
         u16 tileCnt = SPR_PKMN_GFX( 4 ) + 16;
 
         // status ball
-        tileCnt = IO::loadSprite( "BT/bb1", SPR_STATUS_BALL_OAM( 0 ), SPR_STATUS_BALL_PAL, tileCnt,
-                                  OPP_1_HP_X + 8, OPP_1_HP_Y + 8, 16, 16, false, false, true,
-                                  OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( "BT/bb2", SPR_STATUS_BALL_OAM( 1 ), SPR_STATUS_BALL_PAL, tileCnt,
-                                  OPP_2_HP_X + 8, OPP_2_HP_Y + 8, 16, 16, false, false, true,
-                                  OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( "BT/bb3", SPR_STATUS_BALL_OAM( 6 ), SPR_STATUS_BALL_PAL, tileCnt,
-                                  OWN_1_HP_X + 8, OWN_1_HP_Y + 8, 16, 16, false, false, true,
-                                  OBJPRIORITY_0, false );
-        tileCnt = IO::loadSprite( "BT/bb4", SPR_STATUS_BALL_OAM( 7 ), SPR_STATUS_BALL_PAL, tileCnt,
-                                  OWN_2_HP_X + 8, OWN_2_HP_Y + 8, 16, 16, false, false, true,
-                                  OBJPRIORITY_0, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLEBALL1_START, SPR_STATUS_BALL_OAM( 0 ),
+                                  SPR_STATUS_BALL_PAL, tileCnt, OPP_1_HP_X + 8, OPP_1_HP_Y + 8, 16,
+                                  16, false, false, true, OBJPRIORITY_0, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLEBALL2_START, SPR_STATUS_BALL_OAM( 1 ),
+                                  SPR_STATUS_BALL_PAL, tileCnt, OPP_2_HP_X + 8, OPP_2_HP_Y + 8, 16,
+                                  16, false, false, true, OBJPRIORITY_0, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLEBALL3_START, SPR_STATUS_BALL_OAM( 6 ),
+                                  SPR_STATUS_BALL_PAL, tileCnt, OWN_1_HP_X + 8, OWN_1_HP_Y + 8, 16,
+                                  16, false, false, true, OBJPRIORITY_0, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLEBALL4_START, SPR_STATUS_BALL_OAM( 7 ),
+                                  SPR_STATUS_BALL_PAL, tileCnt, OWN_2_HP_X + 8, OWN_2_HP_Y + 8, 16,
+                                  16, false, false, true, OBJPRIORITY_0, false );
 
         for( u8 i = 1 + ( _mode == BM_DOUBLE ); i < 6; ++i ) {
             IO::loadSprite( SPR_STATUS_BALL_OAM( i ), SPR_STATUS_BALL_PAL, SPR_STSBALL_GFX( 0 ),
@@ -203,9 +203,9 @@ namespace BATTLE {
         // Preload other sprites
         // HP "bars"
         // opponent
-        tileCnt = IO::loadSprite( "BT/nmbg", SPR_STATUSBG_OAM( 0 ), SPR_STATUSBG_PAL, tileCnt,
-                                  OPP_1_HP_X - 96, OPP_1_HP_Y, 64, 32, false, false, true,
-                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLE_NAMEBG_START, SPR_STATUSBG_OAM( 0 ),
+                                  SPR_STATUSBG_PAL, tileCnt, OPP_1_HP_X - 96, OPP_1_HP_Y, 64, 32,
+                                  false, false, true, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_STATUSBG_OAM( 0 ) + 1, SPR_STATUSBG_PAL,
                         IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OPP_1_HP_X - 32,
                         OPP_1_HP_Y, 64, 32, 0, 0, 0, false, true, true, OBJPRIORITY_3, false,
@@ -221,18 +221,18 @@ namespace BATTLE {
 
         IO::loadSprite( SPR_HPBAR_OAM, SPR_HPBAR_PAL, tileCnt, OPP_1_HP_X, OPP_1_HP_Y, 32, 32, 0, 0,
                         0, false, false, true, OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "BT/hpbar_battle_opp", SPR_HPBAR_OAM + 1, SPR_HPBAR_PAL, tileCnt,
-                                  OPP_2_HP_X, OPP_2_HP_Y, 32, 32, false, false, true, OBJPRIORITY_3,
-                                  false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::HPBAR_BATTLE_OPP_START, SPR_HPBAR_OAM + 1,
+                                  SPR_HPBAR_PAL, tileCnt, OPP_2_HP_X, OPP_2_HP_Y, 32, 32, false,
+                                  false, true, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         // player
         if( _mode == BM_DOUBLE ) {
             IO::loadSprite( SPR_HPBAR_OAM + 2, SPR_HPBAR_PAL + 1, tileCnt, OWN_1_HP_X, OWN_1_HP_Y,
                             32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
-            tileCnt = IO::loadSprite( "BT/hpbar_battle_opp", SPR_HPBAR_OAM + 3, SPR_HPBAR_PAL + 1,
-                                      tileCnt, OWN_2_HP_X, OWN_2_HP_Y, 32, 32, false, false, true,
-                                      OBJPRIORITY_3, false, OBJMODE_BLENDED );
+            tileCnt = IO::loadUIIcon( IO::ICON::HPBAR_BATTLE_OPP_START, SPR_HPBAR_OAM + 3,
+                                      SPR_HPBAR_PAL + 1, tileCnt, OWN_2_HP_X, OWN_2_HP_Y, 32, 32,
+                                      false, false, true, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
             IO::loadSprite( SPR_STATUSBG_OAM( 2 ), SPR_STATUSBG_PAL,
                             IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_1_HP_X,
@@ -264,9 +264,9 @@ namespace BATTLE {
             IO::loadSprite( SPR_HPBAR_OAM + 3, SPR_HPBAR_PAL + 1, tileCnt, OWN_1_HP_X, OWN_1_HP_Y,
                             32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
-            tileCnt = IO::loadSprite( "BT/hpbar_battle_opp", SPR_HPBAR_OAM + 2, SPR_HPBAR_PAL + 1,
-                                      tileCnt, OWN_2_HP_X, OWN_2_HP_Y, 32, 32, false, false, true,
-                                      OBJPRIORITY_3, false, OBJMODE_BLENDED );
+            tileCnt = IO::loadUIIcon( IO::ICON::HPBAR_BATTLE_OPP_START, SPR_HPBAR_OAM + 2,
+                                      SPR_HPBAR_PAL + 1, tileCnt, OWN_2_HP_X, OWN_2_HP_Y, 32, 32,
+                                      false, false, true, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
             IO::loadSprite( SPR_STATUSBG_OAM( 2 ), SPR_STATUSBG_PAL,
                             IO::OamTop->oamBuffer[ SPR_STATUSBG_OAM( 0 ) ].gfxIndex, OWN_2_HP_X,
@@ -326,9 +326,9 @@ namespace BATTLE {
                         0, true, true, true, OBJPRIORITY_3, false, OBJMODE_NORMAL );
         IO::loadSprite( SPR_ABILITY_OAM( 0 ) + 2, SPR_BOX_PAL, tileCnt, 128 + 64, 64, 64, 32, 0, 0,
                         0, true, true, true, OBJPRIORITY_3, false, OBJMODE_NORMAL );
-        tileCnt
-            = IO::loadSprite( "BT/battle_ability", SPR_ABILITY_OAM( 0 ), SPR_BOX_PAL, tileCnt, 128,
-                              64, 64, 32, true, true, true, OBJPRIORITY_3, false, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLE_ABILITY_START, SPR_ABILITY_OAM( 0 ), SPR_BOX_PAL,
+                                  tileCnt, 128, 64, 64, 32, true, true, true, OBJPRIORITY_3, false,
+                                  OBJMODE_NORMAL );
 
         // Shiny animation
         for( u8 i = 0; i < 8; ++i ) {
@@ -341,7 +341,7 @@ namespace BATTLE {
                             16, 0, 0, 0, false, false, true, OBJPRIORITY_0, false,
                             OBJMODE_BLENDED );
         }
-        tileCnt = IO::loadSprite( "BT/shiny_big", SPR_SHINY_PARTICLE_START_OAM + 15,
+        tileCnt = IO::loadUIIcon( IO::ICON::SHINY_BIG_START, SPR_SHINY_PARTICLE_START_OAM + 15,
                                   SPR_SHINY_ICON_PAL, tileCnt, 0, 0, 16, 16, false, false, true,
                                   OBJPRIORITY_0, false, OBJMODE_BLENDED );
 
@@ -351,7 +351,7 @@ namespace BATTLE {
                             0, 8, 8, 0, 0, 0, false, false, true, OBJPRIORITY_0, false,
                             OBJMODE_BLENDED );
         }
-        tileCnt = IO::loadSprite( "BT/stat_up", SPR_STAT_CHANGE_PARTICLE_START_OAM,
+        tileCnt = IO::loadUIIcon( IO::ICON::STAT_UP_START, SPR_STAT_CHANGE_PARTICLE_START_OAM,
                                   SPR_STAT_CHANGE_PAL, tileCnt, 0, 0, 8, 8, false, false, true,
                                   OBJPRIORITY_0, false, OBJMODE_BLENDED );
 
@@ -379,30 +379,32 @@ namespace BATTLE {
 
         IO::loadSprite( SPR_BATTLE_FITE_OAM_SUB, SPR_BATTLE_FITE_PAL_SUB, tileCnt, 128 - 64, 68, 64,
                         64, 0, 0, 0, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "BT/ft", SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
-                                  tileCnt, 128, 64, 64, 64, true, true, true, OBJPRIORITY_3, true,
-                                  OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLE_FITE_START, SPR_BATTLE_FITE_OAM_SUB + 1,
+                                  SPR_BATTLE_FITE_PAL_SUB, tileCnt, 128, 64, 64, 64, true, true,
+                                  true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_BATTLE_PKMN_OAM_SUB, SPR_BATTLE_PKMN_PAL_SUB, tileCnt,
                         128 - 32 - 16 - 64 - 6, 68 + 64 + 18, 32, 32, 0, 0, 0, false, false, true,
                         OBJPRIORITY_3, true, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "BT/pk", SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
-                                  tileCnt, 128 - 32 - 16 - 32 - 6, 68 + 64 + 18, 32, 32, true, true,
-                                  true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLE_PKMN_START, SPR_BATTLE_PKMN_OAM_SUB + 1,
+                                  SPR_BATTLE_PKMN_PAL_SUB, tileCnt, 128 - 32 - 16 - 32 - 6,
+                                  68 + 64 + 18, 32, 32, true, true, true, OBJPRIORITY_3, true,
+                                  OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_BATTLE_RUN_OAM_SUB, SPR_BATTLE_RUN_PAL_SUB, tileCnt, 128 - 32,
                         68 + 64 + 18, 32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
                         OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                  tileCnt, 128, 68 + 64 + 18, 32, 32, true, true, true,
-                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                  SPR_BATTLE_RUN_PAL_SUB, tileCnt, 128, 68 + 64 + 18, 32, 32, true,
+                                  true, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_BATTLE_BAG_OAM_SUB, SPR_BATTLE_BAG_PAL_SUB, tileCnt, 128 + 32 + 16 + 6,
                         68 + 64 + 18, 32, 32, 0, 0, 0, false, false, true, OBJPRIORITY_3, true,
                         OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "BT/bg", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                                  tileCnt, 128 + 32 + 16 + 32 + 6, 68 + 64 + 18, 32, 32, true, true,
-                                  true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::BATTLE_BAG_START, SPR_BATTLE_BAG_OAM_SUB + 1,
+                              SPR_BATTLE_BAG_PAL_SUB, tileCnt, 128 + 32 + 16 + 32 + 6, 68 + 64 + 18,
+                              32, 32, true, true, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         // message boxes
 
@@ -412,9 +414,9 @@ namespace BATTLE {
                             128 - 32 - 64 + 28 * i, 68 - 18 - 26, 32, 32, 0, 0, 0, false, true,
                             true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
-        tileCnt = IO::loadSprite( "UI/message_24", SPR_SMALL_MESSAGE_OAM_SUB, SPR_BOX_PAL_SUB,
-                                  tileCnt, 128 - 24 - 16 - 64, 68 - 18 - 26, 32, 32, false, false,
-                                  true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::MESSAGE_24_START, SPR_SMALL_MESSAGE_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 128 - 24 - 16 - 64, 68 - 18 - 26, 32,
+                                  32, false, false, true, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         // large (battle log)
 
@@ -425,7 +427,7 @@ namespace BATTLE {
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         }
-        tileCnt = IO::loadSprite( "UI/message_large", SPR_LARGE_MESSAGE_OAM_SUB + 3,
+        tileCnt = IO::loadUIIcon( IO::ICON::MESSAGE_LARGE_START, SPR_LARGE_MESSAGE_OAM_SUB + 3,
                                   SPR_BOX_PAL_SUB, tileCnt, 8, 20, 64, 64, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
@@ -440,10 +442,10 @@ namespace BATTLE {
             u8 pos = 2 * i - 2;
             if( i == 1 ) {
                 tileCnt
-                    = IO::loadSprite( "BT/movebox4", SPR_MOVE_OAM_SUB( pos ),
+                    = IO::loadUIIcon( IO::ICON::MOVEBOX4_START, SPR_MOVE_OAM_SUB( pos ),
                                       SPR_TYPE_PAL_SUB( pos ), tileCnt, 31, 44 + i * 42 + sy, 16,
                                       32, false, false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
-                tileCnt = IO::loadSprite( "BT/movebox2", SPR_MOVE_OAM_SUB( pos ) + 1,
+                tileCnt = IO::loadUIIcon( IO::ICON::MOVEBOX2_START, SPR_MOVE_OAM_SUB( pos ) + 1,
                                           SPR_TYPE_PAL_SUB( pos ), tileCnt, 31 + 16,
                                           44 + i * 42 + sy, 16, 32, false, false, true,
                                           OBJPRIORITY_3, true, OBJMODE_NORMAL );
@@ -746,19 +748,20 @@ namespace BATTLE {
         SpriteEntry* oam = IO::OamTop->oamBuffer;
 
         if( p_shinyType == 2 ) { // Forced shinies
-            IO::loadSprite( "BT/shiny_big_alt2", SPR_SHINY_PARTICLE_START_OAM + 15,
+            IO::loadUIIcon( IO::ICON::SHINY_BIG_ALT2_START, SPR_SHINY_PARTICLE_START_OAM + 15,
                             SPR_SHINY_ICON_PAL, oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex,
                             0, 0, 16, 16, false, false, true, OBJPRIORITY_0, false,
                             OBJMODE_BLENDED );
         } else if( p_shinyType == 1 ) { // Circle for shinies due to extra rolls
-            IO::loadSprite( "BT/shiny_big_alt", SPR_SHINY_PARTICLE_START_OAM + 15,
+            IO::loadUIIcon( IO::ICON::SHINY_BIG_ALT_START, SPR_SHINY_PARTICLE_START_OAM + 15,
                             SPR_SHINY_ICON_PAL, oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex,
                             0, 0, 16, 16, false, false, true, OBJPRIORITY_0, false,
                             OBJMODE_BLENDED );
         } else { // normal star
-            IO::loadSprite( "BT/shiny_big", SPR_SHINY_PARTICLE_START_OAM + 15, SPR_SHINY_ICON_PAL,
-                            oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex, 0, 0, 16, 16, false,
-                            false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::SHINY_BIG_START, SPR_SHINY_PARTICLE_START_OAM + 15,
+                            SPR_SHINY_ICON_PAL, oam[ SPR_SHINY_PARTICLE_START_OAM + 15 ].gfxIndex,
+                            0, 0, 16, 16, false, false, true, OBJPRIORITY_0, false,
+                            OBJMODE_BLENDED );
         }
 
         u16 centerx = oam[ SPR_PKMN_START_OAM( 2 * ( !p_opponent ) + p_slot ) ].x + 48;
@@ -867,16 +870,16 @@ namespace BATTLE {
 
         if( p_down ) {
             SOUND::playSoundEffect( SFX_BATTLE_DECREASE );
-            IO::loadSprite( "BT/stat_down", SPR_STAT_CHANGE_PARTICLE_START_OAM, SPR_STAT_CHANGE_PAL,
-                            oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM ].gfxIndex, 0, 0, 8, 8, false,
-                            false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::STAT_DOWN_START, SPR_STAT_CHANGE_PARTICLE_START_OAM,
+                            SPR_STAT_CHANGE_PAL, oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM ].gfxIndex,
+                            0, 0, 8, 8, false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
             diff  = 1;
             shift = -20;
         } else {
             SOUND::playSoundEffect( SFX_BATTLE_INCREASE );
-            IO::loadSprite( "BT/stat_up", SPR_STAT_CHANGE_PARTICLE_START_OAM, SPR_STAT_CHANGE_PAL,
-                            oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM ].gfxIndex, 0, 0, 8, 8, false,
-                            false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::STAT_UP_START, SPR_STAT_CHANGE_PARTICLE_START_OAM,
+                            SPR_STAT_CHANGE_PAL, oam[ SPR_STAT_CHANGE_PARTICLE_START_OAM ].gfxIndex,
+                            0, 0, 8, 8, false, false, true, OBJPRIORITY_0, false, OBJMODE_BLENDED );
             diff  = -1;
             shift = 20;
         }
@@ -2045,13 +2048,15 @@ namespace BATTLE {
             }
 
             if( !_isWildBattle && !p_slot ) {
-                IO::loadSprite( "BT/in", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32,
-                                32, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                IO::loadUIIcon( IO::ICON::BATTLE_INACTIVE_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                                128, 68 + 64 + 18, 32, 32, true, true, false, OBJPRIORITY_3, true,
+                                OBJMODE_BLENDED );
             } else {
-                IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32,
-                                32, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+                IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                                128, 68 + 64 + 18, 32, 32, true, true, false, OBJPRIORITY_3, true,
+                                OBJMODE_BLENDED );
             }
 
             pkmnSpriteInfo pinfo = p_pokemon->getSpriteInfo( );
@@ -2091,14 +2096,14 @@ namespace BATTLE {
                                            true, IO::font::CENTER );
         }
         if( p_highlightedButton == 0 ) {
-            IO::loadSprite( "BT/ft2", SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
-                            oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_FITE_2_START, SPR_BATTLE_FITE_OAM_SUB + 1,
+                            SPR_BATTLE_FITE_PAL_SUB, oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
-            IO::loadSprite( "BT/ft", SPR_BATTLE_FITE_OAM_SUB + 1, SPR_BATTLE_FITE_PAL_SUB,
-                            oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_FITE_START, SPR_BATTLE_FITE_OAM_SUB + 1,
+                            SPR_BATTLE_FITE_PAL_SUB, oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_FITE_OAM_SUB + 1 ].y, 64, 64, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
@@ -2111,14 +2116,14 @@ namespace BATTLE {
                                   0 ) );
 
         if( p_highlightedButton == 1 ) {
-            IO::loadSprite( "BT/pk2", SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
-                            oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_PKMN_2_START, SPR_BATTLE_PKMN_OAM_SUB + 1,
+                            SPR_BATTLE_PKMN_PAL_SUB, oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
-            IO::loadSprite( "BT/pk", SPR_BATTLE_PKMN_OAM_SUB + 1, SPR_BATTLE_PKMN_PAL_SUB,
-                            oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_PKMN_START, SPR_BATTLE_PKMN_OAM_SUB + 1,
+                            SPR_BATTLE_PKMN_PAL_SUB, oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_PKMN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
@@ -2131,28 +2136,28 @@ namespace BATTLE {
 
         if( p_highlightedButton == 2 ) {
             if( !p_slot && !_isWildBattle ) {
-                IO::loadSprite( "BT/in2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_INACTIVE_2_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
-                IO::loadSprite( "BT/rn2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_RUN_2_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         } else {
             if( !p_slot && !_isWildBattle ) {
-                IO::loadSprite( "BT/in", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_INACTIVE_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
-                IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                                oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                                SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
@@ -2169,28 +2174,28 @@ namespace BATTLE {
 
         if( p_highlightedButton == 3 ) {
             if( _allowItems ) {
-                IO::loadSprite( "BT/bg2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_BAG_2_START, SPR_BATTLE_BAG_OAM_SUB + 1,
+                                SPR_BATTLE_BAG_PAL_SUB, oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
-                IO::loadSprite( "BT/in2", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_INACTIVE_2_START, SPR_BATTLE_BAG_OAM_SUB + 1,
+                                SPR_BATTLE_BAG_PAL_SUB, oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         } else {
             if( _allowItems ) {
-                IO::loadSprite( "BT/bg", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_BAG_START, SPR_BATTLE_BAG_OAM_SUB + 1,
+                                SPR_BATTLE_BAG_PAL_SUB, oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
             } else {
-                IO::loadSprite( "BT/in", SPR_BATTLE_BAG_OAM_SUB + 1, SPR_BATTLE_BAG_PAL_SUB,
-                                oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
+                IO::loadUIIcon( IO::ICON::BATTLE_INACTIVE_START, SPR_BATTLE_BAG_OAM_SUB + 1,
+                                SPR_BATTLE_BAG_PAL_SUB, oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].gfxIndex,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].x,
                                 oam[ SPR_BATTLE_BAG_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                                 OBJPRIORITY_3, true, OBJMODE_BLENDED );
@@ -2460,9 +2465,10 @@ namespace BATTLE {
 
             oam[ SPR_BATTLE_ICON_OAM_SUB ].isHidden = true;
 
-            IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                            SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128,
+                            68 + 64 + 18, 32, 32, true, true, false, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
 
             // Moves
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -2575,14 +2581,14 @@ namespace BATTLE {
         }
 
         if( p_highlightedButton == 4 ) {
-            IO::loadSprite( "BT/rn2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_RUN_2_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                            SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
-            IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                            SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
@@ -2636,9 +2642,10 @@ namespace BATTLE {
 
             oam[ SPR_BATTLE_ICON_OAM_SUB ].isHidden = true;
 
-            IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128, 68 + 64 + 18, 32, 32,
-                            true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                            SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex, 128,
+                            68 + 64 + 18, 32, 32, true, true, false, OBJPRIORITY_3, true,
+                            OBJMODE_BLENDED );
 
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
@@ -2727,14 +2734,14 @@ namespace BATTLE {
         }
 
         if( p_highlightedButton == 4 ) {
-            IO::loadSprite( "BT/rn2", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_RUN_2_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                            SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         } else {
-            IO::loadSprite( "BT/rn", SPR_BATTLE_RUN_OAM_SUB + 1, SPR_BATTLE_RUN_PAL_SUB,
-                            oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
+            IO::loadUIIcon( IO::ICON::BATTLE_RUN_START, SPR_BATTLE_RUN_OAM_SUB + 1,
+                            SPR_BATTLE_RUN_PAL_SUB, oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].gfxIndex,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].x,
                             oam[ SPR_BATTLE_RUN_OAM_SUB + 1 ].y, 32, 32, true, true, false,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );

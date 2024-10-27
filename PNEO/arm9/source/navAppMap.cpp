@@ -39,9 +39,9 @@ namespace IO {
 
     void mapNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        IO::loadSprite( "NV/app01", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
-                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, false, false, false,
-                        OBJPRIORITY_1, p_bottom );
+        IO::loadUIIcon( IO::ICON::APP01_START, p_oamSlot, oam[ p_oamSlot ].palette,
+                        oam[ p_oamSlot ].gfxIndex, oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64,
+                        false, false, false, OBJPRIORITY_1, p_bottom );
     }
 
     void mapNavApp::load( bool p_bottom ) {
@@ -69,15 +69,15 @@ namespace IO {
         u16 tileCnt = 0;
 
         if( !SAVE::SAV.getActiveFile( ).m_appearance ) {
-            tileCnt
-                = IO::loadSprite( "NV/player0", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
-                                  tileCnt, _playerX - 8, _playerY + _mapTopY - 8, 16, 16, false,
-                                  false, false, OBJPRIORITY_3, p_bottom );
+            tileCnt = IO::loadUIIcon( IO::ICON::PLAYER0_START, SPR_NAV_APP_RSV_SUB + 1,
+                                      SPR_NAV_APP_RSV1_PAL_SUB, tileCnt, _playerX - 8,
+                                      _playerY + _mapTopY - 8, 16, 16, false, false, false,
+                                      OBJPRIORITY_3, p_bottom );
         } else {
-            tileCnt
-                = IO::loadSprite( "NV/player1", SPR_NAV_APP_RSV_SUB + 1, SPR_NAV_APP_RSV1_PAL_SUB,
-                                  tileCnt, _playerX - 8, _playerY + _mapTopY - 8, 16, 16, false,
-                                  false, false, OBJPRIORITY_3, p_bottom );
+            tileCnt = IO::loadUIIcon( IO::ICON::PLAYER1_START, SPR_NAV_APP_RSV_SUB + 1,
+                                      SPR_NAV_APP_RSV1_PAL_SUB, tileCnt, _playerX - 8,
+                                      _playerY + _mapTopY - 8, 16, 16, false, false, false,
+                                      OBJPRIORITY_3, p_bottom );
         }
 
         // load cursor icon

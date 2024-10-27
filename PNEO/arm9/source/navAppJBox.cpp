@@ -40,9 +40,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace IO {
     void jboxNavApp::drawIcon( u8 p_oamSlot, bool p_bottom ) {
         SpriteEntry* oam = ( p_bottom ? IO::Oam : IO::OamTop )->oamBuffer;
-        IO::loadSprite( "NV/app02", p_oamSlot, oam[ p_oamSlot ].palette, oam[ p_oamSlot ].gfxIndex,
-                        oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64, false, false, false,
-                        OBJPRIORITY_1, p_bottom );
+        IO::loadUIIcon( IO::ICON::APP02_START, p_oamSlot, oam[ p_oamSlot ].palette,
+                        oam[ p_oamSlot ].gfxIndex, oam[ p_oamSlot ].x, oam[ p_oamSlot ].y, 64, 64,
+                        false, false, false, OBJPRIORITY_1, p_bottom );
     }
 
     void setSongChoiceVis( u8 p_idx, bool p_vis, bool p_bottom = true ) {

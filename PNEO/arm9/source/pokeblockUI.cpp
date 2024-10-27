@@ -151,10 +151,10 @@ namespace BAG {
                                           SPR_PKMN_BLOCK_OAM_TOP, SPR_PKMN_BLOCK_PAL_TOP, tileCntT,
                                           false );
 
-        IO::loadSprite( "UI/device", SPR_PKMN_FEEDER_OAM_TOP, SPR_PKMN_FEEDER_PAL_TOP, tileCntT,
-                        BLOCK_ANIM_START_X + 16, BLOCK_ANIM_START_Y + 16, 64, 64, false, false,
-                        false, OBJPRIORITY_3, false );
-        tileCntT = IO::loadSprite( "UI/device", 1 + SPR_PKMN_FEEDER_OAM_TOP,
+        IO::loadUIIcon( IO::ICON::DEVICE_START, SPR_PKMN_FEEDER_OAM_TOP, SPR_PKMN_FEEDER_PAL_TOP,
+                        tileCntT, BLOCK_ANIM_START_X + 16, BLOCK_ANIM_START_Y + 16, 64, 64, false,
+                        false, false, OBJPRIORITY_3, false );
+        tileCntT = IO::loadUIIcon( IO::ICON::DEVICE_START, 1 + SPR_PKMN_FEEDER_OAM_TOP,
                                    SPR_PKMN_FEEDER_PAL_TOP, tileCntT, 128 - 32 - 32, 40 - 32, 64,
                                    64, false, false, false, OBJPRIORITY_3, false );
         for( u8 i = 0; i < 6; ++i ) {

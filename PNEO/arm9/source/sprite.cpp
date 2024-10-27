@@ -44,9 +44,8 @@ namespace IO {
     const char* DOOR_PATH              = "nitro:/PICS/SPRITES/DOOR/";
     const char* OWP_PATH               = "nitro:/PICS/SPRITES/NPCP/";
     const char* BERRY_PATH             = "nitro:/PICS/SPRITES/BERRIES/";
-    const char* ICON_PATH              = "nitro:/PICS/SPRITES/ICONS/";
-    const char* TYPE_ICON_PATH         = "nitro:/PICS/SPRITES/ICONS/TP/type";
-    const char* CONTEST_TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ICONS/TP/ctype";
+    const char* TYPE_ICON_PATH         = "nitro:/PICS/SPRITES/type";
+    const char* CONTEST_TYPE_ICON_PATH = "nitro:/PICS/SPRITES/ctype";
 
     const char* UI_PATH      = "nitro:/PICS/SPRITES/sprites.raw.ar";
     FILE*       UI_ICON_FILE = nullptr;
@@ -270,31 +269,6 @@ namespace IO {
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, gfx, p_width * p_height * 2 );
         }
         return res;
-    }
-
-    u16 loadSprite( const char* p_name, const u8 p_oamIdx, const u8 p_palIdx, const u16 p_tileCnt,
-                    s16 p_posX, s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX,
-                    bool p_flipY, bool p_hidden, ObjPriority p_priority, bool p_bottom,
-                    ObjBlendMode p_blendMode ) {
-        if( FS::readData( ICON_PATH, p_name, (unsigned int) p_width * p_height / 8, TEMP,
-                          (unsigned short) 16, TEMP_PAL ) ) {
-            return loadSprite( p_oamIdx, p_palIdx, p_tileCnt, p_posX, p_posY, p_width, p_height,
-                               TEMP_PAL, TEMP, p_width * p_height / 2, p_flipX, p_flipY, p_hidden,
-                               p_priority, p_bottom, p_blendMode );
-        }
-        return p_tileCnt + ( p_width * p_height / 2 ) / BYTES_PER_16_COLOR_TILE;
-    }
-
-    u16 loadSpriteB( const char* p_name, const u8 p_oamIdx, const u16 p_tileCnt, s16 p_posX,
-                     s16 p_posY, const u8 p_width, const u8 p_height, bool p_flipX, bool p_flipY,
-                     bool p_hidden, ObjPriority p_priority, bool p_bottom ) {
-        if( FS::readData( ICON_PATH, p_name, (unsigned int) p_width * p_height / 8, TEMP,
-                          (unsigned short) 16, TEMP_PAL ) ) {
-            return loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, p_width, p_height, TEMP_PAL,
-                                TEMP, p_width * p_height / 2, p_flipX, p_flipY, p_hidden,
-                                p_priority, p_bottom );
-        }
-        return p_tileCnt + ( p_width * p_height / 2 ) / BYTES_PER_16_COLOR_TILE;
     }
 
     u16 BITMAP_SPRITE[ 64 * 64 * 2 ] = { 0 };
