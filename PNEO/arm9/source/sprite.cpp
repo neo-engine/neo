@@ -1062,34 +1062,59 @@ namespace IO {
                             16 * 32 / 2, false, false, false, OBJPRIORITY_0, p_bottom );
     }
 
+    constexpr u32 LOCATION_ICON_START[] = {
+        IO::ICON::LOC0_START,  IO::ICON::LOC1_START, IO::ICON::LOC2_START,  IO::ICON::LOC3_START,
+        IO::ICON::LOC4_START,  IO::ICON::LOC5_START, IO::ICON::LOC6_START,  IO::ICON::LOC7_START,
+        IO::ICON::LOC8_START,  IO::ICON::LOC9_START, IO::ICON::LOC10_START, IO::ICON::LOC11_START,
+        IO::ICON::LOC12_START,
+    };
+
     u16 loadLocationBackB( u8 p_idx, s16 p_posX, s16 p_posY, u8 p_oamIdx, u16 p_tileCnt,
                            bool p_bottom ) {
-        if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/LOC/",
-                                                        ( std::to_string( p_idx ) ).c_str( ), 16,
-                                                        TEMP_PAL, 128 * 32 / 8, TEMP ) ) {
-            loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 64, 32, TEMP_PAL, TEMP, 64 * 32 / 2,
-                         false, false, false, OBJPRIORITY_0, p_bottom );
-            return loadSpriteB( ++p_oamIdx, p_tileCnt + 64, p_posX + 64, p_posY, 64, 32, TEMP_PAL,
-                                TEMP + 64 * 32 / 8, 64 * 32 / 2, false, false, false, OBJPRIORITY_0,
-                                p_bottom );
-        } else {
-            return loadLocationBackB( 0, p_posX, p_posY, p_oamIdx, p_tileCnt, p_bottom );
+        auto dpos = LOCATION_ICON_START[ p_idx ];
+
+        if( !FS::checkOrOpen( UI_ICON_FILE, UI_PATH ) || fseek( UI_ICON_FILE, dpos, SEEK_SET )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), UI_ICON_FILE )
+            || !fread( TEMP, u16( 128 ) * u16( 32 ) / 8, sizeof( u32 ), UI_ICON_FILE ) ) {
+            return p_tileCnt + ( u16( 128 ) * u16( 32 ) / 2 ) / BYTES_PER_16_COLOR_TILE;
         }
+
+        loadSpriteB( p_oamIdx, p_tileCnt, p_posX, p_posY, 64, 32, TEMP_PAL, TEMP, 64 * 32 / 2,
+                     false, false, false, OBJPRIORITY_0, p_bottom );
+        return loadSpriteB( ++p_oamIdx, p_tileCnt + 64, p_posX + 64, p_posY, 64, 32, TEMP_PAL,
+                            TEMP + 64 * 32 / 8, 64 * 32 / 2, false, false, false, OBJPRIORITY_0,
+                            p_bottom );
     }
-    u16 loadPlatform( u8 p_platform, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
-                      u16 p_tileCnt, bool p_bottom ) {
-        snprintf( BUFFER, 99, "plat%hhu", p_platform );
-        if( FS::readData<unsigned short, unsigned int>( "nitro:/PICS/SPRITES/PLAT/", BUFFER, 16,
-                                                        TEMP_PAL, 128 * 64 / 8, TEMP ) ) {
-            loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL, TEMP,
-                        128 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
-                        p_platform > 40 ? OBJMODE_BLENDED : OBJMODE_NORMAL );
-            return loadSprite( ++p_oamIdx, p_palCnt, p_tileCnt + 64, p_posX + 64, p_posY, 64, 64, 0,
-                               0, 64 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
-                               p_platform > 40 ? OBJMODE_BLENDED : OBJMODE_NORMAL );
-        } else {
-            return loadPlatform( 10, p_posX, p_posY, p_oamIdx, p_palCnt, p_tileCnt, p_bottom );
+
+    constexpr u32 PLATFORM_ICON_START[]
+        = { IO::ICON::PLAT0_START,  IO::ICON::PLAT1_START,  IO::ICON::PLAT2_START,
+            IO::ICON::PLAT10_START, IO::ICON::PLAT4_START,  IO::ICON::PLAT5_START,
+            IO::ICON::PLAT6_START,  IO::ICON::PLAT7_START,  IO::ICON::PLAT8_START,
+            IO::ICON::PLAT9_START,  IO::ICON::PLAT10_START, IO::ICON::PLAT11_START,
+            IO::ICON::PLAT12_START, IO::ICON::PLAT13_START, IO::ICON::PLAT14_START,
+            IO::ICON::PLAT15_START, IO::ICON::PLAT40_START, IO::ICON::PLAT41_START,
+            IO::ICON::PLAT42_START, IO::ICON::PLAT43_START, IO::ICON::PLAT44_START,
+            IO::ICON::PLAT45_START };
+
+    u16 loadPlatform( u8 p_idx, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt, u16 p_tileCnt,
+                      bool p_bottom ) {
+        auto dpos
+            = ( p_idx <= 15 ? PLATFORM_ICON_START[ p_idx ]
+                            : ( p_idx >= 40 && p_idx <= 45 ? PLATFORM_ICON_START[ p_idx - 40 + 16 ]
+                                                           : PLATFORM_ICON_START[ 10 ] ) );
+
+        if( !FS::checkOrOpen( UI_ICON_FILE, UI_PATH ) || fseek( UI_ICON_FILE, dpos, SEEK_SET )
+            || !fread( TEMP_PAL, 16, sizeof( u16 ), UI_ICON_FILE )
+            || !fread( TEMP, u16( 128 ) * u16( 64 ) / 8, sizeof( u32 ), UI_ICON_FILE ) ) {
+            return p_tileCnt + ( u16( 128 ) * u16( 64 ) / 2 ) / BYTES_PER_16_COLOR_TILE;
         }
+
+        loadSprite( p_oamIdx, p_palCnt, p_tileCnt, p_posX, p_posY, 64, 64, TEMP_PAL, TEMP,
+                    128 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
+                    p_idx >= 40 ? OBJMODE_BLENDED : OBJMODE_NORMAL );
+        return loadSprite( ++p_oamIdx, p_palCnt, p_tileCnt + 64, p_posX + 64, p_posY, 64, 64, 0, 0,
+                           64 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
+                           p_idx >= 40 ? OBJMODE_BLENDED : OBJMODE_NORMAL );
     }
 
     u16 loadRibbonIcon( u8 p_ribbonIdx, s16 p_posX, s16 p_posY, u8 p_oamIdx, u8 p_palCnt,
