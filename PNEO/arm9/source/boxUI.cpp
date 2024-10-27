@@ -128,8 +128,8 @@ namespace BOX {
         tileCnt = IO::loadSpriteB( "SEL/noselection_128_32_2", SPR_NAME_BG_OAM_SUB + 1, tileCnt,
                                    100, 0, 64, 32, false, false, false, OBJPRIORITY_3, true );
 
-        tileCnt = IO::loadSpriteB( "UI/arrow", SPR_PREV_ARR_OAM_SUB, tileCnt, 26, 6, 16, 16, false,
-                                   false, false, OBJPRIORITY_1, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::ARROW_START, SPR_PREV_ARR_OAM_SUB, tileCnt, 26, 6, 16,
+                                   16, false, false, false, OBJPRIORITY_1, true );
         IO::loadSpriteB( SPR_NEXT_ARR_OAM_SUB, oam[ SPR_PREV_ARR_OAM_SUB ].gfxIndex, 146, 6, 16, 16,
                          0, 0, 0, false, true, false, OBJPRIORITY_1, true );
 
@@ -144,8 +144,8 @@ namespace BOX {
 
         // box arrow
 
-        tileCnt = IO::loadSpriteB( "BX/box_arrow", SPR_SEL_ARROW_OAM_SUB, tileCnt, 0, 0, 16, 16,
-                                   false, false, true, OBJPRIORITY_0, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::BOX_ARROW_START, SPR_SEL_ARROW_OAM_SUB, tileCnt, 0, 0,
+                                   16, 16, false, false, true, OBJPRIORITY_0, true );
 
         // Party bg
         IO::loadSpriteB( SPR_PARTY_BG_OAM_SUB + 1, tileCnt, 80, 192 - 32, 32, 32, 0, 0, 0, true,
@@ -558,9 +558,9 @@ namespace BOX {
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 3, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 80,
                         INFO_Y + 64 + 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/pg1", SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL, tileCnt,
-                                  INFO_X + 64, INFO_Y + 64 + 15, 64, 64, true, true, false,
-                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::INFOPAGE1_START, SPR_INFOPAGE_START_OAM + 7,
+                                  SPR_INFOPAGE_PAL, tileCnt, INFO_X + 64, INFO_Y + 64 + 15, 64, 64,
+                                  true, true, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_MOVEWINDOW_START_OAM + 2, SPR_INFOPAGE_PAL, tileCnt, ANCHOR_X + 40,
                         ANCHOR_Y + 119, 64, 64, 0, 0, 64 * 64 / 2, false, false,
                         p_pokemon->isEgg( ), OBJPRIORITY_3, false, OBJMODE_BLENDED );
@@ -577,9 +577,9 @@ namespace BOX {
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 9, SPR_INFOPAGE_PAL, tileCnt, INFO_X,
                         INFO_Y + 64 - 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/pg2", SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL, tileCnt,
-                                  INFO_X, INFO_Y + 64 + 15, 64, 64, true, true, false,
-                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::INFOPAGE2_START, SPR_INFOPAGE_START_OAM + 6,
+                                  SPR_INFOPAGE_PAL, tileCnt, INFO_X, INFO_Y + 64 + 15, 64, 64, true,
+                                  true, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         oam[ SPR_BALL_ICON_OAM ].isHidden = true;
 
@@ -597,10 +597,10 @@ namespace BOX {
             }
 
             // Shiny
-            tileCnt
-                = IO::loadSprite( "STS/status_shiny", SPR_SHINY_ICON_OAM, SPR_SHINY_ICON_PAL,
-                                  tileCnt, ANCHOR_X + 68 - 8, ANCHOR_Y + 20, 8, 8, false, false,
-                                  !p_pokemon->isShiny( ), OBJPRIORITY_0, false, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_SHINY_START, SPR_SHINY_ICON_OAM,
+                                      SPR_SHINY_ICON_PAL, tileCnt, ANCHOR_X + 68 - 8, ANCHOR_Y + 20,
+                                      8, 8, false, false, !p_pokemon->isShiny( ), OBJPRIORITY_0,
+                                      false, OBJMODE_NORMAL );
 
             // Pokéball Icon
             tileCnt = IO::loadItemIcon( BAG::ballToItem( p_pokemon->m_boxdata.m_ball ),

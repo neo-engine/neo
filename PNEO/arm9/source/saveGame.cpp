@@ -113,8 +113,8 @@ namespace SAVE {
                         p_bottom );
         IO::loadSprite( 5, 1, tileCnt, 148, 37, 16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2,
                         p_bottom );
-        tileCnt = IO::loadSprite( "UI/star", 6, 1, tileCnt, 160, 37, 16, 16, false, false, true,
-                                  OBJPRIORITY_2, p_bottom );
+        tileCnt = IO::loadUIIcon( IO::ICON::STAR_START, 6, 1, tileCnt, 160, 37, 16, 16, false,
+                                  false, true, OBJPRIORITY_2, p_bottom );
 
         for( u8 i = 0; i < achvs; ++i ) { oam[ 1 + i ].isHidden = false; }
 

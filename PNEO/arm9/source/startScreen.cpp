@@ -202,9 +202,9 @@ namespace SAVE {
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         // Arrows
-        tileCnt
-            = IO::loadSprite( "UI/arrow", SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4,
-                              76, 16, 16, false, false, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::ARROW_START, SPR_ARROW_LEFT_OAM_SUB,
+                                  SPR_ARROW_X_PAL_SUB, tileCnt, 4, 76, 16, 16, false, false, true,
+                                  OBJPRIORITY_1, true, OBJMODE_NORMAL );
         IO::loadSprite( SPR_ARROW_RIGHT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
                         oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, 0, 0, 0, false,
                         true, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );

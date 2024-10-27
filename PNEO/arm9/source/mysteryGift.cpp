@@ -171,9 +171,9 @@ namespace SAVE {
         // top screen
 
         u16 START = 128;
-        u16 tcTop = IO::loadSprite( "UI/mbox2", SPR_MBOX_OAM_START_TOP, SPR_MBOX_PAL_TOP, START, 2,
-                                    192 - 46, 32, 64, false, false, !p_showMbox, OBJPRIORITY_3,
-                                    false, OBJMODE_BLENDED );
+        u16 tcTop = IO::loadUIIcon( IO::ICON::MBOX2_START, SPR_MBOX_OAM_START_TOP, SPR_MBOX_PAL_TOP,
+                                    START, 2, 192 - 46, 32, 64, false, false, !p_showMbox,
+                                    OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         for( u8 i = 0; i < SPR_MBOX_OAM_LENGTH; ++i ) {
             IO::loadSprite( SPR_MBOX_OAM_START_TOP + SPR_MBOX_OAM_LENGTH - i, SPR_MBOX_PAL_TOP,
@@ -181,8 +181,8 @@ namespace SAVE {
                             OBJPRIORITY_3, false, OBJMODE_BLENDED );
         }
 
-        IO::loadSprite( "UI/mbox1", SPR_MBOX_OAM_START_TOP2, SPR_MBOX_PAL_TOP2, tcTop, 2, 6, 32, 64,
-                        false, false, true, OBJPRIORITY_3, false );
+        IO::loadUIIcon( IO::ICON::MBOX1_START, SPR_MBOX_OAM_START_TOP2, SPR_MBOX_PAL_TOP2, tcTop, 2,
+                        6, 32, 64, false, false, true, OBJPRIORITY_3, false );
 
         for( u8 i = 0; i < SPR_MBOX_OAM_LENGTH; ++i ) {
             IO::loadSprite( SPR_MBOX_OAM_START_TOP2 + SPR_MBOX_OAM_LENGTH - i, SPR_MBOX_PAL_TOP2,
@@ -212,9 +212,9 @@ namespace SAVE {
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         // Arrows
-        tileCnt
-            = IO::loadSprite( "UI/arrow", SPR_ARROW_LEFT_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt, 4,
-                              76, 16, 16, false, false, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::ARROW_START, SPR_ARROW_LEFT_OAM_SUB,
+                                  SPR_ARROW_X_PAL_SUB, tileCnt, 4, 76, 16, 16, false, false, true,
+                                  OBJPRIORITY_1, true, OBJMODE_NORMAL );
         IO::loadSprite( SPR_ARROW_RIGHT_OAM_SUB, SPR_ARROW_X_PAL_SUB,
                         oam[ SPR_ARROW_LEFT_OAM_SUB ].gfxIndex, 236, 76, 16, 16, 0, 0, 0, false,
                         true, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );

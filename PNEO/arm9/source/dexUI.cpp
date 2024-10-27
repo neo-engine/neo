@@ -6,7 +6,7 @@ file        : dexUI.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2024
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -135,20 +135,21 @@ namespace DEX {
                                    16, false, false, false, OBJPRIORITY_2, true );
 
         // no entry
-        tileCnt = IO::loadSpriteB( "DX/dexsp1", SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64, false,
-                                   false, true, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( "DX/dexsp2", SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64, false,
-                                   false, true, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( "DX/dexsp1", SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64, false,
-                                   false, true, OBJPRIORITY_3, true, true, 0b1001'0100'0001'1101 );
+        tileCnt = IO::loadUIIconB( IO::ICON::DEXSP1_START, SPR_DX1_OAM_SUB, tileCnt, 64, 64, 32, 64,
+                                   false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::DEXSP2_START, SPR_DX2_OAM_SUB, tileCnt, 96, 64, 32, 64,
+                                   false, false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::DEXSP3_START, SPR_DX3_OAM_SUB, tileCnt, 96, 64, 32, 64,
+                                   false, false, true, OBJPRIORITY_3, true );
 
         // caught ball
-        tileCnt = IO::loadSpriteB( "DX/caught", SPR_CAUGHT_OAM_SUB, tileCnt, 20, 112, 16, 16, false,
-                                   false, true, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::CAUGHT_START, SPR_CAUGHT_OAM_SUB, tileCnt, 20, 112, 16,
+                                   16, false, false, true, OBJPRIORITY_3, true );
 
         // pkmn name box sub
-        tileCnt = IO::loadSpriteB( "SEL/noselection_64_20", SPR_BOX_START_OAM_SUB, tileCnt, 18, 0,
-                                   32, 32, false, false, false, OBJPRIORITY_3, true );
+        tileCnt
+            = IO::loadUIIconB( IO::ICON::NOSELECTION_64_20_START, SPR_BOX_START_OAM_SUB, tileCnt,
+                               18, 0, 32, 32, false, false, false, OBJPRIORITY_3, true );
         for( u8 i = 0; i < 10; ++i ) {
             oam[ SPR_BOX_START_OAM_SUB + i ] = oam[ SPR_BOX_START_OAM_SUB ];
             oam[ SPR_BOX_START_OAM_SUB + i ].x += 24 * i;
@@ -257,9 +258,9 @@ namespace DEX {
             IO::loadSprite( SPR_WINDOW_NAME_OAM + 4 - i, SPR_BOX_PAL, tileCnt, 0 + 22 * i, 0, 64,
                             32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false );
         }
-        tileCnt
-            = IO::loadSprite( "SEL/noselection_128_32_2", SPR_WINDOW_NAME_OAM, SPR_BOX_PAL, tileCnt,
-                              4 + 22 * 3, 0, 64, 32, false, false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_128_32_2_START, SPR_WINDOW_NAME_OAM,
+                                  SPR_BOX_PAL, tileCnt, 4 + 22 * 3, 0, 64, 32, false, false, false,
+                                  OBJPRIORITY_3, false );
 
         // pkmn sprite
         IO::OamTop->oamBuffer[ SPR_PKMN_START_OAM ].gfxIndex = tileCnt;
@@ -277,8 +278,8 @@ namespace DEX {
             IO::loadSprite( SPR_TEXTBOX_OAM + i, SPR_TEXTBOX_PAL, tileCnt, 12 + 60 * i, 192 - 64,
                             64, 64, 0, 0, 0, false, false, false, OBJPRIORITY_3, false );
         }
-        tileCnt = IO::loadSprite( "UI/pg3", SPR_TEXTBOX_OAM, SPR_TEXTBOX_PAL, tileCnt, 12, 192 - 64,
-                                  64, 64, false, false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::INFOPAGE3_START, SPR_TEXTBOX_OAM, SPR_TEXTBOX_PAL, tileCnt,
+                                  12, 192 - 64, 64, 64, false, false, false, OBJPRIORITY_3, false );
 
         // pkmn name box
         for( u8 i = 1; i < 9; ++i ) {
@@ -286,9 +287,9 @@ namespace DEX {
                             SPR_NAMEBOX_Y, 32, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3,
                             false );
         }
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_NAMEBOX_OAM, SPR_NAMEBOX_PAL,
-                                  tileCnt, 12, SPR_NAMEBOX_Y, 32, 32, false, false, false,
-                                  OBJPRIORITY_3, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_NAMEBOX_OAM,
+                                  SPR_NAMEBOX_PAL, tileCnt, 12, SPR_NAMEBOX_Y, 32, 32, false, false,
+                                  false, OBJPRIORITY_3, false );
 
         // pkmn base stat stars
         for( u8 i = 0; i < 30; ++i ) {
@@ -297,7 +298,7 @@ namespace DEX {
             IO::loadSprite( SPR_STAR_START_OAM + i, SPR_STAR_PAL, tileCnt, x, 42 + 26 * ( i / 10 ),
                             16, 16, 0, 0, 0, false, false, true, OBJPRIORITY_2, false );
         }
-        tileCnt = IO::loadSprite( "UI/star", SPR_STAR_START_OAM, SPR_STAR_PAL, tileCnt,
+        tileCnt = IO::loadUIIcon( IO::ICON::STAR_START, SPR_STAR_START_OAM, SPR_STAR_PAL, tileCnt,
                                   IO::OamTop->oamBuffer[ SPR_STAR_START_OAM ].x,
                                   IO::OamTop->oamBuffer[ SPR_STAR_START_OAM ].y, 16, 16, false,
                                   false, true, OBJPRIORITY_2, false );
@@ -310,9 +311,9 @@ namespace DEX {
         tileCnt += 8;
 
         // init caught ball
-        tileCnt
-            = IO::loadSprite( "DX/caught", SPR_CAUGHT_OAM, SPR_CAUGHT_PAL, tileCnt, SPR_CAUGHT_X,
-                              SPR_CAUGHT_Y, 16, 16, false, false, true, OBJPRIORITY_0, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::CAUGHT_START, SPR_CAUGHT_OAM, SPR_CAUGHT_PAL, tileCnt,
+                                  SPR_CAUGHT_X, SPR_CAUGHT_Y, 16, 16, false, false, true,
+                                  OBJPRIORITY_0, false );
 
         IO::updateOAM( true );
         IO::updateOAM( false );
@@ -389,10 +390,10 @@ namespace DEX {
         u16 y       = 80;
         u16 x       = 128 - 72;
 
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", 0, 0, tileCnt, x, y, 16, 32, false,
-                                  false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", 1, 0, tileCnt, x + 16, y, 16, 32,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START, 0, 0, tileCnt, x, y, 16, 32,
                                   false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START, 1, 0, tileCnt, x + 16, y, 16,
+                                  32, false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         for( u8 j = 2; j < 8; j++ ) {
             IO::loadSprite( 8 + 1 - j, 0, IO::OamTop->oamBuffer[ 1 ].gfxIndex, x + j * 16, y, 16,
                             32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false,
@@ -413,8 +414,8 @@ namespace DEX {
                                   OBJMODE_NORMAL );
 
         y       = 48;
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", 1, 1, tileCnt, x, y, 32, 32, false,
-                                  false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, 1, 1, tileCnt, x, y, 32, 32,
+                                  false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
         if( p_showLocalDex ) {
             if( p_showNationalDex ) { y = 16; }
 
@@ -444,14 +445,14 @@ namespace DEX {
 
             // crown sprites for completed dex
             if( SAVE::SAV.getActiveFile( ).getLocalCaughtCount( ) == LOCAL_DEX_SIZE ) {
-                tileCnt = IO::loadSprite( "DX/crown3", 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16,
-                                          false, false, false, OBJPRIORITY_3, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::CROWN3_START, 20, 3, tileCnt, 255 - x + 6,
+                                          y + 3, 16, 16, false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).localDexCompleted( ) ) {
-                tileCnt = IO::loadSprite( "DX/crown2", 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16,
-                                          false, false, false, OBJPRIORITY_3, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::CROWN2_START, 20, 3, tileCnt, 255 - x + 6,
+                                          y + 3, 16, 16, false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).localDexSeenCompleted( ) ) {
-                tileCnt = IO::loadSprite( "DX/crown1", 20, 3, tileCnt, 255 - x + 6, y + 3, 16, 16,
-                                          false, false, false, OBJPRIORITY_3, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::CROWN1_START, 20, 3, tileCnt, 255 - x + 6,
+                                          y + 3, 16, 16, false, false, false, OBJPRIORITY_3, true );
             }
         } else {
             res.push_back(
@@ -485,14 +486,14 @@ namespace DEX {
 
             // crown sprites for completed dex
             if( SAVE::SAV.getActiveFile( ).getCaughtCount( ) == MAX_PKMN ) {
-                tileCnt = IO::loadSprite( "DX/crown3", 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16,
-                                          false, false, false, OBJPRIORITY_3, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::CROWN3_START, 21, 4, tileCnt, 255 - x + 6,
+                                          y + 3, 16, 16, false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).dexCompleted( ) ) {
-                tileCnt = IO::loadSprite( "DX/crown2", 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16,
-                                          false, false, false, OBJPRIORITY_3, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::CROWN2_START, 21, 4, tileCnt, 255 - x + 6,
+                                          y + 3, 16, 16, false, false, false, OBJPRIORITY_3, true );
             } else if( SAVE::SAV.getActiveFile( ).dexSeenCompleted( ) ) {
-                tileCnt = IO::loadSprite( "DX/crown1", 21, 4, tileCnt, 255 - x + 6, y + 3, 16, 16,
-                                          false, false, false, OBJPRIORITY_3, true );
+                tileCnt = IO::loadUIIcon( IO::ICON::CROWN1_START, 21, 4, tileCnt, 255 - x + 6,
+                                          y + 3, 16, 16, false, false, false, OBJPRIORITY_3, true );
             }
 
         } else {

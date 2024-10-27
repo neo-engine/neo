@@ -100,8 +100,8 @@ namespace IO {
         oam[ SPR_NAV_APP_RSV_SUB + 5 ].isHidden = false;
         oam[ SPR_NAV_APP_RSV_SUB + 6 ].isHidden = false;
 
-        tileCnt = IO::loadSprite( "UI/arrow", SPR_NAV_APP_RSV_SUB, SPR_X_PAL_SUB, tileCnt,
-                                  oam[ SPR_NAV_APP_RSV_SUB + 3 ].x + 8,
+        tileCnt = IO::loadUIIcon( IO::ICON::ARROW_START, SPR_NAV_APP_RSV_SUB, SPR_X_PAL_SUB,
+                                  tileCnt, oam[ SPR_NAV_APP_RSV_SUB + 3 ].x + 8,
                                   oam[ SPR_NAV_APP_RSV_SUB + 3 ].y + 8, 16, 16, false, false, false,
                                   OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 

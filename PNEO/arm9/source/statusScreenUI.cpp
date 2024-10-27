@@ -150,18 +150,18 @@ namespace STS {
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 8, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 64,
                         INFO_Y + 64 - 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/pg1", SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL, tileCnt,
-                                  INFO_X + 64, INFO_Y + 64 + 15, 64, 64, true, true, false,
-                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::INFOPAGE1_START, SPR_INFOPAGE_START_OAM + 7,
+                                  SPR_INFOPAGE_PAL, tileCnt, INFO_X + 64, INFO_Y + 64 + 15, 64, 64,
+                                  true, true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 1, SPR_INFOPAGE_PAL, tileCnt, INFO_X + 64, INFO_Y,
                         64, 64, 0, 0, 64 * 64 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_INFOPAGE_START_OAM + 9, SPR_INFOPAGE_PAL, tileCnt, INFO_X,
                         INFO_Y + 64 - 15, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/pg2", SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL, tileCnt,
-                                  INFO_X, INFO_Y + 64 + 15, 64, 64, true, true, false,
-                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::INFOPAGE2_START, SPR_INFOPAGE_START_OAM + 6,
+                                  SPR_INFOPAGE_PAL, tileCnt, INFO_X, INFO_Y + 64 + 15, 64, 64, true,
+                                  true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         // Pkmn Sprite
         if( !p_pokemon->isEgg( ) ) {
@@ -207,9 +207,9 @@ namespace STS {
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_CHOICE_START_OAM + 6, SPR_BOX_PAL, tileCnt, 88, 28, 16, 32, 0, 0,
                         16 * 32 / 2, true, true, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM + 5, SPR_BOX_PAL,
-                                  tileCnt, 74, 28, 16, 32, true, true, false, OBJPRIORITY_3,
-                                  p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START, SPR_CHOICE_START_OAM + 5,
+                                  SPR_BOX_PAL, tileCnt, 74, 28, 16, 32, true, true, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         IO::loadSprite( SPR_CHOICE_START_OAM + 1, SPR_BOX_PAL, tileCnt, 16, 28, 16, 32, 0, 0,
                         16 * 32 / 2, false, false, false, OBJPRIORITY_3, p_bottom,
                         OBJMODE_BLENDED );
@@ -221,56 +221,56 @@ namespace STS {
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_CHOICE_START_OAM + 7, SPR_BOX_PAL, tileCnt, 75, 28, 16, 32, 0, 0,
                         16 * 32 / 2, false, false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", SPR_CHOICE_START_OAM + 4, SPR_BOX_PAL,
-                                  tileCnt, 64, 28, 16, 32, false, false, false, OBJPRIORITY_3,
-                                  p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START, SPR_CHOICE_START_OAM + 4,
+                                  SPR_BOX_PAL, tileCnt, 64, 28, 16, 32, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         // Status
 #define STATUS_X 68
 #define STATUS_Y 48
         if( !p_pokemon->m_stats.m_curHP ) {
-            tileCnt = IO::loadSprite( "STS/status_fnt", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_FNT_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         } else if( p_pokemon->m_status.m_isParalyzed ) {
-            tileCnt = IO::loadSprite( "STS/status_par", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_PAR_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         } else if( p_pokemon->m_status.m_isAsleep ) {
-            tileCnt = IO::loadSprite( "STS/status_slp", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_SLP_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         } else if( p_pokemon->m_status.m_isBadlyPoisoned ) {
-            tileCnt = IO::loadSprite( "STS/status_txc", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_TXC_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         } else if( p_pokemon->m_status.m_isBurned ) {
-            tileCnt = IO::loadSprite( "STS/status_brn", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_BRN_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         } else if( p_pokemon->m_status.m_isFrozen ) {
-            tileCnt = IO::loadSprite( "STS/status_frz", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_FRZ_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         } else if( p_pokemon->m_status.m_isPoisoned ) {
-            tileCnt = IO::loadSprite( "STS/status_psn", SPR_STATUS_ICON_OAM, SPR_STATUS_ICON_PAL,
-                                      tileCnt, STATUS_X, STATUS_Y, 8, 8, false, false, false,
-                                      OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
+            tileCnt = IO::loadUIIcon( IO::ICON::STATUS_PSN_START, SPR_STATUS_ICON_OAM,
+                                      SPR_STATUS_ICON_PAL, tileCnt, STATUS_X, STATUS_Y, 8, 8, false,
+                                      false, false, OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
         }
 
         // Shiny
-        tileCnt = IO::loadSprite( "STS/status_shiny", SPR_SHINY_ICON_OAM, SPR_SHINY_ICON_PAL,
-                                  tileCnt, STATUS_X - 8, STATUS_Y, 8, 8, false, false,
-                                  !p_pokemon->isShiny( ) || p_pokemon->isEgg( ), OBJPRIORITY_0,
-                                  p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::STATUS_SHINY_START, SPR_SHINY_ICON_OAM,
+                                  SPR_SHINY_ICON_PAL, tileCnt, STATUS_X - 8, STATUS_Y, 8, 8, false,
+                                  false, !p_pokemon->isShiny( ) || p_pokemon->isEgg( ),
+                                  OBJPRIORITY_0, p_bottom, OBJMODE_NORMAL );
 
         // Page
-        tileCnt
-            = IO::loadSprite( "SEL/noselection_64_32", SPR_PAGE_OAM, SPR_PAGE_PAL, tileCnt, 148, -4,
-                              64, 32, true, true, false, OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
-        tileCnt = IO::loadSprite( "STS/status_pkmn", SPR_WINDOW_OAM, SPR_ARROW_X_PAL, tileCnt,
-                                  148 + 32 - 9, 6, 16, 16, false, false, false, OBJPRIORITY_1,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_32_START, SPR_PAGE_OAM, SPR_PAGE_PAL,
+                                  tileCnt, 148, -4, 64, 32, true, true, false, OBJPRIORITY_2,
                                   p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::STATUS_PKMN_START, SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
+                                  tileCnt, 148 + 32 - 9, 6, 16, 16, false, false, false,
+                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // Type icon
         for( u8 i = 0; i < 2; ++i ) {
@@ -294,29 +294,29 @@ namespace STS {
         IO::loadSprite( SPR_EXP_BAR_OAM, SPR_EXP_BAR_PAL, tileCnt, INFO_X - 7 + 128 - 48 - 27,
                         INFO_Y + 15 + 15 * 7, 16, 8, 0, 0, 0, false, false, true, OBJPRIORITY_3,
                         p_bottom, OBJMODE_NORMAL );
-        tileCnt = IO::loadSprite( "BX/hpbar", SPR_EXP_BAR_OAM + 2, SPR_EXP_BAR_PAL, tileCnt,
-                                  INFO_X - 7 + 128 - 48, INFO_Y + 15 + 15 * 7, 64, 32, false, false,
-                                  true, OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::HPBAR_START, SPR_EXP_BAR_OAM + 2, SPR_EXP_BAR_PAL,
+                                  tileCnt, INFO_X - 7 + 128 - 48, INFO_Y + 15 + 15 * 7, 64, 32,
+                                  false, false, true, OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
 
         // Window
 
-        tileCnt = IO::loadSprite( "UI/wn1", SPR_WINDOW_START_OAM, SPR_WINDOW_PAL, tileCnt,
-                                  INFO_X - 14, INFO_Y, 64, 32, false, false, false, OBJPRIORITY_3,
-                                  p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::WINDOW1_START, SPR_WINDOW_START_OAM, SPR_WINDOW_PAL,
+                                  tileCnt, INFO_X - 14, INFO_Y, 64, 32, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         IO::loadSprite( SPR_WINDOW_START_OAM + 1, SPR_WINDOW_PAL, tileCnt, INFO_X - 14, INFO_Y + 32,
                         64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3, p_bottom,
                         OBJMODE_BLENDED );
         IO::loadSprite( SPR_WINDOW_START_OAM + 2, SPR_WINDOW_PAL, tileCnt, INFO_X - 14,
                         INFO_Y + 32 + 30, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3,
                         p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/wn2", SPR_WINDOW_START_OAM + 3, SPR_WINDOW_PAL, tileCnt,
-                                  INFO_X - 14, INFO_Y + 64 + 28, 64, 32, false, false, false,
-                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::WINDOW2_START, SPR_WINDOW_START_OAM + 3, SPR_WINDOW_PAL,
+                                  tileCnt, INFO_X - 14, INFO_Y + 64 + 28, 64, 32, false, false,
+                                  false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         IO::loadSprite( SPR_WINDOW_START_OAM + 5, SPR_WINDOW_PAL, tileCnt, INFO_X - 14,
                         INFO_Y + 111 - 30, 64, 32, 0, 0, 0, false, false, false, OBJPRIORITY_3,
                         p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/wn3", SPR_WINDOW_START_OAM + 4, SPR_WINDOW_PAL, tileCnt,
-                                  INFO_X - 14, INFO_Y + 111, 64, 32, false, false, false,
+        tileCnt = IO::loadUIIcon( IO::ICON::WINDOW3_START, SPR_WINDOW_START_OAM + 4, SPR_WINDOW_PAL,
+                                  tileCnt, INFO_X - 14, INFO_Y + 111, 64, 32, false, false, false,
                                   OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         tileCnt = oam[ SPR_TYPE_OAM( 0 ) ].gfxIndex;
@@ -351,42 +351,42 @@ namespace STS {
         u16          tileCnt = 0;
 
         // Arrows
-        tileCnt = IO::loadSprite( "UI/arrow_up", SPR_ARROW_DOWN_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                                  tileCnt, 102 + 19, 192 - 21, 16, 16, true, false, !_allowKeyDown,
-                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::ARROW_UP_START, SPR_ARROW_DOWN_OAM_SUB,
+                                  SPR_ARROW_X_PAL_SUB, tileCnt, 102 + 19, 192 - 21, 16, 16, true,
+                                  false, !_allowKeyDown, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
         IO::loadSprite( SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB,
                         oam[ SPR_ARROW_DOWN_OAM_SUB ].gfxIndex, 102 + 38 + 18, 192 - 16, 16, 16, 0,
                         0, 0, false, false, !_allowKeyUp, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
-        tileCnt = IO::loadSprite( "UI/backarrow", SPR_ARROW_BACK_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                                  tileCnt, 102 + 56 + 32, 192 - 19, 16, 16, false, false, false,
-                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::BACKARROW_START, SPR_ARROW_BACK_OAM_SUB,
+                                  SPR_ARROW_X_PAL_SUB, tileCnt, 102 + 56 + 32, 192 - 19, 16, 16,
+                                  false, false, false, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
         // x
-        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
-                                  236, 172, 16, 16, false, false, false, OBJPRIORITY_1, p_bottom,
-                                  OBJMODE_NORMAL );
-        // page windows
-        tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB,
-                                  tileCnt, 0 - 8, 57 - 12, 32, 64, true, true, true, OBJPRIORITY_2,
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_ARROW_X_PAL_SUB,
+                                  tileCnt, 236, 172, 16, 16, false, false, false, OBJPRIORITY_1,
                                   p_bottom, OBJMODE_NORMAL );
+        // page windows
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_32_64_START, SPR_PAGE_LEFT_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0 - 8, 57 - 12, 32, 64, true, true,
+                                  true, OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
         for( u8 i = 0; i < 3; i++ ) {
             IO::loadSprite( SPR_PAGE_OAM_SUB( i ), SPR_BOX_PAL_SUB,
                             oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * i, 32, 64, 0,
                             0, 0, false, false, true, OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
         }
 
-        tileCnt = IO::loadSprite( "STS/status_pkmn", SPR_WINDOW_PKMN_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                                  tileCnt, 256 - 18, 24, 16, 16, false, false, false, OBJPRIORITY_1,
-                                  p_bottom, OBJMODE_NORMAL );
-        tileCnt = IO::loadSprite( "STS/status_moves", SPR_WINDOW_MOVE_OAM_SUB, SPR_ARROW_X_PAL_SUB,
-                                  tileCnt, 256 - 18, 24 + 30, 16, 16, false, false, false,
-                                  OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
-        tileCnt = IO::loadSprite( "STS/status_contest", SPR_WINDOW_CONTEST_OAM_SUB,
+        tileCnt = IO::loadUIIcon( IO::ICON::STATUS_PKMN_START, SPR_WINDOW_PKMN_OAM_SUB,
+                                  SPR_ARROW_X_PAL_SUB, tileCnt, 256 - 18, 24, 16, 16, false, false,
+                                  false, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::STATUS_MOVES_START, SPR_WINDOW_MOVE_OAM_SUB,
+                                  SPR_ARROW_X_PAL_SUB, tileCnt, 256 - 18, 24 + 30, 16, 16, false,
+                                  false, false, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::STATUS_CONTEST_START, SPR_WINDOW_CONTEST_OAM_SUB,
                                   SPR_ARROW_X_PAL_SUB, tileCnt, 256 - 18, 24 + 57, 16, 16, false,
                                   false, false, OBJPRIORITY_1, p_bottom, OBJMODE_NORMAL );
 
         // navigation
-        tileCnt = IO::loadSprite( "SEL/noselection_64_32", SPR_NAVIGATION_OAM_SUB( 0 ),
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_32_START, SPR_NAVIGATION_OAM_SUB( 0 ),
                                   SPR_BOX_PAL_SUB, tileCnt, 0, 0, 64, 32, true, true, true,
                                   OBJPRIORITY_2, p_bottom, OBJMODE_NORMAL );
         for( u8 i = 0; i < 3; i++ ) {
@@ -426,9 +426,10 @@ namespace STS {
         IO::loadSprite( SPR_INFOPAGE_START_OAM_SUB, SPR_INFOPAGE_PAL_SUB, tileCnt, INFO_X_SUB + 128,
                         INFO_Y_SUB + 64 + 30, 64, 64, 0, 0, 64 * 64 / 2, true, true, false,
                         OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/pg1", SPR_INFOPAGE_START_OAM_SUB + 6, SPR_INFOPAGE_PAL_SUB,
-                                  tileCnt, INFO_X_SUB + 64, INFO_Y_SUB + 64 + 30, 64, 64, true,
-                                  true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::INFOPAGE1_START, SPR_INFOPAGE_START_OAM_SUB + 6,
+                              SPR_INFOPAGE_PAL_SUB, tileCnt, INFO_X_SUB + 64, INFO_Y_SUB + 64 + 30,
+                              64, 64, true, true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         IO::loadSprite( SPR_INFOPAGE_START_OAM_SUB + 8, SPR_INFOPAGE_PAL_SUB, tileCnt,
                         INFO_X_SUB + 64, INFO_Y_SUB, 64, 64, 0, 0, 64 * 64 / 2, false, false, false,
@@ -442,20 +443,21 @@ namespace STS {
         IO::loadSprite( SPR_INFOPAGE_START_OAM_SUB + 2, SPR_INFOPAGE_PAL_SUB, tileCnt,
                         INFO_X_SUB + 128, INFO_Y_SUB, 64, 64, 0, 0, 64 * 64 / 2, false, false,
                         false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/pg2", SPR_INFOPAGE_START_OAM_SUB + 9, SPR_INFOPAGE_PAL_SUB,
-                                  tileCnt, INFO_X_SUB, INFO_Y_SUB + 64 + 30, 64, 64, true, true,
-                                  false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::INFOPAGE2_START, SPR_INFOPAGE_START_OAM_SUB + 9,
+                              SPR_INFOPAGE_PAL_SUB, tileCnt, INFO_X_SUB, INFO_Y_SUB + 64 + 30, 64,
+                              64, true, true, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         // Moves
         // move windows
         for( u8 i = 1; i < 3; i++ ) {
             u8 pos = 2 * i - 2;
             if( i == 1 ) {
-                tileCnt = IO::loadSprite( "BT/movebox1", SPR_MOVE_OAM_SUB( pos ),
+                tileCnt = IO::loadUIIcon( IO::ICON::MOVEBOX1_START, SPR_MOVE_OAM_SUB( pos ),
                                           SPR_TYPE_PAL_SUB( pos ), tileCnt, 29, 44 + i * 44, 16, 32,
                                           false, false, !p_pokemon->getMove( pos ), OBJPRIORITY_3,
                                           p_bottom, OBJMODE_NORMAL );
-                tileCnt = IO::loadSprite( "BT/movebox2", SPR_MOVE_OAM_SUB( pos ) + 1,
+                tileCnt = IO::loadUIIcon( IO::ICON::MOVEBOX2_START, SPR_MOVE_OAM_SUB( pos ) + 1,
                                           SPR_TYPE_PAL_SUB( pos ), tileCnt, 29 + 16, 44 + i * 44,
                                           16, 32, false, false, !p_pokemon->getMove( pos ),
                                           OBJPRIORITY_3, p_bottom, OBJMODE_NORMAL );
@@ -521,28 +523,29 @@ namespace STS {
 
         // ability window
 
-        tileCnt = IO::loadSprite( "UI/ab3", SPR_ABILITY_OAM_SUB, SPR_ABILITY_PAL_SUB, tileCnt,
-                                  INFO_X_SUB + 88, INFO_Y_SUB, 32, 64, false, false, false,
-                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::ABILITY3_START, SPR_ABILITY_OAM_SUB,
+                                  SPR_ABILITY_PAL_SUB, tileCnt, INFO_X_SUB + 88, INFO_Y_SUB, 32, 64,
+                                  false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         IO::loadSprite( SPR_ABILITY_OAM_SUB + 1, SPR_ABILITY_PAL_SUB, tileCnt, INFO_X_SUB - 12,
                         INFO_Y_SUB, 64, 64, 0, 0, 0, false, false, false, OBJPRIORITY_3, p_bottom,
                         OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/ab1", SPR_ABILITY_OAM_SUB + 2, SPR_ABILITY_PAL_SUB, tileCnt,
-                                  INFO_X_SUB + 36, INFO_Y_SUB, 64, 64, false, false, false,
-                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::ABILITY1_START, SPR_ABILITY_OAM_SUB + 2,
+                                  SPR_ABILITY_PAL_SUB, tileCnt, INFO_X_SUB + 36, INFO_Y_SUB, 64, 64,
+                                  false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         IO::loadSprite( SPR_ABILITY_OAM_SUB + 4, SPR_ABILITY_PAL_SUB, tileCnt, INFO_X_SUB + 64 + 36,
                         INFO_Y_SUB, 64, 64, 0, 0, 0, false, false, false, OBJPRIORITY_3, p_bottom,
                         OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "UI/ab2", SPR_ABILITY_OAM_SUB + 3, SPR_ABILITY_PAL_SUB, tileCnt,
-                                  INFO_X_SUB + 64 + 68, INFO_Y_SUB, 64, 64, false, false, false,
-                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::ABILITY2_START, SPR_ABILITY_OAM_SUB + 3,
+                              SPR_ABILITY_PAL_SUB, tileCnt, INFO_X_SUB + 64 + 68, INFO_Y_SUB, 64,
+                              64, false, false, false, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         // move details
         IO::loadSprite( SPR_MOVE_DETAILS_OAM_SUB + 7, SPR_BOX_PAL_SUB, tileCnt, INFO_X_SUB - 12,
                         INFO_Y_SUB - 2, 32, 64, 0, 0, 0, false, false, true, OBJPRIORITY_3,
                         p_bottom, OBJMODE_BLENDED );
         tileCnt
-            = IO::loadSprite( "SEL/noselection_160_64_1", SPR_MOVE_DETAILS_OAM_SUB + 13,
+            = IO::loadUIIcon( IO::ICON::NOSELECTION_160_64_1_START, SPR_MOVE_DETAILS_OAM_SUB + 13,
                               SPR_BOX_PAL_SUB, tileCnt, INFO_X_SUB + 64 + 68 + 32, INFO_Y_SUB - 2,
                               32, 64, true, true, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         for( u8 i = 1; i < 5; ++i ) {
@@ -551,7 +554,7 @@ namespace STS {
                             true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         }
         tileCnt
-            = IO::loadSprite( "SEL/noselection_160_64_2", SPR_MOVE_DETAILS_OAM_SUB + 12,
+            = IO::loadUIIcon( IO::ICON::NOSELECTION_160_64_2_START, SPR_MOVE_DETAILS_OAM_SUB + 12,
                               SPR_BOX_PAL_SUB, tileCnt, INFO_X_SUB + 64 + 68, INFO_Y_SUB - 2, 32,
                               64, false, false, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
@@ -564,7 +567,7 @@ namespace STS {
                             true, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
         }
         tileCnt
-            = IO::loadSprite( "SEL/noselection_64_20", SPR_MOVE_DETAILS_OAM_SUB + 1,
+            = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_MOVE_DETAILS_OAM_SUB + 1,
                               SPR_BOX_PAL_SUB, tileCnt, INFO_X_SUB + 132 + 24, INFO_Y_SUB + 44 - 2,
                               32, 32, true, true, true, OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
@@ -872,7 +875,7 @@ namespace STS {
         }
 
         if( p_pokemon->isEgg( ) ) {
-            IO::loadSprite( "STS/status_pkmn", SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
+            IO::loadUIIcon( IO::ICON::STATUS_PKMN_START, SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
                             oam[ SPR_WINDOW_OAM ].gfxIndex, 148 + 32 - 9, 6, 16, 16, false, false,
                             false, OBJPRIORITY_1, false, OBJMODE_NORMAL );
 
@@ -903,25 +906,25 @@ namespace STS {
         char buffer[ 50 ];
 
         if( _currentPage == 2 ) {
-            IO::loadSprite( "UI/pg3", SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL,
+            IO::loadUIIcon( IO::ICON::INFOPAGE3_START, SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL,
                             oam[ SPR_INFOPAGE_START_OAM + 7 ].gfxIndex, INFO_X + 64,
                             INFO_Y + 64 + 15, 64, 64, true, true, false, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
-            IO::loadSprite( "UI/pg4", SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL,
+            IO::loadUIIcon( IO::ICON::INFOPAGE4_START, SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL,
                             oam[ SPR_INFOPAGE_START_OAM + 6 ].gfxIndex, INFO_X, INFO_Y + 64 + 15,
                             64, 64, true, true, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
         } else {
-            IO::loadSprite( "UI/pg1", SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL,
+            IO::loadUIIcon( IO::ICON::INFOPAGE1_START, SPR_INFOPAGE_START_OAM + 7, SPR_INFOPAGE_PAL,
                             oam[ SPR_INFOPAGE_START_OAM + 7 ].gfxIndex, INFO_X + 64,
                             INFO_Y + 64 + 15, 64, 64, true, true, false, OBJPRIORITY_3, false,
                             OBJMODE_BLENDED );
-            IO::loadSprite( "UI/pg2", SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL,
+            IO::loadUIIcon( IO::ICON::INFOPAGE2_START, SPR_INFOPAGE_START_OAM + 6, SPR_INFOPAGE_PAL,
                             oam[ SPR_INFOPAGE_START_OAM + 6 ].gfxIndex, INFO_X, INFO_Y + 64 + 15,
                             64, 64, true, true, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
             for( u8 i = 0; i < 5; ++i ) { oam[ SPR_CTYPE_OAM( i ) ].isHidden = true; }
-            IO::loadSprite( "BX/hpbar", SPR_EXP_BAR_OAM + 2, SPR_EXP_BAR_PAL,
+            IO::loadUIIcon( IO::ICON::HPBAR_START, SPR_EXP_BAR_OAM + 2, SPR_EXP_BAR_PAL,
                             oam[ SPR_EXP_BAR_OAM + 2 ].gfxIndex, INFO_X - 7 + 128 - 48,
                             INFO_Y + 15 + 15 * 7, 64, 32, false, false, true, OBJPRIORITY_3, false,
                             OBJMODE_NORMAL );
@@ -938,7 +941,7 @@ namespace STS {
             oamSub[ SPR_WINDOW_MOVE_OAM_SUB ].isHidden    = false;
             oamSub[ SPR_WINDOW_CONTEST_OAM_SUB ].isHidden = false;
 
-            IO::loadSprite( "STS/status_pkmn", SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
+            IO::loadUIIcon( IO::ICON::STATUS_PKMN_START, SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
                             oam[ SPR_WINDOW_OAM ].gfxIndex, 148 + 32 - 9, 6, 16, 16, false, false,
                             false, OBJPRIORITY_1, false, OBJMODE_NORMAL );
 
@@ -1162,7 +1165,7 @@ namespace STS {
             oamSub[ SPR_WINDOW_MOVE_OAM_SUB ].isHidden    = true;
             oamSub[ SPR_WINDOW_CONTEST_OAM_SUB ].isHidden = false;
 
-            IO::loadSprite( "STS/status_moves", SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
+            IO::loadUIIcon( IO::ICON::STATUS_MOVES_START, SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
                             oam[ SPR_WINDOW_OAM ].gfxIndex, 148 + 32 - 9, 6, 16, 16, false, false,
                             false, OBJPRIORITY_1, false, OBJMODE_NORMAL );
 
@@ -1284,7 +1287,7 @@ namespace STS {
 
             // Ability description
 
-            IO::loadSprite( "UI/ab3", SPR_ABILITY_OAM_SUB, SPR_ABILITY_PAL_SUB,
+            IO::loadUIIcon( IO::ICON::ABILITY3_START, SPR_ABILITY_OAM_SUB, SPR_ABILITY_PAL_SUB,
                             oamSub[ SPR_ABILITY_OAM_SUB ].gfxIndex, INFO_X_SUB + 88, INFO_Y_SUB, 32,
                             64, false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
@@ -1353,7 +1356,7 @@ namespace STS {
             // TOP
             for( u8 i = 0; i < 5; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = true; }
 
-            IO::loadSprite( "STS/status_contest", SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
+            IO::loadUIIcon( IO::ICON::STATUS_CONTEST_START, SPR_WINDOW_OAM, SPR_ARROW_X_PAL,
                             oam[ SPR_WINDOW_OAM ].gfxIndex, 148 + 32 - 9, 6, 16, 16, false, false,
                             false, OBJPRIORITY_1, false, OBJMODE_NORMAL );
             // condition

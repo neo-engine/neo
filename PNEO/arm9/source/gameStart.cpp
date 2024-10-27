@@ -145,8 +145,8 @@ namespace SAVE {
 
         // mbox
 
-        IO::loadSprite( "UI/mbox1", 10, 2, tileCnt, 14, 192 - 60, 32, 64, false, false, false,
-                        OBJPRIORITY_3, true );
+        IO::loadUIIcon( IO::ICON::MBOX1_START, 10, 2, tileCnt, 14, 192 - 60, 32, 64, false, false,
+                        false, OBJPRIORITY_3, true );
 
         for( u8 i = 0; i < 10; ++i ) {
             IO::loadSprite( 10 + 11 - i, 2, tileCnt, 35 + 16 * i, 192 - 60, 32, 64, 0, 0, 0, false,
@@ -171,10 +171,10 @@ namespace SAVE {
         tileCnt = IO::loadPokeBallIcon( pb_type, 0, 76, 46, pb_oam, pb_pal, pb_tc, OBJPRIORITY_0,
                                         true );
 
-        IO::Oam->matrixBuffer[ 0 ].hdx         = 1 << 9;
-        IO::Oam->matrixBuffer[ 0 ].vdx         = 0;
-        IO::Oam->matrixBuffer[ 0 ].hdy         = 0;
-        IO::Oam->matrixBuffer[ 0 ].vdy         = 1 << 9;
+        IO::Oam->matrixBuffer[ 0 ].hdx             = 1 << 9;
+        IO::Oam->matrixBuffer[ 0 ].vdx             = 0;
+        IO::Oam->matrixBuffer[ 0 ].hdy             = 0;
+        IO::Oam->matrixBuffer[ 0 ].vdy             = 1 << 9;
         IO::Oam->oamBuffer[ pb_oam ].rotationIndex = 0;
         IO::Oam->oamBuffer[ pb_oam ].isRotateScale = true;
 
@@ -282,7 +282,7 @@ namespace SAVE {
             IO::initOAMTable( true );
 
             tileCnt = 0;
-            IO::loadSprite( "UI/mbox2", 0, 2, tileCnt, 2, 2, 32, 64, false, false, false,
+            IO::loadUIIcon( IO::ICON::MBOX2_START, 0, 2, tileCnt, 2, 2, 32, 64, false, false, false,
                             OBJPRIORITY_3, true );
 
             for( u8 i = 0; i < 13; ++i ) {
@@ -357,8 +357,8 @@ namespace SAVE {
             IO::initOAMTable( true );
 
             tileCnt = 0;
-            IO::loadSprite( "UI/mbox2", 60, 2, tileCnt, 2, 2, 32, 64, false, false, false,
-                            OBJPRIORITY_3, true );
+            IO::loadUIIcon( IO::ICON::MBOX2_START, 60, 2, tileCnt, 2, 2, 32, 64, false, false,
+                            false, OBJPRIORITY_3, true );
 
             for( u8 i = 0; i < 13; ++i ) {
                 IO::loadSprite( 60 + 13 - i, 2, tileCnt, 30 + 16 * i, 2, 32, 64, 0, 0, 0, false,
@@ -460,8 +460,8 @@ namespace SAVE {
 
         // load mbox
 
-        IO::loadSprite( "UI/mbox1", 10, 2, tileCnt, 14, 192 - 60, 32, 64, false, false, false,
-                        OBJPRIORITY_3, true );
+        IO::loadUIIcon( IO::ICON::MBOX1_START, 10, 2, tileCnt, 14, 192 - 60, 32, 64, false, false,
+                        false, OBJPRIORITY_3, true );
 
         for( u8 i = 0; i < 10; ++i ) {
             IO::loadSprite( 10 + 11 - i, 2, tileCnt, 35 + 16 * i, 192 - 60, 32, 64, 0, 0, 0, false,

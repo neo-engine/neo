@@ -123,8 +123,8 @@ namespace IO::ANIM {
         constexpr u8 mbox_pal        = 3;
         constexpr u8 mbox_oam_start  = 8;
         constexpr u8 mbox_oam_length = 13;
-        tileCnt = IO::loadSprite( "UI/mbox1", mbox_oam_start, mbox_pal, tileCnt, 2, 192 - 46, 32,
-                                  64, false, false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::MBOX1_START, mbox_oam_start, mbox_pal, tileCnt, 2,
+                                  192 - 46, 32, 64, false, false, false, OBJPRIORITY_3, false );
 
         for( u8 i = 0; i < mbox_oam_length; ++i ) {
             IO::loadSprite( mbox_oam_start + mbox_oam_length - i, mbox_pal, 0, 30 + 16 * i,
@@ -138,8 +138,9 @@ namespace IO::ANIM {
         u8  SPR_CIRC_PAL = 15;
         u16 SPR_CIRC_GFX = tileCnt;
 
-        tileCnt = IO::loadSprite( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 14, 32, 32,
-                                  false, false, false, OBJPRIORITY_1, false );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::BIGCIRC1_START, SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX,
+                              66, 14, 32, 32, false, false, false, OBJPRIORITY_1, false );
         IO::loadSprite( SPR_CIRC_OAM + 1, SPR_CIRC_PAL, SPR_CIRC_GFX, 126, 14, 32, 32, 0, 0, 0,
                         false, true, false, OBJPRIORITY_1, false );
         IO::loadSprite( SPR_CIRC_OAM + 2, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 74, 32, 32, 0, 0, 0, true,
@@ -300,8 +301,8 @@ namespace IO::ANIM {
         constexpr u8 mbox_oam_length = 13;
         constexpr u8 ownpb_pal       = 4;
         constexpr u8 ownpb_oam_start = 30;
-        tileCnt = IO::loadSprite( "UI/mbox1", mbox_oam_start, mbox_pal, 0, 2, 192 - 46, 32, 64,
-                                  false, false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::MBOX1_START, mbox_oam_start, mbox_pal, 0, 2, 192 - 46,
+                                  32, 64, false, false, false, OBJPRIORITY_3, false );
 
         for( u8 i = 0; i < mbox_oam_length; ++i ) {
             IO::loadSprite( mbox_oam_start + mbox_oam_length - i, mbox_pal, 0, 30 + 16 * i,
@@ -332,8 +333,9 @@ namespace IO::ANIM {
         u8  SPR_CIRC_PAL = 15;
         u16 SPR_CIRC_GFX = tileCnt;
 
-        tileCnt = IO::loadSprite( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 14, 32, 32,
-                                  false, false, false, OBJPRIORITY_1, false );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::BIGCIRC1_START, SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX,
+                              66, 14, 32, 32, false, false, false, OBJPRIORITY_1, false );
         IO::loadSprite( SPR_CIRC_OAM + 1, SPR_CIRC_PAL, SPR_CIRC_GFX, 126, 14, 32, 32, 0, 0, 0,
                         false, true, false, OBJPRIORITY_1, false );
         IO::loadSprite( SPR_CIRC_OAM + 2, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 74, 32, 32, 0, 0, 0, true,
@@ -482,8 +484,9 @@ namespace IO::ANIM {
         for( u8 i = 0; i <= mbox_oam_length; ++i ) {
             OamTop->oamBuffer[ mbox_oam_start + i ].isHidden = false;
         }
-        tileCnt = IO::loadSprite( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 14, 32, 32,
-                                  false, false, false, OBJPRIORITY_1, false );
+        tileCnt
+            = IO::loadUIIcon( IO::ICON::BIGCIRC1_START, SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX,
+                              66, 14, 32, 32, false, false, false, OBJPRIORITY_1, false );
         IO::loadSprite( SPR_CIRC_OAM + 1, SPR_CIRC_PAL, SPR_CIRC_GFX, 126, 14, 32, 32, 0, 0, 0,
                         false, true, false, OBJPRIORITY_1, false );
         IO::loadSprite( SPR_CIRC_OAM + 2, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 74, 32, 32, 0, 0, 0, true,

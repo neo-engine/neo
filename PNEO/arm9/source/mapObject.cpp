@@ -444,8 +444,8 @@ namespace MAP {
         ANIMATE_MAP = false;
         _mapSprites.setVisibility( _playerSprite, true, false );
 
-        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 66, 34, 32, 32, false, false, false,
-                         OBJPRIORITY_1, false );
+        IO::loadUIIconB( IO::ICON::BIGCIRC1_START, SPR_CIRC_OAM, SPR_CIRC_GFX, 66, 34, 32, 32,
+                         false, false, false, OBJPRIORITY_1, false );
         IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 126, 34, 32, 32, 0, 0, 0, false, true,
                          false, OBJPRIORITY_1, false );
         IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 66, 94, 32, 32, 0, 0, 0, true, false,
@@ -559,8 +559,8 @@ namespace MAP {
             SOUND::playBGMOneshot( BGM_OS_SYMBOL );
         }
 
-        IO::loadSpriteB( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_GFX, 66, 34, 32, 32, false, false, false,
-                         OBJPRIORITY_1, false );
+        IO::loadUIIconB( IO::ICON::BIGCIRC1_START, SPR_CIRC_OAM, SPR_CIRC_GFX, 66, 34, 32, 32,
+                         false, false, false, OBJPRIORITY_1, false );
         IO::loadSpriteB( SPR_CIRC_OAM + 1, SPR_CIRC_GFX, 126, 34, 32, 32, 0, 0, 0, false, true,
                          false, OBJPRIORITY_1, false );
         IO::loadSpriteB( SPR_CIRC_OAM + 2, SPR_CIRC_GFX, 66, 94, 32, 32, 0, 0, 0, true, false,

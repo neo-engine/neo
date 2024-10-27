@@ -267,8 +267,8 @@ namespace SPX {
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             u16 tc = 144 + 256;
-            IO::loadSprite( "UI/mbox1", 8, 3, tc, 2, 192 - 46, 32, 64, false, false, false,
-                            OBJPRIORITY_3, false, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::MBOX1_START, 8, 3, tc, 2, 192 - 46, 32, 64, false, false,
+                            false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
             for( u8 i = 0; i < 13; ++i ) {
                 IO::loadSprite( 8 + 13 - i, 3, tc, 30 + 16 * i, 192 - 46, 32, 64, 0, 0, 0, false,
@@ -316,8 +316,8 @@ namespace SPX {
             u8 SPR_CIRC_PAL = 1;
             u8 SPR_CIRC_GFX = tc;
 
-            tc = IO::loadSprite( "UI/cc", SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 14, 32, 32,
-                                 false, false, false, OBJPRIORITY_1, false );
+            tc = IO::loadUIIcon( IO::ICON::BIGCIRC1_START, SPR_CIRC_OAM, SPR_CIRC_PAL, SPR_CIRC_GFX,
+                                 66, 14, 32, 32, false, false, false, OBJPRIORITY_1, false );
             IO::loadSprite( SPR_CIRC_OAM + 1, SPR_CIRC_PAL, SPR_CIRC_GFX, 126, 14, 32, 32, 0, 0, 0,
                             false, true, false, OBJPRIORITY_1, false );
             IO::loadSprite( SPR_CIRC_OAM + 2, SPR_CIRC_PAL, SPR_CIRC_GFX, 66, 74, 32, 32, 0, 0, 0,
@@ -349,8 +349,8 @@ namespace SPX {
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             // mbox
-            IO::loadSprite( "UI/mbox2", 8, 3, tc, 2, 192 - 46, 32, 64, false, false, false,
-                            OBJPRIORITY_3, false, OBJMODE_BLENDED );
+            IO::loadUIIcon( IO::ICON::MBOX2_START, 8, 3, tc, 2, 192 - 46, 32, 64, false, false,
+                            false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
             for( u8 i = 0; i < 13; ++i ) {
                 IO::loadSprite( 8 + 13 - i, 3, tc, 30 + 16 * i, 192 - 46, 32, 64, 0, 0, 0, false,
