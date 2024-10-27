@@ -191,13 +191,13 @@ namespace SAVE {
 
         u16 tileCnt = 0;
 
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_LARGE_CHOICE_OAM_SUB,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START, SPR_LARGE_CHOICE_OAM_SUB,
                                   SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", SPR_LARGE_CHOICE_OAM_SUB + 1,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START, SPR_LARGE_CHOICE_OAM_SUB + 1,
                                   SPR_BOX_PAL_SUB, tileCnt, 0, 0, 16, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_SMALL_CHOICE_OAM_SUB,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_SMALL_CHOICE_OAM_SUB,
                                   SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
@@ -210,9 +210,9 @@ namespace SAVE {
                         true, true, OBJPRIORITY_1, true, OBJMODE_NORMAL );
 
         // page windows
-        tileCnt = IO::loadSprite( "SEL/noselection_32_64", SPR_PAGE_LEFT_OAM_SUB, SPR_BOX_PAL_SUB,
-                                  tileCnt, 0 - 8, 57 - 12, 32, 64, true, true, true, OBJPRIORITY_2,
-                                  true, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_32_64_START, SPR_PAGE_LEFT_OAM_SUB,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0 - 8, 57 - 12, 32, 64, true, true,
+                                  true, OBJPRIORITY_2, true, OBJMODE_BLENDED );
         IO::loadSprite( SPR_PAGE_RIGHT_OAM_SUB, SPR_BOX_PAL_SUB,
                         oam[ SPR_PAGE_LEFT_OAM_SUB ].gfxIndex, 256 - 24, 4 + 28 * 2, 32, 64, 0, 0,
                         0, false, false, true, OBJPRIORITY_2, true, OBJMODE_BLENDED );

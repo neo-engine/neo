@@ -220,7 +220,7 @@ namespace BAG {
                             4 + 24 * ( 5 - i ), 33, 32, 32, 0, 0, 0, false, false, true,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
-        tileCnt = IO::loadSprite( "SEL/noselection_blank_32_24", SPR_MSG_PKMN_SEL_OAM_SUB,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_BLANK_32_24_START, SPR_MSG_PKMN_SEL_OAM_SUB,
                                   SPR_SELECTED_PAL_SUB, tileCnt, 8, 33, 32, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 

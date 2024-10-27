@@ -119,14 +119,16 @@ namespace BOX {
                                    16, false, false, false, OBJPRIORITY_2, true );
 
         // prev / box name / next
-        tileCnt = IO::loadSpriteB( "SEL/noselection_64_32", SPR_PREV_BG_OAM_SUB, tileCnt, 2, -4, 64,
-                                   32, true, true, false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::NOSELECTION_64_32_START, SPR_PREV_BG_OAM_SUB, tileCnt,
+                                   2, -4, 64, 32, true, true, false, OBJPRIORITY_3, true );
         IO::loadSpriteB( SPR_NEXT_BG_OAM_SUB, oam[ SPR_PREV_BG_OAM_SUB ].gfxIndex, 120, -4, 64, 32,
                          0, 0, 0, true, true, false, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( "SEL/noselection_128_32_1", SPR_NAME_BG_OAM_SUB, tileCnt, 36, 0,
-                                   64, 32, false, false, false, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSpriteB( "SEL/noselection_128_32_2", SPR_NAME_BG_OAM_SUB + 1, tileCnt,
-                                   100, 0, 64, 32, false, false, false, OBJPRIORITY_3, true );
+        tileCnt
+            = IO::loadUIIconB( IO::ICON::NOSELECTION_128_32_1_START, SPR_NAME_BG_OAM_SUB, tileCnt,
+                               36, 0, 64, 32, false, false, false, OBJPRIORITY_3, true );
+        tileCnt
+            = IO::loadUIIconB( IO::ICON::NOSELECTION_128_32_2_START, SPR_NAME_BG_OAM_SUB + 1,
+                               tileCnt, 100, 0, 64, 32, false, false, false, OBJPRIORITY_3, true );
 
         tileCnt = IO::loadUIIconB( IO::ICON::ARROW_START, SPR_PREV_ARR_OAM_SUB, tileCnt, 26, 6, 16,
                                    16, false, false, false, OBJPRIORITY_1, true );
@@ -152,8 +154,8 @@ namespace BOX {
                          true, false, OBJPRIORITY_2, true );
         IO::loadSpriteB( SPR_PARTY_BG_OAM_SUB + 2, tileCnt, 64, 192 - 32, 32, 32, 0, 0, 0, true,
                          true, false, OBJPRIORITY_2, true );
-        tileCnt = IO::loadSpriteB( "SEL/noselection_64_20", SPR_PARTY_BG_OAM_SUB, tileCnt, 32,
-                                   192 - 20, 32, 32, false, false, false, OBJPRIORITY_2, true );
+        tileCnt = IO::loadUIIconB( IO::ICON::NOSELECTION_64_20_START, SPR_PARTY_BG_OAM_SUB, tileCnt,
+                                   32, 192 - 20, 32, 32, false, false, false, OBJPRIORITY_2, true );
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
         IO::regularFont->printStringBC( GET_STRING( 380 ), IO::BG_PAL( true ), TEXT_BUF, 64,
@@ -255,7 +257,7 @@ namespace BOX {
         default:
         case 0: // Blue arrow for status
             _outlineColor = 0xF4A0;
-            IO::loadSpriteB( "BX/box_arrow", SPR_SEL_ARROW_OAM_SUB,
+            IO::loadUIIconB( IO::ICON::BOX_ARROW_START, SPR_SEL_ARROW_OAM_SUB,
                              IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].gfxIndex,
                              IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x,
                              IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y, 16, 16, false, false,
@@ -264,7 +266,7 @@ namespace BOX {
             break;
         case 1: // Redish arrow for move
             _outlineColor = 0b1001'0100'0001'1101;
-            IO::loadSpriteB( "BX/box_arrow2", SPR_SEL_ARROW_OAM_SUB,
+            IO::loadUIIconB( IO::ICON::BOX_ARROW2_START, SPR_SEL_ARROW_OAM_SUB,
                              IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].gfxIndex,
                              IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].x,
                              IO::Oam->oamBuffer[ SPR_SEL_ARROW_OAM_SUB ].y, 16, 16, false, false,
@@ -503,9 +505,9 @@ namespace BOX {
                         false, false, OBJPRIORITY_3, false );
         IO::loadSprite( SPR_NAME_BG_OAM + 1, SPR_BOX_PAL, tileCnt, 48, -4, 64, 32, 0, 0, 0, false,
                         false, false, OBJPRIORITY_3, false );
-        tileCnt
-            = IO::loadSprite( "SEL/noselection_128_32_2", SPR_NAME_BG_OAM + 2, SPR_BOX_PAL, tileCnt,
-                              24, -4, 64, 32, false, false, false, OBJPRIORITY_3, false );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_128_32_2_START, SPR_NAME_BG_OAM + 2,
+                                  SPR_BOX_PAL, tileCnt, 24, -4, 64, 32, false, false, false,
+                                  OBJPRIORITY_3, false );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         IO::regularFont->printStringC( GET_STRING( 379 ), 5, 3, false );
@@ -524,9 +526,9 @@ namespace BOX {
         // Name box
         IO::loadSprite( SPR_CHOICE_START_OAM, SPR_BOX_PAL, tileCnt, ANCHOR_X, ANCHOR_Y, 16, 32, 0,
                         0, 0, false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM + 5, SPR_BOX_PAL,
-                                  tileCnt, ANCHOR_X + 80, ANCHOR_Y, 16, 32, true, true, false,
-                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START, SPR_CHOICE_START_OAM + 5,
+                                  SPR_BOX_PAL, tileCnt, ANCHOR_X + 80, ANCHOR_Y, 16, 32, true, true,
+                                  false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_CHOICE_START_OAM + 1, SPR_BOX_PAL, tileCnt, ANCHOR_X + 16, ANCHOR_Y, 16,
                         32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_CHOICE_START_OAM + 2, SPR_BOX_PAL, tileCnt, ANCHOR_X + 32, ANCHOR_Y, 16,
@@ -535,9 +537,9 @@ namespace BOX {
                         32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         IO::loadSprite( SPR_CHOICE_START_OAM + 7, SPR_BOX_PAL, tileCnt, ANCHOR_X + 73, ANCHOR_Y, 16,
                         32, 0, 0, 0, false, false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
-        tileCnt = IO::loadSprite( "SEL/noselection_96_32_2", SPR_CHOICE_START_OAM + 4, SPR_BOX_PAL,
-                                  tileCnt, ANCHOR_X + 64, ANCHOR_Y, 16, 32, false, false, false,
-                                  OBJPRIORITY_3, false, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START, SPR_CHOICE_START_OAM + 4,
+                                  SPR_BOX_PAL, tileCnt, ANCHOR_X + 64, ANCHOR_Y, 16, 32, false,
+                                  false, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
         // Info BG / Move window
         IO::loadSprite( SPR_MOVEWINDOW_START_OAM + 3, SPR_INFOPAGE_PAL, tileCnt, ANCHOR_X - 6,
                         ANCHOR_Y + 119, 64, 64, 0, 0, 64 * 64 / 2, false, false,

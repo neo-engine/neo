@@ -250,16 +250,16 @@ namespace IO {
                         OBJPRIORITY_0, true );
         IO::loadSprite( 3, 0, 3, 0, 0, 8, 8, keyPal, keyTiles, keyTilesLen, false, true, true,
                         OBJPRIORITY_0, true );
-        IO::loadSprite( "KB/pg0", 4, 1, 4, sx - 1 + 0 * ( width + marginx ), py, 16, 32, false,
-                        false, false, OBJPRIORITY_0, true );
-        IO::loadSprite( "KB/pg1", 5, 2, 12, sx - 1 + 1 * ( width + marginx ), py, 16, 32, false,
-                        false, false, OBJPRIORITY_0, true );
-        IO::loadSprite( "KB/pg2", 6, 3, 20, sx - 1 + 2 * ( width + marginx ), py, 16, 32, false,
-                        false, maxPages( ) <= 2, OBJPRIORITY_0, true );
-        IO::loadSprite( "KB/pg3", 7, 4, 28, sx - 1 + 3 * ( width + marginx ), py, 16, 32, false,
-                        false, maxPages( ) <= 3, OBJPRIORITY_0, true );
-        IO::loadSprite( "KB/pg4", 8, 5, 36, sx - 1 + 4 * ( width + marginx ), py, 16, 32, false,
-                        false, maxPages( ) <= 4, OBJPRIORITY_0, true );
+        IO::loadUIIcon( IO::ICON::PG0_START, 4, 1, 4, sx - 1 + 0 * ( width + marginx ), py, 16, 32,
+                        false, false, false, OBJPRIORITY_0, true );
+        IO::loadUIIcon( IO::ICON::PG1_START, 5, 2, 12, sx - 1 + 1 * ( width + marginx ), py, 16, 32,
+                        false, false, false, OBJPRIORITY_0, true );
+        IO::loadUIIcon( IO::ICON::PG2_START, 6, 3, 20, sx - 1 + 2 * ( width + marginx ), py, 16, 32,
+                        false, false, maxPages( ) <= 2, OBJPRIORITY_0, true );
+        IO::loadUIIcon( IO::ICON::PG3_START, 7, 4, 28, sx - 1 + 3 * ( width + marginx ), py, 16, 32,
+                        false, false, maxPages( ) <= 3, OBJPRIORITY_0, true );
+        IO::loadUIIcon( IO::ICON::PG4_START, 8, 5, 36, sx - 1 + 4 * ( width + marginx ), py, 16, 32,
+                        false, false, maxPages( ) <= 4, OBJPRIORITY_0, true );
 
         updateOAM( true );
 

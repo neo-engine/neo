@@ -374,11 +374,11 @@ namespace SAVE {
                 u8 pos = 2 * i;
 
                 if( !i ) {
-                    tileCnt = IO::loadSprite( "SEL/noselection_96_32_1",
+                    tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START,
                                               SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB,
                                               tileCnt, 29, 42 + i * 36, 16, 32, false, false, true,
                                               OBJPRIORITY_3, true, OBJMODE_BLENDED );
-                    tileCnt = IO::loadSprite( "SEL/noselection_96_32_2",
+                    tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START,
                                               SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
                                               tileCnt, 29 + 16, 42 + i * 36, 16, 32, false, false,
                                               true, OBJPRIORITY_3, true, OBJMODE_BLENDED );

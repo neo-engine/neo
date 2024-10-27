@@ -115,9 +115,9 @@ namespace IO {
 
         // load bg
 
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_NAV_APP_RSV_SUB + 7, SPR_BOX_PAL_SUB,
-                                  tileCnt, 0, 0, 32, 32, false, false, false, OBJPRIORITY_3,
-                                  p_bottom, OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_NAV_APP_RSV_SUB + 7,
+                                  SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, false,
+                                  OBJPRIORITY_3, p_bottom, OBJMODE_BLENDED );
 
         for( u8 i = 0; i < SONGS_PER_PAGE + 1; ++i ) {
             for( u8 j = 0; j < 5; ++j ) {

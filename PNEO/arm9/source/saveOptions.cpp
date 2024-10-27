@@ -263,9 +263,9 @@ namespace SAVE {
         u16 tileCnt = 0;
 
         // x
-        tileCnt
-            = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt, 236, 172,
-                              16, 16, false, false, false, OBJPRIORITY_1, true, OBJMODE_NORMAL );
+        tileCnt = IO::loadUIIcon( IO::ICON::X_16_16_START, SPR_X_OAM_SUB, SPR_X_PAL_SUB, tileCnt,
+                                  236, 172, 16, 16, false, false, false, OBJPRIORITY_1, true,
+                                  OBJMODE_NORMAL );
 
         // Choice boxes
         for( u8 i = 0; i < MAX_SETTINGS; ++i ) {
@@ -278,7 +278,7 @@ namespace SAVE {
                                 false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
             }
         }
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_CHOICE_START_OAM_SUB( 0 ),
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_CHOICE_START_OAM_SUB( 0 ),
                                   SPR_BOX_PAL_SUB, tileCnt, 12, 24, 32, 32, false, false, false,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 

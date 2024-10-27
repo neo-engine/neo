@@ -161,13 +161,14 @@ namespace SPX {
         for( u8 i = 0; i < 1; i++ ) {
             u8 pos = 2 * i;
 
-            tileCnt = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM_SUB( pos ),
-                                      SPR_BOX_PAL_SUB, tileCnt, 29, y, 16, 32, false, false, true,
-                                      OBJPRIORITY_0, true, OBJMODE_BLENDED );
-            tileCnt
-                = IO::loadSprite( "SEL/noselection_96_32_2", SPR_CHOICE_START_OAM_SUB( pos ) + 1,
-                                  SPR_BOX_PAL_SUB, tileCnt, 29 + 16, y, 16, 32, false, false, true,
-                                  OBJPRIORITY_3, true, OBJMODE_BLENDED );
+            tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START,
+                                      SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt, 29,
+                                      y, 16, 32, false, false, true, OBJPRIORITY_0, true,
+                                      OBJMODE_BLENDED );
+            tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START,
+                                      SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB, tileCnt,
+                                      29 + 16, y, 16, 32, false, false, true, OBJPRIORITY_3, true,
+                                      OBJMODE_BLENDED );
             for( u8 j = 2; j < 5; j++ ) {
                 IO::loadSprite( SPR_CHOICE_START_OAM_SUB( pos ) + j, SPR_BOX_PAL_SUB,
                                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + 1 ].gfxIndex,
