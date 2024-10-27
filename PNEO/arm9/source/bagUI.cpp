@@ -80,12 +80,18 @@ namespace BAG {
     //     return 10 + ( p_type )
     // }
 
+    constexpr u32 BAG_ICON_START[]
+        = { IO::ICON::BAGBALL1_START,    IO::ICON::BAGBALL2_START,  IO::ICON::BAGMEDIINE1_START,
+            IO::ICON::BAGMEDIINE2_START, IO::ICON::BAGHM1_START,    IO::ICON::BAGHM2_START,
+            IO::ICON::BAGBERRY1_START,   IO::ICON::BAGBERRY2_START, IO::ICON::BAGKEY1_START,
+            IO::ICON::BAGKEY2_START };
+
     void showActiveBag( u8 p_bagNo ) {
         u16 tileIdx = IO::Oam->oamBuffer[ SPR_BAG_ICON_SEL_OAM_SUB ].gfxIndex;
 
-        IO::loadSprite( ( "BG/" + std::to_string( p_bagNo + 1 ) + "_2" ).c_str( ),
-                        SPR_BAG_ICON_SEL_OAM_SUB, SPR_BAG_ICON_SEL_PAL_SUB, tileIdx, 27 * p_bagNo,
-                        0, 32, 32, false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
+        IO::loadUIIcon( BAG_ICON_START[ 2 * p_bagNo + 1 ], SPR_BAG_ICON_SEL_OAM_SUB,
+                        SPR_BAG_ICON_SEL_PAL_SUB, tileIdx, 27 * p_bagNo, 0, 32, 32, false, false,
+                        false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
     }
 
     void bagUI::init( ) {
@@ -111,26 +117,25 @@ namespace BAG {
 
         u16 tileCnt = drawPkmnIcons( );
 
-        tileCnt = IO::loadSprite( "BG/Back", SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, false, false,
-                                  false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::BACK_START, SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB,
+                                  tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, false,
+                                  false, false, OBJPRIORITY_3, true );
 
-        tileCnt = IO::loadSprite( "BG/Down", SPR_ARROW_DOWN_OAM_SUB, SPR_DOWN_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26, 32, 32, false, false,
-                                  false, OBJPRIORITY_3, true );
-        tileCnt = IO::loadSprite( "BG/Up", SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, false, false,
-                                  false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::DOWN_START, SPR_ARROW_DOWN_OAM_SUB, SPR_DOWN_PAL_SUB,
+                                  tileCnt, SCREEN_WIDTH - 60, SCREEN_HEIGHT - 26, 32, 32, false,
+                                  false, false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::UP_START, SPR_ARROW_UP_OAM_SUB, SPR_ARROW_X_PAL_SUB,
+                                  tileCnt, SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, false,
+                                  false, false, OBJPRIORITY_3, true );
 
         for( u8 i = 0; i < SPRITES_PER_ITEM_WINDOW; ++i ) {
-            tileCnt = IO::loadSprite( ( "BG/" + std::to_string( i + 1 ) + "_1" ).c_str( ),
-                                      SPR_BAG_ICON_OAM_SUB + i, SPR_BAG_ICON_PAL_SUB, tileCnt,
-                                      27 * i, 0, 32, 32, false, false, false, OBJPRIORITY_3, true,
-                                      OBJMODE_BLENDED );
+            tileCnt = IO::loadUIIcon( BAG_ICON_START[ 2 * i ], SPR_BAG_ICON_OAM_SUB + i,
+                                      SPR_BAG_ICON_PAL_SUB, tileCnt, 27 * i, 0, 32, 32, false,
+                                      false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
-        tileCnt = IO::loadSprite( "BG/1_2", SPR_BAG_ICON_SEL_OAM_SUB, SPR_BAG_ICON_SEL_PAL_SUB,
-                                  tileCnt, 27, 0, 32, 32, false, false, false, OBJPRIORITY_3, true,
-                                  OBJMODE_BLENDED );
+        tileCnt = IO::loadUIIcon( BAG_ICON_START[ 1 ], SPR_BAG_ICON_SEL_OAM_SUB,
+                                  SPR_BAG_ICON_SEL_PAL_SUB, tileCnt, 27, 0, 32, 32, false, false,
+                                  false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
         tileCnt = IO::loadSprite( SPR_TRANSFER_OAM_SUB, SPR_TRANSFER_PAL_SUB, tileCnt,
                                   SCREEN_WIDTH - 92, SCREEN_HEIGHT - 26, 32, 32, 0, 0,
@@ -138,7 +143,7 @@ namespace BAG {
 
         // item windows
 
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_ITEM_WINDOW_OAM_SUB( 0 ),
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_ITEM_WINDOW_OAM_SUB( 0 ),
                                   SPR_BOX_PAL_SUB, tileCnt, 0, 0, 32, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
@@ -161,11 +166,11 @@ namespace BAG {
             u8 pos = 2 * i;
 
             if( !i ) {
-                tileCnt
-                    = IO::loadSprite( "SEL/noselection_96_32_1", SPR_CHOICE_START_OAM_SUB( pos ),
-                                      SPR_BOX_PAL_SUB, tileCnt, 29, 80 + i * 36, 16, 32, false,
-                                      false, true, OBJPRIORITY_3, true, OBJMODE_NORMAL );
-                tileCnt = IO::loadSprite( "SEL/noselection_96_32_2",
+                tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_1_START,
+                                          SPR_CHOICE_START_OAM_SUB( pos ), SPR_BOX_PAL_SUB, tileCnt,
+                                          29, 80 + i * 36, 16, 32, false, false, true,
+                                          OBJPRIORITY_3, true, OBJMODE_NORMAL );
+                tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_96_32_2_START,
                                           SPR_CHOICE_START_OAM_SUB( pos ) + 1, SPR_BOX_PAL_SUB,
                                           tileCnt, 29 + 16, 80 + i * 36, 16, 32, false, false, true,
                                           OBJPRIORITY_3, true, OBJMODE_NORMAL );
@@ -229,7 +234,7 @@ namespace BAG {
                             4 + 24 * ( 5 - i ), 33, 32, 32, 0, 0, 0, false, false, true,
                             OBJPRIORITY_3, true, OBJMODE_BLENDED );
         }
-        tileCnt = IO::loadSprite( "SEL/noselection_blank_32_24", SPR_MSG_PKMN_SEL_OAM_SUB,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_BLANK_32_24_START, SPR_MSG_PKMN_SEL_OAM_SUB,
                                   SPR_SELECTED_PAL_SUB, tileCnt, 8, 33, 32, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
@@ -239,7 +244,7 @@ namespace BAG {
                             3 + 24 * ( 5 - i ), -9, 32, 32, 0, 0, 0, true, true, true,
                             OBJPRIORITY_3, true, OBJMODE_NORMAL );
         }
-        tileCnt = IO::loadSprite( "SEL/noselection_64_20", SPR_MSG_BOX_SMALL_OAM_SUB,
+        tileCnt = IO::loadUIIcon( IO::ICON::NOSELECTION_64_20_START, SPR_MSG_BOX_SMALL_OAM_SUB,
                                   SPR_BOX_PAL_SUB, tileCnt, 3, 3, 32, 32, false, false, true,
                                   OBJPRIORITY_3, true, OBJMODE_NORMAL );
 

@@ -81,7 +81,7 @@ namespace BAG {
     constexpr s16 CONTEST_TYPE_POS_X[ 5 ] = { 0, 95, 58, -58, -95 };
     constexpr s16 CONTEST_TYPE_POS_Y[ 5 ] = { -90, -20, 90, 90, -20 };
 
-#define ANIM_FUNC( p_x ) ( u8( 0.007 * ( p_x ) * (p_x) -1.73 * ( p_x ) + 120 ) )
+#define ANIM_FUNC( p_x ) ( u8( 0.007 * ( p_x ) * ( p_x ) - 1.73 * ( p_x ) + 120 ) )
 
 #define INFO_X        130
 #define INFO_Y        6
@@ -197,9 +197,9 @@ namespace BAG {
             IO::Oam->oamBuffer[ SPR_PKMN_START_OAM_SUB + i ].priority = OBJPRIORITY_3;
         }
 
-        tileCnt = IO::loadSprite( "BG/Back", SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB, tileCnt,
-                                  SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, false, false,
-                                  false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIcon( IO::ICON::BACK_START, SPR_ARROW_BACK_OAM_SUB, SPR_BACK_PAL_SUB,
+                                  tileCnt, SCREEN_WIDTH - 28, SCREEN_HEIGHT - 26, 32, 32, false,
+                                  false, false, OBJPRIORITY_3, true );
 
         // Pokeblocks, load blocks
         u8 t = 0;

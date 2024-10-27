@@ -81,9 +81,9 @@ namespace IO {
         }
 
         // load cursor icon
-        tileCnt = IO::loadSprite( "BX/box_arrow", SPR_NAV_APP_RSV_SUB, SPR_NAV_APP_RSV2_PAL_SUB,
-                                  tileCnt, _cursorX, _cursorY + _mapTopY - 14, 16, 16, false, false,
-                                  false, OBJPRIORITY_3, true );
+        tileCnt = IO::loadUIIcon(
+            IO::ICON::BOX_ARROW_START, SPR_NAV_APP_RSV_SUB, SPR_NAV_APP_RSV2_PAL_SUB, tileCnt,
+            _cursorX, _cursorY + _mapTopY - 14, 16, 16, false, false, false, OBJPRIORITY_3, true );
 
         // load bg
         // use last OW map as dafault
