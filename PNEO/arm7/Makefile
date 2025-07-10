@@ -22,14 +22,12 @@ DATA		:=
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-mthumb-interwork
+ARCH	:=	-march=armv4t -mtune=arm7tdmi -mthumb
 
-CFLAGS	:=	-g -Wall -O3 -D_FORTIFY_SOURCE=1 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload \
-			-funsafe-loop-optimizations $(EXTRA_FLAGS) \
+CFLAGS	:=	-g -Wall -O3 -ffunction-sections -fdata-sections -ffast-math\
+			$(EXTRA_FLAGS) \
 			-DGAME_CODE="\"$(GAME_CODE)\"" -DVERSION=$(VERSION) \
 			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\""
-			-mcpu=arm7tdmi -mtune=arm7tdmi -fomit-frame-pointer\
-			$(ARCH)
 
 ifdef DESQUID
 CFLAGS	+=	-DDESQUID -fanalyzer
@@ -41,14 +39,14 @@ ifdef FLASHCARD
 CFLAGS	+=	-DFLASHCARD
 endif
 
-CFLAGS	+=	$(INCLUDE) -DARM7
-CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -fno-rtti
+CFLAGS	+=	$(ARCH) $(INCLUDE) -DARM7
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=ds_arm7.specs -g $(ARCH) -Wl,--nmagic -Wl,-Map,$(notdir $*).map
+LDFLAGS	=	-specs=ds_arm7.specs -g $(ARCH) -Wl,-Map,$(notdir $*).map
 
-LIBS	:=	-ldswifi7 -lnds7
+LIBS	:= -lnds7
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -67,19 +65,25 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export ARM7ELF	:=	$(CURDIR)/$(TARGET).elf
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
-export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
+export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))\
+					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
-export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
-			$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+export OFILES_BIN		:=	$(addsuffix .o,$(BINFILES))
 
-export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD)
+export OFILES_SOURCES	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+
+export OFILES	:=	$(OFILES_BIN) $(OFILES_SOURCES)
+
+export HFILES	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
+
+export INCLUDE	:=	$(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir))\
+					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+					-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
@@ -119,14 +123,11 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 $(ARM7ELF)	:	$(OFILES)
-	@echo linking $(notdir $@)
-	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
-
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data
 #---------------------------------------------------------------------------------
-%.bin.o	:	%.bin
+%.bin.o %_bin.h : %.bin
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)

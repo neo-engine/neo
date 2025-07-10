@@ -104,6 +104,7 @@ namespace SOUND {
 #else
         (void) p_id;
         (void) p_force;
+        (void) p_fade;
 #endif
     }
 

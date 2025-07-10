@@ -193,7 +193,7 @@ namespace IO::ICON {
     constexpr u32 HPBAR_BATTLE_START = 159168;
     constexpr u32 HPBAR_BATTLE_OPP_START = 159712;
     constexpr u32 ITEMICON_START = 160256;
-    constexpr u32 KEY_START = 160320;
+    constexpr u32 KEYS_START = 160320;
     constexpr u32 LOC0_START = 160384;
     constexpr u32 LOC1_START = 162464;
     constexpr u32 LOC10_START = 164544;

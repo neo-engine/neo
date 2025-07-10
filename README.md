@@ -71,11 +71,11 @@ _Partially_ implemented features are in _italics_.
 
 Build requirements
 ------------------
-* devkitARM ≥ r57
-* libnds ≥ 1.8.2
-* libfilesystem ≥ 0.9.14
-* libfat-nds ≥ 1.1.5
-* dswifi ≥ 0.4.2 (currently unused)
+* devkitARM ≥ r66
+* libnds ≥ 2.0.1
+* libfat-nds ≥ 2.0.2
+* calico ≥ 1.1.0
+* dswifi ≥ 2.0.2 (currently unused)
 
 * gcc/g++ ≥ 11.2 (for ndstool)
 

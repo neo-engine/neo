@@ -54,27 +54,13 @@ must not be misrepresented as being the original software.
 distribution.
 
 ---------------------------------------------------------------------------------*/
-#include <dswifi7.h>
 #include <nds.h>
+
 #ifndef NOSOUND
 #include "sound/sseq.h"
 #endif
 
 #define FADE_SPEED 9
-
-volatile bool exitflag = false;
-
-void VblankHandler( void ) {
-    Wifi_Update( );
-}
-
-void VcountHandler( ) {
-    inputGetAndSend( );
-}
-
-void powerButtonCB( ) {
-    exitflag = true;
-}
 
 void soundInit( ) {
     powerOn( POWER_SOUND );
@@ -85,45 +71,37 @@ void soundInit( ) {
 }
 
 int main( ) {
-    readUserSettings( );
-    ledBlink( 0 );
+    // Read settings from NVRAM
+    envReadNvramSettings( );
 
-    irqInit( );
-    // Start the RTC tracking IRQ
-    initClockIRQ( );
-    fifoInit( );
+    // Set up extended keypad server (X/Y/hinge)
+    keypadStartExtServer( );
+
+    // Configure and enable VBlank interrupt
+    lcdSetIrqMask( DISPSTAT_IE_ALL, DISPSTAT_IE_VBLANK );
+    irqEnable( IRQ_VBLANK );
+
+    // Set up RTC
+    rtcInit( );
+    rtcSyncTime( );
+
+    // Initialize power management
+    pmInit( );
+
+    // Set up touch screen driver
     touchInit( );
+    touchStartServer( 80, MAIN_THREAD_PRIO );
+
+#ifndef NO_SOUND
     soundInit( );
-
-#ifndef NO_SOUND
     SOUND::SSEQ::installSoundSys( );
-#endif
-
-    SetYtrigger( 80 );
-
-    installWifiFIFO( );
-    installSoundFIFO( );
-
-    installSystemFIFO( );
-
-    irqSet( IRQ_VCOUNT, VcountHandler );
-    irqSet( IRQ_VBLANK, VblankHandler );
-
-    irqEnable( IRQ_VBLANK | IRQ_VCOUNT | IRQ_NETWORK );
-
-    setPowerButtonCB( powerButtonCB );
-
-#ifndef NO_SOUND
     s32 fadeCounter = 0;
 #endif
 
     // Keep the ARM7 mostly idle
-    while( !exitflag ) {
-        if( 0 == ( REG_KEYINPUT & ( KEY_SELECT | KEY_START | KEY_L | KEY_R ) ) ) {
-            exitflag = true;
-        }
+    while( pmMainLoop( ) ) {
+        threadWaitForVBlank( );
 
-        swiWaitForVBlank( );
 #ifndef NO_SOUND
         if( SOUND::SSEQ::SEQ_STATUS == SOUND::SSEQ::STATUS_FADE_OUT ) {
             if( fadeCounter < 24 ) {

@@ -6,7 +6,7 @@ file        : uio.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2025
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -193,15 +193,15 @@ namespace IO {
 
     struct inputTarget {
         enum inputType { BUTTON, TOUCH, TOUCH_CIRCLE };
-        inputType   m_inputType;
-        KEYPAD_BITS m_keys;
-        u16         m_targetX1 = 0;
-        u16         m_targetY1 = 0;
-        u16         m_targetX2 = 300;
-        u16         m_targetY2 = 300;
-        u16         m_targetR  = 16;
+        inputType m_inputType;
+        u32       m_keys;
+        u16       m_targetX1 = 0;
+        u16       m_targetY1 = 0;
+        u16       m_targetX2 = 300;
+        u16       m_targetY2 = 300;
+        u16       m_targetR  = 16;
 
-        inputTarget( KEYPAD_BITS p_keys ) : m_inputType( BUTTON ), m_keys( p_keys ) {
+        inputTarget( u32 p_keys ) : m_inputType( BUTTON ), m_keys( p_keys ) {
         }
         inputTarget( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 )
             : m_inputType( TOUCH ), m_targetX1( p_targetX1 ), m_targetY1( p_targetY1 ),
@@ -233,7 +233,7 @@ namespace IO {
                          u16 p_targetY2 = 300 );
     bool waitForTouchUp( inputTarget p_inputTarget );
 
-    bool waitForKeysUp( KEYPAD_BITS p_keys );
+    bool waitForKeysUp( u32 p_keys );
     bool waitForKeysUp( inputTarget p_inputTarget );
 
     bool waitForInput( inputTarget p_inputTarget );

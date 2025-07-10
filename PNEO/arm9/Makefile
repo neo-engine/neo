@@ -24,10 +24,9 @@ GRAPHICS	:=	data
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-mthumb -mthumb-interwork
+ARCH	:=	-march=armv5te -mtune=arm946e-s
 
-
-CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
+CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
 			-Wfloat-equal -Wformat=1 -Wlogical-op -Werror\
@@ -36,8 +35,7 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wno-array-bounds -Wno-analyzer-null-dereference\
 			-Wno-analyzer-use-of-uninitialized-value -Wno-restrict\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
-			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
-			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\
+			-Wno-class-memaccess\
 			$(EXTRA_FLAGS) -DGAME_CODE="\"$(GAME_CODE)\"" -DVERSION=$(VERSION) \
 			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" $(ARCH) \
 
@@ -55,10 +53,10 @@ CFLAGS	+=	-DFLASHCARD
 endif
 
 
-CFLAGS	+=	$(INCLUDE) -DARM9
+CFLAGS		+=	$(ARCH) $(INCLUDE) -DARM9
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++23 -Wno-multichar
 
-ASFLAGS	:=	-g $(ARCH) -march=armv5te -mtune=arm946e-s
+ASFLAGS	:=	-g $(ARCH)
 
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
@@ -79,17 +77,18 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
 export ARM9ELF	:=	$(CURDIR)/$(TARGET).elf
-export DEPSDIR := $(CURDIR)/$(BUILD)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
 
+export DEPSDIR	:=	$(CURDIR)/$(BUILD)
+
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -105,13 +104,17 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
-					$(PNGFILES:.png=.o) \
-					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+export OFILES_BIN		:=	$(addsuffix .o,$(BINFILES))
 
-export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD)
+export OFILES_SOURCES	:= $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+
+export OFILES	:=	$(PNGFILES:.png=.o) $(OFILES_BIN) $(OFILES_SOURCES)
+
+export HFILES	:=	$(PNGFILES:.png=.h) $(addsuffix .h,$(subst .,_,$(BINFILES)))
+
+export INCLUDE	:=	$(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir))\
+					$(foreach dir,$(LIBDIRS),-I$(dir)/include)\
+					-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
@@ -136,8 +139,6 @@ else
 # main targets
 #---------------------------------------------------------------------------------
 $(ARM9ELF)	:	$(OFILES)
-	@echo linking $(notdir $@)
-	@$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
 
 .PRECIOUS: %.h %.s
 

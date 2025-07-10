@@ -165,7 +165,7 @@ namespace IO {
         return false;
     }
 
-    bool waitForKeysUp( KEYPAD_BITS p_keys ) {
+    bool waitForKeysUp( u32 p_keys ) {
         return waitForKeysUp( inputTarget( p_keys ) );
     }
     bool waitForKeysUp( inputTarget p_inputTarget ) {

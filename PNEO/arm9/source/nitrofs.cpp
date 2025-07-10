@@ -110,6 +110,10 @@ bool nitroFSInit( char **p_basepath ) {
 
     if( __NDSHeader->fatSize == 0 ) return false;
 
+    /*
+
+       TODO
+
     sysSetCartOwner( BUS_OWNER_ARM9 );
     sysSetCardOwner( BUS_OWNER_ARM9 );
 
@@ -126,6 +130,8 @@ bool nitroFSInit( char **p_basepath ) {
             }
         }
     }
+
+    */
 
     // fallback to direct card reads for desmume
     // TODO: validate nitrofs
