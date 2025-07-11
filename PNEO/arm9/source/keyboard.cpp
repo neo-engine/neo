@@ -6,7 +6,7 @@ file        : keyboard.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2025
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -96,7 +96,7 @@ namespace IO {
     std::string keyboard::getText( u8 p_length ) {
         _page = 0;
         init( );
-        for( u8 i = 0; i < p_length; ++i ) clearChar( i );
+        for( u8 i = 0; i < p_length; ++i ) { clearChar( i ); }
 
         std::string res = "";
         u16         c;
@@ -110,7 +110,9 @@ namespace IO {
             }
 
             switch( c ) {
-            case '\n': return guardEmptyString( res );
+            case '\n': {
+                return guardEmptyString( res );
+            }
             case '\b':
                 if( pos ) {
                     clearChar( --pos );
@@ -127,6 +129,7 @@ namespace IO {
                 break;
             }
         }
+        return res;
     }
 
     void keyboard::select( u8 p_idx, u8 p_frame ) {

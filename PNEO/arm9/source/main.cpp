@@ -223,6 +223,7 @@ void vblankIRQ( ) {
     if( ANIMATE_MAP && MAP::curMap ) MAP::curMap->animateMap( FRAME_COUNT );
 }
 
+
 int main( int, char** p_argv ) {
 START:
     // TWL_CONFIG = ( isDSiMode( ) && ( *(u8*) 0x02000400 & 0x0F ) && ( *(u8*) 0x02000401 == 0 )
@@ -236,7 +237,7 @@ START:
     // keysSetRepeat( 25, 5 );
     // sysSetBusOwners( true, true );
 
-    irqEnable( IRQ_VBLANK );
+    // irqEnable( IRQ_VBLANK );
     initGraphics( );
 #ifdef DESQUID
     printf( "\n\nBooting NEO. %u %d\n"
@@ -269,7 +270,8 @@ START:
 #endif
 
     // Read the savegame
-    if( gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
+    // TODO
+    if( true ||  gMod == EMULATOR || ( !FS::CARD::checkCard( ) && !p_argv[ 0 ] )
         || !FS::readSave( p_argv[ 0 ] ) ) {
 #ifdef DESQUID
         printf( "[FAIL]\n- Creating new SAV  " );

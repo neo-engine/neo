@@ -744,6 +744,7 @@ namespace BATTLE {
                 res.m_megaEvolve = !res.m_megaEvolve;
             }
         }
+        return res;
     }
 
     battleMoveSelection battle::handleMoveSelectionSelection( u8 p_slot, bool p_allowMegaEvolution,

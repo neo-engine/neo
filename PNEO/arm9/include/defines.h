@@ -195,7 +195,7 @@ struct pkmnSpriteInfo {
 
 constexpr u32 DEFAULT_SPRITE_PID = 0x88888888;
 
-#define loop( )     while( 1 )
+#define loop( )     while( pmMainLoop( ) )
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )
 #define sq( a )     ( ( a ) * ( a ) )
 
