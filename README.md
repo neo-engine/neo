@@ -72,7 +72,7 @@ _Partially_ implemented features are in _italics_.
 Build requirements
 ------------------
 * devkitARM ≥ r57
-* libnds = 1.8.2
+* libnds = 1.8.*
 * libfilesystem ≥ 0.9.14
 * libfat-nds ≥ 1.1.5
 * dswifi ≥ 0.4.2 (currently unused)
