@@ -82,6 +82,8 @@ Build requirements
 * make
 
 Due to the recent breaking changes of libnds v2.0, this project is scheduled to move away from devkitPro/libnds.
+In particular, the sound system, as well as anything savegame related would require a complete rework. 
+This is unfortunately not feasible with the limited ressources (time, documentation, etc.) available.
 
 Having installed the above tools, _neo_ can be built with a single `make` command.
 See the section below for optional compilation parameters.
