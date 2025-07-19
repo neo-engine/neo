@@ -72,7 +72,7 @@ _Partially_ implemented features are in _italics_.
 Build requirements
 ------------------
 * devkitARM ≥ r57
-* libnds ≥ 1.8.2
+* libnds = 1.8.2
 * libfilesystem ≥ 0.9.14
 * libfat-nds ≥ 1.1.5
 * dswifi ≥ 0.4.2 (currently unused)
@@ -80,6 +80,8 @@ Build requirements
 * gcc/g++ ≥ 11.2 (for ndstool)
 
 * make
+
+Due to the recent breaking changes of libnds v2.0, this project is scheduled to move away from devkitPro/libnds.
 
 Having installed the above tools, _neo_ can be built with a single `make` command.
 See the section below for optional compilation parameters.
