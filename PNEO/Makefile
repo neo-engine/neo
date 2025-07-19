@@ -1,9 +1,6 @@
 .SUFFIXES:
-ifeq ($(strip $(DEVKITARM)),)
-$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM)
-endif
 
-include $(DEVKITARM)/ds_rules
+export SHELL := /usr/bin/env bash
 
 GAME_TITLE_JP	    :=  ポケットモンスター
 GAME_SUBTITLE1_JP	:=  ネオ
@@ -72,11 +69,14 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 endif
 endif
 
-arm7/$(TARGET).elf: FORCE
+arm7/$(TARGET).elf: FORCE libnds
 	$(MAKE) -C arm7
 
-arm9/$(TARGET).elf: FORCE ndstool
+arm9/$(TARGET).elf: FORCE ndstool libnds
 	$(MAKE) -C arm9
+
+libnds:
+	$(MAKE) -C lib/libnds
 
 ndstool:
 	$(MAKE) -C tools/ndstool
@@ -85,6 +85,7 @@ clean:
 	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean
+	$(MAKE) -C lib/libnds clean
 	rm -f $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
 rebuild: clean all

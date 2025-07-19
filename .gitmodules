@@ -9,3 +9,7 @@
 [submodule "PNEO/tools/fsdata"]
 	path = PNEO/tools/fsdata
 	url = https://github.com/neo-engine/fsdata
+[submodule "libnds183"]
+	path = PNEO/lib/libnds
+	url = git@github.com:neo-engine/libnds-1.8.3.git
+	url = https://github.com/neo-engine/libnds-1.8.3
