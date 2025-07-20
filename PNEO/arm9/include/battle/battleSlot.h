@@ -76,8 +76,8 @@ namespace BATTLE {
         u8                  _consecutiveMoveCount;
         u16                 _disabledMove; // move that was disabled
         pkmnData            _pkmnData;
-        std::vector<type>   _altTypes;  // Type(s) the pkmn changed into
-        type                _extraType; // Additional type due to forest's curse or trick-or-treat
+        std::vector<type>   _altTypes; // Type(s) the pkmn changed into
+        type _extraType{ };            // Additional type due to forest's curse or trick-or-treat
 
         u16 _usedItem = 0; // (held) item the pkmn used
 
@@ -677,7 +677,8 @@ namespace BATTLE {
                     break;
                 }
 
-                    [[likely]] default : break;
+                [[likely]] default:
+                    break;
                 }
             }
 
