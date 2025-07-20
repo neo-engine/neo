@@ -72,7 +72,6 @@ _Partially_ implemented features are in _italics_.
 Build requirements
 ------------------
 * devkitARM ≥ r57
-* libnds = 1.8.*
 
 * gcc/g++ ≥ 11.2 (for ndstool)
 
