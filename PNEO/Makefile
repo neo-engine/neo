@@ -39,6 +39,7 @@ export VERSION_NAME		:=	Mimicking Mimikyu
 export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 export NDSTOOL		:=  $(CURDIR)/tools/ndstool/ndstool
+export LIBNDS		:=	$(abspath lib/libnds)
 
 #main targets
 all: $(TARGET).nds
@@ -69,7 +70,7 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 endif
 endif
 
-arm7/$(TARGET).elf: FORCE libnds dswifi libfat
+arm7/$(TARGET).elf: FORCE ndstool libnds dswifi
 	$(MAKE) -C arm7
 
 arm9/$(TARGET).elf: FORCE ndstool libnds dswifi libfat
