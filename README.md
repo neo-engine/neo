@@ -5,7 +5,7 @@ An experimental Pokémon engine for Nintendo DS. For demonstration purposes only
 _neo_ includes some (updated) maps from Pokémon Emerald, as well as images from other
 mainline Pokémon games. These are not part of _neo_.
 
-Consult the compatibilty section for more or less up-to-date information on supported hardware and emulators.
+Consult the compatibility section for more or less up-to-date information on supported hardware and emulators.
 
 Features
 --------
@@ -73,16 +73,13 @@ Build requirements
 ------------------
 * devkitARM ≥ r57
 * libnds = 1.8.*
-* libfilesystem ≥ 0.9.14
-* libfat-nds ≥ 1.1.5
-* dswifi ≥ 0.4.2 (currently unused)
 
 * gcc/g++ ≥ 11.2 (for ndstool)
 
 * make
 
 Due to the recent breaking changes of libnds v2.0, this project is scheduled to move away from devkitPro/libnds.
-In particular, the sound system, as well as anything savegame related would require a complete rework. 
+In particular, the sound system, as well as anything savegame related would require a complete rework.
 This is unfortunately not feasible with the limited ressources (time, documentation, etc.) available.
 
 Having installed the above tools, _neo_ can be built with a single `make` command.

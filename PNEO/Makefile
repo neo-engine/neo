@@ -69,14 +69,20 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 endif
 endif
 
-arm7/$(TARGET).elf: FORCE libnds
+arm7/$(TARGET).elf: FORCE libnds dswifi libfat
 	$(MAKE) -C arm7
 
-arm9/$(TARGET).elf: FORCE ndstool libnds
+arm9/$(TARGET).elf: FORCE ndstool libnds dswifi libfat
 	$(MAKE) -C arm9
 
 libnds:
 	$(MAKE) -C lib/libnds
+
+dswifi: libnds
+	$(MAKE) -C lib/dswifi
+
+libfat: libnds
+	$(MAKE) -C lib/libfat
 
 ndstool:
 	$(MAKE) -C tools/ndstool
@@ -86,6 +92,8 @@ clean:
 	$(MAKE) -C arm7 clean
 	$(MAKE) -C tools/ndstool clean
 	$(MAKE) -C lib/libnds clean
+	$(MAKE) -C lib/dswifi clean
+	$(MAKE) -C lib/libfat clean
 	rm -f $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
 rebuild: clean all

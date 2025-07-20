@@ -2,8 +2,6 @@
 .SUFFIXES:
 #---------------------------------------------------------------------------------
 
-LIBNDS		:=	../lib/libnds
-
 #---------------------------------------------------------------------------------
 # make sure we have bash shell
 #---------------------------------------------------------------------------------
@@ -170,7 +168,9 @@ LIBS	:=	-ldswifi7 -lnds7
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:=	$(LIBNDS)
+
+LIBPATH	:=	../lib/
+LIBDIRS	:=	$(foreach dir,$(LIBPATH),$(sort $(dir $(wildcard $(dir)/*/))))
 
 
 #---------------------------------------------------------------------------------
@@ -199,6 +199,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(abspath $(CURDIR)/$(dir))) \
 			-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(abspath $(dir)/lib))
+
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -237,7 +238,6 @@ DEPENDS	:=	$(OFILES:.o=.d)
 #---------------------------------------------------------------------------------
 $(ARM7ELF)	:	$(OFILES)
 	$(SILENTMSG) linking $(notdir $@)
-	echo $(LIBPATHS)
 	$(SILENTCMD)$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
 
 

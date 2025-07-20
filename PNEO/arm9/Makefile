@@ -2,17 +2,15 @@
 .SUFFIXES:
 #---------------------------------------------------------------------------------
 
-LIBNDS		:=	../lib/libnds
-
 #---------------------------------------------------------------------------------
 # make sure we have bash shell
 #---------------------------------------------------------------------------------
 export SHELL := /usr/bin/env bash
+
 #---------------------------------------------------------------------------------
 # path to tools
 #---------------------------------------------------------------------------------
 DEVKITPATH=$(shell echo "$(DEVKITPRO)" | sed -e 's/^\([a-zA-Z]\):/\/\1/')
-
 export PATH	:=	$(DEVKITPATH)/tools/bin:$(DEVKITPATH)/devkitARM/bin:$(PATH)
 
 #---------------------------------------------------------------------------------
@@ -183,7 +181,8 @@ LIBS	:=	-lfat -ldswifi9 -lnds9
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:=	$(LIBNDS)
+LIBPATH	:=	../lib/
+LIBDIRS	:=	$(foreach dir,$(LIBPATH),$(sort $(dir $(wildcard $(dir)/*/))))
 
 #---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))

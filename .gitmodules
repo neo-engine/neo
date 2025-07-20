@@ -11,5 +11,10 @@
 	url = https://github.com/neo-engine/fsdata
 [submodule "libnds183"]
 	path = PNEO/lib/libnds
-	url = git@github.com:neo-engine/libnds-1.8.3.git
 	url = https://github.com/neo-engine/libnds-1.8.3
+[submodule "dswifi042"]
+	path = PNEO/lib/dswifi
+	url = https://github.com/neo-engine/dswifi-0.4.2
+[submodule "libfat120"]
+	path = PNEO/lib/libfat
+	url = https://github.com/neo-engine/libfat-1.2.0
