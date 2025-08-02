@@ -65,6 +65,8 @@ PNEO/emulator/
 
 *.sav
 
+*.d
+
 .vs/
 
 tags

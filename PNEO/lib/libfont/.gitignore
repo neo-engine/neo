@@ -1,0 +1,5 @@
+arm9/debug
+arm9/release
+include/libfontversion.h
+lib
+*.bz2

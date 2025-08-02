@@ -25,16 +25,26 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+#include <cstring>
 #include <nds.h>
 #include <nds/ndstypes.h>
 
-#include "defines.h"
 #include "io/font.h"
-#include "io/uio.h"
-#include "save/saveGame.h"
+#include "io/fontUtil.h"
 
 namespace IO {
+    u8 TEXTSPEED = 50;
+
     u16 TMPBUF[ 256 * 64 ] = { 0 };
+
+    font *regularFont
+        = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
+    font *boldFont = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar );
+    font *smallFont
+        = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
+    font *brailleFont
+        = new font( BRAILLE_FONT::fontData, BRAILLE_FONT::fontWidths, BRAILLE_FONT::shiftchar );
 
     font::font( u8 *p_data, u8 *p_widths, void ( *p_shiftchar )( u16 &val ) ) {
         _data       = p_data;
@@ -43,11 +53,8 @@ namespace IO {
         _shiftchar                                                          = p_shiftchar;
     }
 
-    void font::_charDelay( ) const {
-        for( u8 i = 0;
-             i < 80 / ( TEXTSPEED + SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
-             ++i )
-            swiWaitForVBlank( );
+    void font::_charDelay( s8 p_textSpeedModifier ) const {
+        for( u8 i = 0; i < 80 / ( TEXTSPEED + p_textSpeedModifier ); ++i ) { swiWaitForVBlank( ); }
     }
 
     u32 font::stringWidth( const char *p_string, u8 p_charShift ) const {
@@ -56,7 +63,7 @@ namespace IO {
 
         bool sp = false;
         while( p_string[ current_char ] ) {
-            if( p_string[ current_char ] == '\n' ) break;
+            if( p_string[ current_char ] == '\n' ) { break; }
             if( p_string[ current_char ] == '[' ) {
                 sp = true;
                 current_char++;
@@ -140,7 +147,7 @@ namespace IO {
                 for( putX = p_x, getX = 0; putX < p_x + _widths[ p_ch ]; putX++, getX++ ) {
                     if( putX >= 0 && putX < SCREEN_WIDTH && putY >= 0 && putY < 256 ) {
                         u8 clr = _color[ _data[ offset + ( getX + getY * FONT_WIDTH ) ] ];
-                        if( clr ) setPixel( putX, putY, p_bottom, clr, p_layer );
+                        if( clr ) { setPixel( putX, putY, p_bottom, clr, p_layer ); }
                     }
                 }
             }
@@ -182,14 +189,13 @@ namespace IO {
         for( u8 i = 0; i < p_digits; ++i, p_value /= 10 ) {
             auto old = getColor( 1 );
             if( i == p_highlightDigit ) {
-                IO::printRectangle( p_x + ( p_digits - i - 1 ) * 8, p_y + 2,
-                                    p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom,
-                                    p_highlightBG, p_layer );
+                printRectangle( p_x + ( p_digits - i - 1 ) * 8, p_y + 2,
+                                p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom, p_highlightBG,
+                                p_layer );
                 setColor( p_highlightFG, 1 );
             } else {
-                IO::printRectangle( p_x + ( p_digits - i - 1 ) * 8, p_y + 2,
-                                    p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom, 0,
-                                    p_layer );
+                printRectangle( p_x + ( p_digits - i - 1 ) * 8, p_y + 2,
+                                p_x + ( p_digits - i ) * 8 - 1, p_y + 14, p_bottom, 0, p_layer );
             }
             printChar( '0' + ( p_value % 10 ), p_x + ( p_digits - i - 1 ) * 8, p_y, p_bottom,
                        p_layer );
@@ -199,7 +205,7 @@ namespace IO {
 
     u16 font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
-                           bool p_delay, u8 p_layer ) const {
+                           bool p_delay, u8 p_layer, s8 p_textSpeedModifier ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
         u16 lines = 1;
@@ -246,7 +252,7 @@ namespace IO {
             putX += printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer )
                     - p_charShift;
 
-            if( p_delay ) { _charDelay( ); }
+            if( p_delay ) { _charDelay( p_textSpeedModifier ); }
 
             current_char++;
         }
@@ -255,16 +261,16 @@ namespace IO {
 
     u16 font::printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX, bool p_delay,
-                            u8 p_layer ) const {
+                            u8 p_layer, s8 p_textSpeedModifier ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX, 1,
-                            p_delay, p_layer );
+                            p_delay, p_layer, p_textSpeedModifier );
     }
 
     u16 font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
-                            u8 p_layer ) const {
+                            u8 p_layer, s8 p_textSpeedModifier ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX,
-                            p_charShift, true, p_layer );
+                            p_charShift, true, p_layer, p_textSpeedModifier );
     }
 
     u16 font::printStringB( const char *p_string, const u16 *p_palette, u16 *p_buffer,
@@ -288,8 +294,8 @@ namespace IO {
                 putY += p_yDistance;
                 lineWd = stringMaxWidth( p_string + current_char + 1, lineSpace, ' ', p_charShift );
                 if( p_alignment == LEFT ) { putX = 0; }
-                if( p_alignment == RIGHT ) putX = lineSpace - lineWd;
-                if( p_alignment == CENTER ) putX = ( lineSpace - lineWd ) / 2;
+                if( p_alignment == RIGHT ) { putX = lineSpace - lineWd; }
+                if( p_alignment == CENTER ) { putX = ( lineSpace - lineWd ) / 2; }
 
                 current_char++;
                 lines++;
@@ -349,7 +355,7 @@ namespace IO {
     u16 font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                    bool p_bottom, alignment p_alignment, u8 p_yDistance,
                                    char p_breakChar, s8 p_adjustX, u8 p_charShift, bool p_delay,
-                                   u8 p_layer ) const {
+                                   u8 p_layer, s8 p_textSpeedModifier ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
         u16 lines = 1;
@@ -367,8 +373,8 @@ namespace IO {
                 putX   = ( p_x -= p_adjustX );
                 lineWd = stringMaxWidth( p_string + current_char + 1, p_maxWidth, p_breakChar,
                                          p_charShift );
-                if( p_alignment == RIGHT ) putX = p_x - lineWd;
-                if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
+                if( p_alignment == RIGHT ) { putX = p_x - lineWd; }
+                if( p_alignment == CENTER ) { putX = p_x - lineWd / 2; }
 
                 current_char++;
                 lines++;
@@ -399,7 +405,7 @@ namespace IO {
             putX += wd - p_charShift;
             lineWd -= wd - p_charShift;
 
-            if( p_delay ) { _charDelay( ); }
+            if( p_delay ) { _charDelay( p_textSpeedModifier ); }
 
             current_char++;
         }
@@ -408,14 +414,16 @@ namespace IO {
 
     u16 font::printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                     bool p_bottom, alignment p_alignment, u8 p_yDistance,
-                                    char p_breakChar, s8 p_adjustX, bool p_delay,
-                                    u8 p_layer ) const {
+                                    char p_breakChar, s8 p_adjustX, bool p_delay, u8 p_layer,
+                                    s8 p_textSpeedModifier ) const {
         return printBreakingString( p_string, p_x, p_y, p_maxWidth, p_bottom, p_alignment,
-                                    p_yDistance, p_breakChar, p_adjustX, 1, p_delay, p_layer );
+                                    p_yDistance, p_breakChar, p_adjustX, 1, p_delay, p_layer,
+                                    p_textSpeedModifier );
     }
 
     void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
-                               u16 p_breakChar, u8 p_charShift, bool p_delay, u8 p_layer ) const {
+                               u16 p_breakChar, u8 p_charShift, bool p_delay, u8 p_layer,
+                               s8 p_textSpeedModifier ) const {
         u32 current_char = 0;
         s16 putX = p_x, putY = p_y;
 
@@ -426,10 +434,11 @@ namespace IO {
             if( putX + wd > p_maxX ) {
                 printChar( p_breakChar, putX, putY, p_bottom, p_layer );
                 break;
-            } else
+            } else {
                 printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer );
+            }
 
-            if( p_delay ) { _charDelay( ); }
+            if( p_delay ) { _charDelay( p_textSpeedModifier ); }
 
             putX += wd;
             current_char++;
@@ -437,9 +446,9 @@ namespace IO {
     }
 
     void font::printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
-                                u16 p_breakChar, bool p_delay, u8 p_layer ) const {
+                                u16 p_breakChar, bool p_delay, u8 p_layer,
+                                s8 p_textSpeedModifier ) const {
         return printMaxString( p_string, p_x, p_y, p_bottom, p_maxX, p_breakChar, 1, p_delay,
-                               p_layer );
+                               p_layer, p_textSpeedModifier );
     }
-
 } // namespace IO

@@ -37,13 +37,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "save/saveGame.h"
 
 namespace IO {
-    font *regularFont
-        = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
-    font *boldFont = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar );
-    font *smallFont
-        = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
-    font *brailleFont
-        = new font( BRAILLE_FONT::fontData, BRAILLE_FONT::fontWidths, BRAILLE_FONT::shiftchar );
     ConsoleFont *consoleFont = new ConsoleFont( );
 
     OAMTable  *Oam = new OAMTable( );
@@ -51,8 +44,6 @@ namespace IO {
 
     OAMTable  *OamTop = new OAMTable( );
     SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-
-    u8 TEXTSPEED = 50;
 
     PrintConsole Top, Bottom;
 
@@ -184,108 +175,6 @@ namespace IO {
         if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON )
             return waitForKeysUp( p_inputTarget );
         return waitForTouchUp( p_inputTarget );
-    }
-
-    void initColors( bool p_sub, bool p_top, bool p_font ) {
-        if( p_font ) {
-            regularFont->setColor( 0, 0 );
-            regularFont->setColor( IO::BLACK_IDX, 1 );
-            regularFont->setColor( IO::GRAY_IDX, 2 );
-            boldFont->setColor( 0, 0 );
-            boldFont->setColor( IO::GRAY_IDX, 1 );
-            boldFont->setColor( IO::WHITE_IDX, 2 );
-        }
-        if( p_sub ) {
-            BG_PALETTE_SUB[ IO::WHITE_IDX ] = IO::WHITE;
-            BG_PALETTE_SUB[ IO::GRAY_IDX ]  = IO::GRAY;
-            BG_PALETTE_SUB[ IO::BLACK_IDX ] = IO::BLACK;
-            BG_PALETTE_SUB[ IO::RED_IDX ]   = IO::RED;
-            BG_PALETTE_SUB[ IO::BLUE_IDX ]  = IO::BLUE;
-        }
-        if( p_top ) {
-            BG_PALETTE[ IO::WHITE_IDX ] = IO::WHITE;
-            BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
-            BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
-            BG_PALETTE[ IO::RED_IDX ]   = IO::RED;
-            BG_PALETTE[ IO::BLUE_IDX ]  = IO::BLUE;
-        }
-    }
-
-    /*
-     * @brief Sets a pixel to the specified color
-     */
-    void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer ) {
-        if( p_bottom ) {
-            color old
-                = ( (color *) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
-            u8 bot = old, top = old >> 8;
-            if( p_x & 1 )
-                old = ( ( (u8) p_color ) << 8 ) | bot;
-            else
-                old = ( top << 8 ) | ( (u8) p_color );
-
-            ( (color *) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
-        } else {
-            color old
-                = ( (color *) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
-            u8 bot = old, top = old >> 8;
-            if( p_x & 1 )
-                old = ( ( (u8) p_color ) << 8 ) | bot;
-            else
-                old = ( top << 8 ) | ( (u8) p_color );
-
-            ( (color *) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
-        }
-    }
-
-    void drawLine( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color, u8 p_layer ) {
-        if( p_x1 == p_x2 ) { // vertical line
-            if( p_y2 < p_y1 ) { std::swap( p_y1, p_y2 ); }
-            for( u16 y = p_y1; y <= p_y2; ++y ) { setPixel( p_x1, y, p_bottom, p_color, p_layer ); }
-            return;
-        }
-        if( p_y1 == p_y2 ) { // horizontal line
-            if( p_x2 < p_x1 ) { std::swap( p_x1, p_x2 ); }
-            for( u16 x = p_x1; x <= p_x2; ++x ) { setPixel( x, p_y1, p_bottom, p_color, p_layer ); }
-            return;
-        }
-
-        if( p_x2 < p_x1 ) {
-            std::swap( p_x1, p_x2 );
-            std::swap( p_y1, p_y2 );
-        }
-
-        auto dx = p_x2 - p_x1;
-        auto dy = -std::abs( p_y2 - p_y1 );
-        auto sy = p_y2 < p_y1 ? -1 : 1;
-        auto D  = dx + dy;
-        auto y  = p_y1;
-        auto x  = p_x1;
-
-        loop( ) {
-            setPixel( x, y, p_bottom, p_color, p_layer );
-            if( x == p_x2 && y == p_y2 ) { break; }
-            auto D2 = 2 * D;
-            if( D2 >= dy ) {
-                if( x == p_x2 ) { break; }
-                D += dy;
-                x++;
-            }
-            if( D2 <= dx ) {
-                if( y == p_y2 ) { break; }
-                D += dx;
-                y += sy;
-            }
-        }
-    }
-
-    /*
-     * @brief Prints a rectangle to the screen, all coordinates inclusive
-     */
-    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color,
-                         u8 p_layer ) {
-        for( u16 y = p_y1; y <= p_y2; ++y )
-            for( u16 x = p_x1; x <= p_x2; ++x ) { setPixel( x, y, p_bottom, p_color, p_layer ); }
     }
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,

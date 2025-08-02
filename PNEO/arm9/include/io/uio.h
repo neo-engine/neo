@@ -26,9 +26,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 #include <string>
+#include <io/font.h>
+#include <io/fontUtil.h>
 #include <nds.h>
 
-#include "io/font.h"
 #include "io/sprite.h"
 #include "save/saveGame.h"
 
@@ -40,52 +41,6 @@ namespace IO {
 #define GET_AND_WAIT( p_key ) \
     ( ( pressed & ( p_key ) ) && IO::waitForInput( IO::inputTarget( p_key ) ) )
 
-    constexpr u16 RGB( u8 p_r, u8 p_g, u8 p_b ) {
-        return RGB15( p_r, p_g, p_b ) | BIT( 15 );
-    }
-
-    constexpr u16 COMPL( u16 p_color ) {
-        return RGB( 31 - ( p_color >> 10 ) % 32, 31 - ( p_color >> 5 ) % 32, 31 - p_color % 32 );
-    }
-
-    constexpr u8 RED2_IDX  = 247;
-    constexpr u8 BLUE2_IDX = 248;
-    constexpr u8 COLOR_IDX = 249;
-    constexpr u8 WHITE_IDX = 250;
-    constexpr u8 GRAY_IDX  = 251;
-    constexpr u8 BLACK_IDX = 252;
-    constexpr u8 RED_IDX   = 253;
-    constexpr u8 BLUE_IDX  = 254;
-
-    constexpr u16 CHOICE_COLOR = RGB( 16, 25, 19 );
-
-    constexpr u16 GREEN         = RGB( 12, 30, 12 );
-    constexpr u16 GREEN2        = RGB( 3, 23, 4 );
-    constexpr u16 RED           = RGB( 30, 15, 12 );
-    constexpr u16 RED2          = RGB( 20, 7, 7 );
-    constexpr u16 BLUE          = RGB( 0, 10, 31 );
-    constexpr u16 BLUE2         = RGB( 0, 0, 15 );
-    constexpr u16 WHITE         = RGB( 30, 30, 30 );
-    constexpr u16 GRAY          = RGB( 20, 20, 20 );
-    constexpr u16 NORMAL_COLOR  = RGB( 27, 27, 27 );
-    constexpr u16 BLACK         = RGB( 2, 2, 4 );
-    constexpr u16 BLACK2        = RGB( 5, 5, 5 );
-    constexpr u16 YELLOW        = RGB( 30, 30, 12 );
-    constexpr u16 YELLOW2       = RGB( 23, 23, 5 );
-    constexpr u16 PURPLE        = RGB( 24, 0, 24 );
-    constexpr u16 TURQOISE      = RGB( 0, 24, 24 );
-    constexpr u16 ICE_COLOR     = RGB( 15, 31, 31 );
-    constexpr u16 FAIRY_COLOR   = RGB( 31, 15, 31 );
-    constexpr u16 GROUND_COLOR  = RGB( 31, 31, 15 );
-    constexpr u16 POISON_COLOR  = RGB( 31, 0, 15 );
-    constexpr u16 ORANGE        = RGB( 31, 15, 0 );
-    constexpr u16 GHOST_COLOR   = RGB( 15, 0, 31 );
-    constexpr u16 ROCK_COLOR    = RGB( 28, 23, 7 );
-    constexpr u16 BUG_COLOR     = RGB( 15, 28, 7 );
-    constexpr u16 STEEL_COLOR   = RGB( 24, 24, 24 );
-    constexpr u16 DRAGON_COLOR  = RGB( 7, 7, 24 );
-    constexpr u16 UNKNOWN_COLOR = RGB( 0, 42, 42 );
-
     const u16 SELECTED_SPR_PAL[ 16 ] = { 0x7FFF, 0x20C3, 0x5208, 0x7FFF, 0x7F2C, 0x318C };
 
     inline u16* BG_PAL( bool p_bottom ) {
@@ -95,15 +50,6 @@ namespace IO {
         return p_bottom ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 );
     }
 
-    constexpr u8 SCREEN_TOP    = 1;
-    constexpr u8 SCREEN_BOTTOM = 0;
-    constexpr u8 FONT_WIDTH    = 16;
-    constexpr u8 FONT_HEIGHT   = 16;
-
-    extern font*        regularFont;
-    extern font*        boldFont;
-    extern font*        smallFont;
-    extern font*        brailleFont;
     extern ConsoleFont* consoleFont;
 
     extern OAMTable*  Oam;
@@ -111,8 +57,6 @@ namespace IO {
 
     extern OAMTable*  OamTop;
     extern SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
-
-    extern u8 TEXTSPEED;
 
     extern int          bg2;
     extern int          bg3;
@@ -124,7 +68,6 @@ namespace IO {
     void initVideo( bool p_noFade = false );
     void initVideoSub( bool p_noFade = false );
     void vramSetup( bool p_noFade = false );
-    void initColors( bool p_sub = true, bool p_top = true, bool p_font = true );
 
     void swapScreens( );
     void animateBG( u8 p_frame, int p_bg );
@@ -237,13 +180,6 @@ namespace IO {
     bool waitForKeysUp( inputTarget p_inputTarget );
 
     bool waitForInput( inputTarget p_inputTarget );
-
-    void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer = 1 );
-
-    void printRectangle( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, bool p_bottom, u8 p_color,
-                         u8 p_layer = 1 );
-
-    void drawLine( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y5, bool p_bottom, u8 p_color, u8 p_layer = 1 );
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
                     bool p_delay, bool p_big = false ); // HP in %

@@ -6,7 +6,7 @@ file        : font.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2025
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -29,7 +29,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 namespace IO {
-    typedef u16 color;
+    typedef u16   color;
+
+    constexpr u8 FONT_WIDTH  = 16;
+    constexpr u8 FONT_HEIGHT = 16;
+    extern u8    TEXTSPEED;
 
     namespace REGULAR_FONT {
         constexpr auto NUM_CHARS = 490;
@@ -63,7 +67,7 @@ namespace IO {
         void ( *_shiftchar )( u16 &val );
         color _color[ 5 ];
 
-        void _charDelay( ) const;
+        void _charDelay( s8 p_textSpeedModifier ) const;
 
       public:
         enum alignment { LEFT, RIGHT, CENTER };
@@ -151,7 +155,8 @@ namespace IO {
          */
         u16 printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                          alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
-                         u8 p_charShift = 0, bool p_delay = false, u8 p_layer = 1 ) const;
+                         u8 p_charShift = 0, bool p_delay = false, u8 p_layer = 1,
+                         s8 p_textSpeedModifier = 0 ) const;
 
         /*
          * @brief: Prints a string with less horizontal space between characters
@@ -159,7 +164,7 @@ namespace IO {
          */
         u16 printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                           alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
-                          bool p_delay = false, u8 p_layer = 1 ) const;
+                          bool p_delay = false, u8 p_layer = 1, s8 p_textSpeedModifier = 0 ) const;
 
         /*
          * @brief: Prints the given string with some delay after every character.
@@ -167,7 +172,7 @@ namespace IO {
          */
         u16 printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                           alignment p_alignment = LEFT, u8 p_yDistance = 15, s8 p_adjustX = 0,
-                          u8 p_charShift = 0, u8 p_layer = 1 ) const;
+                          u8 p_charShift = 0, u8 p_layer = 1, s8 p_textSpeedModifier = 0 ) const;
 
         /*
          * @brief: Prints the given string to the given buffer.
@@ -194,7 +199,8 @@ namespace IO {
         u16 printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                  bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
                                  char p_breakChar = ' ', s8 p_adjustX = 0, u8 p_charShift = 0,
-                                 bool p_delay = false, u8 p_layer = 1 ) const;
+                                 bool p_delay = false, u8 p_layer = 1,
+                                 s8 p_textSpeedModifier = 0 ) const;
         /*
          * @brief: Prints the given string, where newlines are inserted whenever the
          * current line exceeds the given p_maxWidth. Uses less horizontal space for each
@@ -204,7 +210,7 @@ namespace IO {
         u16 printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                   bool p_bottom, alignment p_alignment = LEFT, u8 p_yDistance = 16,
                                   char p_breakChar = ' ', s8 p_adjustX = 0, bool p_delay = false,
-                                  u8 p_layer = 1 ) const;
+                                  u8 p_layer = 1, s8 p_textSpeedModifier = 0 ) const;
 
         /*
          * @brief: Prints a string until p_maxX is reached, writes p_breakChar if the
@@ -212,13 +218,19 @@ namespace IO {
          */
         void printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                              s16 p_maxX = 256, u16 p_breakChar = L'.', u8 p_charShift = 0,
-                             bool p_delay = false, u8 p_layer = 1 ) const;
+                             bool p_delay = false, u8 p_layer = 1,
+                             s8 p_textSpeedModifier = 0 ) const;
         /*
          * @brief: Prints a string with less horizontal space between characters;
          * prints p_breakChar once p_maxX is reached.
          */
         void printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
                               s16 p_maxX = 256, u16 p_breakChar = L'.', bool p_delay = false,
-                              u8 p_layer = 1 ) const;
+                              u8 p_layer = 1, s8 p_textSpeedModifier = 0 ) const;
     };
+
+    extern font *regularFont;
+    extern font *boldFont;
+    extern font *smallFont;
+    extern font *brailleFont;
 } // namespace IO

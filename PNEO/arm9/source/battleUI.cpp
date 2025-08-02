@@ -2823,8 +2823,9 @@ namespace BATTLE {
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
             BG_PALETTE[ IO::BLACK_IDX ] = IO::BLACK;
             BG_PALETTE[ IO::GRAY_IDX ]  = IO::GRAY;
-            IO::regularFont->printBreakingStringC( p_message, 12, 192 - 40, 232, false,
-                                                   IO::font::LEFT, 16, ' ', 0, true );
+            IO::regularFont->printBreakingStringC(
+                p_message, 12, 192 - 40, 232, false, IO::font::LEFT, 16, ' ', 0, true, 1,
+                SAVE::SAV.getActiveFile( ).m_options.m_textSpeedModifier );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         }
     }
