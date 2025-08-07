@@ -80,11 +80,11 @@ Build requirements
 Having installed the above tools, _neo_ can be built with a single `make` command.
 See the section below for optional compilation parameters.
 
-The main data for the maps, 'mons, etc, is stored in the separate `perm2-FSROOT`
+The main data for the maps, 'mons, etc, is stored in the separate `neo/FSROOT`
 repository; some data can be configured and build via tools and `csv` files found in the
-`perm2-fsdata` repository.
+`neo/fsdata` repository.
 
-Further helper scripts to convert images and other data can be found in the `perm2-helper`
+Further helper scripts to convert images and other data can be found in the `neo/helper`
 repository.
 
 Compilation Parameters
