@@ -5,10 +5,9 @@
 #include <nds.h>
 
 #include "fs/data.h"
+#include "sound/sound.h"
 #include "sound/sseq.h"
 #include "sound/sseqData.h"
-
-#include "io/message.h"
 
 namespace SOUND::SSEQ {
     static void sndsysMsgHandler( int, void * );
@@ -185,45 +184,12 @@ namespace SOUND::SSEQ {
         freeSequence( );
     }
 
-    void pauseSequence( ) {
-        soundSysMessage msg;
-        msg.m_message = SNDSYS_PAUSESEQ;
-        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
-    }
-
-    void setMasterVolume( u8 p_volume ) {
-        soundSysMessage msg;
-        msg.m_message = SNDSYS_VOLUME;
-        msg.m_volume  = p_volume;
-        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
-    }
-
     void fadeSequence( ) {
         soundSysMessage msg;
         msg.m_message        = SNDSYS_FADESEQ;
         SEQ_SWAP_IN_PROGRESS = true;
         fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
     }
-
-    int playSample( void *p_data, const sampleInfo &p_sampleInfo, const playInfo &p_playInfo ) {
-        soundSysMessage msg;
-        msg.m_message    = SNDSYS_PLAY_SAMPLE;
-        msg.m_sample     = sequenceData{ p_data, p_sampleInfo.m_nonLoopLen };
-        msg.m_sampleInfo = p_sampleInfo;
-        msg.m_playInfo   = p_playInfo;
-
-        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
-        int ch = (int) fifoGetRetValue( FIFO_SNDSYS );
-        return ( ch == 0xFFFF ) ? -1 : ch;
-    }
-
-    void stopSample( int p_handle ) {
-        soundSysMessage msg;
-        msg.m_message = SNDSYS_STOP_SAMPLE;
-        msg.m_channel = p_handle;
-        fifoSendDatamsg( FIFO_SNDSYS, sizeof( msg ), (u8 *) &msg );
-    }
-
 } // namespace SOUND::SSEQ
 
 #endif

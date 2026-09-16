@@ -162,7 +162,7 @@ CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -fno-rtti -std=c++23
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=ds_arm7.specs -g $(ARCH) -Wl,--nmagic -Wl,-Map,$(notdir $*).map
 
-LIBS	:=	-ldswifi7 -lnds7
+LIBS	:=	-ldswifi7 -lsound7 -lnds7
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

@@ -71,10 +71,10 @@ $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 endif
 endif
 
-arm7/$(TARGET).elf: FORCE ndstool libnds dswifi
+arm7/$(TARGET).elf: FORCE ndstool libnds dswifi libsound
 	$(MAKE) -C arm7
 
-arm9/$(TARGET).elf: FORCE ndstool libnds dswifi libfat libfont
+arm9/$(TARGET).elf: FORCE ndstool libnds dswifi libsound libfat libfont
 	$(MAKE) -C arm9
 
 libnds:
@@ -82,6 +82,9 @@ libnds:
 
 dswifi: libnds
 	$(MAKE) -C lib/dswifi
+
+libsound: libnds
+	$(MAKE) -C lib/libsound
 
 libfat: libnds
 	$(MAKE) -C lib/libfat

@@ -1,0 +1,7 @@
+arm7/debug
+arm7/release
+arm9/debug
+arm9/release
+include/libsound_version.h
+lib
+*.bz2

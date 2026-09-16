@@ -388,30 +388,9 @@ namespace SOUND::SSEQ {
     void stopSample( int p_handle );
 
     /*
-     * @brief: Stops and unloads any currently playing sequence; and then loads and starts
-     * to play sequence p_seqId (fading in when p_fadeIn is true).
-     */
-    bool playSequence( u16 p_seqId, bool p_fadeIn = false );
-
-    /*
-     * @brief: Schedules sequence no. p_seqId to be played next, after first fading out of
-     * the current sequence. If a fade out/in is already in progress, p_seqId overwrites
-     * the next spot in the to-play queue (ensuring that the corresponding sequence is
-     * swapped in after the current fade out/in is completed)
-     */
-    bool fadeSwapSequence( u16 p_seqId );
-
-    /*
      * @brief: Stops any currently playing sequence, but keeps it in storage.
      */
-    void stopSequence( );
-
-    /*
-     * @brief: Freea any memory occupied by a currently loaded sequence. Unloading a
-     * playing sequence is not advised and will most likely result in either a crash or
-     * garbage being played.
-     */
-    void fadeSequence( );
+    void pauseSequence( );
 
     /*
      * @brief: Sets the master playback volume; 0 is mute, 127 is full volume.
