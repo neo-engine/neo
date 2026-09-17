@@ -35,7 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "map/mapSlice.h"
 
 #ifdef DESQUID
-#include "io/uio.h"
+#include "io/util.h"
 #endif
 
 namespace MAP {
