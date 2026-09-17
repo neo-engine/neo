@@ -34,14 +34,13 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dex/dex.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/keyboard.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapScript.h"
 #include "save/saveGame.h"
@@ -426,12 +425,12 @@ namespace MAP {
                         IO::printMessage( p_message, MSG_NORMAL );
                     },
                     [ & ]( boxPokemon* p_pok, u16 p_extraMove ) {
-                        IO::choiceBox menu3
-                            = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                        IO::simpleChoiceBox menu3
+                            = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
                         return menu3.getResult( 0, MSG_NOCLOSE, p_pok->m_moves, p_extraMove );
                     },
                     [ & ]( const char* p_message ) {
-                        IO::yesNoBox yn;
+                        IO::simpleYesNoBox yn;
                         return yn.getResult( p_message, MSG_NOCLOSE ) == IO::yesNoBox::YES;
                     } );
                 IO::init( );
@@ -839,7 +838,7 @@ namespace MAP {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( 141 ),
                           giftPkmn.m_boxdata.m_name );
                 if( IO::yesNoBox::YES
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( buffer.data( ), MSG_INFO_NOCLOSE ).c_str( ),
                         MSG_INFO ) ) {
                     ANIMATE_MAP = false;
@@ -1051,10 +1050,11 @@ namespace MAP {
                     break;
                 }
                 case CLL_RUN_CHOICE_BOX: {
-                    IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-                    registers[ 0 ]   = cb.getResult( GET_MAP_STRING( choiceBoxMessage ),
-                                                     style( choiceBoxMsgType ), choiceBoxItems );
-                    registers[ 1 ]   = choiceBoxPL[ registers[ 0 ] ];
+                    IO::simpleChoiceBox cb
+                        = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                    registers[ 0 ] = cb.getResult( GET_MAP_STRING( choiceBoxMessage ),
+                                                   style( choiceBoxMsgType ), choiceBoxItems );
+                    registers[ 1 ] = choiceBoxPL[ registers[ 0 ] ];
                     IO::init( );
                     break;
                 }
@@ -1075,7 +1075,7 @@ namespace MAP {
                 case CLL_SAVE_GAME: {
                     // save game, writes 1 to eval reg if successful
 
-                    IO::yesNoBox yn;
+                    IO::simpleYesNoBox yn;
                     if( par2 == 1
                         || yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE )
                                == IO::yesNoBox::YES ) {
@@ -1176,7 +1176,7 @@ namespace MAP {
                 break;
             case COU: {
                 style st       = MSG_INFO_NOCLOSE;
-                registers[ 0 ] = IO::counter( 0, parB ).getResult(
+                registers[ 0 ] = IO::simpleCounter( 0, parB ).getResult(
                     convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st );
                 IO::init( );
                 break;
@@ -1184,7 +1184,7 @@ namespace MAP {
             case COUR: {
                 style st = MSG_INFO_NOCLOSE;
                 registers[ 0 ]
-                    = IO::counter( 0, registers[ parB ] )
+                    = IO::simpleCounter( 0, registers[ parB ] )
                           .getResult( convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st );
                 IO::init( );
 #ifdef DESQUID_MORE
@@ -1205,7 +1205,7 @@ namespace MAP {
 
                 registers[ 0 ]
                     = IO::yesNoBox::YES
-                      == IO::yesNoBox( ).getResult(
+                      == IO::simpleYesNoBox( ).getResult(
                           convertMapString( GET_MAP_STRING( parA ), st ).c_str( ), st, showMoney );
                 IO::init( );
                 break;

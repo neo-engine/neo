@@ -27,6 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "battle/battle.h"
 #include "battle/battleField.h"
@@ -39,10 +41,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "gen/bgmNames.h"
 #include "io/animations.h"
-#include "io/choiceBox.h"
 #include "io/strings.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "pokemon.h"
 #include "save/saveGame.h"
@@ -792,7 +792,7 @@ namespace BATTLE {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 res.m_type = MT_CANCEL;
             } else {
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
             return res;
@@ -838,7 +838,7 @@ namespace BATTLE {
                     return res;
                 }
             } else {
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
             break;
@@ -901,29 +901,29 @@ namespace BATTLE {
             }
         }
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
             for( auto i : choices ) {
-                if( i.first.inRange( touch ) ) {
+                if( i.first.inRange( IO::TOUCH ) ) {
                     _battleUI.showMoveSelection(
                         _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), p_slot,
                         curSel = i.second );
 
                     bool bad = false;
-                    while( touch.px || touch.py ) {
+                    while( IO::TOUCH.px || IO::TOUCH.py ) {
                         swiWaitForVBlank( );
-                        if( !i.first.inRange( touch ) ) {
+                        if( !i.first.inRange( IO::TOUCH ) ) {
                             bad = true;
                             break;
                         }
                         scanKeys( );
-                        touchRead( &touch );
+                        touchRead( &IO::TOUCH );
                         swiWaitForVBlank( );
                     }
                     if( !bad ) {
@@ -938,12 +938,12 @@ namespace BATTLE {
                 }
             }
 
-            if( p_slot && ( pressed & KEY_B ) ) {
+            if( p_slot && ( IO::BTN_PRESSED & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 res.m_type = MT_CANCEL;
                 return res;
             }
-            if( pressed & KEY_A ) {
+            if( IO::BTN_PRESSED & KEY_A ) {
                 res = handleMoveSelectionSelection( p_slot, p_allowMegaEvolution, curSel );
                 if( res.m_type != MT_CANCEL ) { return res; }
 
@@ -952,7 +952,7 @@ namespace BATTLE {
                 _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
                                              p_slot, curSel );
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -967,7 +967,7 @@ namespace BATTLE {
                 _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
                                              p_slot, curSel );
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -980,7 +980,7 @@ namespace BATTLE {
                 _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
                                              p_slot, curSel );
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) || GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -993,7 +993,7 @@ namespace BATTLE {
                 _battleUI.showMoveSelection( _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ),
                                              p_slot, curSel );
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             swiWaitForVBlank( );
         }

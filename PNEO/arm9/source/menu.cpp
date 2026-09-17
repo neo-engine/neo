@@ -40,18 +40,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/locationNames.h"
 #include "gen/moveNames.h"
 #include "io/animations.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/keyboard.h"
 #include "io/menu.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/navApp.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapObject.h"
 #include "map/mapSlice.h"
@@ -103,7 +101,7 @@ namespace IO {
 
         if( NAV_NEEDS_REDRAW ) { redraw( ); }
 
-        if( pressed & KEY_Y ) {
+        if( IO::BTN_PRESSED & KEY_Y ) {
             // registered item
             IO::waitForKeysUp( KEY_Y );
             if( SAVE::CURRENT_FILE->m_registeredItem ) {
@@ -141,14 +139,14 @@ namespace IO {
             return;
         }
 
-        if( ( pressed & KEY_X ) || ( pressed & KEY_START ) ) {
+        if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_START ) ) {
             // Open menu
             focusMenu( p_path );
             return;
         }
 
         for( auto c : getTouchPositions( ) ) {
-            if( c.first.inRange( touch ) ) {
+            if( c.first.inRange( IO::TOUCH ) ) {
                 if( c.second < NAV_APP_START ) {
                     oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = false;
                     oam[ SPR_MENU_SEL_OAM_SUB ].x = oam[ SPR_MENU_OAM_SUB( u8( c.second ) ) ].x - 2;
@@ -157,17 +155,17 @@ namespace IO {
                 }
 
                 bool change = true;
-                while( touch.px || touch.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
                     scanKeys( );
 
-                    if( !c.first.inRange( touch ) ) {
+                    if( !c.first.inRange( IO::TOUCH ) ) {
                         change                               = 0;
                         oam[ SPR_MENU_SEL_OAM_SUB ].isHidden = true;
                         IO::updateOAM( true );
                         break;
                     }
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
 
@@ -180,7 +178,7 @@ namespace IO {
         }
 
 #ifdef DESQUID
-        if( pressed & KEY_SELECT ) {
+        if( IO::BTN_PRESSED & KEY_SELECT ) {
             focusDesquidMenu( p_path );
             return;
         }
@@ -192,8 +190,9 @@ namespace IO {
         switch( p_selection ) {
         case DSQ_SPAWN_DEFAULT_TEAM: {
             init( );
-            IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-            auto          res  = menu.getResult(
+            IO::simpleChoiceBox menu
+                = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            auto res = menu.getResult(
                 GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
                 std::vector<u16>{ FS::DESQUID_STRING + 61, FS::DESQUID_STRING + 64,
                                   FS::DESQUID_STRING + 62, FS::DESQUID_STRING + 63,
@@ -325,12 +324,13 @@ namespace IO {
             break;
         case DSQ_EDIT_FLAGS: {
             init( );
-            IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-            auto          res  = menu.getResult( GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
-                                                 std::vector<u16>{ FS::DESQUID_STRING + 53,
-                                                                   FS::DESQUID_STRING + 54,
-                                                                   FS::DESQUID_STRING + 55 },
-                                                 true );
+            IO::simpleChoiceBox menu
+                = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            auto res = menu.getResult( GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
+                                       std::vector<u16>{ FS::DESQUID_STRING + 53,
+                                                         FS::DESQUID_STRING + 54,
+                                                         FS::DESQUID_STRING + 55 },
+                                       true );
             switch( res ) {
             case 0: { // edit badges
                 init( );
@@ -344,7 +344,8 @@ namespace IO {
             }
             case 2: { // edit route
                 init( );
-                IO::choiceBox menu3 = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                IO::simpleChoiceBox menu3
+                    = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
                 SAVE::CURRENT_FILE->m_route = menu3.getResult(
                     GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
                     std::vector<u16>{ FS::DESQUID_STRING + 65, FS::DESQUID_STRING + 66,
@@ -364,8 +365,9 @@ namespace IO {
         }
         case DSQ_TIME: {
             init( );
-            IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-            auto          res  = menu.getResult(
+            IO::simpleChoiceBox menu
+                = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            auto res = menu.getResult(
                 GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE,
                 std::vector<u16>{ FS::DESQUID_STRING + 56, FS::DESQUID_STRING + 57,
                                   FS::DESQUID_STRING + 58, FS::DESQUID_STRING + 59,
@@ -421,8 +423,8 @@ namespace IO {
             FS::DESQUID_STRING + 50, FS::DESQUID_STRING + 51, FS::DESQUID_STRING + 52,
         };
 
-        IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-        auto          res
+        IO::simpleChoiceBox menu = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        auto                res
             = menu.getResult( GET_STRING( FS::DESQUID_STRING + 46 ), MSG_NOCLOSE, choices, true );
 
         if( res != IO::choiceBox::BACK_CHOICE ) {
@@ -582,7 +584,7 @@ namespace IO {
             return;
         }
         case SAVE: {
-            IO::yesNoBox yn;
+            IO::simpleYesNoBox yn;
             if( yn.getResult( GET_STRING( IO::STR_UI_WOULD_YOU_LIKE_TO_SAVE ), MSG_INFO_NOCLOSE )
                 == IO::yesNoBox::YES ) {
                 init( );
@@ -712,7 +714,8 @@ namespace IO {
                     GET_STRING( IO::STR_UI_NOT_ENOUGH_MONEYTYPE_ASH ), 40, 38, 256 - 80, true );
             }
 
-            waitForInteract( );
+            IO::waitForInteract( IO::animateMB,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             return res;
         } else if( mx > 0 ) {

@@ -29,7 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 #include <nds.h>
-#include "io/uio.h"
+#include "io/util.h"
 
 namespace IO {
     constexpr u8 MAX_KEYBOARD_PAGES = 5;

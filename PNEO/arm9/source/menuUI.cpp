@@ -28,6 +28,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <vector>
 
+#include <io/choiceBox.h>
+#include <io/counter.h>
+#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "battle/battle.h"
@@ -39,8 +42,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/itemNames.h"
 #include "gen/locationNames.h"
 #include "gen/moveNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/keyboard.h"
 #include "io/menu.h"
 #include "io/menuUI.h"
@@ -49,8 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapObject.h"
 #include "map/mapSlice.h"

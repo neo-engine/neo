@@ -44,7 +44,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "gen/bgmNames.h"
 #include "gen/pokemonFormes.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "pokemon.h"
 

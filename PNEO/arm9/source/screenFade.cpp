@@ -32,7 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs/fs.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
+#include "io/util.h"
 
 namespace IO {
     void fadeScreen( fadeType p_type, bool p_bottom, bool p_both ) {

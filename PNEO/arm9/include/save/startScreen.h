@@ -27,9 +27,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include <vector>
+#include <io/yesNoBox.h>
 #include "io/strings.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 
 namespace SAVE {

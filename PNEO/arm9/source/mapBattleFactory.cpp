@@ -30,11 +30,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "gen/trainerClassNames.h"
-#include "io/choiceBox.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
+#include "io/simpleWidget.h"
+#include "io/util.h"
 #include "map/mapBattleFacilityDefines.h"
 #include "map/mapDrawer.h"
 #include "sound/sound.h"
@@ -328,7 +328,7 @@ namespace MAP {
 
                 // ask if player wants to continue
                 if( IO::yesNoBox::NO
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( GET_MAP_STRING( 520 + battle ), MSG_NORMAL ).c_str( ),
                         MSG_NORMAL ) ) {
                     IO::init( );
@@ -369,7 +369,7 @@ namespace MAP {
             if( battle ) {
                 // ask for pkmn swap
                 if( IO::yesNoBox::YES
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( GET_MAP_STRING( 529 ), MSG_NORMAL ).c_str( ),
                         MSG_NORMAL ) ) {
                     // select one pkmn from opponent
@@ -379,8 +379,9 @@ namespace MAP {
                     for( auto i = 0; i < numPokemon; ++i ) {
                         pkmnChoices.push_back( FS::getDisplayName( pkmncache[ i ].m_speciesId ) );
                     }
-                    IO::choiceBox tos = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-                    auto          res = tos.getResult(
+                    IO::simpleChoiceBox tos
+                        = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+                    auto res = tos.getResult(
                         convertMapString( GET_MAP_STRING( 875 ), MSG_NOCLOSE ).c_str( ),
                         MSG_NOCLOSE, pkmnChoices, true );
                     IO::init( );

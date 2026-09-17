@@ -34,13 +34,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dex/dex.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapScript.h"
 #include "save/saveGame.h"
@@ -307,7 +306,7 @@ namespace MAP {
         }
 
         // ask if they want to pay the shards (if possible)
-        IO::yesNoBox yn;
+        IO::simpleYesNoBox yn;
         if( yn.getResult( GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS_MET_Q ), MSG_INFO_NOCLOSE )
             == IO::yesNoBox::YES ) {
             IO::init( );

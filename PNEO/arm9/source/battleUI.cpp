@@ -27,6 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstdio>
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "battle/ability.h"
@@ -38,13 +40,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "gen/moveNames.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/keyboard.h"
 #include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "pokemon.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -2966,7 +2966,8 @@ namespace BATTLE {
             } else if( *pos == '\r' ) {
                 printTopMessage( msg.c_str( ), false );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                IO::waitForInteractS( );
+                IO::waitForInteract( IO::animateMBS,
+                                     [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                 msg = "";
                 continue;
             } else {
@@ -2976,7 +2977,7 @@ namespace BATTLE {
 
         printTopMessage( msg.c_str( ), false );
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-        IO::waitForInteractS( );
+        IO::waitForInteract( IO::animateMBS, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
 
         IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );

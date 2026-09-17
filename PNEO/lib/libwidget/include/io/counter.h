@@ -2,11 +2,11 @@
 Pokémon neo
 ------------------------------
 
-file        : choiceBox.h
+file        : counter.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -26,10 +26,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
-
+#include <functional>
+#include <vector>
 #include <nds.h>
-#include "defines.h"
-#include "io/uio.h"
+#include "io/inputTarget.h"
 
 namespace IO {
     /*
@@ -39,6 +39,12 @@ namespace IO {
       public:
         static void DEFAULT_TICK( ) {
         }
+        static void DEFAULT_SFX_CANCEL( ) {
+        }
+        static void DEFAULT_SFX_CHOOSE( ) {
+        }
+        static void DEFAULT_SFX_SELECT( ) {
+        }
 
       private:
         s32 _minValue;
@@ -47,6 +53,14 @@ namespace IO {
       public:
         counter( s32 p_minValue, s32 p_maxValue )
             : _minValue( p_minValue ), _maxValue( p_maxValue ) {
+        }
+
+        inline u32 minValue( ) const {
+            return _minValue;
+        }
+
+        inline u32 maxValue( ) const {
+            return _maxValue;
         }
 
         /*
@@ -60,12 +74,9 @@ namespace IO {
         s32 getResult( std::function<std::vector<std::pair<inputTarget, s32>>( )> p_drawFunction,
                        std::function<void( s32, u8 )>                             p_updateValue,
                        std::function<void( s32 )> p_hoverButton, s32 p_initialValue = 0,
-                       std::function<void( )> p_tick = DEFAULT_TICK );
-
-        /*
-         * @brief: A simplified counter using the default (overworld) message printing
-         * system (from the NAV namespace).
-         */
-        s32 getResult( const char* p_message, style p_style );
+                       std::function<void( )> p_tick      = DEFAULT_TICK,
+                       std::function<void( )> p_sfxCancel = DEFAULT_SFX_CANCEL,
+                       std::function<void( )> p_sfxChoose = DEFAULT_SFX_CHOOSE,
+                       std::function<void( )> p_sfxSelect = DEFAULT_SFX_SELECT );
     };
 } // namespace IO

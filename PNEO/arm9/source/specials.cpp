@@ -32,13 +32,12 @@
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "gen/sprites.raw.h"
-#include "io/choiceBox.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "pokemon.h"
 #include "pokemonData.h"
@@ -520,25 +519,26 @@ namespace SPX {
 
         drawBadges( currentPage );
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
+            if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_B ) || IO::TOUCH.px
+                || IO::TOUCH.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
 
                 SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 return;
             }
 
@@ -547,7 +547,7 @@ namespace SPX {
                     SOUND::playSoundEffect( SFX_SELECT );
                     drawBadges( ++currentPage );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( currentPage
                        && ( GET_KEY_COOLDOWN( KEY_LEFT )
                             || GET_KEY_COOLDOWN( KEY_L ) ) ) { // next badge case
@@ -555,7 +555,7 @@ namespace SPX {
                     SOUND::playSoundEffect( SFX_SELECT );
                     drawBadges( --currentPage );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
         }
     }
@@ -710,7 +710,7 @@ namespace MAP {
         if( !dc1->getSpecies( ) ) {
             // no pkmn deposited, ask if player wants to deposit a pkmn
             if( IO::yesNoBox::YES
-                == IO::yesNoBox( ).getResult(
+                == IO::simpleYesNoBox( ).getResult(
                     convertMapString( GET_MAP_STRING( 477 ), MSG_NORMAL ).c_str( ), MSG_NORMAL ) ) {
                 IO::init( );
                 depositpkmn = true;
@@ -726,7 +726,7 @@ namespace MAP {
             if( !dc2->getSpecies( ) ) {
                 // ask if player wants to deposit a second pkmn
                 if( IO::yesNoBox::YES
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( GET_MAP_STRING( 480 ), MSG_NORMAL ).c_str( ),
                         MSG_NORMAL ) ) {
                     IO::init( );
@@ -761,7 +761,7 @@ namespace MAP {
                               dc1[ takeback ].m_name, cost );
 
                     if( IO::yesNoBox::YES
-                        == IO::yesNoBox( ).getResult(
+                        == IO::simpleYesNoBox( ).getResult(
                             convertMapString( buffer.data( ), MSG_NORMAL ).c_str( ),
                             MSG_NORMAL ) ) {
                         IO::init( );
@@ -895,7 +895,7 @@ namespace MAP {
             if( depositpkmn < 2 ) {
                 // ask if player wants to deposit a second pkmn
                 if( IO::yesNoBox::YES
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( GET_MAP_STRING( 480 ), MSG_NORMAL ).c_str( ),
                         MSG_NORMAL ) ) {
                     IO::init( );
@@ -924,12 +924,12 @@ namespace MAP {
             // an egg spawned
             // ask player if they want to obtain the egg
             if( IO::yesNoBox::NO
-                == IO::yesNoBox( ).getResult(
+                == IO::simpleYesNoBox( ).getResult(
                     convertMapString( GET_MAP_STRING( 464 ), MSG_NORMAL ).c_str( ), MSG_NORMAL ) ) {
                 IO::init( );
                 // ask if they really don't want the egg
                 if( IO::yesNoBox::YES
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( GET_MAP_STRING( 465 ), MSG_NORMAL ).c_str( ),
                         MSG_NORMAL ) ) {
                     IO::init( );

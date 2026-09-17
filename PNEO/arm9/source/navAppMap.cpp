@@ -31,7 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/menuUI.h"
 #include "io/navApp.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDefines.h"
 #include "map/mapDrawer.h"
 
@@ -200,13 +200,13 @@ namespace IO {
         }
 
         // check for (touch) input
-        if( touch.px > _mapTopX && touch.px < _mapBotX && touch.py > _mapTopY
-            && touch.py < _mapBotY ) {
+        if( IO::TOUCH.px > _mapTopX && IO::TOUCH.px < _mapBotX && IO::TOUCH.py > _mapTopY
+            && IO::TOUCH.py < _mapBotY ) {
             // move cursor
-            locChange |= ( touch.px != _cursorX || touch.py != _cursorY );
+            locChange |= ( IO::TOUCH.px != _cursorX || IO::TOUCH.py != _cursorY );
 
-            _cursorX = touch.px;
-            _cursorY = touch.py - _mapTopY;
+            _cursorX = IO::TOUCH.px;
+            _cursorY = IO::TOUCH.py - _mapTopY;
         }
 
         if( locChange ) {
@@ -248,44 +248,44 @@ namespace IO {
                                 oam[ SPR_NAV_APP_RSV_SUB + 2 ].x, 26, p_bottom, 0 );
         }
 
-        if( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
-            && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
-            && touch.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
-            && touch.py <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y + 20 ) {
+        if( IO::TOUCH.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
+            && IO::TOUCH.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
+            && IO::TOUCH.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
+            && IO::TOUCH.py <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y + 20 ) {
             bool suc = true;
-            while( touch.px || touch.py ) {
+            while( IO::TOUCH.px || IO::TOUCH.py ) {
                 swiWaitForVBlank( );
                 scanKeys( );
 
-                if( !( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
-                       && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
-                       && touch.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
-                       && touch.py <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y + 20 ) ) {
+                if( !( IO::TOUCH.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x
+                       && IO::TOUCH.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x + 20
+                       && IO::TOUCH.py >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y
+                       && IO::TOUCH.py <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].y + 20 ) ) {
                     suc = false;
                     break;
                 }
-                touchRead( &touch );
+                touchRead( &IO::TOUCH );
                 swiWaitForVBlank( );
             }
             if( suc ) { return true; }
         }
 
         if( canfly ) {
-            if( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4
-                && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - 1 && touch.py >= 10
-                && touch.py <= 26 ) {
+            if( IO::TOUCH.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4
+                && IO::TOUCH.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - 1 && IO::TOUCH.py >= 10
+                && IO::TOUCH.py <= 26 ) {
                 bool suc = true;
-                while( touch.px || touch.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
                     scanKeys( );
 
-                    if( !( touch.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4
-                           && touch.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - 1 && touch.py >= 10
-                           && touch.py <= 26 ) ) {
+                    if( !( IO::TOUCH.px >= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - wd - 4
+                           && IO::TOUCH.px <= oam[ SPR_NAV_APP_RSV_SUB + 2 ].x - 1
+                           && IO::TOUCH.py >= 10 && IO::TOUCH.py <= 26 ) ) {
                         suc = false;
                         break;
                     }
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
                 if( suc ) {

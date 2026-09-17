@@ -28,16 +28,16 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cstdio>
 
+#include <io/choiceBox.h>
 #include "defines.h"
 #include "dex/dex.h"
 #include "dex/dexUI.h"
 #include "fs/data.h"
 #include "fs/fs.h"
-#include "io/choiceBox.h"
 #include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 
 #define SPR_WINDOW_NAME_OAM    0

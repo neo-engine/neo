@@ -31,12 +31,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/abilityNames.h"
-#include "io/choiceBox.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
@@ -638,11 +638,11 @@ namespace MAP {
         loop( ) {
 
             if( p_allowItemSell ) {
-                curMode = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
+                curMode = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
                               .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
                                           { buystr, 469, 387 } );
             } else {
-                curMode = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
+                curMode = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
                               .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
                                           { buystr, 387 } );
             }

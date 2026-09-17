@@ -31,7 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds/ndstypes.h>
 
 #include "defines.h"
-#include "io/uio.h"
+#include "io/util.h"
 
 namespace IO {
     constexpr u16 SPR_MSGTEXT_OAM     = 108;
@@ -59,14 +59,7 @@ namespace IO {
     void hideMessageBox( );
 
     void animateMB( u8 p_frame );
-
-    void waitForInteract( );
-
-    /*
-     * @brief: Like normal waitForInteract, but doesn't use sprites to draw the continue
-     * character.
-     */
-    void waitForInteractS( );
+    void animateMBS( u8 p_frame );
 
     void doPrintMessage( const char* p_message, style p_style, u16 p_item = 0,
                          const BAG::itemData* p_data = 0, bool p_noDelay = false );

@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "bag/bagUI.h"
 #include "bag/item.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 
 namespace BAG {
     class bagViewer {

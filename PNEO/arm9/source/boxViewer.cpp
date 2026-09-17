@@ -30,7 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "box/boxViewer.h"
 #include "fs/data.h"
 #include "io/keyboard.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 #include "sts/statusScreen.h"
@@ -54,20 +54,20 @@ namespace BOX {
         _showParty = false;
         _mode      = STATUS;
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_X ) ) {
+            if( ( IO::BTN_PRESSED & KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
                 return;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( !_heldPkmn.getSpecies( ) ) {
                     return;
@@ -76,7 +76,7 @@ namespace BOX {
                     _boxUI.hoverPkmn( getPkmn( _selectedIdx ), _selectedIdx );
                 }
             }
-            if( pressed & KEY_SELECT ) {
+            if( IO::BTN_PRESSED & KEY_SELECT ) {
                 _mode = mode( u8( _mode ) ^ 1 );
                 _boxUI.setMode( u8( _mode ) );
             }
@@ -87,14 +87,14 @@ namespace BOX {
                     = ( SAVE::CURRENT_FILE->m_curBox + SAVE::MAX_BOXES - 1 ) % SAVE::MAX_BOXES;
                 _boxUI.draw( SAVE::CURRENT_FILE->getCurrentBox( ) );
                 select( _selectedIdx );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_R ) ) {
                 // next box
                 SAVE::CURRENT_FILE->m_curBox
                     = ( SAVE::CURRENT_FILE->m_curBox + 1 ) % SAVE::MAX_BOXES;
                 _boxUI.draw( SAVE::CURRENT_FILE->getCurrentBox( ) );
                 select( _selectedIdx );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -109,7 +109,7 @@ namespace BOX {
                 } else {
                     select( 6 + _selectedIdx );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -123,7 +123,7 @@ namespace BOX {
                 } else {
                     select( _selectedIdx - 6 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -136,7 +136,7 @@ namespace BOX {
                         = ( SAVE::CURRENT_FILE->m_curBox + 1 ) % SAVE::MAX_BOXES;
                     _boxUI.draw( SAVE::CURRENT_FILE->getCurrentBox( ) );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -149,8 +149,8 @@ namespace BOX {
                         = ( SAVE::CURRENT_FILE->m_curBox + SAVE::MAX_BOXES - 1 ) % SAVE::MAX_BOXES;
                     _boxUI.draw( SAVE::CURRENT_FILE->getCurrentBox( ) );
                 }
-                cooldown = COOLDOWN_COUNT;
-            } else if( pressed & KEY_A ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            } else if( IO::BTN_PRESSED & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
@@ -160,10 +160,10 @@ namespace BOX {
                         if( _mode != MOVE && !_heldPkmn.getSpecies( ) ) {
                             u8 res = runStatusChoice( );
                             if( !res ) {
-                                cooldown = COOLDOWN_COUNT;
+                                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                                 continue;
                             }
-                            if( res == 255 ) { // player pressed X
+                            if( res == 255 ) { // player IO::BTN_PRESSED X
                                 return;
                             }
                         }
@@ -175,19 +175,19 @@ namespace BOX {
                 } else if( _selectedIdx == PARTY_BUTTON ) {
                     if( runParty( ) ) { return; }
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
 
             /*
             auto ranges = _boxUI.getInteractions( );
             for( u8 j = 0; j < ranges.size( ); ++j ) {
                 auto i = ranges[ j ].m_touch;
-                if( IN_RANGE_I( touch, i ) ) {
+                if( IN_RANGE_I( IO::TOUCH , i ) ) {
                     u8 c = 0;
                     loop( ) {
                         scanKeys( );
                         swiWaitForVBlank( );
-                        touchRead( &touch );
+                        touchRead( &IO::TOUCH  );
                         if( c++ == TRESHOLD ) {
                             _selectedIdx = j;
                             takePkmn( _selectedIdx );
@@ -207,7 +207,7 @@ namespace BOX {
                             }
                             break;
                         }
-                        if( !IN_RANGE_I( touch, i ) ) break;
+                        if( !IN_RANGE_I( IO::TOUCH , i ) ) break;
                     }
                 }
             }
@@ -397,20 +397,20 @@ namespace BOX {
         _selectedIdx = MAX_PKMN_PER_BOX;
         select( MAX_PKMN_PER_BOX );
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_X ) ) {
+            if( ( IO::BTN_PRESSED & KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
                 return true;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( !_heldPkmn.getSpecies( ) ) {
                     break;
@@ -419,7 +419,7 @@ namespace BOX {
                     _boxUI.hoverPkmn( getPkmn( _selectedIdx ), _selectedIdx );
                 }
             }
-            if( pressed & KEY_SELECT ) {
+            if( IO::BTN_PRESSED & KEY_SELECT ) {
                 _mode = mode( u8( _mode ) ^ 1 );
                 _boxUI.setMode( u8( _mode ) );
             }
@@ -442,7 +442,7 @@ namespace BOX {
                 } else {
                     select( 2 + _selectedIdx );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -456,7 +456,7 @@ namespace BOX {
                 } else {
                     select( _selectedIdx - 2 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -468,7 +468,7 @@ namespace BOX {
                 } else if( _heldPkmn.getSpecies( ) && _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
                     select( MAX_PKMN_PER_BOX + ( _selectedIdx - MAX_PKMN_PER_BOX + 1 ) % 6 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _selectedIdx == u8( -1 ) ) {
@@ -481,8 +481,8 @@ namespace BOX {
                 } else if( _heldPkmn.getSpecies( ) && _selectedIdx < MAX_PKMN_PER_BOX + 6 ) {
                     select( MAX_PKMN_PER_BOX + ( _selectedIdx - MAX_PKMN_PER_BOX + 5 ) % 6 );
                 }
-                cooldown = COOLDOWN_COUNT;
-            } else if( pressed & KEY_A ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            } else if( IO::BTN_PRESSED & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 if( _selectedIdx == u8( -1 ) ) {
                     select( 0 );
@@ -492,13 +492,13 @@ namespace BOX {
                         if( _mode != MOVE && !_heldPkmn.getSpecies( ) ) {
                             u8 res = runStatusChoice( );
                             if( !res ) {
-                                cooldown = COOLDOWN_COUNT;
+                                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                                 _boxUI.showParty( SAVE::CURRENT_FILE->getCurrentBox( ),
                                                   SAVE::CURRENT_FILE->m_pkmnTeam,
                                                   SAVE::CURRENT_FILE->getTeamPkmnCount( ) );
                                 continue;
                             }
-                            if( res == 255 ) { // player pressed X
+                            if( res == 255 ) { // player IO::BTN_PRESSED X
                                 return true;
                             }
                         }
@@ -507,7 +507,7 @@ namespace BOX {
                 } else if( _selectedIdx == PARTY_BUTTON ) {
                     break;
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             swiWaitForVBlank( );
         }
@@ -542,36 +542,36 @@ namespace BOX {
 
         _boxUI.selectButton( btns[ selectedBtn ] );
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_X ) ) {
-                cooldown = COOLDOWN_COUNT;
+            if( ( IO::BTN_PRESSED & KEY_X ) ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 if( !_heldPkmn.getSpecies( ) ) {
                     SOUND::playSoundEffect( SFX_CANCEL );
                     _boxUI.selectPkmn( nullptr, 0 );
                     return 255;
                 }
             }
-            if( pressed & KEY_B ) {
-                cooldown = COOLDOWN_COUNT;
+            if( IO::BTN_PRESSED & KEY_B ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _boxUI.selectButton( btns[ ( selectedBtn = ( selectedBtn + 1 ) % btns.size( ) ) ] );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _boxUI.selectButton(
                     btns[ ( selectedBtn = ( selectedBtn + btns.size( ) - 1 ) % btns.size( ) ) ] );
-                cooldown = COOLDOWN_COUNT;
-            } else if( pressed & KEY_A ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            } else if( IO::BTN_PRESSED & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 switch( btns[ selectedBtn ] ) {
                 case boxUI::BUTTON_PKMN_MOVE: return 1;

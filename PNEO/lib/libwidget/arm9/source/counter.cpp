@@ -6,7 +6,7 @@ file        : counter.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -28,36 +28,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cmath>
 
-#include "defines.h"
 #include "io/counter.h"
-#include "io/menuUI.h"
-#include "io/message.h"
-#include "io/uio.h"
-#include "save/saveGame.h"
-#include "sound/sound.h"
 
 namespace IO {
-    s32 counter::getResult( const char* p_message, style p_style ) {
-        u8 mxdg = 0;
-        for( s32 i = _maxValue; i > 0; i /= 10, mxdg++ ) {}
-
-        return getResult(
-            [ & ]( ) {
-                IO::printMessage( p_message, p_style );
-                return IO::drawCounter( _minValue, _maxValue );
-            },
-            [ & ]( s32 p_value, u8 p_selDigit ) {
-                IO::updateCounterValue( p_value, p_selDigit, mxdg );
-            },
-            [ & ]( s32 p_button ) { IO::hoverCounterButton( _minValue, _maxValue, p_button ); },
-            _minValue );
-    }
-
     s32
     counter::getResult( std::function<std::vector<std::pair<inputTarget, s32>>( )> p_drawFunction,
                         std::function<void( s32, u8 )>                             p_updateValue,
                         std::function<void( s32 )> p_hoverButton, s32 p_initialValue,
-                        std::function<void( )> p_tick ) {
+                        std::function<void( )> p_tick, std::function<void( )> p_sfxCancel,
+                        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect ) {
 
         s32 value = p_initialValue;
         u8  dig   = 0;
@@ -77,57 +56,57 @@ namespace IO {
 
         p_updateValue( value, 0 );
 
-        cooldown = COOLDOWN_COUNT;
-        loop( ) {
+        BTN_COOLDOWN = COOLDOWN_COUNT;
+        while( 1 ) {
+            swiWaitForVBlank( );
             p_tick( );
             scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            touchRead( &TOUCH );
+            BTN_PRESSED = keysUp( );
+            BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_A ) {
-                SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
+            if( BTN_PRESSED & KEY_A ) {
+                p_sfxChoose( );
+                BTN_COOLDOWN = COOLDOWN_COUNT;
                 p_hoverButton( _minValue - 2 );
                 break;
             }
-            if( back && ( pressed & KEY_B ) ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
+            if( back && ( BTN_PRESSED & KEY_B ) ) {
+                p_sfxCancel( );
+                BTN_COOLDOWN = COOLDOWN_COUNT;
                 p_updateValue( value = 0, dig = 0 );
                 p_hoverButton( 0 );
                 break;
             }
-            if( exit && ( pressed & KEY_X ) ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
+            if( exit && ( BTN_PRESSED & KEY_X ) ) {
+                p_sfxCancel( );
+                BTN_COOLDOWN = COOLDOWN_COUNT;
                 p_updateValue( value = 0, dig = 0 );
                 p_hoverButton( value = _minValue - 3 );
                 break;
             }
             if( GET_KEY_COOLDOWN( KEY_LEFT ) ) { // move to pre digit
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( dig > 0 ) {
                     dig--;
                     df *= 10;
                 }
                 p_updateValue( value, dig );
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( dig + 1 < mxdg ) {
                     dig++;
                     df /= 10;
                 }
                 p_updateValue( value, dig );
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_UP ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( value <= _maxValue - df ) {
                     p_updateValue( value += df, dig );
@@ -136,10 +115,10 @@ namespace IO {
                 } else {
                     p_updateValue( value = _maxValue, dig );
                 }
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
                 if( value >= _minValue + df ) {
                     p_updateValue( value -= df, dig );
                 } else if( value == _minValue ) {
@@ -147,35 +126,34 @@ namespace IO {
                 } else {
                     p_updateValue( value = _minValue, dig );
                 }
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
 
             // touch controls
             for( auto i : choices ) {
-                if( i.first.inRange( touch ) ) {
+                if( i.first.inRange( TOUCH ) ) {
                     s32 df2 = i.second;
                     p_hoverButton( df2 );
                     bool bad = false;
-                    while( touch.px || touch.py ) {
-                        swiWaitForVBlank( );
-                        if( !i.first.inRange( touch ) ) {
+                    while( TOUCH.px || TOUCH.py ) {
+                        if( !i.first.inRange( TOUCH ) ) {
                             bad = true;
                             break;
                         }
+                        swiWaitForVBlank( );
                         p_tick( );
                         scanKeys( );
-                        touchRead( &touch );
-                        swiWaitForVBlank( );
+                        touchRead( &TOUCH );
                     }
                     if( !bad ) {
                         if( !df2 || df2 == _minValue - 3 ) {
-                            SOUND::playSoundEffect( SFX_CANCEL );
+                            p_sfxCancel( );
                             return 0;
                         } else if( df2 == _minValue - 2 ) {
-                            SOUND::playSoundEffect( SFX_CHOOSE );
+                            p_sfxChoose( );
                             return value;
                         } else {
-                            SOUND::playSoundEffect( SFX_SELECT );
+                            p_sfxSelect( );
                         }
 
                         dig = 0;
@@ -203,8 +181,6 @@ namespace IO {
                     p_hoverButton( _maxValue + 1 );
                 }
             }
-
-            swiWaitForVBlank( );
         }
         return value;
     }

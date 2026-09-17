@@ -25,13 +25,13 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "dex/dex.h"
 #include "fs/data.h"
-#include "io/choiceBox.h"
 #include "io/strings.h"
-#include "io/yesNoBox.h"
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -75,10 +75,6 @@ namespace STS {
     partyScreen::~partyScreen( ) {
         if( _partyUI ) { delete _partyUI; }
     }
-
-    int           pressed, held;
-    touchPosition touch;
-    u8            cooldown = COOLDOWN_COUNT;
 
     bool partyScreen::checkReturnCondition( ) {
         return ( _toSelect && _selectedCnt == _toSelect )
@@ -371,7 +367,7 @@ namespace STS {
                       },
                       []( u32 p_value ) { return FS::getMoveName( p_value ); } } ) );
             }
-            // Held Item
+            // IO::BTN_HELD Item
             res.push_back( partyScreen::desquidItem(
                 { FS::DESQUID_STRING + 43, true, 1278, 1,
                   [ & ]( ) { return _team[ _currentSelection ].getItem( ); },
@@ -454,21 +450,21 @@ namespace STS {
                                        choices[ i ].m_currentValue( ), choices[ i ].m_maxValue,
                                        i == selectedLine );
         }
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             _partyUI->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
 
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_X ) {
+            if( IO::BTN_PRESSED & KEY_X ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 UPDATE_VALUE( oldval );
                 break;
-            } else if( pressed & KEY_B ) {
+            } else if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( editing ) {
                     editing = false;
@@ -477,11 +473,11 @@ namespace STS {
                                                choices[ selectedLine ].computeString( ).c_str( ),
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue, true );
-                    cooldown = COOLDOWN_COUNT;
+                    IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 } else {
                     break;
                 }
-            } else if( pressed & KEY_A ) {
+            } else if( IO::BTN_PRESSED & KEY_A ) {
                 if( !editing ) {
                     SOUND::playSoundEffect( SFX_CHOOSE );
                     oldval        = choices[ selectedLine ].m_currentValue( );
@@ -506,7 +502,7 @@ namespace STS {
                                                    choices[ i ].m_maxValue, i == selectedLine );
                     }
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( editing ) {
@@ -536,7 +532,7 @@ namespace STS {
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue, true );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( editing ) {
@@ -566,7 +562,7 @@ namespace STS {
                                                choices[ selectedLine ].m_currentValue( ),
                                                choices[ selectedLine ].m_maxValue, true );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( editing && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -578,7 +574,7 @@ namespace STS {
                     choices[ selectedLine ].m_currentValue( ), choices[ selectedLine ].m_maxValue,
                     true, selectedDigit );
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( editing && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -590,7 +586,7 @@ namespace STS {
                     choices[ selectedLine ].m_currentValue( ), choices[ selectedLine ].m_maxValue,
                     true, selectedDigit );
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             swiWaitForVBlank( );
         }
@@ -673,24 +669,24 @@ namespace STS {
                 _currentSelection, c, std::min( size_t( 6 ), _currentChoices.size( ) ),
                 _currentChoices.size( ) > 6, false, _currentChoiceSelection % 6 );
         }
-        bool ex  = false;
-        cooldown = COOLDOWN_COUNT;
+        bool ex          = false;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             _partyUI->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
 
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_X ) {
+            if( IO::BTN_PRESSED & KEY_X ) {
                 ex = _allowCancel;
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
@@ -710,7 +706,7 @@ namespace STS {
                 } else if( ( _currentChoiceSelection ^ 1 ) < _currentChoices.size( ) ) {
                     selectChoice( _currentChoiceSelection ^ 1 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( !( _currentChoiceSelection & 1 ) && _currentChoiceSelection >= 6 ) {
@@ -722,7 +718,7 @@ namespace STS {
                 } else {
                     selectChoice( _currentChoiceSelection ^ 1 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6
@@ -735,7 +731,7 @@ namespace STS {
                 } else {
                     selectChoice( _currentChoiceSelection + 2 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6 && _currentChoiceSelection < 8 ) {
@@ -751,11 +747,11 @@ namespace STS {
                 } else {
                     selectChoice( _currentChoiceSelection - 2 );
                 }
-                cooldown = COOLDOWN_COUNT;
-            } else if( pressed & KEY_A ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            } else if( IO::BTN_PRESSED & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 ex = executeChoice( _currentChoices[ _currentChoiceSelection ] ) && _allowCancel;
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
 
@@ -802,24 +798,24 @@ namespace STS {
                                                  std::min( size_t( 6 ), choices.size( ) ),
                                                  choices.size( ) > 6, false, 0 );
 
-        bool ex  = false;
-        cooldown = COOLDOWN_COUNT;
+        bool ex          = false;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             _partyUI->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_X ) {
+            if( IO::BTN_PRESSED & KEY_X ) {
                 ex = false;
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 _partyUI->select( _currentSelection );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
@@ -838,7 +834,7 @@ namespace STS {
                 } else if( ( _currentChoiceSelection ^ 1 ) < choices.size( ) ) {
                     selectChoice( _currentChoiceSelection ^ 1, choices.size( ) );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( !( _currentChoiceSelection & 1 ) && _currentChoiceSelection >= 6 ) {
@@ -850,7 +846,7 @@ namespace STS {
                 } else {
                     selectChoice( _currentChoiceSelection ^ 1, choices.size( ) );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6
@@ -863,7 +859,7 @@ namespace STS {
                 } else {
                     selectChoice( _currentChoiceSelection + 2, choices.size( ) );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentChoiceSelection >= 6 && _currentChoiceSelection < 8 ) {
@@ -880,10 +876,10 @@ namespace STS {
                 } else {
                     selectChoice( _currentChoiceSelection - 2, choices.size( ) );
                 }
-                cooldown = COOLDOWN_COUNT;
-            } else if( pressed & KEY_A ) {
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            } else if( IO::BTN_PRESSED & KEY_A ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 if( ( ex = executeDesquidChoice( choices[ _currentChoiceSelection ] ) ) ) { break; }
                 _partyUI->select( _currentSelection );
 
@@ -896,7 +892,7 @@ namespace STS {
                         p_selectedIdx, c, std::min( size_t( 6 ), choices.size( ) ),
                         choices.size( ) > 6, false, _currentChoiceSelection % 6 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             swiWaitForVBlank( );
         }
@@ -1161,27 +1157,28 @@ namespace STS {
     }
 
     void STS::partyScreen::waitForInteract( ) {
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             _partyUI->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
+            if( ( IO::BTN_PRESSED & KEY_A ) || ( IO::BTN_PRESSED & KEY_B ) || IO::TOUCH.px
+                || IO::TOUCH.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     _partyUI->animate( );
                     swiWaitForVBlank( );
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
 
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
         }
@@ -1194,7 +1191,7 @@ namespace STS {
         }
         u8 change = false;
         for( auto i : _partyUI->getTouchPositions( ) ) {
-            if( i.first.inRange( touch ) ) {
+            if( i.first.inRange( IO::TOUCH ) ) {
                 swiWaitForVBlank( );
                 if( i.second < 6 ) {
                     select( i.second );
@@ -1202,11 +1199,11 @@ namespace STS {
                 } else if( i.second == EXIT_TARGET ) {
                     change = 2;
                 }
-                while( touch.px || touch.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     _partyUI->animate( );
                     swiWaitForVBlank( );
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
             }
@@ -1228,7 +1225,7 @@ namespace STS {
         u8   res = 0;
         bool bad = false;
         for( auto i : _ranges ) {
-            if( i.first.inRange( touch ) ) {
+            if( i.first.inRange( IO::TOUCH ) ) {
                 swiWaitForVBlank( );
                 if( _currentChoiceSelection >= 6 && i.second < 6 ) {
                     _currentChoiceSelection = i.second + 6;
@@ -1244,16 +1241,16 @@ namespace STS {
                         && _currentChoices.size( ) > size_t( 7 + p_autoSel ),
                     _currentChoiceSelection >= 6, i.second );
 
-                while( touch.px || touch.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     _partyUI->animate( );
                     swiWaitForVBlank( );
-                    if( !i.first.inRange( touch ) ) {
+                    if( !i.first.inRange( IO::TOUCH ) ) {
                         bad = true;
                         break;
                     }
 
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
                 res = 0;
@@ -1338,21 +1335,21 @@ namespace STS {
         }
 
         select( p_initialSelection );
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             _partyUI->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
-            u8 tc   = 0;
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
+            u8 tc           = 0;
 
-            if( ( pressed & KEY_X ) && _allowCancel ) {
+            if( ( IO::BTN_PRESSED & KEY_X ) && _allowCancel ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _swapSelection != 255 ) {
                     _partyUI->unswap( _swapSelection );
@@ -1370,16 +1367,16 @@ namespace STS {
                 } else if( _allowCancel ) {
                     break;
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentSelection + 1 ) % _teamLength );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentSelection + _teamLength - 1 ) % _teamLength );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentSelection + 2 >= _teamLength ) {
@@ -1387,7 +1384,7 @@ namespace STS {
                 } else {
                     select( _currentSelection + 2 );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _currentSelection < 2 ) {
@@ -1396,10 +1393,11 @@ namespace STS {
                 } else {
                     select( _currentSelection - 2 );
                 }
-                cooldown = COOLDOWN_COUNT;
-            } else if( ( pressed & KEY_A ) || ( tc = handleTouch( false ) ) ) {
-                if( pressed & KEY_A ) { SOUND::playSoundEffect( SFX_CHOOSE ); }
-                if( ( tc == 2 || ( tc == 0 && focus( ) ) ) && _allowCancel ) { // User pressed X
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            } else if( ( IO::BTN_PRESSED & KEY_A ) || ( tc = handleTouch( false ) ) ) {
+                if( IO::BTN_PRESSED & KEY_A ) { SOUND::playSoundEffect( SFX_CHOOSE ); }
+                if( ( tc == 2 || ( tc == 0 && focus( ) ) )
+                    && _allowCancel ) { // User IO::BTN_PRESSED X
                     _currentMarksOrMove.m_selectedMove = 0;
                     break;
                 }
@@ -1414,7 +1412,7 @@ namespace STS {
                         select( tmp );
                     }
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             swiWaitForVBlank( );
         }

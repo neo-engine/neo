@@ -29,6 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "map/mapDrawer.h"
 #include "spx/specials.h"
 
@@ -66,7 +67,7 @@ namespace MAP {
                           _followPkmnData->m_boxdata.m_name );
 
                 if( IO::yesNoBox::YES
-                    == IO::yesNoBox( ).getResult(
+                    == IO::simpleYesNoBox( ).getResult(
                         convertMapString( buffer.data( ), MSG_INFO ).c_str( ), MSG_INFO_NOCLOSE,
                         false ) ) {
 
@@ -97,7 +98,7 @@ namespace MAP {
         }
 
         if( IO::yesNoBox::YES
-            == IO::yesNoBox( ).getResult(
+            == IO::simpleYesNoBox( ).getResult(
                 convertMapString( GET_MAP_STRING( 740 ), MSG_INFO ).c_str( ), MSG_INFO_NOCLOSE,
                 false ) ) {
             // start minigame

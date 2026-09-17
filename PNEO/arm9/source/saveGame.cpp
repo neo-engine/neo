@@ -39,7 +39,7 @@
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"

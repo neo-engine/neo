@@ -31,7 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 #include "save/saveOptions.h"
 #include "sound/sound.h"
@@ -394,13 +394,13 @@ namespace SAVE {
         u8 currentSelection = 0;
         select( currentSelection );
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
             if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
@@ -410,19 +410,19 @@ namespace SAVE {
             if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( currentSelection = ( currentSelection + 1 ) % MAX_SETTINGS );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( currentSelection = ( currentSelection + MAX_SETTINGS - 1 ) % MAX_SETTINGS );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 decreaseSetting( currentSelection );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 increaseSetting( currentSelection );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
 
             swiWaitForVBlank( );

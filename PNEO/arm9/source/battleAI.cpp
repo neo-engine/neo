@@ -35,7 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "gen/bgmNames.h"
 #include "io/animations.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "pokemon.h"
 #include "sound/sound.h"
 

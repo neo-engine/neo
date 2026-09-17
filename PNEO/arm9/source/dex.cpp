@@ -27,12 +27,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cmath>
 
+#include <io/choiceBox.h>
 #include "defines.h"
 #include "dex/dex.h"
 #include "dex/dexUI.h"
 #include "gen/pokemonFormes.h"
-#include "io/choiceBox.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 
@@ -241,17 +241,17 @@ namespace DEX {
     void dex::runDex( ) {
         _dexUI->init( );
         changeMode( _mode, 0 );
-        cooldown = COOLDOWN_COUNT;
-        u8 sl    = 255;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+        u8 sl            = 255;
 
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) ) {
+            if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
@@ -264,7 +264,7 @@ namespace DEX {
                                  SAVE::CURRENT_FILE->m_lstLocalDexSlot, 1, false, _currentForme );
                 }
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _mode == mode::NATIONAL_DEX ) {
@@ -274,7 +274,7 @@ namespace DEX {
                     selectLocal( SAVE::CURRENT_FILE->m_lstLocalDexPage - 1,
                                  SAVE::CURRENT_FILE->m_lstLocalDexSlot, -1, false, _currentForme );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 if( _mode == mode::NATIONAL_DEX ) {
                     if( SAVE::CURRENT_FILE->m_lstDex < _natDexUB ) {
@@ -295,7 +295,7 @@ namespace DEX {
                                      _currentForme );
                     }
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 if( _mode == mode::NATIONAL_DEX ) {
                     if( SAVE::CURRENT_FILE->m_lstDex > 1 ) {
@@ -316,7 +316,7 @@ namespace DEX {
                                      MAX_LOCAL_DEX_SLOTS - 1, -1, false, _currentForme );
                     }
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_L ) ) {
                 // switch to prev page
                 SOUND::playSoundEffect( SFX_SELECT );
@@ -330,7 +330,7 @@ namespace DEX {
                                  SAVE::CURRENT_FILE->m_lstLocalDexSlot, 0, true, _currentForme );
                 }
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_R ) ) {
                 // switch to next page
                 SOUND::playSoundEffect( SFX_SELECT );
@@ -344,7 +344,7 @@ namespace DEX {
                                  SAVE::CURRENT_FILE->m_lstLocalDexSlot, 0, true, _currentForme );
                 }
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_SELECT ) ) {
                 // switch mode local/national dex
                 if( SAVE::CURRENT_FILE->checkFlag( SAVE::F_DEX_OBTAINED )
@@ -357,7 +357,7 @@ namespace DEX {
                                     LOCAL_DEX_PAGES[ SAVE::CURRENT_FILE->m_lstLocalDexPage ]
                                                    [ SAVE::CURRENT_FILE->m_lstLocalDexSlot ] );
                     }
-                    cooldown = COOLDOWN_COUNT;
+                    IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 }
             } else if( GET_KEY_COOLDOWN( KEY_Y ) || GET_KEY_COOLDOWN( KEY_A ) ) {
                 // switch info on current page (next forme, etc)
@@ -387,20 +387,20 @@ namespace DEX {
                     }
                 }
 
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
 
             for( auto t : _dexUI->getTouchPositions( _mode ) ) {
-                if( ( touch.px || touch.py ) && t.first.inRange( touch ) ) {
+                if( ( IO::TOUCH.px || IO::TOUCH.py ) && t.first.inRange( IO::TOUCH ) ) {
                     bool bad = false;
-                    while( touch.px || touch.py ) {
+                    while( IO::TOUCH.px || IO::TOUCH.py ) {
                         swiWaitForVBlank( );
-                        if( !t.first.inRange( touch ) ) {
+                        if( !t.first.inRange( IO::TOUCH ) ) {
                             bad = true;
                             break;
                         }
                         scanKeys( );
-                        touchRead( &touch );
+                        touchRead( &IO::TOUCH );
                         swiWaitForVBlank( );
                     }
 
@@ -460,31 +460,32 @@ namespace DEX {
                          p_female );
         }
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
 
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_X ) || ( pressed & KEY_B ) || ( pressed & KEY_A ) ) {
+            if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_B )
+                || ( IO::BTN_PRESSED & KEY_A ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 return;
             }
 
             for( auto t : _dexUI->getTouchPositions( _mode ) ) {
-                if( ( touch.px || touch.py ) && t.first.inRange( touch ) ) {
+                if( ( IO::TOUCH.px || IO::TOUCH.py ) && t.first.inRange( IO::TOUCH ) ) {
                     bool bad = false;
-                    while( touch.px || touch.py ) {
+                    while( IO::TOUCH.px || IO::TOUCH.py ) {
                         swiWaitForVBlank( );
-                        if( !t.first.inRange( touch ) ) {
+                        if( !t.first.inRange( IO::TOUCH ) ) {
                             bad = true;
                             break;
                         }
                         scanKeys( );
-                        touchRead( &touch );
+                        touchRead( &IO::TOUCH );
                         swiWaitForVBlank( );
                     }
 

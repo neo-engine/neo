@@ -30,10 +30,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include <string>
 #include <vector>
+#include <io/yesNoBox.h>
 
 #include "battle/battleDefines.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 
 namespace BATTLE {

@@ -25,17 +25,17 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "bag/bag.h"
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "gen/itemNames.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/keyboard.h"
 #include "io/menuUI.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
 #include "save/startScreen.h"
@@ -60,12 +60,12 @@ namespace SAVE {
 
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysCurrent( );
+            IO::BTN_PRESSED = keysCurrent( );
 
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || ( IO::inputTarget( 1, 1, 256, 192 ).inRange( touch )
+                || ( IO::inputTarget( 1, 1, 256, 192 ).inRange( IO::TOUCH )
                      && IO::waitForInput( IO::inputTarget( 1, 1, 256, 192 ) ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 break;
@@ -87,9 +87,9 @@ namespace SAVE {
         u8 frame = 0;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysCurrent( );
+            IO::BTN_PRESSED = keysCurrent( );
 
             if( ++frame % 64 == 31 ) {
                 IO::regularFont->printChar( 172, 196, 192 - 28, true );
@@ -98,7 +98,7 @@ namespace SAVE {
             }
 
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || ( IO::inputTarget( 1, 1, 256, 192 ).inRange( touch )
+                || ( IO::inputTarget( 1, 1, 256, 192 ).inRange( IO::TOUCH )
                      && IO::waitForInput( IO::inputTarget( 1, 1, 256, 192 ) ) ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 break;

@@ -41,15 +41,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle/battleTrainer.h"
 #include "defines.h"
 #include "fs/fs.h"
-#include "io/choiceBox.h"
 #include "io/keyboard.h"
 #include "io/menu.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapObject.h"
 #include "map/mapSlice.h"
@@ -70,24 +69,21 @@ GameMod gMod = GameMod::RELEASE;
 
 fsdataInfo FSDATA;
 
-time_t        unixTime;
-int           pressed, held, last;
-touchPosition touch;
-u8            cooldown          = COOLDOWN_COUNT;
-bool          DRAW_TIME         = false;
-bool          UPDATE_TIME       = true;
-bool          ANIMATE_MAP       = false;
-u8            FRAME_COUNT       = 0;
-u8            TIME_COUNT        = 0;
-bool          SCREENS_SWAPPED   = false;
-bool          PLAYER_IS_FISHING = false;
-bool          INIT_NITROFS      = false;
-bool          TWL_CONFIG        = false;
-bool          IN_GAME           = false;
-bool          RTC_BAD           = false;
-bool          HAD_NEW_GAME      = false;
-bool          RESET_GAME        = false;
-bool          FLUSH_GFX_UPDATE  = false;
+time_t unixTime;
+bool   DRAW_TIME         = false;
+bool   UPDATE_TIME       = true;
+bool   ANIMATE_MAP       = false;
+u8     FRAME_COUNT       = 0;
+u8     TIME_COUNT        = 0;
+bool   SCREENS_SWAPPED   = false;
+bool   PLAYER_IS_FISHING = false;
+bool   INIT_NITROFS      = false;
+bool   TWL_CONFIG        = false;
+bool   IN_GAME           = false;
+bool   RTC_BAD           = false;
+bool   HAD_NEW_GAME      = false;
+bool   RESET_GAME        = false;
+bool   FLUSH_GFX_UPDATE  = false;
 
 static volatile bool RTC_POLL_PENDING = false;
 
@@ -329,22 +325,22 @@ START:
         MAP::curMap->draw( OBJPRIORITY_2, false, HAD_NEW_GAME );
     }
 
-    IN_GAME      = true;
-    bool stopped = true;
-    u8   bmp     = 0;
-    cooldown     = COOLDOWN_COUNT;
-    u8 heldcnt   = 0;
+    IN_GAME          = true;
+    bool stopped     = true;
+    u8   bmp         = 0;
+    IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+    u8 heldcnt       = 0;
     loop( ) {
         if( RESET_GAME ) { break; }
         pollRTC( );
         scanKeys( );
-        touchRead( &touch );
+        touchRead( &IO::TOUCH );
         swiWaitForVBlank( );
-        pressed = keysUp( );
-        last    = held;
-        held    = keysHeld( );
+        IO::BTN_PRESSED = keysUp( );
+        IO::BTN_LAST    = IO::BTN_HELD;
+        IO::BTN_HELD    = keysHeld( );
 #ifdef DESQUID
-        if( held & KEY_L ) {
+        if( IO::BTN_HELD & KEY_L ) {
 
             //            time_t     unixTime   = time( NULL );
             //            struct tm* timeStruct = gmtime( (const time_t*) &unixTime );
@@ -394,7 +390,7 @@ START:
                                       GET_STRING( BATTLE::text( a.m_boxdata.m_moves[ j ], param ) ),
                                       mname.c_str( ) );
                             SOUND::playSoundEffect( SFX_CHOOSE );
-                            IO::yesNoBox yn;
+                            IO::simpleYesNoBox yn;
                             if( yn.getResult( buffer.data( ), MSG_NOCLOSE ) == IO::yesNoBox::YES ) {
                                 IO::init( );
                                 IO::printMessage( 0, MSG_NOCLOSE );
@@ -448,8 +444,8 @@ START:
         IO::handleInput( p_argv[ 0 ] );
 
         // Movement
-        if( held & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
-            MAP::direction curDir = MAP::getDir( held );
+        if( IO::BTN_HELD & ( KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT ) ) {
+            MAP::direction curDir = MAP::getDir( IO::BTN_HELD );
             scanKeys( );
 
             if( heldcnt < 5 && stopped ) {
@@ -462,7 +458,7 @@ START:
             if( MAP::curMap->canMove( SAVE::CURRENT_FILE->m_player.m_pos, curDir,
                                       SAVE::CURRENT_FILE->m_player.m_movement ) ) {
                 MAP::curMap->allowFollowPokemon( );
-                MAP::curMap->movePlayer( curDir, ( held & KEY_B ) );
+                MAP::curMap->movePlayer( curDir, ( IO::BTN_HELD & KEY_B ) );
                 bmp = 0;
             } else if( !bmp ) {
                 // Play "Bump" sound

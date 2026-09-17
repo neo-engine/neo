@@ -27,7 +27,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "fs/fs.h"
 #include "io/message.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapSlice.h"
 #include "map/mapSprite.h"
 #include "save/saveGame.h"

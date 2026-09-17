@@ -29,7 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "battle/move.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "pokemon.h"
 #include "pokemonData.h"
 

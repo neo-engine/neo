@@ -27,14 +27,14 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds/system.h>
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/message.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
 #include "save/mysteryGift.h"
@@ -127,12 +127,12 @@ namespace SAVE {
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
 
-            int pressed = keysCurrent( );
+            IO::BTN_PRESSED = keysCurrent( );
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
-                || ( ( touch.px || touch.py ) && IO::waitForTouchUp( ) ) ) {
+                || ( ( IO::TOUCH.px || IO::TOUCH.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playCry( PKMN_RAYQUAZA );
                 for( u8 i = 0; i < 40; ++i ) { swiWaitForVBlank( ); };
                 IO::fadeScreen( IO::CLEAR_DARK, true, true );

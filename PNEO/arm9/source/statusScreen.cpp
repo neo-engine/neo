@@ -25,10 +25,10 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "sts/statusScreen.h"
 #include "defines.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "sound/sound.h"
+#include "sts/statusScreen.h"
 
 namespace STS {
     statusScreen::statusScreen( pokemon* p_pokemon, bool p_allowKeyUp, bool p_allowKeyDown,
@@ -54,7 +54,7 @@ namespace STS {
     u8 statusScreen::handleTouch( ) {
         u8 change = false;
         for( auto i : _ui->getTouchPositions( ) ) {
-            if( i.first.inRange( touch ) ) {
+            if( i.first.inRange( IO::TOUCH ) ) {
                 swiWaitForVBlank( );
                 change = 5;
                 if( i.second == statusScreenUI::BACK_TARGET ) {
@@ -68,17 +68,17 @@ namespace STS {
                 }
                 _ui->highlightButton( i.second );
 
-                while( touch.px || touch.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     _ui->animate( );
                     swiWaitForVBlank( );
                     scanKeys( );
 
-                    if( !i.first.inRange( touch ) ) {
+                    if( !i.first.inRange( IO::TOUCH ) ) {
                         change = 0;
                         _ui->highlightButton( );
                         break;
                     }
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
 
@@ -109,16 +109,16 @@ namespace STS {
         loop( ) {
             _ui->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_X ) {
+            if( IO::BTN_PRESSED & KEY_X ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return true;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 break;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
@@ -127,7 +127,7 @@ namespace STS {
                     = ( _currentDetailChoice + _ui->getBtnUpDetailInc( _currentPage ) )
                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice
@@ -135,20 +135,20 @@ namespace STS {
                         - _ui->getBtnUpDetailInc( _currentPage ) )
                       % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice = ( _currentDetailChoice + 1 )
                                        % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 _currentDetailChoice = ( _currentDetailChoice
                                          + _ui->getDetailsPageCount( _pokemon, _currentPage ) - 1 )
                                        % _ui->getDetailsPageCount( _pokemon, _currentPage );
                 _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             auto tc = handleTouch( );
             if( tc == 2 ) {
@@ -165,39 +165,39 @@ namespace STS {
 
     statusScreen::result statusScreen::run( u8 p_initialPage ) {
         _ui->init( _pokemon, p_initialPage, _allowKeyUp, _allowKeyDown );
-        cooldown     = COOLDOWN_COUNT;
-        _currentPage = p_initialPage;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+        _currentPage     = p_initialPage;
 
         loop( ) {
             _ui->animate( );
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_X ) {
+            if( IO::BTN_PRESSED & KEY_X ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return result::EXIT;
             }
-            if( pressed & KEY_B ) {
+            if( IO::BTN_PRESSED & KEY_B ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return result::BACK;
             }
-            if( pressed & KEY_A ) {
+            if( IO::BTN_PRESSED & KEY_A ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _ui->getDetailsPageCount( _pokemon, _currentPage ) ) {
                     if( runDetails( ) ) { return result::EXIT; }
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentPage + 1 ) % _ui->getPageCount( ) );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 select( ( _currentPage + _ui->getPageCount( ) - 1 ) % _ui->getPageCount( ) );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( _allowKeyDown && GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 return result::NEXT_PKMN;

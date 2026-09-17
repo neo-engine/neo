@@ -34,13 +34,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -86,7 +85,8 @@ namespace MAP {
 
                     // ask player if they want to use the devon scope
                     if( IO::yesNoBox::NO
-                        == IO::yesNoBox( ).getResult( GET_STRING( 816 ), MSG_INFO_NOCLOSE ) ) {
+                        == IO::simpleYesNoBox( ).getResult( GET_STRING( 816 ),
+                                                            MSG_INFO_NOCLOSE ) ) {
                         // no -> break
                         IO::init( );
                         break;
@@ -351,7 +351,7 @@ namespace MAP {
 
                 if( !berryType ) {
                     //  ask if player wants to plant a berry
-                    if( IO::yesNoBox( ).getResult( GET_STRING( 571 ), MSG_INFO_NOCLOSE )
+                    if( IO::simpleYesNoBox( ).getResult( GET_STRING( 571 ), MSG_INFO_NOCLOSE )
                         == IO::yesNoBox::YES ) {
 
                         FADE_TOP_DARK( );
@@ -468,7 +468,7 @@ namespace MAP {
                 IO::printMessage( buffer.data( ), MSG_INFO_CONT );
                 if( stage == 4 ) {
                     // Berries can be harvested
-                    if( IO::yesNoBox( ).getResult( GET_STRING( 570 ), MSG_INFO_NOCLOSE )
+                    if( IO::simpleYesNoBox( ).getResult( GET_STRING( 570 ), MSG_INFO_NOCLOSE )
                         == IO::yesNoBox::YES ) {
                         IO::init( );
                         IO::giveItemToPlayer( BAG::berryToItem( berryType ), yield );
@@ -491,7 +491,7 @@ namespace MAP {
                         + SAVE::CURRENT_FILE->m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                            I_SQUIRT_BOTTLE ) ) {
 
-                        if( IO::yesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
+                        if( IO::simpleYesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
                             == IO::yesNoBox::YES ) {
                             IO::init( );
                             IO::printMessage( GET_STRING( 573 ), MSG_INFO );

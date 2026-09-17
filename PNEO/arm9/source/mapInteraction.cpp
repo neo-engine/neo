@@ -27,6 +27,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
+#include <io/choiceBox.h>
+#include <io/counter.h>
 #include "bag/bagViewer.h"
 #include "battle/battle.h"
 #include "battle/battleTrainer.h"
@@ -34,13 +36,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"

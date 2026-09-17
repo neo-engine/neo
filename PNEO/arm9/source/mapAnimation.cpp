@@ -27,15 +27,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 
+#include <io/choiceBox.h>
 #include "bag/bagViewer.h"
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/abilityNames.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"

@@ -30,18 +30,18 @@
 #include <vector>
 #include <nds.h>
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "gen/sprites.raw.h"
-#include "io/choiceBox.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "pokemon.h"
 #include "pokemonData.h"
@@ -963,7 +963,7 @@ namespace SPX {
         bool overheat = false;
 
         scanKeys( );
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
 
         u8 numPlayer = 0;
         for( ; numPlayer < 4; ++numPlayer ) {
@@ -975,8 +975,8 @@ namespace SPX {
 
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
-            pressed = keysUp( );
+            touchRead( &IO::TOUCH );
+            IO::BTN_PRESSED = keysUp( );
 
             if( p_npctier == ROTOM_TIER ) {
                 currentPosition += currentSpeed;
@@ -1024,7 +1024,7 @@ namespace SPX {
             // numbers devided by number of players (if playing with a non-rotom)
             // if speed is larger than 4642, the machine overheats
 
-            if( ( pressed & KEY_A ) || touch.px || touch.py ) {
+            if( ( IO::BTN_PRESSED & KEY_A ) || IO::TOUCH.px || IO::TOUCH.py ) {
                 if( inPerfectDist( currentSpeed, currentPosition, ARROW_POS[ 0 ] ) ) {
                     // perfect hit
                     animatePerfectHit( ARROW_POS[ 0 ] );
@@ -1054,7 +1054,7 @@ namespace SPX {
                 }
 
                 scanKeys( );
-                cooldown = 2;
+                IO::BTN_COOLDOWN = 2;
             }
 
             // check if arrow is close to arrow of an NPC
@@ -1164,7 +1164,8 @@ namespace SPX {
 
         if( p_overheat ) {
             IO::regularFont->printStringC( GET_STRING( 800 ), 16, 133, false );
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             IO::printRectangle( 0, 132, 255, 192, false, 0 );
         }
 
@@ -1191,7 +1192,7 @@ namespace SPX {
         IO::updateOAM( true );
         SOUND::playSoundEffect( SFX_OBTAIN_ITEM );
         SOUND::restartBGM( );
-        IO::waitForInteractS( );
+        IO::waitForInteract( IO::animateMBS, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
     }
 
     void runPokeblockBlender( u8 p_numNPC, bool p_rotom, bool p_blendMaster ) {

@@ -39,7 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "pokemon.h"
 #include "sound/sound.h"
 #include "spx/specials.h"
@@ -99,70 +99,12 @@ namespace IO {
         }
     }
 
-    void waitForInteract( ) {
-        scanKeys( );
-        cooldown = COOLDOWN_COUNT;
-        u8 frame = 0;
-        loop( ) {
-            animateMB( ++frame );
-            scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
-
-            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
-                    animateMB( ++frame );
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    touchRead( &touch );
-                    swiWaitForVBlank( );
-                }
-
-                SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
-                break;
-            }
-        }
-    }
-
     void animateMBS( u8 p_frame ) {
         if( ( p_frame & 31 ) == 0 ) {
             IO::regularFont->drawContinue( 254 - 12, 192 - 40 + 24, false );
         }
         if( ( p_frame & 31 ) == 15 ) {
             IO::regularFont->hideContinue( 254 - 12, 192 - 40 + 24, 0, false );
-        }
-    }
-
-    void waitForInteractS( ) {
-        scanKeys( );
-        cooldown = COOLDOWN_COUNT;
-        u8 frame = 0;
-        loop( ) {
-            animateMBS( ++frame );
-            scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
-
-            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
-                    animateMBS( ++frame );
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    touchRead( &touch );
-                    swiWaitForVBlank( );
-                }
-
-                SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
-                break;
-            }
         }
     }
 
@@ -329,7 +271,8 @@ namespace IO {
                     } else if( ln == 2 || ( ln > 2 && p_message[ cpos ] == '\n' ) ) {
                         std::strncat( TEXT_CACHE_2, shortbuf, 20 );
                     } else {
-                        waitForInteract( );
+                        IO::waitForInteract( animateMB,
+                                             [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                         std::strncpy( TEXT_CACHE_1, TEXT_CACHE_2, 256 );
                         std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
                         std::strncat( TEXT_CACHE_2, shortbuf, 20 );
@@ -397,14 +340,14 @@ namespace IO {
         doPrintMessage( p_message, p_style, 0, 0, p_noDelay );
 
         if( p_style == MSG_NORMAL_CONT || p_style == MSG_INFO_CONT ) {
-            waitForInteract( );
+            IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
             std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
             std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
             IO::updateOAM( false );
         }
         if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_BRAILLE ) {
-            waitForInteract( );
+            IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             hideMessageBox( );
         }
     }
@@ -429,7 +372,7 @@ namespace IO {
                       iname.c_str( ) );
         }
         doPrintMessage( buffer.data( ), MSG_ITEM, p_itemId, &data );
-        waitForInteract( );
+        IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         hideMessageBox( );
     }
 
@@ -453,7 +396,7 @@ namespace IO {
                       iname.c_str( ) );
         }
         doPrintMessage( buffer.data( ), MSG_ITEM, p_itemId, &data );
-        waitForInteract( );
+        IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         hideMessageBox( );
     }
 
@@ -484,7 +427,7 @@ namespace IO {
         default: SOUND::playSoundEffect( SFX_OBTAIN_ITEM ); break;
         }
         doPrintMessage( buffer.data( ), MSG_ITEM, p_itemId, &data );
-        waitForInteract( );
+        IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         auto fmt = std::string( GET_STRING( IO::STR_UI_PUT_ITEM_INTO_BAG ) );
         snprintf(
             buffer.data( ), 99, fmt.c_str( ), iname.c_str( ), BAG::getItemChar( data.m_itemType ),
@@ -493,7 +436,7 @@ namespace IO {
         std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
         std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         doPrintMessage( buffer.data( ), MSG_ITEM, p_itemId, &data );
-        waitForInteract( );
+        IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         hideMessageBox( );
     }
 

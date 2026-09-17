@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/locationNames.h"
 #include "gen/pokemonNames.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "pokemon.h"
 
 #include "NoPkmn.h"

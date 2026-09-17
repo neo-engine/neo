@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 #include "gen/moveNames.h"
 #include "gen/pokemonNames.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDefines.h"
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"

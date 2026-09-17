@@ -34,13 +34,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "dex/dex.h"
 #include "fs/fs.h"
 #include "gen/locationNames.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapScript.h"
 #include "save/saveGame.h"
@@ -81,7 +80,7 @@ namespace MAP {
         }
 
         if( IO::yesNoBox::YES
-            == IO::yesNoBox( ).getResult(
+            == IO::simpleYesNoBox( ).getResult(
                 convertMapString( GET_MAP_STRING( IO::STR_MAP_ST_MSG3 ), MSG_NORMAL ).c_str( ),
                 MSG_NOCLOSE, false ) ) {
 

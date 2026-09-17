@@ -1,37 +1,35 @@
 /*
-Pokémon neo
+PokÃ©mon neo
 ------------------------------
 
 file        : yesNoBox.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
-This file is part of Pokémon neo.
+This file is part of PokÃ©mon neo.
 
-Pokémon neo is free software: you can redistribute it and/or modify
+PokÃ©mon neo is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Pokémon neo is distributed in the hope that it will be useful,
+PokÃ©mon neo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+along with PokÃ©mon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
 #include <functional>
 #include <vector>
 #include <nds.h>
-
-#include "defines.h"
-#include "io/uio.h"
+#include "io/inputTarget.h"
 
 namespace IO {
     /*
@@ -40,6 +38,12 @@ namespace IO {
     class yesNoBox {
       public:
         static void DEFAULT_TICK( ) {
+        }
+        static void DEFAULT_SFX_CANCEL( ) {
+        }
+        static void DEFAULT_SFX_CHOOSE( ) {
+        }
+        static void DEFAULT_SFX_SELECT( ) {
         }
 
         enum selection { YES = 0, NO = 1 };
@@ -56,16 +60,10 @@ namespace IO {
         selection
         getResult( std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
                    std::function<void( selection )> p_selectFunction,
-                   selection                        p_initialSelection = YES,
-                   std::function<void( )>           p_tick             = DEFAULT_TICK );
-
-        /*
-         * @brief: A simplified yes/no-box that uses the message output system (from the NAV
-         * namespace) when the player is in the overworld and no special menu is currently visible.
-         * @param p_showMoney: Display the current money the player owns; used for shop
-         * dialogs (i.e. "Do you want to buy/pay <..>?").
-         */
-        selection getResult( const char* p_message, style p_style, bool p_showMoney = false );
+                   selection p_initialSelection = YES, std::function<void( )> p_tick = DEFAULT_TICK,
+                   std::function<void( )> p_sfxCancel = DEFAULT_SFX_CANCEL,
+                   std::function<void( )> p_sfxChoose = DEFAULT_SFX_CHOOSE,
+                   std::function<void( )> p_sfxSelect = DEFAULT_SFX_SELECT );
     };
 
 } // namespace IO

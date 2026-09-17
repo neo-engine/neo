@@ -30,7 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <nds.h>
 
 #include "bag/bag.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "io/yesNoBox.h"
 
 namespace BAG {

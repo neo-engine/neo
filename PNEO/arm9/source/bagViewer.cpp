@@ -29,15 +29,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
+#include <io/choiceBox.h>
+#include <io/counter.h>
+#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "fs/data.h"
 #include "gen/itemNames.h"
 #include "io/animations.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/strings.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 
@@ -473,15 +473,15 @@ namespace BAG {
         bool bad = false;
 
         for( auto t : tpos ) {
-            if( ( touch.px || touch.py ) && t.first.inRange( touch ) ) {
-                while( touch.px || touch.py ) {
+            if( ( IO::TOUCH.px || IO::TOUCH.py ) && t.first.inRange( IO::TOUCH ) ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
-                    if( !t.first.inRange( touch ) ) {
+                    if( !t.first.inRange( IO::TOUCH ) ) {
                         bad = true;
                         break;
                     }
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
 
@@ -537,29 +537,29 @@ namespace BAG {
             SOUND::playSoundEffect( SFX_SELECT );
             _currSelectedIdx = 0;
             selectPage( SAVE::CURRENT_FILE->m_lstBag = ( curBg + BAG_TYPES - 1 ) % BAG_TYPES );
-            cooldown = COOLDOWN_COUNT;
+            IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         } else if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
             SOUND::playSoundEffect( SFX_SELECT );
             _currSelectedIdx = 0;
             selectPage( SAVE::CURRENT_FILE->m_lstBag = ( curBg + 1 ) % BAG_TYPES );
 
-            cooldown = COOLDOWN_COUNT;
+            IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
             if( !curBgsz ) {
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 return true;
             }
             SOUND::playSoundEffect( SFX_SELECT );
             selectItem( _currSelectedIdx + 1 );
-            cooldown = COOLDOWN_COUNT;
+            IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
             if( !curBgsz ) {
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 return true;
             }
             SOUND::playSoundEffect( SFX_SELECT );
             selectItem( _currSelectedIdx - 1 );
-            cooldown = COOLDOWN_COUNT;
+            IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         }
 
         return true;
@@ -607,24 +607,25 @@ namespace BAG {
     }
 
     void bagViewer::waitForInteract( ) {
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
-            if( ( pressed & KEY_A ) || ( pressed & KEY_B ) || touch.px || touch.py ) {
-                while( touch.px || touch.py ) {
+            if( ( IO::BTN_PRESSED & KEY_A ) || ( IO::BTN_PRESSED & KEY_B ) || IO::TOUCH.px
+                || IO::TOUCH.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
                 SOUND::playSoundEffect( SFX_CHOOSE );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
             }
         }
@@ -885,14 +886,14 @@ namespace BAG {
         _currSelectedIdx = 0;
         initUI( );
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed  = keysUp( );
-            held     = keysHeld( );
-            auto tmp = handleSomeInput( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
+            auto tmp        = handleSomeInput( );
 
             if( !tmp )
                 break;
@@ -919,13 +920,13 @@ namespace BAG {
             return targetItem;
         }
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
             auto tmp = handleSomeInput( );
             if( !tmp ) {

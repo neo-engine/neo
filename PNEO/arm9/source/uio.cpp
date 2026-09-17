@@ -33,7 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "battle/type.h"
 #include "defines.h"
 #include "fs/data.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 
 namespace IO {
@@ -135,45 +135,6 @@ namespace IO {
         p_palette[ ( p_start + 4 ) ] = RGB15( 15, 0, 15 );  // 35 normal magenta
         p_palette[ ( p_start + 5 ) ] = RGB15( 0, 15, 15 );  // 36 normal cyan
         p_palette[ ( p_start + 6 ) ] = RGB15( 24, 24, 24 ); // 37 normal white
-    }
-
-    bool waitForTouchUp( u16 p_targetX1, u16 p_targetY1, u16 p_targetX2, u16 p_targetY2 ) {
-        return waitForTouchUp( inputTarget( p_targetX1, p_targetY1, p_targetX2, p_targetY2 ) );
-    }
-    bool waitForTouchUp( inputTarget p_inputTarget ) {
-        touchPosition touch;
-        if( p_inputTarget.m_inputType == inputTarget::inputType::TOUCH
-            || p_inputTarget.m_inputType == inputTarget::inputType::TOUCH_CIRCLE ) {
-            loop( ) {
-                swiWaitForVBlank( );
-                scanKeys( );
-                touchRead( &touch );
-                if( TOUCH_UP ) return true;
-                if( !p_inputTarget.inRange( touch ) ) return false;
-            }
-        }
-        return false;
-    }
-
-    bool waitForKeysUp( KEYPAD_BITS p_keys ) {
-        return waitForKeysUp( inputTarget( p_keys ) );
-    }
-    bool waitForKeysUp( inputTarget p_inputTarget ) {
-        if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON ) {
-            loop( ) {
-                scanKeys( );
-                swiWaitForVBlank( );
-                if( keysUp( ) & p_inputTarget.m_keys ) return true;
-                if( !( keysHeld( ) & p_inputTarget.m_keys ) ) return true;
-            }
-        }
-        return false;
-    }
-
-    bool waitForInput( inputTarget p_inputTarget ) {
-        if( p_inputTarget.m_inputType == inputTarget::inputType::BUTTON )
-            return waitForKeysUp( p_inputTarget );
-        return waitForTouchUp( p_inputTarget );
     }
 
     void displayHP( u16 p_HPstart, u16 p_HP, u8 p_x, u8 p_y, u8 p_freecolor1, u8 p_freecolor2,
@@ -281,55 +242,6 @@ namespace IO {
                 }
                 if( p_delay ) swiWaitForVBlank( );
             }
-        }
-    }
-
-    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_colorIdx,
-                         bool p_pressed, bool p_bottom ) {
-        printChoiceBox( p_x1, p_y1, p_x2, p_y2, p_borderWidth, p_borderWidth, p_colorIdx, p_pressed,
-                        p_bottom );
-    }
-
-    void printChoiceBox( u8 p_x1, u8 p_y1, u8 p_x2, u8 p_y2, u8 p_borderWidth, u8 p_borderWidth2,
-                         u8 p_colorIdx, bool p_pressed, bool p_bottom ) {
-        if( !p_pressed ) {
-            printRectangle( p_x2 - 2, p_y1 + 1, p_x2, p_y2, p_bottom, BLACK_IDX );
-            printRectangle( p_x1 + 1, p_y2 - 1, p_x2, p_y2, p_bottom, BLACK_IDX );
-
-            printRectangle( p_x1, p_y1, p_x1 + p_borderWidth, p_y2 - 1, p_bottom, p_colorIdx );
-            printRectangle( p_x2 - p_borderWidth2 - 2, p_y1, p_x2 - 2, p_y2 - 1, p_bottom,
-                            p_colorIdx );
-            printRectangle( p_x1, p_y1, p_x2 - 2, p_y1 + p_borderWidth - 2, p_bottom, p_colorIdx );
-            printRectangle( p_x1, p_y2 - p_borderWidth + 3, p_x2 - 2, p_y2 - 1, p_bottom,
-                            p_colorIdx );
-
-            printRectangle( p_x2 - p_borderWidth2 - 1, p_y1 + p_borderWidth - 1,
-                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4, p_bottom, BLACK_IDX );
-            printRectangle( p_x1 + 1 + p_borderWidth, p_y2 - p_borderWidth + 2,
-                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 4, p_bottom, BLACK_IDX );
-            printRectangle( p_x1 + p_borderWidth, p_y1 + p_borderWidth - 2,
-                            p_x2 - p_borderWidth2 - 2, p_y2 - p_borderWidth + 3, p_bottom,
-                            WHITE_IDX );
-        } else {
-            printRectangle( p_x1, p_y1, p_x1 + 2, p_y2 - 1, p_bottom, 0 );
-            printRectangle( p_x1, p_y1, p_x2 - 1, p_y1 + 1, p_bottom, 0 );
-
-            printRectangle( p_x1 + 2, p_y1 + 1, p_x1 + 2 + p_borderWidth, p_y2, p_bottom,
-                            p_colorIdx );
-            printRectangle( p_x2 - p_borderWidth2, p_y1 + 1, p_x2, p_y2, p_bottom, p_colorIdx );
-            printRectangle( p_x1 + 2, p_y1 + 1, p_x2, p_y1 + p_borderWidth - 1, p_bottom,
-                            p_colorIdx );
-            printRectangle( p_x1 + 2, p_y2 - p_borderWidth + 3, p_x2, p_y2, p_bottom, p_colorIdx );
-
-            printRectangle( p_x2 - p_borderWidth2 + 1, p_y1 + p_borderWidth,
-                            p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4, p_bottom,
-                            BLACK_IDX );
-            printRectangle( p_x1 + 3 + p_borderWidth, p_y2 - p_borderWidth + 4,
-                            p_x2 - p_borderWidth2 + 2, p_y2 - p_borderWidth + 4, p_bottom,
-                            BLACK_IDX );
-
-            printRectangle( p_x1 + 2 + p_borderWidth, p_y1 + p_borderWidth - 1,
-                            p_x2 - p_borderWidth2, p_y2 - p_borderWidth + 3, p_bottom, WHITE_IDX );
         }
     }
 

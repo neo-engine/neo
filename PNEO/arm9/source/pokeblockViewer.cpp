@@ -29,15 +29,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
+#include <io/choiceBox.h>
+#include <io/counter.h>
+#include <io/yesNoBox.h>
 #include "bag/pokeblockViewer.h"
 #include "fs/data.h"
 #include "gen/itemNames.h"
 #include "io/animations.h"
-#include "io/choiceBox.h"
-#include "io/counter.h"
 #include "io/strings.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
 
@@ -93,15 +93,15 @@ namespace BAG {
         bool bad = false;
 
         for( auto t : tpos ) {
-            if( ( touch.px || touch.py ) && t.first.inRange( touch ) ) {
-                while( touch.px || touch.py ) {
+            if( ( IO::TOUCH.px || IO::TOUCH.py ) && t.first.inRange( IO::TOUCH ) ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
-                    if( !t.first.inRange( touch ) ) {
+                    if( !t.first.inRange( IO::TOUCH ) ) {
                         bad = true;
                         break;
                     }
                     scanKeys( );
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
 
@@ -136,13 +136,13 @@ namespace BAG {
         _ui->init( );
         selectView( 0 );
 
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             scanKeys( );
-            touchRead( &touch );
+            touchRead( &IO::TOUCH );
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
             auto tch = handleTouch( );
 
@@ -153,7 +153,7 @@ namespace BAG {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _view ) {
                     selectView( 0 );
-                    cooldown = COOLDOWN_COUNT;
+                    IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 } else {
                     return;
                 }
@@ -166,16 +166,16 @@ namespace BAG {
                 }
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 selectView( _view + 1 );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( !_view && GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 selectBlock( ( _selectedBlock + SAVE::POKEBLOCK_TYPES - 1 )
                              % SAVE::POKEBLOCK_TYPES );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( !_view && GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 selectBlock( ( _selectedBlock + 1 ) % SAVE::POKEBLOCK_TYPES );
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -188,7 +188,7 @@ namespace BAG {
                 } else {
                     selectBlock( ( _selectedBlock + BLOCKS_PER_ROW ) % SAVE::POKEBLOCK_TYPES );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
 
@@ -210,7 +210,7 @@ namespace BAG {
                     selectBlock( ( _selectedBlock + SAVE::POKEBLOCK_TYPES - BLOCKS_PER_ROW )
                                  % SAVE::POKEBLOCK_TYPES );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
             swiWaitForVBlank( );
         }

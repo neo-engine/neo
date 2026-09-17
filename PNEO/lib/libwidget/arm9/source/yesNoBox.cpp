@@ -6,7 +6,7 @@ file        : yesNoBox.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -26,53 +26,48 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "io/yesNoBox.h"
-#include "defines.h"
-#include "io/menuUI.h"
-#include "io/uio.h"
-#include "sound/sound.h"
 
 namespace IO {
     yesNoBox::selection yesNoBox::getResult(
         std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
         std::function<void( selection )> p_selectFunction, selection p_initialSelection,
-        std::function<void( )> p_tick ) {
+        std::function<void( )> p_tick, std::function<void( )> p_sfxCancel,
+        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect ) {
         // initialize the ynbox
         auto choices = p_drawFunction( );
         auto sel     = p_initialSelection;
         p_selectFunction( sel );
-        cooldown = COOLDOWN_COUNT;
+        BTN_COOLDOWN = COOLDOWN_COUNT;
 
-        // loop until player made a decision
-        loop( ) {
-            p_tick( );
-            // check for new input from the player
-            scanKeys( );
-            touchRead( &touch );
+        while( 1 ) {
             swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            p_tick( );
+            scanKeys( );
+            touchRead( &TOUCH );
+            BTN_PRESSED = keysUp( );
+            BTN_HELD    = keysHeld( );
 
-            if( pressed & KEY_A ) {
+            if( BTN_PRESSED & KEY_A ) {
                 // player selects current choice
                 if( sel == yesNoBox::YES ) {
-                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    p_sfxChoose( );
                 } else {
-                    SOUND::playSoundEffect( SFX_CANCEL );
+                    p_sfxCancel( );
                 }
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
                 break;
             }
-            if( pressed & KEY_B ) {
+            if( BTN_PRESSED & KEY_B ) {
                 // player cancels, i.e., selects "NO"
-                SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
-                sel      = yesNoBox::NO;
+                p_sfxCancel( );
+                BTN_COOLDOWN = COOLDOWN_COUNT;
+                sel          = yesNoBox::NO;
                 p_selectFunction( sel );
                 break;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) || GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 // player selects other possible option
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( sel == yesNoBox::YES ) {
                     sel = yesNoBox::NO;
@@ -82,57 +77,44 @@ namespace IO {
 
                 p_selectFunction( sel );
 
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
 
             // touch input
             for( auto i : choices ) {
-                if( i.first.inRange( touch ) ) {
+                if( i.first.inRange( TOUCH ) ) {
                     // player touched on a position that corresponds to a possible selection
                     sel = i.second;
                     p_selectFunction( sel );
                     bool bad = false;
-                    while( touch.px || touch.py ) {
+                    while( TOUCH.px || TOUCH.py ) {
                         // check that the player was serious about their choice, i.e., the
                         // touch-up/release happens at a "valid" position for the current
                         // selection
-                        swiWaitForVBlank( );
-                        if( !i.first.inRange( touch ) ) {
+                        if( !i.first.inRange( TOUCH ) ) {
                             // touch release, but outside of valid selection range
                             bad = true;
                             break;
                         }
+                        swiWaitForVBlank( );
                         p_tick( );
 
                         // update input
                         scanKeys( );
-                        touchRead( &touch );
-                        swiWaitForVBlank( );
+                        touchRead( &TOUCH );
                     }
                     if( !bad ) {
                         // was a valid selection
                         if( sel == yesNoBox::YES ) {
-                            SOUND::playSoundEffect( SFX_CHOOSE );
+                            p_sfxChoose( );
                         } else {
-                            SOUND::playSoundEffect( SFX_CANCEL );
+                            p_sfxCancel( );
                         }
                         return sel;
                     }
                 }
             }
-
-            // wait for a vertical blank
-            swiWaitForVBlank( );
         }
         return sel;
-    }
-
-    yesNoBox::selection yesNoBox::getResult( const char* p_message, style p_style,
-                                             bool p_showMoney ) {
-        return getResult(
-            [ & ]( ) { return IO::printYNMessage( p_message, p_style, 255, p_showMoney ); },
-            [ & ]( yesNoBox::selection p_selection ) {
-                IO::printYNMessage( 0, p_style, p_selection == IO::yesNoBox::NO, p_showMoney );
-            } );
     }
 } // namespace IO

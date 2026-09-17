@@ -39,7 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
@@ -322,7 +322,7 @@ namespace MAP {
             if( p_direction == LEFT || p_direction == RIGHT ) {
                 if( ( curBehave != BEH_BIKE_BRIDGE_VERTICAL
                       && curBehave != BEH_BIKE_BRIDGE_VERTICAL_ALT )
-                    || p_moveMode != ACRO_BIKE || !( held & KEY_B ) ) {
+                    || p_moveMode != ACRO_BIKE || !( IO::BTN_HELD & KEY_B ) ) {
                     return false;
                 }
             }
@@ -337,7 +337,7 @@ namespace MAP {
             if( p_direction == DOWN || p_direction == UP ) {
                 if( ( curBehave != BEH_BIKE_BRIDGE_HORIZONTAL
                       && curBehave != BEH_BIKE_BRIDGE_HORIZONTAL_ALT )
-                    || p_moveMode != ACRO_BIKE || !( held & KEY_B ) ) {
+                    || p_moveMode != ACRO_BIKE || !( IO::BTN_HELD & KEY_B ) ) {
                     return false;
                 }
             }
@@ -1842,7 +1842,7 @@ namespace MAP {
                 for( u8 k = 0; k < 30; ++k ) {
                     scanKeys( );
                     swiWaitForVBlank( );
-                    int pressed = keysDown( );
+                    IO::BTN_PRESSED = keysDown( );
                     if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_B ) ) {
                         failed = true;
                         goto OUT;

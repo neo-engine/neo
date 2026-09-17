@@ -32,7 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 
 #include "NoItem.h"
 

@@ -32,7 +32,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "pokemon.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -60,34 +60,6 @@ namespace IO::ANIM {
             OamTop->oamBuffer[ 4 * p_frame + i ].x += p_dx;
             OamTop->oamBuffer[ 4 * p_frame + i ].y += p_dy;
         }
-    }
-
-    /*
-     * @brief: Waits until the player presses either A or B.
-     */
-    void waitForInteract( ) {
-        loop( ) {
-            scanKeys( );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-
-            if( pressed & KEY_A ) { break; }
-            if( pressed & KEY_B ) { break; }
-            swiWaitForVBlank( );
-        }
-    }
-
-    /*
-     * @brief: Finishes the current frame and checks whether the given buttons were
-     * pressed.
-     */
-    bool interruptableFrame( int p_inter = 0 ) {
-        swiWaitForVBlank( );
-        scanKeys( );
-        pressed = keysUp( );
-
-        if( pressed & p_inter ) { return true; }
-        return false;
     }
 
     bool evolvePkmn( u16 p_startSpecies, u8 p_startForme, u16 p_endSpecies, u8 p_endForme,
@@ -236,7 +208,7 @@ namespace IO::ANIM {
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
             IO::regularFont->printStringC( GET_STRING( STR_ANIM_EVOLUTION_ABORTED ), 12, 192 - 40,
                                            false );
-            waitForInteract( );
+            waitForInteractAB( );
             SOUND::restartBGM( );
             return false;
         } else {
@@ -251,7 +223,7 @@ namespace IO::ANIM {
                       FS::getDisplayName( p_startSpecies ).c_str( ),
                       FS::getDisplayName( p_endSpecies ).c_str( ) );
             IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
-            waitForInteract( );
+            waitForInteractAB( );
             SOUND::restartBGM( );
             SAVE::CURRENT_FILE->registerCaughtPkmn( p_endSpecies );
             return true;
@@ -597,7 +569,7 @@ namespace IO::ANIM {
         setFrameVis( 1, false );
         updateOAM( false );
         for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
-        waitForInteract( );
+        waitForInteractAB( );
         SOUND::restartBGM( );
         SAVE::CURRENT_FILE->registerCaughtPkmn( p_pkmn.m_pkmnIdx );
     }

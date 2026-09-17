@@ -29,15 +29,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdio>
 #include <vector>
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "bag/bagUI.h"
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "defines.h"
 #include "fs/data.h"
-#include "io/choiceBox.h"
 #include "io/screenFade.h"
 #include "io/strings.h"
-#include "io/yesNoBox.h"
 #include "save/saveGame.h"
 
 // Sprites

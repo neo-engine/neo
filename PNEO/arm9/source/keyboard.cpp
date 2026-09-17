@@ -34,7 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "io/keyboard.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "sound/sound.h"
 
 #include "key.h"
@@ -345,16 +345,14 @@ namespace IO {
     }
 
     u16 keyboard::getNextChar( ) {
-        touchPosition touch;
-        int           pressed;
-        cooldown = COOLDOWN_COUNT;
+        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         loop( ) {
             select( _curSel, ++_frame );
             swiWaitForVBlank( );
             scanKeys( );
-            touchRead( &touch );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            touchRead( &IO::TOUCH );
+            IO::BTN_PRESSED = keysUp( );
+            IO::BTN_HELD    = keysHeld( );
 
             if( GET_KEY_COOLDOWN( KEY_A ) ) {
                 if( _curSel == 253 ) {
@@ -390,7 +388,7 @@ namespace IO {
                 } else if( _curSel == 254 ) {
                     select( _curSel = 0, _frame );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _curSel > 0 && _curSel <= numRows * charsPerRow - 1 ) {
@@ -406,7 +404,7 @@ namespace IO {
                 } else if( _curSel == 253 ) {
                     select( _curSel = 240 + maxPages( ) - 1, _frame );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_UP ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _curSel >= charsPerRow && _curSel <= numRows * charsPerRow - 1 ) {
@@ -432,7 +430,7 @@ namespace IO {
                 } else if( _curSel == 253 ) {
                     select( _curSel = ( numRows - 1 ) * charsPerRow + 5, _frame );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             } else if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );
                 if( _curSel <= ( numRows - 1 ) * charsPerRow - 1 ) {
@@ -460,23 +458,23 @@ namespace IO {
                 } else if( _curSel == 253 ) {
                     select( _curSel = 5, _frame );
                 }
-                cooldown = COOLDOWN_COUNT;
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
 
             for( auto i : getTouchPositions( ) ) {
-                if( i.first.inRange( touch ) ) {
+                if( i.first.inRange( IO::TOUCH ) ) {
                     swiWaitForVBlank( );
                     bool good = true;
-                    while( touch.px || touch.py ) {
+                    while( IO::TOUCH.px || IO::TOUCH.py ) {
                         select( _curSel = i.second, _frame++ );
                         swiWaitForVBlank( );
                         scanKeys( );
 
-                        if( !i.first.inRange( touch ) ) {
+                        if( !i.first.inRange( IO::TOUCH ) ) {
                             good = false;
                             break;
                         }
-                        touchRead( &touch );
+                        touchRead( &IO::TOUCH );
                         swiWaitForVBlank( );
                     }
 

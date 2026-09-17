@@ -28,7 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <vector>
 
-#include "io/yesNoBox.h"
+#include <io/yesNoBox.h>
 #include "pokemon.h"
 
 namespace STS {

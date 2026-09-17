@@ -34,15 +34,15 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include <io/choiceBox.h>
+#include <io/yesNoBox.h>
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/moveNames.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/message.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
-#include "io/yesNoBox.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
 #include "save/mysteryGift.h"
@@ -406,7 +406,8 @@ namespace SAVE {
         // Note: This will only ever work for properly configured systems.
         if( !WIFI_INITIALIZED && !Wifi_InitDefault( WFC_CONNECT ) ) {
             message( GET_STRING( IO::STR_UI_WFC_SETUP_FAILED ) );
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             return false;
         }
         WIFI_INITIALIZED = true;
@@ -427,7 +428,8 @@ namespace SAVE {
 #else
             message( GET_STRING( IO::STR_UI_WFC_SETUP_FAILED ) );
 #endif
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             return false;
         }
 
@@ -438,7 +440,8 @@ namespace SAVE {
 #else
             message( GET_STRING( IO::STR_UI_WFC_SETUP_FAILED ) );
 #endif
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             return false;
         }
 
@@ -450,7 +453,8 @@ namespace SAVE {
 #else
             message( GET_STRING( IO::STR_UI_WFC_SETUP_FAILED ) );
 #endif
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             return false;
         }
 
@@ -467,7 +471,8 @@ namespace SAVE {
 #else
             message( GET_STRING( IO::STR_UI_WFC_SETUP_FAILED ) );
 #endif
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             return false;
         }
 
@@ -480,7 +485,8 @@ namespace SAVE {
 #else
             message( GET_STRING( IO::STR_UI_WFC_SERVER_ERROR ) );
 #endif
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             return false;
         }
 
@@ -772,7 +778,8 @@ namespace SAVE {
         if( hasWC || SAVE::CURRENT_FILE->collectedWC( TMP_WC.m_id ) ) {
             // player owns/owned the gift, decline
             message( GET_STRING( IO::STR_UI_GIFT_ALREADY_COLLECTED ), false );
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
 
             clearText( );
             hideSpritesSub( );
@@ -786,7 +793,8 @@ namespace SAVE {
         if( freespace == SAVE::MAX_STORED_WC ) {
             // player has no space. abort
             message( GET_STRING( IO::STR_UI_NO_SPACE ), false );
-            IO::waitForInteractS( );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
 
             clearText( );
             hideSpritesSub( );
@@ -851,11 +859,11 @@ namespace SAVE {
         FS::writeSave( ARGV[ 0 ], []( u16, u16 ) {} );
         IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
         message( GET_STRING( IO::STR_UI_GIFT_RECEIVED ), false );
-        IO::waitForInteractS( );
+        IO::waitForInteract( IO::animateMBS, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
 
         IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
         message( GET_STRING( IO::STR_UI_PLEASE_COLLECT_GIFT ), false );
-        IO::waitForInteractS( );
+        IO::waitForInteract( IO::animateMBS, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
 
         // display wonder card
 
@@ -869,7 +877,7 @@ namespace SAVE {
         hideSpritesSub( );
 
         displayWonderCard( freespace );
-        IO::waitForInteractS( );
+        IO::waitForInteract( IO::animateMBS, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         return true;
     }
 
@@ -937,7 +945,8 @@ namespace SAVE {
                 if( SAVE::CURRENT_FILE->m_storedWonderCards[ SAVE::MAX_STORED_WC - 1 ].m_type
                     != SAVE::WCTYPE_NONE ) {
                     message( GET_STRING( IO::STR_UI_NO_SPACE ) );
-                    IO::waitForInteractS( );
+                    IO::waitForInteract( IO::animateMBS,
+                                         [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                     continue;
                 }
 
@@ -966,7 +975,8 @@ namespace SAVE {
                         acceptWC( );
                     } else {
                         message( GET_STRING( IO::STR_UI_NO_GIFT_FOUND ) );
-                        IO::waitForInteractS( );
+                        IO::waitForInteract( IO::animateMBS,
+                                             [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                     }
                 } else if( res2 == 1 ) {
                     // receive from wireless
@@ -975,7 +985,8 @@ namespace SAVE {
                         acceptWC( );
                     } else {
                         message( GET_STRING( IO::STR_UI_NO_GIFT_FOUND ) );
-                        IO::waitForInteractS( );
+                        IO::waitForInteract( IO::animateMBS,
+                                             [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                     }
                 } else if( res2 == 2 ) {
                     // receive from internet
@@ -984,7 +995,8 @@ namespace SAVE {
                         acceptWC( );
                     } else {
                         message( GET_STRING( IO::STR_UI_NO_GIFT_FOUND ) );
-                        IO::waitForInteractS( );
+                        IO::waitForInteract( IO::animateMBS,
+                                             [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                     }
                 }
             } else if( res == 1 && res == mainChoices.size( ) - 2 ) {

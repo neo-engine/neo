@@ -35,7 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/screenFade.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "sound/sound.h"
 #include "sts/statusScreenUI.h"
 

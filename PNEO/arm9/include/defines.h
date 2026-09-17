@@ -142,9 +142,6 @@ constexpr u8 DAY_TIMES[ 4 ][ 5 ]
 
 u8 getCurrentDaytime( );
 
-// num frames between button input
-constexpr u8 COOLDOWN_COUNT = 6;
-
 extern bool DRAW_TIME;
 extern bool UPDATE_TIME;
 extern bool ANIMATE_MAP;
@@ -158,10 +155,6 @@ extern bool RESET_GAME;
 extern bool FLUSH_GFX_UPDATE;
 
 extern char** ARGV;
-
-extern int           pressed, held, last;
-extern touchPosition touch;
-extern u8            cooldown;
 
 extern bool TWL_CONFIG;
 
@@ -203,9 +196,6 @@ constexpr u32 DEFAULT_SPRITE_PID = 0x88888888;
 
 #define loop( )     while( 1 )
 #define TIMER_SPEED ( BUS_CLOCK / 1024 )
-constexpr u32 sq( s32 a ) {
-    return u32( a * a );
-}
 
 #define IN_DEX( pidx ) \
     ( SAVE::SAV.getActiveFile( ).m_caughtPkmn[ ( pidx ) / 8 ] & ( 1 << ( ( pidx ) % 8 ) ) )

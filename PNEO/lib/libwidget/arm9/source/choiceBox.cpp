@@ -6,7 +6,7 @@ file        : choiceBox.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -28,12 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cmath>
 
-#include "defines.h"
 #include "io/choiceBox.h"
-#include "io/menuUI.h"
-#include "io/uio.h"
-#include "save/saveGame.h"
-#include "sound/sound.h"
 
 namespace IO {
 
@@ -50,39 +45,11 @@ namespace IO {
         }                                                                               \
     } while( false )
 
-    choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
-                                               const std::vector<u16>& p_choices,
-                                               bool                    p_showExitButton ) {
-        return getResult(
-            [ & ]( u8 ) {
-                return printChoiceMessage( p_message, p_style, p_choices, p_showExitButton );
-            },
-            [ & ]( u8 p_selection ) { printChoiceMessage( 0, p_style, p_choices, p_selection ); } );
-    }
-
-    choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
-                                               const std::vector<std::string>& p_choices,
-                                               bool                            p_showExitButton ) {
-        return getResult(
-            [ & ]( u8 ) {
-                return printChoiceMessage( p_message, p_style, p_choices, p_showExitButton );
-            },
-            [ & ]( u8 p_selection ) { printChoiceMessage( 0, p_style, p_choices, p_selection ); } );
-    }
-
-    choiceBox::selection choiceBox::getResult( const char* p_message, style p_style,
-                                               u16 p_moves[ 4 ], u16 p_extraMove ) {
-        return getResult(
-            [ & ]( u8 ) { return printChoiceMessage( p_message, p_style, p_moves, p_extraMove ); },
-            [ & ]( u8 p_selection ) {
-                printChoiceMessage( 0, p_style, p_moves, p_extraMove, p_selection );
-            } );
-    }
-
     choiceBox::selection choiceBox::getResult(
         std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
         std::function<void( selection )> p_selectFunction, selection p_initialSelection,
-        std::function<void( )> p_tick, u8 p_initialPage ) {
+        std::function<void( )> p_tick, u8 p_initialPage, std::function<void( )> p_sfxCancel,
+        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect ) {
         u8   page    = p_initialPage;
         auto choices = p_drawFunction( page );
         if( !choices.size( ) ) [[unlikely]] { return BACK_CHOICE; }
@@ -94,51 +61,51 @@ namespace IO {
         u8   mxchoice = 0;
         UPDATE_PAGE_STATS;
 
-        cooldown = COOLDOWN_COUNT;
-        loop( ) {
+        BTN_COOLDOWN = COOLDOWN_COUNT;
+        while( 1 ) {
+            swiWaitForVBlank( );
             p_tick( );
             scanKeys( );
-            touchRead( &touch );
-            swiWaitForVBlank( );
-            pressed = keysUp( );
-            held    = keysHeld( );
+            touchRead( &TOUCH );
+            BTN_PRESSED = keysUp( );
+            BTN_HELD    = keysHeld( );
 
             // key controls
-            if( pressed & KEY_A ) {
+            if( BTN_PRESSED & KEY_A ) {
                 if( sel < choices.size( ) ) {
                     if( choices[ sel ].second == choiceBox::BACK_CHOICE
                         || choices[ sel ].second == choiceBox::EXIT_CHOICE ) {
-                        SOUND::playSoundEffect( SFX_CANCEL );
+                        p_sfxCancel( );
                         break;
                     } else if( choices[ sel ].second == choiceBox::DISABLED_CHOICE ) {
                         // Choice is disabled, nothing happens
                     } else {
-                        SOUND::playSoundEffect( SFX_CHOOSE );
+                        p_sfxChoose( );
                         break;
                     }
                 } else {
-                    SOUND::playSoundEffect( SFX_CANCEL );
+                    p_sfxCancel( );
                     break;
                 }
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
-            if( back && ( pressed & KEY_B ) ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
-                sel      = choiceBox::BACK_CHOICE;
+            if( back && ( BTN_PRESSED & KEY_B ) ) {
+                p_sfxCancel( );
+                BTN_COOLDOWN = COOLDOWN_COUNT;
+                sel          = choiceBox::BACK_CHOICE;
                 if( _mode != MODE_UP_DOWN_LEFT_RIGHT_CANCEL ) { p_selectFunction( sel ); }
                 break;
             }
-            if( ext && ( pressed & KEY_X ) ) {
-                SOUND::playSoundEffect( SFX_CANCEL );
-                cooldown = COOLDOWN_COUNT;
-                sel      = choiceBox::EXIT_CHOICE;
+            if( ext && ( BTN_PRESSED & KEY_X ) ) {
+                p_sfxCancel( );
+                BTN_COOLDOWN = COOLDOWN_COUNT;
+                sel          = choiceBox::EXIT_CHOICE;
                 p_selectFunction( sel );
                 break;
             }
 
             if( GET_KEY_COOLDOWN( KEY_LEFT ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( _mode == MODE_LEFT_RIGHT ) {
                     sel = ( sel + mxchoice - 1 ) % mxchoice;
@@ -155,15 +122,15 @@ namespace IO {
                     choices = p_drawFunction( --page );
                     UPDATE_PAGE_STATS;
                 } else {
-                    cooldown = COOLDOWN_COUNT;
+                    BTN_COOLDOWN = COOLDOWN_COUNT;
                     continue;
                 }
                 p_selectFunction( sel );
 
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_RIGHT ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( _mode == MODE_LEFT_RIGHT ) {
                     sel = ( sel + 1 ) % mxchoice;
@@ -189,15 +156,15 @@ namespace IO {
                     UPDATE_PAGE_STATS;
                     sel = std::min( sel, mxchoice );
                 } else {
-                    cooldown = COOLDOWN_COUNT;
+                    BTN_COOLDOWN = COOLDOWN_COUNT;
                     continue;
                 }
                 p_selectFunction( sel );
 
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_UP ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( _mode == MODE_UP_DOWN ) {
                     sel = ( sel + mxchoice - 1 ) % mxchoice;
@@ -217,10 +184,10 @@ namespace IO {
                 }
                 p_selectFunction( sel );
 
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
             if( GET_KEY_COOLDOWN( KEY_DOWN ) ) {
-                SOUND::playSoundEffect( SFX_SELECT );
+                p_sfxSelect( );
 
                 if( _mode == MODE_UP_DOWN ) {
                     sel = ( sel + 1 ) % mxchoice;
@@ -242,31 +209,30 @@ namespace IO {
                 }
                 p_selectFunction( sel );
 
-                cooldown = COOLDOWN_COUNT;
+                BTN_COOLDOWN = COOLDOWN_COUNT;
             }
 
             // touch controls
             for( auto i : choices ) {
-                if( i.first.inRange( touch ) ) {
+                if( i.first.inRange( TOUCH ) ) {
                     sel = i.second;
                     p_selectFunction( sel );
                     bool bad = false;
-                    while( touch.px || touch.py ) {
-                        swiWaitForVBlank( );
-                        if( !i.first.inRange( touch ) ) {
+                    while( TOUCH.px || TOUCH.py ) {
+                        if( !i.first.inRange( TOUCH ) ) {
                             bad = true;
                             break;
                         }
+                        swiWaitForVBlank( );
                         p_tick( );
                         scanKeys( );
-                        touchRead( &touch );
-                        swiWaitForVBlank( );
+                        touchRead( &TOUCH );
                     }
                     if( !bad && sel != DISABLED_CHOICE ) {
                         if( sel == EXIT_CHOICE || sel == BACK_CHOICE ) {
-                            SOUND::playSoundEffect( SFX_CANCEL );
+                            p_sfxCancel( );
                         } else {
-                            SOUND::playSoundEffect( SFX_CHOOSE );
+                            p_sfxChoose( );
                         }
                         if( sel == NEXT_PAGE_CHOICE ) {
                             choices = p_drawFunction( ++page );
@@ -283,8 +249,6 @@ namespace IO {
                     }
                 }
             }
-
-            swiWaitForVBlank( );
         }
         return sel;
     }

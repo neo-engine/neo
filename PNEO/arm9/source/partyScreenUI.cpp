@@ -25,13 +25,13 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <io/choiceBox.h>
 #include "defines.h"
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "save/saveGame.h"
 #include "sts/partyScreenUI.h"
 

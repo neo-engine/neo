@@ -28,7 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <vector>
 #include "box/box.h"
-#include "io/uio.h"
+#include "io/util.h"
 
 namespace BOX {
 #define PAGE_ICON_START 5

@@ -35,7 +35,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/menuUI.h"
 #include "io/message.h"
 #include "io/screenFade.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapBattleFacilityDefines.h"
 #include "map/mapDrawer.h"
 #include "sound/sound.h"

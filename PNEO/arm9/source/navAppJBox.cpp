@@ -33,7 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/navApp.h"
 #include "io/sprite.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "sound/sound.h"
 #include "sound/sseqData.h"
 
@@ -326,7 +326,7 @@ namespace IO {
 
     bool jboxNavApp::tick( bool p_bottom ) {
         for( auto c : touchPositions( ) ) {
-            if( c.first.inRange( touch ) ) {
+            if( c.first.inRange( IO::TOUCH ) ) {
                 if( c.second >= NUM_SPECIAL_TGS ) {
                     if( _currentMode == JMODE_SHOW_RECORD ) {
                         hoverButton( c.second - _currentRecSelStart, p_bottom );
@@ -337,15 +337,15 @@ namespace IO {
                     hoverButton( c.second, p_bottom );
                 }
                 bool suc = true;
-                while( touch.px || touch.py ) {
+                while( IO::TOUCH.px || IO::TOUCH.py ) {
                     swiWaitForVBlank( );
                     scanKeys( );
 
-                    if( !c.first.inRange( touch ) ) {
+                    if( !c.first.inRange( IO::TOUCH ) ) {
                         suc = false;
                         break;
                     }
-                    touchRead( &touch );
+                    touchRead( &IO::TOUCH );
                     swiWaitForVBlank( );
                 }
                 hoverButton( 0, p_bottom );

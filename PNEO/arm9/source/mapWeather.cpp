@@ -25,6 +25,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <io/choiceBox.h>
 #include "bag/bagViewer.h"
 #include "battle/battle.h"
 #include "battle/battleDefines.h"
@@ -33,10 +34,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "gen/abilityNames.h"
 #include "gen/pokemonNames.h"
-#include "io/choiceBox.h"
 #include "io/screenFade.h"
 #include "io/sprite.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"

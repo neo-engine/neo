@@ -30,7 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/moveNames.h"
 #include "io/message.h"
 #include "io/strings.h"
-#include "io/uio.h"
+#include "io/util.h"
 #include "map/mapDrawer.h"
 #include "map/mapSlice.h"
 #include "map/mapSprite.h"
