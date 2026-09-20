@@ -973,11 +973,7 @@ namespace SPX {
 
         u32 cooldownNPC[ 4 ] = { 0 };
 
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            IO::BTN_PRESSED = keysUp( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( p_npctier == ROTOM_TIER ) {
                 currentPosition += currentSpeed;
             } else {
@@ -1113,8 +1109,6 @@ namespace SPX {
 
             if( currentSpeed > mxSpeed ) { mxSpeed = currentSpeed; }
             updateRPM( currentSpeed );
-
-            swiWaitForVBlank( );
         }
 
         for( u8 i = 0; i < 10; ++i ) {

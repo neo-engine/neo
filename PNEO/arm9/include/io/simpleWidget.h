@@ -75,8 +75,8 @@ namespace IO {
         selection getResult(
             std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
             std::function<void( selection )>                                    p_selectFunction,
-            std::function<void( )> p_tick = choiceBox::DEFAULT_TICK,
-            selection p_initialSelection = 0, u8 p_initialPage = 0 );
+            std::function<void( )> p_tick = DEFAULT_TICK, selection p_initialSelection = 0,
+            u8 p_initialPage = 0 );
     };
 
     /*

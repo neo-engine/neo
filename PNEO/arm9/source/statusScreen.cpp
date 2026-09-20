@@ -106,14 +106,7 @@ namespace STS {
     bool statusScreen::runDetails( u8 p_initialChoice ) {
         _currentDetailChoice = p_initialChoice;
         _ui->showDetails( _pokemon, _currentPage, _currentDetailChoice );
-        loop( ) {
-            _ui->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( _ui->animate ) {
             if( IO::BTN_PRESSED & KEY_X ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return true;
@@ -156,7 +149,6 @@ namespace STS {
             } else if( tc == 1 ) {
                 break;
             }
-            swiWaitForVBlank( );
         }
 
         _ui->showDetails( _pokemon, _currentPage, -1 );
@@ -165,17 +157,9 @@ namespace STS {
 
     statusScreen::result statusScreen::run( u8 p_initialPage ) {
         _ui->init( _pokemon, p_initialPage, _allowKeyUp, _allowKeyDown );
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        _currentPage     = p_initialPage;
+        _currentPage = p_initialPage;
 
-        loop( ) {
-            _ui->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( _ui->animate ) {
             if( IO::BTN_PRESSED & KEY_X ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return result::EXIT;
@@ -220,7 +204,6 @@ namespace STS {
                 if( runDetails( _currentDetailChoice ) ) { return result::EXIT; }
                 _detailsMode = false;
             }
-            swiWaitForVBlank( );
         }
 
         return result::EXIT;

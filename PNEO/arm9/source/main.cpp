@@ -325,20 +325,12 @@ START:
         MAP::curMap->draw( OBJPRIORITY_2, false, HAD_NEW_GAME );
     }
 
-    IN_GAME          = true;
-    bool stopped     = true;
-    u8   bmp         = 0;
-    IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-    u8 heldcnt       = 0;
-    loop( ) {
+    IN_GAME      = true;
+    bool stopped = true;
+    u8   bmp     = 0;
+    u8   heldcnt = 0;
+    GAME_LOOP_FAST( pollRTC ) {
         if( RESET_GAME ) { break; }
-        pollRTC( );
-        scanKeys( );
-        touchRead( &IO::TOUCH );
-        swiWaitForVBlank( );
-        IO::BTN_PRESSED = keysUp( );
-        IO::BTN_LAST    = IO::BTN_HELD;
-        IO::BTN_HELD    = keysHeld( );
 #ifdef DESQUID
         if( IO::BTN_HELD & KEY_L ) {
 

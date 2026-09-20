@@ -61,15 +61,7 @@ namespace IO {
         u8   mxchoice = 0;
         UPDATE_PAGE_STATS;
 
-        BTN_COOLDOWN = COOLDOWN_COUNT;
-        while( 1 ) {
-            p_tick( );
-            scanKeys( );
-            touchRead( &TOUCH );
-            swiWaitForVBlank( );
-            BTN_PRESSED = keysUp( );
-            BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( p_tick ) {
             // key controls
             if( BTN_PRESSED & KEY_A ) {
                 if( sel < choices.size( ) ) {
@@ -250,7 +242,6 @@ namespace IO {
                     }
                 }
             }
-            swiWaitForVBlank( );
         }
         return sel;
     }

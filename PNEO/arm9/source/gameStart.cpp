@@ -57,12 +57,7 @@ namespace SAVE {
         swiWaitForVBlank( );
         IO::fadeScreen( IO::fadeType::UNFADE, true, true );
 
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysCurrent( );
-
+        GAME_LOOP_FAST( IO::DEFAULT_TICK ) {
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
                 || ( IO::inputTarget( 1, 1, 256, 192 ).inRange( IO::TOUCH )
                      && IO::waitForInput( IO::inputTarget( 1, 1, 256, 192 ) ) ) ) {
@@ -84,12 +79,7 @@ namespace SAVE {
         IO::regularFont->printBreakingStringC( p_text, 23, 192 - 54, 178, true, IO::font::LEFT, 16,
                                                ' ', 0, true );
         u8 frame = 0;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysCurrent( );
-
+        GAME_LOOP_FAST( IO::DEFAULT_TICK ) {
             if( ++frame % 64 == 31 ) {
                 IO::regularFont->printChar( 172, 196, 192 - 28, true );
             } else if( frame % 64 == 63 ) {

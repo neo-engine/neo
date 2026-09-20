@@ -54,14 +54,7 @@ namespace BOX {
         _showParty = false;
         _mode      = STATUS;
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
@@ -212,7 +205,6 @@ namespace BOX {
                 }
             }
             */
-            swiWaitForVBlank( );
         }
     }
 
@@ -397,14 +389,7 @@ namespace BOX {
         _selectedIdx = MAX_PKMN_PER_BOX;
         select( MAX_PKMN_PER_BOX );
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
@@ -509,7 +494,6 @@ namespace BOX {
                 }
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
         }
         _boxUI.hideParty( SAVE::CURRENT_FILE->getCurrentBox( ) );
         select( 0 );
@@ -542,14 +526,7 @@ namespace BOX {
 
         _boxUI.selectButton( btns[ selectedBtn ] );
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_X ) ) {
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 if( !_heldPkmn.getSpecies( ) ) {
@@ -699,7 +676,6 @@ namespace BOX {
                 }
                 break;
             }
-            swiWaitForVBlank( );
         }
 
         _boxUI.selectPkmn( nullptr, 0 );

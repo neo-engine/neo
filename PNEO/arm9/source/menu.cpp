@@ -740,7 +740,7 @@ namespace IO {
                     updateCounterValue( p_newValue, p_selDig, mdg );
                 },
                 [ & ]( s32 p_hoveredButton ) { hoverCounterButton( 0, mx, p_hoveredButton ); },
-                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, counter::DEFAULT_TICK, 1 );
+                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::DEFAULT_TICK, 1 );
             if( !res ) { return res; }
             if( res == -3 ) { return -1; }
         } else {
@@ -838,8 +838,7 @@ namespace IO {
                                 descr[ NUM_CB_CHOICES * curPg + p_selection ],
                                 NUM_CB_CHOICES * curPg + p_selection );
                 },
-                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::choiceBox::DEFAULT_TICK, oldsel,
-                curPg );
+                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::DEFAULT_TICK, oldsel, curPg );
 
             oldsel = curItm;
 

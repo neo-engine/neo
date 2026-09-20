@@ -136,14 +136,7 @@ namespace BAG {
         _ui->init( );
         selectView( 0 );
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             auto tch = handleTouch( );
 
             if( GET_AND_WAIT( KEY_X ) ) {
@@ -212,7 +205,6 @@ namespace BAG {
                 }
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
         }
         return;
     }

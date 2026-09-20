@@ -449,16 +449,7 @@ namespace STS {
                                        choices[ i ].m_currentValue( ), choices[ i ].m_maxValue,
                                        i == selectedLine );
         }
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            _partyUI->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( _partyUI->animate ) {
             if( IO::BTN_PRESSED & KEY_X ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 UPDATE_VALUE( oldval );
@@ -587,7 +578,6 @@ namespace STS {
 
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
         }
 
         _partyUI->hideDesquidWindow( );
@@ -669,17 +659,8 @@ namespace STS {
                 _currentSelection, c, std::min( size_t( 6 ), _currentChoices.size( ) ),
                 _currentChoices.size( ) > 6, false, _currentChoiceSelection % 6 );
         }
-        bool ex          = false;
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            _partyUI->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        bool ex = false;
+        GAME_LOOP( _partyUI->animate ) {
             if( IO::BTN_PRESSED & KEY_X ) {
                 ex = _allowCancel;
                 break;
@@ -759,8 +740,6 @@ namespace STS {
                 ex = _allowCancel;
                 break;
             }
-
-            swiWaitForVBlank( );
         }
 
         for( u8 i = 0; i < _currentChoices.size( ); i++ ) {
@@ -798,16 +777,8 @@ namespace STS {
                                                  std::min( size_t( 6 ), choices.size( ) ),
                                                  choices.size( ) > 6, false, 0 );
 
-        bool ex          = false;
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            _partyUI->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        bool ex = false;
+        GAME_LOOP( _partyUI->animate ) {
             if( IO::BTN_PRESSED & KEY_X ) {
                 ex = false;
                 break;
@@ -894,7 +865,6 @@ namespace STS {
                 }
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
         }
         _currentChoiceSelection = 0;
         return ex;
@@ -1157,16 +1127,7 @@ namespace STS {
     }
 
     void STS::partyScreen::waitForInteract( ) {
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            _partyUI->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( _partyUI->animate ) {
             if( ( IO::BTN_PRESSED & KEY_A ) || ( IO::BTN_PRESSED & KEY_B ) || IO::TOUCH.px
                 || IO::TOUCH.py ) {
                 while( IO::TOUCH.px || IO::TOUCH.py ) {
@@ -1335,15 +1296,8 @@ namespace STS {
         }
 
         select( p_initialSelection );
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            _partyUI->animate( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-            u8 tc           = 0;
+        GAME_LOOP( _partyUI->animate ) {
+            u8 tc = 0;
 
             if( ( IO::BTN_PRESSED & KEY_X ) && _allowCancel ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
@@ -1414,7 +1368,6 @@ namespace STS {
                 }
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
         }
 
         return _currentMarksOrMove;

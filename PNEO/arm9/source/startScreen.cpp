@@ -124,12 +124,7 @@ namespace SAVE {
         u8 frame = 0;
 
         IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-
-            IO::BTN_PRESSED = keysCurrent( );
+        GAME_LOOP_FAST( IO::DEFAULT_TICK ) {
             if( GET_AND_WAIT( KEY_A ) || GET_AND_WAIT( KEY_START )
                 || ( ( IO::TOUCH.px || IO::TOUCH.py ) && IO::waitForTouchUp( ) ) ) {
                 SOUND::playCry( PKMN_RAYQUAZA );
@@ -627,7 +622,7 @@ namespace SAVE {
                     }
                     IO::updateOAM( true );
                 },
-                IO::choiceBox::DEFAULT_TICK, _currentLanguage );
+                IO::DEFAULT_TICK, _currentLanguage );
             IO::clearScreen( true, false, true );
         }
         return _currentLanguage;
@@ -708,8 +703,7 @@ namespace SAVE {
                     [ & ]( u8 p_slot ) {
                         return drawMainChoice( getMainChoicesForSlot( p_slot ), p_slot );
                     },
-                    [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
-                    IO::choiceBox::DEFAULT_TICK, 0,
+                    [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, IO::DEFAULT_TICK, 0,
                     _currentSlot == 255 ? SAVE::SAV.m_activeFile : _currentSlot );
 
                 if( res == IO::choiceBox::BACK_CHOICE ) { break; }

@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <nds.h>
 
+#include <io/inputTarget.h>
 #include "fs/data.h"
 #include "fs/fs.h"
 #include "io/keyboard.h"
@@ -345,15 +346,8 @@ namespace IO {
     }
 
     u16 keyboard::getNextChar( ) {
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            select( _curSel, ++_frame );
-            swiWaitForVBlank( );
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        auto tick = [ & ]( ) { select( _curSel, ++_frame ); };
+        GAME_LOOP( tick ) {
             if( GET_KEY_COOLDOWN( KEY_A ) ) {
                 if( _curSel == 253 ) {
                     SOUND::playSoundEffect( SFX_CANCEL );
@@ -489,7 +483,6 @@ namespace IO {
                     }
                 }
             }
-            swiWaitForVBlank( );
         }
         return '\n';
     }

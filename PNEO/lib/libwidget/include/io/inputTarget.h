@@ -47,6 +47,31 @@ namespace IO {
         return u32( a * a );
     }
 
+    constexpr void DEFAULT_TICK( ) {
+    }
+
+#define WAIT_FOR_TOUCH_UP( p_tick ) \
+    do {                            \
+        swiWaitForVBlank( );        \
+        p_tick( );                  \
+        scanKeys( );                \
+        touchRead( &IO::TOUCH );    \
+        swiWaitForVBlank( );        \
+    } while( !TOUCH_UP )
+
+#define GAME_LOOP( p_tick )                                                                      \
+    for( IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;                                                  \
+         ( (p_tick) ( ), scanKeys( ), touchRead( &IO::TOUCH ), swiWaitForVBlank( ),              \
+           IO::BTN_PRESSED = keysUp( ), IO::BTN_LAST = IO::BTN_HELD, IO::BTN_HELD = keysHeld( ), \
+           true );                                                                               \
+         swiWaitForVBlank( ) )
+
+#define GAME_LOOP_FAST( p_tick )                                                                 \
+    for( IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;                                                  \
+         ( (p_tick) ( ), scanKeys( ), touchRead( &IO::TOUCH ), swiWaitForVBlank( ),              \
+           IO::BTN_PRESSED = keysUp( ), IO::BTN_LAST = IO::BTN_HELD, IO::BTN_HELD = keysHeld( ), \
+           true ); )
+
     /*
      * @brief: Returns a predicate to detect a rhombus with two edges parallel to the y
      * axis.

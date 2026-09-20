@@ -55,15 +55,7 @@ namespace IO {
 
         p_updateValue( value, 0 );
 
-        BTN_COOLDOWN = COOLDOWN_COUNT;
-        while( 1 ) {
-            p_tick( );
-            scanKeys( );
-            touchRead( &TOUCH );
-            swiWaitForVBlank( );
-            BTN_PRESSED = keysUp( );
-            BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( p_tick ) {
             if( BTN_PRESSED & KEY_A ) {
                 p_sfxChoose( );
                 BTN_COOLDOWN = COOLDOWN_COUNT;
@@ -181,7 +173,6 @@ namespace IO {
                     p_hoverButton( _maxValue + 1 );
                 }
             }
-            swiWaitForVBlank( );
         }
         return value;
     }

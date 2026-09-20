@@ -37,9 +37,6 @@ namespace IO {
      */
     class yesNoBox {
       public:
-        static void DEFAULT_TICK( ) {
-        }
-
         enum selection { YES = 0, NO = 1 };
 
         yesNoBox( ) {

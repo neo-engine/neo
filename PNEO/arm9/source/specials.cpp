@@ -519,15 +519,7 @@ namespace SPX {
 
         drawBadges( currentPage );
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_B ) || IO::TOUCH.px
                 || IO::TOUCH.py ) {
                 while( IO::TOUCH.px || IO::TOUCH.py ) {

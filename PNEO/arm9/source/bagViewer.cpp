@@ -605,23 +605,10 @@ namespace BAG {
     }
 
     void bagViewer::waitForInteract( ) {
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_A ) || ( IO::BTN_PRESSED & KEY_B ) || IO::TOUCH.px
                 || IO::TOUCH.py ) {
-                while( IO::TOUCH.px || IO::TOUCH.py ) {
-                    swiWaitForVBlank( );
-                    scanKeys( );
-                    touchRead( &IO::TOUCH );
-                    swiWaitForVBlank( );
-                }
+                WAIT_FOR_TOUCH_UP( IO::DEFAULT_TICK );
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 break;
@@ -667,7 +654,7 @@ namespace BAG {
                     [ & ]( s32 p_hoveredButton ) {
                         _bagUI->hoverCounterButton( 0, cnt, p_hoveredButton );
                     },
-                    IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::counter::DEFAULT_TICK, 1 );
+                    IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::DEFAULT_TICK, 1 );
                 _bagUI->destroyCounter( );
                 if( sellCnt <= 0 ) { return 0; } // player doesn't want to toss item after all
 
@@ -730,7 +717,7 @@ namespace BAG {
                     [ & ]( s32 p_hoveredButton ) {
                         _bagUI->hoverCounterButton( 0, numItems, p_hoveredButton );
                     },
-                    IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::counter::DEFAULT_TICK, 1 );
+                    IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::DEFAULT_TICK, 1 );
                 _bagUI->destroyCounter( );
                 if( tossCnt <= 0 ) { return 0; } // player doesn't want to toss item after all
 
@@ -884,14 +871,8 @@ namespace BAG {
         _currSelectedIdx = 0;
         initUI( );
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-            auto tmp        = handleSomeInput( );
+        GAME_LOOP( IO::DEFAULT_TICK ) {
+            auto tmp = handleSomeInput( );
 
             if( !tmp )
                 break;
@@ -899,7 +880,6 @@ namespace BAG {
                 u16 res = handleSelection( );
                 if( res & 2 ) return ( res >> 2 );
             }
-            swiWaitForVBlank( );
         }
         return 0;
     }
@@ -918,14 +898,7 @@ namespace BAG {
             return targetItem;
         }
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             auto tmp = handleSomeInput( );
             if( !tmp ) {
                 return 0;
@@ -946,7 +919,6 @@ namespace BAG {
                 _bagUI->drawBagPage( (bag::bagType) SAVE::CURRENT_FILE->m_lstBag, _view,
                                      _currSelectedIdx );
             }
-            swiWaitForVBlank( );
         }
         return 0;
     }

@@ -38,9 +38,6 @@ namespace IO {
      */
     class choiceBox {
       public:
-        static void DEFAULT_TICK( ) {
-        }
-
         typedef u8                 selection;
         static constexpr selection DISABLED_CHOICE  = 253;
         static constexpr selection EXIT_CHOICE      = 254;

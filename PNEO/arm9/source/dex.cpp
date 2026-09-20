@@ -244,13 +244,7 @@ namespace DEX {
         IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
         u8 sl            = 255;
 
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_B ) ) {
                 SOUND::playSoundEffect( SFX_CANCEL );
                 return;
@@ -426,8 +420,6 @@ namespace DEX {
                     }
                 }
             }
-
-            swiWaitForVBlank( );
         }
     }
 
@@ -460,15 +452,7 @@ namespace DEX {
                          p_female );
         }
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( ( IO::BTN_PRESSED & KEY_X ) || ( IO::BTN_PRESSED & KEY_B )
                 || ( IO::BTN_PRESSED & KEY_A ) ) {
                 SOUND::playSoundEffect( SFX_SELECT );

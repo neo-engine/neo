@@ -37,16 +37,8 @@ namespace IO {
         auto choices = p_drawFunction( );
         auto sel     = p_initialSelection;
         p_selectFunction( sel );
-        BTN_COOLDOWN = COOLDOWN_COUNT;
 
-        while( 1 ) {
-            p_tick( );
-            scanKeys( );
-            touchRead( &TOUCH );
-            swiWaitForVBlank( );
-            BTN_PRESSED = keysUp( );
-            BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( p_tick ) {
             if( BTN_PRESSED & KEY_A ) {
                 // player selects current choice
                 if( sel == yesNoBox::YES ) {
@@ -115,7 +107,6 @@ namespace IO {
                     }
                 }
             }
-            swiWaitForVBlank( );
         }
         return sel;
     }

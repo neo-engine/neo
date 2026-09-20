@@ -36,10 +36,6 @@ namespace IO {
      * @brief: Makes the player select a numeric value.
      */
     class counter {
-      public:
-        static void DEFAULT_TICK( ) {
-        }
-
       private:
         s32 _minValue;
         s32 _maxValue;

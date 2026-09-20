@@ -654,7 +654,7 @@ namespace BATTLE {
                     _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmnOrDisguise,
                                                    p_selection );
                 },
-                IO::choiceBox::DEFAULT_TICK, initialSel );
+                IO::DEFAULT_TICK, initialSel );
             if( rs < 4 ) {
                 // player selects a target
                 if( hasChoice ) { res.m_target = { rs < 2, ( rs < 2 ) ^ ( rs % 2 ) }; }
@@ -721,7 +721,7 @@ namespace BATTLE {
                         _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), canUse, mega,
                         curSel, res.m_megaEvolve );
                 },
-                IO::choiceBox::DEFAULT_TICK, curSel );
+                IO::DEFAULT_TICK, curSel );
 
             if( rs == IO::choiceBox::BACK_CHOICE || rs == 4 ) {
                 res.m_type = MT_CANCEL;
@@ -902,14 +902,7 @@ namespace BATTLE {
             }
         }
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             for( auto i : choices ) {
                 if( i.first.inRange( IO::TOUCH ) ) {
                     _battleUI.showMoveSelection(
@@ -996,7 +989,6 @@ namespace BATTLE {
 
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-            swiWaitForVBlank( );
         }
 
         return res;
@@ -1137,7 +1129,7 @@ namespace BATTLE {
                                             _battleUI.showAttackSelection( p_pkmn, canUse, false,
                                                                            curSel, false );
                                         },
-                                        IO::choiceBox::DEFAULT_TICK, curSel );
+                                        IO::DEFAULT_TICK, curSel );
 
                                     if( rs < 4 ) {
                                         return rs;

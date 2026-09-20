@@ -394,14 +394,7 @@ namespace SAVE {
         u8 currentSelection = 0;
         select( currentSelection );
 
-        IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-        loop( ) {
-            scanKeys( );
-            touchRead( &IO::TOUCH );
-            swiWaitForVBlank( );
-            IO::BTN_PRESSED = keysUp( );
-            IO::BTN_HELD    = keysHeld( );
-
+        GAME_LOOP( IO::DEFAULT_TICK ) {
             if( GET_AND_WAIT( KEY_B ) || GET_AND_WAIT( KEY_X ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 return;
@@ -424,8 +417,6 @@ namespace SAVE {
                 increaseSetting( currentSelection );
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
-
-            swiWaitForVBlank( );
         }
     }
 } // namespace SAVE

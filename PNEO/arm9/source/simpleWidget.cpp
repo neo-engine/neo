@@ -104,7 +104,7 @@ namespace IO {
             [ & ]( s32 p_button ) {
                 IO::hoverCounterButton( counter::minValue( ), counter::maxValue( ), p_button );
             },
-            sfxCancel, sfxChoose, sfxSelect, counter::DEFAULT_TICK, counter::minValue( ) );
+            sfxCancel, sfxChoose, sfxSelect, DEFAULT_TICK, counter::minValue( ) );
     }
 
     yesNoBox::selection simpleYesNoBox::getResult( const char* p_message, style p_style,
