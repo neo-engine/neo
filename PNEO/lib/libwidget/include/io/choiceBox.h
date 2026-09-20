@@ -40,12 +40,6 @@ namespace IO {
       public:
         static void DEFAULT_TICK( ) {
         }
-        static void DEFAULT_SFX_CANCEL( ) {
-        }
-        static void DEFAULT_SFX_CHOOSE( ) {
-        }
-        static void DEFAULT_SFX_SELECT( ) {
-        }
 
         typedef u8                 selection;
         static constexpr selection DISABLED_CHOICE  = 253;
@@ -78,10 +72,9 @@ namespace IO {
          */
         selection getResult(
             std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
-            std::function<void( selection )> p_selectFunction, selection p_initialSelection = 0,
-            std::function<void( )> p_tick = DEFAULT_TICK, u8 p_initialPage = 0,
-            std::function<void( )> p_sfxCancel = DEFAULT_SFX_CANCEL,
-            std::function<void( )> p_sfxChoose = DEFAULT_SFX_CHOOSE,
-            std::function<void( )> p_sfxSelect = DEFAULT_SFX_SELECT );
+            std::function<void( selection )> p_selectFunction, std::function<void( )> p_sfxCancel,
+            std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect,
+            std::function<void( )> p_tick = DEFAULT_TICK, selection p_initialSelection = 0,
+            u8 p_initialPage = 0 );
     };
 } // namespace IO

@@ -29,13 +29,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include <io/choiceBox.h>
-#include <io/counter.h>
-#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "fs/data.h"
 #include "gen/itemNames.h"
 #include "io/animations.h"
+#include "io/simpleWidget.h"
 #include "io/strings.h"
 #include "io/util.h"
 #include "save/saveGame.h"
@@ -193,8 +191,8 @@ namespace BAG {
     }
 
     u8 bagViewer::chooseMove( const boxPokemon* p_pokemon, u16 p_extraMove ) {
-        IO::choiceBox cb  = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-        auto          res = cb.getResult(
+        IO::simpleChoiceBox cb  = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        auto                res = cb.getResult(
             [ & ]( u8 ) { return _bagUI->drawMoveChoice( p_pokemon, p_extraMove ); },
             [ & ]( u8 p_selection ) { _bagUI->selectMoveChoice( p_selection ); } );
         _bagUI->drawBagPage( (bag::bagType) SAVE::CURRENT_FILE->m_lstBag, _view, _currSelectedIdx );
@@ -218,7 +216,7 @@ namespace BAG {
                            return chooseMove( p_pok, p_extraMove );
                        },
                        [ & ]( const char* p_message ) {
-                           IO::yesNoBox yn;
+                           IO::simpleYesNoBox yn;
                            return yn.getResult(
                                       [ & ]( ) { return _bagUI->printYNMessage( p_message, 254 ); },
                                       [ & ]( IO::yesNoBox::selection p_sel ) {
@@ -322,7 +320,7 @@ namespace BAG {
         if( p_pokemon.isEgg( ) ) { return false; }
 
         if( p_pokemon.getItem( ) ) {
-            IO::yesNoBox          yn;
+            IO::simpleYesNoBox    yn;
             std::array<char, 100> buffer{ };
             snprintf( buffer.data( ), buffer.size( ),
                       GET_STRING( IO::STR_UI_BAG_PKMN_CARRIES_ITEM ), p_pokemon.m_boxdata.m_name );
@@ -351,8 +349,8 @@ namespace BAG {
         if( _context == BATTLE || _context == WILD_BATTLE ) {
             // Check if the item needs to be used on a pkmn
             if( ( p_data->m_itemType & 15 ) == ITEMTYPE_MEDICINE ) {
-                IO::choiceBox cb2    = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
-                auto          tgpkmn = cb2.getResult(
+                IO::simpleChoiceBox cb2    = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
+                auto                tgpkmn = cb2.getResult(
                     [ & ]( u8 ) {
                         _bagUI->drawPkmnChoice( );
                         auto tmp = _bagUI->getPkmnInputTarget( );
@@ -373,7 +371,7 @@ namespace BAG {
             }
         }
 
-        IO::yesNoBox          yn;
+        IO::simpleYesNoBox    yn;
         std::array<char, 100> buffer{ };
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_BAG_CHOOSE_ITEM ),
                   FS::getItemName( p_targetItem ).c_str( ) );
@@ -669,7 +667,7 @@ namespace BAG {
                     [ & ]( s32 p_hoveredButton ) {
                         _bagUI->hoverCounterButton( 0, cnt, p_hoveredButton );
                     },
-                    1 );
+                    IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::counter::DEFAULT_TICK, 1 );
                 _bagUI->destroyCounter( );
                 if( sellCnt <= 0 ) { return 0; } // player doesn't want to toss item after all
 
@@ -683,7 +681,7 @@ namespace BAG {
             snprintf( buffer.data( ), buffer.size( ),
                       GET_STRING( IO::STR_UI_BAG_WILL_BUY_ITEM_FOR ), sellprice );
 
-            IO::yesNoBox yn;
+            IO::simpleYesNoBox yn;
             if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer.data( ), 254 ); },
                               [ & ]( IO::yesNoBox::selection p_sel ) {
                                   _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
@@ -732,7 +730,7 @@ namespace BAG {
                     [ & ]( s32 p_hoveredButton ) {
                         _bagUI->hoverCounterButton( 0, numItems, p_hoveredButton );
                     },
-                    1 );
+                    IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::counter::DEFAULT_TICK, 1 );
                 _bagUI->destroyCounter( );
                 if( tossCnt <= 0 ) { return 0; } // player doesn't want to toss item after all
 
@@ -740,7 +738,7 @@ namespace BAG {
                                      _currSelectedIdx );
             }
 
-            IO::yesNoBox yn;
+            IO::simpleYesNoBox yn;
             if( yn.getResult(
                     [ & ]( ) {
                         return _bagUI->printYNMessage(
@@ -806,8 +804,8 @@ namespace BAG {
             _bagUI->drawBagPage( (bag::bagType) SAVE::CURRENT_FILE->m_lstBag, _view,
                                  _currSelectedIdx );
 
-            IO::choiceBox cb2 = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
-            tgpkmn            = cb2.getResult(
+            IO::simpleChoiceBox cb2 = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
+            tgpkmn                  = cb2.getResult(
                 [ & ]( u8 ) {
                     _bagUI->drawPkmnChoice( );
                     auto tmp = _bagUI->getPkmnInputTarget( );
@@ -860,7 +858,7 @@ namespace BAG {
             texts.push_back( getTextForChoice( _choices[ i ] ) );
         }
 
-        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
 
         auto res
             = cb.getResult( [ & ]( u8 ) { return _bagUI->drawChoice( targetItem, &idata, texts ); },

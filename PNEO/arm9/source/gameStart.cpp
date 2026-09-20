@@ -25,8 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <io/choiceBox.h>
-#include <io/yesNoBox.h>
 #include "bag/bag.h"
 #include "fs/data.h"
 #include "fs/fs.h"
@@ -35,6 +33,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/keyboard.h"
 #include "io/menuUI.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/util.h"
 #include "save/gameStart.h"
 #include "save/saveGame.h"
@@ -304,7 +303,7 @@ namespace SAVE {
                 GET_STRING( IO::STR_UI_INIT_GAME_CHOOSE_APPEARANCE ), 8, 8, 240, true,
                 IO::font::LEFT, 16 );
 
-            IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_LEFT_RIGHT );
+            IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_LEFT_RIGHT );
 
             // make player pick an appearance
             CURRENT_FILE->m_appearance = cb.getResult(
@@ -429,7 +428,7 @@ namespace SAVE {
 #undef SPR_BOX_PAL_SUB
 #undef SPR_BOX_SEL_PAL_SUB
 #undef SPR_CHOICE_START_OAM_SUB
-        } while( IO::yesNoBox( ).getResult( // make player confirm their chara choice
+        } while( IO::simpleYesNoBox( ).getResult( // make player confirm their chara choice
                      [ & ]( ) {
                          auto res = IO::printYNMessage( 0, MSG_NORMAL, 253 );
 

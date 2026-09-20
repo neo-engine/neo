@@ -30,9 +30,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace IO {
     yesNoBox::selection yesNoBox::getResult(
         std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
-        std::function<void( selection )> p_selectFunction, selection p_initialSelection,
-        std::function<void( )> p_tick, std::function<void( )> p_sfxCancel,
-        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect ) {
+        std::function<void( selection )> p_selectFunction, std::function<void( )> p_sfxCancel,
+        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect,
+        std::function<void( )> p_tick, selection p_initialSelection ) {
         // initialize the ynbox
         auto choices = p_drawFunction( );
         auto sel     = p_initialSelection;
@@ -40,10 +40,10 @@ namespace IO {
         BTN_COOLDOWN = COOLDOWN_COUNT;
 
         while( 1 ) {
-            swiWaitForVBlank( );
             p_tick( );
             scanKeys( );
             touchRead( &TOUCH );
+            swiWaitForVBlank( );
             BTN_PRESSED = keysUp( );
             BTN_HELD    = keysHeld( );
 
@@ -91,17 +91,18 @@ namespace IO {
                         // check that the player was serious about their choice, i.e., the
                         // touch-up/release happens at a "valid" position for the current
                         // selection
+                        swiWaitForVBlank( );
                         if( !i.first.inRange( TOUCH ) ) {
                             // touch release, but outside of valid selection range
                             bad = true;
                             break;
                         }
-                        swiWaitForVBlank( );
                         p_tick( );
 
                         // update input
                         scanKeys( );
                         touchRead( &TOUCH );
+                        swiWaitForVBlank( );
                     }
                     if( !bad ) {
                         // was a valid selection
@@ -114,6 +115,7 @@ namespace IO {
                     }
                 }
             }
+            swiWaitForVBlank( );
         }
         return sel;
     }

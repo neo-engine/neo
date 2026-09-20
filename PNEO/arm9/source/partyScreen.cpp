@@ -25,12 +25,11 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <io/choiceBox.h>
-#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "dex/dex.h"
 #include "fs/data.h"
+#include "io/simpleWidget.h"
 #include "io/strings.h"
 #include "map/mapDrawer.h"
 #include "save/saveGame.h"
@@ -88,13 +87,13 @@ namespace STS {
             _partyUI->select( _currentSelection, GET_STRING( IO::STR_UI_STS_CHOOSE_THIS_PKMN ) );
         }
         _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
-        IO::yesNoBox yn;
-        bool         res = yn.getResult( [ & ]( ) { return _partyUI->printYNMessage( 0, 254 ); },
-                                         [ & ]( IO::yesNoBox::selection p_sel ) {
+        IO::simpleYesNoBox yn;
+        bool res = yn.getResult( [ & ]( ) { return _partyUI->printYNMessage( 0, 254 ); },
+                                 [ & ]( IO::yesNoBox::selection p_sel ) {
                                      _partyUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );
-                                         },
-                                         IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( ); } )
-                           == IO::yesNoBox::YES;
+                                 },
+                                 IO::yesNoBox::YES, [ & ]( ) { _partyUI->animate( ); } )
+                   == IO::yesNoBox::YES;
 
         _partyUI->hideYNMessageBox( );
         _currentChoiceSelection = 0;
@@ -630,8 +629,9 @@ namespace STS {
         std::vector<std::string> locNames{ };
         for( auto l : locs ) { locNames.push_back( FS::getLocation( l ) ); }
 
-        IO::choiceBox locChoice = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-        u8            curPage   = 0;
+        IO::simpleChoiceBox locChoice
+            = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        u8 curPage = 0;
 
         u16 selectedLocation = locChoice.getResult(
             [ & ]( u8 p_page ) {
@@ -639,7 +639,7 @@ namespace STS {
                 return _partyUI->drawChoice( locNames, p_page, 255,
                                              GET_STRING( IO::STR_UI_STS_FLY_WHERE ) );
             },
-            [ & ]( u8 p_selection ) { _partyUI->drawChoice( locNames, curPage, p_selection ); }, 0,
+            [ & ]( u8 p_selection ) { _partyUI->drawChoice( locNames, curPage, p_selection ); },
             [ & ]( ) { _partyUI->animate( ); } );
 
         if( selectedLocation == IO::choiceBox::BACK_CHOICE

@@ -37,6 +37,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "pokemon.h"
 
 namespace IO {
+    void sfxCancel( );
+    void sfxChoose( );
+    void sfxSelect( );
+
     /*
      * @brief: Makes the player select one out of a set of different choices.
      */
@@ -67,6 +71,12 @@ namespace IO {
          */
         selection getResult( const char* p_message, style p_style, u16 p_moves[ 4 ],
                              u16 p_extraMove );
+
+        selection getResult(
+            std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
+            std::function<void( selection )>                                    p_selectFunction,
+            std::function<void( )> p_tick = choiceBox::DEFAULT_TICK,
+            selection p_initialSelection = 0, u8 p_initialPage = 0 );
     };
 
     /*
@@ -99,6 +109,12 @@ namespace IO {
          * dialogs (i.e. "Do you want to buy/pay <..>?").
          */
         selection getResult( const char* p_message, style p_style, bool p_showMoney = false );
+
+        selection
+        getResult( std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
+                   std::function<void( selection )> p_selectFunction,
+                   selection                        p_initialSelection = YES,
+                   std::function<void( )>           p_tick             = DEFAULT_TICK );
     };
 
 } // namespace IO

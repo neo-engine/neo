@@ -27,13 +27,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds/system.h>
 
-#include <io/choiceBox.h>
-#include <io/yesNoBox.h>
 #include "defines.h"
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
@@ -406,7 +405,7 @@ namespace SAVE {
     }
 
     u8 startScreen::runEpisodeChoice( ) {
-        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+        IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
 
         auto res = cb.getResult( [ & ]( u8 ) { return drawEpisodeChoice( ); },
                                  [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); } );
@@ -560,7 +559,7 @@ namespace SAVE {
     language startScreen::runLanguageChoice( ) {
         IO::initOAMTable( false );
         IO::clearScreen( true, true, true );
-        IO::yesNoBox yn;
+        IO::simpleYesNoBox yn;
         while( yn.getResult(
                    [ & ]( ) {
                        return printYNMessage(
@@ -571,8 +570,8 @@ namespace SAVE {
                        printYNMessage( 0, p_sel == IO::yesNoBox::NO );
                    } )
                == IO::yesNoBox::YES ) {
-            IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-            _currentLanguage = (language) cb.getResult(
+            IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+            _currentLanguage       = (language) cb.getResult(
                 [ & ]( u8 ) {
                     auto         res = std::vector<std::pair<IO::inputTarget, u8>>( );
                     SpriteEntry* oam = IO::Oam->oamBuffer;
@@ -628,7 +627,7 @@ namespace SAVE {
                     }
                     IO::updateOAM( true );
                 },
-                _currentLanguage );
+                IO::choiceBox::DEFAULT_TICK, _currentLanguage );
             IO::clearScreen( true, false, true );
         }
         return _currentLanguage;
@@ -654,7 +653,7 @@ namespace SAVE {
         if( SAV.m_saveFile[ _currentSlot ].m_gameType != UNUSED ) {
             // Ask the player if they want to override their save
 
-            IO::yesNoBox yn;
+            IO::simpleYesNoBox yn;
             if( yn.getResult(
                     [ & ]( ) {
                         return printYNMessage( GET_STRING_L( IO::STR_UI_OVERWRITE_EXISTING_SAVEDATA,
@@ -700,7 +699,7 @@ namespace SAVE {
             _currentSlot = 255;
 
             loop( ) {
-                IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+                IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
 
                 FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 500, 1,
                                      256 * 192, true );
@@ -709,8 +708,8 @@ namespace SAVE {
                     [ & ]( u8 p_slot ) {
                         return drawMainChoice( getMainChoicesForSlot( p_slot ), p_slot );
                     },
-                    [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, 0,
-                    IO::choiceBox::DEFAULT_TICK,
+                    [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
+                    IO::choiceBox::DEFAULT_TICK, 0,
                     _currentSlot == 255 ? SAVE::SAV.m_activeFile : _currentSlot );
 
                 if( res == IO::choiceBox::BACK_CHOICE ) { break; }

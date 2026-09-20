@@ -27,11 +27,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cmath>
 
-#include <io/choiceBox.h>
 #include "defines.h"
 #include "dex/dex.h"
 #include "dex/dexUI.h"
 #include "gen/pokemonFormes.h"
+#include "io/simpleWidget.h"
 #include "io/util.h"
 #include "save/saveGame.h"
 #include "sound/sound.h"
@@ -221,7 +221,7 @@ namespace DEX {
     }
 
     bool dex::runModeChoice( ) {
-        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+        IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
 
         auto res = cb.getResult(
             [ & ]( u8 ) {
@@ -229,7 +229,7 @@ namespace DEX {
                     SAVE::CURRENT_FILE->checkFlag( SAVE::F_DEX_OBTAINED ),
                     SAVE::CURRENT_FILE->checkFlag( SAVE::F_NAT_DEX_OBTAINED ) );
             },
-            [ & ]( u8 p_newSel ) { _dexUI->selectMode( p_newSel ); }, 0 );
+            [ & ]( u8 p_newSel ) { _dexUI->selectMode( p_newSel ); } );
 
         if( res == IO::choiceBox::EXIT_CHOICE || res == IO::choiceBox::BACK_CHOICE ) {
             return true;

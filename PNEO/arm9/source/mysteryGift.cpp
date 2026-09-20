@@ -42,6 +42,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "gen/pokemonNames.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/util.h"
 #include "map/mapDrawer.h"
 #include "save/gameStart.h"
@@ -669,14 +670,15 @@ namespace SAVE {
                     displayWonderCard( currentCard, reverse );
                     return rs;
                 },
-                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, 0,
+                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, IO::sfxCancel,
+                IO::sfxChoose, IO::sfxSelect,
                 [ & ]( ) {
                     // ++frame;
                     // IO::animateBG( frame, IO::bg3 );
                     // IO::animateBG( frame, IO::bg3sub );
                     // bgUpdate( );
                 },
-                currentCard );
+                0, currentCard );
 
             if( res == wcopts.size( ) - 1 || res == IO::choiceBox::BACK_CHOICE ) {
                 clearText( );
@@ -805,13 +807,13 @@ namespace SAVE {
             return false;
         }
 
-        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
+        IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
         if( cb.getResult(
                 [ & ]( u8 ) {
                     return drawChoice( IO::STR_UI_ACCEPT_GIFT,
                                        { IO::STR_UI_ACCEPT, IO::STR_UI_DECLINE }, false );
                 },
-                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, 0,
+                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
                 [ & ]( ) {
                     // ++frame;
                     // IO::animateBG( frame, IO::bg3 );
@@ -924,10 +926,10 @@ namespace SAVE {
             // - view wonder cards
             // - exit
 
-            IO::choiceBox cb  = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
-            auto          res = cb.getResult(
+            IO::simpleChoiceBox cb  = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
+            auto                res = cb.getResult(
                 [ & ]( u8 ) { return drawChoice( IO::STR_UI_WELCOME_TO_MG, mainChoices ); },
-                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, 0,
+                [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
                 [ & ]( ) {
                     // ++frame;
                     // IO::animateBG( frame, IO::bg3 );
@@ -951,13 +953,13 @@ namespace SAVE {
                 }
 
                 // ask for method to use for finding events
-                IO::choiceBox cb2  = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
-                auto          res2 = cb2.getResult(
+                IO::simpleChoiceBox cb2  = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN );
+                auto                res2 = cb2.getResult(
                     [ & ]( u8 ) {
                         clearText( );
                         return drawChoice( IO::STR_UI_OBTAIN_SEL_MSG, recvChoices, false );
                     },
-                    [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); }, 0,
+                    [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
                     [ & ]( ) {
                         // ++frame;
                         // IO::animateBG( frame, IO::bg3 );

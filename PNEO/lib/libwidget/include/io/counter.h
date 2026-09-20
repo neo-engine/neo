@@ -39,12 +39,6 @@ namespace IO {
       public:
         static void DEFAULT_TICK( ) {
         }
-        static void DEFAULT_SFX_CANCEL( ) {
-        }
-        static void DEFAULT_SFX_CHOOSE( ) {
-        }
-        static void DEFAULT_SFX_SELECT( ) {
-        }
 
       private:
         s32 _minValue;
@@ -73,10 +67,8 @@ namespace IO {
          */
         s32 getResult( std::function<std::vector<std::pair<inputTarget, s32>>( )> p_drawFunction,
                        std::function<void( s32, u8 )>                             p_updateValue,
-                       std::function<void( s32 )> p_hoverButton, s32 p_initialValue = 0,
-                       std::function<void( )> p_tick      = DEFAULT_TICK,
-                       std::function<void( )> p_sfxCancel = DEFAULT_SFX_CANCEL,
-                       std::function<void( )> p_sfxChoose = DEFAULT_SFX_CHOOSE,
-                       std::function<void( )> p_sfxSelect = DEFAULT_SFX_SELECT );
+                       std::function<void( s32 )> p_hoverButton, std::function<void( )> p_sfxCancel,
+                       std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect,
+                       std::function<void( )> p_tick = DEFAULT_TICK, s32 p_initialValue = 0 );
     };
 } // namespace IO

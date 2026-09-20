@@ -31,12 +31,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/counter.h"
 
 namespace IO {
-    s32
-    counter::getResult( std::function<std::vector<std::pair<inputTarget, s32>>( )> p_drawFunction,
-                        std::function<void( s32, u8 )>                             p_updateValue,
-                        std::function<void( s32 )> p_hoverButton, s32 p_initialValue,
-                        std::function<void( )> p_tick, std::function<void( )> p_sfxCancel,
-                        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect ) {
+    s32 counter::getResult(
+        std::function<std::vector<std::pair<inputTarget, s32>>( )> p_drawFunction,
+        std::function<void( s32, u8 )> p_updateValue, std::function<void( s32 )> p_hoverButton,
+        std::function<void( )> p_sfxCancel, std::function<void( )> p_sfxChoose,
+        std::function<void( )> p_sfxSelect, std::function<void( )> p_tick, s32 p_initialValue ) {
 
         s32 value = p_initialValue;
         u8  dig   = 0;
@@ -58,10 +57,10 @@ namespace IO {
 
         BTN_COOLDOWN = COOLDOWN_COUNT;
         while( 1 ) {
-            swiWaitForVBlank( );
             p_tick( );
             scanKeys( );
             touchRead( &TOUCH );
+            swiWaitForVBlank( );
             BTN_PRESSED = keysUp( );
             BTN_HELD    = keysHeld( );
 
@@ -136,14 +135,15 @@ namespace IO {
                     p_hoverButton( df2 );
                     bool bad = false;
                     while( TOUCH.px || TOUCH.py ) {
+                        swiWaitForVBlank( );
                         if( !i.first.inRange( TOUCH ) ) {
                             bad = true;
                             break;
                         }
-                        swiWaitForVBlank( );
                         p_tick( );
                         scanKeys( );
                         touchRead( &TOUCH );
+                        swiWaitForVBlank( );
                     }
                     if( !bad ) {
                         if( !df2 || df2 == _minValue - 3 ) {
@@ -181,6 +181,7 @@ namespace IO {
                     p_hoverButton( _maxValue + 1 );
                 }
             }
+            swiWaitForVBlank( );
         }
         return value;
     }

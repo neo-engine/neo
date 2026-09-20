@@ -306,7 +306,7 @@ namespace SPX {
                     IO::Oam->oamBuffer[ 3 ].y        = IO::Oam->oamBuffer[ p_selection ].y - 32;
                     IO::updateOAM( true );
                 },
-                curSel, tick );
+                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, tick, curSel );
 
             // Make the player confirm the choice
 
@@ -372,7 +372,7 @@ namespace SPX {
 
             IO::updateOAM( false );
 
-            IO::yesNoBox yn;
+            IO::simpleYesNoBox yn;
 
             if( yn.getResult(
                     [ & ]( ) {

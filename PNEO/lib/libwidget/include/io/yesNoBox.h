@@ -39,12 +39,6 @@ namespace IO {
       public:
         static void DEFAULT_TICK( ) {
         }
-        static void DEFAULT_SFX_CANCEL( ) {
-        }
-        static void DEFAULT_SFX_CHOOSE( ) {
-        }
-        static void DEFAULT_SFX_SELECT( ) {
-        }
 
         enum selection { YES = 0, NO = 1 };
 
@@ -60,10 +54,9 @@ namespace IO {
         selection
         getResult( std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
                    std::function<void( selection )> p_selectFunction,
-                   selection p_initialSelection = YES, std::function<void( )> p_tick = DEFAULT_TICK,
-                   std::function<void( )> p_sfxCancel = DEFAULT_SFX_CANCEL,
-                   std::function<void( )> p_sfxChoose = DEFAULT_SFX_CHOOSE,
-                   std::function<void( )> p_sfxSelect = DEFAULT_SFX_SELECT );
+                   std::function<void( )> p_sfxCancel, std::function<void( )> p_sfxChoose,
+                   std::function<void( )> p_sfxSelect, std::function<void( )> p_tick = DEFAULT_TICK,
+                   selection p_initialSelection = YES );
     };
 
 } // namespace IO

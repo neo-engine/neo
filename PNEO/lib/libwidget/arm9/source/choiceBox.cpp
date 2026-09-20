@@ -47,9 +47,9 @@ namespace IO {
 
     choiceBox::selection choiceBox::getResult(
         std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
-        std::function<void( selection )> p_selectFunction, selection p_initialSelection,
-        std::function<void( )> p_tick, u8 p_initialPage, std::function<void( )> p_sfxCancel,
-        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect ) {
+        std::function<void( selection )> p_selectFunction, std::function<void( )> p_sfxCancel,
+        std::function<void( )> p_sfxChoose, std::function<void( )> p_sfxSelect,
+        std::function<void( )> p_tick, selection p_initialSelection, u8 p_initialPage ) {
         u8   page    = p_initialPage;
         auto choices = p_drawFunction( page );
         if( !choices.size( ) ) [[unlikely]] { return BACK_CHOICE; }
@@ -63,10 +63,10 @@ namespace IO {
 
         BTN_COOLDOWN = COOLDOWN_COUNT;
         while( 1 ) {
-            swiWaitForVBlank( );
             p_tick( );
             scanKeys( );
             touchRead( &TOUCH );
+            swiWaitForVBlank( );
             BTN_PRESSED = keysUp( );
             BTN_HELD    = keysHeld( );
 
@@ -219,14 +219,15 @@ namespace IO {
                     p_selectFunction( sel );
                     bool bad = false;
                     while( TOUCH.px || TOUCH.py ) {
+                        swiWaitForVBlank( );
                         if( !i.first.inRange( TOUCH ) ) {
                             bad = true;
                             break;
                         }
-                        swiWaitForVBlank( );
                         p_tick( );
                         scanKeys( );
                         touchRead( &TOUCH );
+                        swiWaitForVBlank( );
                     }
                     if( !bad && sel != DISABLED_CHOICE ) {
                         if( sel == EXIT_CHOICE || sel == BACK_CHOICE ) {
@@ -249,6 +250,7 @@ namespace IO {
                     }
                 }
             }
+            swiWaitForVBlank( );
         }
         return sel;
     }

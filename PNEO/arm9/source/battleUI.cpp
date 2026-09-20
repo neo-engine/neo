@@ -27,8 +27,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstdio>
 
-#include <io/choiceBox.h>
-#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "bag/item.h"
 #include "battle/ability.h"
@@ -43,6 +41,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/keyboard.h"
 #include "io/message.h"
 #include "io/screenFade.h"
+#include "io/simpleWidget.h"
 #include "io/sprite.h"
 #include "io/util.h"
 #include "pokemon.h"
@@ -2888,7 +2887,7 @@ namespace BATTLE {
         showTopMessagePkmn( p_pokemon );
         printTopMessage( 0, true );
 
-        IO::yesNoBox yn;
+        IO::simpleYesNoBox yn;
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( 141 ), p_pokemon->m_boxdata.m_name );
         printTopMessage( buffer.data( ), false );
 

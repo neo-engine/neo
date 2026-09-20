@@ -655,8 +655,8 @@ namespace IO {
     void focusMenu( const char* p_path ) {
         SOUND::playSoundEffect( SFX_MENU );
 
-        IO::choiceBox menu = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
-        auto          res  = menu.getResult( [ & ]( u8 ) { return drawMenu( ); }, selectMenuItem );
+        IO::simpleChoiceBox menu = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        auto res = menu.getResult( [ & ]( u8 ) { return drawMenu( ); }, selectMenuItem );
 
         init( );
         if( res != IO::choiceBox::BACK_CHOICE ) {
@@ -739,7 +739,8 @@ namespace IO {
                 [ & ]( u32 p_newValue, u8 p_selDig ) {
                     updateCounterValue( p_newValue, p_selDig, mdg );
                 },
-                [ & ]( s32 p_hoveredButton ) { hoverCounterButton( 0, mx, p_hoveredButton ); }, 1 );
+                [ & ]( s32 p_hoveredButton ) { hoverCounterButton( 0, mx, p_hoveredButton ); },
+                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, counter::DEFAULT_TICK, 1 );
             if( !res ) { return res; }
             if( res == -3 ) { return -1; }
         } else {
@@ -766,8 +767,8 @@ namespace IO {
                       GET_STRING( IO::STR_UI_MART_CLERK_TOTAL_MONEYTYPE_ASH ), p_name.c_str( ),
                       cost );
         }
-        IO::yesNoBox yn;
-        auto         conf = yn.getResult(
+        IO::simpleYesNoBox yn;
+        auto               conf = yn.getResult(
             [ & ]( ) {
                 auto tmpres = printYNMessage( 0, MSG_NORMAL, 253 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
@@ -796,7 +797,7 @@ namespace IO {
     }
 
     u8 chooseDaycarePkmn( u8 p_daycare ) {
-        IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
+        IO::simpleChoiceBox cb = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT );
         return cb.getResult(
             [ & ]( u8 ) { return drawDaycareChoice( p_daycare ); },
             [ & ]( u8 p_selection ) { selectDaycarePkmn( p_daycare, p_selection ); } );
@@ -837,7 +838,8 @@ namespace IO {
                                 descr[ NUM_CB_CHOICES * curPg + p_selection ],
                                 NUM_CB_CHOICES * curPg + p_selection );
                 },
-                oldsel, IO::choiceBox::DEFAULT_TICK, curPg );
+                IO::sfxCancel, IO::sfxChoose, IO::sfxSelect, IO::choiceBox::DEFAULT_TICK, oldsel,
+                curPg );
 
             oldsel = curItm;
 

@@ -37,6 +37,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound/sound.h"
 
 namespace IO {
+    void sfxCancel( ) {
+        SOUND::playSoundEffect( SFX_CANCEL );
+    }
+
+    void sfxChoose( ) {
+        SOUND::playSoundEffect( SFX_CHOOSE );
+    }
+
+    void sfxSelect( ) {
+        SOUND::playSoundEffect( SFX_SELECT );
+    }
 
     choiceBox::selection simpleChoiceBox::getResult( const char* p_message, style p_style,
                                                      const std::vector<u16>& p_choices,
@@ -46,9 +57,7 @@ namespace IO {
                 return printChoiceMessage( p_message, p_style, p_choices, p_showExitButton );
             },
             [ & ]( u8 p_selection ) { printChoiceMessage( 0, p_style, p_choices, p_selection ); },
-            0, choiceBox::DEFAULT_TICK, 0, [ & ]( ) { SOUND::playSoundEffect( SFX_CANCEL ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_SELECT ); } );
+            sfxCancel, sfxChoose, sfxSelect );
     }
 
     choiceBox::selection simpleChoiceBox::getResult( const char* p_message, style p_style,
@@ -59,9 +68,7 @@ namespace IO {
                 return printChoiceMessage( p_message, p_style, p_choices, p_showExitButton );
             },
             [ & ]( u8 p_selection ) { printChoiceMessage( 0, p_style, p_choices, p_selection ); },
-            0, choiceBox::DEFAULT_TICK, 0, [ & ]( ) { SOUND::playSoundEffect( SFX_CANCEL ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_SELECT ); } );
+            sfxCancel, sfxChoose, sfxSelect );
     }
 
     choiceBox::selection simpleChoiceBox::getResult( const char* p_message, style p_style,
@@ -71,9 +78,15 @@ namespace IO {
             [ & ]( u8 p_selection ) {
                 printChoiceMessage( 0, p_style, p_moves, p_extraMove, p_selection );
             },
-            0, choiceBox::DEFAULT_TICK, 0, [ & ]( ) { SOUND::playSoundEffect( SFX_CANCEL ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_SELECT ); } );
+            sfxCancel, sfxChoose, sfxSelect );
+    }
+
+    choiceBox::selection simpleChoiceBox::getResult(
+        std::function<std::vector<std::pair<inputTarget, selection>>( u8 )> p_drawFunction,
+        std::function<void( selection )> p_selectFunction, std::function<void( )> p_tick,
+        selection p_initialSelection, u8 p_initialPage ) {
+        return choiceBox::getResult( p_drawFunction, p_selectFunction, sfxCancel, sfxChoose,
+                                     sfxSelect, p_tick, p_initialSelection, p_initialPage );
     }
 
     s32 simpleCounter::getResult( const char* p_message, style p_style ) {
@@ -91,10 +104,7 @@ namespace IO {
             [ & ]( s32 p_button ) {
                 IO::hoverCounterButton( counter::minValue( ), counter::maxValue( ), p_button );
             },
-            counter::minValue( ), counter::DEFAULT_TICK,
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CANCEL ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_SELECT ); } );
+            sfxCancel, sfxChoose, sfxSelect, counter::DEFAULT_TICK, counter::minValue( ) );
     }
 
     yesNoBox::selection simpleYesNoBox::getResult( const char* p_message, style p_style,
@@ -104,10 +114,16 @@ namespace IO {
             [ & ]( yesNoBox::selection p_selection ) {
                 IO::printYNMessage( 0, p_style, p_selection == IO::yesNoBox::NO, p_showMoney );
             },
-            IO::yesNoBox::selection::YES, yesNoBox::DEFAULT_TICK,
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CANCEL ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); },
-            [ & ]( ) { SOUND::playSoundEffect( SFX_SELECT ); } );
+            sfxCancel, sfxChoose, sfxSelect );
+    }
+
+    yesNoBox::selection simpleYesNoBox::getResult(
+        std::function<std::vector<std::pair<inputTarget, selection>>( )> p_drawFunction,
+        std::function<void( selection )> p_selectFunction, selection p_initialSelection,
+        std::function<void( )> p_tick ) {
+
+        return yesNoBox::getResult( p_drawFunction, p_selectFunction, sfxCancel, sfxChoose,
+                                    sfxSelect, p_tick, p_initialSelection );
     }
 
 } // namespace IO

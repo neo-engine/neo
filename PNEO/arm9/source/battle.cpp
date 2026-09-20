@@ -27,8 +27,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include <io/choiceBox.h>
-#include <io/yesNoBox.h>
 #include "bag/bagViewer.h"
 #include "battle/battle.h"
 #include "battle/battleField.h"
@@ -41,6 +39,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/data.h"
 #include "gen/bgmNames.h"
 #include "io/animations.h"
+#include "io/simpleWidget.h"
 #include "io/strings.h"
 #include "io/util.h"
 #include "map/mapDrawer.h"
@@ -639,7 +638,8 @@ namespace BATTLE {
                 break;
             }
 
-            IO::choiceBox cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
+            IO::simpleChoiceBox cb
+                = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
 
             auto getPkmnOrDisguise = [ & ]( bool p_opp, u8 p_slot ) {
                 return _field.getPkmnOrDisguise( p_opp, p_slot );
@@ -654,7 +654,7 @@ namespace BATTLE {
                     _battleUI.showTargetSelection( possibleTargets, hasChoice, getPkmnOrDisguise,
                                                    p_selection );
                 },
-                initialSel );
+                IO::choiceBox::DEFAULT_TICK, initialSel );
             if( rs < 4 ) {
                 // player selects a target
                 if( hasChoice ) { res.m_target = { rs < 2, ( rs < 2 ) ^ ( rs % 2 ) }; }
@@ -705,8 +705,9 @@ namespace BATTLE {
             return chooseTarget( res );
         }
 
-        IO::choiceBox cb     = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
-        u8            curSel = _lastMoveChoice;
+        IO::simpleChoiceBox cb
+            = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
+        u8 curSel = _lastMoveChoice;
 
         loop( ) {
             u8 rs = cb.getResult(
@@ -720,7 +721,7 @@ namespace BATTLE {
                         _field.getPkmnOrDisguise( field::PLAYER_SIDE, p_slot ), canUse, mega,
                         curSel, res.m_megaEvolve );
                 },
-                curSel );
+                IO::choiceBox::DEFAULT_TICK, curSel );
 
             if( rs == IO::choiceBox::BACK_CHOICE || rs == 4 ) {
                 res.m_type = MT_CANCEL;
@@ -1121,7 +1122,7 @@ namespace BATTLE {
                                     WAIT( THREEHALF_SEC );
                                 },
                                 [ & ]( boxPokemon* p_pkmn, u16 ) -> u8 {
-                                    IO::choiceBox cb = IO::choiceBox(
+                                    IO::simpleChoiceBox cb = IO::simpleChoiceBox(
                                         IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT_CANCEL );
                                     u8 curSel = 0;
 
@@ -1136,7 +1137,7 @@ namespace BATTLE {
                                             _battleUI.showAttackSelection( p_pkmn, canUse, false,
                                                                            curSel, false );
                                         },
-                                        curSel );
+                                        IO::choiceBox::DEFAULT_TICK, curSel );
 
                                     if( rs < 4 ) {
                                         return rs;
@@ -1145,7 +1146,7 @@ namespace BATTLE {
                                     }
                                 },
                                 [ & ]( const char* p_message ) {
-                                    IO::yesNoBox yn;
+                                    IO::simpleYesNoBox yn;
                                     _battleUI.printTopMessage( p_message, true );
                                     return yn.getResult(
                                                [ & ]( ) { return _battleUI.printYNMessage( 254 ); },
