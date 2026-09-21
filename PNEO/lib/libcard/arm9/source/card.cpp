@@ -28,8 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <memory>
 
-#include "defines.h"
-#include "fs/fs.h"
+#include "fs/card.h"
 
 namespace FS::CARD {
     bool checkCard( ) {

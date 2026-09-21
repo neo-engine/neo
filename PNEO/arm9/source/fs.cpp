@@ -34,6 +34,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include <fat.h>
+#include <fs/card.h>
 #include <sys/stat.h>
 
 #include "bag/item.h"

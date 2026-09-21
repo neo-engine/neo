@@ -25,9 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <fat.h>
-#include <nds.h>
-
 #include <chrono>
 #include <cmath>
 #include <cstdio>
@@ -35,6 +32,11 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <fat.h>
+#include <filesystem.h>
+#include <fs/card.h>
+#include <nds.h>
 
 #include "bag/item.h"
 #include "battle/battle.h"
@@ -88,8 +90,6 @@ bool   FLUSH_GFX_UPDATE  = false;
 static volatile bool RTC_POLL_PENDING = false;
 
 char** ARGV;
-
-bool nitroFSInit( char** p_basepath = nullptr );
 
 u8 getCurrentDaytime( ) {
     u8 t = SAVE::CURRENT_TIME.m_hours, m = SAVE::CURRENT_DATE.m_month;

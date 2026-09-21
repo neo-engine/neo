@@ -74,7 +74,7 @@ endif
 arm7/$(TARGET).elf: FORCE ndstool libnds dswifi libsound
 	$(MAKE) -C arm7
 
-arm9/$(TARGET).elf: FORCE ndstool libnds dswifi libsound libfat libfont libwidget
+arm9/$(TARGET).elf: FORCE ndstool libnds dswifi libsound libfat libfont libwidget libcard
 	$(MAKE) -C arm9
 
 libnds:
@@ -94,6 +94,9 @@ libfont: libnds
 
 libwidget: libnds
 	$(MAKE) -C lib/libwidget
+
+libcard: libnds
+	$(MAKE) -C lib/libcard
 
 ndstool:
 	$(MAKE) -C tools/ndstool

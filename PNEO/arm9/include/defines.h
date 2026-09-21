@@ -83,9 +83,6 @@ constexpr u32 MBOX_SCREEN        = 256 * 50;
 constexpr u32 COMPLETE_SCREEN    = 256 * 192;
 constexpr u32 COMPLETE_SCREEN_SQ = 256 * 256;
 
-// Assumes that the Backup is a 512k flash memory
-constexpr u32 BACKUP_SIZE = ( 512 * 1024 );
-
 #define MAX_ITEMS      FSDATA.m_maxItem
 #define MAX_ATTACK     FSDATA.m_maxMove
 #define MAX_MOVE       FSDATA.m_maxMove
