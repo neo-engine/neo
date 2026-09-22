@@ -102,13 +102,16 @@ ndstool:
 	$(MAKE) -C tools/ndstool
 
 clean:
-	$(MAKE) -C arm9 clean
 	$(MAKE) -C arm7 clean
-	$(MAKE) -C tools/ndstool clean
+	$(MAKE) -C arm9 clean
 	$(MAKE) -C lib/libnds clean
 	$(MAKE) -C lib/dswifi clean
+	$(MAKE) -C lib/libsound clean
 	$(MAKE) -C lib/libfat clean
 	$(MAKE) -C lib/libfont clean
+	$(MAKE) -C lib/libwidget clean
+	$(MAKE) -C lib/libcard clean
+	$(MAKE) -C tools/ndstool clean
 	rm -f $(TARGET).nds $(TARGET).arm7 $(TARGET).arm9
 
 rebuild: clean all
