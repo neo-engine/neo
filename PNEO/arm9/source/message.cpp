@@ -25,9 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
-#include <vector>
-
 #include "bag/item.h"
 #include "battle/battle.h"
 #include "defines.h"
@@ -70,8 +67,9 @@ namespace IO {
         if( sscanf( p_cmd.c_str( ), "VAR:%hu", &tmp ) && tmp != u16( -1 ) ) {
             return std::to_string( SAVE::CURRENT_FILE->getVar( tmp ) );
         }
-        if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp != u16( -1 ) ) {
-            return SAVE::CURRENT_FILE->getTeamPkmn( tmp )->m_boxdata.m_name;
+        if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp < 6 ) {
+            auto pkmn = SAVE::CURRENT_FILE->getTeamPkmn( tmp );
+            return pkmn != nullptr ? std::string( pkmn->m_boxdata.m_name ) : std::string( "" );
         }
         return std::string( "[" ) + p_cmd + "]";
     }

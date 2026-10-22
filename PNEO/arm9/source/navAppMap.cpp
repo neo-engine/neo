@@ -189,7 +189,7 @@ namespace IO {
         bool flyusable = false;
         for( u8 i = 0; i < 6; ++i ) {
             if( !SAVE::CURRENT_FILE->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) { break; }
-            auto a = SAVE::CURRENT_FILE->m_pkmnTeam[ i ];
+            auto& a = SAVE::CURRENT_FILE->m_pkmnTeam[ i ];
             if( a.isEgg( ) ) { continue; }
             for( u8 j = 0; j < 4; ++j ) {
                 if( a.m_boxdata.m_moves[ j ] == M_FLY && BATTLE::possible( M_FLY, 0 ) ) {

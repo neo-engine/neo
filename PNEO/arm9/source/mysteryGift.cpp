@@ -907,8 +907,13 @@ namespace SAVE {
 
         // u8 frame = 0;
 
+        std::vector<u16> mainChoices;
+        mainChoices.reserve( 3 );
+
         loop( ) {
-            std::vector<u16> mainChoices{ IO::STR_UI_RECEIVE_GIFT };
+            mainChoices.clear( );
+            mainChoices.push_back( IO::STR_UI_RECEIVE_GIFT );
+
             if( SAVE::CURRENT_FILE->m_storedWonderCards[ 0 ].m_type != SAVE::WCTYPE_NONE ) {
                 mainChoices.push_back( IO::STR_UI_CHECK_WC );
             }

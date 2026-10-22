@@ -25,7 +25,6 @@
     along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-#include <vector>
 #include <nds.h>
 
 #include "defines.h"

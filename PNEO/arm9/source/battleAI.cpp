@@ -135,11 +135,19 @@ namespace BATTLE {
             case TG_RANDOM:
             case TG_ANY_FOE:
             [[likely]] case TG_ANY:
-                while( !canTarget[ 2 + ctg ] ) { ctg = rand( ) & 1; }
+                if( !canTarget[ 2 ] && !canTarget[ 3 ] ) {
+                    ctg = 0;
+                } else {
+                    while( !canTarget[ 2 + ctg ] ) { ctg = rand( ) & 1; }
+                }
                 res.m_target = fieldPosition( field::PLAYER_SIDE, ctg );
                 break;
             case TG_ALLY_OR_SELF:
-                while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
+                if( !canTarget[ 0 ] && !canTarget[ 1 ] ) {
+                    ctg = 0;
+                } else {
+                    while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
+                }
                 res.m_target = fieldPosition( field::OPPONENT_SIDE, ctg );
                 break;
             [[unlikely]] default:
@@ -198,7 +206,11 @@ namespace BATTLE {
                     bmove[ i ].m_target = { fieldPosition( field::PLAYER_SIDE, ctg ) };
                     break;
                 case TG_ALLY_OR_SELF:
-                    while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
+                    if( !canTarget[ 0 ] && !canTarget[ 1 ] ) {
+                        ctg = 0;
+                    } else {
+                        while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
+                    }
                     bmove[ i ].m_target = { fieldPosition( field::OPPONENT_SIDE, ctg ) };
                     break;
                 case TG_SELF:

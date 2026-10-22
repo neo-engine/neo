@@ -78,6 +78,13 @@ namespace SAVE {
             u8 m_data[ 100 ];
         } m_data;
 
+        static inline void copyFixed( char* p_dst, size_t p_size, const char* p_src ) {
+            size_t len = 0;
+            while( len < p_size && p_src[ len ] != '\0' ) { ++len; }
+            memcpy( p_dst, p_src, len );
+            memset( p_dst + len, 0, p_size - len );
+        }
+
         inline wonderCard( ) : m_type{ WCTYPE_NONE } {
         }
 
@@ -85,7 +92,7 @@ namespace SAVE {
                            u8 p_itemCount1 = 1, u16 p_itemId2 = 0, u8 p_itemCount2 = 0,
                            u16 p_itemId3 = 0, u8 p_itemCount3 = 0 )
             : m_descriptionId{ p_descriptionId }, m_type{ WCTYPE_ITEM }, m_id{ p_cardId } {
-            memcpy( m_title, p_title, 96 );
+            copyFixed( m_title, sizeof( m_title ), p_title );
             m_data.m_item.m_itemId[ 0 ] = p_itemId1;
             m_data.m_item.m_itemId[ 1 ] = p_itemId2;
             m_data.m_item.m_itemId[ 2 ] = p_itemId3;
@@ -102,10 +109,12 @@ namespace SAVE {
                            u8 p_ball, u8 p_pokerus, u8 p_forme, const u8 p_ribbons[ 12 ],
                            const u16 p_items[ 4 ] )
             : m_descriptionId{ p_descriptionId }, m_type{ WCTYPE_PKMN }, m_id{ p_cardId } {
-            memcpy( m_title, p_title, 96 );
+            copyFixed( m_title, sizeof( m_title ), p_title );
             memcpy( m_data.m_pkmn.m_moves, p_moves, 8 );
-            if( p_name ) { memcpy( m_data.m_pkmn.m_name, p_name, PKMN_NAMELENGTH ); }
-            if( p_ot ) { memcpy( m_data.m_pkmn.m_oT, p_ot, OTLENGTH ); }
+            if( p_name ) {
+                copyFixed( m_data.m_pkmn.m_name, sizeof( m_data.m_pkmn.m_name ), p_name );
+            }
+            if( p_ot ) { copyFixed( m_data.m_pkmn.m_oT, sizeof( m_data.m_pkmn.m_oT ), p_ot ); }
             if( p_ribbons ) { memcpy( m_data.m_pkmn.m_ribbons, p_ribbons, 12 ); }
             if( p_items ) { memcpy( m_data.m_pkmn.m_items, p_items, 8 ); }
 

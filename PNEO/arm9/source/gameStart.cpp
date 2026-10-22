@@ -262,7 +262,7 @@ namespace SAVE {
 
         // run chara creation
         do {
-            std::memcpy( CURRENT_FILE->m_playername, "", OTLENGTH );
+            std::memset( CURRENT_FILE->m_playername, 0, OTLENGTH );
             FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "tbg_t" );
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "tbg_s", 249 * 2,
                                  256 * 192, true );
@@ -330,7 +330,7 @@ namespace SAVE {
             IO::regularFont->printBreakingStringC( GET_STRING( IO::STR_UI_INIT_GAME_CHOOSE_NAME ),
                                                    8, 4, 40, true, IO::font::LEFT, 13 );
 
-            auto name = IO::keyboard( ).getText( 10 );
+            auto name = IO::keyboard( ).getText( OTLENGTH - 1 );
             if( name == "" ) {
                 name
                     = GET_STRING( IO::STR_UI_INIT_GAME_DEFAULT_NAME0 + CURRENT_FILE->m_appearance );
@@ -498,7 +498,7 @@ namespace SAVE {
         switch( p_episode ) {
         case 0:
             // Initialize character and send them to starting towm
-            std::memcpy( CURRENT_FILE->m_playername, "Test", OTLENGTH );
+            std::memcpy( CURRENT_FILE->m_playername, "Test", std::min( u16( 5 ), OTLENGTH ) );
             CURRENT_FILE->m_appearance = 1;
             CURRENT_FILE->setFlag( F_RIVAL_APPEARANCE, 1 - CURRENT_FILE->m_appearance );
             CURRENT_FILE->m_currentMap = 10;

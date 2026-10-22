@@ -25,14 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <initializer_list>
-#include <string>
-#include <vector>
-
 #include <fat.h>
 #include <sys/stat.h>
 
@@ -130,8 +122,8 @@ namespace FS {
         std::fseek( f, p_language * p_maxLen, SEEK_SET );
         fread( p_out, 1, p_maxLen, f );
         fclose( f );
+        p_out[ p_maxLen - 1 ] = '\0';
         DC_FlushRange( p_out, p_maxLen );
-
         return true;
     }
 
@@ -139,6 +131,7 @@ namespace FS {
         if( !p_bankFile ) { return false; }
         if( std::fseek( p_bankFile, p_stringId * p_maxLen, SEEK_SET ) ) { return false; }
         fread( p_out, 1, p_maxLen, p_bankFile );
+        p_out[ p_maxLen - 1 ] = '\0';
         DC_FlushRange( p_out, p_maxLen );
         return true;
     }
@@ -663,7 +656,12 @@ namespace FS {
         }
 
         p_data->m_size = p_size;
-        fread( p_data->m_data, 1, p_data->m_size, p_f );
+        if( fread( p_data->m_data, 1, p_data->m_size, p_f ) != p_data->m_size ) {
+            free( p_data->m_data );
+            p_data->m_data = nullptr;
+            p_data->m_size = 0;
+            return false;
+        }
         DC_FlushRange( p_data->m_data, p_data->m_size );
         return true;
     }
@@ -676,7 +674,7 @@ namespace FS {
         if( !SSEQ_INFO_BANK_FILE ) { return false; }
 
         fseek( SSEQ_INFO_BANK_FILE, 8 * u32( p_sseqId ), SEEK_SET );
-        u32 index, size;
+        u32 index = 0, size = 0;
         if( !fread( &index, 4, 1, SSEQ_INFO_BANK_FILE ) ) { return false; }
         fread( &size, 4, 1, SSEQ_INFO_BANK_FILE );
         auto res = loadSequenceData( p_data, index, size, SSEQ_DATA_BANK_FILE );
@@ -691,7 +689,7 @@ namespace FS {
         if( !SBNK_INFO_BANK_FILE ) { return false; }
 
         fseek( SBNK_INFO_BANK_FILE, 8 * u32( p_sbnkId ), SEEK_SET );
-        u32 index, size;
+        u32 index = 0, size = 0;
         if( !fread( &index, 4, 1, SBNK_INFO_BANK_FILE ) ) { return false; }
         fread( &size, 4, 1, SBNK_INFO_BANK_FILE );
         auto res = loadSequenceData( p_data, index, size, SBNK_DATA_BANK_FILE );
@@ -706,7 +704,7 @@ namespace FS {
         if( !SWAR_INFO_BANK_FILE ) { return false; }
 
         fseek( SWAR_INFO_BANK_FILE, 8 * u32( p_swarId ), SEEK_SET );
-        u32 index, size;
+        u32 index = 0, size = 0;
         if( !fread( &index, 4, 1, SWAR_INFO_BANK_FILE ) ) { return false; }
         fread( &size, 4, 1, SWAR_INFO_BANK_FILE );
         auto res = loadSequenceData( p_data, index, size, SWAR_DATA_BANK_FILE );

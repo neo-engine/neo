@@ -25,9 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <vector>
-
 #include "battle/ability.h"
 #include "battle/battle.h"
 #include "battle/battleField.h"
@@ -586,7 +583,8 @@ namespace BATTLE {
                 }
                 break;
             }
-                [[likely]] default : break;
+            [[likely]] default:
+                break;
             }
         }
         return;
@@ -3500,6 +3498,7 @@ namespace BATTLE {
 
             damage *= movePower;
 
+            if( !def ) { def = 1; }
             damage = ( damage * atk ) / def;
             damage = ( damage / 50 ) + 2;
 
@@ -3746,7 +3745,7 @@ namespace BATTLE {
                                       * std::min( u8( 5 ),
                                                   getConsecutiveMoveCount( p_move.m_user.first,
                                                                            p_move.m_user.second ) );
-                    damage = ( damage * cons / 100 );
+                    damage    = ( damage * cons / 100 );
                     break;
                 }
                 default: break;

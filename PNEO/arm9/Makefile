@@ -7,6 +7,8 @@
 #---------------------------------------------------------------------------------
 export SHELL := /usr/bin/env bash
 
+TARGET	?=	$(notdir $(patsubst %/,%,$(dir $(CURDIR))))
+
 #---------------------------------------------------------------------------------
 # path to tools
 #---------------------------------------------------------------------------------
@@ -140,8 +142,8 @@ CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
 			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
 			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
 			-Wfloat-equal -Wformat=1 -Wlogical-op -Werror\
-			-Wno-analyzer-possible-null-dereference -Wno-stringop-overflow\
-			-Wno-analyzer-possible-null-argument -Wno-stringop-overread\
+			-Wno-analyzer-possible-null-dereference -Wstringop-overflow=2\
+			-Wno-analyzer-possible-null-argument -Wstringop-overread\
 			-Wno-array-bounds -Wno-analyzer-null-dereference\
 			-Wno-analyzer-use-of-uninitialized-value -Wno-restrict\
 			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\

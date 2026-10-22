@@ -25,8 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string>
-
 #include "bag/bagViewer.h"
 #include "battle/battle.h"
 #include "battle/battleField.h"
@@ -1265,8 +1263,7 @@ namespace BATTLE {
             break;
 
         case I_REPEAT_BALL:
-            if( SAVE::CURRENT_FILE->m_caughtPkmn[ specId / 8 ] & ( 1LLU << ( specId % 8 ) ) )
-                ballCatchRate = 6;
+            if( SAVE::CURRENT_FILE->caught( specId ) ) { ballCatchRate = 6; }
             break;
         case I_TIMER_BALL: ballCatchRate = std::min( ( _round + 10 ) / 5, 8 ); break;
         case I_NEST_BALL: ballCatchRate = std::max( ( 40 - wild->m_level ) / 5, 2 ); break;
@@ -1366,7 +1363,7 @@ namespace BATTLE {
         u16          spid            = pkmn->getSpecies( );
         constexpr u8 TMP_BUFFER_SIZE = 100;
         char         buffer[ TMP_BUFFER_SIZE + 10 ];
-        if( !( SAVE::CURRENT_FILE->m_caughtPkmn[ spid / 8 ] & ( 1LLU << ( spid % 8 ) ) ) ) {
+        if( !SAVE::CURRENT_FILE->caught( spid ) ) {
             SAVE::CURRENT_FILE->registerCaughtPkmn( spid );
             snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_PKMN_DEX_REGISTERED ),
                       FS::getDisplayName( spid ).c_str( ) );
@@ -1778,7 +1775,7 @@ namespace BATTLE {
                                                 << m1 ) );
                             }
 
-                            u32 curexp = baseexp / reg.size( );
+                            u32 curexp = baseexp / ( reg.size( ) ? reg.size( ) : 1 );
                             if( _playerTeam[ i ].getItem( ) == I_LUCKY_EGG ) { curexp <<= 1; }
                             if( _playerTeam[ i ].isForeign( ) ) { curexp <<= 1; }
 

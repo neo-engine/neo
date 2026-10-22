@@ -25,9 +25,6 @@
     along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     */
 
-#include <algorithm>
-#include <tuple>
-#include <vector>
 #include <nds.h>
 
 #include <io/choiceBox.h>

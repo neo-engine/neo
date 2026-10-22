@@ -367,7 +367,7 @@ START:
             if( MAP::curMap->currentPosAllowsDirectFieldMove( ) ) {
                 for( u8 i = 0; i < 6; ++i ) {
                     if( !SAVE::CURRENT_FILE->m_pkmnTeam[ i ].m_boxdata.m_speciesId ) break;
-                    auto a = SAVE::CURRENT_FILE->m_pkmnTeam[ i ];
+                    auto& a = SAVE::CURRENT_FILE->m_pkmnTeam[ i ];
                     if( a.isEgg( ) ) continue;
                     for( u8 j = 0; j < 4; ++j )
                         for( u8 param = 0; param < 2; ++param ) {

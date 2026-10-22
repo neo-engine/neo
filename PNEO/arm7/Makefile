@@ -7,6 +7,8 @@
 #---------------------------------------------------------------------------------
 export SHELL := /usr/bin/env bash
 
+TARGET	?=	$(notdir $(patsubst %/,%,$(dir $(CURDIR))))
+
 #---------------------------------------------------------------------------------
 # path to tools
 #---------------------------------------------------------------------------------
@@ -141,7 +143,7 @@ ARCH	:=	-mthumb-interwork
 CFLAGS	:=	-g -Wall -O3 -D_FORTIFY_SOURCE=1 -ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload \
 			-funsafe-loop-optimizations $(EXTRA_FLAGS) \
 			-DGAME_CODE="\"$(GAME_CODE)\"" -DVERSION=$(VERSION) \
-			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\""
+			-DGAME_TITLE="\"$(GAME_TITLE)\"" -DVERSION_NAME="\"$(VERSION_NAME)\"" \
 			-mcpu=arm7tdmi -mtune=arm7tdmi -fomit-frame-pointer\
 			$(ARCH)
 
