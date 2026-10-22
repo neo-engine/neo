@@ -461,9 +461,9 @@ namespace SAVE {
 
         // Tell the socket to connect to the IP address we found
         struct sockaddr_in sain{ };
-        sain.sin_family      = AF_INET;
-        sain.sin_port        = htons( port );
-        sain.sin_addr.s_addr = *( (u32*) ( myhost->h_addr_list[ 0 ] ) );
+        sain.sin_family = AF_INET;
+        sain.sin_port   = htons( port );
+        memcpy( &sain.sin_addr.s_addr, myhost->h_addr_list[ 0 ], sizeof( sain.sin_addr.s_addr ) );
         if( connect( my_socket, (struct sockaddr*) &sain, sizeof( sain ) ) < 0 ) {
             closesocket( my_socket );
 

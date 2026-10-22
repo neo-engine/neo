@@ -434,7 +434,7 @@ namespace SPX {
 
             for( u8 i = 0; i < 3; ++i ) {
                 if( BLENDER_NPC[ p_npctier ][ i ].m_name ) {
-                    snprintf( NAME_CACHE[ i ], 19,
+                    snprintf( NAME_CACHE[ i ], 19, "%s",
                               GET_MAP_STRING( BLENDER_NPC[ p_npctier ][ i ].m_name ) );
                 }
             }
@@ -796,7 +796,7 @@ namespace SPX {
         // compute expected output
         auto result = computeBlockType( p_berries, bonus, speedToRPM100( p_mxSpeed ) );
         std::array<char, 60> sbuffer{ };
-        snprintf( sbuffer.data( ), sbuffer.size( ), GET_STRING( u8( result ) + 742 ) );
+        snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( result ) + 742 ) );
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( 808 ), player, sbuffer.data( ) );
         IO::regularFont->printStringC( buffer.data( ), 16, 133, false );
     }
@@ -1163,7 +1163,7 @@ namespace SPX {
         IO::printRectangle( 0, 0, 255, 24, false, 0 );
         IO::regularFont->printString( GET_STRING( 803 ), 128, 5, false, IO::font::CENTER );
         std::array<char, 60> sbuffer{ };
-        snprintf( sbuffer.data( ), sbuffer.size( ), GET_STRING( u8( p_type ) + 742 ) );
+        snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( p_type ) + 742 ) );
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( 801 ), p_amount, sbuffer.data( ) );
         IO::regularFont->printStringC( buffer.data( ), 16, 133, false );
 

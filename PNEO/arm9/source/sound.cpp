@@ -25,9 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
-#include <string>
-
 #ifndef NO_SOUND
 #include "sound/sseq.h"
 #include "sound/sseqData.h"

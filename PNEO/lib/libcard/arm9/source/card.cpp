@@ -23,10 +23,7 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <cstdio>
 #include <cstring>
-#include <memory>
 
 #include "fs/card.h"
 

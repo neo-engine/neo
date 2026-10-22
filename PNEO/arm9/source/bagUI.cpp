@@ -25,10 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <cstdio>
-#include <vector>
-
 #include <io/choiceBox.h>
 #include <io/yesNoBox.h>
 #include "bag/bagUI.h"
@@ -383,7 +379,7 @@ namespace BAG {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_BAG_ACCURACY ),
                           move.m_accuracy );
             } else {
-                snprintf( buffer.data( ), buffer.size( ),
+                snprintf( buffer.data( ), buffer.size( ), "%s",
                           GET_STRING( IO::STR_UI_BAG_ACCURACY_NO_MISS ) );
             }
             IO::regularFont->setColor( IO::BLUE_IDX, 1 );

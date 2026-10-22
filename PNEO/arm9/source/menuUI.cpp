@@ -25,9 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
-#include <vector>
-
 #include <io/choiceBox.h>
 #include <io/counter.h>
 #include <io/yesNoBox.h>
@@ -1160,7 +1157,8 @@ namespace IO {
                             snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
                         }
                     } else {
-                        snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_NONE ) );
+                        snprintf( buffer.data( ), buffer.size( ), "%s",
+                                  GET_STRING( IO::STR_UI_NONE ) );
                     }
                     IO::regularFont->printStringC( buffer.data( ), 64 + 128 * i,
                                                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 36

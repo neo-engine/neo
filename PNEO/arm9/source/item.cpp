@@ -25,9 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, new see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <vector>
-
 #include "bag/item.h"
 #include "bag/pokeblockViewer.h"
 #include "battle/move.h"

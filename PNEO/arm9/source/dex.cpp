@@ -25,8 +25,6 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cmath>
-
 #include "defines.h"
 #include "dex/dex.h"
 #include "dex/dexUI.h"

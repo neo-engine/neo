@@ -27,9 +27,6 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
-#include <algorithm>
-#include <ctime>
-
 #include "battle/type.h"
 #include "defines.h"
 #include "fs/data.h"

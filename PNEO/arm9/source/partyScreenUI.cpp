@@ -842,7 +842,7 @@ namespace STS {
                             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 332 ),
                                       _toSelect );
                         } else {
-                            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 333 ) );
+                            snprintf( buffer.data( ), buffer.size( ), "%s", GET_STRING( 333 ) );
                         }
                     }
                 } else {
