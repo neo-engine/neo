@@ -397,13 +397,13 @@ namespace BAG {
                                                 _playerTeam[ p_pkmnIdx ].getNature( ) );
         if( str == LIKED_FALVOR ) {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 797 ),
-                      _playerTeam[ p_pkmnIdx ].m_boxdata.m_name );
+                      _playerTeam[ p_pkmnIdx ].m_boxdata.getName( ) );
         } else if( str == NORMAL_FALVOR ) {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 798 ),
-                      _playerTeam[ p_pkmnIdx ].m_boxdata.m_name );
+                      _playerTeam[ p_pkmnIdx ].m_boxdata.getName( ) );
         } else if( str == DISLIKED_FALVOR ) {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 799 ),
-                      _playerTeam[ p_pkmnIdx ].m_boxdata.m_name );
+                      _playerTeam[ p_pkmnIdx ].m_boxdata.getName( ) );
         }
 
         IO::regularFont->printStringC( buffer.data( ), 128, 108, false, IO::font::CENTER );
@@ -509,7 +509,7 @@ namespace BAG {
                                                SINGLE_LINE, true );
             } else {
                 if( p_blockOwned ) {
-                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45,
+                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.getName( ), 45,
                                                    FIRST_LINE, true );
                     IO::regularFont->setColor( 0, 2 );
                     if( !_playerTeam[ i ].canEatPokeblock( p_blockType ) ) {
@@ -533,7 +533,7 @@ namespace BAG {
                         }
                     }
                 } else {
-                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45,
+                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.getName( ), 45,
                                                    SINGLE_LINE, true );
                 }
             }

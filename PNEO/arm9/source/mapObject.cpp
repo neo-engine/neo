@@ -619,7 +619,7 @@ namespace MAP {
 
         std::array<char, 140> buffer{ };
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( 436 ),
-                  SAVE::CURRENT_FILE->m_playername, getBadgeName( p_type, p_badge ) );
+                  SAVE::CURRENT_FILE->getPlayerName( ), getBadgeName( p_type, p_badge ) );
         IO::printMessage( buffer.data( ), MSG_INFO );
         SOUND::restartBGM( );
         ANIMATE_MAP = true;

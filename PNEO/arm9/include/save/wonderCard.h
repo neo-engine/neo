@@ -74,6 +74,7 @@ namespace SAVE {
                 u8   m_forme;
                 u8   m_ribbons[ 12 ];
                 u16  m_items[ 4 ];
+                u8   m_origLang;
             } m_pkmn;
             u8 m_data[ 100 ];
         } m_data;
@@ -107,7 +108,7 @@ namespace SAVE {
                            u16 p_id, u16 p_sid, const char* p_ot, u8 p_shiny, bool p_hiddenAbility,
                            bool p_fatefulEncounter, bool p_isEgg, u16 p_gotPlace, u8 p_female,
                            u8 p_ball, u8 p_pokerus, u8 p_forme, const u8 p_ribbons[ 12 ],
-                           const u16 p_items[ 4 ] )
+                           const u16 p_items[ 4 ], u8 p_origLang )
             : m_descriptionId{ p_descriptionId }, m_type{ WCTYPE_PKMN }, m_id{ p_cardId } {
             copyFixed( m_title, sizeof( m_title ), p_title );
             memcpy( m_data.m_pkmn.m_moves, p_moves, 8 );
@@ -131,6 +132,7 @@ namespace SAVE {
             m_data.m_pkmn.m_ball             = p_ball;
             m_data.m_pkmn.m_pokerus          = p_pokerus;
             m_data.m_pkmn.m_forme            = p_forme;
+            m_data.m_pkmn.m_origLang         = p_origLang;
         }
     };
 } // namespace SAVE

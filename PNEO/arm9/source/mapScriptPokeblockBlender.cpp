@@ -60,11 +60,11 @@ namespace MAP {
 
             if( canUseRotom ) {
                 snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 738 ),
-                          _followPkmnData->m_boxdata.m_name );
+                          _followPkmnData->m_boxdata.getName( ) );
                 printMapMessage( buffer.data( ), MSG_INFO );
 
                 snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 739 ),
-                          _followPkmnData->m_boxdata.m_name );
+                          _followPkmnData->m_boxdata.getName( ) );
 
                 if( IO::yesNoBox::YES
                     == IO::simpleYesNoBox( ).getResult(

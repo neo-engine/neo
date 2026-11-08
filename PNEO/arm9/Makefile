@@ -131,6 +131,7 @@ INCLUDES	:=	include ../common
 DATA		:=
 GRAPHICS	:=	data
 
+GENHEADERS	:=	$(FSROOT)/.headers
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -197,11 +198,19 @@ export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
 
+ifneq ($(wildcard $(GENHEADERS)/src/*.cpp),)
+export VPATH	:=	$(abspath $(GENHEADERS)/src) $(VPATH)
+endif
+
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
+
+ifneq ($(wildcard $(GENHEADERS)/src/*.cpp),)
+CPPFILES	+=	$(notdir $(wildcard $(GENHEADERS)/src/*.cpp))
+endif
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -223,7 +232,8 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(abspath $(CURDIR)/$(dir))) \
 			$(foreach dir,$(LIBDIRS),-I$(abspath $(dir)/include)) \
-			-I$(CURDIR)/$(BUILD)
+			-I$(CURDIR)/$(BUILD) \
+			-I$(abspath $(GENHEADERS))
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(abspath $(dir)/lib))
 

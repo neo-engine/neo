@@ -141,7 +141,7 @@ namespace SAVE {
         // player name
         IO::regularFont->printString( GET_STRING_L( 406, m_options.m_language ), 108, 52,
                                       p_bottom );
-        IO::regularFont->printString( m_playername, 234, 52, p_bottom, IO::font::RIGHT );
+        IO::regularFont->printString( getPlayerName( ), 234, 52, p_bottom, IO::font::RIGHT );
 
         // play time
         if( !p_dummy ) {
@@ -169,7 +169,9 @@ namespace SAVE {
             // Last Badge / Hall of Fame.
             if( m_lastAchievementEvent ) {
                 snprintf( buffer.data( ), buffer.size( ),
-                          FS::getAchievement( m_lastAchievementEvent, m_options.m_language ),
+                          FS::kanaWrap(
+                              FS::getAchievement( m_lastAchievementEvent, m_options.m_language ),
+                              m_options.m_language ),
                           IO::formatDate( m_lastAchievementDate, m_options.m_language ).c_str( ) );
                 IO::regularFont->printStringC( buffer.data( ), 242, 116, p_bottom,
                                                IO::font::RIGHT );
@@ -178,7 +180,9 @@ namespace SAVE {
             // Last save
             if( m_lastSaveLocation ) {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING_L( 411, m_options.m_language ),
-                          FS::getLocation( m_lastSaveLocation, m_options.m_language ).c_str( ),
+                          FS::kanaWrap(
+                              FS::getLocation( m_lastSaveLocation, m_options.m_language ).c_str( ),
+                              m_options.m_language ),
                           IO::formatDate( m_lastSaveDate, m_options.m_language ).c_str( ),
                           m_lastSaveTime.m_hours, m_lastSaveTime.m_mins );
                 IO::regularFont->printBreakingStringC( buffer.data( ), 242, 132, 230, p_bottom,
@@ -662,6 +666,13 @@ namespace SAVE {
                 }
             }
         }
+    }
+    const char* saveGame::playerInfo::getPlayerName( ) const {
+        static std::array<char, OTLENGTH + 3> buf{ };
+        IO::KANA::embedKana( m_playername, m_oTLanguage == language::JAP,
+                             CURRENT_LANGUAGE != language::JAP || m_oTLanguage == language::JAP,
+                             buf.data( ), buf.size( ) );
+        return buf.data( );
     }
 
     u8 saveGame::playerInfo::getEncounterLevel( u8 p_tier ) {

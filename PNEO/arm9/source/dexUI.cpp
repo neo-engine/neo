@@ -691,8 +691,10 @@ namespace DEX {
 
             // pkmn name
             if( seen || caught ) {
-                IO::regularFont->printStringC( FS::getDisplayName( p_pkmn.m_pkmnIdx, 0 ).c_str( ),
-                                               128, 176, p_bottom, IO::font::CENTER );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( FS::getDisplayName( p_pkmn.m_pkmnIdx, 0 ).c_str( ),
+                                  CURRENT_LANGUAGE ),
+                    128, 176, p_bottom, IO::font::CENTER );
             } else {
                 IO::regularFont->printStringC( GET_STRING( 581 ), 128, 176, p_bottom,
                                                IO::font::CENTER );
@@ -749,11 +751,15 @@ namespace DEX {
             if( seen || caught ) {
                 if( !p_pkmn.m_forme ) {
                     IO::regularFont->printStringC(
-                        FS::getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 112,
-                        p_bottom, IO::font::CENTER );
+                        FS::kanaWrap(
+                            FS::getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                            CURRENT_LANGUAGE ),
+                        128, 112, p_bottom, IO::font::CENTER );
                 } else {
                     IO::regularFont->printStringC(
-                        FS::getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                        FS::kanaWrap(
+                            FS::getDisplayName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                            CURRENT_LANGUAGE ),
                         SPR_TYPE_X( 0 ) - 4, 112, p_bottom, IO::font::RIGHT );
                 }
             } else {
@@ -795,8 +801,9 @@ namespace DEX {
                                                IO::font::CENTER );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->printBreakingStringC(
-                    FS::getDexEntry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ), 128, 141, 214,
-                    p_bottom, IO::font::CENTER, 12 );
+                    FS::kanaWrap( FS::getDexEntry( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                                  CURRENT_LANGUAGE ),
+                    128, 141, 214, p_bottom, IO::font::CENTER, 12 );
 
                 // base stats
 
@@ -981,8 +988,9 @@ namespace DEX {
 
             std::memset( IO::TEXT_BUF, 0, sizeof( IO::TEXT_BUF ) );
             if( seen || caught ) {
-                IO::regularFont->printStringBC( FS::getDisplayName( p_pkmnIdx ).c_str( ), TEXT_PAL,
-                                                IO::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
+                IO::regularFont->printStringBC(
+                    FS::kanaWrap( FS::getDisplayName( p_pkmnIdx ).c_str( ), CURRENT_LANGUAGE ),
+                    TEXT_PAL, IO::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
             } else {
                 IO::regularFont->printStringBC( GET_STRING( 581 ), TEXT_PAL, IO::TEXT_BUF, 96,
                                                 IO::font::LEFT, 15, 32, 16 );

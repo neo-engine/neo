@@ -825,7 +825,7 @@ namespace MAP {
                 // Player obtained <pkmn>
 
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( 814 ),
-                          SAVE::CURRENT_FILE->m_playername, giftPkmn.m_boxdata.m_name );
+                          SAVE::CURRENT_FILE->getPlayerName( ), giftPkmn.m_boxdata.getName( ) );
 
                 SOUND::playSoundEffect( SFX_CAPTURE_SUCCESSFUL );
                 printMapMessage( buffer.data( ), MSG_INFO );
@@ -834,7 +834,7 @@ namespace MAP {
 
                 IO::yesNoBox yn;
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( 141 ),
-                          giftPkmn.m_boxdata.m_name );
+                          giftPkmn.m_boxdata.getName( ) );
                 if( IO::yesNoBox::YES
                     == IO::simpleYesNoBox( ).getResult(
                         convertMapString( buffer.data( ), MSG_INFO_NOCLOSE ).c_str( ),
@@ -865,7 +865,7 @@ namespace MAP {
                     if( nb != u8( -1 ) ) {
                         snprintf( buffer.data( ), buffer.size( ),
                                   GET_STRING( IO::STR_UI_PKMN_SENT_TO_STORAGE ),
-                                  giftPkmn.m_boxdata.m_name );
+                                  giftPkmn.m_boxdata.getName( ) );
                         printMapMessage( buffer.data( ), MSG_INFO );
 
                         if( oldbx != nb ) {
@@ -876,7 +876,7 @@ namespace MAP {
                         }
                         snprintf( buffer.data( ), buffer.size( ),
                                   GET_STRING( IO::STR_UI_STORAGE_BOX_PICKED ),
-                                  giftPkmn.m_boxdata.m_name,
+                                  giftPkmn.m_boxdata.getName( ),
                                   SAVE::CURRENT_FILE->m_storedPokemon[ nb ].m_name );
                         printMapMessage( buffer.data( ), MSG_INFO );
                         registers[ 0 ] = 1;
@@ -885,7 +885,7 @@ namespace MAP {
                                          MSG_INFO );
                         snprintf( buffer.data( ), buffer.size( ),
                                   GET_STRING( IO::STR_UI_PKMN_RELEASED ),
-                                  giftPkmn.m_boxdata.m_name );
+                                  giftPkmn.m_boxdata.getName( ) );
                         printMapMessage( buffer.data( ), MSG_INFO );
                         registers[ 0 ] = 0;
                     }

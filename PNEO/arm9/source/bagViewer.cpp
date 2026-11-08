@@ -321,7 +321,8 @@ namespace BAG {
             IO::simpleYesNoBox    yn;
             std::array<char, 100> buffer{ };
             snprintf( buffer.data( ), buffer.size( ),
-                      GET_STRING( IO::STR_UI_BAG_PKMN_CARRIES_ITEM ), p_pokemon.m_boxdata.m_name );
+                      GET_STRING( IO::STR_UI_BAG_PKMN_CARRIES_ITEM ),
+                      p_pokemon.m_boxdata.getName( ) );
             if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer.data( ), 254 ); },
                               [ & ]( IO::yesNoBox::selection p_sel ) {
                                   _bagUI->printYNMessage( 0, p_sel == IO::yesNoBox::NO );

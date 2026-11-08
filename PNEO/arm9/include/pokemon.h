@@ -32,9 +32,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "battle/ability.h"
 #include "defines.h"
-#include "gen/itemNames.h"
-#include "gen/pokemonNames.h"
+#include "io/kana.h"
 #include "pokemonData.h"
+#include "save/saveOptions.h"
 
 /*
  * @brief: holds information that is sufficient to construct a behaviourally consistent
@@ -109,7 +109,7 @@ struct boxPokemon {
 
     u8 m_nature       = 0;
     u8 m_gotLevel : 7 = 0; //
-    u8 m_unused : 1   = 0; // unused
+    u8 m_oTIsKana : 1 = 0; // stores if the OT should be printed in Kana
 
     u8 m_abilitySlot : 2 = 0;
     u8 m_shinyType : 2   = 0;
@@ -133,6 +133,23 @@ struct boxPokemon {
                 const char* p_ot, u8 p_shiny = 0, bool p_hiddenAbility = false,
                 bool p_fatefulEncounter = false, bool p_isEgg = false, u16 p_gotPlace = 0,
                 u8 p_ball = 0, u8 p_pokerus = 0, u8 p_forme = 0, pkmnData* p_data = nullptr );
+
+    inline bool nameIsKana( ) const {
+        return m_origLang == SAVE::JAP;
+    }
+
+    const char* getName( ) const;
+    std::string getNameS( ) const;
+
+    inline bool oTIsKana( ) const {
+        return m_oTIsKana;
+    }
+
+    const char* getOT( ) const;
+
+    inline void setOrigLang( u8 p_language ) {
+        m_origLang = p_language;
+    }
 
     bool canEatPokeblock( u8 p_blockType ) const;
 
@@ -566,63 +583,7 @@ struct pokemon {
     void giveItem( u16 p_newItem );
     u16  takeItem( );
 
-    inline bool canBattleTransform( ) const {
-        if( getForme( ) ) { return false; }
-        switch( getSpecies( ) ) {
-        case PKMN_VENUSAUR: return getItem( ) == I_VENUSAURITE;
-        case PKMN_CHARIZARD:
-            return getItem( ) == I_CHARIZARDITE_X || getItem( ) == I_CHARIZARDITE_Y;
-        case PKMN_BLASTOISE: return getItem( ) == I_BLASTOISINITE;
-        case PKMN_ALAKAZAM: return getItem( ) == I_ALAKAZITE;
-        case PKMN_GENGAR: return getItem( ) == I_GENGARITE;
-        case PKMN_KANGASKHAN: return getItem( ) == I_KANGASKHANITE;
-        case PKMN_PINSIR: return getItem( ) == I_PINSIRITE;
-        case PKMN_GYARADOS: return getItem( ) == I_GYARADOSITE;
-        case PKMN_AERODACTYL: return getItem( ) == I_AERODACTYLITE;
-        case PKMN_MEWTWO: return getItem( ) == I_MEWTWONITE_X || getItem( ) == I_MEWTWONITE_Y;
-        case PKMN_AMPHAROS: return getItem( ) == I_AMPHAROSITE;
-        case PKMN_SCIZOR: return getItem( ) == I_SCIZORITE;
-        case PKMN_HERACROSS: return getItem( ) == I_HERACRONITE;
-        case PKMN_HOUNDOOM: return getItem( ) == I_HOUNDOOMINITE;
-        case PKMN_TYRANITAR: return getItem( ) == I_TYRANITARITE;
-        case PKMN_BLAZIKEN: return getItem( ) == I_BLAZIKENITE;
-        case PKMN_GARDEVOIR: return getItem( ) == I_GARDEVOIRITE;
-        case PKMN_MAWILE: return getItem( ) == I_MAWILITE;
-        case PKMN_AGGRON: return getItem( ) == I_AGGRONITE;
-        case PKMN_MEDICHAM: return getItem( ) == I_MEDICHAMITE;
-        case PKMN_MANECTRIC: return getItem( ) == I_MANECTITE;
-        case PKMN_BANETTE: return getItem( ) == I_BANETTITE;
-        case PKMN_ABSOL: return getItem( ) == I_ABSOLITE;
-        case PKMN_GARCHOMP: return getItem( ) == I_GARCHOMPITE;
-        case PKMN_LUCARIO: return getItem( ) == I_LUCARIONITE;
-        case PKMN_ABOMASNOW: return getItem( ) == I_ABOMASITE;
-        case PKMN_BEEDRILL: return getItem( ) == I_BEEDRILLITE;
-        case PKMN_PIDGEOT: return getItem( ) == I_PIDGEOTITE;
-        case PKMN_SLOWBRO: return getItem( ) == I_SLOWBRONITE;
-        case PKMN_STEELIX: return getItem( ) == I_STEELIXITE;
-        case PKMN_SCEPTILE: return getItem( ) == I_SCEPTILITE;
-        case PKMN_SWAMPERT: return getItem( ) == I_SWAMPERTITE;
-        case PKMN_SABLEYE: return getItem( ) == I_SABLENITE;
-        case PKMN_SHARPEDO: return getItem( ) == I_SHARPEDONITE;
-        case PKMN_CAMERUPT: return getItem( ) == I_CAMERUPTITE;
-        case PKMN_ALTARIA: return getItem( ) == I_ALTARIANITE;
-        case PKMN_GLALIE: return getItem( ) == I_GLALITITE;
-        case PKMN_SALAMENCE: return getItem( ) == I_SALAMENCITE;
-        case PKMN_METAGROSS: return getItem( ) == I_METAGROSSITE;
-        case PKMN_LATIAS: return getItem( ) == I_LATIASITE;
-        case PKMN_LATIOS: return getItem( ) == I_LATIOSITE;
-        case PKMN_RAYQUAZA: return getItem( ) == I_JADE_ORB;
-        case PKMN_LOPUNNY: return getItem( ) == I_LOPUNNITE;
-        case PKMN_GALLADE: return getItem( ) == I_GALLADITE;
-        case PKMN_AUDINO: return getItem( ) == I_AUDINITE;
-        case PKMN_DIANCIE: return getItem( ) == I_DIANCITE;
-        case PKMN_KYOGRE: return getItem( ) == I_BLUE_ORB;
-        case PKMN_GROUDON:
-            return getItem( ) == I_RED_ORB;
-        [[likely]] default:
-            return false;
-        }
-    }
+    bool canBattleTransform( ) const;
 
     void battleTransform( );
     void revertBattleTransform( );

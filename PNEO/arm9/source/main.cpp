@@ -388,7 +388,7 @@ START:
                                 IO::printMessage( 0, MSG_NOCLOSE );
                                 swiWaitForVBlank( );
                                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( 99 ),
-                                          a.m_boxdata.m_name, mname.c_str( ) );
+                                          a.m_boxdata.getName( ), mname.c_str( ) );
                                 IO::printMessage( buffer.data( ), MSG_NORMAL );
                                 IO::printMessage( 0, MSG_NOCLOSE );
                                 IO::init( );

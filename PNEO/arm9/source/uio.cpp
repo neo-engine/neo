@@ -34,12 +34,12 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "save/saveGame.h"
 
 namespace IO {
-    ConsoleFont *consoleFont = new ConsoleFont( );
+    ConsoleFont* consoleFont = new ConsoleFont( );
 
-    OAMTable  *Oam = new OAMTable( );
+    OAMTable*  Oam = new OAMTable( );
     SpriteInfo spriteInfo[ SPRITE_COUNT ];
 
-    OAMTable  *OamTop = new OAMTable( );
+    OAMTable*  OamTop = new OAMTable( );
     SpriteInfo spriteInfoTop[ SPRITE_COUNT ];
 
     PrintConsole Top, Bottom;
@@ -123,7 +123,7 @@ namespace IO {
         bgScrollf( p_bg, 1 << 6, 1 << 6 );
     }
 
-    void setDefaultConsoleTextColors( u16 *p_palette, u8 p_start ) {
+    void setDefaultConsoleTextColors( u16* p_palette, u8 p_start ) {
         p_palette[ ( p_start + 0 ) ] = RGB15( 15, 0, 0 );  // 31 normal red
         p_palette[ ( p_start + 1 ) ] = RGB15( 0, 15, 0 );  // 32 normal green
         p_palette[ ( p_start + 2 ) ] = RGB15( 15, 15, 0 ); // 33 normal yellow
@@ -221,7 +221,7 @@ namespace IO {
                     s16 nx = p_x + 16 + ( ( (s32) j * x ) >> 12 );
                     s16 ny = p_y + 15 - ( ( (s32) j * y ) >> 12 );
                     if( nx == p_x + 16 + j ) --nx;
-                    ( (color *) BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
+                    ( (color*) BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
                         = ( ( (u8) p_freecolor1 ) << 8 ) | (u8) p_freecolor1;
                 }
             }
@@ -234,7 +234,7 @@ namespace IO {
                     s16 nx = p_x + 16 + ( ( (s32) j * x ) >> 12 );
                     s16 ny = p_y + 15 - ( ( (s32) j * y ) >> 12 );
                     if( nx == p_x + 16 + j ) --nx;
-                    ( (color *) BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
+                    ( (color*) BG_BMP( p_sub ) )[ ( nx + ny * SCREEN_WIDTH ) / 2 ]
                         = ( ( (u8) p_freecolor2 ) << 8 ) | (u8) p_freecolor2;
                 }
                 if( p_delay ) swiWaitForVBlank( );
@@ -252,7 +252,7 @@ namespace IO {
     }
 
     std::string formatDate( u8 p_date[ 3 ], u8 p_language ) {
-        std::array<char, 20> buffer{ };
+        std::array<char, 50> buffer{ };
         switch( p_language ) {
         default:
         case 0: // EN
@@ -263,6 +263,27 @@ namespace IO {
         case 1: // DE
             snprintf( buffer.data( ), buffer.size( ), "%hhu. %s 20%02hhu", p_date[ 0 ] + 1,
                       FS::MONTHS[ p_date[ 1 ] ][ p_language ], p_date[ 2 ] );
+            break;
+        case 2: // JP
+            if( ( p_date[ 0 ] && p_date[ 0 ] + 1 <= 10 ) || ( p_date[ 0 ] + 1 ) % 4 == 0 ) {
+                snprintf( buffer.data( ), buffer.size( ),
+                          "20%02hhu\xe"
+                          "nenn\xf"
+                          "%hhu\xe"
+                          "gatu\xf"
+                          "%hhu\xe"
+                          "ka\xf",
+                          p_date[ 2 ], p_date[ 1 ], p_date[ 0 ] + 1 );
+            } else {
+                snprintf( buffer.data( ), buffer.size( ),
+                          "20%02hhu\xe"
+                          "nenn\xf"
+                          "%hhu\xe"
+                          "gatu\xf"
+                          "%hhu\xe"
+                          "niti\xf",
+                          p_date[ 2 ], p_date[ 1 ], p_date[ 0 ] + 1 );
+            }
             break;
         }
         return std::string( buffer.data( ) );

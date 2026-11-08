@@ -404,16 +404,16 @@ namespace SPX {
 
             // print player names and load active sprite
             IO::boldFont->setColor( TEXT_COLOR_IDX2, 2 );
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->m_playername, PLAYERNAME_RIGHTX,
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getPlayerName( ), PLAYERNAME_RIGHTX,
                                         PLAYERNAME_TOPY, true, IO::font::CENTER );
 
             IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.m_name,
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.getName( ),
                                         PLAYERNAME_LEFTX, PLAYERNAME_BOTY, true, IO::font::CENTER );
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.m_name,
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.getName( ),
                                         PLAYERNAME_RIGHTX, PLAYERNAME_BOTY, true,
                                         IO::font::CENTER );
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.m_name,
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.getName( ),
                                         PLAYERNAME_LEFTX, PLAYERNAME_TOPY, true, IO::font::CENTER );
         } else {
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "blendersub", 512,
@@ -428,7 +428,7 @@ namespace SPX {
 
             // print player names and load active sprite
             IO::boldFont->setColor( TEXT_COLOR_IDX2, 2 );
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->m_playername, PLAYERNAME_RIGHTX,
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getPlayerName( ), PLAYERNAME_RIGHTX,
                                         PLAYERNAME_TOPY, true, IO::font::CENTER );
             IO::boldFont->setColor( TEXT_COLOR_IDX, 2 );
 
@@ -640,7 +640,7 @@ namespace SPX {
                 IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].x = 0;
                 if( !p_berries[ i ] ) { break; }
                 if( !i ) {
-                    IO::boldFont->printStringC( SAVE::CURRENT_FILE->m_playername, 32,
+                    IO::boldFont->printStringC( SAVE::CURRENT_FILE->getPlayerName( ), 32,
                                                 LINE_Y + LINE_SEP * y, false );
                 } else {
                     IO::boldFont->printStringC( NAME_CACHE[ i - 1 ], 32, LINE_Y + LINE_SEP * y,
@@ -669,8 +669,8 @@ namespace SPX {
                 IO::OamTop->oamBuffer[ SPR_BERRY_OAM + i ].x = 64 + i * 32;
             }
 
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->m_playername, 32, LINE_Y + LINE_SEP * 0,
-                                        false );
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getPlayerName( ), 32,
+                                        LINE_Y + LINE_SEP * 0, false );
             IO::boldFont->printStringC( toString( p_perfect_count[ 0 ] ), 128,
                                         LINE_Y + LINE_SEP * 0, false, IO::font::CENTER );
             IO::boldFont->printStringC( toString( p_hit_count[ 0 ] ), 160, LINE_Y + LINE_SEP * 0,
@@ -687,8 +687,8 @@ namespace SPX {
                 }
             }
 
-            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.m_name, 32,
-                                        LINE_Y + LINE_SEP * 1, false );
+            IO::boldFont->printStringC( SAVE::CURRENT_FILE->getTeamPkmn( 0 )->m_boxdata.getName( ),
+                                        32, LINE_Y + LINE_SEP * 1, false );
             IO::boldFont->printStringC(
                 toString( p_perfect_count[ 1 ] + p_perfect_count[ 2 ] + p_perfect_count[ 3 ] ), 128,
                 LINE_Y + LINE_SEP * 1, false, IO::font::CENTER );

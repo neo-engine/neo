@@ -92,12 +92,14 @@ namespace IO {
         pal[ 0 ] = IO::BLACK;
 
         if( _cursorLocationId ) {
-            snprintf( buffer, TMP_BUFFER_SIZE, "%s: %s",
-                      FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
-                      FS::getLocation( _cursorLocationId ).c_str( ) );
+            snprintf(
+                buffer, TMP_BUFFER_SIZE, "%s",
+                FS::kanaWrap( FS::getLocation( _cursorLocationId ).c_str( ), CURRENT_LANGUAGE ) );
         } else {
-            snprintf( buffer, TMP_BUFFER_SIZE, "%s",
-                      FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ) );
+            snprintf(
+                buffer, TMP_BUFFER_SIZE, "%s",
+                FS::kanaWrap( FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
+                              CURRENT_LANGUAGE ) );
         }
 
         IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
@@ -217,19 +219,22 @@ namespace IO {
             if( _cursorLocationId != oldl ) {
                 if( _cursorLocationId
                     && MAP::MAP_LOCATIONS.m_defaultLocation != _cursorLocationId ) {
-                    snprintf( buffer, TMP_BUFFER_SIZE, "%s: %s",
-                              FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
-                              FS::getLocation( _cursorLocationId ).c_str( ) );
+                    snprintf( buffer, TMP_BUFFER_SIZE, "%s",
+                              FS::kanaWrap( FS::getLocation( _cursorLocationId ).c_str( ),
+                                            CURRENT_LANGUAGE ) );
                 } else {
                     snprintf( buffer, TMP_BUFFER_SIZE, "%s",
-                              FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ) );
+                              FS::kanaWrap(
+                                  FS::getLocation( MAP::MAP_LOCATIONS.m_defaultLocation ).c_str( ),
+                                  CURRENT_LANGUAGE ) );
                 }
-                IO::printRectangle( 43, 10, 200, 30, p_bottom, 0 );
+                IO::printRectangle( 10, 10, 200, 30, p_bottom, 0 );
                 IO::regularFont->printStringC( buffer, 12, 10, p_bottom, IO::font::LEFT );
             }
         }
 
-        auto nm     = FS::getMoveName( M_FLY );
+        auto nm
+            = std::string{ FS::kanaWrap( FS::getMoveName( M_FLY ).c_str( ), CURRENT_LANGUAGE ) };
         auto wd     = IO::regularFont->stringWidth( nm.c_str( ) );
         bool canfly = false;
         if( flyusable && _cursorLocationId ) {

@@ -6,7 +6,7 @@ file        : font.cpp
 author      : Philip Wellnitz
 description :
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -34,36 +34,56 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/fontUtil.h"
 
 namespace IO {
-    u8 TEXTSPEED = 50;
-
+    u8  TEXTSPEED          = 50;
     u16 TMPBUF[ 256 * 64 ] = { 0 };
 
-    font *regularFont
-        = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths, REGULAR_FONT::shiftchar );
-    font *boldFont = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar );
-    font *smallFont
-        = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar );
-    font *brailleFont
-        = new font( BRAILLE_FONT::fontData, BRAILLE_FONT::fontWidths, BRAILLE_FONT::shiftchar );
+    font* regularFont = new font( REGULAR_FONT::fontData, REGULAR_FONT::fontWidths,
+                                  REGULAR_FONT::shiftchar, REGULAR_FONT::parseKanaDigraph );
+    font* boldFont    = new font( BOLD_FONT::fontData, BOLD_FONT::fontWidths, BOLD_FONT::shiftchar,
+                                  BOLD_FONT::parseKanaDigraph );
+    font* smallFont
+        = new font( SMALL_FONT::fontData, SMALL_FONT::fontWidths, SMALL_FONT::shiftchar, nullptr );
+    font* brailleFont = new font( BRAILLE_FONT::fontData, BRAILLE_FONT::fontWidths,
+                                  BRAILLE_FONT::shiftchar, BRAILLE_FONT::parseKanaDigraph );
 
-    font::font( u8 *p_data, u8 *p_widths, void ( *p_shiftchar )( u16 &val ) ) {
+    font::font( u8* p_data, u8* p_widths, void ( *p_shiftchar )( u16& ),
+                void ( *p_parseKanaDigraph )( const char*, u32&, u16[ 2 ], u8& ) ) {
         _data       = p_data;
         _widths     = p_widths;
         _color[ 0 ] = _color[ 1 ] = _color[ 2 ] = _color[ 3 ] = _color[ 4 ] = WHITE;
-        _shiftchar                                                          = p_shiftchar;
+
+        _shiftchar        = p_shiftchar;
+        _parseKanaDigraph = p_parseKanaDigraph;
     }
 
     void font::_charDelay( s8 p_textSpeedModifier ) const {
         for( u8 i = 0; i < 80 / ( TEXTSPEED + p_textSpeedModifier ); ++i ) { swiWaitForVBlank( ); }
     }
 
-    u32 font::stringWidth( const char *p_string, u8 p_charShift ) const {
-        u32 current_char = 0;
-        u32 width        = 0;
+    u32 font::stringWidth( const char* p_string, u8 p_charShift, bool p_startInKanaMode ) const {
+        u32  current_char = 0;
+        u32  width        = 0;
+        bool kanaModeOn   = p_startInKanaMode;
+        u8   kanaCounter  = 0;
 
         bool sp = false;
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) { break; }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
+                kanaCounter += kanaModeOn;
+                kanaModeOn = true;
+                current_char++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::OFF ) {
+                if( kanaCounter ) {
+                    kanaModeOn = --kanaCounter;
+                } else {
+                    kanaModeOn = false;
+                }
+                current_char++;
+                continue;
+            }
             if( p_string[ current_char ] == '[' ) {
                 sp = true;
                 current_char++;
@@ -77,6 +97,19 @@ namespace IO {
             }
             if( sp ) {
                 current_char++;
+                continue;
+            }
+            if( kanaModeOn ) {
+                // in case of kana braille, a single kana digraph in text can result in
+                // up to two glyphs being printed.
+                u16 codes[ 2 ];
+                u8  n = 0;
+                _parseKanaDigraph( p_string, current_char, codes, n );
+                for( u8 k = 0; k < n; ++k ) {
+                    u16 c = codes[ k ];
+                    _shiftchar( c );
+                    width += _widths[ c ] - p_charShift;
+                }
                 continue;
             }
 
@@ -90,19 +123,36 @@ namespace IO {
         return width;
     }
 
-    u32 font::stringWidthC( const char *p_string ) const {
+    u32 font::stringWidthC( const char* p_string ) const {
         return stringWidth( p_string, 1 );
     }
 
-    u32 font::stringMaxWidth( const char *p_string, u16 p_maxWidth, char p_breakChar,
-                              u8 p_charShift ) const {
+    u32 font::stringMaxWidth( const char* p_string, u16 p_maxWidth, char p_breakChar,
+                              u8 p_charShift, bool p_startInKanaMode ) const {
         u32  current_char = 0;
         u32  width        = 0;
         u32  lasttmpwidth = 0;
         bool sp           = false;
+        bool kanaModeOn   = p_startInKanaMode;
+        u8   kanaCounter  = 0;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) { return width; }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
+                kanaCounter += kanaModeOn;
+                kanaModeOn = true;
+                current_char++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::OFF ) {
+                if( kanaCounter ) {
+                    kanaModeOn = --kanaCounter;
+                } else {
+                    kanaModeOn = false;
+                }
+                current_char++;
+                continue;
+            }
             if( p_string[ current_char ] == '[' ) {
                 sp = true;
                 current_char++;
@@ -118,7 +168,21 @@ namespace IO {
                 current_char++;
                 continue;
             }
-            if( p_string[ current_char ] == p_breakChar ) { lasttmpwidth = width; }
+            if( p_string[ current_char ] == p_breakChar ) {
+                lasttmpwidth = width;
+            } else if( kanaModeOn ) {
+                // in case of kana braille, a single kana digraph in text can result in
+                // up to two glyphs being printed.
+                u16 codes[ 2 ];
+                u8  n = 0;
+                _parseKanaDigraph( p_string, current_char, codes, n );
+                for( u8 k = 0; k < n; ++k ) {
+                    u16 c = codes[ k ];
+                    _shiftchar( c );
+                    width += _widths[ c ] - p_charShift;
+                }
+                continue;
+            }
 
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
@@ -130,7 +194,7 @@ namespace IO {
         return width;
     }
 
-    u32 font::stringMaxWidthC( const char *p_string, u16 p_maxWidth, char p_breakChar ) const {
+    u32 font::stringMaxWidthC( const char* p_string, u16 p_maxWidth, char p_breakChar ) const {
         return stringMaxWidth( p_string, p_maxWidth, p_breakChar, 1 );
     }
 
@@ -155,7 +219,7 @@ namespace IO {
         return _widths[ p_ch ];
     }
 
-    u16 font::printCharB( u16 p_ch, const u16 *p_palette, u16 *p_buffer, u16 p_bufferWidth, s16 p_x,
+    u16 font::printCharB( u16 p_ch, const u16* p_palette, u16* p_buffer, u16 p_bufferWidth, s16 p_x,
                           s16 p_y, bool p_shift ) const {
         if( p_shift ) { _shiftchar( p_ch ); }
 
@@ -203,7 +267,7 @@ namespace IO {
         }
     }
 
-    u16 font::printString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+    u16 font::printString( const char* p_string, s16 p_x, s16 p_y, bool p_bottom,
                            alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
                            bool p_delay, u8 p_layer, s8 p_textSpeedModifier ) const {
         u32 current_char = 0;
@@ -212,22 +276,42 @@ namespace IO {
         if( p_alignment == RIGHT ) { putX = p_x - stringWidth( p_string, p_charShift ); }
         if( p_alignment == CENTER ) { putX = p_x - stringWidth( p_string, p_charShift ) / 2; }
 
-        bool sp   = false; // special character
-        u16  spch = 0;
+        bool sp          = false; // special character
+        u16  spch        = 0;
+        bool kanaModeOn  = false;
+        u8   kanaCounter = 0;
 
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
                 putX = ( p_x -= p_adjustX );
                 if( p_alignment == RIGHT ) {
-                    putX = p_x - stringWidth( p_string + current_char + 1, p_charShift );
+                    putX
+                        = p_x - stringWidth( p_string + current_char + 1, p_charShift, kanaModeOn );
                 }
                 if( p_alignment == CENTER ) {
-                    putX = p_x - stringWidth( p_string + current_char + 1, p_charShift ) / 2;
+                    putX
+                        = p_x
+                          - stringWidth( p_string + current_char + 1, p_charShift, kanaModeOn ) / 2;
                 }
 
                 current_char++;
                 lines++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
+                kanaCounter += kanaModeOn;
+                kanaModeOn = true;
+                current_char++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::OFF ) {
+                if( kanaCounter ) {
+                    kanaModeOn = --kanaCounter;
+                } else {
+                    kanaModeOn = false;
+                }
+                current_char++;
                 continue;
             }
             if( p_string[ current_char ] == '[' ) {
@@ -248,6 +332,18 @@ namespace IO {
                 current_char++;
                 continue;
             }
+            if( kanaModeOn ) {
+                // in case of kana braille, a single kana digraph in text can result in
+                // up to two glyphs being printed.
+                u16 codes[ 2 ];
+                u8  n = 0;
+                _parseKanaDigraph( p_string, current_char, codes, n );
+                for( u8 k = 0; k < n; ++k ) {
+                    putX += printChar( codes[ k ], putX, putY, p_bottom, p_layer ) - p_charShift;
+                }
+                if( p_delay ) { _charDelay( p_textSpeedModifier ); }
+                continue;
+            }
 
             putX += printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer )
                     - p_charShift;
@@ -259,21 +355,21 @@ namespace IO {
         return lines;
     }
 
-    u16 font::printStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+    u16 font::printStringC( const char* p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX, bool p_delay,
                             u8 p_layer, s8 p_textSpeedModifier ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX, 1,
                             p_delay, p_layer, p_textSpeedModifier );
     }
 
-    u16 font::printStringD( const char *p_string, s16 p_x, s16 p_y, bool p_bottom,
+    u16 font::printStringD( const char* p_string, s16 p_x, s16 p_y, bool p_bottom,
                             alignment p_alignment, u8 p_yDistance, s8 p_adjustX, u8 p_charShift,
                             u8 p_layer, s8 p_textSpeedModifier ) const {
         return printString( p_string, p_x, p_y, p_bottom, p_alignment, p_yDistance, p_adjustX,
                             p_charShift, true, p_layer, p_textSpeedModifier );
     }
 
-    u16 font::printStringB( const char *p_string, const u16 *p_palette, u16 *p_buffer,
+    u16 font::printStringB( const char* p_string, const u16* p_palette, u16* p_buffer,
                             u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance,
                             u8 p_charShift, u8 p_chunkSize, u16 p_bufferHeight,
                             u16 p_rightPadding ) const {
@@ -287,8 +383,10 @@ namespace IO {
 
         std::memset( TMPBUF, 0, sizeof( TMPBUF ) );
 
-        u16  spch = 0;
-        bool sp   = false;
+        u16  spch        = 0;
+        bool sp          = false;
+        bool kanaModeOn  = false;
+        u8   kanaCounter = 0;
         while( p_string[ current_char ] && putX < lineSpace ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
@@ -299,6 +397,21 @@ namespace IO {
 
                 current_char++;
                 lines++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
+                kanaCounter += kanaModeOn;
+                kanaModeOn = true;
+                current_char++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::OFF ) {
+                if( kanaCounter ) {
+                    kanaModeOn = --kanaCounter;
+                } else {
+                    kanaModeOn = false;
+                }
+                current_char++;
                 continue;
             }
             if( p_string[ current_char ] == '[' ) {
@@ -319,6 +432,19 @@ namespace IO {
                 spch *= 10;
                 spch += ( p_string[ current_char ] - '0' );
                 current_char++;
+                continue;
+            }
+            if( kanaModeOn ) {
+                // in case of kana braille, a single kana digraph in text can result in
+                // up to two glyphs being printed.
+                u16 codes[ 2 ];
+                u8  n = 0;
+                _parseKanaDigraph( p_string, current_char, codes, n );
+                for( u8 k = 0; k < n; ++k ) {
+                    u16 wd = printCharB( codes[ k ], p_palette, TMPBUF, p_bufferWidth, putX, putY );
+                    putX += wd - p_charShift;
+                    lineWd -= wd - p_charShift;
+                }
                 continue;
             }
 
@@ -345,14 +471,14 @@ namespace IO {
         return lines;
     }
 
-    u16 font::printStringBC( const char *p_string, const u16 *p_palette, u16 *p_buffer,
+    u16 font::printStringBC( const char* p_string, const u16* p_palette, u16* p_buffer,
                              u16 p_bufferWidth, alignment p_alignment, u8 p_yDistance,
                              u8 p_chunkSize, u16 p_bufferHeight, u16 p_rightPadding ) const {
         return printStringB( p_string, p_palette, p_buffer, p_bufferWidth, p_alignment, p_yDistance,
                              1, p_chunkSize, p_bufferHeight, p_rightPadding );
     }
 
-    u16 font::printBreakingString( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
+    u16 font::printBreakingString( const char* p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                    bool p_bottom, alignment p_alignment, u8 p_yDistance,
                                    char p_breakChar, s8 p_adjustX, u8 p_charShift, bool p_delay,
                                    u8 p_layer, s8 p_textSpeedModifier ) const {
@@ -364,9 +490,10 @@ namespace IO {
         if( p_alignment == RIGHT ) putX = p_x - lineWd;
         if( p_alignment == CENTER ) putX = p_x - lineWd / 2;
 
-        bool sp   = false;
-        u16  spch = 0;
-
+        bool sp          = false;
+        u16  spch        = 0;
+        bool kanaModeOn  = false;
+        u8   kanaCounter = 0;
         while( p_string[ current_char ] ) {
             if( lineWd <= 0 || p_string[ current_char ] == '\n' ) {
                 putY += p_yDistance;
@@ -378,6 +505,21 @@ namespace IO {
 
                 current_char++;
                 lines++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
+                kanaCounter += kanaModeOn;
+                kanaModeOn = true;
+                current_char++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::OFF ) {
+                if( kanaCounter ) {
+                    kanaModeOn = --kanaCounter;
+                } else {
+                    kanaModeOn = false;
+                }
+                current_char++;
                 continue;
             }
             if( p_string[ current_char ] == '[' ) {
@@ -400,6 +542,20 @@ namespace IO {
                 current_char++;
                 continue;
             }
+            if( kanaModeOn ) {
+                // in case of kana braille, a single kana digraph in text can result in
+                // up to two glyphs being printed.
+                u16 codes[ 2 ];
+                u8  n = 0;
+                _parseKanaDigraph( p_string, current_char, codes, n );
+                for( u8 k = 0; k < n; ++k ) {
+                    u16 wd = printChar( codes[ k ], putX, putY, p_bottom, p_layer );
+                    putX += wd - p_charShift;
+                    lineWd -= wd - p_charShift;
+                }
+                if( p_delay ) { _charDelay( p_textSpeedModifier ); }
+                continue;
+            }
 
             u16 wd = printChar( p_string[ current_char ], putX, putY, p_bottom, p_layer );
             putX += wd - p_charShift;
@@ -412,7 +568,7 @@ namespace IO {
         return lines;
     }
 
-    u16 font::printBreakingStringC( const char *p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
+    u16 font::printBreakingStringC( const char* p_string, s16 p_x, s16 p_y, s16 p_maxWidth,
                                     bool p_bottom, alignment p_alignment, u8 p_yDistance,
                                     char p_breakChar, s8 p_adjustX, bool p_delay, u8 p_layer,
                                     s8 p_textSpeedModifier ) const {
@@ -421,13 +577,81 @@ namespace IO {
                                     p_textSpeedModifier );
     }
 
-    void font::printMaxString( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
+    void font::printMaxString( const char* p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
                                u16 p_breakChar, u8 p_charShift, bool p_delay, u8 p_layer,
                                s8 p_textSpeedModifier ) const {
-        u32 current_char = 0;
-        s16 putX = p_x, putY = p_y;
-
+        u32  current_char = 0;
+        s16  putX = p_x, putY = p_y;
+        bool sp          = false;
+        u16  spch        = 0;
+        bool kanaModeOn  = false;
+        u8   kanaCounter = 0;
         while( p_string[ current_char ] ) {
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
+                kanaCounter += kanaModeOn;
+                kanaModeOn = true;
+                current_char++;
+                continue;
+            }
+            if( _parseKanaDigraph && p_string[ current_char ] == KANA::OFF ) {
+                if( kanaCounter ) {
+                    kanaModeOn = --kanaCounter;
+                } else {
+                    kanaModeOn = false;
+                }
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == '[' ) {
+                sp   = true;
+                spch = 0;
+                current_char++;
+                continue;
+            }
+            if( p_string[ current_char ] == ']' ) {
+                sp     = false;
+                u16 wd = _widths[ spch ] - p_charShift;
+                if( putX + wd > p_maxX ) {
+                    printChar( p_breakChar, putX, putY, p_bottom, p_layer );
+                    break;
+                } else {
+                    printChar( spch, putX, putY, p_bottom, p_layer );
+                }
+                putX += wd - p_charShift;
+                current_char++;
+                continue;
+            }
+            if( sp ) {
+                spch *= 10;
+                spch += ( p_string[ current_char ] - '0' );
+                current_char++;
+                continue;
+            }
+            if( kanaModeOn ) {
+                // in case of kana braille, a single kana digraph in text can result in
+                // up to two glyphs being printed.
+                u16 codes[ 2 ];
+                u8  n = 0;
+                _parseKanaDigraph( p_string, current_char, codes, n );
+                u16 clusterWidth = 0;
+                for( u8 k = 0; k < n; ++k ) {
+                    u16 c = codes[ k ];
+                    _shiftchar( c );
+                    clusterWidth += _widths[ c ] - p_charShift;
+                }
+                if( putX + clusterWidth > p_maxX ) {
+                    // too large, break
+                    printChar( p_breakChar, putX, putY, p_bottom, p_layer );
+                    break;
+                }
+
+                for( u8 k = 0; k < n; ++k ) {
+                    putX += printChar( codes[ k ], putX, putY, p_bottom, p_layer ) - p_charShift;
+                }
+                if( p_delay ) { _charDelay( p_textSpeedModifier ); }
+                continue;
+            }
+
             u16 c = (u16) p_string[ current_char ];
             _shiftchar( c );
             u16 wd = _widths[ c ] - p_charShift;
@@ -445,10 +669,11 @@ namespace IO {
         }
     }
 
-    void font::printMaxStringC( const char *p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
+    void font::printMaxStringC( const char* p_string, s16 p_x, s16 p_y, bool p_bottom, s16 p_maxX,
                                 u16 p_breakChar, bool p_delay, u8 p_layer,
                                 s8 p_textSpeedModifier ) const {
         return printMaxString( p_string, p_x, p_y, p_bottom, p_maxX, p_breakChar, 1, p_delay,
                                p_layer, p_textSpeedModifier );
     }
+
 } // namespace IO

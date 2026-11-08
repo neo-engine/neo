@@ -405,7 +405,8 @@ namespace IO {
                 auto mid = i < 4 ? p_moves[ i ] : p_extraMove;
 
                 IO::regularFont->printString(
-                    FS::getMoveName( mid ).c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    FS::kanaWrap( FS::getMoveName( mid ).c_str( ), CURRENT_LANGUAGE ),
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
 
                 res.push_back(
@@ -623,7 +624,7 @@ namespace IO {
 
             if( !oam[ SPR_MENU_OAM_SUB( i ) ].isHidden ) {
                 if( i == IO::STR_UI_MENU_ITEM_TRAINER_ID - IO::STR_UI_MENU_ITEM_NAME_START ) {
-                    IO::regularFont->printString( SAVE::CURRENT_FILE->m_playername,
+                    IO::regularFont->printString( SAVE::CURRENT_FILE->getPlayerName( ),
                                                   oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48 + 13,
                                                   oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true,
                                                   IO::font::CENTER );
@@ -767,15 +768,15 @@ namespace IO {
             }
 
             if( IO::regularFont->stringWidthC( p_itemNames[ p_firstItem + i ].c_str( ) ) <= 85 ) {
-                IO::regularFont->printStringC( p_itemNames[ p_firstItem + i ].c_str( ),
-                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
-                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true,
-                                               IO::font::CENTER );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( p_itemNames[ p_firstItem + i ].c_str( ), CURRENT_LANGUAGE ),
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::CENTER );
             } else {
-                IO::regularFont->printStringC( p_itemNames[ p_firstItem + i ].c_str( ),
-                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 112,
-                                               oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true,
-                                               IO::font::RIGHT );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( p_itemNames[ p_firstItem + i ].c_str( ), CURRENT_LANGUAGE ),
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 112,
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::RIGHT );
             }
 
             snprintf( buffer.data( ), buffer.size( ),
@@ -1074,16 +1075,16 @@ namespace IO {
                     SPR_ITEM_PAL_SUB( i ), oam[ SPR_ITEM_OAM_SUB( i ) ].gfxIndex, true );
 
                 // pkmn nick name
-                auto strwd = IO::regularFont->stringWidthC( dcstart[ i ].m_name );
+                auto strwd = IO::regularFont->stringWidthC( dcstart[ i ].getName( ) );
                 u16  posx  = 0;
                 if( strwd <= 85 ) {
                     IO::regularFont->printStringC(
-                        dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
+                        dcstart[ i ].getName( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70,
                         oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::CENTER );
                     posx = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 70 + strwd / 2 + 2;
                 } else {
                     IO::regularFont->printStringC(
-                        dcstart[ i ].m_name, oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 102,
+                        dcstart[ i ].getName( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 102,
                         oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true, IO::font::RIGHT );
                     posx = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 104;
                 }
@@ -1150,9 +1151,15 @@ namespace IO {
 
                 for( u8 j = 0; j < 4; ++j ) {
                     if( dcstart[ i ].getMove( j ) ) {
-                        auto mname = FS::getMoveName( dcstart[ i ].getMove( j ) );
+                        auto mname = std::string{
+                            FS::kanaWrap( FS::getMoveName( dcstart[ i ].getMove( j ) ).c_str( ),
+                                          CURRENT_LANGUAGE ) };
                         if( mname.length( ) > 18 ) {
-                            snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                            if( CURRENT_LANGUAGE == SAVE::JAP ) {
+                                snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
+                            } else {
+                                snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                            }
                         } else {
                             snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
                         }

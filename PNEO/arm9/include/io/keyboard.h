@@ -32,18 +32,24 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "io/util.h"
 
 namespace IO {
-    constexpr u8 MAX_KEYBOARD_PAGES = 5;
+    constexpr u8 MAX_KEYBOARD_PAGES = 6;
     class keyboard {
       private:
         u8 _page   = 0;
         u8 _frame  = 0;
         u8 _curSel = 0;
 
+        // last typed kana digraph for voiced/unvoiced toggle
+        char _lastKanaC1 = 0;
+        char _lastKanaC2 = 0;
+
         u8 maxPages( ) const;
+        u8 pageStart( ) const;
 
         std::vector<std::pair<inputTarget, u8>> getTouchPositions( ) const;
 
         void drawPage( ) const;
+        void drawMarkKeys( ) const;
 
         void init( ) const;
 

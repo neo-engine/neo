@@ -117,15 +117,18 @@ namespace FS {
 
 #define getBadgeName( p_type, p_badge )                                                         \
     ( ( ( p_type ) == 0 )                                                                       \
-          ? FS::getBadge( (p_badge) -1 )                                                        \
+          ? FS::getBadge( ( p_badge ) - 1 )                                                     \
           : ( ( p_type ) == 1                                                                   \
                   ? FS::getBadge( 8 + ( ( p_badge ) / 10 - 1 ) * 2 + ( ( p_badge ) % 10 ) - 1 ) \
                   : nullptr ) )
 
-#define GET_MAP_STRING( p_stringId )           FS::getMapString( p_stringId )
-#define GET_TRADE_STRING( p_stringId )         FS::getTradeString( p_stringId )
-#define GET_WC_STRING( p_stringId )            FS::getWCString( p_stringId )
-#define GET_STRING_L( p_stringId, p_language ) FS::getUIString( p_stringId, p_language )
+#define GET_MAP_STRING( p_stringId ) \
+    FS::kanaWrap( FS::getMapString( p_stringId ), CURRENT_LANGUAGE )
+#define GET_TRADE_STRING( p_stringId ) \
+    FS::kanaWrap( FS::getTradeString( p_stringId ), CURRENT_LANGUAGE )
+#define GET_WC_STRING( p_stringId ) FS::kanaWrap( FS::getWCString( p_stringId ), CURRENT_LANGUAGE )
+#define GET_STRING_L( p_stringId, p_language ) \
+    FS::kanaWrap( FS::getUIString( p_stringId, p_language ), p_language )
 
 #ifdef DESQUID
     constexpr u16            MAX_DESQUID_STRINGS = 100;
@@ -135,13 +138,25 @@ namespace FS {
           ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ]                        \
           : ( ( p_stringId ) >= FS::MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
                                                : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) ) )
+
+#define GET_STRING_RAW( p_stringId )                                    \
+    ( ( ( p_stringId ) >= FS::DESQUID_STRING )                          \
+          ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ] \
+          : ( ( p_stringId ) >= FS::MAP_STRING                          \
+                  ? FS::getMapString( p_stringId - FS::MAP_STRING )     \
+                  : FS::getUIString( p_stringId, CURRENT_LANGUAGE ) ) )
 #else
 #define GET_STRING( p_stringId )                                                       \
     ( ( p_stringId ) >= FS::MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
                                        : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) )
+
+#define GET_STRING_RAW( p_stringId )                                                     \
+    ( ( p_stringId ) >= FS::MAP_STRING ? FS::getMapString( p_stringId - FS::MAP_STRING ) \
+                                       : FS::getUIString( p_stringId, CURRENT_LANGUAGE ) )
 #endif
 #define HP_ICON FS::HP_ICONS[ CURRENT_LANGUAGE ]
 
+    const char* kanaWrap( const char* p_s, u8 p_language );
     bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );

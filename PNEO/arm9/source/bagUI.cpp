@@ -290,14 +290,19 @@ namespace BAG {
             if( p_data->m_itemType & ITEMTYPE_BERRY ) {
                 snprintf( buffer.data( ), buffer.size( ), "%s%hu: %s",
                           GET_STRING( IO::STR_UI_BAG_NUMBER ), itemToBerry( p_itemId ),
-                          FS::getItemName( p_itemId ).c_str( ) );
+                          FS::kanaWrap( FS::getItemName( p_itemId ).c_str( ), CURRENT_LANGUAGE ) );
+                IO::regularFont->printStringC( buffer.data( ), 128, 26, false, IO::font::CENTER );
             } else {
                 FS::getItemName( p_itemId, CURRENT_LANGUAGE, buffer.data( ) );
+                IO::regularFont->printStringC( FS::kanaWrap( buffer.data( ), CURRENT_LANGUAGE ),
+                                               128, 26, false, IO::font::CENTER );
             }
 
-            IO::regularFont->printStringC( buffer.data( ), 128, 26, false, IO::font::CENTER );
-
-            descr = FS::getItemDescr( p_itemId );
+            if( CURRENT_LANGUAGE == SAVE::JAP ) {
+                descr = std::string{ "\xe" } + FS::getItemDescr( p_itemId ) + std::string{ "\xf" };
+            } else {
+                descr = FS::getItemDescr( p_itemId );
+            }
             if( p_data->m_itemType != ITEMTYPE_KEYITEM
                 && p_data->m_itemType != ITEMTYPE_FORMECHANGE ) {
                 snprintf( buffer.data( ), buffer.size( ), "x %d", p_count );
@@ -341,16 +346,22 @@ namespace BAG {
                 IO::regularFont->printStringC( buffer.data( ), 146, 52, false );
             }
 
-            descr                 = FS::getMoveDescr( p_data->m_param2 );
+            if( CURRENT_LANGUAGE == SAVE::JAP ) {
+                descr = std::string{ "\xe" } + FS::getMoveDescr( p_data->m_param2 )
+                        + std::string{ "\xf" };
+            } else {
+                descr = FS::getMoveDescr( p_data->m_param2 );
+            }
             BATTLE::moveData move = FS::getMoveData( p_data->m_param2 );
 
             u8 tmtype = p_data->m_effect;
             if( tmtype == 1 && BATTLE::isFieldMove( p_data->m_param2 ) ) { tmtype = 0; }
             u16 tileCnt = IO::loadTMIcon( move.m_type, tmtype, 112, 44, 0, 0, 0, false );
 
-            snprintf( buffer.data( ), buffer.size( ), "%s: %s",
-                      FS::getItemName( p_itemId ).c_str( ),
-                      FS::getMoveName( p_data->m_param2 ).c_str( ) );
+            snprintf(
+                buffer.data( ), buffer.size( ), "%s: %s",
+                FS::kanaWrap( FS::getItemName( p_itemId ).c_str( ), CURRENT_LANGUAGE ),
+                FS::kanaWrap( FS::getMoveName( p_data->m_param2 ).c_str( ), CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 128, 26, false, IO::font::CENTER );
 
             IO::regularFont->printStringC( GET_STRING( IO::STR_UI_BAG_TYPE ), 56, 147, false,
@@ -451,13 +462,14 @@ namespace BAG {
                                                SINGLE_LINE, true );
             } else {
                 if( p_data == nullptr ) {
-                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45,
+                    IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.getName( ), 45,
                                                    FIRST_LINE, true );
                     IO::regularFont->setColor( 0, 2 );
                     IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                     if( _playerTeam[ i ].getItem( ) ) {
-                        IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 45,
-                                                       SECOND_LINE, true );
+                        IO::regularFont->printStringC(
+                            FS::kanaWrap( _teamItemCache[ i ].second.c_str( ), CURRENT_LANGUAGE ),
+                            45, SECOND_LINE, true );
                     } else
                         IO::regularFont->printStringC( GET_STRING( IO::STR_UI_BAG_PARTY_NO_ITEM ),
                                                        45, SECOND_LINE, true );
@@ -469,8 +481,8 @@ namespace BAG {
                     continue;
                 }
 
-                IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.m_name, 45, FIRST_LINE,
-                                               true );
+                IO::regularFont->printStringC( _playerTeam[ i ].m_boxdata.getName( ), 45,
+                                               FIRST_LINE, true );
                 if( p_itemId && p_data->m_itemType == ITEMTYPE_TM ) {
                     u16 currMv = p_data->m_param2;
                     if( currMv == _playerTeam[ i ].getMove( 0 )
@@ -530,8 +542,9 @@ namespace BAG {
                     IO::regularFont->setColor( 0, 2 );
                     IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                     if( _playerTeam[ i ].getItem( ) ) {
-                        IO::regularFont->printStringC( _teamItemCache[ i ].second.c_str( ), 45,
-                                                       SECOND_LINE, true );
+                        IO::regularFont->printStringC(
+                            FS::kanaWrap( _teamItemCache[ i ].second.c_str( ), CURRENT_LANGUAGE ),
+                            45, SECOND_LINE, true );
                     } else
                         IO::regularFont->printStringC( GET_STRING( IO::STR_UI_BAG_PARTY_NO_ITEM ),
                                                        45, SECOND_LINE, true );
@@ -607,7 +620,9 @@ namespace BAG {
             IO::boldFont->printChar( getItemChar( ITEMTYPE_TM ), 236, y + 2, true );
         }
 
-        IO::regularFont->printStringC( _itemCache[ p_idx ].second.c_str( ), x + 6, y + 2, true );
+        IO::regularFont->printStringC(
+            FS::kanaWrap( _itemCache[ p_idx ].second.c_str( ), CURRENT_LANGUAGE ), x + 6, y + 2,
+            true );
 
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -1062,7 +1077,8 @@ namespace BAG {
                                 oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 95,
                                 oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 31, true, 0 );
             IO::regularFont->printString(
-                FS::getMoveName( mv ).c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                FS::kanaWrap( FS::getMoveName( mv ).c_str( ), CURRENT_LANGUAGE ),
+                oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, true, IO::font::CENTER );
         }
 

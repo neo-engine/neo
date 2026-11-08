@@ -594,12 +594,13 @@ namespace STS {
                 if( p_pos < _inBattle ) {
                     IO::regularFont->printString( GET_STRING( 150 ), anchor_x + 32, anchor_y + 12,
                                                   false );
-                } else if( IO::regularFont->stringWidth( _team[ p_pos ].m_boxdata.m_name ) > 80 ) {
-                    IO::regularFont->printStringC( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
-                                                   anchor_y + 12, false );
+                } else if( IO::regularFont->stringWidth( _team[ p_pos ].m_boxdata.getName( ) )
+                           > 80 ) {
+                    IO::regularFont->printStringC( _team[ p_pos ].m_boxdata.getName( ),
+                                                   anchor_x + 32, anchor_y + 12, false );
                 } else {
-                    IO::regularFont->printString( _team[ p_pos ].m_boxdata.m_name, anchor_x + 32,
-                                                  anchor_y + 12, false );
+                    IO::regularFont->printString( _team[ p_pos ].m_boxdata.getName( ),
+                                                  anchor_x + 32, anchor_y + 12, false );
                 }
 
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -836,7 +837,7 @@ namespace STS {
                         auto fmt = std::string( GET_STRING( 57 ) );
                         snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
                                   _team[ p_pos ].isEgg( ) ? GET_STRING( 34 )
-                                                          : _team[ p_pos ].m_boxdata.m_name );
+                                                          : _team[ p_pos ].m_boxdata.getName( ) );
                     } else {
                         if( _toSelect > 1 ) {
                             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 332 ),

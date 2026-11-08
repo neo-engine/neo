@@ -145,7 +145,7 @@ namespace IO {
         auto s1 = std::string( GET_STRING( IO::STR_UI_JBOX_LUDICOBOX ) );
         if( _currentSong && SOUND::SSEQ::existsBGM( _currentSong ) ) {
             snprintf( buffer.data( ), buffer.size( ), "%s: %s", s1.c_str( ),
-                      FS::getBGMName( _currentSong ).c_str( ) );
+                      FS::kanaWrap( FS::getBGMName( _currentSong ).c_str( ), CURRENT_LANGUAGE ) );
         } else {
             snprintf( buffer.data( ), buffer.size( ), "%s: %s", s1.c_str( ),
                       GET_STRING( _currentMode == JMODE_SHOW_RECORD
@@ -225,7 +225,7 @@ namespace IO {
             auto s1      = std::string( GET_STRING( IO::STR_UI_JBOX_LUDICOBOX ) );
             SOUND::setJBoxBGM( _currentSong );
             snprintf( buffer.data( ), buffer.size( ), "%s: %s", s1.c_str( ),
-                      FS::getBGMName( _currentSong ).c_str( ) );
+                      FS::kanaWrap( FS::getBGMName( _currentSong ).c_str( ), CURRENT_LANGUAGE ) );
             IO::printRectangle( 45, 10, 200, 30, p_bottom, 0 );
             IO::regularFont->printStringC( buffer.data( ), 12, 10, p_bottom, IO::font::LEFT );
         }
@@ -242,8 +242,9 @@ namespace IO {
                 auto idx = SPR_NAV_APP_RSV_SUB + 7 + 5 * i;
 
                 setSongChoiceVis( i, false, p_bottom );
-                IO::regularFont->printStringC( FS::getBGMName( next ).c_str( ), oam[ idx ].x + 64,
-                                               oam[ idx ].y + 2, p_bottom, IO::font::CENTER );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( FS::getBGMName( next ).c_str( ), CURRENT_LANGUAGE ),
+                    oam[ idx ].x + 64, oam[ idx ].y + 2, p_bottom, IO::font::CENTER );
             } else {
                 setSongChoiceVis( i, true, p_bottom );
             }

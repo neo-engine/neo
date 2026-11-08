@@ -43,6 +43,7 @@ boxPokemon::boxPokemon( u16 p_pkmnId, u16 p_level, u8 p_forme, const char* p_nam
           nullptr, p_pkmnId, p_name, p_level, SAVE::CURRENT_FILE->m_id, SAVE::CURRENT_FILE->m_sid,
           SAVE::CURRENT_FILE->m_playername, p_shiny, p_hiddenAbility, p_fatefulEncounter, p_isEgg,
           MAP::curMap->getCurrentLocationId( ), p_ball, p_pokerus, p_forme, p_data ) {
+    m_oTIsKana = SAVE::CURRENT_FILE->m_oTLanguage == SAVE::JAP;
 }
 
 boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_level, u16 p_id,
@@ -110,7 +111,7 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
         m_hatchDate[ 2 ] = SAVE::CURRENT_DATE.m_year % 100;
         m_hatchPlace     = p_gotPlace;
     }
-    m_origLang = 5;
+    m_origLang = CURRENT_LANGUAGE;
 
     if( p_moves ) {
         memcpy( m_moves, p_moves, 8 );
@@ -159,6 +160,27 @@ boxPokemon::boxPokemon( u16* p_moves, u16 p_pkmnId, const char* p_name, u16 p_le
     m_abilitySlot = 2 * p_hiddenAbility + ( m_pid & 1 );
     setSpecies( p_pkmnId, &data );
     setForme( p_forme );
+}
+
+const char* boxPokemon::getName( ) const {
+    static std::array<char, PKMN_NAMELENGTH + 3> buf{ };
+    IO::KANA::embedKana( m_name, nameIsKana( ), CURRENT_LANGUAGE != SAVE::JAP || nameIsKana( ),
+                         buf.data( ), buf.size( ) );
+    return buf.data( );
+}
+
+std::string boxPokemon::getNameS( ) const {
+    static std::array<char, PKMN_NAMELENGTH + 3> buf{ };
+    IO::KANA::embedKana( m_name, nameIsKana( ), CURRENT_LANGUAGE != SAVE::JAP || nameIsKana( ),
+                         buf.data( ), buf.size( ) );
+    return std::string{ buf.data( ) };
+}
+
+const char* boxPokemon::getOT( ) const {
+    static std::array<char, OTLENGTH + 3> buf{ };
+    IO::KANA::embedKana( m_oT, oTIsKana( ), CURRENT_LANGUAGE != SAVE::JAP || oTIsKana( ),
+                         buf.data( ), buf.size( ) );
+    return buf.data( );
 }
 
 bool boxPokemon::canEatPokeblock( u8 p_type ) const {
@@ -684,7 +706,7 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
     if( p_move == m_moves[ 0 ] || p_move == m_moves[ 1 ] || p_move == m_moves[ 2 ]
         || p_move == m_moves[ 3 ] ) {
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_MOVE ),
-                  m_name, FS::getMoveName( p_move ).c_str( ) );
+                  getName( ), FS::getMoveName( p_move ).c_str( ) );
         p_message( buffer.data( ) );
         return false;
     } else if( FS::canLearn( getSpecies( ), getForme( ), p_move, FS::LEARN_TM ) ) {
@@ -696,7 +718,7 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                 m_curPP[ i ] = mdata.m_pp;
 
                 snprintf( buffer.data( ), buffer.size( ),
-                          GET_STRING( IO::STR_UI_PKMN_LEARNED_MOVE ), m_name,
+                          GET_STRING( IO::STR_UI_PKMN_LEARNED_MOVE ), getName( ),
                           FS::getMoveName( p_move ).c_str( ) );
                 p_message( buffer.data( ) );
                 freeSpot = true;
@@ -704,22 +726,23 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
             }
         if( !freeSpot ) {
             snprintf( buffer.data( ), buffer.size( ),
-                      GET_STRING( IO::STR_UI_PKMN_TRIES_TO_LEARN_MOVE ), m_name,
+                      GET_STRING( IO::STR_UI_PKMN_TRIES_TO_LEARN_MOVE ), getName( ),
                       FS::getMoveName( p_move ).c_str( ) );
             p_message( buffer.data( ) );
             snprintf( buffer.data( ), buffer.size( ),
-                      GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_4_MOVES ), m_name );
+                      GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_4_MOVES ), getName( ) );
             if( p_yesNoMessage( buffer.data( ) ) ) {
                 loop( ) {
                     u8 res = p_getMove( this, p_move );
                     if( res < 4 ) {
                         if( BATTLE::isFieldMove( m_moves[ res ] ) ) {
                             snprintf( buffer.data( ), buffer.size( ),
-                                      GET_STRING( IO::STR_UI_PKMN_CANT_FORGET_MOVE ), m_name,
+                                      GET_STRING( IO::STR_UI_PKMN_CANT_FORGET_MOVE ), getName( ),
                                       FS::getMoveName( m_moves[ res ] ).c_str( ) );
                             p_message( buffer.data( ) );
                             snprintf( buffer.data( ), buffer.size( ),
-                                      GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_4_MOVES ), m_name );
+                                      GET_STRING( IO::STR_UI_PKMN_ALREADY_KNOWS_4_MOVES ),
+                                      getName( ) );
                             p_message( buffer.data( ) );
                             continue;
                         } else {
@@ -727,7 +750,7 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                             m_curPP[ res ] = std::min( m_curPP[ res ], mdata.m_pp );
 
                             snprintf( buffer.data( ), buffer.size( ),
-                                      GET_STRING( IO::STR_UI_PKMN_LEARNED_MOVE ), m_name,
+                                      GET_STRING( IO::STR_UI_PKMN_LEARNED_MOVE ), getName( ),
                                       FS::getMoveName( p_move ).c_str( ) );
                             p_message( buffer.data( ) );
                         }
@@ -737,14 +760,14 @@ bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_mes
                 }
             }
             snprintf( buffer.data( ), buffer.size( ),
-                      GET_STRING( IO::STR_UI_PKMN_DIDNT_LEARN_MOVE ), m_name,
+                      GET_STRING( IO::STR_UI_PKMN_DIDNT_LEARN_MOVE ), getName( ),
                       FS::getMoveName( p_move ).c_str( ) );
             p_message( buffer.data( ) );
             return false;
         }
     } else {
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_PKMN_CANT_LEARN_MOVE ),
-                  m_name, FS::getMoveName( p_move ).c_str( ) );
+                  getName( ), FS::getMoveName( p_move ).c_str( ) );
         p_message( buffer.data( ) );
         return false;
     }

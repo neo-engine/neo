@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <array>
 #include <bit>
 #include <memory>
 #include <string>
@@ -35,6 +36,7 @@
 #include "bag/bag.h"
 #include "bag/pokeblock.h"
 #include "box/box.h"
+#include "io/kana.h"
 #include "map/mapObject.h"
 #include "pokemon.h"
 #include "save/saveOptions.h"
@@ -179,27 +181,27 @@ namespace SAVE {
             gameType m_gameType;
             u8       m_achievements; // Hall of Fame / Dex / Battle Frontier /
                                      // Contest / Berries / Game clear
-            u8   m_appearance;       // sprite the player currently uses
-            char m_playername[ OTLENGTH ];
-            u16  m_id;
-            u16  m_sid;
-            time m_playTime;
-            date m_startDate;
-            date m_lastSaveDate;
-            time m_lastSaveTime;
-            u16  m_lastSaveLocation;
-            date m_lastAchievementDate; // Time player won last badge / entered hof
-            u8   m_HOENN_Badges;
-            u16  m_FRONTIER_Badges;
-            u8   m_KANTO_Badges;
-            u8   m_JOHTO_Badges;
-            u8   m_RESERVED_Badges;
-            u8   m_lastAchievementEvent; // id of a string to be printed on the second line of the
-                                         // trainer's card.
-            u32            m_money;
-            u16            m_coins;
-            u16            m_battlePoints;
-            u32            m_ashCount = 0; // ash collected on Route 113
+            u8       m_appearance;   // sprite the player currently uses
+            char     m_playername[ OTLENGTH ];
+            u16      m_id;
+            u16      m_sid;
+            time     m_playTime;
+            date     m_startDate;
+            date     m_lastSaveDate;
+            time     m_lastSaveTime;
+            u16      m_lastSaveLocation;
+            date     m_lastAchievementDate; // Time player won last badge / entered hof
+            u8       m_HOENN_Badges;
+            u16      m_FRONTIER_Badges;
+            u8       m_KANTO_Badges;
+            u8       m_JOHTO_Badges;
+            u8       m_RESERVED_Badges;
+            u8  m_lastAchievementEvent; // id of a string to be printed on the second line of the
+                                        // trainer's card.
+            u32 m_money;
+            u16 m_coins;
+            u16 m_battlePoints;
+            u32 m_ashCount = 0; // ash collected on Route 113
             MAP::mapPlayer m_player;
             u8             m_currentMap;
             u8             m_stepCount;
@@ -230,7 +232,7 @@ namespace SAVE {
                                            // their pkmn are fainted
             MAP::warpPos m_lastCaveEntry; // position where a player is teleported to if they use an
                                           // escape rope in a cave
-            MAP::warpPos    m_lastOWPos;  // last position of the player on an outside-type map
+            MAP::warpPos m_lastOWPos;     // last position of the player on an outside-type map
             MAP::mapWeather m_currentMapWeather; // current map weather
 
             std::pair<u8, MAP::mapObject> m_mapObjects[ MAX_MAPOBJECT ];
@@ -268,14 +270,17 @@ namespace SAVE {
 
             u8 m_caughtPkmn[ 250 ]; // The pkmn the player has caught
             u8 m_seenPkmn[ 250 ];   // The pkmn the player has seen
-            u8 m_reserved2[ 300 ];
+            u8 m_reserved2[ 299 ];
 
-            u8 m_route = 0; // current story route
+            u8 m_oTLanguage = 0; // language player chose at game creation
+            u8 m_route      = 0; // current story route
 
             wonderCard m_storedWonderCards[ MAX_STORED_WC ];
             u8         m_collectedWonderCards[ MAX_WC_IDX / 8 ];
 
             u32 m_good2 = 0;
+
+            const char* getPlayerName( ) const;
 
             /*
              * @brief: tries to register a new fly pos; returns true on success.
@@ -690,6 +695,6 @@ namespace SAVE {
 
     bool initNewGame( );
 
-    extern saveGame SAV;
+    extern saveGame              SAV;
     extern saveGame::playerInfo* CURRENT_FILE;
 } // namespace SAVE

@@ -40,6 +40,7 @@ export TARGET		:=	$(shell basename $(CURDIR))
 export TOPDIR		:=	$(CURDIR)
 export NDSTOOL		:=  $(CURDIR)/tools/ndstool/ndstool
 export LIBNDS		:=	$(abspath lib/libnds)
+export FSROOT		:=	$(abspath ./FSROOT)
 
 #main targets
 all: $(TARGET).nds
@@ -50,15 +51,15 @@ endif
 
 ifdef VANILLA
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
-	ndstool -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -u 00030000 -b $(GAME_ICON) "$(GAME_TITLE_EN_2);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
+	ndstool -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d $(FSROOT) -u 00030000 -b $(GAME_ICON) "$(GAME_TITLE_EN_2);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
 else
 ifdef FLASHCARD
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
-	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d ./FSROOT -u 00030000 -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
+	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf -d $(FSROOT) -u 00030000 -b $(GAME_ICON) "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES)
 else
 $(TARGET).nds: FORCE arm7/$(TARGET).elf arm9/$(TARGET).elf
 	$(NDSTOOL) -c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
-		-d ./FSROOT -bi $(GAME_ICON) \
+		-d $(FSROOT) -bi $(GAME_ICON) \
 		-bt 0 "$(GAME_TITLE_JP);$(GAME_SUBTITLE1_JP);$(GAME_SUBTITLE2_JP)" $(_ADDFILES) \
 		-bt 1 "$(GAME_TITLE_EN);$(GAME_SUBTITLE1_EN);$(GAME_SUBTITLE2_EN)" $(_ADDFILES) \
 		-bt 2 "$(GAME_TITLE_FR);$(GAME_SUBTITLE1_FR);$(GAME_SUBTITLE2_FR)" $(_ADDFILES) \

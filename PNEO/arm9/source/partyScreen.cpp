@@ -1038,7 +1038,7 @@ namespace STS {
 
                 sprintf( BUFFER, GET_STRING( IO::STR_UI_STS_GAVE_ITEM_TO_PKMN ),
                          FS::getItemName( itm ).c_str( ),
-                         _team[ _currentSelection ].m_boxdata.m_name );
+                         _team[ _currentSelection ].m_boxdata.getName( ) );
                 _partyUI->printMessage( BUFFER, itm );
                 waitForInteract( );
                 _partyUI->hideMessageBox( );
@@ -1054,7 +1054,8 @@ namespace STS {
             _ranges = _partyUI->drawPartyPkmnChoice( 0, 0, 0, false, false );
 
             sprintf( BUFFER, GET_STRING( IO::STR_UI_STS_TOOK_ITEM_FROM_PKMN ),
-                     FS::getItemName( acI ).c_str( ), _team[ _currentSelection ].m_boxdata.m_name );
+                     FS::getItemName( acI ).c_str( ),
+                     _team[ _currentSelection ].m_boxdata.getName( ) );
             _partyUI->printMessage( BUFFER, acI );
             SAVE::CURRENT_FILE->m_bag.insert( BAG::toBagType( FS::getItemData( acI ).m_itemType ),
                                               acI, 1 );

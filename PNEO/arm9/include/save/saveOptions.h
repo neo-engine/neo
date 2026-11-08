@@ -29,7 +29,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 
 namespace SAVE {
-    enum language { EN, GER };
+    enum language { EN, GER, JAP };
 
     struct saveOptions {
         u8 m_EXPShareEnabled;

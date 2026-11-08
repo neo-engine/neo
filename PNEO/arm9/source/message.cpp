@@ -52,7 +52,7 @@ namespace IO {
     std::string parseLogCmd( const std::string& p_cmd ) {
         u16 tmp = -1;
 
-        if( p_cmd == "PLAYER" ) { return SAVE::CURRENT_FILE->m_playername; }
+        if( p_cmd == "PLAYER" ) { return SAVE::CURRENT_FILE->getPlayerName( ); }
         if( p_cmd == "RIVAL" ) {
             if( SAVE::CURRENT_FILE->checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
                 return std::string( GET_STRING( 461 ) );
@@ -69,7 +69,7 @@ namespace IO {
         }
         if( sscanf( p_cmd.c_str( ), "TEAM:%hu", &tmp ) && tmp < 6 ) {
             auto pkmn = SAVE::CURRENT_FILE->getTeamPkmn( tmp );
-            return pkmn != nullptr ? std::string( pkmn->m_boxdata.m_name ) : std::string( "" );
+            return pkmn != nullptr ? std::string( pkmn->m_boxdata.getNameS( ) ) : std::string( "" );
         }
         return std::string( "[" ) + p_cmd + "]";
     }
@@ -459,8 +459,9 @@ namespace IO {
             IO::regularFont->setColor( 3, 1 );
         }
         IO::regularFont->setColor( 2, 2 );
-        IO::regularFont->printStringBC( ( FS::getLocation( p_newLocation ) + " " ).c_str( ),
-                                        TEXT_PAL, TEXT_BUF, 128, IO::font::CENTER );
+        IO::regularFont->printStringBC(
+            FS::kanaWrap( ( FS::getLocation( p_newLocation ) + " " ).c_str( ), CURRENT_LANGUAGE ),
+            TEXT_PAL, TEXT_BUF, 128, IO::font::CENTER );
         u16 tileCnt = SPR_MSG_GFX;
         u16 x = 0, y = 8;
         tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, 32, TEXT_BUF, 64 * 32 / 2,

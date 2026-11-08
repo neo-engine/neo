@@ -115,7 +115,7 @@ namespace MAP {
             }
             if( msg ) {
                 snprintf( buffer.data( ), buffer.size( ), FS::getPkmnPhrase( msg ),
-                          _followPkmnData->m_boxdata.m_name );
+                          _followPkmnData->m_boxdata.getName( ) );
                 break;
             }
 
@@ -128,7 +128,7 @@ namespace MAP {
             while( emotion == 10 ) { emotion = rand( ) % 12; } // ignore poison
             u8 msg = rand( ) % 3;
             snprintf( buffer.data( ), buffer.size( ), FS::getPkmnPhrase( 3 * emotion + msg ),
-                      _followPkmnData->m_boxdata.m_name );
+                      _followPkmnData->m_boxdata.getName( ) );
             break;
         }
 
@@ -176,7 +176,7 @@ namespace MAP {
                 }
             }
             snprintf( buffer.data( ), buffer.size( ), FS::getPkmnPhrase( msg ),
-                      _followPkmnData->m_boxdata.m_name );
+                      _followPkmnData->m_boxdata.getName( ) );
             break;
         }
 
@@ -202,7 +202,7 @@ namespace MAP {
                 msg     = 49;
             }
             snprintf( buffer.data( ), buffer.size( ), FS::getPkmnPhrase( msg ),
-                      _followPkmnData->m_boxdata.m_name );
+                      _followPkmnData->m_boxdata.getName( ) );
             break;
         }
         }

@@ -1063,7 +1063,7 @@ namespace BATTLE {
                 fmt = std::string( GET_STRING( 310 ) );
             }
         }
-        snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ), p_pokemon->m_boxdata.m_name );
+        snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ), p_pokemon->m_boxdata.getName( ) );
         return std::string( buffer.data( ) );
     }
 
@@ -1165,8 +1165,9 @@ namespace BATTLE {
         IO::updateOAM( false );
 
         std::array<char, 100> buffer{ };
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 393 ), p_pokemon->m_boxdata.m_name,
-                  FS::getItemName( p_pokemon->getItem( ) ).c_str( ), p_pokemon->m_boxdata.m_name );
+        snprintf(
+            buffer.data( ), buffer.size( ), GET_STRING( 393 ), p_pokemon->m_boxdata.getName( ),
+            FS::getItemName( p_pokemon->getItem( ) ).c_str( ), p_pokemon->m_boxdata.getName( ) );
 
         IO::regularFont->printStringC( buffer.data( ), 128 + ( p_opponent ? 18 : -32 ),
                                        oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1, false,
@@ -1193,9 +1194,10 @@ namespace BATTLE {
         IO::updateOAM( false );
 
         std::array<char, 100> buffer{ };
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 393 ), p_pokemon->m_boxdata.m_name,
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 393 ),
+                  p_pokemon->m_boxdata.getName( ),
                   FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
-                  p_pokemon->m_boxdata.m_name );
+                  p_pokemon->m_boxdata.getName( ) );
 
         IO::regularFont->printStringC( buffer.data( ), 128 + ( p_opponent ? 18 : -32 ),
                                        oam[ SPR_ABILITY_OAM( !p_opponent ) ].y + 1, false,
@@ -1333,13 +1335,13 @@ namespace BATTLE {
 
         if( p_pokemon != nullptr && ( !p_pos || _mode == BM_DOUBLE ) ) {
             // pkmn name
-            u16 namewd = IO::regularFont->stringWidth( p_pokemon->m_boxdata.m_name );
+            u16 namewd = IO::regularFont->stringWidth( p_pokemon->m_boxdata.getName( ) );
             if( namewd > 60 ) {
-                IO::regularFont->printStringC( p_pokemon->m_boxdata.m_name, anchorx, anchory,
+                IO::regularFont->printStringC( p_pokemon->m_boxdata.getName( ), anchorx, anchory,
                                                false );
-                namewd = IO::regularFont->stringWidthC( p_pokemon->m_boxdata.m_name );
+                namewd = IO::regularFont->stringWidthC( p_pokemon->m_boxdata.getName( ) );
             } else {
-                IO::regularFont->printString( p_pokemon->m_boxdata.m_name, anchorx, anchory,
+                IO::regularFont->printString( p_pokemon->m_boxdata.getName( ), anchorx, anchory,
                                               false );
             }
 
@@ -1747,7 +1749,8 @@ namespace BATTLE {
         updatePkmnStats( true, 0, p_pokemon );
 
         std::array<char, 50> buffer{ };
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 394 ), p_pokemon->m_boxdata.m_name );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 394 ),
+                  p_pokemon->m_boxdata.getName( ) );
         log( std::string( buffer.data( ) ) );
     }
 
@@ -1811,11 +1814,11 @@ namespace BATTLE {
             auto fmt = std::string( GET_STRING( 263 ) );
             snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
                       FS::getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
-                      _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
+                      _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.getName( ) );
             log( std::string( buffer.data( ) ) );
         } else {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 395 ),
-                      p_pokemon->m_boxdata.m_name );
+                      p_pokemon->m_boxdata.getName( ) );
             log( std::string( buffer.data( ) ) );
         }
 
@@ -1848,7 +1851,8 @@ namespace BATTLE {
         bgUpdate( );
 
         std::array<char, 100> buffer{ };
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 395 ), p_pokemon->m_boxdata.m_name );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 395 ),
+                  p_pokemon->m_boxdata.getName( ) );
         log( std::string( buffer.data( ) ) );
 
         // No ball animation, pkmn slides in from left
@@ -1959,11 +1963,12 @@ namespace BATTLE {
             // TODO
             //            snprintf( buffer.data(), buffer.size(), GET_STRING( 274 + p_forced ),
             //                    FS::getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
-            //                    _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.m_name );
+            //                    _battleTrainer->m_strings.m_name,
+            //                    p_pokemon->m_boxdata.getName() );
             //            log( std::string( buffer.data()) );
         } else {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 272 + p_forced ),
-                      p_pokemon->m_boxdata.m_name );
+                      p_pokemon->m_boxdata.getName( ) );
             log( std::string( buffer.data( ) ) );
         }
 
@@ -2099,7 +2104,7 @@ namespace BATTLE {
                                            IO::font::CENTER );
 
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 162 ),
-                      p_pokemon->m_boxdata.m_name );
+                      p_pokemon->m_boxdata.getName( ) );
             IO::regularFont->printStringC( buffer.data( ), 128,
                                            oam[ SPR_SMALL_MESSAGE_OAM_SUB ].y + 4, true,
                                            IO::font::CENTER );
@@ -2571,9 +2576,14 @@ namespace BATTLE {
 
             for( int i = 0; i < 4; i++ ) {
                 if( !p_pokemon->getMove( i ) ) continue;
-                auto mname = FS::getMoveName( p_pokemon->getMove( i ) );
+                auto mname = std::string{ FS::kanaWrap(
+                    FS::getMoveName( p_pokemon->getMove( i ) ).c_str( ), CURRENT_LANGUAGE ) };
                 if( mname.length( ) > 18 ) {
-                    snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                    if( CURRENT_LANGUAGE == SAVE::JAP ) {
+                        snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
+                    } else {
+                        snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                    }
                 } else {
                     snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
                 }
@@ -2587,7 +2597,7 @@ namespace BATTLE {
                                                oam[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true,
                                                IO::font::CENTER );
 
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 377 ),
+                snprintf( buffer.data( ), buffer.size( ), GET_STRING_RAW( 377 ),
                           p_pokemon->m_curPP[ i ],
                           s8( mdatas[ i ].m_pp * ( ( 5 + p_pokemon->PPupget( i ) ) / 5.0 ) ) );
                 IO::smallFont->printStringC( buffer.data( ), oam[ SPR_MOVE_OAM_SUB( i ) ].x + 84,
@@ -2631,9 +2641,8 @@ namespace BATTLE {
                                    std::function<pokemon*( bool, u8 )> p_getPkmn,
                                    u8                                  p_highlightedButton ) {
 
-        auto                  res = std::vector<std::pair<IO::inputTarget, u8>>( );
-        SpriteEntry*          oam = IO::Oam->oamBuffer;
-        std::array<char, 100> buffer{ };
+        auto         res = std::vector<std::pair<IO::inputTarget, u8>>( );
+        SpriteEntry* oam = IO::Oam->oamBuffer;
 
         // hide yn choice boxes here b/c learn move.
         for( u8 i = 0; i < 4; i++ ) {
@@ -2731,12 +2740,10 @@ namespace BATTLE {
                 auto pk = p_getPkmn( i < 2, ( i < 2 ) ^ ( i % 2 ) );
                 if( pk == nullptr ) { continue; }
 
-                snprintf( buffer.data( ), buffer.size( ), "%s", pk->m_boxdata.m_name );
-
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
-                IO::regularFont->printStringC( buffer.data( ), oam[ SPR_MOVE_OAM_SUB( i ) ].x + 48,
-                                               oam[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true,
-                                               IO::font::CENTER );
+                IO::regularFont->printStringC(
+                    pk->m_boxdata.getName( ), oam[ SPR_MOVE_OAM_SUB( i ) ].x + 48,
+                    oam[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true, IO::font::CENTER );
             }
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         }
@@ -2888,7 +2895,8 @@ namespace BATTLE {
         printTopMessage( 0, true );
 
         IO::simpleYesNoBox yn;
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 141 ), p_pokemon->m_boxdata.m_name );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 141 ),
+                  p_pokemon->m_boxdata.getName( ) );
         printTopMessage( buffer.data( ), false );
 
         if( yn.getResult( [ & ]( ) { return printYNMessage( 254 ); },
@@ -2899,7 +2907,7 @@ namespace BATTLE {
             IO::keyboard kbd;
             printTopMessage( GET_STRING( 142 ), false );
             auto nick = kbd.getText( 10 );
-            if( strcmp( nick.c_str( ), p_pokemon->m_boxdata.m_name )
+            if( strcmp( nick.c_str( ), p_pokemon->m_boxdata.getName( ) )
                 && strcmp( "", nick.c_str( ) ) ) {
                 strcpy( p_pokemon->m_boxdata.m_name, nick.c_str( ) );
                 p_pokemon->m_boxdata.setIsNicknamed( true );
@@ -2954,6 +2962,7 @@ namespace BATTLE {
         IO::updateOAM( false );
 
         std::string msg = "";
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += "\xe"; }
         for( char* pos = p_playerWon ? _battleTrainer->m_strings.m_message2
                                      : _battleTrainer->m_strings.m_message3;
              *pos; ++pos ) {
@@ -2973,6 +2982,7 @@ namespace BATTLE {
                 msg += *pos;
             }
         }
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += "\xf"; }
 
         printTopMessage( msg.c_str( ), false );
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );

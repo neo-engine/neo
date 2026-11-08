@@ -610,13 +610,13 @@ namespace STS {
             oam[ SPR_CHOICE_START_OAM + 5 ].isHidden = false;
             //
             for( u8 i = 0; i < 5; ++i ) { oam[ SPR_WINDOW_START_OAM + i ].isHidden = false; }
-            if( IO::regularFont->stringWidthC( p_pokemon->m_boxdata.m_name ) > 66 ) {
-                s8 diff = 66 - IO::regularFont->stringWidthC( p_pokemon->m_boxdata.m_name );
+            if( IO::regularFont->stringWidthC( p_pokemon->m_boxdata.getName( ) ) > 66 ) {
+                s8 diff = 66 - IO::regularFont->stringWidthC( p_pokemon->m_boxdata.getName( ) );
                 oam[ SPR_BALL_ICON_OAM ].x = diff - 2;
-                IO::regularFont->printStringC( p_pokemon->m_boxdata.m_name, 22 + diff, 31,
+                IO::regularFont->printStringC( p_pokemon->m_boxdata.getName( ), 22 + diff, 31,
                                                p_bottom );
             } else {
-                IO::regularFont->printStringC( p_pokemon->m_boxdata.m_name, 22, 31, p_bottom );
+                IO::regularFont->printStringC( p_pokemon->m_boxdata.getName( ), 22, 31, p_bottom );
             }
 
             // Level
@@ -646,8 +646,10 @@ namespace STS {
             // Item
             if( p_pokemon->getItem( ) ) {
                 IO::regularFont->printString( GET_STRING( IO::STR_UI_STS_ITEM ), 8, 166, p_bottom );
-                IO::regularFont->printStringC( FS::getItemName( p_pokemon->getItem( ) ).c_str( ),
-                                               16, 178, p_bottom );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( FS::getItemName( p_pokemon->getItem( ) ).c_str( ),
+                                  CURRENT_LANGUAGE ),
+                    16, 178, p_bottom );
             }
         } else {
             oam[ SPR_CHOICE_START_OAM + 6 ].isHidden = false;
@@ -696,12 +698,16 @@ namespace STS {
             auto loc = FS::getLocation( p_pokemon->m_boxdata.m_gotPlace );
             IO::regularFont->setColor( IO::BLUE2_IDX, 1 );
             IO::regularFont->setColor( IO::BLUE_IDX, 2 );
-            IO::regularFont->printStringC( loc.c_str( ), INFO_X + 9 + shift,
-                                           INFO_Y + 11 + 15 * startline, p_bottom );
+            IO::regularFont->printStringC( FS::kanaWrap( loc.c_str( ), CURRENT_LANGUAGE ),
+                                           INFO_X + 9 + shift, INFO_Y + 11 + 15 * startline,
+                                           p_bottom );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->printStringC(
-                ".",
+                CURRENT_LANGUAGE == SAVE::JAP ? "\xe"
+                                                "x."
+                                                "\xf"
+                                              : ".",
                 INFO_X + 9 + shift + IO::regularFont->stringWidth( loc.c_str( ) ) - loc.length( ),
                 INFO_Y + 11 + 15 * startline, p_bottom );
 
@@ -959,7 +965,9 @@ namespace STS {
             }
             // Species Name
             writeLineTop( GET_STRING( IO::STR_UI_STS_SPECIES_NAME ),
-                          FS::getDisplayName( p_pokemon->getSpecies( ) ).c_str( ), 1 );
+                          FS::kanaWrap( FS::getDisplayName( p_pokemon->getSpecies( ) ).c_str( ),
+                                        CURRENT_LANGUAGE ),
+                          1 );
             // Type
             for( u8 i = 0; i < 2; ++i ) {
                 IO::loadTypeIcon( _data.m_baseForme.m_types[ i ], INFO_X - 7 + 128 - 66 + 34 * i,
@@ -974,7 +982,7 @@ namespace STS {
                 oam[ SPR_TYPE_OAM( 0 ) ].isHidden = false;
             }
             // OT
-            writeLineTop( GET_STRING( IO::STR_UI_STS_OT ), p_pokemon->m_boxdata.m_oT, 3 );
+            writeLineTop( GET_STRING( IO::STR_UI_STS_OT ), p_pokemon->m_boxdata.getOT( ), 3 );
             // Id
             snprintf( buffer.data( ), buffer.size( ), "%05hu", p_pokemon->m_boxdata.m_oTId );
             writeLineTop( GET_STRING( IO::STR_UI_STS_ID ), buffer.data( ), 4 );
@@ -1052,8 +1060,9 @@ namespace STS {
                 auto loc = FS::getLocation( p_pokemon->m_boxdata.m_gotPlace );
                 IO::regularFont->setColor( IO::BLUE2_IDX, 1 );
                 IO::regularFont->setColor( IO::BLUE_IDX, 2 );
-                IO::regularFont->printStringC( loc.c_str( ), INFO_X_SUB + 12,
-                                               INFO_LINE_SUB( currentLine++ ), true );
+                IO::regularFont->printStringC( FS::kanaWrap( loc.c_str( ), CURRENT_LANGUAGE ),
+                                               INFO_X_SUB + 12, INFO_LINE_SUB( currentLine++ ),
+                                               true );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
                 IO::regularFont->printStringC( GET_STRING( IO::STR_UI_STS_EGG_RECEIVED ),
@@ -1067,8 +1076,8 @@ namespace STS {
             IO::regularFont->setColor( IO::BLUE2_IDX, 1 );
             IO::regularFont->setColor( IO::BLUE_IDX, 2 );
             auto loc = FS::getLocation( p_pokemon->m_boxdata.m_hatchPlace );
-            IO::regularFont->printStringC( loc.c_str( ), INFO_X_SUB + 12,
-                                           INFO_LINE_SUB( currentLine++ ), true );
+            IO::regularFont->printStringC( FS::kanaWrap( loc.c_str( ), CURRENT_LANGUAGE ),
+                                           INFO_X_SUB + 12, INFO_LINE_SUB( currentLine++ ), true );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
 
@@ -1288,7 +1297,8 @@ namespace STS {
                                            IO::font::RIGHT );
 
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-            auto aname = FS::getAbilityName( p_pokemon->getAbility( ) );
+            auto aname = std::string{ FS::kanaWrap(
+                FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ), CURRENT_LANGUAGE ) };
             IO::regularFont->printStringC( aname.c_str( ), INFO_X_SUB - 5, INFO_Y_SUB + 3, true );
 
             // Ability description
@@ -1298,8 +1308,9 @@ namespace STS {
                             64, false, false, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
             IO::regularFont->printBreakingStringC(
-                FS::getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ), INFO_X_SUB,
-                INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
+                FS::kanaWrap( FS::getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ),
+                              CURRENT_LANGUAGE ),
+                INFO_X_SUB, INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
 
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
@@ -1334,9 +1345,14 @@ namespace STS {
                     oamSub[ SPR_MOVE_OAM_SUB( i ) + j ].isHidden = false;
                 }
 
-                auto mname = FS::getMoveName( p_pokemon->getMove( i ) );
+                auto mname = std::string{ FS::kanaWrap(
+                    FS::getMoveName( p_pokemon->getMove( i ) ).c_str( ), CURRENT_LANGUAGE ) };
                 if( mname.length( ) > 18 ) {
-                    snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                    if( CURRENT_LANGUAGE == SAVE::JAP ) {
+                        snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
+                    } else {
+                        snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                    }
                 } else {
                     snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
                 }
@@ -1346,7 +1362,7 @@ namespace STS {
                     oamSub[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true, IO::font::CENTER );
 
                 snprintf(
-                    buffer.data( ), 49, GET_STRING( IO::STR_UI_STS_PP_FORMAT ),
+                    buffer.data( ), 49, GET_STRING_RAW( IO::STR_UI_STS_PP_FORMAT ),
                     p_pokemon->m_boxdata.m_curPP[ i ],
                     s8( _moves[ i ].m_pp * ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
                 IO::smallFont->printStringC( buffer.data( ), oamSub[ SPR_MOVE_OAM_SUB( i ) ].x + 91,
@@ -1658,7 +1674,8 @@ namespace STS {
 
                 // Move descr
                 IO::regularFont->printBreakingStringC(
-                    FS::getMoveDescr( p_pokemon->getMove( p_detailsPage ) ).c_str( ),
+                    FS::kanaWrap( FS::getMoveDescr( p_pokemon->getMove( p_detailsPage ) ).c_str( ),
+                                  CURRENT_LANGUAGE ),
                     INFO_X_SUB - 8, INFO_Y_SUB + 3 - 2, 200, true, IO::font::LEFT, 13 );
 
                 // power / acc
@@ -1694,14 +1711,16 @@ namespace STS {
                                                IO::font::RIGHT );
 
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                auto aname = FS::getAbilityName( p_pokemon->getAbility( ) );
+                auto aname = std::string{ FS::kanaWrap(
+                    FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ), CURRENT_LANGUAGE ) };
                 IO::regularFont->printStringC( aname.c_str( ), INFO_X_SUB - 5, INFO_Y_SUB + 3,
                                                true );
 
                 // Ability description
                 IO::regularFont->printBreakingStringC(
-                    FS::getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ), INFO_X_SUB,
-                    INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
+                    FS::kanaWrap( FS::getAbilityDescr( p_pokemon->getAbility( ) ).c_str( ),
+                                  CURRENT_LANGUAGE ),
+                    INFO_X_SUB, INFO_Y_SUB + 18, 188, true, IO::font::LEFT, 13 );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
             }
@@ -1800,13 +1819,13 @@ namespace STS {
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( 0, 2 );
 
-                IO::regularFont->printBreakingStringC( FS::getRibbonDescr( ribs[ p_detailsPage ] ),
-                                                       INFO_X_SUB - 8, INFO_Y_SUB + 3 - 2, 200,
-                                                       true, IO::font::LEFT, 13 );
+                IO::regularFont->printBreakingStringC(
+                    FS::kanaWrap( FS::getRibbonDescr( ribs[ p_detailsPage ] ), CURRENT_LANGUAGE ),
+                    INFO_X_SUB - 8, INFO_Y_SUB + 3 - 2, 200, true, IO::font::LEFT, 13 );
 
-                IO::regularFont->printStringC( FS::getRibbonName( ribs[ p_detailsPage ] ),
-                                               INFO_X_SUB + 190 - 8, INFO_Y_SUB + 58 - 2, true,
-                                               IO::font::RIGHT );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( FS::getRibbonName( ribs[ p_detailsPage ] ), CURRENT_LANGUAGE ),
+                    INFO_X_SUB + 190 - 8, INFO_Y_SUB + 58 - 2, true, IO::font::RIGHT );
 
             } else {
                 // load up to 12 ribbons

@@ -6,7 +6,7 @@ file        : fontUtil.cpp
 author      : Philip Wellnitz
 description : helper functions to draw and set pixels on-screen
 
-Copyright (C) 2025
+Copyright (C) 2025 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -57,31 +57,30 @@ namespace IO {
         }
     }
 
-
     /*
      * @brief Sets a pixel to the specified color
      */
     void setPixel( u8 p_x, u8 p_y, bool p_bottom, u8 p_color, u8 p_layer ) {
         if( p_bottom ) {
             color old
-                = ( (color *) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
+                = ( (color*) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
             u8 bot = old, top = old >> 8;
             if( p_x & 1 )
                 old = ( ( (u8) p_color ) << 8 ) | bot;
             else
                 old = ( top << 8 ) | ( (u8) p_color );
 
-            ( (color *) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
+            ( (color*) BG_BMP_RAM_SUB( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
         } else {
             color old
-                = ( (color *) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
+                = ( (color*) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ];
             u8 bot = old, top = old >> 8;
             if( p_x & 1 )
                 old = ( ( (u8) p_color ) << 8 ) | bot;
             else
                 old = ( top << 8 ) | ( (u8) p_color );
 
-            ( (color *) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
+            ( (color*) BG_BMP_RAM( p_layer ) )[ ( p_x + p_y * (u16) SCREEN_WIDTH ) / 2 ] = old;
         }
     }
 
@@ -134,4 +133,72 @@ namespace IO {
         for( u16 y = p_y1; y <= p_y2; ++y )
             for( u16 x = p_x1; x <= p_x2; ++x ) { setPixel( x, y, p_bottom, p_color, p_layer ); }
     }
+
+    namespace KANA {
+        const char* embedKana( const char* p_s, bool p_kanaOnInitially, bool p_kanaOffFinally,
+                               char* p_buf, uint32_t p_bufSize ) {
+            if( p_bufSize < 3 ) {
+                if( p_bufSize ) { p_buf[ 0 ] = 0; }
+                return p_buf;
+            }
+            p_buf[ 0 ] = p_kanaOnInitially ? ON : OFF;
+            uint32_t i = 1;
+            for( uint32_t j = 0; i < p_bufSize - 2 && p_s[ j ]; ++i, ++j ) {
+                p_buf[ i ] = p_s[ j ];
+            }
+            p_buf[ i++ ] = p_kanaOffFinally ? OFF : ON;
+            p_buf[ i ]   = 0;
+            return p_buf;
+        }
+
+        char devoice( char p_char ) {
+            switch( p_char ) {
+            case 'g': return 'k';
+            case 'z': return 's';
+            case 'd': return 't';
+            case 'b':
+            case 'p': return 'h';
+            case 'G': return 'K';
+            case 'Z': return 'S';
+            case 'D': return 'T';
+            case 'B':
+            case 'P': return 'H';
+            default: return 0;
+            }
+        }
+
+        char voice( char p_char, bool p_half ) {
+            switch( p_char ) {
+            case 'k': return p_half ? 0 : 'g';
+            case 's': return p_half ? 0 : 'z';
+            case 't': return p_half ? 0 : 'd';
+            case 'h': return p_half ? 'p' : 'b';
+            case 'K': return p_half ? 0 : 'G';
+            case 'S': return p_half ? 0 : 'Z';
+            case 'T': return p_half ? 0 : 'D';
+            case 'H': return p_half ? 'P' : 'B';
+            default: return 0;
+            }
+        }
+
+        bool hasVariant( char p_c1, char p_c2, bool p_half ) {
+            if( isUpper( p_c1 ) != isUpper( p_c2 ) ) { return false; }
+            if( voice( devoice( p_c1 ), p_half ) == p_c1 ) { return true; }
+            if( devoice( voice( p_c1, p_half ) ) == p_c1 ) { return true; }
+            return false;
+        }
+
+        bool toggleVoicedness( char& p_c1, char p_c2, bool p_half ) {
+            if( !hasVariant( p_c1, p_c2, p_half ) ) { return false; }
+            if( voice( devoice( p_c1 ), p_half ) == p_c1 ) {
+                p_c1 = devoice( p_c1 );
+                return true;
+            }
+            if( devoice( voice( p_c1, p_half ) ) == p_c1 ) {
+                p_c1 = voice( p_c1, p_half );
+                return true;
+            }
+            return false;
+        }
+    } // namespace KANA
 } // namespace IO

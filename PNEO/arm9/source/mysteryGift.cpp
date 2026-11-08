@@ -105,7 +105,8 @@ namespace SAVE {
                                0,
                                0,
                                RIBBON,
-                               ITEMS },
+                               ITEMS,
+                               language::EN },
         TEST_WC2{
             0, 1, "A set of test gift items.", I_LANSAT_BERRY, 5, I_STARF_BERRY, 5, I_APICOT_BERRY,
             5 },
@@ -129,7 +130,8 @@ namespace SAVE {
                   0,
                   0,
                   RIBBON2,
-                  ITEMS2 };
+                  ITEMS2,
+                  language::EN };
 #endif
     void movePkmn( s16 p_dx, s16 p_dy ) {
         for( u8 i = 0; i < 4; ++i ) {

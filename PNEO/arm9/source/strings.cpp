@@ -49,11 +49,14 @@ along with Pok\xe9mon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace FS {
     const char* EPISODE_NAMES[ SAVE::MAX_SPECIAL_EPISODES + 1 ][ MAX_LANGUAGES ]
-        = { { "Dev's Heaven", "Dev's Heaven" } };
+        = { { "Dev's Heaven", "Dev's Heaven", "Dev's Heaven" } };
 
-    const char* LANGUAGE_NAMES[ MAX_LANGUAGES ] = { "English", "Deutsch" };
+    const char* LANGUAGE_NAMES[ MAX_LANGUAGES ] = { "English", "Deutsch",
+                                                    "\x0e"
+                                                    "nihonngo"
+                                                    "\x0f" };
 
-    const char* HP_ICONS[ MAX_LANGUAGES ] = { "\xd", "\xe" };
+    const char* HP_ICONS[ MAX_LANGUAGES ] = { "\xd", "\xe", "\xf" };
 
 #ifdef DESQUID
     const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ MAX_LANGUAGES ] = {
@@ -162,7 +165,10 @@ namespace FS {
 #endif
 
     const char* const MONTHS[ 12 ][ MAX_LANGUAGES ]
-        = { { "Jan.", "Jan." }, { "Feb.", "Feb." }, { "Mar.", "M\xe4r." }, { "Apr.", "Apr." },
-            { "May", "Mai" },   { "June", "Juni" }, { "July", "Juli" },    { "Aug.", "Aug." },
-            { "Sep.", "Sep." }, { "Oct.", "Okt." }, { "Nov.", "Nov." },    { "Dec.", "Dez." } };
+        = { { "Jan.", "Jan.", "x1gatu" },    { "Feb.", "Feb.", "x2gatu" },
+            { "Mar.", "M\xe4r.", "x3gatu" }, { "Apr.", "Apr.", "x4gatu" },
+            { "May", "Mai", "x5gatu" },      { "June", "Juni", "x6gatu" },
+            { "July", "Juli", "x7gatu" },    { "Aug.", "Aug.", "x8gatu" },
+            { "Sep.", "Sep.", "x9gatu" },    { "Oct.", "Okt.", "x1x0gatu" },
+            { "Nov.", "Nov.", "x1x1gatu" },  { "Dec.", "Dez.", "x1x2gatu" } };
 } // namespace FS

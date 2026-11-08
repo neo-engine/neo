@@ -154,7 +154,7 @@ namespace MAP {
                 if( battleres != BATTLE::battle::BATTLE_CAPTURE ) {
                     std::array<char, 100> buffer{ };
                     snprintf( buffer.data( ), buffer.size( ), GET_STRING( 672 ),
-                              WILD_PKMN.m_boxdata.m_name );
+                              WILD_PKMN.m_boxdata.getName( ) );
                     printMapMessage( std::string( buffer.data( ) ), MSG_INFO );
                 }
             }

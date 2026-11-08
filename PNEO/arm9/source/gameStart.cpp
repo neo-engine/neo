@@ -330,10 +330,10 @@ namespace SAVE {
             IO::regularFont->printBreakingStringC( GET_STRING( IO::STR_UI_INIT_GAME_CHOOSE_NAME ),
                                                    8, 4, 40, true, IO::font::LEFT, 13 );
 
-            auto name = IO::keyboard( ).getText( OTLENGTH - 1 );
+            auto name = IO::keyboard( ).getText( OTLENGTH );
             if( name == "" ) {
-                name
-                    = GET_STRING( IO::STR_UI_INIT_GAME_DEFAULT_NAME0 + CURRENT_FILE->m_appearance );
+                name = GET_STRING_RAW( IO::STR_UI_INIT_GAME_DEFAULT_NAME0
+                                       + CURRENT_FILE->m_appearance );
             }
             std::memcpy( CURRENT_FILE->m_playername, name.c_str( ), OTLENGTH );
 
@@ -463,7 +463,7 @@ namespace SAVE {
         IO::fadeScreen( IO::fadeType::UNFADE, true, true );
 
         auto p1 = std::string( GET_STRING( IO::STR_UI_INIT_GAME_TEXT3 ) );
-        p1 += std::string( CURRENT_FILE->m_playername );
+        p1 += std::string( CURRENT_FILE->getPlayerName( ) );
         p1 += std::string( GET_STRING( IO::STR_UI_INIT_GAME_TEXT4 ) );
         printMBoxTextAndWait( p1.c_str( ) );
 

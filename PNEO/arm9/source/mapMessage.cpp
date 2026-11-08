@@ -49,6 +49,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     std::string convertMapString( const std::string& p_text, style p_style ) {
         std::string res = "";
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { res += "\xe"; }
         for( size_t i = 0; i < p_text.size( ); ++i ) {
             if( p_text[ i ] == '[' ) {
                 std::string accmd = "";
@@ -68,6 +69,7 @@ namespace MAP {
             }
             res += p_text[ i ];
         }
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { res += "\xf"; }
         return res;
     }
 

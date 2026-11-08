@@ -318,7 +318,7 @@ namespace BATTLE {
                 && _field.canSwitchOut( field::OPPONENT_SIDE, field::PKMN_0 ) ) {
                 SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
                 snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_WILD_PKMN_FLED ),
-                          _opponentTeam[ field::PKMN_0 ].m_boxdata.m_name );
+                          _opponentTeam[ field::PKMN_0 ].m_boxdata.getName( ) );
                 _battleUI.log( std::string( buffer ) );
                 WAIT( THREE_QUARTER_SEC );
                 endBattle( battleEnd = BATTLE_RUN );
@@ -1335,7 +1335,7 @@ namespace BATTLE {
             break;
         case 4:
             snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_SUCC ),
-                      wild->m_boxdata.m_name );
+                      wild->m_boxdata.getName( ) );
             _battleUI.log( buffer );
             break;
         }
@@ -1384,7 +1384,7 @@ namespace BATTLE {
             u8 nb    = SAVE::CURRENT_FILE->storePkmn( *pkmn );
             if( nb != u8( -1 ) ) {
                 snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_PKMN_SENT_TO_STORAGE ),
-                          pkmn->m_boxdata.m_name );
+                          pkmn->m_boxdata.getName( ) );
                 _battleUI.log( buffer );
 
                 if( oldbx != nb ) {
@@ -1393,13 +1393,13 @@ namespace BATTLE {
                     _battleUI.log( buffer );
                 }
                 snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_STORAGE_BOX_PICKED ),
-                          pkmn->m_boxdata.m_name,
+                          pkmn->m_boxdata.getName( ),
                           SAVE::CURRENT_FILE->m_storedPokemon[ nb ].m_name );
                 _battleUI.log( buffer );
             } else {
                 _battleUI.log( GET_STRING( IO::STR_UI_STORAGE_ALL_BOXES_FULL ) );
                 snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_PKMN_RELEASED ),
-                          pkmn->m_boxdata.m_name );
+                          pkmn->m_boxdata.getName( ) );
                 _battleUI.log( buffer );
             }
             WAIT( DOUBLE_SEC );
@@ -1730,7 +1730,7 @@ namespace BATTLE {
                     if( _yieldEXP[ j ].count( _playerPkmnPerm[ q2 ] )
                         && _playerTeam[ q2 ].canBattle( ) ) {
 #ifdef DESQUID_MORE
-                        lmsg += std::string( _playerTeam[ q2 ].m_boxdata.m_name ) + " ";
+                        lmsg += std::string( _playerTeam[ q2 ].m_boxdata.getName( ) ) + " ";
 #endif
                         // pkmn that get regular exp
                         reg.push_back( q2 );
@@ -1784,12 +1784,12 @@ namespace BATTLE {
                                 _playerTeam[ i ].gainExperience( curexp );
                                 snprintf( buffer, TMP_BUFFER_SIZE,
                                           GET_STRING( IO::STR_UI_BATTLE_EXP_GAINED ),
-                                          _playerTeam[ i ].m_boxdata.m_name, curexp );
+                                          _playerTeam[ i ].m_boxdata.getName( ), curexp );
                                 _battleUI.log( buffer );
                                 if( _playerTeam[ i ].m_level != oldlv ) {
                                     snprintf( buffer, TMP_BUFFER_SIZE,
                                               GET_STRING( IO::STR_UI_BATTLE_ADVANCE_LEVEL ),
-                                              _playerTeam[ i ].m_boxdata.m_name,
+                                              _playerTeam[ i ].m_boxdata.getName( ),
                                               _playerTeam[ i ].m_level );
                                     _battleUI.log( buffer );
                                 }

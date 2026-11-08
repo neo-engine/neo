@@ -1,5 +1,7 @@
 v1.1 (??? Goomy)
 Map engine:
+[ ] Added Voltorb Flip
+[ ] Added PKMN Communication Club
 [ ] PKMN Contests (currently w/o move animations)
 [ ] Mauville Game Corner
 [ ] multi battles
@@ -44,7 +46,16 @@ Demo Story:
 [ ] battle frontier
 [ ] roaming lati@s
 
+Battle engine:
+[ ] Added missing moves, items, abilities
+
 General:
+[ ] Added full support for Kans strings/Japanese
+[ ] Updated PKMN Data
+[ ] Factored out libcard, libwidget, libcard, libsound
+[ ] Reworked NitroFat access to mirror retail games
+[ ] Added support for memory overlays
+[ ] Added receiving/distributing Mystery Gifts from/to retail games/neo via local WiFi
 [ ] Game Credits
 - Ate some squids, had some fun
 

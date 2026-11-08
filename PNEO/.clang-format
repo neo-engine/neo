@@ -41,7 +41,7 @@ ColumnLimit: 100
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
-DerivePointerAlignment: true
+DerivePointerAlignment: false
 IncludeCategories:
   - Regex: '^<.*\.h>'
     Priority: -1

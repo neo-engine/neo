@@ -120,15 +120,15 @@ namespace MAP {
         // check if player is OT
         if( pkmn->isForeign( ) ) {
             // no rename possible
-            snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 824 ), pkmn->m_boxdata.m_name,
-                      pkmn->m_boxdata.m_name );
+            snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 824 ),
+                      pkmn->m_boxdata.getName( ), pkmn->m_boxdata.getName( ) );
             printMapMessage( buffer.data( ), MSG_NORMAL );
             ANIMATE_MAP = true;
             return;
         } else {
             // list old name
-            snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 819 ), pkmn->m_boxdata.m_name,
-                      pkmn->m_boxdata.m_name );
+            snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 819 ),
+                      pkmn->m_boxdata.getName( ), pkmn->m_boxdata.getName( ) );
             printMapMessage( buffer.data( ), MSG_NORMAL );
             // ask for rename
             if( IO::yesNoBox::YES
@@ -146,12 +146,12 @@ namespace MAP {
                     pkmn->m_boxdata.setIsNicknamed( true );
                     // pkmn got new nickname
                     snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 821 ),
-                              pkmn->m_boxdata.m_name, pkmn->m_boxdata.m_name );
+                              pkmn->m_boxdata.getName( ), pkmn->m_boxdata.getName( ) );
                     printMapMessage( buffer.data( ), MSG_NORMAL );
                 } else {
                     // pkmn got same nickname
                     snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 823 ),
-                              pkmn->m_boxdata.m_name, pkmn->m_boxdata.m_name );
+                              pkmn->m_boxdata.getName( ), pkmn->m_boxdata.getName( ) );
                     printMapMessage( buffer.data( ), MSG_NORMAL );
                 }
             } else {

@@ -57,7 +57,7 @@ struct fsdataInfo {
     u16 m_maxItem = 0;
 
     u16 m_maxMove   = 0;  // valid move idx 0..m_maxMove
-    u8  m_languages = 2;  // num languages
+    u8  m_languages = 3;  // num languages
     u8  m_fileSplit = 30; // max num files per dir
 
     u8 m_maxNavBG     = 0; // valid subscrn wallpaper 0..m_maxNavBg

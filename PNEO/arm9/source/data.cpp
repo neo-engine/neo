@@ -859,6 +859,27 @@ namespace FS {
         return getString( p_path, p_maxLen, p_stringId, CURRENT_LANGUAGE );
     }
 
+    namespace {
+        constexpr u8  KANA_WRAP_SLOTS = 8;
+        constexpr u16 KANA_WRAP_LEN   = 512;
+        char          KANA_BUF[ KANA_WRAP_SLOTS ][ KANA_WRAP_LEN ];
+        u8            KANA_BUF_SLOT = 0;
+    } // namespace
+
+    const char* kanaWrap( const char* p_s, u8 p_language ) {
+        if( p_s == nullptr || p_language != SAVE::JAP ) { return p_s; }
+        char* out     = KANA_BUF[ KANA_BUF_SLOT ];
+        KANA_BUF_SLOT = u8( ( KANA_BUF_SLOT + 1 ) % KANA_WRAP_SLOTS );
+        u32 i         = 0;
+        out[ i++ ]    = IO::KANA::ON;
+        for( u32 j = 0; i < KANA_WRAP_LEN - 2 && p_s[ j ] != '\0'; ++i, ++j ) {
+            out[ i ] = p_s[ j ];
+        }
+        out[ i++ ] = IO::KANA::OFF;
+        out[ i ]   = '\0';
+        return out;
+    }
+
     bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {
         static u8    lastLang = -1;
         static FILE* bankfile = nullptr;

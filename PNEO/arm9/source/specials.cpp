@@ -364,7 +364,7 @@ namespace SPX {
             snprintf(
                 buffer.data( ), 99, GET_STRING( 437 ),
                 FS::getSpeciesName( pkmn[ res ].getSpecies( ), pkmn[ res ].getForme( ) ).c_str( ),
-                pkmn[ res ].m_boxdata.m_name );
+                pkmn[ res ].m_boxdata.getName( ) );
 
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
             IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
@@ -711,7 +711,7 @@ namespace MAP {
                 return;
             }
         } else {
-            snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 479 ), dc1->m_name );
+            snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 479 ), dc1->getName( ) );
             printMapMessage( buffer.data( ), MSG_NORMAL );
 
             if( !dc2->getSpecies( ) ) {
@@ -749,7 +749,7 @@ namespace MAP {
                     pokemon pk   = pokemon( dc1[ takeback ] );
                     u32     cost = ( pk.m_level - dcl1[ takeback ] + 1 ) * 100;
                     snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 488 ),
-                              dc1[ takeback ].m_name, cost );
+                              dc1[ takeback ].getName( ), cost );
 
                     if( IO::yesNoBox::YES
                         == IO::simpleYesNoBox( ).getResult(
@@ -761,11 +761,11 @@ namespace MAP {
                             SOUND::playSoundEffect( SFX_BUY_SUCCESSFUL );
                             SAVE::CURRENT_FILE->m_money -= cost;
                             snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 490 ),
-                                      dc1[ takeback ].m_name );
+                                      dc1[ takeback ].getName( ) );
                             printMapMessage( buffer.data( ), MSG_NORMAL );
 
                             snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 491 ),
-                                      dc1[ takeback ].m_name );
+                                      dc1[ takeback ].getName( ) );
                             printMapMessage( buffer.data( ), MSG_INFO );
 
                             SAVE::CURRENT_FILE->setTeamPkmn(
@@ -877,7 +877,7 @@ namespace MAP {
                 if( selpkmn == 0 ) { MAP::curMap->removeFollowPkmn( ); }
 
                 snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 486 ),
-                          dc1[ depositpkmn - 1 ].m_name );
+                          dc1[ depositpkmn - 1 ].getName( ) );
                 printMapMessage( buffer.data( ), MSG_NORMAL );
             } else {
                 break;
@@ -963,11 +963,12 @@ namespace MAP {
                 return;
             } else {
                 if( !dc2->getSpecies( ) ) {
-                    snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 467 ), dc1->m_name );
+                    snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 467 ),
+                              dc1->getName( ) );
                     printMapMessage( buffer.data( ), MSG_NORMAL );
                 } else {
-                    snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 468 ), dc1->m_name,
-                              dc2->m_name );
+                    snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 468 ),
+                              dc1->getName( ), dc2->getName( ) );
                     printMapMessage( buffer.data( ), MSG_NORMAL );
 
                     u8 comp = dc1->getCompatibility( *dc2 );

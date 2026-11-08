@@ -338,7 +338,7 @@ namespace IO::ANIM {
         updateOAM( false );
 
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_TRADE_SEND1 ),
-                  p_ownToOther.m_name, p_otherName );
+                  p_ownToOther.getName( ), p_otherName );
         IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
 
         SOUND::playBGM( BGM_EVOLVING );
@@ -347,7 +347,7 @@ namespace IO::ANIM {
         SOUND::playCry( p_ownToOther.getSpecies( ) );
         IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_TRADE_SEND2 ),
-                  p_ownToOther.m_name );
+                  p_ownToOther.getName( ) );
         IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
         for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
 
@@ -492,13 +492,13 @@ namespace IO::ANIM {
 
         IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_TRADE_RECV1 ), p_otherName,
-                  p_otherToMe.m_name );
+                  p_otherToMe.getName( ) );
         IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
         for( u8 i = 0; i < 150; ++i ) { swiWaitForVBlank( ); }
 
         IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_TRADE_RECV2 ),
-                  p_otherToMe.m_name );
+                  p_otherToMe.getName( ) );
         IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
         for( u8 i = 0; i < 150; ++i ) { swiWaitForVBlank( ); }
         SOUND::restartBGM( );

@@ -456,7 +456,8 @@ namespace BOX {
 
     void boxUI::writeLineTop( const char* p_string, u8 p_line, u8 p_color, bool p_bottom ) {
         IO::regularFont->setColor( p_color, 1 );
-        IO::regularFont->printStringC( p_string, INFO_X + 12, INFO_Y + 11 + 15 * p_line, p_bottom );
+        IO::regularFont->printStringC( FS::kanaWrap( p_string, CURRENT_LANGUAGE ), INFO_X + 12,
+                                       INFO_Y + 11 + 15 * p_line, p_bottom );
     }
 
     void boxUI::drawPkmnInfoSub( boxPokemon* p_pokemon ) {
@@ -609,13 +610,13 @@ namespace BOX {
                                         ANCHOR_X - 4, ANCHOR_Y, SPR_BALL_ICON_OAM,
                                         SPR_BALL_ICON_PAL, tileCnt, false );
 
-            if( IO::regularFont->stringWidthC( p_pokemon->m_boxdata.m_name ) > 74 ) {
-                s8 diff = 66 - IO::regularFont->stringWidthC( p_pokemon->m_boxdata.m_name );
+            if( IO::regularFont->stringWidthC( p_pokemon->m_boxdata.getName( ) ) > 74 ) {
+                s8 diff = 66 - IO::regularFont->stringWidthC( p_pokemon->m_boxdata.getName( ) );
                 oam[ SPR_BALL_ICON_OAM ].x = ANCHOR_X + diff - 2;
-                IO::regularFont->printStringC( p_pokemon->m_boxdata.m_name, ANCHOR_X + 22 + diff,
-                                               ANCHOR_Y + 3, false );
+                IO::regularFont->printStringC( p_pokemon->m_boxdata.getName( ),
+                                               ANCHOR_X + 22 + diff, ANCHOR_Y + 3, false );
             } else {
-                IO::regularFont->printStringC( p_pokemon->m_boxdata.m_name, ANCHOR_X + 22,
+                IO::regularFont->printStringC( p_pokemon->m_boxdata.getName( ), ANCHOR_X + 22,
                                                ANCHOR_Y + 3, false );
             }
 
@@ -680,26 +681,29 @@ namespace BOX {
             IO::regularFont->printStringC( GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ),
                                            INFO_X + 144 - 12, INFO_Y + 27 + 30, false,
                                            IO::font::RIGHT );
-            IO::regularFont->printStringC( FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
-                                           INFO_X + 144 - 12, INFO_Y + 27 + 60, false,
-                                           IO::font::RIGHT );
+            IO::regularFont->printStringC(
+                FS::kanaWrap( FS::getAbilityName( p_pokemon->getAbility( ) ).c_str( ),
+                              CURRENT_LANGUAGE ),
+                INFO_X + 144 - 12, INFO_Y + 27 + 60, false, IO::font::RIGHT );
 
             if( p_pokemon->getItem( ) ) {
                 IO::regularFont->setColor( 0, 2 );
                 IO::regularFont->printStringC( GET_STRING( 362 ), INFO_X + 12, INFO_Y + 27 + 75,
                                                false );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
-                IO::regularFont->printStringC( FS::getItemName( p_pokemon->getItem( ) ).c_str( ),
-                                               INFO_X + 144 - 12, INFO_Y + 27 + 90, false,
-                                               IO::font::RIGHT );
+                IO::regularFont->printStringC(
+                    FS::kanaWrap( FS::getItemName( p_pokemon->getItem( ) ).c_str( ),
+                                  CURRENT_LANGUAGE ),
+                    INFO_X + 144 - 12, INFO_Y + 27 + 90, false, IO::font::RIGHT );
             }
 
             // Moves
             for( u8 i = 0; i < 4; ++i ) {
                 if( p_pokemon->m_boxdata.m_moves[ i ] ) {
                     IO::regularFont->printStringC(
-                        FS::getMoveName( p_pokemon->m_boxdata.m_moves[ i ] ).c_str( ), ANCHOR_X + 2,
-                        ANCHOR_Y + 123 + 15 * i, false );
+                        FS::kanaWrap( FS::getMoveName( p_pokemon->m_boxdata.m_moves[ i ] ).c_str( ),
+                                      CURRENT_LANGUAGE ),
+                        ANCHOR_X + 2, ANCHOR_Y + 123 + 15 * i, false );
                 }
             }
         } else {
@@ -747,12 +751,16 @@ namespace BOX {
             auto loc = FS::getLocation( p_pokemon->m_boxdata.m_gotPlace );
             IO::regularFont->setColor( IO::BLUE2_IDX, 1 );
             IO::regularFont->setColor( IO::BLUE_IDX, 2 );
-            IO::regularFont->printStringC( loc.c_str( ), INFO_X + 9 + shift,
-                                           INFO_Y + 11 + 15 * startline, false );
+            IO::regularFont->printStringC( FS::kanaWrap( loc.c_str( ), CURRENT_LANGUAGE ),
+                                           INFO_X + 9 + shift, INFO_Y + 11 + 15 * startline,
+                                           false );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->printStringC(
-                ".",
+                CURRENT_LANGUAGE == SAVE::JAP ? "\x0e"
+                                                "x."
+                                                "\x0f"
+                                              : ".",
                 INFO_X + 9 + shift + IO::regularFont->stringWidth( loc.c_str( ) ) - loc.length( ),
                 INFO_Y + 11 + 15 * startline, false );
 
