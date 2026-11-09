@@ -496,6 +496,7 @@ namespace SAVE {
                                p_message, 128, oam[ SPR_MSG_BOX_OAM_SUB ].y + 8, 196, true,
                                IO::font::CENTER, 14, ' ', 0, false, -1 )
                            - 1;
+            if( lineCnt >= 2 ) { lineCnt = 1; }
             IO::regularFont->printBreakingStringC( p_message, 128,
                                                    oam[ SPR_MSG_BOX_OAM_SUB ].y + 8 - lineCnt * 7,
                                                    196, true, IO::font::CENTER, 14 );
@@ -634,7 +635,7 @@ namespace SAVE {
         IO::clearScreen( true, true, true );
     }
 
-    bool startScreen::initNewGame( gameType p_type, language, u8 p_episode ) {
+    bool startScreen::initNewGame( gameType p_type, language p_language, u8 p_episode ) {
         // Check if this is the first save file
         bool hasSave = false;
 
@@ -666,9 +667,11 @@ namespace SAVE {
         }
 
         cleanUp( );
-        SAV.m_activeFile = _currentSlot;
+        SAV.m_activeFile   = _currentSlot;
+        SAVE::CURRENT_FILE = &SAVE::SAV.getActiveFile( );
         SAV.getActiveFile( ).initialize( );
-        SAV.getActiveFile( ).m_options.m_language = _currentLanguage;
+        SAV.getActiveFile( ).m_options.m_language = p_language;
+        SAV.getActiveFile( ).m_oTLanguage         = p_language;
         SAV.getActiveFile( ).m_gameType           = p_type;
         SAV.getActiveFile( ).m_options.m_bgIdx    = DEFAULT_NAV_BG;
 

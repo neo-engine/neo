@@ -144,6 +144,7 @@ namespace MAP {
                     && strcmp( "", nick.c_str( ) ) ) {
                     strcpy( pkmn->m_boxdata.m_name, nick.c_str( ) );
                     pkmn->m_boxdata.setIsNicknamed( true );
+                    pkmn->m_boxdata.setOrigLang( CURRENT_LANGUAGE );
                     // pkmn got new nickname
                     snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 821 ),
                               pkmn->m_boxdata.getName( ), pkmn->m_boxdata.getName( ) );

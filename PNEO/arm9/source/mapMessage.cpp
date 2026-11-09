@@ -49,14 +49,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 namespace MAP {
     std::string convertMapString( const std::string& p_text, style p_style ) {
         std::string res = "";
-        if( CURRENT_LANGUAGE == SAVE::JAP ) { res += "\xe"; }
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { res += IO::KANA::ON; }
         for( size_t i = 0; i < p_text.size( ); ++i ) {
-            if( p_text[ i ] == '[' ) {
+            if( p_text[ i ] == IO::KANA::ON || p_text[ i ] == IO::KANA::OFF ) {
+                continue;
+            } else if( p_text[ i ] == '[' ) {
                 std::string accmd = "";
                 while( p_text[ ++i ] != ']' ) { accmd += p_text[ i ]; }
                 res += IO::parseLogCmd( accmd );
                 continue;
             } else if( p_text[ i ] == '\r' ) {
+                if( CURRENT_LANGUAGE == SAVE::JAP ) { res += IO::KANA::OFF; }
                 if( p_style == MSG_NORMAL ) {
                     IO::printMessage( res.c_str( ), MSG_NORMAL_CONT );
                 } else if( p_style == MSG_INFO ) {
@@ -65,11 +68,12 @@ namespace MAP {
                     IO::printMessage( res.c_str( ), p_style );
                 }
                 res = "";
+                if( CURRENT_LANGUAGE == SAVE::JAP ) { res += IO::KANA::ON; }
                 continue;
             }
             res += p_text[ i ];
         }
-        if( CURRENT_LANGUAGE == SAVE::JAP ) { res += "\xf"; }
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { res += IO::KANA::OFF; }
         return res;
     }
 

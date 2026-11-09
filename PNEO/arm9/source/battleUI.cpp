@@ -2962,27 +2962,31 @@ namespace BATTLE {
         IO::updateOAM( false );
 
         std::string msg = "";
-        if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += "\xe"; }
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += IO::KANA::ON; }
         for( char* pos = p_playerWon ? _battleTrainer->m_strings.m_message2
                                      : _battleTrainer->m_strings.m_message3;
              *pos; ++pos ) {
-            if( *pos == '[' ) {
+            if( *pos == IO::KANA::ON || *pos == IO::KANA::OFF ) {
+                continue;
+            } else if( *pos == '[' ) {
                 std::string accmd = "";
                 while( *( ++pos ) != ']' ) { accmd += pos; }
                 msg += IO::parseLogCmd( accmd );
                 continue;
             } else if( *pos == '\r' ) {
+                if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += IO::KANA::OFF; }
                 printTopMessage( msg.c_str( ), false );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                 IO::waitForInteract( IO::animateMBS,
                                      [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
                 msg = "";
+                if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += IO::KANA::ON; }
                 continue;
             } else {
                 msg += *pos;
             }
         }
-        if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += "\xf"; }
+        if( CURRENT_LANGUAGE == SAVE::JAP ) { msg += IO::KANA::OFF; }
 
         printTopMessage( msg.c_str( ), false );
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
