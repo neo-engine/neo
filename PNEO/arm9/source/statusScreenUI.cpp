@@ -820,10 +820,10 @@ namespace STS {
         }
 
         FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4, TEMP,
-                                                    256, TEMP_PAL );
+                                                    256, TEMP_PAL, COMPRESS_BG );
         dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
         FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4, TEMP,
-                                                    256, TEMP_PAL );
+                                                    256, TEMP_PAL, COMPRESS_BG );
         dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
 
         _needsInit       = false;
@@ -889,10 +889,10 @@ namespace STS {
             IO::updateOAM( false );
 
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4,
-                                                        TEMP, 256, TEMP_PAL );
+                                                        TEMP, 256, TEMP_PAL, COMPRESS_BG );
             dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4,
-                                                        TEMP, 256, TEMP_PAL );
+                                                        TEMP, 256, TEMP_PAL, COMPRESS_BG );
             dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
 
             if( !_needsInit ) {
@@ -1505,10 +1505,10 @@ namespace STS {
         IO::updateOAM( false );
 
         FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4, TEMP,
-                                                    256, TEMP_PAL );
+                                                    256, TEMP_PAL, COMPRESS_BG );
         dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
         FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4, TEMP,
-                                                    256, TEMP_PAL );
+                                                    256, TEMP_PAL, COMPRESS_BG );
         dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
 
         if( !_needsInit ) {

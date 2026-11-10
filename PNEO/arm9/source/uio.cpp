@@ -251,6 +251,17 @@ namespace IO {
         return formatDate( p_date, CURRENT_LANGUAGE );
     }
 
+    std::string wideNumeral( u8 p_num, u8 p_pad = 1 ) {
+        std::string res = "";
+        while( p_num || p_pad ) {
+            res += std::to_string( p_num % 10 ) + "x";
+            p_num /= 10;
+            if( p_pad ) { --p_pad; }
+        }
+
+        return std::string{ res.rbegin( ), res.rend( ) };
+    }
+
     std::string formatDate( u8 p_date[ 3 ], u8 p_language ) {
         std::array<char, 50> buffer{ };
         switch( p_language ) {
@@ -267,22 +278,18 @@ namespace IO {
         case 2: // JP
             if( ( p_date[ 0 ] && p_date[ 0 ] + 1 <= 10 ) || ( p_date[ 0 ] + 1 ) % 4 == 0 ) {
                 snprintf( buffer.data( ), buffer.size( ),
-                          "20%02hhu\xe"
-                          "nenn\xf"
-                          "%hhu\xe"
-                          "gatu\xf"
-                          "%hhu\xe"
-                          "ka\xf",
-                          p_date[ 2 ], p_date[ 1 ], p_date[ 0 ] + 1 );
+                          "\xe"
+                          "x2x0%snenn%sgatu%ska\xf",
+                          wideNumeral( p_date[ 2 ], 2 ).c_str( ),
+                          wideNumeral( p_date[ 1 ] + 1 ).c_str( ),
+                          wideNumeral( p_date[ 0 ] + 1 ).c_str( ) );
             } else {
                 snprintf( buffer.data( ), buffer.size( ),
-                          "20%02hhu\xe"
-                          "nenn\xf"
-                          "%hhu\xe"
-                          "gatu\xf"
-                          "%hhu\xe"
-                          "niti\xf",
-                          p_date[ 2 ], p_date[ 1 ], p_date[ 0 ] + 1 );
+                          "\xe"
+                          "x2x0%snenn%sgatu%sniti\xf",
+                          wideNumeral( p_date[ 2 ], 2 ).c_str( ),
+                          wideNumeral( p_date[ 1 ] + 1 ).c_str( ),
+                          wideNumeral( p_date[ 0 ] + 1 ).c_str( ) );
             }
             break;
         }

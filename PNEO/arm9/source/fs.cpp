@@ -25,6 +25,10 @@ You should have received a copy of the GNU General Public License
 along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
 #include <fat.h>
 #include <fs/card.h>
 #include <sys/stat.h>
@@ -46,24 +50,87 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 namespace FS {
-    const char* OW_NPC_BANK_PATH     = "nitro:/PICS/SPRITES/npc.rsdb";
-    FILE*       NPC_BANK_FILE        = nullptr;
-    u32         NPC_BANK_FILE_HEADER = 0;
-
-    const char* BERRY_BANK_PATH        = "nitro:/PICS/SPRITES/berry.rsdb";
-    FILE*       BERRY_BANK_FILE        = nullptr;
-    u32         BERRY_BANK_FILE_HEADER = 0;
-
+    const char* OW_NPC_BANK_PATH    = "nitro:/PICS/SPRITES/npc.rsdb";
+    const char* BERRY_BANK_PATH     = "nitro:/PICS/SPRITES/berry.rsdb";
     const char* NPCP_BANK_PATH[ 4 ] = {
         "nitro:/PICS/SPRITES/NPCP.rsdb",
         "nitro:/PICS/SPRITES/NPCPs.rsdb",
         "nitro:/PICS/SPRITES/NPCPf.rsdb",
         "nitro:/PICS/SPRITES/NPCPfs.rsdb",
     };
-    FILE* NPCP_BANK_FILE[ 4 ]        = { nullptr, nullptr, nullptr, nullptr };
-    u32   NPCP_BANK_FILE_HEADER[ 4 ] = { 0, 0, 0, 0 };
 
     char TMP_BUFFER[ 100 ];
+
+    compressedSpriteBank NPC_BANK, BERRY_BANK, NPCP_BANK[ 4 ];
+
+    u8 SPR_SCRATCH[ 0x5A00 ] __attribute__( ( aligned( 4 ) ) ) = { 0 };
+
+    bool isMemoryStream( FILE* p_f ) {
+        return p_f == NPC_BANK.m_memoryFile || p_f == BERRY_BANK.m_memoryFile
+               || p_f == NPCP_BANK[ 0 ].m_memoryFile || p_f == NPCP_BANK[ 1 ].m_memoryFile
+               || p_f == NPCP_BANK[ 2 ].m_memoryFile || p_f == NPCP_BANK[ 3 ].m_memoryFile;
+    }
+
+    long fileSize( FILE* p_f ) {
+        if( fseek( p_f, 0, SEEK_END ) ) { return -1; }
+        long sz = ftell( p_f );
+        fseek( p_f, 0, SEEK_SET );
+        return sz;
+    }
+
+    FILE* openSpriteBank( compressedSpriteBank& p_bank, const char* p_path, u32 p_id ) {
+        if( !p_bank.m_bankFile ) {
+            p_bank.m_bankFile = fopen( p_path, "rb" );
+            if( !p_bank.m_bankFile ) { return nullptr; }
+            if( fread( &p_bank.m_recordSize, 4, 1, p_bank.m_bankFile ) != 1
+                || p_bank.m_recordSize < 8 || p_bank.m_recordSize > 0x5000 ) {
+                fclose( p_bank.m_bankFile );
+                p_bank.m_bankFile = nullptr;
+                return nullptr;
+            }
+        }
+
+        if( ( COMPRESSION & COMPRESS_SPRITE ) == 0 ) {
+            if( fseek( p_bank.m_bankFile, 4 + p_id * p_bank.m_recordSize, SEEK_SET ) ) {
+                return nullptr;
+            }
+            return p_bank.m_bankFile;
+        }
+
+        u32 entry[ 2 ] = { 0, 0 };
+        if( fseek( p_bank.m_bankFile, 4 + p_id * 8, SEEK_SET )
+            || fread( entry, 8, 1, p_bank.m_bankFile ) != 1 ) {
+            return nullptr;
+        }
+
+        long sz = fileSize( p_bank.m_bankFile );
+        if( sz < 0 || entry[ 1 ] < 4 || entry[ 1 ] > sizeof( SPR_SCRATCH )
+            || (long) entry[ 0 ] + (long) entry[ 1 ] > sz ) {
+            return nullptr;
+        }
+        if( fseek( p_bank.m_bankFile, entry[ 0 ], SEEK_SET )
+            || fread( SPR_SCRATCH, 1, entry[ 1 ], p_bank.m_bankFile ) != entry[ 1 ] ) {
+            return nullptr;
+        }
+        if( SPR_SCRATCH[ 0 ] != 0x10 ) { return nullptr; }
+        u32 dsize = (u32) SPR_SCRATCH[ 1 ] | ( (u32) SPR_SCRATCH[ 2 ] << 8 )
+                    | ( (u32) SPR_SCRATCH[ 3 ] << 16 );
+        if( dsize != p_bank.m_recordSize ) { return nullptr; }
+        if( !p_bank.m_recordBuffer ) {
+            p_bank.m_recordBuffer = (u8*) malloc( p_bank.m_recordSize );
+            if( p_bank.m_recordBuffer ) {
+                p_bank.m_memoryFile = fmemopen( p_bank.m_recordBuffer, p_bank.m_recordSize, "rb" );
+            }
+            if( !p_bank.m_memoryFile ) {
+                free( p_bank.m_recordBuffer );
+                p_bank.m_recordBuffer = nullptr;
+                return nullptr;
+            }
+        }
+        swiDecompressLZSSWram( SPR_SCRATCH, p_bank.m_recordBuffer );
+        if( fseek( p_bank.m_memoryFile, 0, SEEK_SET ) ) { return nullptr; }
+        return p_bank.m_memoryFile;
+    }
 
     bool checkOrOpen( FILE*& p_f, const char* p_path ) {
         if( p_f == nullptr ) { p_f = fopen( p_path, "rb" ); }
@@ -137,46 +204,16 @@ namespace FS {
     }
 
     FILE* openNPCBank( u16 p_imageId ) {
-        if( !NPC_BANK_FILE || !NPC_BANK_FILE_HEADER ) {
-            NPC_BANK_FILE = fopen( OW_NPC_BANK_PATH, "rb" );
-            if( !NPC_BANK_FILE ) { return nullptr; }
-            fread( &NPC_BANK_FILE_HEADER, 1, sizeof( u32 ), NPC_BANK_FILE );
-        }
-
-        if( NPC_BANK_FILE ) {
-            fseek( NPC_BANK_FILE, 4 + p_imageId * NPC_BANK_FILE_HEADER, SEEK_SET );
-            return NPC_BANK_FILE;
-        }
-        return nullptr;
+        return openSpriteBank( NPC_BANK, OW_NPC_BANK_PATH, p_imageId );
     }
 
     FILE* openBerryBank( u16 p_imageId ) {
-        if( !BERRY_BANK_FILE || !BERRY_BANK_FILE_HEADER ) {
-            BERRY_BANK_FILE = fopen( BERRY_BANK_PATH, "rb" );
-            if( !BERRY_BANK_FILE ) { return nullptr; }
-            fread( &BERRY_BANK_FILE_HEADER, 1, sizeof( u32 ), BERRY_BANK_FILE );
-        }
-
-        if( BERRY_BANK_FILE ) {
-            fseek( BERRY_BANK_FILE, 4 + p_imageId * BERRY_BANK_FILE_HEADER, SEEK_SET );
-            return BERRY_BANK_FILE;
-        }
-        return nullptr;
+        return openSpriteBank( BERRY_BANK, BERRY_BANK_PATH, p_imageId );
     }
 
     FILE* openNPCPBank( u16 p_imageId, bool p_shiny, bool p_female ) {
         auto idx = 2 * p_female + p_shiny;
-        if( !NPCP_BANK_FILE[ idx ] || !NPCP_BANK_FILE_HEADER[ idx ] ) {
-            NPCP_BANK_FILE[ idx ] = fopen( NPCP_BANK_PATH[ idx ], "rb" );
-            if( !NPCP_BANK_FILE[ idx ] ) { return nullptr; }
-            fread( &NPCP_BANK_FILE_HEADER[ idx ], 1, sizeof( u32 ), NPCP_BANK_FILE[ idx ] );
-        }
-
-        if( NPCP_BANK_FILE[ idx ] ) {
-            fseek( NPCP_BANK_FILE[ idx ], 4 + p_imageId * NPCP_BANK_FILE_HEADER[ idx ], SEEK_SET );
-            return NPCP_BANK_FILE[ idx ];
-        }
-        return nullptr;
+        return openSpriteBank( NPCP_BANK[ idx ], NPCP_BANK_PATH[ idx ], p_imageId );
     }
 
     void close( FILE* p_file ) {
@@ -185,7 +222,11 @@ namespace FS {
     size_t read( FILE* p_stream, void* p_buffer, size_t p_size, size_t p_count ) {
         if( !p_stream ) { return 0; }
         auto res = fread( p_buffer, p_size, p_count, p_stream );
-        DC_InvalidateRange( p_buffer, p_size * p_count );
+        if( isMemoryStream( p_stream ) ) {
+            DC_FlushRange( p_buffer, p_size * p_count );
+        } else {
+            DC_InvalidateRange( p_buffer, p_size * p_count );
+        }
         return res;
     }
     size_t write( FILE* p_stream, const void* p_buffer, size_t p_size, size_t p_count ) {
@@ -200,6 +241,42 @@ namespace FS {
         if( !fd ) { return false; }
         read( fd, p_data, sizeof( unsigned short ), p_dataCnt );
         close( fd );
+        return true;
+    }
+
+    u8 RL_SCRATCH[ 0x10200 ] __attribute__( ( aligned( 4 ) ) ) = { 0 };
+    u8 RL_DECOMP[ 0x10200 ] __attribute__( ( aligned( 4 ) ) )  = { 0 };
+
+    inline u32 rlDecompressedSize( const u8* p_hdr ) {
+        return (u32) p_hdr[ 1 ] | ( (u32) p_hdr[ 2 ] << 8 ) | ( (u32) p_hdr[ 3 ] << 16 );
+    }
+
+    bool readThrough( FILE* p_f, u8 p_category, u32 p_rasterBytes, void* p_p1, u32 p_palBytes,
+                      void* p_p2 ) {
+        if( !p_f ) { return false; }
+
+        if( ( COMPRESSION & p_category ) == 0 ) {
+            read( p_f, p_p1, p_rasterBytes, 1 );
+            read( p_f, p_p2, p_palBytes, 1 );
+            return true;
+        }
+
+        long csize = fileSize( p_f );
+        if( csize < 4 || csize > (long) sizeof( RL_SCRATCH ) ) { return false; }
+
+        if( read( p_f, RL_SCRATCH, 1, (size_t) csize ) != (size_t) csize ) { return false; }
+        if( RL_SCRATCH[ 0 ] != 0x30 ) { return false; }
+
+        u32 dsize = rlDecompressedSize( RL_SCRATCH );
+        if( dsize != p_rasterBytes + p_palBytes ) { return false; }
+        if( dsize > (u32) sizeof( RL_DECOMP ) ) { return false; }
+
+        swiDecompressRLEWram( RL_SCRATCH, RL_DECOMP );
+
+        memcpy( p_p1, RL_DECOMP, p_rasterBytes );
+        memcpy( p_p2, RL_DECOMP + p_rasterBytes, p_palBytes );
+        DC_FlushRange( p_p1, p_rasterBytes );
+        DC_FlushRange( p_p2, p_palBytes );
         return true;
     }
 

@@ -57,8 +57,8 @@ namespace MAP {
 
         switch( getWeather( ) ) {
         case RAINY:
-            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "rain",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+            FS::readData<unsigned int, unsigned short>(
+                "nitro:/PICS/WEATHER/", "rain", dataSize / 4, TEMP, 256, TEMP_PAL, COMPRESS_BG );
             bgWrap          = true;
             _weatherScrollX = 32;
             _weatherScrollY = -64;
@@ -68,7 +68,7 @@ namespace MAP {
 
         case FOG:
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "fog", dataSize / 4,
-                                                        TEMP, 256, TEMP_PAL );
+                                                        TEMP, 256, TEMP_PAL, COMPRESS_BG );
             bgWrap          = true;
             _weatherScrollX = 2;
             _weatherScrollY = 0;
@@ -78,8 +78,8 @@ namespace MAP {
 
         case MIST:
         case DENSE_MIST:
-            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "mist",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+            FS::readData<unsigned int, unsigned short>(
+                "nitro:/PICS/WEATHER/", "mist", dataSize / 4, TEMP, 256, TEMP_PAL, COMPRESS_BG );
             bgWrap = true;
             if( getWeather( ) == MIST ) {
                 _weatherScrollX = 1;
@@ -94,8 +94,8 @@ namespace MAP {
             break;
 
         case CLOUDY:
-            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "clouds",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+            FS::readData<unsigned int, unsigned short>(
+                "nitro:/PICS/WEATHER/", "clouds", dataSize / 4, TEMP, 256, TEMP_PAL, COMPRESS_BG );
             bgWrap          = true;
             _weatherScrollX = 2;
             _weatherScrollY = 0;
@@ -105,7 +105,8 @@ namespace MAP {
 
         case FOREST_CLOUDS:
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "forestcloud",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+                                                        dataSize / 4, TEMP, 256, TEMP_PAL,
+                                                        COMPRESS_BG );
             bgWrap          = true;
             _weatherScrollX = 0;
             _weatherScrollY = 0;
@@ -114,8 +115,8 @@ namespace MAP {
             break;
 
         case ASH_RAIN:
-            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "ashrain",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+            FS::readData<unsigned int, unsigned short>(
+                "nitro:/PICS/WEATHER/", "ashrain", dataSize / 4, TEMP, 256, TEMP_PAL, COMPRESS_BG );
             bgWrap          = true;
             _weatherScrollX = 2;
             _weatherScrollY = -4;
@@ -125,7 +126,8 @@ namespace MAP {
             bool goggles = SAVE::CURRENT_FILE->m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                             I_GO_GOGGLES );
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "sandstorm",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+                                                        dataSize / 4, TEMP, 256, TEMP_PAL,
+                                                        COMPRESS_BG );
             if( goggles ) { bgAlpha = 0xff | ( 0x05 << 8 ); }
             bgWrap          = true;
             _weatherScrollX = 40;
@@ -140,8 +142,8 @@ namespace MAP {
         case DARK_FLASH_2:
             dataSize = COMPLETE_SCREEN;
             partial  = true;
-            FS::readData<unsigned int, unsigned short>( "nitro:/PICS/WEATHER/", "flash",
-                                                        dataSize / 4, TEMP, 256, TEMP_PAL );
+            FS::readData<unsigned int, unsigned short>(
+                "nitro:/PICS/WEATHER/", "flash", dataSize / 4, TEMP, 256, TEMP_PAL, COMPRESS_BG );
             _weatherFollow = false;
             break;
         default:

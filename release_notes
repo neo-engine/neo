@@ -1,4 +1,4 @@
-v1.1 (??? Goomy)
+v1.1 (Gloomy Goomy)
 Map engine:
 [ ] Added Voltorb Flip
 [ ] Added PKMN Communication Club
@@ -50,9 +50,10 @@ Battle engine:
 [ ] Added missing moves, items, abilities
 
 General:
-[ ] Added full support for Kans strings/Japanese
-[ ] Updated PKMN Data
-[ ] Factored out libcard, libwidget, libcard, libsound
+- Added full support for Kana strings/Japanese
+- Updated PKMN Data
+- Factored out libcard, libwidget, libcard, libsound
+- Added LZ/RLE compression to the FSROOT
 [ ] Reworked NitroFat access to mirror retail games
 [ ] Added support for memory overlays
 [ ] Added receiving/distributing Mystery Gifts from/to retail games/neo via local WiFi

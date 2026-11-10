@@ -289,25 +289,24 @@ namespace MAP {
     }
 
     void mapDrawer::draw( ObjPriority, bool p_playerHidden, bool p_init ) {
-        GFX_GUARD( gfGuard );
-        draw( SAVE::CURRENT_FILE->m_player.m_pos.m_posX, SAVE::CURRENT_FILE->m_player.m_pos.m_posY,
-              true ); // Draw the map
-        stepOn( SAVE::CURRENT_FILE->m_player.m_pos.m_posX,
-                SAVE::CURRENT_FILE->m_player.m_pos.m_posY,
-                SAVE::CURRENT_FILE->m_player.m_pos.m_posZ, false, false, false );
+        {
+            GFX_GUARD( gfGuard );
+            draw( SAVE::CURRENT_FILE->m_player.m_pos.m_posX,
+                  SAVE::CURRENT_FILE->m_player.m_pos.m_posY, true ); // Draw the map
+            stepOn( SAVE::CURRENT_FILE->m_player.m_pos.m_posX,
+                    SAVE::CURRENT_FILE->m_player.m_pos.m_posY,
+                    SAVE::CURRENT_FILE->m_player.m_pos.m_posZ, false, false, false );
 
-        if( p_init ) { unfadeScreen( ); }
+            if( p_init ) { unfadeScreen( ); }
+            drawPlayer( SAVE::CURRENT_FILE->m_playerPriority, p_playerHidden );
+            IO::commitOAM( false );
+            unfadeScreen( );
 
-        drawPlayer( SAVE::CURRENT_FILE->m_playerPriority,
-                    p_playerHidden ); // Draw the player
-        IO::commitOAM( false );
-        unfadeScreen( );
-
-        for( const auto& fn : _newBankCallbacks ) { fn( SAVE::CURRENT_FILE->m_currentMap ); }
-        auto curLocId = getCurrentLocationId( );
-        for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, false ); }
-
-        for( const auto& fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
+            for( const auto& fn : _newBankCallbacks ) { fn( SAVE::CURRENT_FILE->m_currentMap ); }
+            auto curLocId = getCurrentLocationId( );
+            for( const auto& fn : _newLocationCallbacks ) { fn( curLocId, false ); }
+            for( const auto& fn : _newWeatherCallbacks ) { fn( getWeather( ) ); }
+        }
 
         if( !_scriptRunning ) {
             handleEvents( SAVE::CURRENT_FILE->m_player.m_pos.m_posX,

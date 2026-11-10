@@ -50,7 +50,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
     {}
 #endif
 
-struct fsdataInfo {
+struct __attribute__( ( packed ) ) fsdataInfo {
     static constexpr u8 MAX_OW_MAPS = 8;
 
     u16 m_maxPkmn = 0;
@@ -67,6 +67,8 @@ struct fsdataInfo {
 
     u8 m_owMaps[ MAX_OW_MAPS ] = { 10 };
 
+    u8 m_compression = 0;
+
     inline bool isOWMap( u8 p_map ) {
         for( u8 i = 0; i < m_owMapCount; ++i ) {
             if( m_owMaps[ i ] == p_map ) { return true; }
@@ -76,6 +78,11 @@ struct fsdataInfo {
 };
 
 extern fsdataInfo FSDATA;
+#define COMPRESS_BG     ( 1 << 0 )
+#define COMPRESS_SPRITE ( 1 << 1 )
+#define COMPRESS_MAP    ( 1 << 2 )
+#define COMPRESS_BANK   ( 1 << 3 )
+#define COMPRESSION     FSDATA.m_compression
 
 // complete screen when filling with dmaFillWords
 constexpr u32 MBOX_SCREEN_HALF   = 256 * 20;

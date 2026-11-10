@@ -88,7 +88,7 @@ namespace BOX {
         IO::initOAMTable( false );
 
         FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4, TEMP,
-                                                    256, TEMP_PAL );
+                                                    256, TEMP_PAL, COMPRESS_BG );
         dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
         dmaCopy( TEMP_PAL, BG_PALETTE, 5 * 2 );
         // dmaCopy( partybgBitmap, bgGetGfxPtr( IO::bg3 ), 256 * 256 );

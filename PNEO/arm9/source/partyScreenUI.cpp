@@ -1100,10 +1100,10 @@ namespace STS {
             IO::animateBG( _frame, IO::bg3sub );
 
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg2", 256 * 256 / 4,
-                                                        TEMP, 256, TEMP_PAL );
+                                                        TEMP, 256, TEMP_PAL, COMPRESS_BG );
             dmaCopy( TEMP, bgGetGfxPtr( IO::bg3sub ), 256 * 256 );
             FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "partybg", 256 * 256 / 4,
-                                                        TEMP, 256, TEMP_PAL );
+                                                        TEMP, 256, TEMP_PAL, COMPRESS_BG );
             dmaCopy( TEMP, bgGetGfxPtr( IO::bg3 ), 256 * 256 );
 
             REG_BLDCNT_SUB   = BLEND_ALPHA | BLEND_DST_BG3;

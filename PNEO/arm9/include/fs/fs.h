@@ -33,7 +33,17 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <nds.h>
 
+extern "C" FILE* fmemopen( void* p_buf, size_t p_size, const char* p_mode );
 namespace FS {
+    struct compressedSpriteBank {
+        FILE* m_bankFile     = nullptr;
+        u8*   m_recordBuffer = nullptr;
+        FILE* m_memoryFile   = nullptr;
+        u32   m_recordSize   = 0;
+    };
+
+    long fileSize( FILE* p_f );
+
     bool SDFound( );
     bool FCFound( );
 
@@ -57,17 +67,20 @@ namespace FS {
     bool checkOrOpen( FILE*& p_f, const char* p_path );
     bool checkOrOpen( FILE*& p_f, const char* p_path, u8& p_lastLang, u8 p_language );
 
+    bool readThrough( FILE* p_f, u8 p_category, u32 p_rasterBytes, void* p_p1, u32 p_palBytes,
+                      void* p_p2 );
+
     bool readData( const char* p_path, const char* p_name, unsigned short p_dataCnt,
                    unsigned short* p_data );
     template <typename T1, typename T2>
     bool readData( const char* p_path, const char* p_name, T1 p_dataCnt1, T1* p_data1,
-                   T2 p_dataCnt2, T2* p_data2 ) {
+                   T2 p_dataCnt2, T2* p_data2, u8 p_category = 0 ) {
         FILE* fd = open( p_path, p_name );
         if( !fd ) return false;
-        read( fd, p_data1, sizeof( T1 ), p_dataCnt1 );
-        read( fd, p_data2, sizeof( T2 ), p_dataCnt2 );
+        bool ok = readThrough( fd, p_category, sizeof( T1 ) * (u32) p_dataCnt1, p_data1,
+                               sizeof( T2 ) * (u32) p_dataCnt2, p_data2 );
         close( fd );
-        return true;
+        return ok;
     }
 
     bool readNop( FILE* p_file, u32 p_cnt );

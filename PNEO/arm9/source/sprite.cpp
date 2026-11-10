@@ -66,6 +66,14 @@ namespace IO {
     FILE* PKMN_SPRITE_FRNT_FILES[ 4 ] = { nullptr, nullptr, nullptr, nullptr };
     FILE* PKMN_SPRITE_BACK_FILES[ 4 ] = { nullptr, nullptr, nullptr, nullptr };
 
+    constexpr u8             NUM_SPRITE_BANK_SLOT = 24;
+    FS::compressedSpriteBank SPRITE_BANK_CACHE[ NUM_SPRITE_BANK_SLOT ];
+    u8                       NEXT_SPRITE_BANK_SLOT = 0;
+
+    constexpr u32 SPRB_MAX_RECORD_SIZE = 0x1300;
+
+    u8 SPRB_SCRATCH[ 0x1600 ] __attribute__( ( aligned( 4 ) ) ) = { 0 };
+
     const u8  SPRITE_DMA_CHANNEL      = 2;
     const u16 BYTES_PER_16_COLOR_TILE = 32;
     const u16 COLORS_PER_PALETTE      = 16;
@@ -433,6 +441,41 @@ namespace IO {
         return true;
     }
 
+    FS::compressedSpriteBank* openCachedSpriteBank( FILE* p_f ) {
+        if( !p_f ) { return nullptr; }
+        for( u8 i = 0; i < NEXT_SPRITE_BANK_SLOT; ++i ) {
+            if( SPRITE_BANK_CACHE[ i ].m_memoryFile == p_f ) { return &SPRITE_BANK_CACHE[ i ]; }
+        }
+        return nullptr;
+    }
+
+    FILE* wrapSpriteBank( FILE* p_bankFile ) {
+        if( !p_bankFile || ( COMPRESSION & COMPRESS_SPRITE ) == 0 ) { return p_bankFile; }
+        if( openCachedSpriteBank( p_bankFile ) ) { return p_bankFile; }
+
+        for( u8 i = 0; i < NEXT_SPRITE_BANK_SLOT; ++i ) {
+            if( SPRITE_BANK_CACHE[ i ].m_bankFile == p_bankFile ) {
+                return SPRITE_BANK_CACHE[ i ].m_memoryFile;
+            }
+        }
+        if( NEXT_SPRITE_BANK_SLOT >= NUM_SPRITE_BANK_SLOT ) { return nullptr; }
+
+        FS::compressedSpriteBank& c = SPRITE_BANK_CACHE[ NEXT_SPRITE_BANK_SLOT ];
+        c.m_bankFile                = p_bankFile;
+        c.m_recordBuffer            = (u8*) malloc( SPRB_MAX_RECORD_SIZE );
+        if( c.m_recordBuffer ) {
+            c.m_memoryFile = fmemopen( c.m_recordBuffer, SPRB_MAX_RECORD_SIZE, "rb" );
+        }
+        if( !c.m_memoryFile ) {
+            free( c.m_recordBuffer );
+            c.m_recordBuffer = nullptr;
+            c.m_bankFile     = nullptr;
+            return nullptr;
+        }
+        ++NEXT_SPRITE_BANK_SLOT;
+        return c.m_memoryFile;
+    }
+
     FILE* checkOrOpenPKMNFile( FILE* p_files[ 4 ], const char* p_path, bool p_female,
                                bool p_shiny ) {
         FILE* f = p_files[ 2 * p_female + p_shiny ];
@@ -440,12 +483,45 @@ namespace IO {
         if( f == nullptr ) {
             snprintf( BUFFER, 149, "%s%s%s.pkmn.sprb", p_path, p_female ? "f" : "",
                       p_shiny ? "s" : "" );
-            f = p_files[ 2 * p_female + p_shiny ] = fopen( BUFFER, "rb" );
+            f = fopen( BUFFER, "rb" );
+            f = p_files[ 2 * p_female + p_shiny ] = wrapSpriteBank( f );
         }
         return f;
     }
 
-    bool seekSpriteData( FILE* p_file, u16 p_idx, u16 p_dataSize = 16 * 32 / 8 ) {
+    bool seekSpriteData( FILE*& p_file, u16 p_idx, u16 p_dataSize = 16 * 32 / 8 ) {
+        p_file = wrapSpriteBank( p_file );
+        if( !p_file ) { return false; }
+        FS::compressedSpriteBank* c = openCachedSpriteBank( p_file );
+        if( c ) {
+            u32 recordSize = 16 * sizeof( u16 ) + p_dataSize * sizeof( u32 );
+            if( recordSize > SPRB_MAX_RECORD_SIZE ) { return false; }
+
+            u32 entry[ 2 ] = { 0, 0 };
+            if( fseek( c->m_bankFile, (u32) p_idx * 8, SEEK_SET )
+                || fread( entry, 8, 1, c->m_bankFile ) != 1 ) {
+                return false;
+            }
+
+            long sz = FS::fileSize( c->m_bankFile );
+            if( sz < 0 || entry[ 1 ] < 4 || entry[ 1 ] > sizeof( SPRB_SCRATCH )
+                || (long) entry[ 0 ] + (long) entry[ 1 ] > sz ) {
+                return false;
+            }
+
+            if( fseek( c->m_bankFile, entry[ 0 ], SEEK_SET )
+                || fread( SPRB_SCRATCH, 1, entry[ 1 ], c->m_bankFile ) != entry[ 1 ] ) {
+                return false;
+            }
+            if( SPRB_SCRATCH[ 0 ] != 0x10 ) { return false; }
+
+            u32 dsize = (u32) SPRB_SCRATCH[ 1 ] | ( (u32) SPRB_SCRATCH[ 2 ] << 8 )
+                        | ( (u32) SPRB_SCRATCH[ 3 ] << 16 );
+            if( dsize != recordSize ) { return false; }
+
+            swiDecompressLZSSWram( SPRB_SCRATCH, c->m_recordBuffer );
+            return fseek( p_file, 0, SEEK_SET ) == 0;
+        }
         if( fseek( p_file, p_idx * ( 16 * sizeof( u16 ) + p_dataSize * sizeof( u32 ) ),
                    SEEK_SET ) ) {
             return false;

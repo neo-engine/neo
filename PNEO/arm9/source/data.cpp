@@ -229,7 +229,7 @@ namespace FS {
     bool readSpriteData( IO::SpriteInfo* p_spriteInfo, const char* p_path, const char* p_name,
                          const u32 p_tileCnt, const u16 p_palCnt, bool p_bottom ) {
         if( !readData<unsigned int, unsigned short>( p_path, p_name, p_tileCnt, TEMP, p_palCnt,
-                                                     TEMP_PAL ) )
+                                                     TEMP_PAL, COMPRESS_SPRITE ) )
             return false;
 
         IO::copySpriteData( TEMP, p_spriteInfo->m_entry->gfxIndex, 4 * p_tileCnt, p_bottom );
@@ -239,7 +239,8 @@ namespace FS {
 
     bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize,
                           u32 p_tileCnt, bool p_bottom ) {
-        if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL ) )
+        if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL,
+                                                     COMPRESS_BG ) )
             return false;
 
         if( p_tileCnt ) { dmaCopy( TEMP, p_layer, p_tileCnt ); }
@@ -254,7 +255,8 @@ namespace FS {
 
     bool readPictureData( u16* p_layer, const char* p_path, const char* p_name, u16 p_palSize,
                           u16 p_palStart, u32 p_tileCnt, bool p_bottom ) {
-        if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL ) )
+        if( !readData<unsigned int, unsigned short>( p_path, p_name, 12288, TEMP, 256, TEMP_PAL,
+                                                     COMPRESS_BG ) )
             return false;
 
         if( p_tileCnt ) { dmaCopy( TEMP, p_layer, p_tileCnt ); }
@@ -395,10 +397,60 @@ namespace FS {
         return 0;
     }
 
+    constexpr u32 MAP_RECORD_SIZE   = sizeof( MAP::mapSliceData ) + sizeof( MAP::mapData ); // 3504
+    constexpr u32 MAP_SCRATCH_BYTES = 0x1000;
+
+    u8 MAP_SCRATCH[ MAP_SCRATCH_BYTES ] __attribute__( ( aligned( 4 ) ) ) = { 0 };
+    u8 MAP_DECOMP[ MAP_RECORD_SIZE ] __attribute__( ( aligned( 4 ) ) )    = { 0 };
+
+    bool readCompressedMap( FILE* p_mapFile, const MAP::bankInfo& p_info, u16 p_x, u16 p_y ) {
+        u32 count = ( (u32) p_info.m_sizeX + 1 ) * ( (u32) p_info.m_sizeY + 1 );
+        u32 idx   = ( (u32) p_info.m_sizeX + 1 ) * p_y + p_x;
+
+        if( idx >= count ) { return false; }
+
+        u32 entry[ 2 ] = { 0, 0 };
+        if( fseek( p_mapFile, sizeof( MAP::bankInfo ) + idx * 8, SEEK_SET )
+            || fread( entry, 8, 1, p_mapFile ) != 1 ) {
+            return false;
+        }
+
+        u32 offset = entry[ 0 ], csize = entry[ 1 ];
+        if( csize < 4 || csize > MAP_SCRATCH_BYTES ) { return false; }
+
+        if( fseek( p_mapFile, offset, SEEK_SET )
+            || fread( MAP_SCRATCH, 1, csize, p_mapFile ) != csize ) {
+            return false;
+        }
+        if( MAP_SCRATCH[ 0 ] != 0x10 ) { return false; }
+
+        u32 dsize = (u32) MAP_SCRATCH[ 1 ] | ( (u32) MAP_SCRATCH[ 2 ] << 8 )
+                    | ( (u32) MAP_SCRATCH[ 3 ] << 16 );
+        if( dsize != MAP_RECORD_SIZE ) { return false; }
+
+        swiDecompressLZSSWram( MAP_SCRATCH, MAP_DECOMP );
+        return true;
+    }
+
     u32 readMapSliceAndData( FILE* p_mapFile, MAP::mapSlice* p_slice, MAP::mapData* p_data, u16 p_x,
                              u16 p_y ) {
         MAP::bankInfo info;
         if( readMapBankInfo( p_mapFile, &info ) ) { return 1; }
+
+        if( ( COMPRESSION & COMPRESS_MAP ) != 0 ) {
+            if( !readCompressedMap( p_mapFile, info, p_x, p_y ) ) { return 6; }
+            if( p_slice ) {
+                p_slice->m_x = p_x;
+                p_slice->m_y = p_y;
+                memcpy( &p_slice->m_data, MAP_DECOMP, sizeof( MAP::mapSliceData ) );
+                DC_FlushRange( &p_slice->m_data, sizeof( MAP::mapSliceData ) );
+            }
+            if( p_data ) {
+                memcpy( p_data, MAP_DECOMP + sizeof( MAP::mapSliceData ), sizeof( MAP::mapData ) );
+                DC_FlushRange( p_data, sizeof( MAP::mapData ) );
+            }
+            return 0;
+        }
 
         if( fseek( p_mapFile,
                    sizeof( MAP::bankInfo )
@@ -644,25 +696,79 @@ namespace FS {
     }
 
 #ifndef NO_SOUND
-    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, u32 p_start, u32 p_size, FILE* p_f ) {
+    bool loadSequenceData( SOUND::SSEQ::sequenceData* p_data, u32 p_start, u32 p_size, FILE* p_f,
+                           bool p_compressed ) {
         if( !p_f ) { return false; }
         fseek( p_f, p_start, SEEK_SET );
 
-        p_data->m_data = malloc( p_size );
+        if( !p_compressed ) {
+            p_data->m_data = malloc( p_size );
 
-        if( !p_data->m_data ) {
-            p_data->m_size = 0;
-            return false;
+            if( !p_data->m_data ) {
+                p_data->m_size = 0;
+                return false;
+            }
+
+            p_data->m_size = p_size;
+            if( fread( p_data->m_data, 1, p_data->m_size, p_f ) != p_data->m_size ) {
+                free( p_data->m_data );
+                p_data->m_data = nullptr;
+                p_data->m_size = 0;
+                return false;
+            }
+            DC_FlushRange( p_data->m_data, p_data->m_size );
+            return true;
         }
 
-        p_data->m_size = p_size;
-        if( fread( p_data->m_data, 1, p_data->m_size, p_f ) != p_data->m_size ) {
-            free( p_data->m_data );
+        if( !p_size ) {
+            p_data->m_data = nullptr;
+            p_data->m_size = 0;
+            return true;
+        }
+
+        u8* comp = (u8*) malloc( p_size );
+        if( !comp ) {
             p_data->m_data = nullptr;
             p_data->m_size = 0;
             return false;
         }
-        DC_FlushRange( p_data->m_data, p_data->m_size );
+
+        if( fread( comp, 1, p_size, p_f ) != p_size ) {
+            free( comp );
+            p_data->m_data = nullptr;
+            p_data->m_size = 0;
+            return false;
+        }
+
+        if( comp[ 0 ] != 0x10 ) {
+            free( comp );
+            p_data->m_data = nullptr;
+            p_data->m_size = 0;
+            return false;
+        }
+
+        u32 dsize = (u32) comp[ 1 ] | ( (u32) comp[ 2 ] << 8 ) | ( (u32) comp[ 3 ] << 16 );
+        if( dsize > 2 * 1024 * 1024 ) {
+            free( comp );
+            p_data->m_data = nullptr;
+            p_data->m_size = 0;
+            return false;
+        }
+
+        u8* dst = (u8*) malloc( dsize );
+        if( !dst ) {
+            free( comp );
+            p_data->m_data = nullptr;
+            p_data->m_size = 0;
+            return false;
+        }
+
+        swiDecompressLZSSWram( comp, dst );
+        free( comp );
+        DC_FlushRange( dst, dsize );
+
+        p_data->m_data = dst;
+        p_data->m_size = dsize;
         return true;
     }
 
@@ -677,7 +783,8 @@ namespace FS {
         u32 index = 0, size = 0;
         if( !fread( &index, 4, 1, SSEQ_INFO_BANK_FILE ) ) { return false; }
         fread( &size, 4, 1, SSEQ_INFO_BANK_FILE );
-        auto res = loadSequenceData( p_data, index, size, SSEQ_DATA_BANK_FILE );
+        auto res = loadSequenceData( p_data, index, size, SSEQ_DATA_BANK_FILE,
+                                     ( COMPRESSION & COMPRESS_BANK ) != 0 );
         return res;
     }
 
@@ -692,7 +799,8 @@ namespace FS {
         u32 index = 0, size = 0;
         if( !fread( &index, 4, 1, SBNK_INFO_BANK_FILE ) ) { return false; }
         fread( &size, 4, 1, SBNK_INFO_BANK_FILE );
-        auto res = loadSequenceData( p_data, index, size, SBNK_DATA_BANK_FILE );
+        auto res = loadSequenceData( p_data, index, size, SBNK_DATA_BANK_FILE,
+                                     ( COMPRESSION & COMPRESS_BANK ) != 0 );
         return res;
     }
 
@@ -707,7 +815,8 @@ namespace FS {
         u32 index = 0, size = 0;
         if( !fread( &index, 4, 1, SWAR_INFO_BANK_FILE ) ) { return false; }
         fread( &size, 4, 1, SWAR_INFO_BANK_FILE );
-        auto res = loadSequenceData( p_data, index, size, SWAR_DATA_BANK_FILE );
+        // Mostly incompressible data, stays raw
+        auto res = loadSequenceData( p_data, index, size, SWAR_DATA_BANK_FILE, false );
         return res;
     }
 #endif

@@ -459,9 +459,10 @@ namespace IO {
             IO::regularFont->setColor( 3, 1 );
         }
         IO::regularFont->setColor( 2, 2 );
-        IO::regularFont->printStringBC(
-            FS::kanaWrap( ( FS::getLocation( p_newLocation ) + " " ).c_str( ), CURRENT_LANGUAGE ),
-            TEXT_PAL, TEXT_BUF, 128, IO::font::CENTER );
+
+        std::string locNameStr = FS::getLocation( p_newLocation );
+        const char* locName    = FS::kanaWrap( locNameStr.c_str( ), CURRENT_LANGUAGE );
+        IO::regularFont->printStringBC( locName, TEXT_PAL, TEXT_BUF, 128, IO::font::CENTER );
         u16 tileCnt = SPR_MSG_GFX;
         u16 x = 0, y = 8;
         tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, 32, TEXT_BUF, 64 * 32 / 2,
