@@ -268,13 +268,17 @@ namespace FS {
         if( RL_SCRATCH[ 0 ] != 0x30 ) { return false; }
 
         u32 dsize = rlDecompressedSize( RL_SCRATCH );
-        if( dsize != p_rasterBytes + p_palBytes ) { return false; }
+        if( dsize < p_rasterBytes || dsize > p_rasterBytes + p_palBytes ) { return false; }
         if( dsize > (u32) sizeof( RL_DECOMP ) ) { return false; }
 
         swiDecompressRLEWram( RL_SCRATCH, RL_DECOMP );
 
+        u32 palAvail = dsize - p_rasterBytes;
         memcpy( p_p1, RL_DECOMP, p_rasterBytes );
-        memcpy( p_p2, RL_DECOMP + p_rasterBytes, p_palBytes );
+        memcpy( p_p2, RL_DECOMP + p_rasterBytes, palAvail );
+        if( palAvail < p_palBytes ) {
+            std::memset( (u8*) p_p2 + palAvail, 0, p_palBytes - palAvail );
+        }
         DC_FlushRange( p_p1, p_rasterBytes );
         DC_FlushRange( p_p2, p_palBytes );
         return true;
