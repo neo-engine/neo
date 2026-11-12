@@ -55,4 +55,8 @@ namespace SPX {
     void runIDViewer( );
 
     void runHallOfFame( );
+
+    namespace VF {
+        void runVoltorbFlip( );
+    }
 } // namespace SPX

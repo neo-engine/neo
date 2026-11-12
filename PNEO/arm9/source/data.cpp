@@ -968,6 +968,17 @@ namespace FS {
         return getString( p_path, p_maxLen, p_stringId, CURRENT_LANGUAGE );
     }
 
+    std::string wideNumeral( u32 p_num, u8 p_pad ) {
+        std::string res = "";
+        while( p_num || p_pad ) {
+            res += std::to_string( p_num % 10 ) + "x";
+            p_num /= 10;
+            if( p_pad ) { --p_pad; }
+        }
+
+        return std::string{ res.rbegin( ), res.rend( ) };
+    }
+
     namespace {
         constexpr u8  KANA_WRAP_SLOTS = 8;
         constexpr u16 KANA_WRAP_LEN   = 512;
@@ -987,6 +998,11 @@ namespace FS {
         out[ i++ ] = IO::KANA::OFF;
         out[ i ]   = '\0';
         return out;
+    }
+
+    const char* kanaWrap( u32 p_number, u8 p_language ) {
+        if( p_language != SAVE::JAP ) { return std::to_string( p_number ).c_str( ); }
+        return kanaWrap( wideNumeral( p_number ).c_str( ), p_language );
     }
 
     bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {

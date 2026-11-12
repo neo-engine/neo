@@ -40,8 +40,8 @@ namespace IO {
     inline u16* BG_PAL( bool p_bottom ) {
         return p_bottom ? BG_PALETTE_SUB : BG_PALETTE;
     }
-    inline u16* BG_BMP( bool p_bottom ) {
-        return p_bottom ? BG_BMP_RAM_SUB( 1 ) : BG_BMP_RAM( 1 );
+    inline u16* BG_BMP( bool p_bottom, u8 p_layer = 1 ) {
+        return p_bottom ? BG_BMP_RAM_SUB( p_layer ) : BG_BMP_RAM( p_layer );
     }
 
     extern ConsoleFont* consoleFont;

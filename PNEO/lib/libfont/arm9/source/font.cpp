@@ -70,8 +70,8 @@ namespace IO {
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) { break; }
             if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
-                kanaCounter += kanaModeOn;
                 kanaModeOn = true;
+                kanaCounter += kanaModeOn;
                 current_char++;
                 continue;
             }
@@ -139,8 +139,8 @@ namespace IO {
         while( p_string[ current_char ] ) {
             if( p_string[ current_char ] == '\n' ) { return width; }
             if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
-                kanaCounter += kanaModeOn;
                 kanaModeOn = true;
+                kanaCounter += kanaModeOn;
                 current_char++;
                 continue;
             }
@@ -300,8 +300,8 @@ namespace IO {
                 continue;
             }
             if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
-                kanaCounter += kanaModeOn;
                 kanaModeOn = true;
+                kanaCounter += kanaModeOn;
                 current_char++;
                 continue;
             }
@@ -400,8 +400,8 @@ namespace IO {
                 continue;
             }
             if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
-                kanaCounter += kanaModeOn;
                 kanaModeOn = true;
+                kanaCounter += kanaModeOn;
                 current_char++;
                 continue;
             }
@@ -508,8 +508,8 @@ namespace IO {
                 continue;
             }
             if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
-                kanaCounter += kanaModeOn;
                 kanaModeOn = true;
+                kanaCounter += kanaModeOn;
                 current_char++;
                 continue;
             }
@@ -588,8 +588,8 @@ namespace IO {
         u8   kanaCounter = 0;
         while( p_string[ current_char ] ) {
             if( _parseKanaDigraph && p_string[ current_char ] == KANA::ON ) {
-                kanaCounter += kanaModeOn;
                 kanaModeOn = true;
+                kanaCounter += kanaModeOn;
                 current_char++;
                 continue;
             }

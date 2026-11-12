@@ -279,6 +279,35 @@ namespace MAP {
 
             return;
         }
+        case BEH_POKEBLOCK_FEEDER: {
+            // TODO
+            return;
+        }
+        case BEH_SLOT_MACHINE: {
+            // TODO
+            SPX::runSlotMachine( );
+            return;
+        }
+        case BEH_VOLTORB_FLIP: {
+            ANIMATE_MAP = false;
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+
+            SPX::VF::runVoltorbFlip( );
+
+            FADE_TOP_DARK( );
+            FADE_SUB_DARK( );
+            IO::clearScreen( false );
+            videoSetMode( MODE_5_2D );
+            bgUpdate( );
+            IO::initVideoSub( );
+            memset( (void*) BG_BMP_RAM_SUB( 5 ), 0, 256 * 192 );
+            ANIMATE_MAP = true;
+            IO::init( );
+            draw( );
+            return;
+        }
+
         case BEH_INTERACT_MAP: { // Map
             // TODO
             printMapMessage( GET_STRING( 560 ), MSG_NORMAL );

@@ -156,7 +156,10 @@ namespace FS {
 #endif
 #define HP_ICON FS::HP_ICONS[ CURRENT_LANGUAGE ]
 
+    std::string wideNumeral( u32 p_num, u8 p_pad = 1 );
     const char* kanaWrap( const char* p_s, u8 p_language );
+    const char* kanaWrap( u32 p_num, u8 p_language );
+
     bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );

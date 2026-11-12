@@ -44,3 +44,9 @@
 #define SFX_OBTAIN_TM            41
 #define SFX_BUY_SUCCESSFUL       42
 #define SFX_CAPTURE_SUCCESSFUL   43
+#define SFX_VOLTORB_FLIP         44
+#define SFX_VOLTORB_FLIP_PREP    45
+#define SFX_VOLTORB_HIT          46
+#define SFX_VOLTORB_PAYOUT       47
+#define SFX_VOLTORB_PAYOUT_END   48
+#define SFX_VOLTORB_WIN          49

@@ -1,9 +1,9 @@
 v1.1 (Gloomy Goomy)
 Map engine:
-[ ] Added Voltorb Flip
 [ ] Added PKMN Communication Club
 [ ] PKMN Contests (currently w/o move animations)
-[ ] Mauville Game Corner
+- Mauville Game Corner/Voltorb Flip
+[ ] Mauville Game Corner/Slot Machine
 [ ] multi battles
 [ ] call 'n' rebattle
 [~] fite: battle tents, battle factory
@@ -54,9 +54,9 @@ General:
 - Updated PKMN Data
 - Factored out libcard, libwidget, libcard, libsound
 - Added LZ/RLE compression to the FSROOT
+[ ] Added receiving/distributing Mystery Gifts from/to retail games/neo via local WiFi
 [ ] Reworked NitroFat access to mirror retail games
 [ ] Added support for memory overlays
-[ ] Added receiving/distributing Mystery Gifts from/to retail games/neo via local WiFi
 [ ] Game Credits
 - Ate some squids, had some fun
 

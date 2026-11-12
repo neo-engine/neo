@@ -143,14 +143,14 @@ namespace MAP {
             BEH_PACIFIDLOG_LOG_HORIZONTAL_RIGHT = 0x77,
             BEH_FORTREE_BRIDGE_BIKE_BELOW       = 0x78,
 
-            BEH_INTERACT_BEHIND = 0x80,
-            BEH_INTERACT_PC     = 0x83,
-            BEH_INTERACT_MAP    = 0x85,
-            BEH_INTERACT_TV     = 0x86,
+            BEH_INTERACT_BEHIND  = 0x80,
+            BEH_INTERACT_PC      = 0x83,
+            BEH_INTERACT_MAP     = 0x85,
+            BEH_INTERACT_TV      = 0x86,
+            BEH_POKEBLOCK_FEEDER = 0x87,
+            BEH_SLOT_MACHINE     = 0x89,
+            BEH_VOLTORB_FLIP     = 0x8A, // Roulette replaced by "Voltorb Flip"
 
-            BEH_POKEBLOCK_FEEDER_UNUSED                = 0x87,
-            BEH_SLOT_MACHINE_UNUSED                    = 0x89,
-            BEH_ROULETTE_UNUSED                        = 0x8A,
             BEH_DOOR_CLOSED_MESSAGE_SOOTOPOLIS_UNUSED  = 0x8B, // "The door is closed."
             BEH_DOOR_CLOSED_MESSAGE_SECRET_CODE_UNUSED = 0x8C, // "The door is locked.
                                                                // ...On closer inspection,

@@ -6,7 +6,7 @@ file        : defines.h
 author      : Philip Wellnitz
 description : Header file. Consult the corresponding source file for details.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -395,4 +395,25 @@ namespace IO {
     constexpr u16 STR_MAP_HM_MESSAGE_WATERFALL          = 320;
     constexpr u16 STR_MAP_HM_MESSAGE_HEADBUTT           = 321;
     constexpr u16 STR_MAP_HM_MESSAGE_SWEET_SCENT_FAILED = 90;
+
+    constexpr u16 STR_VF_0_COINS        = 825;
+    constexpr u16 STR_VF_1_COIN         = 826;
+    constexpr u16 STR_VF_MULT_COINS     = 827;
+    constexpr u16 STR_VF_GAME_CLEAR     = 828;
+    constexpr u16 STR_VF_OBT_1_COIN     = 829;
+    constexpr u16 STR_VF_OBT_MULT_COINS = 830;
+
+    constexpr u16 STR_VF_QUIT       = 831;
+    constexpr u16 STR_VF_OPEN_MEMO  = 832;
+    constexpr u16 STR_VF_CLOSE_MEMO = 833;
+
+    constexpr u16 STR_VF_VOLTORB_FLIP               = 834;
+    constexpr u16 STR_VF_FLIP_FOR_COINS             = 835;
+    constexpr u16 STR_VF_MULT                       = 836;
+    constexpr u16 STR_VF_GAME_OVER                  = 837;
+    constexpr u16 STR_VF_COLLECTED_COINS            = 838;
+    constexpr u16 STR_VF_COLLECTED_COINS_THIS_ROUND = 839;
+    constexpr u16 STR_VF_QUIT_NOW_1                 = 840;
+    constexpr u16 STR_VF_QUIT_NOW_2                 = 841;
+    constexpr u16 STR_VF_QUIT_NOW_3                 = 842;
 } // namespace IO
