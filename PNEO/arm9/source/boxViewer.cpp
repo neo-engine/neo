@@ -171,40 +171,48 @@ namespace BOX {
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
             }
 
-            /*
-            auto ranges = _boxUI.getInteractions( );
-            for( u8 j = 0; j < ranges.size( ); ++j ) {
-                auto i = ranges[ j ].m_touch;
-                if( IN_RANGE_I( IO::TOUCH , i ) ) {
-                    u8 c = 0;
-                    loop( ) {
-                        scanKeys( );
-                        swiWaitForVBlank( );
-                        touchRead( &IO::TOUCH  );
-                        if( c++ == TRESHOLD ) {
-                            _selectedIdx = j;
-                            takePkmn( _selectedIdx );
-                            IO::waitForTouchUp( i );
-                            break;
-                        }
-                        if( TOUCH_UP ) {
-                            switch( ranges[ j ].m_buttonType ) {
-                                case boxUI::BUTTON_PKMN:
-                                    select( ranges[ j ].m_param );
-                                    if( _mode == MOVE || runStatusChoice( ) ) {
-                                        takePkmn( _selectedIdx );
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
-                            break;
-                        }
-                        if( !IN_RANGE_I( IO::TOUCH , i ) ) break;
-                    }
+            for( const auto& i : _boxUI.getInteractions( ) ) {
+                if( !i.m_touch.inRange( IO::TOUCH ) ) { continue; }
+
+                const boxUI::button btn = i.m_buttonType;
+                const u8            idx = i.m_param;
+                IO::waitForTouchUp( i.m_touch );
+
+                switch( btn ) {
+                case boxUI::BUTTON_BACK:
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                    if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
+                    return;
+                case boxUI::BUTTON_PKMN:
+                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    _selectedIdx = idx;
+                    takePkmn( idx, _mode == MOVE );
+                    break;
+                case boxUI::BUTTON_LEFT:
+                case boxUI::BUTTON_RIGHT: {
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    const int delta = btn == boxUI::BUTTON_LEFT ? -1 : 1;
+                    SAVE::CURRENT_FILE->m_curBox
+                        = ( SAVE::CURRENT_FILE->m_curBox + SAVE::MAX_BOXES + delta )
+                          % SAVE::MAX_BOXES;
+                    _boxUI.draw( SAVE::CURRENT_FILE->getCurrentBox( ) );
+                    select( _selectedIdx );
+                    break;
                 }
+                case boxUI::BUTTON_BOX_NAME:
+                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    select( BOXNAME_BUTTON );
+                    runBoxSettings( );
+                    break;
+                case boxUI::BUTTON_PARTY:
+                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    if( runParty( ) ) { return; }
+                    break;
+                default: break;
+                }
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+                break;
             }
-            */
         }
     }
 
@@ -493,6 +501,34 @@ namespace BOX {
                     break;
                 }
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            }
+
+            for( const auto& i : _boxUI.getInteractions( ) ) {
+                if( !i.m_touch.inRange( IO::TOUCH ) ) { continue; }
+
+                const boxUI::button btn = i.m_buttonType;
+                const u8            idx = i.m_param;
+                IO::waitForTouchUp( i.m_touch );
+
+                switch( btn ) {
+                case boxUI::BUTTON_BACK:
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                    if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
+                    return true;
+                case boxUI::BUTTON_PARTY:
+                    SOUND::playSoundEffect( SFX_CANCEL );
+                    _boxUI.hideParty( SAVE::CURRENT_FILE->getCurrentBox( ) );
+                    select( 0 );
+                    return false;
+                case boxUI::BUTTON_PKMN:
+                    SOUND::playSoundEffect( SFX_CHOOSE );
+                    _selectedIdx = idx;
+                    takePkmn( idx, _mode == MOVE );
+                    break;
+                default: break;
+                }
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+                break;
             }
         }
         _boxUI.hideParty( SAVE::CURRENT_FILE->getCurrentBox( ) );

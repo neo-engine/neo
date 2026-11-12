@@ -212,11 +212,6 @@ namespace BOX {
         }
     }
 
-    std::vector<boxUI::interact> boxUI::getInteractions( ) {
-        // TODO
-        return std::vector<interact>( );
-    }
-
     void boxUI::init( ) {
         for( u8 i = 0; i < 2; ++i ) {
             u16* pal             = IO::BG_PAL( i );
@@ -964,4 +959,34 @@ namespace BOX {
         IO::updateOAM( true );
     }
 
+    std::vector<boxUI::interact> boxUI::getInteractions( ) {
+        std::vector<interact> out;
+
+        out.push_back( { IO::inputTarget( 236, 172, 252, 188 ), BUTTON_BACK, 0 } );
+        out.push_back( { IO::inputTarget( 2, 0, 52, 30 ), BUTTON_LEFT, 0 } );
+        out.push_back( { IO::inputTarget( 130, 0, 184, 30 ), BUTTON_RIGHT, 0 } );
+        out.push_back( { IO::inputTarget( 52, 0, 130, 30 ), BUTTON_BOX_NAME, 0 } );
+
+        out.push_back( { IO::inputTarget( 32, 160, 112, 192 ), BUTTON_PARTY, 0 } );
+
+        if( _showTeam ) {
+            for( u8 i = 0; i < 3; ++i ) {
+                const u16 y = 46 + 36 * i;
+                out.push_back( { IO::inputTarget( 36, y, 36 + 31, y + 31 ), BUTTON_PKMN,
+                                 u8( MAX_PKMN_PER_BOX + 2 * i ) } );
+                out.push_back( { IO::inputTarget( 72, y + 5, 72 + 31, y + 5 + 31 ), BUTTON_PKMN,
+                                 u8( MAX_PKMN_PER_BOX + 2 * i + 1 ) } );
+            }
+        } else {
+            for( u8 i = 0; i < 5; ++i ) {
+                for( u8 j = 0; j < 6; ++j ) {
+                    const u16 x = 26 + 26 * j;
+                    const u16 y = 32 + 26 * i;
+                    out.push_back(
+                        { IO::inputTarget( x, y, x + 25, y + 25 ), BUTTON_PKMN, u8( 6 * i + j ) } );
+                }
+            }
+        }
+        return out;
+    }
 } // namespace BOX

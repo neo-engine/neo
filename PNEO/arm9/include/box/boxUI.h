@@ -6,7 +6,7 @@ file        : boxUI.h
 author      : Philip Wellnitz
 description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -89,11 +89,6 @@ namespace BOX {
         };
 
         /*
-         * @brief: returns the current buttons.
-         */
-        std::vector<interact> getInteractions( );
-
-        /*
          * @brief: Initializes the box UI.
          */
         void init( );
@@ -143,5 +138,10 @@ namespace BOX {
          * @brief: Replaces the pkmn at position p_index with the given pkmn.
          */
         void updatePkmn( boxPokemon* p_newPkmn, u8 p_index );
+
+        /*
+         * @brief: returns the current buttons.
+         */
+        std::vector<interact> getInteractions( );
     };
 } // namespace BOX
