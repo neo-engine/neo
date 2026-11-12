@@ -389,6 +389,90 @@ namespace SAVE {
         drawSub( );
     }
 
+    enum touchEffect : u8 {
+        TOUCH_NONE,
+        TOUCH_HIGHLIGHT,
+        TOUCH_LESS,
+        TOUCH_MIDDLE,
+        TOUCH_MORE,
+        TOUCH_LEAVE
+    };
+
+    struct touchZone {
+        IO::inputTarget m_box;
+        u8              m_row;
+        touchEffect     m_effect;
+    };
+
+    std::vector<touchZone> touchZones( ) {
+        const auto& oam = IO::Oam->oamBuffer;
+
+        auto res = std::vector<touchZone>( );
+        for( u8 i = 0; i < MAX_SETTINGS; ++i ) {
+            s16 top    = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y - 2;
+            s16 bottom = oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 18;
+
+            res.push_back( { IO::inputTarget( 12, top, 99, bottom ), i, TOUCH_HIGHLIGHT } );
+            res.push_back( { IO::inputTarget( 100, top, 147, bottom ), i, TOUCH_LESS } );
+            res.push_back( { IO::inputTarget( 148, top, 195, bottom ), i,
+                             ( 0 == i || 4 == i ) ? TOUCH_MIDDLE : TOUCH_HIGHLIGHT } );
+            res.push_back( { IO::inputTarget( 196, top, 244, bottom ), i, TOUCH_MORE } );
+        }
+
+        const SpriteEntry& x = oam[ SPR_X_OAM_SUB ];
+        res.push_back(
+            { IO::inputTarget( x.x - 2, x.y - 2, x.x + 18, x.y + 18 ), 0, TOUCH_LEAVE } );
+
+        return res;
+    }
+
+    touchEffect handleTouch( u8& p_currentSelection ) {
+        if( TOUCH_UP ) { return TOUCH_NONE; }
+
+        for( auto& zone : touchZones( ) ) {
+            if( !zone.m_box.inRange( IO::TOUCH ) ) { continue; }
+            if( !IO::waitForTouchUp( zone.m_box ) ) { return TOUCH_NONE; }
+
+            if( TOUCH_LEAVE == zone.m_effect ) { return TOUCH_LEAVE; }
+
+            if( p_currentSelection != zone.m_row ) {
+                p_currentSelection = zone.m_row;
+                select( zone.m_row );
+            }
+
+            switch( zone.m_effect ) {
+            case TOUCH_LESS:
+                SOUND::playSoundEffect( SFX_SELECT );
+                decreaseSetting( zone.m_row );
+                if( 0 == zone.m_row || 4 == zone.m_row ) { decreaseSetting( zone.m_row ); }
+                break;
+            case TOUCH_MORE:
+                SOUND::playSoundEffect( SFX_SELECT );
+                increaseSetting( zone.m_row );
+                if( 0 == zone.m_row || 4 == zone.m_row ) { increaseSetting( zone.m_row ); }
+                break;
+            case TOUCH_MIDDLE: {
+                const u8 middle = ( 0 == zone.m_row ) ? 1 : 3;
+                const u8 value  = ( 0 == zone.m_row )
+                                      ? SAVE::SAV.getActiveFile( ).m_options.getTextSpeed( )
+                                      : SAVE::SAV.getActiveFile( ).m_options.getDifficulty( );
+
+                if( value < middle ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    increaseSetting( zone.m_row );
+                } else if( value > middle ) {
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    decreaseSetting( zone.m_row );
+                }
+                break;
+            }
+            default: break;
+            }
+            return TOUCH_NONE;
+        }
+        return TOUCH_NONE;
+    }
+
     void runSettings( ) {
         init( );
         u8 currentSelection = 0;
@@ -416,6 +500,11 @@ namespace SAVE {
                 SOUND::playSoundEffect( SFX_SELECT );
                 increaseSetting( currentSelection );
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+            }
+
+            if( TOUCH_LEAVE == handleTouch( currentSelection ) ) {
+                SOUND::playSoundEffect( SFX_CHOOSE );
+                return;
             }
         }
     }
