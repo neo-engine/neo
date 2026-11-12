@@ -56,14 +56,16 @@ _Partially_ implemented features are in _italics_.
         * [x] Saving the progress to the micro SD (works only on flash cards)
         * [x] Saving the progress to flash memory (works only in emulators)
     * [ ] Support for communication with “the originals”
-        * [ ] Playing with / importing a save from a GBA version
-        * [ ] Link trading with Gen IV and Gen V games
+        * [ ] Receive and distribute Mystery Gifts from/to Gen IV Games
+        * [ ] Link trading with Gen V Games
+        * [ ] Link trading with Gen IV Games
+        * [ ] Playing with / importing a save from Gen III Games
     * [x] A clean UI
     * [x] Dynamic difficulty
         * [x] Wild Pokémon's levels scale with the story progression
         * [x] Adjust the difficulty anytime via the Options.
-    * [x] Full support for multiple languages (English, German)
-        * [x] Kana are supported font-wise, getting Kana text for story content still requires some work.
+    * [x] Full support for multiple languages (English, German, Japanese)
+        * [x] Support for Braille and Braille Kana.
 
 * [x] Easy-to-understand and ready-to-(re)use code
     * [x] Strict and intuitive naming conventions
