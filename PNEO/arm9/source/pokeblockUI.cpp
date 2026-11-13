@@ -231,7 +231,7 @@ namespace BAG {
         IO::initColors( true, true, true );
 
         // "PokeBlocks"
-        IO::regularFont->printString( GET_STRING( 739 ), 128, 5, false, IO::font::CENTER );
+        IO::regularFont->printString( GET_STRING( 579 ), 128, 5, false, IO::font::CENTER );
 
         bgUpdate( );
     }
@@ -244,7 +244,7 @@ namespace BAG {
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
 
         // "Select"
-        IO::regularFont->printString( GET_STRING( 740 ), 64, 5, true, IO::font::CENTER );
+        IO::regularFont->printString( GET_STRING( 580 ), 64, 5, true, IO::font::CENTER );
 
         // Pokeblocks, load blocks
         IO::loadPokeblockIcon( 0, POKEBLOCK_X + POKEBLOCK_SIZE_X * 0,
@@ -324,7 +324,7 @@ namespace BAG {
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         // "Feed"
-        IO::regularFont->printString( GET_STRING( 741 ), 64, 5, true, IO::font::CENTER );
+        IO::regularFont->printString( GET_STRING( 581 ), 64, 5, true, IO::font::CENTER );
 
         // hide pokeblocks on subscreen
         for( u8 i = 0; i < BLOCKS_PER_PAGE; ++i ) {
@@ -396,13 +396,13 @@ namespace BAG {
         auto str = pokeblock::strengthModifier( pokeblockType{ p_blockType },
                                                 _playerTeam[ p_pkmnIdx ].getNature( ) );
         if( str == LIKED_FALVOR ) {
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 797 ),
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 637 ),
                       _playerTeam[ p_pkmnIdx ].m_boxdata.getName( ) );
         } else if( str == NORMAL_FALVOR ) {
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 798 ),
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 638 ),
                       _playerTeam[ p_pkmnIdx ].m_boxdata.getName( ) );
         } else if( str == DISLIKED_FALVOR ) {
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 799 ),
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 639 ),
                       _playerTeam[ p_pkmnIdx ].m_boxdata.getName( ) );
         }
 
@@ -446,13 +446,13 @@ namespace BAG {
 
             // block flavor
             IO::regularFont->printStringC(
-                GET_STRING( 766 + p_blockType ),
+                GET_STRING( 606 + p_blockType ),
                 IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].x * 2 + 24,
                 IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y, false, IO::font::LEFT );
 
             // Flavor
             IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 791 ),
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 631 ),
                       pokeblock::flavorStrength( pokeblockType{ p_blockType } ) );
             IO::regularFont->printStringC( buffer.data( ), 64 + 48,
                                            IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y + 32,
@@ -460,14 +460,14 @@ namespace BAG {
 
             // Strength
             IO::regularFont->setColor( IO::RED_IDX, 1 );
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 792 ),
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 632 ),
                       pokeblock::smoothness( pokeblockType{ p_blockType } ) );
             IO::regularFont->printStringC( buffer.data( ), 128 + 64,
                                            IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y + 32,
                                            false, IO::font::CENTER );
         } else {
             // "Try to create this block"
-            IO::regularFont->printStringC( GET_STRING( 790 ), 128,
+            IO::regularFont->printStringC( GET_STRING( 630 ), 128,
                                            IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y + 16,
                                            false, IO::font::CENTER );
             IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].isHidden = true;
@@ -515,20 +515,20 @@ namespace BAG {
                     if( !_playerTeam[ i ].canEatPokeblock( p_blockType ) ) {
                         // pkmn is full
                         IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-                        IO::regularFont->printStringC( GET_STRING( 796 ), 45, SECOND_LINE, true );
+                        IO::regularFont->printStringC( GET_STRING( 636 ), 45, SECOND_LINE, true );
                     } else {
                         auto str = pokeblock::strengthModifier( pokeblockType{ p_blockType },
                                                                 _playerTeam[ i ].getNature( ) );
                         if( str == LIKED_FALVOR ) {
                             IO::regularFont->setColor( IO::COLOR_IDX, 1 );
-                            IO::regularFont->printStringC( GET_STRING( 793 ), 45, SECOND_LINE,
+                            IO::regularFont->printStringC( GET_STRING( 633 ), 45, SECOND_LINE,
                                                            true );
                         } else if( str == NORMAL_FALVOR ) {
-                            IO::regularFont->printStringC( GET_STRING( 794 ), 45, SECOND_LINE,
+                            IO::regularFont->printStringC( GET_STRING( 634 ), 45, SECOND_LINE,
                                                            true );
                         } else if( str == DISLIKED_FALVOR ) {
                             IO::regularFont->setColor( IO::RED_IDX, 1 );
-                            IO::regularFont->printStringC( GET_STRING( 795 ), 45, SECOND_LINE,
+                            IO::regularFont->printStringC( GET_STRING( 635 ), 45, SECOND_LINE,
                                                            true );
                         }
                     }

@@ -64,10 +64,10 @@ namespace SAVE {
         // Nav Background
 
         // Options string
-        IO::regularFont->printString( GET_STRING( 418 ), 4, 4, true );
+        IO::regularFont->printString( GET_STRING( 340 ), 4, 4, true );
 
         for( u8 i = 0; i < MAX_SETTINGS; ++i ) {
-            IO::regularFont->printStringC( GET_STRING( 419 + i ),
+            IO::regularFont->printStringC( GET_STRING( 341 + i ),
                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 6,
                                            oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 2, true );
         }
@@ -80,7 +80,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 425 ),
+        IO::boldFont->printStringC( GET_STRING( 347 ),
                                     oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 6 + 86,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y, true, IO::font::LEFT );
         if( SAVE::SAV.getActiveFile( ).m_options.getTextSpeed( ) == 1 ) {
@@ -90,7 +90,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 426 ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 158,
+        IO::boldFont->printStringC( GET_STRING( 348 ), oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 158,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y, true,
                                     IO::font::CENTER );
         if( SAVE::SAV.getActiveFile( ).m_options.getTextSpeed( ) == 2 ) {
@@ -100,7 +100,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 427 ), 256 - 12 - 10,
+        IO::boldFont->printStringC( GET_STRING( 349 ), 256 - 12 - 10,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y, true, IO::font::RIGHT );
 
         // language
@@ -125,7 +125,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 428 ),
+        IO::boldFont->printStringC( GET_STRING( 350 ),
                                     oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].x + 6 + 86,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y, true, IO::font::LEFT );
         if( !SAVE::SAV.getActiveFile( ).m_options.m_enableBGM ) {
@@ -135,12 +135,12 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 429 ), 256 - 12 - 10,
+        IO::boldFont->printStringC( GET_STRING( 351 ), 256 - 12 - 10,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 2 ) ].y, true, IO::font::RIGHT );
 #else
         IO::boldFont->setColor( IO::BLUE_IDX, 2 );
         IO::boldFont->setColor( IO::BLUE2_IDX, 1 );
-        IO::boldFont->printStringC( GET_STRING( 431 ), oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 158,
+        IO::boldFont->printStringC( GET_STRING( 353 ), oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 158,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y, true,
                                     IO::font::CENTER );
 
@@ -155,7 +155,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 428 ),
+        IO::boldFont->printStringC( GET_STRING( 350 ),
                                     oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].x + 6 + 86,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y, true, IO::font::LEFT );
         if( !SAVE::SAV.getActiveFile( ).m_options.m_enableSFX ) {
@@ -165,12 +165,12 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 429 ), 256 - 12 - 10,
+        IO::boldFont->printStringC( GET_STRING( 351 ), 256 - 12 - 10,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y, true, IO::font::RIGHT );
 #else
         IO::boldFont->setColor( IO::BLUE_IDX, 2 );
         IO::boldFont->setColor( IO::BLUE2_IDX, 1 );
-        IO::boldFont->printStringC( GET_STRING( 431 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 158,
+        IO::boldFont->printStringC( GET_STRING( 353 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 158,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 3 ) ].y, true,
                                     IO::font::CENTER );
 
@@ -184,7 +184,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 430 ),
+        IO::boldFont->printStringC( GET_STRING( 352 ),
                                     oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 6 + 86,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].y, true, IO::font::LEFT );
         if( SAVE::SAV.getActiveFile( ).m_options.m_difficulty == 3 ) {
@@ -194,7 +194,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 431 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 158,
+        IO::boldFont->printStringC( GET_STRING( 353 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 158,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].y, true,
                                     IO::font::CENTER );
         if( SAVE::SAV.getActiveFile( ).m_options.m_difficulty > 3 ) {
@@ -204,7 +204,7 @@ namespace SAVE {
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
         }
-        IO::boldFont->printStringC( GET_STRING( 432 ), 256 - 12 - 10,
+        IO::boldFont->printStringC( GET_STRING( 354 ), 256 - 12 - 10,
                                     oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].y, true, IO::font::RIGHT );
 
         // BG

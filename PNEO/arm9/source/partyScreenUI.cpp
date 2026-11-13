@@ -548,7 +548,7 @@ namespace STS {
                     IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                     IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 }
-                IO::regularFont->printString( GET_STRING( 34 ), anchor_x + 32, anchor_y + 12,
+                IO::regularFont->printString( GET_STRING( 33 ), anchor_x + 32, anchor_y + 12,
                                               false );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
@@ -592,7 +592,7 @@ namespace STS {
 
                 // general data
                 if( p_pos < _inBattle ) {
-                    IO::regularFont->printString( GET_STRING( 150 ), anchor_x + 32, anchor_y + 12,
+                    IO::regularFont->printString( GET_STRING( 147 ), anchor_x + 32, anchor_y + 12,
                                                   false );
                 } else if( IO::regularFont->stringWidth( _team[ p_pos ].m_boxdata.getName( ) )
                            > 80 ) {
@@ -834,20 +834,20 @@ namespace STS {
             } else {
                 if( !_swapping ) {
                     if( !_toSelect ) {
-                        auto fmt = std::string( GET_STRING( 57 ) );
+                        auto fmt = std::string( GET_STRING( 56 ) );
                         snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
-                                  _team[ p_pos ].isEgg( ) ? GET_STRING( 34 )
+                                  _team[ p_pos ].isEgg( ) ? GET_STRING( 33 )
                                                           : _team[ p_pos ].m_boxdata.getName( ) );
                     } else {
                         if( _toSelect > 1 ) {
-                            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 332 ),
+                            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 262 ),
                                       _toSelect );
                         } else {
-                            snprintf( buffer.data( ), buffer.size( ), "%s", GET_STRING( 333 ) );
+                            snprintf( buffer.data( ), buffer.size( ), "%s", GET_STRING( 263 ) );
                         }
                     }
                 } else {
-                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 166 ) );
+                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 160 ) );
                 }
                 IO::regularFont->printString( buffer.data( ), 32, 2, p_bottom );
             }
@@ -1395,7 +1395,7 @@ namespace STS {
             }
 
             IO::regularFont->printString(
-                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
+                GET_STRING( 79 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 4 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
 
             res.push_back(
@@ -1406,7 +1406,7 @@ namespace STS {
                            IO::yesNoBox::YES ) );
 
             IO::regularFont->printString(
-                GET_STRING( 81 ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
+                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 5 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
 
             res.push_back(

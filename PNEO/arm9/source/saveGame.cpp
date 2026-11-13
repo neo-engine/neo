@@ -81,7 +81,7 @@ namespace SAVE {
         if( m_gameType == UNUSED ) {
             IO::boldFont->setColor( IO::GRAY_IDX, 1 );
             IO::boldFont->setColor( IO::WHITE_IDX, 2 );
-            IO::boldFont->printString( GET_STRING_L( 412, m_options.m_language ), 128, 90, p_bottom,
+            IO::boldFont->printString( GET_STRING_L( 334, m_options.m_language ), 128, 90, p_bottom,
                                        IO::font::CENTER );
             IO::fadeScreen( IO::UNFADE_IMMEDIATE, true, true );
             return;
@@ -125,12 +125,12 @@ namespace SAVE {
         std::array<char, 100> buffer{ };
 
         // "TRAINER'S CARD"
-        IO::boldFont->printString( GET_STRING_L( 405, m_options.m_language ), 112, 13, p_bottom,
+        IO::boldFont->printString( GET_STRING_L( 327, m_options.m_language ), 112, 13, p_bottom,
                                    IO::font::CENTER );
 
         if( achvs < 5 ) {
             snprintf( buffer.data( ), buffer.size( ), "%s %05hu",
-                      GET_STRING_L( 340, m_options.m_language ), m_id );
+                      GET_STRING_L( 270, m_options.m_language ), m_id );
         } else {
             snprintf( buffer.data( ), buffer.size( ), "%05hu", m_id );
         }
@@ -140,27 +140,27 @@ namespace SAVE {
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
         // player name
-        IO::regularFont->printString( GET_STRING_L( 406, m_options.m_language ), 108, 52,
+        IO::regularFont->printString( GET_STRING_L( 328, m_options.m_language ), 108, 52,
                                       p_bottom );
         IO::regularFont->printString( getPlayerName( ), 234, 52, p_bottom, IO::font::RIGHT );
 
         // play time
         if( !p_dummy ) {
-            IO::regularFont->printString( GET_STRING_L( 407, m_options.m_language ), 108, 68,
+            IO::regularFont->printString( GET_STRING_L( 329, m_options.m_language ), 108, 68,
                                           p_bottom );
             snprintf( buffer.data( ), buffer.size( ), "%hu:%02hhu", m_playTime.m_hours,
                       m_playTime.m_mins );
             IO::regularFont->printString( buffer.data( ), 234, 68, p_bottom, IO::font::RIGHT );
 
             // Money
-            IO::regularFont->printString( GET_STRING_L( 408, m_options.m_language ), 108, 84,
+            IO::regularFont->printString( GET_STRING_L( 330, m_options.m_language ), 108, 84,
                                           p_bottom );
             snprintf( buffer.data( ), buffer.size( ), "$%lu", m_money );
             IO::regularFont->printString( buffer.data( ), 234, 84, p_bottom, IO::font::RIGHT );
 
             if( checkFlag( F_DEX_OBTAINED ) ) {
                 // PokeDex
-                IO::regularFont->printString( GET_STRING_L( 409, m_options.m_language ), 108, 100,
+                IO::regularFont->printString( GET_STRING_L( 331, m_options.m_language ), 108, 100,
                                               p_bottom );
                 snprintf( buffer.data( ), buffer.size( ), "%hu/%hu", getSeenCount( ),
                           getCaughtCount( ) );
@@ -180,7 +180,7 @@ namespace SAVE {
 
             // Last save
             if( m_lastSaveLocation ) {
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING_L( 411, m_options.m_language ),
+                snprintf( buffer.data( ), buffer.size( ), GET_STRING_L( 333, m_options.m_language ),
                           FS::kanaWrap(
                               FS::getLocation( m_lastSaveLocation, m_options.m_language ).c_str( ),
                               m_options.m_language ),
@@ -191,7 +191,7 @@ namespace SAVE {
             }
 
             // Adventure started
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING_L( 410, m_options.m_language ),
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING_L( 332, m_options.m_language ),
                       IO::formatDate( m_startDate, m_options.m_language ).c_str( ) );
             IO::regularFont->printStringC( buffer.data( ), 242, 164, p_bottom, IO::font::RIGHT );
         }

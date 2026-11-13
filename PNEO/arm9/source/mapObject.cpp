@@ -618,7 +618,7 @@ namespace MAP {
         IO::updateOAM( false );
 
         std::array<char, 140> buffer{ };
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 436 ),
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 358 ),
                   SAVE::CURRENT_FILE->getPlayerName( ), getBadgeName( p_type, p_badge ) );
         IO::printMessage( buffer.data( ), MSG_INFO );
         SOUND::restartBGM( );
@@ -637,11 +637,11 @@ namespace MAP {
 
             if( p_allowItemSell ) {
                 curMode = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
-                              .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
+                              .getResult( p_message ? p_message : GET_STRING( 392 ), MSG_NOCLOSE,
                                           { buystr, 469, 387 } );
             } else {
                 curMode = IO::simpleChoiceBox( IO::choiceBox::MODE_UP_DOWN_LEFT_RIGHT )
-                              .getResult( p_message ? p_message : GET_STRING( 470 ), MSG_NOCLOSE,
+                              .getResult( p_message ? p_message : GET_STRING( 392 ), MSG_NOCLOSE,
                                           { buystr, 387 } );
             }
 

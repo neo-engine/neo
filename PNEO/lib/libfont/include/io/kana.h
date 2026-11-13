@@ -112,11 +112,30 @@ namespace IO::KANA {
             { 0, 0 },     { 0, 0 },     { 0, 0 },     { 0, 0 },     { 'q', 'a' }, { 'q', 'w' },
             { 'q', 's' }, { 'q', 'd' }, { 0, 0 } };
 
+    constexpr u16  KANA_CODE_START        = 5000;
+    constexpr u16  KANA_CODE_END          = KANA_CODE_START + KANA::NUM_DIGRAPHS - 1;
+    constexpr u8   NUM_KANA_BRAILLE_CELLS = 64;
+    constexpr bool isKana( u16 p_val ) {
+        return KANA_CODE_START <= p_val && p_val <= KANA_CODE_END;
+    }
+    constexpr u16 valToKana( u16 p_val, u16 p_kanaStart ) {
+        return ( p_val - KANA_CODE_START ) + p_kanaStart;
+    }
+
     constexpr u16 NO_CODE = NUM_DIGRAPHS - 1;
     constexpr u16 digraphToGlyphOrderIndex( char p_c1, char p_c2 ) {
         for( u16 i = 0; i < NUM_DIGRAPHS; ++i ) {
             if( GLYPH_ORDER[ i ][ 0 ] == p_c1 && GLYPH_ORDER[ i ][ 1 ] == p_c2 ) { return i; }
         }
         return NO_CODE;
+    }
+
+    constexpr bool glyphOrderIndexToDigraph( uint16_t p_code, char& p_c1, char& p_c2 ) {
+        if( !isKana( p_code ) ) { return false; }
+        u8 hi = GLYPH_ORDER[ p_code - KANA_CODE_START ][ 0 ];
+        if( hi == 0 ) { return false; }
+        p_c1 = (char) hi;
+        p_c2 = (char) GLYPH_ORDER[ p_code - KANA_CODE_START ][ 1 ];
+        return true;
     }
 } // namespace IO::KANA

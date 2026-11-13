@@ -532,12 +532,19 @@ namespace SAVE {
         return got_body && TMP_WC.m_type != SAVE::WCTYPE_NONE;
     }
 
+    void loadWonderCardBackdrop( bool p_bottom ) {
+        if( !FS::readData<unsigned int, unsigned short>( "nitro:/PICS/", "wcbg", 256 * 256 / 4,
+                                                         TEMP, 256, TEMP_PAL, COMPRESS_BG ) ) {
+            return;
+        }
+        dmaCopy( TEMP, bgGetGfxPtr( p_bottom ? IO::bg3sub : IO::bg3 ), 256 * 256 );
+    }
+
     void displayWonderCard( u8 p_cardIdx, bool p_reverse = false ) {
         bgSetScale( IO::bg3, 1 << 7, 1 << 7 );
         bgSetScroll( IO::bg3, 0, 0 );
         bgUpdate( );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "wcbg", 0, 256 * 256 / 2,
-                             false );
+        loadWonderCardBackdrop( false );
         if( p_reverse ) {
             FS::readPictureData( bgGetGfxPtr( IO::bg2 ), "nitro:/PICS/", "wc2", 200, 3, 256 * 192,
                                  false );
@@ -638,13 +645,11 @@ namespace SAVE {
         bool reverse     = false;
 
         loop( ) {
-            // TODO: "Details" (flips card)
+            // "Details" (flips card)
             // "Delete card" (deletes card)
             // "Share with a friend"
             // "Back"
             // "left" / "right"
-            // TODO: allow redistributing the card to a friend (new option to be
-            // implemented); friend downloads via "receive from friend" method
 
             IO::choiceBox    cb = IO::choiceBox( IO::choiceBox::MODE_UP_DOWN );
             std::vector<u16> wcopts;
@@ -656,6 +661,10 @@ namespace SAVE {
                     dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), COMPLETE_SCREEN );
                     wcopts.clear( );
                     wcopts.push_back( IO::STR_UI_WC_FLIP );
+                    // if( canDistribute( SAVE::CURRENT_FILE->m_storedWonderCards[ currentCard ] ) )
+                    // {
+                    //    wcopts.push_back( IO::STR_UI_WC_SEND );
+                    // }
                     if( SAVE::CURRENT_FILE->collectedWC( wc.m_id ) ) {
                         wcopts.push_back( IO::STR_UI_WC_TOSS );
                     }
@@ -875,8 +884,7 @@ namespace SAVE {
 
         bgSetScale( IO::bg3sub, 1 << 7, 1 << 7 );
         bgSetScroll( IO::bg3sub, 0, 0 );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "wcbg", 0, 256 * 256 / 2,
-                             true );
+        loadWonderCardBackdrop( true );
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), COMPLETE_SCREEN );
         hideSpritesSub( );
 
@@ -894,20 +902,24 @@ namespace SAVE {
         bgSetScroll( IO::bg3sub, 0, 0 );
         bgSetScroll( IO::bg3, 0, 0 );
         bgUpdate( );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "wcbg", 0, 256 * 256 / 2,
-                             true );
-        FS::readPictureData( bgGetGfxPtr( IO::bg3 ), "nitro:/PICS/", "wcbg", 0, 256 * 256 / 2,
-                             false );
+        loadWonderCardBackdrop( true );
+        loadWonderCardBackdrop( false );
 
         BG_PALETTE[ 1 ]     = 0xfbba;
         BG_PALETTE[ 2 ]     = 0xf775;
         BG_PALETTE_SUB[ 1 ] = 0xfbba;
         BG_PALETTE_SUB[ 2 ] = 0xf775;
 
-        std::vector<u16> recvChoices{ IO::STR_UI_OBTAIN_FRIEND, IO::STR_UI_OBTAIN_WIRELESS,
-                                      IO::STR_UI_OBTAIN_INTERNET, IO::STR_UI_CANCEL };
+#ifdef DESQUID
+        std::vector<u16> recvChoices{ IO::STR_UI_OBTAIN_WIRELESS, IO::STR_UI_OBTAIN_INTERNET,
+                                      IO::STR_UI_OBTAIN_DESQUID, IO::STR_UI_OBTAIN_DESQUID,
+                                      IO::STR_UI_CANCEL };
+#else
+        std::vector<u16> recvChoices{ IO::STR_UI_OBTAIN_WIRELESS, IO::STR_UI_OBTAIN_INTERNET,
+                                      IO::STR_UI_CANCEL };
+#endif
 
-        // u8 frame = 0;
+        u8 frame = 0;
 
         std::vector<u16> mainChoices;
         mainChoices.reserve( 3 );
@@ -923,9 +935,9 @@ namespace SAVE {
 
             IO::initOAMTable( true );
             IO::initOAMTable( false );
-            // ++frame;
-            // IO::animateBG( frame, IO::bg3 );
-            // IO::animateBG( frame, IO::bg3sub );
+            ++frame;
+            IO::animateBG( frame, IO::bg3 );
+            IO::animateBG( frame, IO::bg3sub );
             bgUpdate( );
 
             // general choice
@@ -938,10 +950,10 @@ namespace SAVE {
                 [ & ]( u8 ) { return drawChoice( IO::STR_UI_WELCOME_TO_MG, mainChoices ); },
                 [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
                 [ & ]( ) {
-                    // ++frame;
-                    // IO::animateBG( frame, IO::bg3 );
-                    // IO::animateBG( frame, IO::bg3sub );
-                    // bgUpdate( );
+                    ++frame;
+                    IO::animateBG( frame, IO::bg3 );
+                    IO::animateBG( frame, IO::bg3sub );
+                    bgUpdate( );
                 } );
             hideSpritesSub( );
 
@@ -968,10 +980,10 @@ namespace SAVE {
                     },
                     [ & ]( u8 p_choice ) { selectMainChoice( p_choice ); },
                     [ & ]( ) {
-                        // ++frame;
-                        // IO::animateBG( frame, IO::bg3 );
-                        // IO::animateBG( frame, IO::bg3sub );
-                        // bgUpdate( );
+                        ++frame;
+                        IO::animateBG( frame, IO::bg3 );
+                        IO::animateBG( frame, IO::bg3sub );
+                        bgUpdate( );
                     } );
                 hideSpritesSub( );
 

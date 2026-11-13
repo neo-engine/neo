@@ -163,7 +163,8 @@ namespace IO {
                         _lastKanaC1    = c1;
                         _lastKanaC2    = c2;
                         drawChar( ( cell - 1 ) * 2,
-                                  KANA_CODE_START + KANA::digraphToGlyphOrderIndex( c1, c2 ) );
+                                  KANA::KANA_CODE_START
+                                      + KANA::digraphToGlyphOrderIndex( c1, c2 ) );
                         drawMarkKeys( );
                         break;
                     }
@@ -180,9 +181,9 @@ namespace IO {
                         c1       = ' ';
                         need     = 1;
                         drawCode = 0;
-                    } else if( isKana( c ) ) {
-                        c1 = KANA::GLYPH_ORDER[ valToKana( c, 0 ) ][ 0 ];
-                        c2 = KANA::GLYPH_ORDER[ valToKana( c, 0 ) ][ 1 ];
+                    } else if( KANA::isKana( c ) ) {
+                        c1 = KANA::GLYPH_ORDER[ KANA::valToKana( c, 0 ) ][ 0 ];
+                        c2 = KANA::GLYPH_ORDER[ KANA::valToKana( c, 0 ) ][ 1 ];
                     } else if( isNumeral( c ) || isUpper( c ) || isLower( c ) ) {
                         // full width chars
                         c1       = 'x';

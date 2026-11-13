@@ -776,7 +776,7 @@ namespace BATTLE {
 
             // Check for move item effects
 
-            auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_PASS_ITEM_SPECIAL ) );
+            auto fmt = std::string( GET_STRING( IO::STR_BATTLE_PASS_ITEM_SPECIAL ) );
 
             switch( item ) {
             case I_CHILAN_BERRY2: {
@@ -870,7 +870,7 @@ namespace BATTLE {
                 WAIT( HALF_SEC );
                 addVolatileStatus( p_ui, p_sourceOpp, p_sorceSlot, VS_PROTECT, 1 );
                 snprintf(
-                    buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_PASS_ITEM_PROTECT_PKMN ),
+                    buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_PASS_ITEM_PROTECT_PKMN ),
                     itemname.c_str( ),
                     p_ui->getPkmnName( getPkmnOrDisguise( p_sourceOpp, p_sorceSlot ), p_sourceOpp )
                         .c_str( ) );
@@ -889,7 +889,7 @@ namespace BATTLE {
 
             constexpr u8 TMP_BUFFER_SIZE = 100;
             char         buffer[ TMP_BUFFER_SIZE + 10 ];
-            auto         fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_NO_EFFECT_ON ) );
+            auto         fmt = std::string( GET_STRING( IO::STR_BATTLE_NO_EFFECT_ON ) );
             snprintf(
                 buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                 p_ui->getPkmnName( getPkmnOrDisguise( p_opponent, p_slot ), p_opponent ).c_str( ),

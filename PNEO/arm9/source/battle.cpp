@@ -317,7 +317,7 @@ namespace BATTLE {
             if( _isWildBattle && _opponentRuns
                 && _field.canSwitchOut( field::OPPONENT_SIDE, field::PKMN_0 ) ) {
                 SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
-                snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_WILD_PKMN_FLED ),
+                snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_WILD_PKMN_FLED ),
                           _opponentTeam[ field::PKMN_0 ].m_boxdata.getName( ) );
                 _battleUI.log( std::string( buffer ) );
                 WAIT( THREE_QUARTER_SEC );
@@ -348,13 +348,13 @@ namespace BATTLE {
                 }
 
                 SOUND::playSoundEffect( SFX_BATTLE_ESCAPE );
-                _battleUI.log( std::string( GET_STRING( IO::STR_UI_BATTLE_GOT_AWAY_SAFELY ) ) );
+                _battleUI.log( std::string( GET_STRING( IO::STR_BATTLE_GOT_AWAY_SAFELY ) ) );
                 WAIT( THREE_QUARTER_SEC );
                 endBattle( battleEnd = BATTLE_RUN );
                 return battleEnd;
             } else if( playerWillRun ) [[unlikely]] {
                 // escape failed
-                _battleUI.log( std::string( GET_STRING( IO::STR_UI_BATTLE_COULDNT_ESCAPE ) ) );
+                _battleUI.log( std::string( GET_STRING( IO::STR_BATTLE_COULDNT_ESCAPE ) ) );
                 WAIT( THREE_QUARTER_SEC );
             }
 
@@ -401,7 +401,7 @@ namespace BATTLE {
                 // show messages for special items
                 if( sortedMoves[ i ].m_type == MT_MESSAGE_ITEM ) [[unlikely]] {
                     auto itmnm = FS::getItemName( sortedMoves[ i ].m_param );
-                    auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_USE_ITEM_TO_ACT_FIRST ) );
+                    auto fmt   = std::string( GET_STRING( IO::STR_BATTLE_USE_ITEM_TO_ACT_FIRST ) );
                     snprintf( buffer, TMP_BUFFER_SIZE, fmt.c_str( ), itmnm.c_str( ),
                               _battleUI
                                   .getPkmnName(
@@ -422,16 +422,14 @@ namespace BATTLE {
                     switch( sortedMoves[ i ].m_param ) {
                     case M_SHELL_TRAP:
                         snprintf( buffer, TMP_BUFFER_SIZE,
-                                  GET_STRING( IO::STR_UI_BATTLE_PREPARE_SHELL_TRAP ),
-                                  pnm.c_str( ) );
+                                  GET_STRING( IO::STR_BATTLE_PREPARE_SHELL_TRAP ), pnm.c_str( ) );
                         _battleUI.log( buffer );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
                                                   sortedMoves[ i ].m_user.second, VS_SHELLTRAP, 1 );
                         break;
                     case M_FOCUS_PUNCH:
                         snprintf( buffer, TMP_BUFFER_SIZE,
-                                  GET_STRING( IO::STR_UI_BATTLE_PREPARE_FOCUS_PUNCH ),
-                                  pnm.c_str( ) );
+                                  GET_STRING( IO::STR_BATTLE_PREPARE_FOCUS_PUNCH ), pnm.c_str( ) );
                         _battleUI.log( buffer );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
                                                   sortedMoves[ i ].m_user.second, VS_FOCUSPUNCH,
@@ -439,8 +437,7 @@ namespace BATTLE {
                         break;
                     case M_BEAK_BLAST:
                         snprintf( buffer, TMP_BUFFER_SIZE,
-                                  GET_STRING( IO::STR_UI_BATTLE_PREPARE_BEAK_BLAST ),
-                                  pnm.c_str( ) );
+                                  GET_STRING( IO::STR_BATTLE_PREPARE_BEAK_BLAST ), pnm.c_str( ) );
                         _field.addVolatileStatus( &_battleUI, sortedMoves[ i ].m_user.first,
                                                   sortedMoves[ i ].m_user.second, VS_BEAKBLAST, 1 );
                         _battleUI.log( buffer );
@@ -1054,7 +1051,7 @@ namespace BATTLE {
                 _battleUI.handleBattleEnd( true );
 
                 if( _opponent.m_data.m_moneyMultiplier ) {
-                    snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_WIN_MONEY ),
+                    snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_WIN_MONEY ),
                               _opponent.m_data.m_moneyMultiplier );
                     _battleUI.log( buffer );
                     WAIT( FULL_SEC );
@@ -1068,7 +1065,7 @@ namespace BATTLE {
                 _battleUI.handleBattleEnd( false );
 
                 if( _opponent.m_data.m_moneyMultiplier ) {
-                    snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_LOSE_MONEY ),
+                    snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_LOSE_MONEY ),
                               _opponent.m_data.m_moneyMultiplier );
                     _battleUI.log( buffer );
                     WAIT( FULL_SEC );
@@ -1227,7 +1224,7 @@ namespace BATTLE {
 
         if( forceFail ) {
             _battleUI.animateCapturePkmn( p_pokeball, 0 );
-            _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_FORCED_FAIL ) );
+            _battleUI.log( GET_STRING( IO::STR_BATTLE_PKMN_CAPTURE_FORCED_FAIL ) );
 
             return false;
         }
@@ -1321,20 +1318,12 @@ namespace BATTLE {
 
         switch( succ ) {
         default:
-        case 0:
-            _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_0 ) );
-            break;
-        case 1:
-            _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_1 ) );
-            break;
-        case 2:
-            _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_2 ) );
-            break;
-        case 3:
-            _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_3 ) );
-            break;
+        case 0: _battleUI.log( GET_STRING( IO::STR_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_0 ) ); break;
+        case 1: _battleUI.log( GET_STRING( IO::STR_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_1 ) ); break;
+        case 2: _battleUI.log( GET_STRING( IO::STR_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_2 ) ); break;
+        case 3: _battleUI.log( GET_STRING( IO::STR_BATTLE_PKMN_CAPTURE_FAIL_AFTER_TICK_3 ) ); break;
         case 4:
-            snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_PKMN_CAPTURE_SUCC ),
+            snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_PKMN_CAPTURE_SUCC ),
                       wild->m_boxdata.getName( ) );
             _battleUI.log( buffer );
             break;
@@ -1499,13 +1488,13 @@ namespace BATTLE {
                 return;
             }
 
-            snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_TRAINER_USED_ITEM ),
+            snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_TRAINER_USED_ITEM ),
                       FS::getTrainerClassName( _opponent.getClass( ) ).c_str( ),
                       _opponent.m_strings.m_name, FS::getItemName( p_item ).c_str( ) );
             _battleUI.log( buffer );
         } else {
             // player item
-            snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_UI_BATTLE_PLAYER_USED_ITEM ),
+            snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_PLAYER_USED_ITEM ),
                       FS::getItemName( p_item ) );
             _battleUI.log( buffer );
         }
@@ -1591,7 +1580,7 @@ namespace BATTLE {
                 bs    = bs.negative( ).invert( );
                 boost = true;
             } else {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
         }
@@ -1604,19 +1593,19 @@ namespace BATTLE {
                     p_target.first, p_target.second,
                     _field.getPkmnOrDisguise( p_target.first, p_target.second ) );
             } else {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
 
         case I_GUARD_SPEC:
             if( !_field.addSideCondition( &_battleUI, p_target.first, SC_MIST, 5 ) ) {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
         case I_DIRE_HIT:
             if( !_field.addVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                            VS_FOCUSENERGY, 255 ) ) {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
         case I_YELLOW_FLUTE:
@@ -1627,7 +1616,7 @@ namespace BATTLE {
             if( volst & VS_CONFUSION ) {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              VS_CONFUSION );
-                auto fmt = std::string( GET_STRING( IO::STR_UI_BATTLE_CONFUSION_HEALED ) );
+                auto fmt = std::string( GET_STRING( IO::STR_BATTLE_CONFUSION_HEALED ) );
                 snprintf(
                     buffer, TMP_BUFFER_SIZE, fmt.c_str( ),
                     _battleUI
@@ -1636,7 +1625,7 @@ namespace BATTLE {
                         .c_str( ) );
                 _battleUI.log( buffer );
             } else {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
 
@@ -1648,7 +1637,7 @@ namespace BATTLE {
                 _field.removeVolatileStatus( &_battleUI, p_target.first, p_target.second,
                                              VS_ATTRACT );
             } else {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
             break;
 
@@ -1661,7 +1650,7 @@ namespace BATTLE {
                 _battleUI.logBoosts( _field.getPkmnOrDisguise( p_target.first, p_target.second ),
                                      p_target.first, p_target.second, bs, res );
             } else {
-                _battleUI.log( GET_STRING( IO::STR_UI_BATTLE_NOTHING_HAPPENED ) );
+                _battleUI.log( GET_STRING( IO::STR_BATTLE_NOTHING_HAPPENED ) );
             }
         }
         if( remitem && !p_target.first ) {
@@ -1783,12 +1772,12 @@ namespace BATTLE {
                             if( _playerTeam[ i ].m_level < 100 ) {
                                 _playerTeam[ i ].gainExperience( curexp );
                                 snprintf( buffer, TMP_BUFFER_SIZE,
-                                          GET_STRING( IO::STR_UI_BATTLE_EXP_GAINED ),
+                                          GET_STRING( IO::STR_BATTLE_EXP_GAINED ),
                                           _playerTeam[ i ].m_boxdata.getName( ), curexp );
                                 _battleUI.log( buffer );
                                 if( _playerTeam[ i ].m_level != oldlv ) {
                                     snprintf( buffer, TMP_BUFFER_SIZE,
-                                              GET_STRING( IO::STR_UI_BATTLE_ADVANCE_LEVEL ),
+                                              GET_STRING( IO::STR_BATTLE_ADVANCE_LEVEL ),
                                               _playerTeam[ i ].m_boxdata.getName( ),
                                               _playerTeam[ i ].m_level );
                                     _battleUI.log( buffer );

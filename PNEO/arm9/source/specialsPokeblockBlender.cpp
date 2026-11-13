@@ -319,7 +319,7 @@ namespace SPX {
                              false );
         IO::initColors( false, true, true );
         // "Berry blender"
-        IO::regularFont->printString( GET_STRING( 802 ), 128, 5, false, IO::font::CENTER );
+        IO::regularFont->printString( GET_STRING( 642 ), 128, 5, false, IO::font::CENTER );
 
         u16 tileCntT = 0;
         tileCntT
@@ -593,7 +593,7 @@ namespace SPX {
 
         constexpr u8 TOP_Y = 26;
 
-        IO::boldFont->printStringC( GET_STRING( 804 ), 32, TOP_Y, false );
+        IO::boldFont->printStringC( GET_STRING( 644 ), 32, TOP_Y, false );
 
         IO::OamTop->oamBuffer[ SPR_PERFECT_OAM ].y        = TOP_Y;
         IO::OamTop->oamBuffer[ SPR_PERFECT_OAM ].x        = 128 - 6;
@@ -712,13 +712,13 @@ namespace SPX {
         }
 
         if( p_mxSpeed && bonus ) {
-            IO::boldFont->printStringC( GET_STRING( 805 ), 224, TOP_Y, false, IO::font::CENTER );
+            IO::boldFont->printStringC( GET_STRING( 645 ), 224, TOP_Y, false, IO::font::CENTER );
 
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 806 ), bonus );
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 646 ), bonus );
             IO::boldFont->printStringC( buffer.data( ), 250, 112, false, IO::font::RIGHT );
         }
         // max RPM
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 807 ),
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 647 ),
                   speedToRPM100( p_mxSpeed ) / 100.0 );
         IO::boldFont->printStringC( buffer.data( ), 6, 112, false );
         IO::updateOAM( false );
@@ -796,8 +796,8 @@ namespace SPX {
         // compute expected output
         auto result = computeBlockType( p_berries, bonus, speedToRPM100( p_mxSpeed ) );
         std::array<char, 60> sbuffer{ };
-        snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( result ) + 742 ) );
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 808 ), player, sbuffer.data( ) );
+        snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( result ) + 582 ) );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 648 ), player, sbuffer.data( ) );
         IO::regularFont->printStringC( buffer.data( ), 16, 133, false );
     }
 
@@ -1154,17 +1154,17 @@ namespace SPX {
         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
         if( p_overheat ) {
-            IO::regularFont->printStringC( GET_STRING( 800 ), 16, 133, false );
+            IO::regularFont->printStringC( GET_STRING( 640 ), 16, 133, false );
             IO::waitForInteract( IO::animateMBS,
                                  [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             IO::printRectangle( 0, 132, 255, 192, false, 0 );
         }
 
         IO::printRectangle( 0, 0, 255, 24, false, 0 );
-        IO::regularFont->printString( GET_STRING( 803 ), 128, 5, false, IO::font::CENTER );
+        IO::regularFont->printString( GET_STRING( 643 ), 128, 5, false, IO::font::CENTER );
         std::array<char, 60> sbuffer{ };
-        snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( p_type ) + 742 ) );
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 801 ), p_amount, sbuffer.data( ) );
+        snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( p_type ) + 582 ) );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 641 ), p_amount, sbuffer.data( ) );
         IO::regularFont->printStringC( buffer.data( ), 16, 133, false );
 
         // remove lid, show resulting block

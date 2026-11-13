@@ -400,7 +400,7 @@ namespace DEX {
         IO::loadSprite( 8, 0, IO::OamTop->oamBuffer[ 0 ].gfxIndex, x + 8 * 16, y, 16, 32, 0, 0, 0,
                         true, true, false, OBJPRIORITY_3, false, OBJMODE_BLENDED );
 
-        IO::boldFont->printString( GET_STRING( 576 ), 128, y + 7, false, IO::font::CENTER );
+        IO::boldFont->printString( GET_STRING( 432 ), 128, y + 7, false, IO::font::CENTER );
 
         // bottom screen
         tileCnt = 0;
@@ -425,12 +425,12 @@ namespace DEX {
             IO::loadSprite( 7, 1, IO::Oam->oamBuffer[ 1 ].gfxIndex, x + 7 * 16, y - 12, 32, 32, 0,
                             0, 0, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
-            IO::regularFont->printStringC( GET_STRING( 577 ), 128, y + 2, true, IO::font::CENTER );
+            IO::regularFont->printStringC( GET_STRING( 433 ), 128, y + 2, true, IO::font::CENTER );
             IO::regularFont->setColor( 0, 2 );
-            IO::regularFont->printStringC( GET_STRING( 579 ), 128 - 32, y + 21, true,
+            IO::regularFont->printStringC( GET_STRING( 435 ), 128 - 32, y + 21, true,
                                            IO::font::LEFT );
 
-            IO::regularFont->printStringC( GET_STRING( 580 ), 128 - 32, y + 21 + 14, true,
+            IO::regularFont->printStringC( GET_STRING( 436 ), 128 - 32, y + 21 + 14, true,
                                            IO::font::LEFT );
 
             snprintf( buffer.data( ), buffer.size( ), "%hu",
@@ -471,11 +471,11 @@ namespace DEX {
             IO::loadSprite( 14, 1, IO::Oam->oamBuffer[ 1 ].gfxIndex, x + 7 * 16, y - 12, 32, 32, 0,
                             0, 0, true, true, false, OBJPRIORITY_3, true, OBJMODE_BLENDED );
 
-            IO::regularFont->printStringC( GET_STRING( 578 ), 128, y + 2, true, IO::font::CENTER );
+            IO::regularFont->printStringC( GET_STRING( 434 ), 128, y + 2, true, IO::font::CENTER );
             IO::regularFont->setColor( 0, 2 );
-            IO::regularFont->printStringC( GET_STRING( 579 ), 128 - 32, y + 21, true,
+            IO::regularFont->printStringC( GET_STRING( 435 ), 128 - 32, y + 21, true,
                                            IO::font::LEFT );
-            IO::regularFont->printStringC( GET_STRING( 580 ), 128 - 32, y + 21 + 14, true,
+            IO::regularFont->printStringC( GET_STRING( 436 ), 128 - 32, y + 21 + 14, true,
                                            IO::font::LEFT );
 
             snprintf( buffer.data( ), buffer.size( ), "%hu", SAVE::CURRENT_FILE->getSeenCount( ) );
@@ -532,32 +532,32 @@ namespace DEX {
         IO::printRectangle( 0, 6, 97, 22, false, 0 );
         IO::printRectangle( 20, 0, 235, 22, true, 0 );
         if( p_newMode == 0 ) { // local dex
-            IO::regularFont->printStringC( GET_STRING( 577 ), 94 / 2 + 1, 5, false,
+            IO::regularFont->printStringC( GET_STRING( 433 ), 94 / 2 + 1, 5, false,
                                            IO::font::CENTER );
             localInitSub( true );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 583 ),
+            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 439 ),
                            SAVE::CURRENT_FILE->getLocalSeenCount( ) );
             IO::regularFont->printStringC( buffer.data( ), 74, 2, true, IO::font::CENTER );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 584 ),
+            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 440 ),
                            SAVE::CURRENT_FILE->getLocalCaughtCount( ) );
             IO::regularFont->printStringC( buffer.data( ), 54 + 128, 2, true, IO::font::CENTER );
 
             _nationalSelectedIdx = 0;
             _localSelectedPage   = -1;
         } else if( p_newMode == 1 ) { // national dex
-            IO::regularFont->printStringC( GET_STRING( 578 ), 94 / 2 + 1, 5, false,
+            IO::regularFont->printStringC( GET_STRING( 434 ), 94 / 2 + 1, 5, false,
                                            IO::font::CENTER );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 583 ),
+            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 439 ),
                            SAVE::CURRENT_FILE->getSeenCount( ) );
             IO::regularFont->printStringC( buffer.data( ), 74, 2, true, IO::font::CENTER );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 584 ),
+            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 440 ),
                            SAVE::CURRENT_FILE->getCaughtCount( ) );
             IO::regularFont->printStringC( buffer.data( ), 54 + 128, 2, true, IO::font::CENTER );
 
             _nationalSelectedIdx = 0;
             _localSelectedPage   = -1;
         }
-        IO::regularFont->printStringC( GET_STRING( 706 ), 32, 176, true );
+        IO::regularFont->printStringC( GET_STRING( 546 ), 32, 176, true );
     }
 
     void dexUI::selectMode( u8 p_newMode ) {
@@ -600,7 +600,7 @@ namespace DEX {
             IO::printRectangle( 20, 32, 235, 192, p_bottom, 0 );
 
             // heading
-            IO::regularFont->printStringC( GET_STRING( 707 + daytime ), 128, 34, p_bottom,
+            IO::regularFont->printStringC( GET_STRING( 547 + daytime ), 128, 34, p_bottom,
                                            IO::font::CENTER );
 
             BG_PALETTE[ IO::RED_IDX ]   = IO::GREEN;
@@ -610,7 +610,7 @@ namespace DEX {
 
             // print habitats
             if( !_OWhabitats || ( !seen && !caught ) ) {
-                IO::regularFont->printStringC( GET_STRING( 711 ), 128, 100, p_bottom,
+                IO::regularFont->printStringC( GET_STRING( 551 ), 128, 100, p_bottom,
                                                IO::font::CENTER );
             } else {
                 auto res = fseek( _OWhabitats,
@@ -621,7 +621,7 @@ namespace DEX {
                 fread( &hasHabitats, 1, 1, _OWhabitats );
 
                 if( res || !hasHabitats ) {
-                    IO::regularFont->printStringC( GET_STRING( 711 ), 128, 100, p_bottom,
+                    IO::regularFont->printStringC( GET_STRING( 551 ), 128, 100, p_bottom,
                                                    IO::font::CENTER );
                 } else {
 
@@ -696,7 +696,7 @@ namespace DEX {
                                   CURRENT_LANGUAGE ),
                     128, 176, p_bottom, IO::font::CENTER );
             } else {
-                IO::regularFont->printStringC( GET_STRING( 581 ), 128, 176, p_bottom,
+                IO::regularFont->printStringC( GET_STRING( 437 ), 128, 176, p_bottom,
                                                IO::font::CENTER );
             }
 
@@ -763,7 +763,7 @@ namespace DEX {
                         SPR_TYPE_X( 0 ) - 4, 112, p_bottom, IO::font::RIGHT );
                 }
             } else {
-                IO::regularFont->printStringC( GET_STRING( 581 ), 128, 112, p_bottom,
+                IO::regularFont->printStringC( GET_STRING( 437 ), 128, 112, p_bottom,
                                                IO::font::CENTER );
             }
 
@@ -793,7 +793,7 @@ namespace DEX {
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
             if( caught ) {
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 582 ),
+                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 438 ),
                           FS::getSpeciesName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
                           data.m_baseForme.m_size / 10.0, data.m_baseForme.m_weight / 10.0 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 1 );
@@ -823,16 +823,16 @@ namespace DEX {
                         = ( bs < 30 + 30 * ( i % 5 ) ) ? SPR_SHADOW_PAL : SPR_STAR_PAL;
                     oamTop[ i + SPR_STAR_START_OAM ].isHidden = false;
                 }
-                IO::regularFont->printStringC( GET_STRING( 126 ), 86, 49 - 20, false,
+                IO::regularFont->printStringC( GET_STRING( 125 ), 86, 49 - 20, false,
                                                IO::font::RIGHT );
-                IO::regularFont->printStringC( GET_STRING( 127 ), 86, 74 - 21, false,
+                IO::regularFont->printStringC( GET_STRING( 126 ), 86, 74 - 21, false,
                                                IO::font::RIGHT );
-                IO::regularFont->printStringC( GET_STRING( 129 ), 86, 99 - 20, false,
+                IO::regularFont->printStringC( GET_STRING( 128 ), 86, 99 - 20, false,
                                                IO::font::RIGHT );
 
-                IO::regularFont->printStringC( GET_STRING( 131 ), 170, 49 - 20, false );
-                IO::regularFont->printStringC( GET_STRING( 128 ), 170, 74 - 21, false );
-                IO::regularFont->printStringC( GET_STRING( 130 ), 170, 99 - 20, false );
+                IO::regularFont->printStringC( GET_STRING( 130 ), 170, 49 - 20, false );
+                IO::regularFont->printStringC( GET_STRING( 127 ), 170, 74 - 21, false );
+                IO::regularFont->printStringC( GET_STRING( 129 ), 170, 99 - 20, false );
             } else {
                 for( u8 i = 0; i < 30; ++i ) { oamTop[ i + SPR_STAR_START_OAM ].isHidden = true; }
                 IO::regularFont->printStringC( GET_STRING( 0 ), 128, 150, p_bottom,
@@ -992,7 +992,7 @@ namespace DEX {
                     FS::kanaWrap( FS::getDisplayName( p_pkmnIdx ).c_str( ), CURRENT_LANGUAGE ),
                     TEXT_PAL, IO::TEXT_BUF, 96, IO::font::LEFT, 15, 32, 16 );
             } else {
-                IO::regularFont->printStringBC( GET_STRING( 581 ), TEXT_PAL, IO::TEXT_BUF, 96,
+                IO::regularFont->printStringBC( GET_STRING( 437 ), TEXT_PAL, IO::TEXT_BUF, 96,
                                                 IO::font::LEFT, 15, 32, 16 );
             }
             IO::loadSpriteB( oamStart + 6, oam[ oamStart + 6 ].gfxIndex,

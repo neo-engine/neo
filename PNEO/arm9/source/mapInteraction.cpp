@@ -247,7 +247,7 @@ namespace MAP {
                        ( _lastrow + NUM_ROWS / 2 ) % NUM_ROWS );
             bgUpdate( );
             for( u8 i = 0; i < 3; ++i ) { swiWaitForVBlank( ); }
-            IO::printMessage( GET_STRING( 559 ), MSG_INFO );
+            IO::printMessage( GET_STRING( 415 ), MSG_INFO );
 
             BOX::boxViewer bxv;
             ANIMATE_MAP = false;
@@ -310,7 +310,7 @@ namespace MAP {
 
         case BEH_INTERACT_MAP: { // Map
             // TODO
-            printMapMessage( GET_STRING( 560 ), MSG_NORMAL );
+            printMapMessage( GET_STRING( 416 ), MSG_NORMAL );
             return;
         }
         case BEH_INTERACT_TV: { // TV

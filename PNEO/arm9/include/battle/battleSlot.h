@@ -490,7 +490,7 @@ namespace BATTLE {
                                       u8 p_duration = 0 ) {
 
             if( ( _slotCondition & p_slotCondition ) == p_slotCondition ) {
-                p_ui->log( GET_STRING( IO::STR_UI_BATTLE_IT_FAILED ) );
+                p_ui->log( GET_STRING( IO::STR_BATTLE_IT_FAILED ) );
                 return false;
             }
 

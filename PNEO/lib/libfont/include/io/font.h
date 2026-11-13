@@ -58,16 +58,6 @@ namespace IO {
         return ( p_val - 'a' ) + p_lowerStart;
     }
 
-    constexpr u16  KANA_CODE_START        = 5000;
-    constexpr u16  KANA_CODE_END          = KANA_CODE_START + KANA::NUM_DIGRAPHS - 1;
-    constexpr u8   NUM_KANA_BRAILLE_CELLS = 64;
-    constexpr bool isKana( u16 p_val ) {
-        return KANA_CODE_START <= p_val && p_val <= KANA_CODE_END;
-    }
-    constexpr u16 valToKana( u16 p_val, u16 p_kanaStart ) {
-        return ( p_val - KANA_CODE_START ) + p_kanaStart;
-    }
-
     namespace REGULAR_FONT {
         constexpr auto NUM_CHARS          = 490;
         constexpr auto NUMERAL_START      = 0;
@@ -113,7 +103,7 @@ namespace IO {
         extern u8 fontData[ NUM_CHARS * 256 ];
     } // namespace SMALL_FONT
     namespace BRAILLE_FONT {
-        constexpr auto NUM_CHARS     = 30 + NUM_KANA_BRAILLE_CELLS;
+        constexpr auto NUM_CHARS     = 30 + KANA::NUM_KANA_BRAILLE_CELLS;
         constexpr auto NUMERAL_START = NUM_CHARS;
         constexpr auto UPPER_START   = 0;
         constexpr auto LOWER_START   = 0;

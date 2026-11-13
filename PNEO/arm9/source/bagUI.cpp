@@ -314,12 +314,12 @@ namespace BAG {
 
                 IO::regularFont->setColor( IO::RED_IDX, 1 );
                 if( data.m_firmness ) {
-                    std::string firmness = GET_STRING( 16 + data.m_firmness );
-                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 16 ), firmness.c_str( ) );
+                    std::string firmness = GET_STRING( 15 + data.m_firmness );
+                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 15 ), firmness.c_str( ) );
                     IO::regularFont->printStringC( buffer.data( ), 24, 145, false );
                 }
                 IO::regularFont->setColor( IO::BLUE_IDX, 1 );
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 23 ), data.m_size / 10.0 );
+                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 22 ), data.m_size / 10.0 );
                 IO::regularFont->printStringC( buffer.data( ), 140, 145, false );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
 
@@ -334,7 +334,7 @@ namespace BAG {
                         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                         IO::regularFont->setColor( IO::BLACK_IDX, 1 );
                     }
-                    IO::regularFont->printStringC( GET_STRING( 24 + i ),
+                    IO::regularFont->printStringC( GET_STRING( 23 + i ),
                                                    poses[ CURRENT_LANGUAGE ][ i ], 160, false );
                 }
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );

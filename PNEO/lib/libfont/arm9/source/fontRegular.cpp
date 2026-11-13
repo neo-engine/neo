@@ -42,7 +42,7 @@ namespace IO::REGULAR_FONT {
         }
         if( p_string[ p_start + 1 ] ) {
             p_outCodes[ 0 ]
-                = KANA_CODE_START
+                = KANA::KANA_CODE_START
                   + KANA::digraphToGlyphOrderIndex( p_string[ p_start ], p_string[ p_start + 1 ] );
             p_outCodesLen = !!p_outCodes[ 0 ];
             p_start += 2;
@@ -66,8 +66,8 @@ namespace IO::REGULAR_FONT {
             p_val = valToLower( p_val, LOWER_START );
             return;
         }
-        if( isKana( p_val ) ) {
-            p_val = valToKana( p_val, KANA_START );
+        if( KANA::isKana( p_val ) ) {
+            p_val = KANA::valToKana( p_val, KANA_START );
             return;
         }
 

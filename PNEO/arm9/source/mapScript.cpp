@@ -824,7 +824,7 @@ namespace MAP {
 
                 // Player obtained <pkmn>
 
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 814 ),
+                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 653 ),
                           SAVE::CURRENT_FILE->getPlayerName( ), giftPkmn.m_boxdata.getName( ) );
 
                 SOUND::playSoundEffect( SFX_CAPTURE_SUCCESSFUL );
@@ -833,7 +833,7 @@ namespace MAP {
                 // would you like to nickname <pkmn>?
 
                 IO::yesNoBox yn;
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 141 ),
+                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 139 ),
                           giftPkmn.m_boxdata.getName( ) );
                 if( IO::yesNoBox::YES
                     == IO::simpleYesNoBox( ).getResult(
@@ -842,7 +842,7 @@ namespace MAP {
                     ANIMATE_MAP = false;
                     IO::init( );
                     IO::keyboard kbd;
-                    printMapMessage( GET_STRING( 142 ), MSG_INFO_NOCLOSE );
+                    printMapMessage( GET_STRING( 140 ), MSG_INFO_NOCLOSE );
                     auto nick = kbd.getText( 10 );
                     if( strcmp( nick.c_str( ), giftPkmn.m_boxdata.m_name )
                         && strcmp( "", nick.c_str( ) ) ) {
@@ -1075,7 +1075,7 @@ namespace MAP {
 
                     IO::simpleYesNoBox yn;
                     if( par2 == 1
-                        || yn.getResult( GET_STRING( 92 ), MSG_INFO_NOCLOSE )
+                        || yn.getResult( GET_STRING( 91 ), MSG_INFO_NOCLOSE )
                                == IO::yesNoBox::YES ) {
                         IO::init( );
                         ANIMATE_MAP = false;
@@ -1094,18 +1094,18 @@ namespace MAP {
                                         buf2 += "\x04";
                                         if( i % 3 == 2 ) { buf2 += " "; }
                                     }
-                                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 93 ),
+                                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 92 ),
                                               buf2.c_str( ) );
                                     IO::printMessage( buffer.data( ), MSG_INFO_NOCLOSE, true );
                                 }
                             } ) ) {
                             IO::printMessage( 0, MSG_INFO_NOCLOSE );
                             SOUND::playSoundEffect( SFX_SAVE );
-                            IO::printMessage( GET_STRING( 94 ), MSG_INFO );
+                            IO::printMessage( GET_STRING( 93 ), MSG_INFO );
                             registers[ 0 ] = 1;
                         } else {
                             IO::printMessage( 0, MSG_INFO_NOCLOSE );
-                            IO::printMessage( GET_STRING( 95 ), MSG_INFO );
+                            IO::printMessage( GET_STRING( 94 ), MSG_INFO );
                             registers[ 0 ] = 0;
                         }
                         ANIMATE_MAP = true;

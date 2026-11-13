@@ -75,7 +75,7 @@ namespace MAP {
                 // check for devon scope
                 if( invisible ) {
                     // "something invisible is blocking the way"
-                    printMapMessage( std::string( GET_STRING( 815 ) ), MSG_INFO );
+                    printMapMessage( std::string( GET_STRING( 654 ) ), MSG_INFO );
                     if( !SAVE::CURRENT_FILE->m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                           I_DEVON_SCOPE ) ) {
                         break;
@@ -83,7 +83,7 @@ namespace MAP {
 
                     // ask player if they want to use the devon scope
                     if( IO::yesNoBox::NO
-                        == IO::simpleYesNoBox( ).getResult( GET_STRING( 816 ),
+                        == IO::simpleYesNoBox( ).getResult( GET_STRING( 655 ),
                                                             MSG_INFO_NOCLOSE ) ) {
                         // no -> break
                         IO::init( );
@@ -91,14 +91,14 @@ namespace MAP {
                     }
                     IO::init( );
                     // "player used davon scope"
-                    printMapMessage( std::string( GET_STRING( 817 ) ), MSG_INFO );
+                    printMapMessage( std::string( GET_STRING( 656 ) ), MSG_INFO );
 
                     _mapSprites.setVisibility( SAVE::CURRENT_FILE->m_mapObjects[ p_objectId ].first,
                                                false, true );
                     swiWaitForVBlank( );
 
                     // "A previously invisible Pokemon\nbecame visible to the naked eye!"
-                    printMapMessage( std::string( GET_STRING( 818 ) ), MSG_INFO );
+                    printMapMessage( std::string( GET_STRING( 657 ) ), MSG_INFO );
                 }
 
                 u16  pkmnIdx = p_event.m_data.m_owPkmn.m_speciesId;
@@ -117,9 +117,9 @@ namespace MAP {
 
                 if( p_event.m_data.m_owPkmn.m_movementType == KECLEON_FIGHT ) {
                     // "The startled Pokemon attacked!"
-                    printMapMessage( std::string( GET_STRING( 819 ) ), MSG_INFO );
+                    printMapMessage( std::string( GET_STRING( 658 ) ), MSG_INFO );
                 } else if( p_event.m_data.m_owPkmn.m_movementType == KECLEON_FLEE ) {
-                    printMapMessage( std::string( GET_STRING( 820 ) ), MSG_INFO );
+                    printMapMessage( std::string( GET_STRING( 659 ) ), MSG_INFO );
                     SAVE::CURRENT_FILE->setFlag( p_event.m_deactivateFlag, 1 );
                     constructAndAddNewMapObjects( currentData( ), mapX, mapY );
                     break;
@@ -153,7 +153,7 @@ namespace MAP {
                 }
                 if( battleres != BATTLE::battle::BATTLE_CAPTURE ) {
                     std::array<char, 100> buffer{ };
-                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 672 ),
+                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 514 ),
                               WILD_PKMN.m_boxdata.getName( ) );
                     printMapMessage( std::string( buffer.data( ) ), MSG_INFO );
                 }
@@ -205,15 +205,15 @@ namespace MAP {
             switch( p_event.m_data.m_hmObject.m_hmType ) {
             case mapSpriteManager::SPR_STRENGTH:
                 if( _strengthUsed ) {
-                    IO::printMessage( GET_STRING( 558 ), MSG_INFO );
+                    IO::printMessage( GET_STRING( 414 ), MSG_INFO );
                 } else {
-                    IO::printMessage( GET_STRING( 318 ), MSG_INFO );
+                    IO::printMessage( GET_STRING( 248 ), MSG_INFO );
                 }
                 break;
             case mapSpriteManager::SPR_ROCKSMASH:
-                IO::printMessage( GET_STRING( 314 ), MSG_INFO );
+                IO::printMessage( GET_STRING( 244 ), MSG_INFO );
                 break;
-            case mapSpriteManager::SPR_CUT: IO::printMessage( GET_STRING( 313 ), MSG_INFO ); break;
+            case mapSpriteManager::SPR_CUT: IO::printMessage( GET_STRING( 243 ), MSG_INFO ); break;
             default: break;
             }
             break;
@@ -349,7 +349,7 @@ namespace MAP {
 
                 if( !berryType ) {
                     //  ask if player wants to plant a berry
-                    if( IO::simpleYesNoBox( ).getResult( GET_STRING( 571 ), MSG_INFO_NOCLOSE )
+                    if( IO::simpleYesNoBox( ).getResult( GET_STRING( 427 ), MSG_INFO_NOCLOSE )
                         == IO::yesNoBox::YES ) {
 
                         FADE_TOP_DARK( );
@@ -390,7 +390,7 @@ namespace MAP {
                             SOUND::restoreVolume( );
                             if( itm ) {
                                 std::array<char, 100> buffer{ };
-                                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 572 ),
+                                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 428 ),
                                           FS::getItemName( itm ).c_str( ) );
                                 IO::printMessage( buffer.data( ), MSG_INFO );
                             }
@@ -454,11 +454,11 @@ namespace MAP {
                 case 1:
                 case 2:
                 case 3:
-                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 565 + stage ),
+                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 421 + stage ),
                               FS::getItemName( BAG::berryToItem( berryType ) ).c_str( ) );
                     break;
                 case 4:
-                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 569 ),
+                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 425 ),
                               FS::getItemName( BAG::berryToItem( berryType ) ).c_str( ), yield );
                     break;
                 default: continue;
@@ -466,7 +466,7 @@ namespace MAP {
                 IO::printMessage( buffer.data( ), MSG_INFO_CONT );
                 if( stage == 4 ) {
                     // Berries can be harvested
-                    if( IO::simpleYesNoBox( ).getResult( GET_STRING( 570 ), MSG_INFO_NOCLOSE )
+                    if( IO::simpleYesNoBox( ).getResult( GET_STRING( 426 ), MSG_INFO_NOCLOSE )
                         == IO::yesNoBox::YES ) {
                         IO::init( );
                         IO::giveItemToPlayer( BAG::berryToItem( berryType ), yield );
@@ -489,10 +489,10 @@ namespace MAP {
                         + SAVE::CURRENT_FILE->m_bag.count( BAG::toBagType( BAG::ITEMTYPE_KEYITEM ),
                                                            I_SQUIRT_BOTTLE ) ) {
 
-                        if( IO::simpleYesNoBox( ).getResult( GET_STRING( 574 ), MSG_INFO_NOCLOSE )
+                        if( IO::simpleYesNoBox( ).getResult( GET_STRING( 430 ), MSG_INFO_NOCLOSE )
                             == IO::yesNoBox::YES ) {
                             IO::init( );
-                            IO::printMessage( GET_STRING( 573 ), MSG_INFO );
+                            IO::printMessage( GET_STRING( 429 ), MSG_INFO );
                             SAVE::CURRENT_FILE->waterBerry(
                                 o.second.m_event.m_data.m_berryTree.m_treeIdx );
                         } else {

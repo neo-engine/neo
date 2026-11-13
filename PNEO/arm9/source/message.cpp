@@ -55,9 +55,9 @@ namespace IO {
         if( p_cmd == "PLAYER" ) { return SAVE::CURRENT_FILE->getPlayerName( ); }
         if( p_cmd == "RIVAL" ) {
             if( SAVE::CURRENT_FILE->checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
-                return std::string( GET_STRING( 461 ) );
+                return std::string( GET_STRING( 383 ) );
             } else {
-                return std::string( GET_STRING( 460 ) );
+                return std::string( GET_STRING( 382 ) );
             }
         }
         if( sscanf( p_cmd.c_str( ), "CRY:%hu", &tmp ) && tmp != u16( -1 ) ) {

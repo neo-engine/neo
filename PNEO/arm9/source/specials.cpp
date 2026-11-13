@@ -276,7 +276,7 @@ namespace SPX {
 
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
             IO::printRectangle( 0, 192 - 42, 255, 192, true, 0 );
-            IO::regularFont->printStringC( GET_STRING( 438 ), 12, 192 - 40, false );
+            IO::regularFont->printStringC( GET_STRING( 360 ), 12, 192 - 40, false );
 
             for( u8 i = 0; i < 12; ++i ) {
                 IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) + i ].isHidden = true;
@@ -362,7 +362,7 @@ namespace SPX {
 
             std::array<char, 100> buffer{ };
             snprintf(
-                buffer.data( ), 99, GET_STRING( 437 ),
+                buffer.data( ), 99, GET_STRING( 359 ),
                 FS::getSpeciesName( pkmn[ res ].getSpecies( ), pkmn[ res ].getForme( ) ).c_str( ),
                 pkmn[ res ].m_boxdata.getName( ) );
 
@@ -376,12 +376,12 @@ namespace SPX {
             if( yn.getResult(
                     [ & ]( ) {
                         IO::regularFont->printString(
-                            GET_STRING( 80 ),
+                            GET_STRING( 79 ),
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].x + 48,
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 0 ) ].y + 8, true,
                             IO::font::CENTER );
                         IO::regularFont->printString(
-                            GET_STRING( 81 ),
+                            GET_STRING( 80 ),
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 1 ) ].x + 48,
                             IO::Oam->oamBuffer[ SPR_CHOICE_START_OAM_SUB( 1 ) ].y + 8, true,
                             IO::font::CENTER );
@@ -431,10 +431,6 @@ namespace SPX {
         // TODO
     }
 
-    void runPokeBlockMaker( ) {
-        // TODO
-    }
-
     void drawBadges( u8 p_page ) {
         dmaFillWords( 0, bgGetGfxPtr( IO::bg2sub ), MBOX_SCREEN_HALF );
         IO::regularFont->setColor( 0, 0 );
@@ -452,7 +448,7 @@ namespace SPX {
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "bc1", 480, 49152,
                                  true );
             BG_PALETTE_SUB[ IO::GRAY_IDX ] = RGB15( 24, 24, 24 );
-            IO::regularFont->printStringC( GET_STRING( 434 ), 2, 0, true );
+            IO::regularFont->printStringC( GET_STRING( 356 ), 2, 0, true );
 
             constexpr u16 spos[ 9 ][ 2 ] = { { 8, 19 }, { 67, 19 }, { 128, 19 }, { 182, 19 },
                                              { 9, 89 }, { 68, 90 }, { 128, 90 }, { 182, 90 } };
@@ -471,7 +467,7 @@ namespace SPX {
             FS::readPictureData( bgGetGfxPtr( IO::bg3sub ), "nitro:/PICS/", "bc2", 480, 49152,
                                  true );
             BG_PALETTE_SUB[ IO::GRAY_IDX ] = RGB15( 24, 24, 24 );
-            IO::regularFont->printStringC( GET_STRING( 435 ), 2, 0, true );
+            IO::regularFont->printStringC( GET_STRING( 357 ), 2, 0, true );
 
             constexpr u16 spos[ 7 ][ 2 ] = { { 6, 18 },  { 66, 18 }, { 126, 18 }, { 186, 18 },
                                              { 36, 88 }, { 96, 88 }, { 156, 88 } };
@@ -609,16 +605,16 @@ namespace SPX {
                         buf2 += "\x04";
                         if( i % 3 == 2 ) { buf2 += " "; }
                     }
-                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 93 ), buf2.c_str( ) );
+                    snprintf( buffer.data( ), buffer.size( ), GET_STRING( 92 ), buf2.c_str( ) );
                     IO::printMessage( buffer.data( ), MSG_INFO_NOCLOSE, true );
                 }
             } ) ) {
             IO::printMessage( 0, MSG_INFO_NOCLOSE );
             SOUND::playSoundEffect( SFX_SAVE );
-            IO::printMessage( GET_STRING( 94 ), MSG_INFO );
+            IO::printMessage( GET_STRING( 93 ), MSG_INFO );
         } else {
             IO::printMessage( 0, MSG_INFO_NOCLOSE );
-            IO::printMessage( GET_STRING( 95 ), MSG_INFO );
+            IO::printMessage( GET_STRING( 94 ), MSG_INFO );
         }
 
         IO::fadeScreen( IO::CLEAR_DARK_IMMEDIATE, true, true );

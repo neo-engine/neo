@@ -104,8 +104,8 @@ namespace IO::BRAILLE_FONT {
             p_val = 29;
             return;
         }
-        if( isKana( p_val ) ) {
-            p_val = valToKana( p_val, KANA_START );
+        if( KANA::isKana( p_val ) ) {
+            p_val = KANA::valToKana( p_val, KANA_START );
             return;
         }
         return;

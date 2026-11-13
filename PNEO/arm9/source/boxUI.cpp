@@ -158,12 +158,12 @@ namespace BOX {
                                    32, 192 - 20, 32, 32, false, false, false, OBJPRIORITY_2, true );
 
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        IO::regularFont->printStringBC( GET_STRING( 380 ), IO::BG_PAL( true ), TEXT_BUF, 64,
+        IO::regularFont->printStringBC( GET_STRING( 310 ), IO::BG_PAL( true ), TEXT_BUF, 64,
                                         IO::font::CENTER );
         tileCnt = IO::loadSpriteB( SPR_PARTY_TEXT_OAM_SUB, tileCnt, 40, 192 - 18, 64, 32, TEXT_BUF,
                                    64 * 32 / 2, false, false, false, OBJPRIORITY_1, true );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        IO::regularFont->printStringBC( GET_STRING( 381 ), IO::BG_PAL( true ), TEXT_BUF, 64,
+        IO::regularFont->printStringBC( GET_STRING( 311 ), IO::BG_PAL( true ), TEXT_BUF, 64,
                                         IO::font::CENTER );
         tileCnt = IO::loadSpriteB( SPR_PARTY_TEXT_OAM_SUB + 1, tileCnt, 40, 192 - 18, 64, 32,
                                    TEXT_BUF, 64 * 32 / 2, false, false, true, OBJPRIORITY_1, true );
@@ -177,7 +177,7 @@ namespace BOX {
                              256 - 32, 24 + 21 * i, 32, 32, 0, 0, 0, true, true, true,
                              OBJPRIORITY_2, true );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            IO::regularFont->printStringBC( GET_STRING( 382 + i ), IO::BG_PAL( true ), TEXT_BUF, 64,
+            IO::regularFont->printStringBC( GET_STRING( 312 + i ), IO::BG_PAL( true ), TEXT_BUF, 64,
                                             IO::font::CENTER );
             tileCnt = IO::loadSpriteB( SPR_PKMN_OPTS_OAM_SUB( i ) + 2, tileCnt, 256 - 64,
                                        38 + 21 * i, 64, 32, TEXT_BUF, 64 * 32 / 2, false, false,
@@ -506,7 +506,7 @@ namespace BOX {
                                   OBJPRIORITY_3, false );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->printStringC( GET_STRING( 379 ), 5, 3, false );
+        IO::regularFont->printStringC( GET_STRING( 309 ), 5, 3, false );
 
         for( u8 i = 0; i < 128; ++i ) {
             if( i >= SPR_NAME_BG_OAM && i <= SPR_NAME_BG_OAM + 3 ) { continue; }
@@ -655,7 +655,7 @@ namespace BOX {
             } else {
                 snprintf( buffer.data( ), buffer.size( ), "????" );
             }
-            IO::regularFont->printStringC( GET_STRING( 337 ), INFO_X + 12, INFO_Y + 27, false );
+            IO::regularFont->printStringC( GET_STRING( 267 ), INFO_X + 12, INFO_Y + 27, false );
             if( p_pokemon->isShiny( ) ) {
                 IO::regularFont->setColor( IO::RED2_IDX, 1 );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
@@ -664,16 +664,16 @@ namespace BOX {
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
             }
             IO::regularFont->printStringC(
-                buffer.data( ), IO::regularFont->stringWidthC( GET_STRING( 337 ) ) + INFO_X + 16,
+                buffer.data( ), IO::regularFont->stringWidthC( GET_STRING( 267 ) ) + INFO_X + 16,
                 INFO_Y + 27, false );
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
-            IO::regularFont->printStringC( GET_STRING( 378 ), INFO_X + 12, INFO_Y + 27 + 30,
+            IO::regularFont->printStringC( GET_STRING( 308 ), INFO_X + 12, INFO_Y + 27 + 30,
                                            false );
-            IO::regularFont->printStringC( GET_STRING( 363 ), INFO_X + 12, INFO_Y + 27 + 45,
+            IO::regularFont->printStringC( GET_STRING( 293 ), INFO_X + 12, INFO_Y + 27 + 45,
                                            false );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
-            IO::regularFont->printStringC( GET_STRING( 187 + u8( p_pokemon->getNature( ) ) ),
+            IO::regularFont->printStringC( GET_STRING( 176 + u8( p_pokemon->getNature( ) ) ),
                                            INFO_X + 144 - 12, INFO_Y + 27 + 30, false,
                                            IO::font::RIGHT );
             IO::regularFont->printStringC(
@@ -683,7 +683,7 @@ namespace BOX {
 
             if( p_pokemon->getItem( ) ) {
                 IO::regularFont->setColor( 0, 2 );
-                IO::regularFont->printStringC( GET_STRING( 362 ), INFO_X + 12, INFO_Y + 27 + 75,
+                IO::regularFont->printStringC( GET_STRING( 292 ), INFO_X + 12, INFO_Y + 27 + 75,
                                                false );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
                 IO::regularFont->printStringC(
@@ -705,7 +705,7 @@ namespace BOX {
             // Egg
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );
             IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-            IO::regularFont->printString( GET_STRING( 34 ), ANCHOR_X + 12, ANCHOR_Y + 8, false );
+            IO::regularFont->printString( GET_STRING( 33 ), ANCHOR_X + 12, ANCHOR_Y + 8, false );
 
             u8 startline = 0;
 
@@ -714,12 +714,12 @@ namespace BOX {
                           IO::BLUE2_IDX );
             IO::regularFont->setColor( IO::COLOR_IDX, 2 );
             if( p_pokemon->getSpecies( ) == PKMN_MANAPHY ) {
-                writeLineTop( GET_STRING( 359 ), startline++ );
-                writeLineTop( GET_STRING( 360 ), startline++ );
-                writeLineTop( GET_STRING( 361 ), startline++ );
+                writeLineTop( GET_STRING( 389 ), startline++ );
+                writeLineTop( GET_STRING( 390 ), startline++ );
+                writeLineTop( GET_STRING( 391 ), startline++ );
             } else {
-                writeLineTop( GET_STRING( 354 ), startline++ );
-                writeLineTop( GET_STRING( 355 ), startline++ );
+                writeLineTop( GET_STRING( 284 ), startline++ );
+                writeLineTop( GET_STRING( 285 ), startline++ );
             }
             u8 shift = 2;
             switch( p_pokemon->m_boxdata.m_gotPlace ) {
@@ -727,20 +727,20 @@ namespace BOX {
             case L_DAY_CARE_COUPLE:
             case L_TRAVELING_MAN:
             case L_POKEWALKER:
-                writeLineTop( GET_STRING( 356 ), startline );
-                shift += IO::regularFont->stringWidth( GET_STRING( 356 ) );
+                writeLineTop( GET_STRING( 286 ), startline );
+                shift += IO::regularFont->stringWidth( GET_STRING( 286 ) );
                 break;
             default:
-                writeLineTop( GET_STRING( 357 ), startline );
-                shift += IO::regularFont->stringWidth( GET_STRING( 357 ) );
+                writeLineTop( GET_STRING( 287 ), startline );
+                shift += IO::regularFont->stringWidth( GET_STRING( 287 ) );
                 break;
             case L_RILEY:
             case L_CYNTHIA:
             case L_MR_POKEMON:
             case L_PRIMO:
             case L_POKEMON_RANGER:
-                writeLineTop( GET_STRING( 358 ), startline );
-                shift += IO::regularFont->stringWidthC( GET_STRING( 358 ) );
+                writeLineTop( GET_STRING( 288 ), startline );
+                shift += IO::regularFont->stringWidthC( GET_STRING( 288 ) );
                 break;
             }
             auto loc = FS::getLocation( p_pokemon->m_boxdata.m_gotPlace );
@@ -763,15 +763,15 @@ namespace BOX {
 
             if( p_pokemon->m_boxdata.m_steps > 10 ) {
                 for( u8 i = 0; i < 3; ++i ) {
-                    writeLineTop( GET_STRING( 345 + i ), startline + i );
+                    writeLineTop( GET_STRING( 275 + i ), startline + i );
                 }
             } else if( p_pokemon->m_boxdata.m_steps > 5 ) {
                 for( u8 i = 0; i < 3; ++i ) {
-                    writeLineTop( GET_STRING( 348 + i ), startline + i );
+                    writeLineTop( GET_STRING( 278 + i ), startline + i );
                 }
             } else {
                 for( u8 i = 0; i < 3; ++i ) {
-                    writeLineTop( GET_STRING( 351 + i ), startline + i );
+                    writeLineTop( GET_STRING( 281 + i ), startline + i );
                 }
             }
             IO::regularFont->setColor( IO::WHITE_IDX, 1 );

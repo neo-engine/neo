@@ -637,7 +637,7 @@ namespace FS {
     std::string getTrainerClassName( u16 p_trainerClass, u8 p_language ) {
         char tmpbuf[ TCLASS_NAMELENGTH ];
         if( !getTrainerClassName( p_trainerClass, p_language, tmpbuf ) ) {
-            return std::string( GET_STRING( 550 ) );
+            return std::string( GET_STRING( 409 ) );
         }
         return std::string( tmpbuf );
     }
