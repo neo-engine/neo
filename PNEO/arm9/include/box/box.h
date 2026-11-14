@@ -30,6 +30,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <nds.h>
 
+#include "io/kana.h"
 #include "pokemon.h"
 
 namespace BOX {
@@ -39,6 +40,12 @@ namespace BOX {
         char       m_name[ MAX_BOX_NAME_LENGTH ];
         boxPokemon m_pokemon[ MAX_PKMN_PER_BOX ];
         u8         m_wallpaper;
+
+        inline const char* getName( bool p_jap ) {
+            static std::array<char, MAX_BOX_NAME_LENGTH + 3> buf{ };
+            IO::KANA::embedKana( m_name, false, !p_jap, buf.data( ), buf.size( ) );
+            return buf.data( );
+        }
 
         /*
          * @brief: Returns the first non-occupied spot in the box or -1 if the box is

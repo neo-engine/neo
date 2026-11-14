@@ -1,29 +1,29 @@
 /*
-    Pokémon neo
-    ------------------------------
+   Pokémon neo
+   ------------------------------
 
-    file        : battleSlot.h
-    author      : Philip Wellnitz
-    description : Header file. Consult the corresponding source file for details.
+   file        : battleSlot.h
+   author      : Philip Wellnitz
+   description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2022
-    Philip Wellnitz
+   Copyright (C) 2012 - 2026
+   Philip Wellnitz
 
-    This file is part of Pokémon neo.
+   This file is part of Pokémon neo.
 
-    Pokémon neo is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+   Pokémon neo is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-    Pokémon neo is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+   Pokémon neo is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
-    */
+   You should have received a copy of the GNU General Public License
+   along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 #include <cstring>
@@ -57,29 +57,51 @@ namespace BATTLE {
         };
 
       private:
-        status         _status;
-        slotCondition  _slotCondition;
-        u8             _slotConditionCounter[ MAX_SLOT_CONDITIONS ];
-        pokemon*       _pokemon;
-        pokemon        _transformedPkmn; // pkmn the pkmn is transformed into
-        bool           _isTransformed;
-        const pokemon* _disguise; // disguise for illusion
-        u8             _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
-        u8             _volatileStatusAmount[ MAX_VOLATILE_STATUS ]; // Multiple stockpiles
-        boosts         _boosts;
-        u16            _toxicCount;
-        u16 _turnsInPlay; // Number of turns the pkmn in the slot in participating in the battle
-
+        status              _status;
+        slotCondition       _slotCondition = static_cast<slotCondition>( 0 );
+        u8                  _slotConditionCounter[ MAX_SLOT_CONDITIONS ] = { 0 };
+        u16                 _slotConditionAmount[ MAX_SLOT_CONDITIONS ]  = { 0 };
+        std::string         _slotConditionWisher;
+        u16                 _slotConditionSrc = 0xFFFF;
+        u16                 _substituteHp     = 0;
+        std::string         _trapWisher;
+        u16                 _trapMove       = 0;
+        u16                 _trapSpecies    = 0;
+        u8                  _trapSide       = 0xFF;
+        u8                  _trapSlot       = 0xFF;
+        u8                  _trapTimer      = 0;
+        u8                  _perishTimer    = 0;
+        u8                  _moveActions    = 0;
+        u16                 _stallCounter   = 0;
+        u8                  _stallWindow    = 0;
+        u16                 _counterDamage  = 0;
+        u8                  _counterFrom    = 0xFF;
+        u16                 _mirrorDamage   = 0;
+        u8                  _mirrorFrom     = 0xFF;
+        u8                  _leechSource    = 0xFF;
+        u16                 _bideDamage     = 0;
+        u8                  _bideFrom       = 0xFF;
+        u8                  _autotomizeCuts = 0;
+        pokemon*            _pokemon;
+        pokemon             _transformedPkmn;
+        bool                _isTransformed;
+        const pokemon*      _disguise;
+        u8                  _volatileStatusCounter[ MAX_VOLATILE_STATUS ];
+        u8                  _volatileStatusAmount[ MAX_VOLATILE_STATUS ];
+        boosts              _boosts;
+        u16                 _toxicCount;
+        u16                 _turnsInPlay;
         battleMoveSelection _lockedMove; // move that a pkmn is forced to execute (no op if hib)
         u8                  _lockedMoveTurns; // remaining turns the pkmn is locked into _lockedMove
         battleMove          _lastMove;        // Last used moves
+        bool                _moveActedThisTurn = false;
         u8                  _consecutiveMoveCount;
         u16                 _disabledMove; // move that was disabled
+        u16                 _encoreMove = 0;
         pkmnData            _pkmnData;
-        std::vector<type>   _altTypes; // Type(s) the pkmn changed into
-        type _extraType{ };            // Additional type due to forest's curse or trick-or-treat
-
-        u16 _usedItem = 0; // (held) item the pkmn used
+        std::vector<type>   _altTypes;
+        type                _extraType{ };
+        u16                 _usedItem = 0; // (held) item the pkmn used
 
       public:
         slot( ) {
@@ -126,17 +148,32 @@ namespace BATTLE {
             _lockedMoveTurns      = 0;
             _consecutiveMoveCount = 0;
             _status               = status( 0 );
-            _slotCondition        = slotCondition( 0 );
             _isTransformed        = false;
             _boosts               = boosts( );
             _lastMove             = battleMove( );
+            _moveActedThisTurn    = false;
             _disabledMove         = 0;
-            _disguise             = nullptr;
+            _encoreMove           = 0;
+            _perishTimer          = 0;
+            _moveActions          = 0;
+            _stallCounter         = 0;
+            _stallWindow          = 0;
+            _counterDamage        = 0;
+            _counterFrom          = 0xFF;
+
+            _mirrorDamage   = 0;
+            _mirrorFrom     = 0xFF;
+            _leechSource    = 0xFF;
+            _bideDamage     = 0;
+            _bideFrom       = 0xFF;
+            _autotomizeCuts = 0;
+            _disguise       = nullptr;
             _altTypes.clear( );
             std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
             std::memset( _volatileStatusCounter, 0, sizeof( _volatileStatusCounter ) );
-            std::memset( _slotConditionCounter, 0, sizeof( _slotConditionCounter ) );
             std::memset( _volatileStatusAmount, 0, sizeof( _volatileStatusAmount ) );
+            clearPartialTrap( );
+            _substituteHp = 0;
         }
 
         /*
@@ -179,41 +216,7 @@ namespace BATTLE {
         /*
          * @brief: Checks whether the pkmn currently has the specified type.
          */
-        constexpr bool hasType( type p_type ) const {
-            if( _pokemon == nullptr ) [[unlikely]] { return false; }
-
-            if( _volatileStatusCounter[ 54 ] && p_type == TYPE_FLYING ) [[unlikely]] { // Roost
-                return false;
-            }
-
-            if( _volatileStatusCounter[ 54 ] && p_type == TYPE_NORMAL ) [[unlikely]] { // Roost
-                if( _pkmnData.m_baseForme.m_types[ 0 ] == TYPE_FLYING
-                    && _pkmnData.m_baseForme.m_types[ 1 ] == TYPE_FLYING ) {
-                    return true;
-                }
-            }
-
-            if( _volatileStatusCounter[ 55 ] && p_type == TYPE_FIRE ) [[unlikely]] { // Burn Up
-                return false;
-            }
-
-            if( _volatileStatusCounter[ 51 ] ) [[unlikely]] { // Extra type
-                if( p_type == _extraType ) { return true; }
-            }
-
-            if( _volatileStatusCounter[ 56 ] ) [[unlikely]] { // replace type
-                for( auto t : _altTypes ) {
-                    if( p_type == t ) { return true; }
-                }
-                return false;
-            }
-
-            if( _pkmnData.m_baseForme.m_types[ 0 ] == p_type
-                || _pkmnData.m_baseForme.m_types[ 1 ] == p_type ) {
-                return true;
-            }
-            return false;
-        }
+        bool hasType( type p_type ) const;
 
         /*
          * @brief: Sets the move the specified pkmn used last.
@@ -231,48 +234,25 @@ namespace BATTLE {
             return _lastMove;
         }
 
+        inline void markMoveActed( ) {
+            _moveActedThisTurn = true;
+        }
+
+        inline bool takeMoveActed( ) {
+            bool acted         = _moveActedThisTurn;
+            _moveActedThisTurn = false;
+            return acted;
+        }
+
         /*
          * @brief: Recalls a non-FAINTED pokemon.
          */
-        inline void recallPokemon( bool p_keepVolatileStatus = false ) {
-            if( !p_keepVolatileStatus ) {
-                reset( );
-            } else {
-                _usedItem             = 0;
-                _turnsInPlay          = 0;
-                _toxicCount           = 0;
-                _lockedMove           = NO_OP_SELECTION;
-                _lockedMoveTurns      = 0;
-                _slotCondition        = slotCondition( 0 );
-                _isTransformed        = false;
-                _lastMove             = battleMove( );
-                _consecutiveMoveCount = 0;
-                _disabledMove         = 0;
-                _altTypes.clear( );
-                std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
-            }
-            _status = RECALLED;
-        }
+        void recallPokemon( bool p_keepVolatileStatus = false );
 
         /*
          * @brief: Adds the specified amount of damage to the pkmn.
          */
-        inline void damagePokemon( u16 p_damage ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return; }
-
-            if( p_damage >= pkmn->m_stats.m_curHP ) {
-                pkmn->m_stats.m_curHP = 0;
-                pkmn->m_statusint     = 0;
-                if( _isTransformed ) {
-                    _pokemon->m_stats.m_curHP = 0;
-                    _pokemon->m_statusint     = 0;
-                }
-            } else {
-                pkmn->m_stats.m_curHP -= p_damage;
-                if( _isTransformed ) { _pokemon->m_stats.m_curHP = pkmn->m_stats.m_curHP; }
-            }
-        }
+        void damagePokemon( u16 p_damage );
 
         /*
          * @brief: Heals the specified amount of damage from the pkmn.
@@ -286,26 +266,46 @@ namespace BATTLE {
             if( _isTransformed ) { _pokemon->m_stats.m_curHP = pkmn->m_stats.m_curHP; }
         }
 
-        /*
-         * @brief: Faints the pokemon. Deals necessary damage first.
-         */
-        inline void faintPokemon( ) {
+        constexpr void healFully( ) {
             auto pkmn = getPkmn( );
             if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return; }
 
-            pkmn->m_stats.m_curHP = 0;
-            pkmn->m_statusint     = 0;
-            pkmn->revertBattleTransform( );
-            _status = FAINTED;
+            pkmn->m_stats.m_curHP = pkmn->m_stats.m_maxHP;
+            if( _isTransformed ) { _pokemon->m_stats.m_curHP = pkmn->m_stats.m_maxHP; }
         }
 
-        constexpr boosts addBoosts( boosts p_boosts, bool p_allowAbilities = true ) {
+        void restoreAllMovePP( );
+
+        bool hasMovePPDeficit( );
+
+        /*
+         * @brief: true iff the move sits in one of the pkmn's four slots.
+         */
+        bool hasMove( u16 p_moveId ) {
+            auto pkmn = getPkmn( );
+            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return false; }
+
+            for( u8 i = 0; i < 4; ++i ) {
+                if( pkmn->m_boxdata.m_moves[ i ] == p_moveId ) { return true; }
+            }
+            return false;
+        }
+
+        /*
+         * @brief: Faints the pokemon. Deals necessary damage first.
+         */
+        void faintPokemon( );
+
+        constexpr boosts addBoosts( boosts p_boosts, bool p_allowAbilities = true,
+                                    bool p_allowOverMax = false ) {
             auto pkmn = getPkmn( );
             if( pkmn == nullptr ) { return boosts( ); }
 
-            if( p_allowAbilities && pkmn->getAbility( ) == A_CONTRARY ) { p_boosts.invert( ); }
+            if( p_allowAbilities && !abilitiesNullified( ) && pkmn->getAbility( ) == A_CONTRARY ) {
+                p_boosts.invert( );
+            }
 
-            return _boosts.addBoosts( p_boosts );
+            return _boosts.addBoosts( p_boosts, p_allowOverMax );
         }
         constexpr bool resetBoosts( ) {
             _boosts = boosts( );
@@ -315,53 +315,7 @@ namespace BATTLE {
             return _boosts;
         }
 
-        constexpr bool setStatusCondition( u8 p_status, u8 p_duration = 255,
-                                           bool p_force = false ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return false; }
-
-            if( !p_force && pkmn->m_statusint ) { return false; }
-
-            switch( p_status ) {
-            case SLEEP:
-                if( pkmn->getAbility( ) == A_COMATOSE ) { return false; }
-                pkmn->m_status.m_isAsleep = p_duration;
-                if( _isTransformed ) { _pokemon->m_status.m_isAsleep = p_duration; }
-                break;
-            case BURN:
-                if( hasType( TYPE_FIRE ) ) { return false; }
-                pkmn->m_status.m_isBurned = true;
-                if( _isTransformed ) { _pokemon->m_status.m_isBurned = true; }
-                break;
-            case FROZEN:
-                if( hasType( TYPE_ICE ) ) { return false; }
-                pkmn->m_status.m_isFrozen = true;
-                if( _isTransformed ) { _pokemon->m_status.m_isFrozen = true; }
-                break;
-            case PARALYSIS:
-                if( hasType( TYPE_LIGHTNING ) ) { return false; }
-                pkmn->m_status.m_isParalyzed = true;
-                if( _isTransformed ) { _pokemon->m_status.m_isParalyzed = true; }
-                break;
-            case POISON:
-                // p_duration == 254 iff pkmn causing poison has corrosion ability
-                if( hasType( TYPE_POISON ) && p_duration != 254 ) { return false; }
-                if( hasType( TYPE_STEEL ) && p_duration != 254 ) { return false; }
-                pkmn->m_status.m_isPoisoned = true;
-                if( _isTransformed ) { _pokemon->m_status.m_isPoisoned = true; }
-                break;
-            case TOXIC:
-                // p_duration == 254 iff pkmn causing poison has corrosion ability
-                if( hasType( TYPE_POISON ) && p_duration != 254 ) { return false; }
-                if( hasType( TYPE_STEEL ) && p_duration != 254 ) { return false; }
-                _toxicCount                      = 1;
-                pkmn->m_status.m_isBadlyPoisoned = true;
-                if( _isTransformed ) { _pokemon->m_status.m_isBadlyPoisoned = true; }
-                break;
-            default: return false;
-            }
-            return true;
-        }
+        bool setStatusCondition( u8 p_status, u8 p_duration = 255, bool p_force = false );
 
         /*
          * @brief: Removes any status condition a pkmn may have
@@ -402,8 +356,13 @@ namespace BATTLE {
          */
         constexpr bool hasAbility( u16 p_abilityId ) const {
             if( _pokemon == nullptr ) [[unlikely]] { return false; }
+            if( abilitiesNullified( ) ) [[unlikely]] { return false; }
             auto& pkmn = _isTransformed ? _transformedPkmn : *_pokemon;
             return pkmn.getAbility( ) == p_abilityId;
+        }
+
+        bool abilitiesNullified( ) const {
+            return _volatileStatusCounter[ 19 ] != 0; // VS_GASTROACID
         }
 
         /*
@@ -425,25 +384,14 @@ namespace BATTLE {
             }
         }
 
-        constexpr bool addVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus,
-                                          u8 p_duration = 255 ) {
-            bool change = false;
-            for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                if( ( p_volatileStatus & ( 1LLU << i ) )
-                    && ( _volatileStatusCounter[ i ] >= 250 || !_volatileStatusAmount[ i ] ) ) {
-                    change = true;
-                    _volatileStatusAmount[ i ]++;
-                    _volatileStatusCounter[ i ] = p_duration;
-#ifdef DESQUID_MORE
-                    p_ui->log( std::string( "Add volatile status condition " )
-                               + std::to_string( 1LLU << i ) + " for "
-                               + std::to_string( p_duration ) + " rounds." );
-#else
-                    (void) p_ui;
-#endif
-                }
-            }
-            return change;
+        bool addVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus,
+                                u8 p_duration = 255 );
+
+        constexpr bool restackVolatile( u8 p_index ) {
+            if( !_volatileStatusCounter[ p_index ] ) { return false; }
+            if( _volatileStatusAmount[ p_index ] < 255 ) { _volatileStatusAmount[ p_index ]++; }
+            _volatileStatusCounter[ p_index ] = 1;
+            return true;
         }
 
         constexpr bool removeVolatileStatus( battleUI* p_ui, volatileStatus p_volatileStatus ) {
@@ -472,6 +420,13 @@ namespace BATTLE {
             return res;
         }
 
+        constexpr u16 getSubstituteHp( ) const {
+            return _substituteHp;
+        }
+        constexpr void setSubstituteHp( u16 p_hp ) {
+            _substituteHp = p_hp;
+        }
+
         constexpr u8 getVolatileStatusAmount( volatileStatus p_volatileStatus ) const {
             for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
                 if( p_volatileStatus & ( 1LLU << i ) ) { return _volatileStatusAmount[ i ]; }
@@ -487,15 +442,16 @@ namespace BATTLE {
         }
 
         inline bool addSlotCondition( battleUI* p_ui, slotCondition p_slotCondition,
-                                      u8 p_duration = 0 ) {
+                                      u8 p_duration = 0, u16 p_amount = 0,
+                                      const std::string& p_wisher = std::string( ),
+                                      u16                p_src    = 0xFFFF ) {
 
-            if( ( _slotCondition & p_slotCondition ) == p_slotCondition ) {
-                p_ui->log( GET_STRING( IO::STR_BATTLE_IT_FAILED ) );
-                return false;
-            }
+            if( ( _slotCondition & p_slotCondition ) == p_slotCondition ) { return false; }
 
 #ifdef DESQUID_MORE
             p_ui->log( std::string( "Add slot condition " ) + std::to_string( p_slotCondition ) );
+#else
+            (void) p_ui;
 #endif
 
             for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
@@ -503,31 +459,207 @@ namespace BATTLE {
                     if( !( ( 1LLU << i ) & _slotCondition ) ) {
                         _slotConditionCounter[ i ]
                             = p_duration ? p_duration : defaultSlotConditionDurations[ i ];
+                        _slotConditionAmount[ i ] = p_amount;
                     }
                 }
             }
+            if( p_slotCondition & SL_WISH ) { _slotConditionWisher = p_wisher; }
+            if( p_slotCondition & SL_FUTURESIGHT ) { _slotConditionSrc = p_src; }
             _slotCondition = slotCondition( _slotCondition | p_slotCondition );
             return true;
         }
-        inline bool removeSlotCondition( battleUI* p_ui, slotCondition p_slotCondition ) {
-            if( !( _slotCondition & p_slotCondition ) ) { return false; }
-
-            for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
-                if( ( 1LLU << i ) & p_slotCondition ) { _slotConditionCounter[ i ] = 0; }
-            }
-            _slotCondition = slotCondition( _slotCondition & ~p_slotCondition );
-#ifdef DESQUID_MORE
-            p_ui->log( std::string( "Remove slot condition " )
-                       + std::to_string( p_slotCondition ) );
-#else
-            (void) p_ui;
-#endif
-            return true;
-        }
+        bool removeSlotCondition( battleUI* p_ui, slotCondition p_slotCondition );
         constexpr slotCondition getSlotCondition( ) const {
             return _slotCondition;
         }
 
+        /*
+         * @brief: Remaining duration of a slot condition (0 = absent or
+         * permanent). A condition whose counter is 1 ages out during the
+         * next slot::age pass.
+         */
+        constexpr u8 getSlotConditionDuration( slotCondition p_slotCondition ) const {
+            for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
+                if( p_slotCondition == slotCondition( 1LLU << i ) ) {
+                    return _slotConditionCounter[ i ];
+                }
+            }
+            return 0;
+        }
+
+        constexpr u16 getSlotConditionAmount( slotCondition p_slotCondition ) const {
+            for( u8 i = 0; i < MAX_SLOT_CONDITIONS; ++i ) {
+                if( p_slotCondition == slotCondition( 1LLU << i ) ) {
+                    return _slotConditionAmount[ i ];
+                }
+            }
+            return 0;
+        }
+
+        const std::string& getSlotConditionWisher( ) const {
+            return _slotConditionWisher;
+        }
+
+        constexpr u16 getSlotConditionSrc( ) const {
+            return _slotConditionSrc;
+        }
+
+        void setPartialTrap( const std::string& p_wisher, u16 p_move, u16 p_species, u8 p_side,
+                             u8 p_slot, u8 p_timer ) {
+            _trapWisher  = p_wisher;
+            _trapMove    = p_move;
+            _trapSpecies = p_species;
+            _trapSide    = p_side;
+            _trapSlot    = p_slot;
+            _trapTimer   = p_timer;
+        }
+        void clearPartialTrap( ) {
+            _trapWisher.clear( );
+            _trapMove    = 0;
+            _trapSpecies = 0;
+            _trapSide    = 0xFF;
+            _trapSlot    = 0xFF;
+            _trapTimer   = 0;
+        }
+        void decreasePartialTrapTimer( ) {
+            if( _trapTimer ) { --_trapTimer; }
+        }
+        const std::string& getPartialTrapWisher( ) const {
+            return _trapWisher;
+        }
+        u16 getPartialTrapMove( ) const {
+            return _trapMove;
+        }
+        u16 getPartialTrapSpecies( ) const {
+            return _trapSpecies;
+        }
+        u8 getPartialTrapSide( ) const {
+            return _trapSide;
+        }
+        u8 getPartialTrapSlot( ) const {
+            return _trapSlot;
+        }
+        u8 getPartialTrapTimer( ) const {
+            return _trapTimer;
+        }
+
+        u8 getPerishTimer( ) const {
+            return _perishTimer;
+        }
+        void setPerishTimer( u8 p_timer ) {
+            _perishTimer = p_timer;
+        }
+
+        u8 getMoveActions( ) const {
+            return _moveActions;
+        }
+        void registerMoveAction( ) {
+            ++_moveActions;
+        }
+
+        u16 getStallCounter( ) const {
+            return _stallCounter;
+        }
+        void setStallCounter( u16 p_counter ) {
+            _stallCounter = p_counter;
+        }
+        u8 getStallWindow( ) const {
+            return _stallWindow;
+        }
+        void setStallWindow( u8 p_window ) {
+            _stallWindow = p_window;
+        }
+
+        bool hasCounter( ) const {
+            return _counterFrom != 0xFF;
+        }
+        bool hasMirrorCoat( ) const {
+            return _mirrorFrom != 0xFF;
+        }
+        bool counterRecorded( ) const {
+            return _counterFrom < 0xFE;
+        }
+        bool mirrorRecorded( ) const {
+            return _mirrorFrom < 0xFE;
+        }
+        u16 getCounterDamage( ) const {
+            return _counterDamage;
+        }
+        u8 getCounterFrom( ) const {
+            return _counterFrom;
+        }
+        u16 getMirrorDamage( ) const {
+            return _mirrorDamage;
+        }
+        u8 getMirrorFrom( ) const {
+            return _mirrorFrom;
+        }
+        void armCounters( bool p_mirror ) {
+            _counterDamage = 0;
+            _counterFrom   = ( p_mirror ? 0xFF : 0xFE );
+            _mirrorDamage  = 0;
+            _mirrorFrom    = ( p_mirror ? 0xFE : 0xFF );
+        }
+        void recordCounter( bool p_mirror, u16 p_damage, u8 p_from ) {
+            if( p_mirror ) {
+                _mirrorDamage = p_damage;
+                _mirrorFrom   = p_from;
+            } else {
+                _counterDamage = p_damage;
+                _counterFrom   = p_from;
+            }
+        }
+        void clearCounters( ) {
+            _counterDamage = 0;
+            _counterFrom   = 0xFF;
+            _mirrorDamage  = 0;
+            _mirrorFrom    = 0xFF;
+        }
+
+        u16 getBideDamage( ) const {
+            return _bideDamage;
+        }
+        u8 getBideFrom( ) const {
+            return _bideFrom;
+        }
+        bool bideHit( ) const {
+            return _bideFrom != 0xFF;
+        }
+        void addBideDamage( u16 p_damage, u8 p_from ) {
+            const u32 tot = u32( _bideDamage ) + p_damage;
+            _bideDamage   = ( tot > 0xFFFFu ) ? 0xFFFFu : u16( tot );
+            _bideFrom     = p_from;
+        }
+        void clearBide( ) {
+            _bideDamage = 0;
+            _bideFrom   = 0xFF;
+        }
+
+        void setLeechSource( u8 p_src ) {
+            _leechSource = p_src;
+        }
+        u8 getLeechSource( ) const {
+            return _leechSource;
+        }
+        void clearLeechSource( ) {
+            _leechSource = 0xFF;
+        }
+        bool seeded( ) const {
+            return _leechSource != 0xFF;
+        }
+
+        inline void setDisabledMove( u16 p_mv ) {
+            _disabledMove = p_mv;
+        }
+        u16 getDisabledMove( ) const {
+            return _disabledMove;
+        }
+        inline void setEncoreMove( u16 p_mv ) {
+            _encoreMove = p_mv;
+        }
+        u16 getEncoreMove( ) const {
+            return _encoreMove;
+        }
         constexpr void giveItem( u16 p_item ) {
             if( _pokemon == nullptr ) [[unlikely]] { return; }
 
@@ -552,36 +684,15 @@ namespace BATTLE {
         /*
          * @brief: returns whether the specified pkmn currently touches the ground.
          */
-        inline bool isGrounded( bool p_allowAbilities = true ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return true; }
-
-            bool grn = !( hasType( TYPE_FLYING )
-                          || ( p_allowAbilities && pkmn->getAbility( ) == A_LEVITATE )
-                          || ( canUseItem( p_allowAbilities ) && pkmn->getItem( ) == I_AIR_BALLOON )
-                          || _volatileStatusCounter[ 16 ] /* telekinesis */
-                          || _volatileStatusCounter[ 17 ] ) /* magnet rise */;
-
-            grn = grn || ( canUseItem( p_allowAbilities ) && pkmn->getItem( ) == I_IRON_BALL )
-                  || _volatileStatusCounter[ 37 ] /* ingrain */
-                  || _volatileStatusCounter[ 10 ] /* smack down / Thousand arrows */;
-
-            return grn;
-        }
+        bool isGrounded( bool p_allowAbilities = true );
 
         /*
          * @brief: returns the weight of the specified pkmn.
          */
-        inline u16 getWeight( bool p_allowAbilities = true ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr ) [[unlikely]] { return 0; }
+        u16 getWeight( bool p_allowAbilities = true );
 
-            u16 wg = getPokemonData( ).m_baseForme.m_weight;
-
-            if( p_allowAbilities && pkmn->getAbility( ) == A_HEAVY_METAL ) { wg <<= 1; }
-            if( p_allowAbilities && pkmn->getAbility( ) == A_LIGHT_METAL ) { wg >>= 1; }
-
-            return wg;
+        inline void addAutotomizeCut( ) {
+            if( _autotomizeCuts < 255 ) { _autotomizeCuts++; }
         }
 
         /*
@@ -590,206 +701,18 @@ namespace BATTLE {
          * @returns: The numerical value of the stat or a value in [0, 15] for ACCURACY
          * and EVASION, where 7 represents no change.
          */
-        constexpr u16 getStat( u8 p_stat, bool p_allowAbilities = true,
-                               bool p_ignoreNegative = false, bool p_ignorePositive = false ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return 0; }
-
-            if( p_stat == EVASION || p_stat == ACCURACY ) {
-                auto res = _boosts.getShiftedBoost( p_stat );
-                if( res < 7 && p_ignoreNegative ) { return 7; }
-                if( res > 7 && p_ignorePositive ) { return 7; }
-
-                return res;
-            }
-
-            // base value
-            u16 base = pkmn->getStat( p_stat );
-            if( p_stat == HP ) { base = pkmn->m_stats.m_curHP; }
-
-            // apply boosts
-            s8 bst = _boosts.getBoost( p_stat );
-            if( bst > 0 && !p_ignorePositive ) {
-                base *= ( bst + 2 );
-                base >>= 1;
-            } else if( bst < 0 && !p_ignoreNegative ) {
-                base *= 2;
-                base /= ( -bst + 2 );
-            }
-
-            // status (par)
-            if( !p_ignoreNegative && p_stat == SPEED
-                && ( !p_allowAbilities || pkmn->getAbility( ) != A_QUICK_FEET )
-                && pkmn->m_status.m_isParalyzed ) {
-                base >>= 1;
-            }
-
-            // Abilities
-            if( p_allowAbilities ) [[likely]] {
-                switch( pkmn->getAbility( ) ) {
-                case A_UNBURDEN: {
-                    if( !p_ignorePositive && p_stat == SPEED && _usedItem && !pkmn->getItem( ) )
-                        [[unlikely]] {
-                        base <<= 1;
-                    }
-                    break;
-                }
-                case A_SLOW_START:
-                    [[unlikely]] {
-                        if( !p_ignoreNegative && ( p_stat == ATK || p_stat == SPEED )
-                            && _turnsInPlay < 5 ) {
-                            base >>= 1;
-                        }
-                        break;
-                    }
-                case A_DEFEATIST:
-                    if( !p_ignoreNegative && ( p_stat == ATK || p_stat == SATK ) ) {
-                        if( pkmn->m_stats.m_curHP * 2 < pkmn->m_stats.m_maxHP ) { base >>= 1; }
-                    }
-                    break;
-                case A_PURE_POWER:
-                case A_HUGE_POWER:
-                    if( !p_ignorePositive && p_stat == ATK ) { base <<= 1; }
-                    break;
-                case A_FUR_COAT:
-                    if( !p_ignorePositive && p_stat == DEF ) { base <<= 1; }
-                    break;
-                case A_GORILLA_TACTICS:
-                case A_HUSTLE:
-                    if( !p_ignorePositive && p_stat == ATK ) { base = 3 * base / 2; }
-                    break;
-                case A_GUTS: {
-                    if( !p_ignorePositive && pkmn->m_statusint ) {
-                        if( p_stat == ATK ) { base = 3 * base / 2; }
-                    }
-                    break;
-                }
-                case A_MARVEL_SCALE: {
-                    if( !p_ignorePositive && pkmn->m_statusint ) {
-                        if( p_stat == DEF ) { base = 3 * base / 2; }
-                    }
-                    break;
-                }
-                case A_QUICK_FEET: {
-                    if( !p_ignorePositive && pkmn->m_statusint ) {
-                        if( p_stat == SPEED ) { base = 3 * base / 2; }
-                    }
-                    break;
-                }
-
-                [[likely]] default:
-                    break;
-                }
-            }
-
-            // Special boosts
-            if( canUseItem( p_allowAbilities ) ) [[likely]] {
-                switch( pkmn->getItem( ) ) {
-                case I_CHOICE_SCARF:
-                    if( !p_ignorePositive && p_stat == SPEED ) { base = 3 * base / 2; }
-                    break;
-                case I_CHOICE_BAND:
-                    if( !p_ignorePositive && p_stat == ATK ) { base = 3 * base / 2; }
-                    break;
-                case I_CHOICE_SPECS:
-                    if( !p_ignorePositive && p_stat == SATK ) { base = 3 * base / 2; }
-                    break;
-                case I_ASSAULT_VEST:
-                    if( !p_ignorePositive && p_stat == SDEF ) { base = 3 * base / 2; }
-                    break;
-                case I_DEEP_SEA_SCALE:
-                    if( !p_ignorePositive && pkmn->getSpecies( ) == PKMN_CLAMPERL
-                        && p_stat == SDEF ) {
-                        base <<= 1;
-                    }
-                    break;
-                case I_DEEP_SEA_TOOTH:
-                    if( !p_ignorePositive && pkmn->getSpecies( ) == PKMN_CLAMPERL
-                        && p_stat == SATK ) {
-                        base <<= 1;
-                    }
-                    break;
-                case I_LIGHT_BALL:
-                    if( !p_ignorePositive && pkmn->getSpecies( ) == PKMN_PIKACHU
-                        && ( p_stat == SATK || p_stat == ATK ) ) {
-                        base <<= 1;
-                    }
-                    break;
-                case I_QUICK_POWDER:
-                    if( !p_ignorePositive && pkmn->getSpecies( ) == PKMN_DITTO && !_isTransformed
-                        && p_stat == SPEED ) {
-                        base <<= 1;
-                    }
-                    break;
-                case I_METAL_POWDER:
-                    if( !p_ignorePositive && pkmn->getSpecies( ) == PKMN_DITTO && !_isTransformed
-                        && p_stat == DEF ) {
-                        base <<= 1;
-                    }
-                    break;
-                [[unlikely]] case I_EVIOLITE:
-                    if( !p_ignorePositive && ( p_stat == SDEF || p_stat == DEF )
-                        && !_pokemon->isFullyEvolved( ) ) {
-                        base = 3 * base / 2;
-                    }
-                    break;
-
-                [[likely]] default:
-                    break;
-                }
-            }
-
-            return std::max( base, u16( 1 ) );
-        }
+        u16 getStat( u8 p_stat, bool p_allowAbilities = true, bool p_ignoreNegative = false,
+                     bool p_ignorePositive = false, bool p_wonderRoom = false );
 
         /*
-         * @brief: Checks whether the pokemon can move.
+         * @brief: Checks whether the pkmn can move.
          */
-        constexpr bool canSelectMove( ) const {
-            if( _pokemon == nullptr ) [[unlikely]] { return false; }
-            if( ( getVolatileStatus( ) & VS_RECHARGE ) || ( getVolatileStatus( ) & VS_CHARGE )
-                || _lockedMoveTurns ) {
-                return false;
-            }
-            return true;
-        }
+        bool canSelectMove( ) const;
 
         /*
-         * @brief: Checks whether the pokemon can use its i-th move.
+         * @brief: Checks whether the pkmn can use its i-th move.
          */
-        constexpr bool canSelectMove( u8 p_moveIdx ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return false; }
-
-            auto mv = pkmn->getMove( p_moveIdx );
-            if( !mv ) { return false; }
-
-            // pkmn may only use the move it is locked into
-            if( _lockedMove.m_type == MT_ATTACK && _lockedMove.m_param != mv ) { return false; }
-
-            if( pkmn->getItem( ) == I_CHOICE_SCARF || pkmn->getItem( ) == I_CHOICE_SPECS
-                || pkmn->getItem( ) == I_CHOICE_BAND ) [[unlikely]] {
-                if( _lastMove.m_param && _lastMove.m_param != mv ) { return false; }
-            }
-
-            if( !pkmn->m_boxdata.m_curPP[ p_moveIdx ] ) { return false; }
-
-            auto volstat = getVolatileStatus( );
-
-            if( ( volstat & VS_TAUNT ) || pkmn->getItem( ) == I_ASSAULT_VEST ) [[unlikely]] {
-                if( FS::getMoveData( mv ).m_category == MH_STATUS ) { return false; }
-            }
-
-            if( volstat & VS_DISABLE ) [[unlikely]] { // Disable
-                if( _disabledMove == mv ) { return false; }
-            }
-
-            if( volstat & VS_TORMENT ) [[unlikely]] { // Torment
-                if( _lastMove.m_param == mv ) { return false; }
-            }
-
-            return true;
-        }
+        bool canSelectMove( u8 p_moveIdx );
 
         /*
          * @brief: Locks the specified pkmn to use the specified move for the next
@@ -800,6 +723,14 @@ namespace BATTLE {
 
             _lockedMove      = p_move;
             _lockedMoveTurns = p_duration;
+        }
+
+        inline battleMoveSelection getLockedMove( ) const {
+            return _lockedMove;
+        }
+
+        inline void setLockedMoveCount( u8 p_turns ) {
+            _lockedMoveTurns = p_turns;
         }
 
         /*
@@ -831,7 +762,7 @@ namespace BATTLE {
         }
 
         /*
-         * @brief: Checks whether the pokemon can use a held item.
+         * @brief: Checks whether the pkmn can use a held item.
          */
         constexpr bool canUseItem( bool p_allowAbilities = true ) {
             auto pkmn = getPkmn( );
@@ -844,42 +775,14 @@ namespace BATTLE {
         }
 
         /*
-         * @brief: Checks whether the pokemon can be switched out.
+         * @brief: Checks whether the pkmn can be switched out.
          */
-        inline bool canSwitchOut( ) {
-            auto pkmn = getPkmn( );
-            if( pkmn == nullptr || _pokemon == nullptr ) [[unlikely]] { return false; }
-
-            if( canUseItem( ) && pkmn->getItem( ) == I_SHED_SHELL ) [[unlikely]] { return true; }
-
-            auto volstat = getVolatileStatus( );
-            if( volstat & VS_NORETREAT ) [[unlikely]] { // no retreat
-                return false;
-            }
-            if( volstat & VS_INGRAIN ) [[unlikely]] { // ingrain
-                return false;
-            }
-            if( volstat & VS_OCTOLOCK ) [[unlikely]] { // octo lock
-                return false;
-            }
-
-            return true;
-        }
+        bool canSwitchOut( );
 
         /*
          * @brief: Sets the pkmn to the specified value.
          */
-        inline void setPkmn( pokemon* p_pokemon ) {
-            if( !p_pokemon ) {
-                _status = EMPTY;
-                reset( );
-                return;
-            }
-            _pokemon  = p_pokemon;
-            _pkmnData = FS::getPkmnData( p_pokemon->getSpecies( ), p_pokemon->getForme( ) );
-            reset( );
-            _status = NORMAL;
-        }
+        void setPkmn( pokemon* p_pokemon );
 
         inline void setDisguise( const pokemon* p_pokemon ) {
             if( !p_pokemon ) {
@@ -903,29 +806,7 @@ namespace BATTLE {
             }
         }
 
-        constexpr pokemon* getPkmnOrDisguise( ) const {
-            if( _status != NORMAL || _pokemon == nullptr ) { return nullptr; }
-
-            static pokemon result;
-
-            if( !_isTransformed ) {
-                result = *_pokemon;
-            } else {
-                result = _transformedPkmn;
-            }
-
-            if( isDisguised( ) ) {
-                result.m_boxdata.m_speciesId = _disguise->getSpecies( );
-                result.m_boxdata.m_altForme  = _disguise->getForme( );
-                result.m_boxdata.m_shinyType = _disguise->m_boxdata.m_shinyType;
-                result.m_boxdata.m_pid       = _disguise->m_boxdata.m_pid;
-                result.m_boxdata.m_oTId      = _disguise->m_boxdata.m_oTId;
-                result.m_boxdata.m_oTSid     = _disguise->m_boxdata.m_oTSid;
-                std::strncpy( result.m_boxdata.m_name, _disguise->m_boxdata.m_name,
-                              PKMN_NAMELENGTH );
-            }
-            return &result;
-        }
+        pokemon* getPkmnOrDisguise( ) const;
 
         inline bool isDisguised( ) const {
             return _disguise != nullptr;
@@ -944,49 +825,10 @@ namespace BATTLE {
          * @brief: Transforms the pkmn at the specified position to the specified pkmn.
          * @returns: true iff the transformation succeeded.
          */
-        inline bool transformPkmn( slot* p_target ) {
-            if( _pokemon == nullptr ) [[unlikely]] { return false; }
-
-            if( p_target != nullptr ) {
-                auto target = p_target->getPkmn( );
-                if( target == nullptr ) [[unlikely]] { return false; }
-
-                _isTransformed   = true;
-                _transformedPkmn = *target;
-                _pkmnData        = FS::getPkmnData( _transformedPkmn.getSpecies( ),
-                                                    _transformedPkmn.getForme( ) );
-
-                _pokemon->setBattleTimeAbility( 0 );
-                _transformedPkmn.m_stats.m_curHP      = _pokemon->m_stats.m_curHP;
-                _transformedPkmn.m_stats.m_maxHP      = _pokemon->m_stats.m_maxHP;
-                _transformedPkmn.m_boxdata.m_heldItem = _pokemon->m_boxdata.m_heldItem;
-                std::strncpy( _transformedPkmn.m_boxdata.m_name, _pokemon->m_boxdata.m_name,
-                              PKMN_NAMELENGTH );
-                for( u8 i = 0; i < 4; ++i ) { _transformedPkmn.m_boxdata.m_curPP[ i ] = 5; }
-                _transformedPkmn.m_level = _pokemon->m_level;
-
-                auto volstat = p_target->getVolatileStatus( );
-                for( u8 i = 0; i < MAX_VOLATILE_STATUS; ++i ) {
-                    if( volstat & ( 1LLU << i ) ) {
-                        _volatileStatusAmount[ i ]
-                            = p_target->getVolatileStatusAmount( volatileStatus( 1LLU << i ) );
-                        _volatileStatusCounter[ i ]
-                            = p_target->getVolatileStatusCounter( volatileStatus( 1LLU << i ) );
-                    }
-                }
-
-                _extraType = p_target->getExtraType( );
-                _altTypes  = p_target->getAltTypes( );
-                _boosts    = p_target->getBoosts( );
-            } else {
-                _isTransformed = false;
-                std::memset( &_transformedPkmn, 0, sizeof( pokemon ) );
-            }
-            return true;
-        }
+        bool transformPkmn( slot* p_target );
 
         /*
-         * @brief: Returns true iff the specified pokemon fulfills all reqs to mega
+         * @brief: Returns true iff the specified pkmn fulfills all reqs to mega
          * evolve.
          */
         constexpr bool canMegaEvolve( ) {

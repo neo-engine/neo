@@ -136,7 +136,7 @@ namespace BATTLE {
             case TG_ANY_FOE:
             [[likely]] case TG_ANY:
                 if( !canTarget[ 2 ] && !canTarget[ 3 ] ) {
-                    ctg = 0;
+                    ctg = 0; // no valid target; avoid an endless reroll loop
                 } else {
                     while( !canTarget[ 2 + ctg ] ) { ctg = rand( ) & 1; }
                 }
@@ -144,7 +144,7 @@ namespace BATTLE {
                 break;
             case TG_ALLY_OR_SELF:
                 if( !canTarget[ 0 ] && !canTarget[ 1 ] ) {
-                    ctg = 0;
+                    ctg = 0; // no valid target; avoid an endless reroll loop
                 } else {
                     while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
                 }
@@ -207,7 +207,7 @@ namespace BATTLE {
                     break;
                 case TG_ALLY_OR_SELF:
                     if( !canTarget[ 0 ] && !canTarget[ 1 ] ) {
-                        ctg = 0;
+                        ctg = 0; // no valid target; avoid an endless reroll loop
                     } else {
                         while( !canTarget[ ctg ] ) { ctg = rand( ) & 1; }
                     }

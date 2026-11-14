@@ -89,6 +89,7 @@ namespace FS {
     const char EASYW_PATH[]         = "nitro:/STRN/EAS/easw";
     const char EASYP_PATH[]         = "nitro:/STRN/EAS/easp";
     const char MAPSTRING_PATH[]     = "nitro:/STRN/MAP/map";
+    const char BATTLESTRING_PATH[]  = "nitro:/STRN/BTL/bstr";
     const char TRADESTRING_PATH[]   = "nitro:/STRN/TRD/str";
     const char WCSTRING_PATH[]      = "nitro:/STRN/UIS/mys";
     const char PKMNPHRS_PATH[]      = "nitro:/STRN/PHR/phr";
@@ -901,6 +902,15 @@ namespace FS {
         static FILE* bankfile = nullptr;
         checkOrOpen( bankfile, MAPSTRING_PATH, lastLang, CURRENT_LANGUAGE );
         if( getString( bankfile, MAPSTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
+        return "(string failed)";
+    }
+
+    const char* getBattleString( u16 p_stringId ) {
+        static char  st_buffer[ UISTRING_LEN + 10 ];
+        static u8    lastLang = -1;
+        static FILE* bankfile = nullptr;
+        checkOrOpen( bankfile, BATTLESTRING_PATH, lastLang, CURRENT_LANGUAGE );
+        if( getString( bankfile, UISTRING_LEN, p_stringId, st_buffer ) ) { return st_buffer; }
         return "(string failed)";
     }
 

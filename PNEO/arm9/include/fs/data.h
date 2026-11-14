@@ -108,7 +108,8 @@ namespace FS {
     constexpr u16 DESQUID_STRING = ( 1 << 13 );
 #endif
 
-    constexpr u16 MAP_STRING = ( 1 << 11 );
+    constexpr u16 MAP_STRING    = ( 1 << 11 );
+    constexpr u16 BATTLE_STRING = ( 1 << 12 );
 
     extern const char*       LANGUAGE_NAMES[ MAX_LANGUAGES ];
     extern const char*       HP_ICONS[ MAX_LANGUAGES ];
@@ -124,6 +125,8 @@ namespace FS {
 
 #define GET_MAP_STRING( p_stringId ) \
     FS::kanaWrap( FS::getMapString( p_stringId ), CURRENT_LANGUAGE )
+#define GET_BATTLE_STRING( p_stringId ) \
+    FS::kanaWrap( FS::getBattleString( p_stringId ), CURRENT_LANGUAGE )
 #define GET_TRADE_STRING( p_stringId ) \
     FS::kanaWrap( FS::getTradeString( p_stringId ), CURRENT_LANGUAGE )
 #define GET_WC_STRING( p_stringId ) FS::kanaWrap( FS::getWCString( p_stringId ), CURRENT_LANGUAGE )
@@ -133,26 +136,36 @@ namespace FS {
 #ifdef DESQUID
     constexpr u16            MAX_DESQUID_STRINGS = 100;
     extern const char* const DESQUID_STRINGS[ MAX_DESQUID_STRINGS ][ MAX_LANGUAGES ];
+#define GET_STRING( p_stringId )                                          \
+    ( ( ( p_stringId ) >= FS::DESQUID_STRING )                            \
+          ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ]   \
+          : ( ( p_stringId ) >= FS::BATTLE_STRING                         \
+                  ? GET_BATTLE_STRING( p_stringId - FS::BATTLE_STRING )   \
+                  : ( ( p_stringId ) >= FS::MAP_STRING                    \
+                          ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
+                          : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) ) ) )
+
+#define GET_STRING_RAW( p_stringId )                                        \
+    ( ( ( p_stringId ) >= FS::DESQUID_STRING )                              \
+          ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ]     \
+          : ( ( p_stringId ) >= FS::BATTLE_STRING                           \
+                  ? FS::getBattleString( p_stringId - FS::BATTLE_STRING )   \
+                  : ( ( p_stringId ) >= FS::MAP_STRING                      \
+                          ? FS::getMapString( p_stringId - FS::MAP_STRING ) \
+                          : FS::getUIString( p_stringId, CURRENT_LANGUAGE ) ) ) )
+#else
 #define GET_STRING( p_stringId )                                                               \
-    ( ( ( p_stringId ) >= FS::DESQUID_STRING )                                                 \
-          ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ]                        \
+    ( ( p_stringId ) >= FS::BATTLE_STRING                                                      \
+          ? GET_BATTLE_STRING( p_stringId - FS::BATTLE_STRING )                                \
           : ( ( p_stringId ) >= FS::MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
                                                : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) ) )
 
-#define GET_STRING_RAW( p_stringId )                                    \
-    ( ( ( p_stringId ) >= FS::DESQUID_STRING )                          \
-          ? FS::DESQUID_STRINGS[ p_stringId - FS::DESQUID_STRING ][ 0 ] \
-          : ( ( p_stringId ) >= FS::MAP_STRING                          \
-                  ? FS::getMapString( p_stringId - FS::MAP_STRING )     \
+#define GET_STRING_RAW( p_stringId )                                \
+    ( ( p_stringId ) >= FS::BATTLE_STRING                           \
+          ? FS::getBattleString( p_stringId - FS::BATTLE_STRING )   \
+          : ( ( p_stringId ) >= FS::MAP_STRING                      \
+                  ? FS::getMapString( p_stringId - FS::MAP_STRING ) \
                   : FS::getUIString( p_stringId, CURRENT_LANGUAGE ) ) )
-#else
-#define GET_STRING( p_stringId )                                                       \
-    ( ( p_stringId ) >= FS::MAP_STRING ? GET_MAP_STRING( p_stringId - FS::MAP_STRING ) \
-                                       : GET_STRING_L( p_stringId, CURRENT_LANGUAGE ) )
-
-#define GET_STRING_RAW( p_stringId )                                                     \
-    ( ( p_stringId ) >= FS::MAP_STRING ? FS::getMapString( p_stringId - FS::MAP_STRING ) \
-                                       : FS::getUIString( p_stringId, CURRENT_LANGUAGE ) )
 #endif
 #define HP_ICON FS::HP_ICONS[ CURRENT_LANGUAGE ]
 
@@ -165,6 +178,7 @@ namespace FS {
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId );
 
     const char* getUIString( u16 p_stringId, u8 p_language );
+    const char* getBattleString( u16 p_stringId );
     const char* getMapString( u16 p_stringId );
     const char* getTradeString( u16 p_stringId );
     const char* getWCString( u16 p_stringId );

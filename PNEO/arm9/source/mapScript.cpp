@@ -846,7 +846,7 @@ namespace MAP {
                     auto nick = kbd.getText( 10 );
                     if( strcmp( nick.c_str( ), giftPkmn.m_boxdata.m_name )
                         && strcmp( "", nick.c_str( ) ) ) {
-                        strcpy( giftPkmn.m_boxdata.m_name, nick.c_str( ) );
+                        memcpy( giftPkmn.m_boxdata.m_name, nick.c_str( ), PKMN_NAMELENGTH );
                         giftPkmn.m_boxdata.setIsNicknamed( true );
                     }
                     ANIMATE_MAP = true;
@@ -871,13 +871,15 @@ namespace MAP {
                         if( oldbx != nb ) {
                             snprintf( buffer.data( ), buffer.size( ),
                                       GET_STRING( IO::STR_UI_STORAGE_BOX_FULL ),
-                                      SAVE::CURRENT_FILE->m_storedPokemon[ oldbx ].m_name );
+                                      SAVE::CURRENT_FILE->m_storedPokemon[ oldbx ].getName(
+                                          CURRENT_LANGUAGE == SAVE::JAP ) );
                             printMapMessage( buffer.data( ), MSG_INFO );
                         }
                         snprintf( buffer.data( ), buffer.size( ),
                                   GET_STRING( IO::STR_UI_STORAGE_BOX_PICKED ),
                                   giftPkmn.m_boxdata.getName( ),
-                                  SAVE::CURRENT_FILE->m_storedPokemon[ nb ].m_name );
+                                  SAVE::CURRENT_FILE->m_storedPokemon[ nb ].getName(
+                                      CURRENT_LANGUAGE == SAVE::JAP ) );
                         printMapMessage( buffer.data( ), MSG_INFO );
                         registers[ 0 ] = 1;
                     } else {

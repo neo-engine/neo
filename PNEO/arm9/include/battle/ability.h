@@ -1,28 +1,28 @@
 /*
-Pokémon neo
-------------------------------
+   Pokémon neo
+   ------------------------------
 
-file        : ability.h
-author      : Philip Wellnitz
-description :
+   file        : ability.h
+   author      : Philip Wellnitz
+   description :
 
-Copyright (C) 2012 - 2022
-Philip Wellnitz
+   Copyright (C) 2012 - 2026
+   Philip Wellnitz
 
-This file is part of Pokémon neo.
+   This file is part of Pokémon neo.
 
-Pokémon neo is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+   Pokémon neo is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-Pokémon neo is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   Pokémon neo is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
@@ -74,6 +74,28 @@ namespace BATTLE {
         case A_WONDER_GUARD:
         case A_ZEN_MODE: return false;
         default: return true;
+        }
+    }
+
+    constexpr bool abilityCantSuppress( u16 p_ability ) {
+        switch( p_ability ) {
+        case A_AS_ONE_GLASTRIER:
+        case A_AS_ONE_SPECTRIER:
+        case A_BATTLE_BOND:
+        case A_COMATOSE:
+        case A_DISGUISE:
+        case A_GULP_MISSILE:
+        case A_ICE_FACE:
+        case A_MULTITYPE:
+        case A_POWER_CONSTRUCT:
+        case A_RKS_SYSTEM:
+        case A_SCHOOLING:
+        case A_SHIELDS_DOWN:
+        case A_STANCE_CHANGE:
+        case A_TERA_SHIFT:
+        case A_ZEN_MODE:
+        case A_ZERO_TO_HERO: return true;
+        default: return false;
         }
     }
 } // namespace BATTLE

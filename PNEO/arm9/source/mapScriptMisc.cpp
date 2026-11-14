@@ -142,7 +142,7 @@ namespace MAP {
                 IO::init( );
                 if( strcmp( nick.c_str( ), pkmn->m_boxdata.m_name )
                     && strcmp( "", nick.c_str( ) ) ) {
-                    strcpy( pkmn->m_boxdata.m_name, nick.c_str( ) );
+                    memcpy( pkmn->m_boxdata.m_name, nick.c_str( ), PKMN_NAMELENGTH );
                     pkmn->m_boxdata.setIsNicknamed( true );
                     pkmn->m_boxdata.setOrigLang( CURRENT_LANGUAGE );
                     // pkmn got new nickname

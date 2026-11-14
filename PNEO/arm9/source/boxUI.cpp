@@ -318,7 +318,8 @@ namespace BOX {
         IO::updateOAM( true );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
+        IO::regularFont->printStringC( p_box->getName( CURRENT_LANGUAGE == SAVE::JAP ), 94, 6, true,
+                                       IO::font::CENTER );
 
         for( u8 i = 0; i < MAX_PKMN_PER_BOX; ++i ) {
             if( p_box->m_pokemon[ i ].getSpecies( ) ) {
@@ -904,7 +905,8 @@ namespace BOX {
         FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "boxsub2", 0, 49152, true );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
+        IO::regularFont->printStringC( p_box->getName( CURRENT_LANGUAGE == SAVE::JAP ), 94, 6, true,
+                                       IO::font::CENTER );
         SpriteEntry* oam = IO::Oam->oamBuffer;
         // Load some placeholder
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + p_partyLen; ++i ) {
@@ -949,7 +951,8 @@ namespace BOX {
         // dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
-        IO::regularFont->printStringC( p_box->m_name, 94, 6, true, IO::font::CENTER );
+        IO::regularFont->printStringC( p_box->getName( CURRENT_LANGUAGE == SAVE::JAP ), 94, 6, true,
+                                       IO::font::CENTER );
         SpriteEntry* oam = IO::Oam->oamBuffer;
         for( u8 i = MAX_PKMN_PER_BOX; i < MAX_PKMN_PER_BOX + 6; ++i ) {
             oam[ SPR_PKMN_START_OAM_SUB + i ].isHidden = true;

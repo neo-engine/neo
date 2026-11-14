@@ -1,29 +1,29 @@
 /*
-    Pokémon neo
-    ------------------------------
+   Pokémon neo
+   ------------------------------
 
-    file        : battle.h
-    author      : Philip Wellnitz
-    description : Header file. Consult the corresponding source file for details.
+   file        : battle.h
+   author      : Philip Wellnitz
+   description : Header file. Consult the corresponding source file for details.
 
-    Copyright (C) 2012 - 2026
-    Philip Wellnitz
+   Copyright (C) 2012 - 2026
+   Philip Wellnitz
 
-    This file is part of Pokémon neo.
+   This file is part of Pokémon neo.
 
-    Pokémon neo is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+   Pokémon neo is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-    Pokémon neo is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+   Pokémon neo is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
-    */
+   You should have received a copy of the GNU General Public License
+   along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #pragma once
 #include <vector>
@@ -80,15 +80,16 @@ namespace BATTLE {
 
         /*
          * @brief: Adds the given boosts to the boosts.
+         * @param p_allowOverMax: allow boosts to reach level 7.
          * @returns: the change in boosts.
          */
-        inline boosts addBoosts( boosts p_other ) {
-            boosts res = boosts( );
+        inline boosts addBoosts( boosts p_other, bool p_allowOverMax = false ) {
+            const s8 maxBoost = p_allowOverMax ? s8( BOOST_MAX_VALUE ) : s8( BOOST_MAX_VALUE - 1 );
+            boosts   res      = boosts( );
             for( u8 i = 0; i < NUM_BOOSTS; ++i ) {
                 s8 old = getBoost( i );
-                setBoost( i, std::min( s8( BOOST_MAX_VALUE - 1 ),
-                                       std::max( s8( -BOOST_MAX_VALUE + 1 ),
-                                                 s8( old + p_other.getBoost( i ) ) ) ) );
+                setBoost( i, std::min( maxBoost, std::max( s8( -maxBoost ),
+                                                           s8( old + p_other.getBoost( i ) ) ) ) );
                 res.setBoost( i, getBoost( i ) - old );
             }
             return res;
@@ -123,55 +124,55 @@ namespace BATTLE {
         VS_NONE             = 0,
         VS_CONFUSION        = ( 1 << 0 ),
         VS_OBSTRUCT         = ( 1 << 1 ),
-        VS_PARTIALLYTRAPPED = ( 1 << 2 ), // TODO
+        VS_PARTIALLYTRAPPED = ( 1 << 2 ),
         VS_FLINCH           = ( 1 << 3 ),
         VS_OCTOLOCK         = ( 1 << 4 ), // TODO
-        VS_TARSHOT          = ( 1 << 5 ), // TODO
+        VS_TARSHOT          = ( 1 << 5 ),
         VS_NORETREAT        = ( 1 << 6 ),
         VS_LASERFOCUS       = ( 1 << 7 ),
-        VS_SPOTLIGHT        = ( 1 << 8 ), // TODO
+        VS_SPOTLIGHT        = ( 1 << 8 ),
         VS_BANEFULBUNKER    = ( 1 << 9 ),
-        VS_SMACKDOWN        = ( 1 << 10 ), // TODO
-        VS_POWDERED         = ( 1 << 11 ), // TODO
+        VS_SMACKDOWN        = ( 1 << 10 ),
+        VS_POWDERED         = ( 1 << 11 ),
         VS_SPIKYSHIELD      = ( 1 << 12 ),
         VS_KINGSSHIELD      = ( 1 << 13 ),
         VS_ELECTRIFY        = ( 1 << 14 ),
-        VS_RAGEPOWDER       = ( 1 << 15 ), // TODO
+        VS_RAGEPOWDER       = ( 1 << 15 ),
         VS_TELEKINESIS      = ( 1 << 16 ),
         VS_MAGNETRISE       = ( 1 << 17 ),
         VS_AQUARING         = ( 1 << 18 ),
-        VS_GASTROACID       = ( 1 << 19 ), // TODO
-        VS_POWERTRICK       = ( 1 << 20 ), // TODO
+        VS_GASTROACID       = ( 1 << 19 ),
+        VS_POWERTRICK       = ( 1 << 20 ),
         VS_HEALBLOCK        = ( 1 << 21 ),
         VS_EMBARGO          = ( 1 << 22 ),
         VS_MIRACLEEYE       = ( 1 << 23 ),
-        VS_SUBSTITUTE       = ( 1 << 24 ), // TODO
-        VS_BIDE             = ( 1 << 25 ), // TODO
+        VS_SUBSTITUTE       = ( 1 << 24 ),
+        VS_BIDE             = ( 1 << 25 ),
         VS_FOCUSENERGY      = ( 1 << 26 ),
-        VS_DEFENSECURL      = ( 1 << 27 ), // TODO
-        VS_MINIMIZE         = ( 1 << 28 ), // TODO
-        VS_LEECHSEED        = ( 1 << 29 ), // TODO
-        VS_DISABLE          = ( 1 << 30 ), // TODO
+        VS_DEFENSECURL      = ( 1 << 27 ),
+        VS_MINIMIZE         = ( 1 << 28 ),
+        VS_LEECHSEED        = ( 1 << 29 ),
+        VS_DISABLE          = ( 1 << 30 ),
         VS_FORESIGHT        = ( 1ULL << 31 ),
-        VS_SNATCH           = ( 1ULL << 32 ), // TODO
-        VS_GRUDGE           = ( 1ULL << 33 ), // TODO
-        VS_IMPRISON         = ( 1ULL << 34 ), // TODO
+        VS_SNATCH           = ( 1ULL << 32 ),
+        VS_GRUDGE           = ( 1ULL << 33 ),
+        VS_IMPRISON         = ( 1ULL << 34 ),
         VS_YAWN             = ( 1ULL << 35 ),
-        VS_MAGICCOAT        = ( 1ULL << 36 ), // TODO
+        VS_MAGICCOAT        = ( 1ULL << 36 ),
         VS_INGRAIN          = ( 1ULL << 37 ),
-        VS_HELPINGHAND      = ( 1ULL << 38 ), // TODO
-        VS_TAUNT            = ( 1ULL << 39 ), // TODO
-        VS_CHARGE           = ( 1ULL << 40 ), // TODO
-        VS_FOLLOWME         = ( 1ULL << 41 ), // TODO
-        VS_TORMENT          = ( 1ULL << 42 ), // TODO
+        VS_HELPINGHAND      = ( 1ULL << 38 ),
+        VS_TAUNT            = ( 1ULL << 39 ),
+        VS_CHARGE           = ( 1ULL << 40 ),
+        VS_FOLLOWME         = ( 1ULL << 41 ),
+        VS_TORMENT          = ( 1ULL << 42 ),
         VS_ATTRACT          = ( 1ULL << 43 ),
-        VS_ENDURE           = ( 1ULL << 44 ), // TODO
+        VS_ENDURE           = ( 1ULL << 44 ),
         VS_PROTECT          = ( 1ULL << 45 ),
-        VS_DESTINYBOND      = ( 1ULL << 46 ), // TODO
+        VS_DESTINYBOND      = ( 1ULL << 46 ),
         VS_CURSE            = ( 1ULL << 47 ),
         VS_NIGHTMARE        = ( 1ULL << 48 ),
         VS_STOCKPILE        = ( 1ULL << 49 ), // TODO
-        VS_ENCORE           = ( 1ULL << 50 ), // TODO
+        VS_ENCORE           = ( 1ULL << 50 ),
         VS_EXTRATYPE        = ( 1ULL << 51 ),
         VS_MOVECHARGE       = ( 1ULL << 52 ),
         VS_RECHARGE         = ( 1ULL << 53 ),
@@ -241,19 +242,20 @@ namespace BATTLE {
     };
 
     const u8 defaultSideConditionDurations[ MAX_SIDE_CONDITIONS ]
-        = { 1, 0, 1, 1, 1, 0, 0, 5, 5, 5, 0, 5, 5, 5, 5 };
+        = { 1, 0, 1, 1, 1, 0, 0, 5, 4, 5, 0, 5, 5, 5, 5 };
     const u8 maxSideConditionAmount[ MAX_SIDE_CONDITIONS ]
         = { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 3, 1, 1, 1, 1 };
 
-    constexpr u8 MAX_SLOT_CONDITIONS = 3;
+    constexpr u8 MAX_SLOT_CONDITIONS = 4;
     enum slotCondition : u8 {
         SL_NONE        = 0,
-        SL_WISH        = 1,
-        SL_HEALINGWISH = 2,
-        SL_LUNARDANCE  = 3,
+        SL_WISH        = ( 1 << 0 ),
+        SL_HEALINGWISH = ( 1 << 1 ),
+        SL_LUNARDANCE  = ( 1 << 2 ),
+        SL_FUTURESIGHT = ( 1 << 3 ),
     };
 
-    const u8 defaultSlotConditionDurations[ MAX_SLOT_CONDITIONS ] = { 3, 1, 1 };
+    const u8 defaultSlotConditionDurations[ MAX_SLOT_CONDITIONS ] = { 2, 0, 0, 2 };
 
     enum battleMode {
         BM_SINGLE         = 0,
@@ -302,106 +304,56 @@ namespace BATTLE {
         = { BM_DOUBLE, true, false, false, false, WE_NONE, 7, 0 };
 
     enum moveFlags : long long unsigned {
-        /** Ignores a target's substitute. */
-        MF_AUTHENTIC = ( 1 << 0 ), // TODO
-        /** Power is multiplied by 1.5 when used by a Pokemon with the Strong Jaw Ability. */
-        MF_BITE = ( 1 << 1 ), // TODO
-        /** Has no effect on Pokemon with the Bulletproof Ability. */
-        MF_BULLET = ( 1 << 2 ), // TODO
-        /** The user is unable to make a move between turns. */
-        MF_CHARGE = ( 1 << 3 ),
-        /** Makes contact. */
-        MF_CONTACT = ( 1 << 4 ),
-        /** When used by a Pokemon, other Pokemon with the Dancer Ability can attempt to execute the
-           same   move. */
-        MF_DANCE = ( 1 << 5 ), // TODO
-        /** Thaws the user if executed successfully while the user is frozen. */
-        MF_DEFROST = ( 1 << 6 ),
-        /** Can target a Pokemon positioned anywhere in a Triple Battle. */
-        MF_DISTANCE = ( 1 << 7 ), /* (unused) */
-        /** Prevented from being executed or selected during Gravity's effect. */
-        MF_GRAVITY = ( 1 << 8 ), // TODO: Add to canSelectMove
-        /** Prevented from being executed or selected during Heal Block's effect. */
-        MF_HEAL = ( 1 << 9 ), // TODO: Add to canselectmove
-        /** Can be copied by Mirror Move. */
-        MF_MIRROR = ( 1 << 10 ), // TODO
-        /** Recoil halves HP */
-        MF_MINDBLOWNRECOIL = ( 1 << 11 ),
-        /** Prevented from being executed or selected in a Sky Battle. */
-        MF_NONSKY = ( 1 << 12 ), /* (unused) */
-        /** Has no effect on Grass-type Pokemon, Pokemon with the Overcoat Ability, and Pokemon
-           holding     Safety Goggles. */
-        MF_POWDER = ( 1 << 13 ), // TODO
-        /** Blocked by Detect, Protect, Spiky Shield, and if not a Status move, King's Shield. */
-        MF_PROTECT = ( 1 << 14 ),
-        /** Power is multiplied by 1.5 when used by a Pokemon with the Mega Launcher Ability. */
-        MF_PULSE = ( 1 << 15 ), // TODO
-        /** Power is multiplied by 1.2 when used by a Pokemon with the Iron Fist Ability. */
-        MF_PUNCH = ( 1 << 16 ), // TODO
-        /** If this move is successful, the user must recharge on the following turn and cannot make
-           a      move. */
-        MF_RECHARGE = ( 1 << 17 ),
-        /** Bounced back to the original user by Magic Coat or the Magic Bounce Ability. */
-        MF_REFLECTABLE = ( 1 << 18 ), // TODO
-        /** Can be stolen from the original user and instead used by another Pokemon using Snatch.
-         */
-        MF_SNATCH = ( 1 << 19 ), // TODO
-        /** Has no effect on Pokemon with the Soundproof Ability. */
-        MF_SOUND = ( 1 << 20 ),
-        /** Forces the pokemon to use the move for another 1-2 turns. */
-        MF_LOCKEDMOVE = ( 1 << 21 ),
-        /** Maintains the rage counter */
-        MF_RAGE = ( 1 << 22 ), // TODO
-        /** Roost */
-        MF_ROOST = ( 1 << 23 ),
-        /** Uproar */
-        MF_UPROAR = ( 1 << 24 ), // TODO
-        /** Self-Switch: User switches after successful use */
-        MF_SELFSWITCH = ( 1 << 25 ),
-        /** Use source defensive stats as offensive stats */
-        MF_DEFASOFF = ( 1 << 26 ),
-        /** User is damaged if the attack misses */
-        MF_CRASHDAMAGE = ( 1 << 27 ),
-        /** OHKO move */
-        MF_OHKO = ( 1 << 28 ),
-        /** PKMN self-destructs */
-        MF_SELFDESTRUCT = ( 1 << 29 ),
-        /** PKMN self-destructs */
-        MF_SELFDESTRUCTHIT = ( 1 << 30 ),
-        /** move cannot be sketched */
-        MF_NOSKETCH = ( 1ULL << 31 ), // TODO
-        /** move pp cannot be increased */
-        MF_NOPPBOOST = ( 1ULL << 32 ),
-        /** move can be used while asleep */
-        MF_SLEEPUSABLE = ( 1ULL << 33 ),
-        /** target cannot faint due to move */
-        MF_NOFAINT = ( 1ULL << 34 ),
-        /** breaks protect */
-        MF_BREAKSPROTECT = ( 1ULL << 35 ),
-        /** ignores type immunities */
-        MF_IGNOREIMMUNITY = ( 1ULL << 36 ),
-        /** ignores ground type immunity */
+        MF_AUTHENTIC            = ( 1 << 0 ), // TODO
+        MF_BITE                 = ( 1 << 1 ), // TODO
+        MF_BULLET               = ( 1 << 2 ), // TODO
+        MF_CHARGE               = ( 1 << 3 ),
+        MF_CONTACT              = ( 1 << 4 ),
+        MF_DANCE                = ( 1 << 5 ), // TODO
+        MF_DEFROST              = ( 1 << 6 ),
+        MF_DISTANCE             = ( 1 << 7 ), /* (unused) */
+        MF_GRAVITY              = ( 1 << 8 ),
+        MF_HEAL                 = ( 1 << 9 ),  // TODO: Add to canselectmove
+        MF_MIRROR               = ( 1 << 10 ), // TODO
+        MF_MINDBLOWNRECOIL      = ( 1 << 11 ),
+        MF_NONSKY               = ( 1 << 12 ), /* (unused) */
+        MF_POWDER               = ( 1 << 13 ),
+        MF_PROTECT              = ( 1 << 14 ),
+        MF_PULSE                = ( 1 << 15 ), // TODO
+        MF_PUNCH                = ( 1 << 16 ), // TODO
+        MF_RECHARGE             = ( 1 << 17 ),
+        MF_REFLECTABLE          = ( 1 << 18 ),
+        MF_SNATCH               = ( 1 << 19 ),
+        MF_SOUND                = ( 1 << 20 ),
+        MF_LOCKEDMOVE           = ( 1 << 21 ),
+        MF_RAGE                 = ( 1 << 22 ), // TODO
+        MF_ROOST                = ( 1 << 23 ),
+        MF_UPROAR               = ( 1 << 24 ), // TODO
+        MF_SELFSWITCH           = ( 1 << 25 ),
+        MF_DEFASOFF             = ( 1 << 26 ),
+        MF_CRASHDAMAGE          = ( 1 << 27 ),
+        MF_OHKO                 = ( 1 << 28 ),
+        MF_SELFDESTRUCT         = ( 1 << 29 ),
+        MF_SELFDESTRUCTHIT      = ( 1 << 30 ),
+        MF_NOSKETCH             = ( 1ULL << 31 ), // TODO
+        MF_NOPPBOOST            = ( 1ULL << 32 ),
+        MF_SLEEPUSABLE          = ( 1ULL << 33 ),
+        MF_NOFAINT              = ( 1ULL << 34 ),
+        MF_BREAKSPROTECT        = ( 1ULL << 35 ),
+        MF_IGNOREIMMUNITY       = ( 1ULL << 36 ),
         MF_IGNOREIMMUNITYGROUND = ( 1ULL << 37 ),
-        /** ignores abilities */
-        MF_IGNOREABILITY = ( 1ULL << 38 ),
-        /** ignores defense boosts */
-        MF_IGNOREDEFS = ( 1ULL << 39 ), // TODO
-        /** ignores evasion boosts */
-        MF_IGNOREEVASION = ( 1ULL << 40 ),
-        /** Defrosts the target */
-        MF_DEFROSTTARGET = ( 1ULL << 41 ),
-        /** Forces the target to switch out */
-        MF_FORCESWITCH = ( 1ULL << 42 ),
-        /** Will always land a critical hit */
-        MF_WILLCRIT = ( 1ULL << 43 ),
-        /** Move uses atk/satk of the target */
-        MF_TARGETOFFENSIVES = ( 1ULL << 44 ), // TODO
-        /** Move hits at a later time */
-        MF_FUTUREMOVE = ( 1ULL << 45 ), // TODO
-        /** Beton pass */
-        MF_BATONPASS = ( 1ULL << 46 ),
-        /** OHKO move (useless on ice-type pkmn) */
-        MF_OHKOICE = ( 1ULL << 47 ),
+        MF_IGNOREABILITY        = ( 1ULL << 38 ),
+        MF_IGNOREDEFS           = ( 1ULL << 39 ), // TODO
+        MF_IGNOREEVASION        = ( 1ULL << 40 ),
+        MF_DEFROSTTARGET        = ( 1ULL << 41 ),
+        MF_FORCESWITCH          = ( 1ULL << 42 ),
+        MF_WILLCRIT             = ( 1ULL << 43 ),
+        MF_TARGETOFFENSIVES     = ( 1ULL << 44 ), // TODO
+        MF_FUTUREMOVE           = ( 1ULL << 45 ), // TODO
+        MF_BATONPASS            = ( 1ULL << 46 ),
+        MF_OHKOICE              = ( 1ULL << 47 ),
+        MF_SLICE                = ( 1ULL << 48 ),
+        MF_WIND                 = ( 1ULL << 49 ),
     };
 
     constexpr u8 NUM_MOVE_HIT_TYPES = 3;
@@ -459,6 +411,8 @@ namespace BATTLE {
         u8 m_secondaryStatus = 0;
         u8 m_unused          = 0;
 
+        u32 m_reserved = 0;
+
         volatileStatus m_volatileStatus          = (volatileStatus) 0; // confusion, etc
         volatileStatus m_secondaryVolatileStatus = (volatileStatus) 0; // confusion, etc
 
@@ -495,12 +449,12 @@ namespace BATTLE {
 
     struct battleMoveSelection {
         battleMoveType m_type;
-        u16            m_param; // move id for attack/ m attack; target pkmn
-                                // for swtich; tg item
-        fieldPosition m_target; // If the move has a selectable, single target, it is stored here
-        fieldPosition m_user;
-        bool          m_megaEvolve;
-        moveData      m_moveData;
+        u16            m_param;  // move id for attack/ m attack; target pkmn
+                                 // for swtich; tg item
+        fieldPosition  m_target; // If the move has a selectable, single target, it is stored here
+        fieldPosition  m_user;
+        bool           m_megaEvolve;
+        moveData       m_moveData;
     };
 
     constexpr battleMoveSelection NO_OP_SELECTION
@@ -516,6 +470,11 @@ namespace BATTLE {
         u8                         m_pertubation; // random number to break speed ties
         moveData                   m_moveData;
         bool                       m_megaEvolve;
+        u8                         m_actsAfter     = 0;
+        u16                        m_powerOverride = 0;
+        bool                       m_bounced       = false;
+        bool                       m_fromSnatch    = false;
+        bool                       m_dancerCopy    = false;
 
         std::strong_ordering operator<=>( const battleMove& p_other ) {
             if( auto cmp = p_other.m_priority <=> this->m_priority; cmp != 0 ) return cmp;

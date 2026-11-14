@@ -1,28 +1,28 @@
 /*
-Pokémon neo
-------------------------------
+   Pokémon neo
+   ------------------------------
 
-file        : battleUI.h
-author      : Philip Wellnitz
-description : Consult corresponding source file.
+   file        : battleUI.h
+   author      : Philip Wellnitz
+   description : Consult corresponding source file.
 
-Copyright (C) 2012 - 2022
-Philip Wellnitz
+   Copyright (C) 2012 - 2026
+   Philip Wellnitz
 
-This file is part of Pokémon neo.
+   This file is part of Pokémon neo.
 
-Pokémon neo is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+   Pokémon neo is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-Pokémon neo is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   Pokémon neo is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
@@ -37,6 +37,128 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "save/saveGame.h"
 
 namespace BATTLE {
+    // Top screen
+    // (opp 1, opp 2, own 1, own 2)
+    constexpr u8 SPR_ABILITY_OAM( u8 p_opponent ) {
+        return ( 3 * ( p_opponent ) );
+    }
+    constexpr u8 SPR_HPBAR_OAM = 6;
+    constexpr u8 SPR_STATUSBG_OAM( u8 p_idx ) {
+        return ( 10 + 3 * ( p_idx ) );
+    }
+    constexpr u8 SPR_PKMN_START_OAM( u8 p_idx ) {
+        return ( 22 + 4 * ( p_idx ) );
+    }
+    constexpr u8 SPR_PKMN_SHADOW_START_OAM( u8 p_idx ) {
+        return ( 38 + 4 * ( p_idx ) );
+    }
+    constexpr u8 SPR_STATUS_ICON_OAM( u8 p_idx ) {
+        return ( 58 + ( p_idx ) );
+    }
+    constexpr u8 SPR_SHINY_ICON_OAM( u8 p_idx ) {
+        return ( 62 + ( p_idx ) );
+    }
+    constexpr u8 SPR_SHINY_PARTICLE_START_OAM       = 70;
+    constexpr u8 SPR_STAT_CHANGE_PARTICLE_START_OAM = 86;
+    constexpr u8 SPR_MBOX_START_OAM                 = 86;
+    constexpr u8 SPR_BALL_START_OAM                 = 101;
+    constexpr u8 SPR_PLATFORM_OAM                   = 102;
+    constexpr u8 SPR_STATUS_BALL_OAM( u8 p_idx ) {
+        return ( 106 + ( p_idx ) );
+    }
+
+    constexpr u8 SPR_PKMN_PAL( u8 p_idx ) {
+        return ( p_idx );
+    }
+    constexpr u8 SPR_PKMN_SHADOW_PAL = 4;
+    constexpr u8 SPR_PLATFORM_PAL    = 5;
+    constexpr u8 SPR_HPBAR_PAL       = 7;
+    constexpr u8 SPR_STATUS_ICON_PAL = 9;
+    constexpr u8 SPR_SHINY_ICON_PAL  = 10;
+    constexpr u8 SPR_STATUSBG_PAL    = 11;
+    constexpr u8 SPR_BOX_PAL         = 12;
+    constexpr u8 SPR_STAT_CHANGE_PAL = 13;
+    constexpr u8 SPR_BALL_PAL        = 14;
+    constexpr u8 SPR_STATUS_BALL_PAL = 15;
+
+    constexpr u16 SPR_PKMN_GFX( u8 p_idx ) {
+        return ( 144 * ( p_idx ) );
+    }
+    constexpr u16 SPR_STSBALL_GFX( u8 p_idx ) {
+        return ( SPR_PKMN_GFX( 4 ) + 16 + 4 * ( p_idx ) );
+    }
+
+    // Sub screen
+    constexpr u8 SPR_BATTLE_FITE_OAM_SUB   = 0;
+    constexpr u8 SPR_BATTLE_BAG_OAM_SUB    = 2;
+    constexpr u8 SPR_BATTLE_PKMN_OAM_SUB   = 4;
+    constexpr u8 SPR_BATTLE_RUN_OAM_SUB    = 6;
+    constexpr u8 SPR_BATTLE_ICON_OAM_SUB   = 8;
+    constexpr u8 SPR_SMALL_MESSAGE_OAM_SUB = 9;
+    constexpr u8 SPR_LARGE_MESSAGE_OAM_SUB = 20;
+    constexpr u8 SPR_TYPE_OAM_SUB( u8 p_idx ) {
+        return ( 40 + ( p_idx ) );
+    }
+    constexpr u8 SPR_MOVE_OAM_SUB( u8 p_move ) {
+        return ( 44 + 6 * ( p_move ) );
+    }
+    constexpr u8 SPR_DMG_CAT_OAM_SUB( u8 p_idx ) {
+        return ( 80 + ( p_idx ) );
+    }
+    constexpr u8 SPR_CHOICE_START_OAM_SUB( u8 p_pos ) {
+        return ( 84 + 8 * ( p_pos ) );
+    }
+
+    constexpr u8 SPR_BATTLE_FITE_PAL_SUB = 0;
+    constexpr u8 SPR_BATTLE_BAG_PAL_SUB  = 1;
+    constexpr u8 SPR_BATTLE_PKMN_PAL_SUB = 2;
+    constexpr u8 SPR_BATTLE_RUN_PAL_SUB  = 3;
+    constexpr u8 SPR_BATTLE_ICON_PAL_SUB = 4;
+    constexpr u8 SPR_BOX_PAL_SUB         = 5;
+    constexpr u8 SPR_BOX_SEL_PAL_SUB     = 6;
+    constexpr u8 SPR_TYPE_PAL_SUB( u8 p_idx ) {
+        return ( 6 + ( p_idx ) );
+    }
+    constexpr u8 SPR_DMG_CAT_PAL_SUB( u8 p_idx ) {
+        return ( 10 + ( p_idx ) );
+    }
+
+    // other macros
+    constexpr u16 WILD_BATTLE_SPRITE_X_START = 144;
+    constexpr u16 WILD_BATTLE_SPRITE_X       = 160;
+
+    constexpr u8 OPP_PLAT_Y = 72;
+    constexpr u8 PLY_PLAT_Y = 120;
+    constexpr u8 OPP_2_HP_X = 94;
+    constexpr u8 OPP_2_HP_Y = 44;
+    constexpr u8 OPP_1_HP_X = 100;
+    constexpr u8 OPP_1_HP_Y = 12;
+    constexpr u8 OWN_2_HP_X = 130;
+    constexpr u8 OWN_2_HP_Y = 152;
+    constexpr u8 OWN_1_HP_X = 124;
+    constexpr u8 OWN_1_HP_Y = 120;
+
+    constexpr u8 PKMN_OPP_1_X        = 192;
+    constexpr u8 PKMN_OPP_1_Y        = ( OPP_PLAT_Y + 38 - 96 );
+    constexpr u8 PKMN_OPP_1_X_SINGLE = 160;
+    constexpr u8 PKMN_OPP_1_Y_SINGLE = ( OPP_PLAT_Y + 35 - 96 );
+    constexpr u8 PKMN_OPP_2_X        = 128;
+    constexpr u8 PKMN_OPP_2_Y        = ( OPP_PLAT_Y + 32 - 96 );
+
+    constexpr s16 PKMN_OWN_1_X        = -40;
+    constexpr s16 PKMN_OWN_1_Y        = 84;
+    constexpr s16 PKMN_OWN_1_X_SINGLE = 4;
+    constexpr s16 PKMN_OWN_1_Y_SINGLE = 92;
+    constexpr s16 PKMN_OWN_2_X        = 40;
+    constexpr s16 PKMN_OWN_2_Y        = 100;
+
+    constexpr s16 HP_OUTLINE_COL = 240;
+    constexpr s16 OWN_HP_COL     = 241;
+    constexpr s16 OPP_HP_COL     = 245;
+    constexpr s16 HP_COL( s16 p_a, s16 p_b ) {
+        return ( ( p_a ) ? ( OPP_HP_COL + ( p_b ) * 2 ) : ( OWN_HP_COL + ( p_b ) * 2 ) );
+    }
+
     class battleUI {
         u8             _platform;
         u8             _platform2;

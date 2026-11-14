@@ -696,7 +696,7 @@ void boxPokemon::hatch( ) {
 
     m_oTId  = SAVE::CURRENT_FILE->m_id;
     m_oTSid = SAVE::CURRENT_FILE->m_sid;
-    strcpy( m_oT, SAVE::CURRENT_FILE->m_playername );
+    strncpy( m_oT, SAVE::CURRENT_FILE->m_playername, OTLENGTH );
 }
 
 bool boxPokemon::learnMove( u16 p_move, std::function<void( const char* )> p_message,
