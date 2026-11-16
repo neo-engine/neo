@@ -268,14 +268,14 @@ namespace IO {
             if( ( p_date[ 0 ] && p_date[ 0 ] + 1 <= 10 ) || ( p_date[ 0 ] + 1 ) % 4 == 0 ) {
                 snprintf( buffer.data( ), buffer.size( ),
                           "\xe"
-                          "x2x0%snenn%sgatu%ska\xf",
+                          "%sx/%sx/%s\xf",
                           FS::wideNumeral( p_date[ 2 ], 2 ).c_str( ),
                           FS::wideNumeral( p_date[ 1 ] + 1 ).c_str( ),
                           FS::wideNumeral( p_date[ 0 ] + 1 ).c_str( ) );
             } else {
                 snprintf( buffer.data( ), buffer.size( ),
                           "\xe"
-                          "x2x0%snenn%sgatu%sniti\xf",
+                          "%sx/%sx/%s\xf",
                           FS::wideNumeral( p_date[ 2 ], 2 ).c_str( ),
                           FS::wideNumeral( p_date[ 1 ] + 1 ).c_str( ),
                           FS::wideNumeral( p_date[ 0 ] + 1 ).c_str( ) );

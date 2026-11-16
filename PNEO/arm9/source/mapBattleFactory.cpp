@@ -644,7 +644,8 @@ namespace MAP {
                 // hand out bp
                 printMapMessage( GET_MAP_STRING( 872 ), MSG_NORMAL );
                 std::array<char, 100> buffer{ };
-                snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 873 ), resultBP );
+                snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( 873 ),
+                          FS::kanaWrap( resultBP, CURRENT_LANGUAGE ) );
                 SOUND::playSoundEffect( SFX_OBTAIN_ITEM );
                 printMapMessage( buffer.data( ), MSG_INFO );
                 SAVE::CURRENT_FILE->m_battlePoints

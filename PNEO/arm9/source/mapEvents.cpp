@@ -459,7 +459,8 @@ namespace MAP {
                     break;
                 case 4:
                     snprintf( buffer.data( ), buffer.size( ), GET_STRING( 425 ),
-                              FS::getItemName( BAG::berryToItem( berryType ) ).c_str( ), yield );
+                              FS::getItemName( BAG::berryToItem( berryType ) ).c_str( ),
+                              FS::kanaWrap( yield, CURRENT_LANGUAGE ) );
                     break;
                 default: continue;
                 }

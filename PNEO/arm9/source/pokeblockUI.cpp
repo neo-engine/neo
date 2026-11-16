@@ -439,7 +439,7 @@ namespace BAG {
                                    IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].gfxIndex, false );
 
             // block amount
-            IO::regularFont->printString( std::to_string( p_blockOwned ).c_str( ),
+            IO::regularFont->printString( FS::kanaWrap( p_blockOwned, CURRENT_LANGUAGE ),
                                           IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].x + 16,
                                           IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y + 32,
                                           false, IO::font::CENTER );
@@ -453,7 +453,8 @@ namespace BAG {
             // Flavor
             IO::regularFont->setColor( IO::BLUE_IDX, 1 );
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 631 ),
-                      pokeblock::flavorStrength( pokeblockType{ p_blockType } ) );
+                      FS::kanaWrap( pokeblock::flavorStrength( pokeblockType{ p_blockType } ),
+                                    CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 64 + 48,
                                            IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y + 32,
                                            false, IO::font::CENTER );
@@ -461,7 +462,8 @@ namespace BAG {
             // Strength
             IO::regularFont->setColor( IO::RED_IDX, 1 );
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 632 ),
-                      pokeblock::smoothness( pokeblockType{ p_blockType } ) );
+                      FS::kanaWrap( pokeblock::smoothness( pokeblockType{ p_blockType } ),
+                                    CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 128 + 64,
                                            IO::OamTop->oamBuffer[ SPR_POKEBLOCK_OAM_TOP ].y + 32,
                                            false, IO::font::CENTER );
@@ -718,7 +720,8 @@ namespace BAG {
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->setColor( IO::GRAY_IDX, 2 );
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_STS_SHEEN ),
-                  _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ 5 ] );
+                  FS::kanaWrap( _playerTeam[ p_pkmnIdx ].m_boxdata.m_contestStats[ 5 ],
+                                CURRENT_LANGUAGE ) );
         IO::regularFont->printStringC( buffer.data( ), INFO_X - 7 + 128, INFO_Y + 20 + 15 * 7, true,
                                        IO::font::RIGHT );
         IO::updateOAM( true );

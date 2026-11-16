@@ -842,7 +842,7 @@ namespace STS {
                     } else {
                         if( _toSelect > 1 ) {
                             snprintf( buffer.data( ), buffer.size( ), GET_STRING( 262 ),
-                                      _toSelect );
+                                      FS::kanaWrap( _toSelect, CURRENT_LANGUAGE ) );
                         } else {
                             snprintf( buffer.data( ), buffer.size( ), "%s", GET_STRING( 263 ) );
                         }

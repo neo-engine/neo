@@ -128,11 +128,13 @@ namespace SAVE {
         IO::boldFont->printString( GET_STRING_L( 327, m_options.m_language ), 112, 13, p_bottom,
                                    IO::font::CENTER );
 
-        if( achvs < 5 ) {
-            snprintf( buffer.data( ), buffer.size( ), "%s %05hu",
-                      GET_STRING_L( 270, m_options.m_language ), m_id );
+        if( achvs < 5 && m_options.m_language != SAVE::JAP ) {
+            snprintf( buffer.data( ), buffer.size( ), "%s %s",
+                      GET_STRING_L( 270, m_options.m_language ),
+                      FS::kanaWrap( m_id, 5, m_options.m_language ) );
         } else {
-            snprintf( buffer.data( ), buffer.size( ), "%05hu", m_id );
+            snprintf( buffer.data( ), buffer.size( ), "%s",
+                      FS::kanaWrap( m_id, 5, m_options.m_language ) );
         }
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );
         IO::regularFont->printStringC( buffer.data( ), 218, 35, p_bottom, IO::font::RIGHT );
@@ -148,22 +150,31 @@ namespace SAVE {
         if( !p_dummy ) {
             IO::regularFont->printString( GET_STRING_L( 329, m_options.m_language ), 108, 68,
                                           p_bottom );
-            snprintf( buffer.data( ), buffer.size( ), "%hu:%02hhu", m_playTime.m_hours,
-                      m_playTime.m_mins );
+            snprintf( buffer.data( ), buffer.size( ), "%s:%s",
+                      FS::kanaWrap( m_playTime.m_hours, m_options.m_language ),
+                      FS::kanaWrap( m_playTime.m_mins, 2, m_options.m_language ) );
             IO::regularFont->printString( buffer.data( ), 234, 68, p_bottom, IO::font::RIGHT );
 
             // Money
             IO::regularFont->printString( GET_STRING_L( 330, m_options.m_language ), 108, 84,
                                           p_bottom );
-            snprintf( buffer.data( ), buffer.size( ), "$%lu", m_money );
+            if( m_options.m_language == SAVE::JAP ) {
+                snprintf( buffer.data( ), buffer.size( ),
+                          "%s\xe"
+                          "x$\xf",
+                          FS::kanaWrap( m_money, m_options.m_language ) );
+            } else {
+                snprintf( buffer.data( ), buffer.size( ), "$%lu", m_money );
+            }
             IO::regularFont->printString( buffer.data( ), 234, 84, p_bottom, IO::font::RIGHT );
 
             if( checkFlag( F_DEX_OBTAINED ) ) {
                 // PokeDex
                 IO::regularFont->printString( GET_STRING_L( 331, m_options.m_language ), 108, 100,
                                               p_bottom );
-                snprintf( buffer.data( ), buffer.size( ), "%hu/%hu", getSeenCount( ),
-                          getCaughtCount( ) );
+                snprintf( buffer.data( ), buffer.size( ), "%s/%s",
+                          FS::kanaWrap( getSeenCount( ), m_options.m_language ),
+                          FS::kanaWrap( getCaughtCount( ), m_options.m_language ) );
                 IO::regularFont->printString( buffer.data( ), 234, 100, p_bottom, IO::font::RIGHT );
             }
 
@@ -185,7 +196,8 @@ namespace SAVE {
                               FS::getLocation( m_lastSaveLocation, m_options.m_language ).c_str( ),
                               m_options.m_language ),
                           IO::formatDate( m_lastSaveDate, m_options.m_language ).c_str( ),
-                          m_lastSaveTime.m_hours, m_lastSaveTime.m_mins );
+                          FS::kanaWrap( m_lastSaveTime.m_hours, 2, m_options.m_language ),
+                          FS::kanaWrap( m_lastSaveTime.m_mins, 2, m_options.m_language ) );
                 IO::regularFont->printBreakingStringC( buffer.data( ), 242, 132, 230, p_bottom,
                                                        IO::font::RIGHT );
             }

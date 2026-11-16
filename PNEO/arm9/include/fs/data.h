@@ -172,6 +172,8 @@ namespace FS {
     std::string wideNumeral( u32 p_num, u8 p_pad = 1 );
     const char* kanaWrap( const char* p_s, u8 p_language );
     const char* kanaWrap( u32 p_num, u8 p_language );
+    const char* kanaWrap( u32 p_num, u8 p_pad, u8 p_language );
+    const char* kanaWrapFloat( double p_value, u8 p_decimals, u8 p_language );
 
     bool getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language, char* p_out );
     std::string getString( const char* p_path, u16 p_maxLen, u16 p_stringId, u8 p_language );

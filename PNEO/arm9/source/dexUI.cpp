@@ -535,11 +535,13 @@ namespace DEX {
             IO::regularFont->printStringC( GET_STRING( 433 ), 94 / 2 + 1, 5, false,
                                            IO::font::CENTER );
             localInitSub( true );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 439 ),
-                           SAVE::CURRENT_FILE->getLocalSeenCount( ) );
+            std::snprintf(
+                buffer.data( ), buffer.size( ), GET_STRING( 439 ),
+                FS::kanaWrap( SAVE::CURRENT_FILE->getLocalSeenCount( ), CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 74, 2, true, IO::font::CENTER );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 440 ),
-                           SAVE::CURRENT_FILE->getLocalCaughtCount( ) );
+            std::snprintf(
+                buffer.data( ), buffer.size( ), GET_STRING( 440 ),
+                FS::kanaWrap( SAVE::CURRENT_FILE->getLocalCaughtCount( ), CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 54 + 128, 2, true, IO::font::CENTER );
 
             _nationalSelectedIdx = 0;
@@ -548,10 +550,11 @@ namespace DEX {
             IO::regularFont->printStringC( GET_STRING( 434 ), 94 / 2 + 1, 5, false,
                                            IO::font::CENTER );
             std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 439 ),
-                           SAVE::CURRENT_FILE->getSeenCount( ) );
+                           FS::kanaWrap( SAVE::CURRENT_FILE->getSeenCount( ), CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 74, 2, true, IO::font::CENTER );
-            std::snprintf( buffer.data( ), buffer.size( ), GET_STRING( 440 ),
-                           SAVE::CURRENT_FILE->getCaughtCount( ) );
+            std::snprintf(
+                buffer.data( ), buffer.size( ), GET_STRING( 440 ),
+                FS::kanaWrap( SAVE::CURRENT_FILE->getCaughtCount( ), CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 54 + 128, 2, true, IO::font::CENTER );
 
             _nationalSelectedIdx = 0;
@@ -793,9 +796,11 @@ namespace DEX {
             IO::regularFont->setColor( IO::BLACK_IDX, 1 );
             IO::regularFont->setColor( 0, 2 );
             if( caught ) {
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( 438 ),
-                          FS::getSpeciesName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
-                          data.m_baseForme.m_size / 10.0, data.m_baseForme.m_weight / 10.0 );
+                snprintf(
+                    buffer.data( ), buffer.size( ), GET_STRING( 438 ),
+                    FS::getSpeciesName( p_pkmn.m_pkmnIdx, p_pkmn.m_forme ).c_str( ),
+                    FS::kanaWrapFloat( data.m_baseForme.m_size / 10.0, 1, CURRENT_LANGUAGE ),
+                    FS::kanaWrapFloat( data.m_baseForme.m_weight / 10.0, 1, CURRENT_LANGUAGE ) );
                 IO::regularFont->setColor( IO::GRAY_IDX, 1 );
                 IO::regularFont->printStringC( buffer.data( ), 128, 128, p_bottom,
                                                IO::font::CENTER );

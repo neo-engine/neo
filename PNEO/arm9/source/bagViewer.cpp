@@ -665,7 +665,8 @@ namespace BAG {
 
             u32 sellprice = cnt * idata.m_sellPrice;
             snprintf( buffer.data( ), buffer.size( ),
-                      GET_STRING( IO::STR_UI_BAG_WILL_BUY_ITEM_FOR ), sellprice );
+                      GET_STRING( IO::STR_UI_BAG_WILL_BUY_ITEM_FOR ),
+                      FS::kanaWrap( sellprice, CURRENT_LANGUAGE ) );
 
             IO::simpleYesNoBox yn;
             if( yn.getResult( [ & ]( ) { return _bagUI->printYNMessage( buffer.data( ), 254 ); },

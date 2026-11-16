@@ -572,9 +572,7 @@ namespace SPX {
     }
 
     char* toString( int p_num ) {
-        static std::array<char, 50> buffer{ };
-        snprintf( buffer.data( ), buffer.size( ), "%i", p_num );
-        return buffer.data( );
+        return const_cast<char*>( FS::kanaWrap( p_num > 0 ? u32( p_num ) : 0u, CURRENT_LANGUAGE ) );
     }
 
     void scoreBoard( u8 p_miss_count[ 4 ], u8 p_hit_count[ 4 ], u8 p_perfect_count[ 4 ],
@@ -714,12 +712,13 @@ namespace SPX {
         if( p_mxSpeed && bonus ) {
             IO::boldFont->printStringC( GET_STRING( 645 ), 224, TOP_Y, false, IO::font::CENTER );
 
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 646 ), bonus );
+            snprintf( buffer.data( ), buffer.size( ), GET_STRING( 646 ),
+                      FS::kanaWrap( bonus, CURRENT_LANGUAGE ) );
             IO::boldFont->printStringC( buffer.data( ), 250, 112, false, IO::font::RIGHT );
         }
         // max RPM
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( 647 ),
-                  speedToRPM100( p_mxSpeed ) / 100.0 );
+                  FS::kanaWrapFloat( speedToRPM100( p_mxSpeed ) / 100.0, 2, CURRENT_LANGUAGE ) );
         IO::boldFont->printStringC( buffer.data( ), 6, 112, false );
         IO::updateOAM( false );
     }
@@ -797,7 +796,8 @@ namespace SPX {
         auto result = computeBlockType( p_berries, bonus, speedToRPM100( p_mxSpeed ) );
         std::array<char, 60> sbuffer{ };
         snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( result ) + 582 ) );
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 648 ), player, sbuffer.data( ) );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 648 ),
+                  FS::kanaWrap( player, CURRENT_LANGUAGE ), sbuffer.data( ) );
         IO::regularFont->printStringC( buffer.data( ), 16, 133, false );
     }
 
@@ -1164,7 +1164,8 @@ namespace SPX {
         IO::regularFont->printString( GET_STRING( 643 ), 128, 5, false, IO::font::CENTER );
         std::array<char, 60> sbuffer{ };
         snprintf( sbuffer.data( ), sbuffer.size( ), "%s", GET_STRING( u8( p_type ) + 582 ) );
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 641 ), p_amount, sbuffer.data( ) );
+        snprintf( buffer.data( ), buffer.size( ), GET_STRING( 641 ),
+                  FS::kanaWrap( p_amount, CURRENT_LANGUAGE ), sbuffer.data( ) );
         IO::regularFont->printStringC( buffer.data( ), 16, 133, false );
 
         // remove lid, show resulting block

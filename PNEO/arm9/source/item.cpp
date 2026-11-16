@@ -356,21 +356,21 @@ namespace BAG {
         case I_SOOT_SACK:
             if( !p_dryRun ) {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_ASH_COUNT ),
-                          SAVE::CURRENT_FILE->m_ashCount );
+                          FS::kanaWrap( SAVE::CURRENT_FILE->m_ashCount, CURRENT_LANGUAGE ) );
                 p_message( buffer.data( ) );
             }
             return true;
         case I_COIN_CASE:
             if( !p_dryRun ) {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_COIN_COUNT ),
-                          SAVE::CURRENT_FILE->m_coins );
+                          FS::kanaWrap( SAVE::CURRENT_FILE->m_coins, CURRENT_LANGUAGE ) );
                 p_message( buffer.data( ) );
             }
             return true;
         case I_POINT_CARD:
             if( !p_dryRun ) {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_BP_COUNT ),
-                          SAVE::CURRENT_FILE->m_battlePoints );
+                          FS::kanaWrap( SAVE::CURRENT_FILE->m_battlePoints, CURRENT_LANGUAGE ) );
                 p_message( buffer.data( ) );
             }
             return true;

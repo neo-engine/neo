@@ -1010,9 +1010,56 @@ namespace FS {
         return out;
     }
 
+    const char* kanaWrap( u32 p_number, u8 p_pad, u8 p_language ) {
+        char* out     = KANA_BUF[ KANA_BUF_SLOT ];
+        KANA_BUF_SLOT = u8( ( KANA_BUF_SLOT + 1 ) % KANA_WRAP_SLOTS );
+        u32 i         = 0;
+        if( p_language == SAVE::JAP ) { out[ i++ ] = IO::KANA::ON; }
+        std::string num;
+        if( p_language == SAVE::JAP ) {
+            num = wideNumeral( p_number, p_pad );
+        } else {
+            std::array<char, 16> dec{ };
+            snprintf( dec.data( ), dec.size( ), "%0*lu", p_pad, (unsigned long) p_number );
+            num = std::string{ dec.data( ) };
+        }
+        for( size_t j = 0; i < KANA_WRAP_LEN - 2 && j < num.size( ); ++i, ++j ) {
+            out[ i ] = num[ j ];
+        }
+        if( p_language == SAVE::JAP ) { out[ i++ ] = IO::KANA::OFF; }
+        out[ i ] = '\0';
+        return out;
+    }
     const char* kanaWrap( u32 p_number, u8 p_language ) {
-        if( p_language != SAVE::JAP ) { return std::to_string( p_number ).c_str( ); }
-        return kanaWrap( wideNumeral( p_number ).c_str( ), p_language );
+        return kanaWrap( p_number, 1, p_language );
+    }
+
+    const char* kanaWrapFloat( double p_value, u8 p_decimals, u8 p_language ) {
+        char* out     = KANA_BUF[ KANA_BUF_SLOT ];
+        KANA_BUF_SLOT = u8( ( KANA_BUF_SLOT + 1 ) % KANA_WRAP_SLOTS );
+        u32 i         = 0;
+        u32 scale     = 1;
+        for( u8 d = 0; d < p_decimals; ++d ) { scale *= 10; }
+        std::string num;
+        if( p_language == SAVE::JAP ) {
+            out[ i++ ] = IO::KANA::ON;
+            u32 scaled = u32( p_value * scale + 0.5 );
+            num        = wideNumeral( scaled / scale );
+            if( p_decimals ) {
+                num += "x.";
+                num += wideNumeral( scaled % scale, p_decimals );
+            }
+        } else {
+            std::array<char, 24> dec{ };
+            snprintf( dec.data( ), dec.size( ), "%.*f", p_decimals, p_value );
+            num = std::string{ dec.data( ) };
+        }
+        for( size_t j = 0; i < KANA_WRAP_LEN - 2 && j < num.size( ); ++i, ++j ) {
+            out[ i ] = num[ j ];
+        }
+        if( p_language == SAVE::JAP ) { out[ i++ ] = IO::KANA::OFF; }
+        out[ i ] = '\0';
+        return out;
     }
 
     bool getAbilityName( u16 p_abilityId, u8 p_language, char* p_out ) {

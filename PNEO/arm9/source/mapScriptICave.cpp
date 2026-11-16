@@ -285,7 +285,9 @@ namespace MAP {
         u8 yellow = ( infinityCaveReqs >> 24 ) & 255;
 
         snprintf( buffer.data( ), buffer.size( ), GET_MAP_STRING( IO::STR_MAP_ICAVE_REPORT_REQS ),
-                  red, blue, yellow, green );
+                  FS::kanaWrap( red, CURRENT_LANGUAGE ), FS::kanaWrap( blue, CURRENT_LANGUAGE ),
+                  FS::kanaWrap( yellow, CURRENT_LANGUAGE ),
+                  FS::kanaWrap( green, CURRENT_LANGUAGE ) );
         IO::printMessage( buffer.data( ), MSG_INFO );
 
         // check if player has required shards

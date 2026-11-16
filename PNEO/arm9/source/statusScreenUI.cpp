@@ -984,11 +984,13 @@ namespace STS {
             // OT
             writeLineTop( GET_STRING( IO::STR_UI_STS_OT ), p_pokemon->m_boxdata.getOT( ), 3 );
             // Id
-            snprintf( buffer.data( ), buffer.size( ), "%05hu", p_pokemon->m_boxdata.m_oTId );
+            snprintf( buffer.data( ), buffer.size( ), "%s",
+                      FS::kanaWrap( p_pokemon->m_boxdata.m_oTId, 5, CURRENT_LANGUAGE ) );
             writeLineTop( GET_STRING( IO::STR_UI_STS_ID ), buffer.data( ), 4 );
             // Exp
             writeLineTop( GET_STRING( IO::STR_UI_STS_EXP ),
-                          std::to_string( p_pokemon->m_boxdata.m_experienceGained ).c_str( ), 6 );
+                          FS::kanaWrap( p_pokemon->m_boxdata.m_experienceGained, CURRENT_LANGUAGE ),
+                          6 );
             if( p_pokemon->m_level < 100 ) {
                 // Exp to next level
                 writeLineTop( GET_STRING( IO::STR_UI_STS_NEXT ), 0, 7, IO::WHITE_IDX );
@@ -1015,8 +1017,9 @@ namespace STS {
                                     oam[ SPR_EXP_BAR_OAM ].y + 3, false, 239 );
                 IO::regularFont->setColor( IO::COLOR_IDX, 2 );
                 IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                IO::regularFont->printString( std::to_string( togo ).c_str( ), INFO_X + 128 - 7,
-                                              INFO_Y + 4 + 15 * 8, false, IO::font::RIGHT );
+                IO::regularFont->printString( FS::kanaWrap( togo, CURRENT_LANGUAGE ),
+                                              INFO_X + 128 - 7, INFO_Y + 4 + 15 * 8, false,
+                                              IO::font::RIGHT );
             }
 
             // BOTTOM
@@ -1105,13 +1108,13 @@ namespace STS {
                 if( p_pokemon->m_boxdata.m_fateful ) {
                     snprintf( buffer.data( ), buffer.size( ),
                               GET_STRING( IO::STR_UI_STS_APP_FATEFUL_ENC_AT_LEVEL ),
-                              p_pokemon->m_boxdata.m_gotLevel );
+                              FS::kanaWrap( p_pokemon->m_boxdata.m_gotLevel, CURRENT_LANGUAGE ) );
                     IO::regularFont->printStringC( buffer.data( ), INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 } else {
                     snprintf( buffer.data( ), buffer.size( ),
                               GET_STRING( IO::STR_UI_STS_APP_MET_AT_LEVEL ),
-                              p_pokemon->m_boxdata.m_gotLevel );
+                              FS::kanaWrap( p_pokemon->m_boxdata.m_gotLevel, CURRENT_LANGUAGE ) );
                     IO::regularFont->printStringC( buffer.data( ), INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 }
@@ -1119,13 +1122,13 @@ namespace STS {
                 if( p_pokemon->m_boxdata.m_fateful ) {
                     snprintf( buffer.data( ), buffer.size( ),
                               GET_STRING( IO::STR_UI_STS_FATEFUL_ENC_AT_LEVEL ),
-                              p_pokemon->m_boxdata.m_gotLevel );
+                              FS::kanaWrap( p_pokemon->m_boxdata.m_gotLevel, CURRENT_LANGUAGE ) );
                     IO::regularFont->printStringC( buffer.data( ), INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 } else {
                     snprintf( buffer.data( ), buffer.size( ),
                               GET_STRING( IO::STR_UI_STS_MET_AT_LEVEL ),
-                              p_pokemon->m_boxdata.m_gotLevel );
+                              FS::kanaWrap( p_pokemon->m_boxdata.m_gotLevel, CURRENT_LANGUAGE ) );
                     IO::regularFont->printStringC( buffer.data( ), INFO_X_SUB + 12,
                                                    INFO_LINE_SUB( currentLine++ ), true );
                 }
@@ -1461,7 +1464,7 @@ namespace STS {
             }
 
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_STS_SHEEN ),
-                      p_pokemon->m_boxdata.m_contestStats[ 5 ] );
+                      FS::kanaWrap( p_pokemon->m_boxdata.m_contestStats[ 5 ], CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), INFO_X - 7 + 128, INFO_Y + 20 + 15 * 7,
                                            false, IO::font::RIGHT );
 
@@ -1485,7 +1488,7 @@ namespace STS {
                                                true, IO::font::CENTER );
             } else {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_STS_RIBBONS ),
-                          ribs.size( ) );
+                          FS::kanaWrap( u32( ribs.size( ) ), CURRENT_LANGUAGE ) );
                 IO::regularFont->printStringC( buffer.data( ), 32, 156, true );
 
                 // load up to 12 ribbons
@@ -1683,16 +1686,17 @@ namespace STS {
 
                 if( p_pokemon->getMove( p_detailsPage ) == M_HIDDEN_POWER ) {
                     snprintf( buffer2.data( ), buffer2.size( ), GET_STRING( IO::STR_UI_BAG_POWER ),
-                              p_pokemon->getHPPower( ) );
+                              FS::kanaWrap( p_pokemon->getHPPower( ), CURRENT_LANGUAGE ) );
                 } else if( _moves[ p_detailsPage ].m_basePower ) {
-                    snprintf( buffer2.data( ), buffer2.size( ), GET_STRING( IO::STR_UI_BAG_POWER ),
-                              _moves[ p_detailsPage ].m_basePower );
+                    snprintf(
+                        buffer2.data( ), buffer2.size( ), GET_STRING( IO::STR_UI_BAG_POWER ),
+                        FS::kanaWrap( _moves[ p_detailsPage ].m_basePower, CURRENT_LANGUAGE ) );
                 }
                 if( _moves[ p_detailsPage ].m_accuracy > 0
                     && _moves[ p_detailsPage ].m_accuracy <= 100 ) {
-                    snprintf( buffer3.data( ), buffer3.size( ),
-                              GET_STRING( IO::STR_UI_BAG_ACCURACY ),
-                              _moves[ p_detailsPage ].m_accuracy );
+                    snprintf(
+                        buffer3.data( ), buffer3.size( ), GET_STRING( IO::STR_UI_BAG_ACCURACY ),
+                        FS::kanaWrap( _moves[ p_detailsPage ].m_accuracy, CURRENT_LANGUAGE ) );
                 } else {
                     snprintf( buffer3.data( ), buffer3.size( ),
                               GET_STRING( IO::STR_UI_BAG_ACCURACY_NO_MISS ) );
@@ -1768,7 +1772,7 @@ namespace STS {
                 return;
             } else {
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_STS_RIBBONS ),
-                          ribs.size( ) );
+                          FS::kanaWrap( u32( ribs.size( ) ), CURRENT_LANGUAGE ) );
                 IO::regularFont->printStringC( buffer.data( ), 32, 156, true );
             }
 
