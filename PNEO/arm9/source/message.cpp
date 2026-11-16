@@ -50,6 +50,13 @@ namespace IO {
         u16 tmp = -1;
 
         if( p_cmd == "PLAYER" ) { return SAVE::CURRENT_FILE->getPlayerName( ); }
+        if( p_cmd == "KUN" ) {
+            if( SAVE::CURRENT_FILE->m_appearance == 0 ) {
+                return "kunn";
+            } else {
+                return "tiyAnn";
+            }
+        }
         if( p_cmd == "RIVAL" ) {
             if( SAVE::CURRENT_FILE->checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
                 return std::string( GET_STRING( 383 ) );
