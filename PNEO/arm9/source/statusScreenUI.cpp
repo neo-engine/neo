@@ -1362,7 +1362,7 @@ namespace STS {
                     oamSub[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true, IO::font::CENTER );
 
                 snprintf(
-                    buffer.data( ), 49, GET_STRING_RAW( IO::STR_UI_STS_PP_FORMAT ),
+                    buffer.data( ), buffer.size( ), GET_STRING_RAW( IO::STR_UI_STS_PP_FORMAT ),
                     p_pokemon->m_boxdata.m_curPP[ i ],
                     s8( _moves[ i ].m_pp * ( ( 5 + p_pokemon->m_boxdata.PPupget( i ) ) / 5.0 ) ) );
                 IO::smallFont->printStringC( buffer.data( ), oamSub[ SPR_MOVE_OAM_SUB( i ) ].x + 91,

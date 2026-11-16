@@ -592,14 +592,14 @@ namespace IO {
                         if( stat != lst ) {
                             lst = stat;
                             printMessage( 0, MSG_INFO_NOCLOSE );
-                            std::array<char, 100> buffer{ };
+                            std::array<char, 200> buffer{ };
                             std::string           buf2 = "";
                             for( u8 i = 0; i < stat; ++i ) {
-                                buf2 += "\x03";
+                                buf2 += "[447]";
                                 if( i % 3 == 2 ) { buf2 += " "; }
                             }
                             for( u8 i = stat; i < 18; ++i ) {
-                                buf2 += "\x04";
+                                buf2 += "[448]";
                                 if( i % 3 == 2 ) { buf2 += " "; }
                             }
                             snprintf( buffer.data( ), buffer.size( ),
@@ -758,11 +758,12 @@ namespace IO {
         if( p_paymentMethod < 3 ) {
             snprintf( buffer.data( ), buffer.size( ),
                       GET_STRING( IO::STR_UI_MART_CLERK_TOTAL_MONEYTYPE_START + p_paymentMethod ),
-                      p_name.c_str( ), res, cost );
+                      p_name.c_str( ), FS::kanaWrap( res, CURRENT_LANGUAGE ),
+                      FS::kanaWrap( cost, CURRENT_LANGUAGE ) );
         } else if( p_paymentMethod == 3 ) {
             snprintf( buffer.data( ), buffer.size( ),
                       GET_STRING( IO::STR_UI_MART_CLERK_TOTAL_MONEYTYPE_ASH ), p_name.c_str( ),
-                      cost );
+                      FS::kanaWrap( cost, CURRENT_LANGUAGE ) );
         }
         IO::simpleYesNoBox yn;
         auto               conf = yn.getResult(

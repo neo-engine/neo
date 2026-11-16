@@ -146,7 +146,7 @@ namespace IO::ANIM {
 
         std::array<char, 200> buffer{ };
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_EVOLUTION_START ),
-                  FS::getDisplayName( p_startSpecies ).c_str( ) );
+                  FS::kanaWrap( FS::getDisplayName( p_startSpecies ).c_str( ), CURRENT_LANGUAGE ) );
         IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
 
         SOUND::playBGM( BGM_EVOLVING );
@@ -219,9 +219,10 @@ namespace IO::ANIM {
             SOUND::playCry( p_endSpecies );
             for( u8 i = 0; i < 50; ++i ) { swiWaitForVBlank( ); }
             IO::printRectangle( 0, 192 - 42, 255, 192, false, 0 );
-            snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_EVOLUTION_COMPLETE ),
-                      FS::getDisplayName( p_startSpecies ).c_str( ),
-                      FS::getDisplayName( p_endSpecies ).c_str( ) );
+            snprintf(
+                buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_EVOLUTION_COMPLETE ),
+                FS::kanaWrap( FS::getDisplayName( p_startSpecies ).c_str( ), CURRENT_LANGUAGE ),
+                FS::kanaWrap( FS::getDisplayName( p_endSpecies ).c_str( ), CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 12, 192 - 40, false );
             waitForInteractAB( );
             SOUND::restartBGM( );
@@ -562,8 +563,9 @@ namespace IO::ANIM {
         SOUND::playBGMOneshot( BGM_OS_EVOLVED );
         std::array<char, 200> buffer{ };
         clearScreen( true, true, true );
-        snprintf( buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_EGG_HATCH ),
-                  FS::getDisplayName( p_pkmn.m_pkmnIdx ).c_str( ) );
+        snprintf(
+            buffer.data( ), buffer.size( ), GET_STRING( STR_ANIM_EGG_HATCH ),
+            FS::kanaWrap( FS::getDisplayName( p_pkmn.m_pkmnIdx ).c_str( ), CURRENT_LANGUAGE ) );
         regularFont->printStringC( buffer.data( ), 127, 136, false, font::CENTER );
         setFrameVis( 0, true );
         setFrameVis( 1, false );

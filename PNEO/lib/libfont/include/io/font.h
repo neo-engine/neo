@@ -26,6 +26,8 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #pragma once
+#include <string>
+#include <vector>
 #include <nds.h>
 
 #include "io/kana.h"
@@ -57,6 +59,9 @@ namespace IO {
     constexpr u16 valToLower( u16 p_val, u16 p_lowerStart ) {
         return ( p_val - 'a' ) + p_lowerStart;
     }
+
+    void bitmapScramble( u16* p_bufferIn, u16* p_bufferOut, u16 p_bufferWidth, u8 p_chunkSize,
+                         u16 p_bufferHeight );
 
     namespace REGULAR_FONT {
         constexpr auto NUM_CHARS          = 490;
@@ -122,8 +127,6 @@ namespace IO {
         void ( *_shiftchar )( u16& );
         color _color[ 5 ];
 
-        void _charDelay( s8 p_textSpeedModifier ) const;
-
         /*
          * @brief: Interprets p_string[ p_start ] p_string[ p_start + 1] as a kana digraph
          * and returns the corresponding up to two glyph ids to be printed.
@@ -150,6 +153,23 @@ namespace IO {
         constexpr color getColor( int p_num ) const {
             return _color[ p_num ];
         }
+
+        void charDelay( s8 p_textSpeedModifier ) const;
+
+        std::vector<u32> lineWidths( const std::vector<std::pair<u16, u16>>& p_tokens,
+                                     u8                                      p_charShift ) const;
+        u32              tokenWidth( const std::pair<u16, u16>& p_token, u8 p_charShift = 0 ) const;
+        std::pair<u16, u16> nextToken( const char* p_string, u32& p_start,
+                                       bool p_kanaMode = false ) const;
+
+        /*
+         * @brief: Split the given string into tokens (i.e. single chars/digraph/special
+         * blocks); inserts a "\n" token whenever the cumulative length of the current
+         * line exceeds p_maxWidth.
+         */
+        std::vector<std::pair<u16, u16>> tokenize( const char* p_string, u16 p_maxWidth = u16( -1 ),
+                                                   char p_breakChar = ' ',
+                                                   u8   p_charShift = 0 ) const;
 
         /*
          * @brief: Returns the width in px that the given string has when using the font
@@ -254,6 +274,11 @@ namespace IO {
                            u16 p_bufferWidth, alignment p_alignment = LEFT, u8 p_yDistance = 15,
                            u8 p_chunkSize = 64, u16 p_bufferHeight = 32,
                            u16 p_rightPadding = 0 ) const;
+
+        u16 printTokensB( const std::vector<std::pair<u16, u16>>& p_tokens, const u16* p_palette,
+                          u16* p_buffer, u16 p_bufferWidth, alignment p_alignment = LEFT,
+                          u8 p_yDistance = 15, u8 p_charShift = 0, u8 p_chunkSize = 64,
+                          u16 p_bufferHeight = 32, u16 p_rightPadding = 0 ) const;
 
         /*
          * @brief: Prints the given string, where newlines are inserted whenever the

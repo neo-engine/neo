@@ -42,12 +42,9 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "spx/specials.h"
 
 namespace IO {
-    char TMP_TEXT_BUF[ 512 ]  = { 0 };
-    u16  CONT_BUF[ 16 * 16 ]  = { 0 };
-    u16  TEXT_BUF[ 64 * 256 ] = { 0 };
-    u16  TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
-    char TEXT_CACHE_1[ 256 ]  = { 0 }; // top line
-    char TEXT_CACHE_2[ 256 ]  = { 0 }; // bottom line
+    u16 CONT_BUF[ 16 * 16 ]  = { 0 };
+    u16 TEXT_BUF[ 64 * 256 ] = { 0 };
+    u16 TEXT_PAL[ 16 ]       = { 0, IO::BLACK, IO::GRAY, IO::WHITE, IO::BLUE, IO::BLUE };
 
     std::string parseLogCmd( const std::string& p_cmd ) {
         u16 tmp = -1;
@@ -84,8 +81,6 @@ namespace IO {
             IO::OamTop->oamBuffer[ SPR_MSGTEXT_OAM + i ].isHidden = true;
         }
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
-        std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         IO::updateOAM( false );
     }
 
@@ -193,8 +188,6 @@ namespace IO {
             } else if( p_style == MSG_MART_ITEM ) {
                 p_noDelay = true;
                 std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
-                std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
 
                 IO::regularFont->setColor( 3, 1 );
                 IO::regularFont->setColor( 0, 2 );
@@ -209,77 +202,35 @@ namespace IO {
 
         if( !p_message ) {
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
-            std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         } else {
-            u16  cpos    = 0;
-            u16  tileCnt = p_style == MSG_MART_ITEM ? SPR_MSG_GFX_MART : SPR_MSG_GFX;
-            bool sp      = false;
+            u16 tileCnt = p_style == MSG_MART_ITEM ? SPR_MSG_GFX_MART : SPR_MSG_GFX;
             IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
-            std::memset( TMP_TEXT_BUF, 0, sizeof( TMP_TEXT_BUF ) );
 
-            u8   tmppos         = 0;
-            char shortbuf[ 20 ] = { 0 };
+            u8  charShift    = 1;
+            u16 bufferWidth  = 256 - ( 64 * !!p_item );
+            u8  yDistance    = 16 - ( 4 * !!p_item );
+            u8  chunkSize    = 64;
+            u16 bufferHeight = hg;
+            u16 rightPadding = 20;
 
-            auto fnt = ( p_style == MSG_BRAILLE ) ? IO::brailleFont : IO::regularFont;
+            auto       fnt  = ( p_style == MSG_BRAILLE ) ? IO::brailleFont : IO::regularFont;
+            const auto toks = fnt->tokenize( p_message, bufferWidth, ' ', 1 );
 
-            while( p_message[ cpos ] ) {
-                if( !p_noDelay ) {
-                    // Check for special escaped characters ([escape sequence]), that need
-                    // to be treated as a single character.
-                    if( p_message[ cpos ] == '[' ) {
-                        std::memset( shortbuf, 0, sizeof( shortbuf ) );
-                        tmppos               = 0;
-                        sp                   = true;
-                        shortbuf[ tmppos++ ] = p_message[ cpos ];
-                        ++cpos;
-                        continue;
-                    }
-                    if( p_message[ cpos ] == ']' ) {
-                        sp                   = false;
-                        shortbuf[ tmppos++ ] = p_message[ cpos ];
-                    } else if( !sp ) {
-                        std::memset( shortbuf, 0, sizeof( shortbuf ) );
-                        shortbuf[ tmppos = 0 ] = p_message[ cpos ];
-                    }
-                    if( sp ) {
-                        shortbuf[ tmppos++ ] = p_message[ cpos ];
-                        ++cpos;
-                        continue;
-                    }
-                }
+            u32  curLine = 0;
+            bool init    = false;
+
+            std::vector<std::pair<u16, u16>> lineToken[ 2 ]
+                = { std::vector<std::pair<u16, u16>>{ }, std::vector<std::pair<u16, u16>>{ } };
+
+            auto render = [ & ]( ) {
+                std::vector<std::pair<u16, u16>> text{ };
+                text.append_range( lineToken[ ( curLine + 1 ) & 1 ] );
+                text.append_range( lineToken[ curLine & 1 ] );
+
+                fnt->printTokensB( text, TEXT_PAL, TEXT_BUF, bufferWidth, IO::font::LEFT, yDistance,
+                                   charShift, chunkSize, bufferHeight, rightPadding );
 
                 tileCnt = p_style == MSG_MART_ITEM ? SPR_MSG_GFX_MART : SPR_MSG_GFX;
-                u8 ln   = 1;
-                if( p_noDelay ) {
-                    std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-                    ln = fnt->printStringBC( p_message, TEXT_PAL, TEXT_BUF, 256 - ( 64 * !!p_item ),
-                                             IO::font::LEFT, 16 - ( 4 * !!p_item ), 64, hg, 20 );
-                } else {
-                    std::strncat( TMP_TEXT_BUF, shortbuf, 20 );
-                    if( !cpos ) { std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) ); }
-                    ln = fnt->printStringBC( TMP_TEXT_BUF, TEXT_PAL, TEXT_BUF,
-                                             256 - ( 64 * !!p_item ), IO::font::LEFT,
-                                             16 - ( 4 * !!p_item ), 64, hg, 20 );
-                }
-
-                if( !p_noDelay ) {
-                    if( ln == 1 || ( ln == 2 && p_message[ cpos ] == '\n' ) ) {
-                        std::strncat( TEXT_CACHE_1, shortbuf, 20 );
-                    } else if( ln == 2 || ( ln > 2 && p_message[ cpos ] == '\n' ) ) {
-                        std::strncat( TEXT_CACHE_2, shortbuf, 20 );
-                    } else {
-                        IO::waitForInteract( animateMB,
-                                             [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
-                        std::strncpy( TEXT_CACHE_1, TEXT_CACHE_2, 256 );
-                        std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
-                        std::strncat( TEXT_CACHE_2, shortbuf, 20 );
-                        std::memset( TMP_TEXT_BUF, 0, sizeof( TMP_TEXT_BUF ) );
-                        std::strncat( TMP_TEXT_BUF, TEXT_CACHE_1, 256 );
-                        std::strncat( TMP_TEXT_BUF, shortbuf, 20 );
-                    }
-                }
-
                 tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM, tileCnt, x, y, 64, hg, TEXT_BUF,
                                            64 * hg / 2, false, false, false, OBJPRIORITY_0, false );
                 tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 1, tileCnt, x + 64, y, 64, hg,
@@ -292,7 +243,8 @@ namespace IO {
                     tileCnt = IO::loadSpriteB( SPR_MSGTEXT_OAM + 3, tileCnt, x + 64 + 128, y, 64,
                                                hg, TEXT_BUF + 3 * 64 * hg, 64 * hg / 2, false,
                                                false, false, OBJPRIORITY_0, false );
-                } else if( !cpos ) {
+                } else if( !init ) {
+                    init = true;
                     if( !p_data || p_data->m_itemType != BAG::ITEMTYPE_TM ) {
                         tileCnt = IO::loadItemIconB( p_item, 16, 192 - 40, SPR_MSGTEXT_OAM + 3,
                                                      tileCnt, false );
@@ -306,14 +258,7 @@ namespace IO {
                     }
                 }
                 IO::updateOAM( false );
-                for( u8 i = 0;
-                     i < 80 / ( IO::TEXTSPEED + SAVE::CURRENT_FILE->m_options.m_textSpeedModifier );
-                     ++i ) {
-                    swiWaitForVBlank( );
-                }
-                if( p_noDelay ) { break; }
-                cpos++;
-            }
+            };
 
             if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_NORMAL_CONT
                 || p_style == MSG_INFO_CONT || p_style == MSG_ITEM || p_style == MSG_BRAILLE ) {
@@ -322,8 +267,34 @@ namespace IO {
                 tileCnt = IO::loadSpriteB( SPR_MSGCONT_OAM, SPR_MSGCONT_GFX, 254 - 12,
                                            192 - 40 + 24, 16, 16, CONT_BUF, 16 * 16 / 2, false,
                                            false, false, OBJPRIORITY_0, false );
+                IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
             } else {
                 IO::OamTop->oamBuffer[ SPR_MSGCONT_OAM ].isHidden = true;
+            }
+
+            std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
+            if( !p_noDelay ) {
+                for( const auto& tok : toks ) {
+                    if( tok.first == '\n' ) {
+                        lineToken[ curLine & 1 ].push_back( tok );
+                        // scroll
+                        curLine++;
+                        lineToken[ curLine & 1 ].clear( );
+
+                        if( curLine >= 2 ) {
+                            IO::waitForInteract(
+                                animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
+                        }
+                        continue;
+                    }
+                    // print chars
+                    lineToken[ curLine & 1 ].push_back( tok );
+                    render( );
+                    fnt->charDelay( SAVE::CURRENT_FILE->m_options.m_textSpeedModifier );
+                }
+            } else {
+                lineToken[ 0 ] = toks;
+                render( );
             }
         }
 
@@ -340,8 +311,6 @@ namespace IO {
         if( p_style == MSG_NORMAL_CONT || p_style == MSG_INFO_CONT ) {
             IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
             std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-            std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
-            std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
             IO::updateOAM( false );
         }
         if( p_style == MSG_NORMAL || p_style == MSG_INFO || p_style == MSG_BRAILLE ) {
@@ -431,8 +400,6 @@ namespace IO {
             buffer.data( ), 99, fmt.c_str( ), iname.c_str( ), BAG::getItemChar( data.m_itemType ),
             GET_STRING( IO::STR_UI_BAG_PAGE_NAME_START + BAG::toBagType( data.m_itemType ) ) );
         std::memset( TEXT_BUF, 0, sizeof( TEXT_BUF ) );
-        std::memset( TEXT_CACHE_1, 0, sizeof( TEXT_CACHE_1 ) );
-        std::memset( TEXT_CACHE_2, 0, sizeof( TEXT_CACHE_2 ) );
         doPrintMessage( buffer.data( ), MSG_ITEM, p_itemId, &data );
         IO::waitForInteract( animateMB, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
         hideMessageBox( );

@@ -262,7 +262,6 @@ START:
 
     {
         AM_GUARD_UNAWARE( amG );
-
 #ifdef DESQUID
         printf( "\n\nBooting NEO. %u %d\n"
                 "- Init Graphics     [ OK ]\n"

@@ -426,9 +426,14 @@ namespace BATTLE {
 
             for( int i = 0; i < 4; i++ ) {
                 if( !p_pokemon->getMove( i ) ) continue;
-                auto mname = FS::getMoveName( p_pokemon->getMove( i ) );
+                auto mname = std::string{ FS::kanaWrap(
+                    FS::getMoveName( p_pokemon->getMove( i ) ).c_str( ), CURRENT_LANGUAGE ) };
                 if( mname.length( ) > 18 ) {
-                    snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                    if( CURRENT_LANGUAGE == SAVE::JAP ) {
+                        snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
+                    } else {
+                        snprintf( buffer.data( ), buffer.size( ), "%s.", mname.c_str( ) );
+                    }
                 } else {
                     snprintf( buffer.data( ), buffer.size( ), "%s", mname.c_str( ) );
                 }
@@ -442,8 +447,8 @@ namespace BATTLE {
                                                oam[ SPR_MOVE_OAM_SUB( i ) ].y + 7, true,
                                                IO::font::CENTER );
 
-                snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_BATTLE_HP_FORMAT ),
-                          p_pokemon->m_curPP[ i ],
+                snprintf( buffer.data( ), buffer.size( ),
+                          GET_STRING_RAW( IO::STR_BATTLE_HP_FORMAT ), p_pokemon->m_curPP[ i ],
                           s8( mdatas[ i ].m_pp * ( ( 5 + p_pokemon->PPupget( i ) ) / 5.0 ) ) );
                 IO::smallFont->printStringC( buffer.data( ), oam[ SPR_MOVE_OAM_SUB( i ) ].x + 84,
                                              oam[ SPR_MOVE_OAM_SUB( i ) ].y + 13, true,

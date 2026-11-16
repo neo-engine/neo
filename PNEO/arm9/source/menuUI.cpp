@@ -356,7 +356,7 @@ namespace IO {
             if( p_showMoney ) {
                 std::array<char, 100> buffer{ };
                 snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_MONEY ),
-                          SAVE::CURRENT_FILE->m_money );
+                          FS::kanaWrap( SAVE::CURRENT_FILE->m_money, CURRENT_LANGUAGE ) );
                 IO::regularFont->printStringC( buffer.data( ), 2, 2, true, IO::font::LEFT );
             }
         }
@@ -712,15 +712,17 @@ namespace IO {
 
         std::array<char, 100> buffer{ };
         if( p_paymentMethod < 3 ) {
-            snprintf( buffer.data( ), buffer.size( ),
-                      GET_STRING( IO::STR_UI_MONEYTYPE_START + p_paymentMethod ),
-                      p_paymentMethod == 0
-                          ? SAVE::CURRENT_FILE->m_money
-                          : ( p_paymentMethod == 1 ? SAVE::CURRENT_FILE->m_battlePoints
-                                                   : SAVE::CURRENT_FILE->m_coins ) );
+            snprintf(
+                buffer.data( ), buffer.size( ),
+                GET_STRING( IO::STR_UI_MONEYTYPE_START + p_paymentMethod ),
+                FS::kanaWrap( p_paymentMethod == 0
+                                  ? SAVE::CURRENT_FILE->m_money
+                                  : ( p_paymentMethod == 1 ? SAVE::CURRENT_FILE->m_battlePoints
+                                                           : SAVE::CURRENT_FILE->m_coins ),
+                              CURRENT_LANGUAGE ) );
         } else if( p_paymentMethod == 3 ) {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_MONEYTYPE_ASH ),
-                      SAVE::CURRENT_FILE->m_ashCount );
+                      FS::kanaWrap( SAVE::CURRENT_FILE->m_ashCount, CURRENT_LANGUAGE ) );
         }
         IO::regularFont->printStringC( buffer.data( ), 2, 2, true, IO::font::LEFT );
 
@@ -781,7 +783,7 @@ namespace IO {
 
             snprintf( buffer.data( ), buffer.size( ),
                       GET_STRING( IO::STR_UI_MONEYTYPE_START_PAY + p_paymentMethod ),
-                      p_offeredItems[ p_firstItem + i ].second );
+                      FS::kanaWrap( p_offeredItems[ p_firstItem + i ].second, CURRENT_LANGUAGE ) );
             IO::regularFont->setColor( 0, 2 );
             IO::regularFont->printStringC(
                 buffer.data( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 114,
@@ -854,16 +856,18 @@ namespace IO {
                    || p_selection == IO::choiceBox::BACK_CHOICE ) {
             // empty!
         } else {
-            IO::printRectangle( 128, 0, 255, 40, true, 0 );
+            IO::printRectangle( 164, 0, 255, 40, true, 0 );
 
             std::array<char, 100> buffer{ };
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_ITEMCOUNT_IN_BAG ),
-                      SAVE::CURRENT_FILE->m_bag.count( BAG::toBagType( p_itemData.m_itemType ),
-                                                       p_item.first ) );
+                      FS::kanaWrap( SAVE::CURRENT_FILE->m_bag.count(
+                                        BAG::toBagType( p_itemData.m_itemType ), p_item.first ),
+                                    CURRENT_LANGUAGE ) );
             IO::regularFont->printStringC( buffer.data( ), 254, 2, true, IO::font::RIGHT );
 
             selectMenuItem( p_selection % NUM_CB_CHOICES );
-            doPrintMessage( p_descr.c_str( ), MSG_MART_ITEM, p_item.first, &p_itemData );
+            doPrintMessage( FS::kanaWrap( p_descr.c_str( ), CURRENT_LANGUAGE ), MSG_MART_ITEM,
+                            p_item.first, &p_itemData );
         }
     }
 
@@ -1024,7 +1028,7 @@ namespace IO {
 
         std::array<char, 100> buffer{ };
         snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_UI_MONEYTYPE_MONEY ),
-                  SAVE::CURRENT_FILE->m_money );
+                  FS::kanaWrap( SAVE::CURRENT_FILE->m_money, CURRENT_LANGUAGE ) );
         IO::regularFont->printStringC( buffer.data( ), 2, 2, true, IO::font::LEFT );
 
         auto& oam = IO::Oam->oamBuffer;

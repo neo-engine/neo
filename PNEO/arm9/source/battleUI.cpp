@@ -745,7 +745,7 @@ namespace BATTLE {
         auto                 fmt = std::string( GET_STRING( IO::STR_BATTLE_DETECTS_MOVE ) );
         snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
                   getPkmnName( p_pokemon, p_opponent ).c_str( ),
-                  FS::getMoveName( p_move ).c_str( ) );
+                  FS::kanaWrap( FS::getMoveName( p_move ).c_str( ), CURRENT_LANGUAGE ) );
         log( std::string( buffer.data( ) ) );
     }
 

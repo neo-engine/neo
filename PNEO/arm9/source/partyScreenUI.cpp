@@ -31,6 +31,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "fs/fs.h"
 #include "gen/pokemonNames.h"
 #include "io/screenFade.h"
+#include "io/strings.h"
 #include "io/util.h"
 #include "save/saveGame.h"
 #include "sts/partyScreenUI.h"
@@ -548,8 +549,8 @@ namespace STS {
                     IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                     IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 }
-                IO::regularFont->printString( GET_STRING( 33 ), anchor_x + 32, anchor_y + 12,
-                                              false );
+                IO::regularFont->printString( GET_STRING( IO::STR_UI_BAG_PARTY_EGG ), anchor_x + 32,
+                                              anchor_y + 12, false );
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
                 IO::regularFont->setColor( IO::GRAY_IDX, 2 );
                 IO::loadEggIcon( oam[ SPR_PKMN_ICON_OAM( p_pos ) ].x,
@@ -834,9 +835,9 @@ namespace STS {
             } else {
                 if( !_swapping ) {
                     if( !_toSelect ) {
-                        auto fmt = std::string( GET_STRING( 56 ) );
+                        auto fmt = std::string( GET_STRING( IO::STR_UI_BAG_ASK_ITEM_ACTION ) );
                         snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
-                                  _team[ p_pos ].isEgg( ) ? GET_STRING( 33 )
+                                  _team[ p_pos ].isEgg( ) ? GET_STRING( IO::STR_UI_BAG_PARTY_EGG )
                                                           : _team[ p_pos ].m_boxdata.getName( ) );
                     } else {
                         if( _toSelect > 1 ) {
@@ -1025,7 +1026,8 @@ namespace STS {
                 IO::regularFont->setColor( IO::BLUE2_IDX, 2 );
 
                 IO::regularFont->printString(
-                    FS::getMoveName( move ).c_str( ), oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
+                    FS::kanaWrap( FS::getMoveName( move ).c_str( ), CURRENT_LANGUAGE ),
+                    oam[ SPR_CHOICE_START_OAM_SUB( i ) ].x + 48,
                     oam[ SPR_CHOICE_START_OAM_SUB( i ) ].y + 8, p_bottom, IO::font::CENTER );
 
                 IO::regularFont->setColor( IO::WHITE_IDX, 1 );
@@ -1395,7 +1397,7 @@ namespace STS {
             }
 
             IO::regularFont->printString(
-                GET_STRING( 79 ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
+                GET_STRING( IO::STR_UI_YES ), oam[ SPR_CHOICE_START_OAM_SUB( 4 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 4 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
 
             res.push_back(
@@ -1406,7 +1408,7 @@ namespace STS {
                            IO::yesNoBox::YES ) );
 
             IO::regularFont->printString(
-                GET_STRING( 80 ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
+                GET_STRING( IO::STR_UI_NO ), oam[ SPR_CHOICE_START_OAM_SUB( 5 ) ].x + 48,
                 oam[ SPR_CHOICE_START_OAM_SUB( 5 - shift ) ].y + 8, p_bottom, IO::font::CENTER );
 
             res.push_back(

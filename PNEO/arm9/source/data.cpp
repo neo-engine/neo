@@ -991,7 +991,7 @@ namespace FS {
 
     namespace {
         constexpr u8  KANA_WRAP_SLOTS = 8;
-        constexpr u16 KANA_WRAP_LEN   = 512;
+        constexpr u16 KANA_WRAP_LEN   = MAPSTRING_LEN + 24;
         char          KANA_BUF[ KANA_WRAP_SLOTS ][ KANA_WRAP_LEN ];
         u8            KANA_BUF_SLOT = 0;
     } // namespace

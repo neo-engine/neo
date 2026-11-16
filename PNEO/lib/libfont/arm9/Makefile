@@ -132,14 +132,23 @@ DATA		:=	data
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -Os\
+CFLAGS	:=	-g -Wall -Wextra -Wlogical-op -Wno-psabi -O3 -D_FORTIFY_SOURCE=1\
+			-Wshadow -Wpointer-arith -Wcast-qual -Wno-ignored-qualifiers\
+			-Wduplicated-branches -Wduplicated-cond -Wno-volatile\
+			-Wfloat-equal -Wformat=1 -Wlogical-op -Werror\
+			-Wno-analyzer-possible-null-dereference -Wstringop-overflow=2\
+			-Wno-analyzer-possible-null-argument -Wstringop-overread\
+			-Wno-array-bounds -Wno-analyzer-null-dereference\
+			-Wno-analyzer-use-of-uninitialized-value -Wno-restrict\
+			-Wmissing-noreturn -Wsuggest-attribute=malloc -Wunused-macros\
+			-Wno-class-memaccess -march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
+			-ffast-math -fgcse-sm -fgcse-las -fgcse-after-reload -funsafe-loop-optimizations\
 			-ffunction-sections -fdata-sections \
-			-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
 			-ffast-math -Wno-multichar \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM9
-CXXFLAGS	:=	$(CFLAGS)
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions -std=c++23 -Wno-multichar
 
 ASFLAGS	:=	-g $(ARCH) $(INCLUDE) -DARM9
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
