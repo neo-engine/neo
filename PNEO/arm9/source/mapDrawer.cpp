@@ -209,6 +209,8 @@ namespace MAP {
 
             swiWaitForVBlank( );
             u8* tileMemory = (u8*) BG_TILE_RAM( 1 );
+
+            DC_FlushRange( CUR_SLICE.m_tileSet.m_tiles, MAX_TILES_PER_TILE_SET * 2 * 32 );
             dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
 
             // for palettes, the unchanged day-time pal comes first
@@ -230,6 +232,7 @@ namespace MAP {
             for( u16 y = 0; y < NUM_ROWS; y++ )
                 for( u16 x = 0; x < NUM_COLS; x++ ) { loadBlock( at( mnx + x, mny + y ), x, y ); }
 
+            DC_FlushRange( CUR_SLICE.m_pals + currDT * 16, 512 - 32 );
             dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 - 32 );
 
             BG_PALETTE[ 0 ] = 0;
@@ -397,8 +400,11 @@ namespace MAP {
 
             AM_GUARD_UNAWARE( amGuard );
             if( oldts1 != newts1 && oldts2 != newts2 ) {
+                DC_FlushRange( CUR_SLICE.m_tileSet.m_tiles, MAX_TILES_PER_TILE_SET * 2 * 32 );
                 dmaCopy( CUR_SLICE.m_tileSet.m_tiles, tileMemory, MAX_TILES_PER_TILE_SET * 2 * 32 );
             } else if( oldts2 != newts2 ) {
+                DC_FlushRange( &CUR_SLICE.m_tileSet.m_tiles[ MAX_TILES_PER_TILE_SET ],
+                               MAX_TILES_PER_TILE_SET * 32 );
                 dmaCopy( &CUR_SLICE.m_tileSet.m_tiles[ MAX_TILES_PER_TILE_SET ],
                          &tileMemory[ MAX_TILES_PER_TILE_SET * 32 ], MAX_TILES_PER_TILE_SET * 32 );
             }
@@ -408,6 +414,7 @@ namespace MAP {
             if( ( currentData( ).m_mapType & INSIDE ) || ( currentData( ).m_mapType & CAVE ) ) {
                 currDT = 0;
             }
+            DC_FlushRange( CUR_SLICE.m_pals + currDT * 16, 512 - 32 );
             dmaCopy( CUR_SLICE.m_pals + currDT * 16, BG_PALETTE, 512 - 32 );
             BG_PALETTE[ 0 ] = 0;
 

@@ -6,7 +6,7 @@ file        : sprite.cpp
 author      : Philip Wellnitz
 description : Some sprite code.
 
-Copyright (C) 2012 - 2024
+Copyright (C) 2012 - 2026
 Philip Wellnitz
 
 This file is part of Pokémon neo.
@@ -142,7 +142,7 @@ namespace IO {
         OAM_DIRTY[ p_bottom ] = false;
 
         OAMTable* oam = ( p_bottom ? Oam : OamTop );
-        DC_FlushAll( );
+        DC_FlushRange( oam->oamBuffer, SPRITE_COUNT * sizeof( SpriteEntry ) );
         if( p_bottom ) {
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, oam->oamBuffer, OAM_SUB,
                               SPRITE_COUNT * sizeof( SpriteEntry ) );
@@ -199,6 +199,7 @@ namespace IO {
     }
     void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, const u8 p_startIdx,
                         const u16 p_palLen, bool p_bottom ) {
+        if( p_spritePal ) { DC_FlushRange( p_spritePal, p_palLen ); }
         if( !p_bottom && p_spritePal )
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal,
                               &SPRITE_PALETTE[ p_palIdx * COLORS_PER_PALETTE + p_startIdx ],
@@ -210,6 +211,7 @@ namespace IO {
     }
     void copySpriteData( const unsigned int* p_spriteData, const u16 p_tileCnt,
                          const u32 p_spriteDataLen, bool p_bottom ) {
+        if( p_spriteData ) { DC_FlushRange( p_spriteData, p_spriteDataLen ); }
         if( !p_bottom && p_spriteData )
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData,
                               &SPRITE_GFX[ (u32) p_tileCnt * OFFSET_MULTIPLIER ], p_spriteDataLen );
@@ -286,6 +288,7 @@ namespace IO {
         auto gfx = p_bottom ? &SPRITE_GFX_SUB[ (u32) p_tileCnt * 64 ]
                             : &SPRITE_GFX[ (u32) p_tileCnt * 64 ];
         if( p_spriteData ) {
+            DC_FlushRange( p_spriteData, p_width * p_height * 2 );
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData, gfx, p_width * p_height * 2 );
         }
         return res;
