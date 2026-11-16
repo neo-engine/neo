@@ -841,6 +841,9 @@ namespace BOX {
         } else {
             oam[ SPR_PKMN_START_OAM_SUB + p_index ].priority = OBJPRIORITY_3;
         }
+        if( !_showTeam && p_index >= MAX_PKMN_PER_BOX ) {
+            oam[ SPR_PKMN_START_OAM_SUB + p_index ].isHidden = true;
+        }
         if( p_index == _currentSelection ) { selectPkmn( p_pokemon, p_index ); }
         IO::updateOAM( true );
     }
@@ -943,10 +946,12 @@ namespace BOX {
             }
             oam[ SPR_PKMN_START_OAM_SUB + i ].priority = OBJPRIORITY_1;
         }
+        _showTeam = true;
         IO::updateOAM( true );
     }
 
     void boxUI::hideParty( box* p_box ) {
+        _showTeam = false;
         FS::readPictureData( bgGetGfxPtr( IO::bg2sub ), "nitro:/PICS/", "boxsub", 0, 49152, true );
         // dmaCopy( boxsubBitmap, bgGetGfxPtr( IO::bg2sub ), 256 * 256 );
         IO::regularFont->setColor( IO::WHITE_IDX, 1 );

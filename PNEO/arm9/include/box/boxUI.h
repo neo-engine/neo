@@ -34,10 +34,10 @@ namespace BOX {
 #define PAGE_ICON_START 5
     class boxUI {
       private:
-        bool       _showTeam;
-        u8         _currentSelection;
-        boxPokemon _heldPkmn;
-        u16        _outlineColor = 0xF4A0;
+        bool       _showTeam         = false;
+        u8         _currentSelection = u8( -1 );
+        boxPokemon _heldPkmn         = { };
+        u16        _outlineColor     = 0xF4A0;
 
         void initTop( );
         void initSub( );

@@ -184,8 +184,8 @@ namespace BOX {
                     if( _heldPkmn.getSpecies( ) ) { returnPkmn( ); }
                     return;
                 case boxUI::BUTTON_PKMN:
-                    SOUND::playSoundEffect( SFX_CHOOSE );
-                    _selectedIdx = idx;
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    select( idx );
                     takePkmn( idx, _mode == MOVE );
                     break;
                 case boxUI::BUTTON_LEFT:
@@ -308,9 +308,8 @@ namespace BOX {
         if( p_position < MAX_PKMN_PER_BOX ) {
             return &( *SAVE::CURRENT_FILE->getCurrentBox( ) )[ p_position ];
         } else if( p_position < MAX_PKMN_PER_BOX + 6 ) {
-            return &SAVE::SAV.getActiveFile( )
-                        .getTeamPkmn( p_position - MAX_PKMN_PER_BOX )
-                        ->m_boxdata;
+            auto ptmp = SAVE::SAV.getActiveFile( ).getTeamPkmn( p_position - MAX_PKMN_PER_BOX );
+            return ptmp ? &ptmp->m_boxdata : nullptr;
         }
         return nullptr;
     }
@@ -320,9 +319,9 @@ namespace BOX {
             return &SAVE::SAV.getActiveFile( )
                         .m_storedPokemon[ p_position.first ][ p_position.second ];
         } else if( p_position.second < MAX_PKMN_PER_BOX + 6 ) {
-            return &SAVE::SAV.getActiveFile( )
-                        .getTeamPkmn( p_position.second - MAX_PKMN_PER_BOX )
-                        ->m_boxdata;
+            auto ptmp
+                = SAVE::SAV.getActiveFile( ).getTeamPkmn( p_position.second - MAX_PKMN_PER_BOX );
+            return ptmp ? &ptmp->m_boxdata : nullptr;
         }
         return nullptr;
     }
@@ -521,8 +520,8 @@ namespace BOX {
                     select( 0 );
                     return false;
                 case boxUI::BUTTON_PKMN:
-                    SOUND::playSoundEffect( SFX_CHOOSE );
-                    _selectedIdx = idx;
+                    SOUND::playSoundEffect( SFX_SELECT );
+                    select( idx );
                     takePkmn( idx, _mode == MOVE );
                     break;
                 default: break;
@@ -571,6 +570,20 @@ namespace BOX {
                     return 255;
                 }
             }
+
+            bool penChoose = false;
+            for( u8 k = 0; k < u8( btns.size( ) ) && !penChoose; ++k ) {
+                u8              row = u8( btns[ k ] ) - u8( boxUI::BUTTON_PKMN_MOVE );
+                IO::inputTarget rowTarget( 192, u16( 36 + 21 * row ), 255,
+                                           u16( 36 + 21 * row + 20 ) );
+                if( !rowTarget.inRange( IO::TOUCH ) ) { continue; }
+                IO::waitForTouchUp( rowTarget );
+                selectedBtn = k;
+                _boxUI.selectButton( btns[ k ] );
+                IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
+                penChoose        = true;
+            }
+
             if( IO::BTN_PRESSED & KEY_B ) {
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
                 SOUND::playSoundEffect( SFX_CANCEL );
@@ -584,7 +597,7 @@ namespace BOX {
                 _boxUI.selectButton(
                     btns[ ( selectedBtn = ( selectedBtn + btns.size( ) - 1 ) % btns.size( ) ) ] );
                 IO::BTN_COOLDOWN = IO::COOLDOWN_COUNT;
-            } else if( IO::BTN_PRESSED & KEY_A ) {
+            } else if( penChoose || ( IO::BTN_PRESSED & KEY_A ) ) {
                 SOUND::playSoundEffect( SFX_CHOOSE );
                 switch( btns[ selectedBtn ] ) {
                 case boxUI::BUTTON_PKMN_MOVE: return 1;
