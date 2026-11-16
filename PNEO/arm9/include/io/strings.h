@@ -527,21 +527,21 @@ namespace IO {
     constexpr u16 STR_UI_STORAGE_ALL_BOXES_FULL = 167;
     constexpr u16 STR_UI_PKMN_RELEASED          = 168;
 
-    constexpr u16 STR_MAP_MY_NEXT_VISIT = 541;
-    constexpr u16 STR_MAP_MY_GIFT       = 542;
-    constexpr u16 STR_MAP_MY_MAKE_SPACE = 543;
-    constexpr u16 STR_MAP_MY_RECEIVE    = 544;
+    constexpr u16 STR_MAP_MY_NEXT_VISIT = 701;
+    constexpr u16 STR_MAP_MY_GIFT       = 702;
+    constexpr u16 STR_MAP_MY_MAKE_SPACE = 703;
+    constexpr u16 STR_MAP_MY_RECEIVE    = 704;
 
-    constexpr u16 STR_MAP_ST_INTRO = 545;
-    constexpr u16 STR_MAP_ST_MSG1  = 546;
-    constexpr u16 STR_MAP_ST_MSG2  = 547;
-    constexpr u16 STR_MAP_ST_MSG3  = 548;
-    constexpr u16 STR_MAP_ST_MSG4  = 549;
+    constexpr u16 STR_MAP_ST_INTRO = 705;
+    constexpr u16 STR_MAP_ST_MSG1  = 706;
+    constexpr u16 STR_MAP_ST_MSG2  = 707;
+    constexpr u16 STR_MAP_ST_MSG3  = 708;
+    constexpr u16 STR_MAP_ST_MSG4  = 709;
 
-    constexpr u16 STR_MAP_ICAVE_REPORT_REQS           = 522;
-    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_NOT_MET   = 523;
-    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_MET_Q     = 524;
-    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_MET_AFTER = 525;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS           = 682;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_NOT_MET   = 683;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_MET_Q     = 684;
+    constexpr u16 STR_MAP_ICAVE_REPORT_REQS_MET_AFTER = 685;
 
     constexpr u16 STR_MAP_FISH_SUCCESS       = 8;
     constexpr u16 STR_MAP_FISH_FAIL          = 9;
