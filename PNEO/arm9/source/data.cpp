@@ -101,7 +101,6 @@ namespace FS {
     const char TRAINERNAME_PATH[]   = "nitro:/STRN/TRN/name";
     const char TRAINERMSG1_PATH[]   = "nitro:/STRN/TRN/msg1";
     const char TRAINERMSG2_PATH[]   = "nitro:/STRN/TRN/msg2";
-    const char TRAINERMSG3_PATH[]   = "nitro:/STRN/TRN/msg3";
 
     const char LOCDATA_PATH[]        = "nitro:/DATA/location.datab";
     const char MOVE_DATA_PATH[]      = "nitro:/DATA/move.datab";
@@ -663,7 +662,6 @@ namespace FS {
         static FILE* namefile = nullptr;
         static FILE* msg1file = nullptr;
         static FILE* msg2file = nullptr;
-        static FILE* msg3file = nullptr;
         checkOrOpen( namefile, TRAINERNAME_PATH, lastLang, p_language );
         if( !getString( namefile, TRAINERNAME_LEN, p_battleTrainerId, p_out->m_strings.m_name ) ) {
             return false;
@@ -676,11 +674,6 @@ namespace FS {
         checkOrOpen( msg2file, TRAINERMSG2_PATH, lastLang, p_language );
         if( !getString( msg2file, TRAINERMSG_LEN, p_battleTrainerId,
                         p_out->m_strings.m_message2 ) ) {
-            return false;
-        }
-        checkOrOpen( msg3file, TRAINERMSG3_PATH, lastLang, p_language );
-        if( !getString( msg3file, TRAINERMSG_LEN, p_battleTrainerId,
-                        p_out->m_strings.m_message3 ) ) {
             return false;
         }
 

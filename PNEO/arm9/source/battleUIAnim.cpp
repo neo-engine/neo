@@ -797,46 +797,47 @@ namespace BATTLE {
         oam[ SPR_PLATFORM_OAM + 2 ].priority = OBJPRIORITY_3;
         oam[ SPR_PLATFORM_OAM + 3 ].priority = OBJPRIORITY_3;
 
-        IO::loadUIIcon( IO::ICON::MBOX1_START, SPR_MBOX_START_OAM, SPR_BALL_PAL,
-                        SPR_PKMN_GFX( 2 * ( !p_playerWon ) + 1 ), 0, 192 - 46, 32, 64, false, false,
-                        false, OBJPRIORITY_3, false );
-        for( u8 i = 0; i < 13; ++i ) {
-            IO::loadSprite( SPR_MBOX_START_OAM + 13 - i, SPR_BALL_PAL,
-                            SPR_PKMN_GFX( 2 * ( !p_playerWon ) + 1 ), 32 + 16 * i, 192 - 46, 32, 64,
-                            0, 0, 0, false, true, false, OBJPRIORITY_3, false );
-        }
-        IO::updateOAM( false );
-
-        const bool  kana = ( CURRENT_LANGUAGE == SAVE::JAP );
-        std::string msg = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
-        for( char* pos = p_playerWon ? _battleTrainer->m_strings.m_message2
-                                     : _battleTrainer->m_strings.m_message3;
-             *pos; ++pos ) {
-            if( *pos == IO::KANA::ON || *pos == IO::KANA::OFF ) { continue; }
-            if( *pos == '[' ) {
-                std::string accmd = "";
-                while( *( ++pos ) != ']' && *pos != '\0' ) {
-                    accmd += *pos;
-                }
-                if( *pos == '\0' ) { break; }
-                msg += IO::parseLogCmd( accmd );
-                continue;
-            } else if( *pos == '\r' ) {
-                if( kana ) { msg += IO::KANA::OFF; }
-                printTopMessage( msg.c_str( ), false );
-                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                IO::waitForInteract( IO::animateMBS,
-                                     [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
-                msg = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
-                continue;
+        if( p_playerWon ) {
+            IO::loadUIIcon( IO::ICON::MBOX1_START, SPR_MBOX_START_OAM, SPR_BALL_PAL,
+                            SPR_PKMN_GFX( 2 * ( !p_playerWon ) + 1 ), 0, 192 - 46, 32, 64, false,
+                            false, false, OBJPRIORITY_3, false );
+            for( u8 i = 0; i < 13; ++i ) {
+                IO::loadSprite( SPR_MBOX_START_OAM + 13 - i, SPR_BALL_PAL,
+                                SPR_PKMN_GFX( 2 * ( !p_playerWon ) + 1 ), 32 + 16 * i, 192 - 46, 32,
+                                64, 0, 0, 0, false, true, false, OBJPRIORITY_3, false );
             }
-            msg += *pos;
-        }
+            IO::updateOAM( false );
 
-        printTopMessage( msg.c_str( ), false );
-        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-        IO::waitForInteract( IO::animateMBS, [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
-        IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            const bool  kana = ( CURRENT_LANGUAGE == SAVE::JAP );
+            std::string msg  = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
+            for( char* pos = _battleTrainer->m_strings.m_message2; *pos; ++pos ) {
+                if( *pos == IO::KANA::ON || *pos == IO::KANA::OFF ) { continue; }
+                if( *pos == '[' ) {
+                    std::string accmd = "";
+                    while( *( ++pos ) != ']' && *pos != '\0' ) { accmd += *pos; }
+                    if( *pos == '\0' ) { break; }
+                    msg += IO::parseLogCmd( accmd );
+                    continue;
+                } else if( *pos == '\r' ) {
+                    if( kana ) { msg += IO::KANA::OFF; }
+                    printTopMessage( msg.c_str( ), false );
+                    IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                    IO::waitForInteract( IO::animateMBS,
+                                         [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
+                    msg = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
+                    continue;
+                }
+                msg += *pos;
+            }
+
+            printTopMessage( msg.c_str( ), false );
+            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+            IO::waitForInteract( IO::animateMBS,
+                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
+            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+        } else {
+            IO::updateOAM( false );
+        }
 
         IO::printRectangle( 0, 192 - 46, 255, 192, false, 0 );
         for( u8 i = 0; i <= 13; ++i ) { oam[ SPR_MBOX_START_OAM + 13 - i ].isHidden = true; }

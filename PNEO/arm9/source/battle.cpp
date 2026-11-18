@@ -156,8 +156,6 @@ namespace BATTLE {
                   p_opponent.m_beforeBattle.construct( ).c_str( ) );
         snprintf( _opponent.m_strings.m_message2, trainerStrings::MSG_LENGTH - 1, "%s",
                   p_opponent.m_onLoseAgainstPlayer.construct( ).c_str( ) );
-        snprintf( _opponent.m_strings.m_message3, trainerStrings::MSG_LENGTH - 1, "%s",
-                  p_opponent.m_onWinAgainstPlayer.construct( ).c_str( ) );
 
         _opponent.m_data.m_trainerClass = p_opponent.m_trainerClass;
         _opponent.m_data.m_trainerBG    = p_opponent.m_trainerBG;
