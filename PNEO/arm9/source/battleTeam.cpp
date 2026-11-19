@@ -60,8 +60,8 @@ namespace BATTLE {
                 if( _field.getSlotStatus( i, j ) == p_checkType ) {
                     if( i && !_isWildBattle ) {
                         // AI chooses a next pkmn
-                        auto nxt = getNextAIPokemon( );
-                        if( nxt != 255 ) { switchPokemon( { i, j }, nxt ); }
+                        auto nxt = getNextAIPokemon( getOwner( j ) );
+                        if( nxt != NO_PKMN ) { switchPokemon( { i, j }, nxt ); }
                     } else if( !i ) {
                         // Check if the player has something to send out
                         bool good = false;
@@ -129,11 +129,12 @@ namespace BATTLE {
 
         if( p_target.first ) {
             // opponent item
-            bool itemfound = false;
+            auto& tr        = getOpponent( getOwner( p_target.second ) );
+            bool  itemfound = false;
             for( u8 i = 0; i < 5; ++i ) {
-                if( _opponent.m_data.m_items[ i ] == p_item ) {
-                    _opponent.m_data.m_items[ i ] = 0;
-                    itemfound                     = true;
+                if( tr.m_data.m_items[ i ] == p_item ) {
+                    tr.m_data.m_items[ i ] = 0;
+                    itemfound              = true;
                     break;
                 }
             }
@@ -143,8 +144,8 @@ namespace BATTLE {
             }
 
             snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_TRAINER_USED_ITEM ),
-                      FS::getTrainerClassName( _opponent.getClass( ) ).c_str( ),
-                      _opponent.m_strings.m_name, FS::getItemName( p_item ).c_str( ) );
+                      FS::getTrainerClassName( tr.getClass( ) ).c_str( ), tr.m_strings.m_name,
+                      FS::getItemName( p_item ).c_str( ) );
             _battleUI.log( buffer );
         } else {
             // player item
@@ -317,18 +318,25 @@ namespace BATTLE {
         u8*      perm = p_opponent ? _opponentPkmnPerm : _playerPkmnPerm;
         u8       len  = p_opponent ? _opponentTeamSize : _playerTeamSize;
 
-        if( len > 6 ) [[unlikely]] { len = 6; }
-
-        for( u8 i = 0; i < len - 1; ++i ) {
-            if( !pkmn[ 0 ].canBattle( ) ) {
-                // pkmn cannot battle, move it to the end of the list.
-                for( u8 j = 1; j < len - i; ++j ) {
-                    std::swap( pkmn[ j - 1 ], pkmn[ j ] );
-                    if( p_opponent ) { std::swap( _yieldEXP[ j - 1 ], _yieldEXP[ j ] ); }
-                    std::swap( perm[ j - 1 ], perm[ j ] );
-                }
-            }
+        if( len > ( p_opponent && isMultiBattle( ) ? MAX_OPPONENT_TEAM : SAVE::NUM_PARTY_SLOTS ) )
+            [[unlikely]] {
+            len = p_opponent && isMultiBattle( ) ? MAX_OPPONENT_TEAM : SAVE::NUM_PARTY_SLOTS;
         }
+
+        const auto swapSortAt = [ pkmn, perm, p_opponent, this ]( u8 p_a, u8 p_b ) {
+            std::swap( pkmn[ p_a ], pkmn[ p_b ] );
+            if( p_opponent ) { std::swap( _yieldEXP[ p_a ], _yieldEXP[ p_b ] ); }
+            std::swap( perm[ p_a ], perm[ p_b ] );
+        };
+        const auto canBattleAt = [ pkmn ]( u8 p_idx ) { return pkmn[ p_idx ].canBattle( ); };
+
+        if( p_opponent && isMultiBattle( ) ) {
+            for( u8 owner : { OWNER_A, OWNER_B } ) {
+                sortGroup( owner, 2, groupLen( len, owner, true ), canBattleAt, swapSortAt );
+            }
+            return;
+        }
+        sortGroup( OWNER_A, 1, len, canBattleAt, swapSortAt );
     }
 
     void battle::restoreInitialOrder( bool p_opponent ) {
@@ -336,14 +344,18 @@ namespace BATTLE {
         u8*      perm = p_opponent ? _opponentPkmnPerm : _playerPkmnPerm;
         u8       len  = p_opponent ? _opponentTeamSize : _playerTeamSize;
 
-        for( u8 i = 0; i < len - 1; ++i ) {
-            // In each step, move the i-th pkmn to the correct place.
-            while( perm[ i ] != i ) {
-                std::swap( pkmn[ i ], pkmn[ perm[ i ] ] );
-                if( p_opponent ) { std::swap( _yieldEXP[ i ], _yieldEXP[ perm[ i ] ] ); }
-                std::swap( perm[ i ], perm[ perm[ i ] ] );
+        const auto swapRestoreAt = [ pkmn, p_opponent, this ]( u8 p_a, u8 p_b ) {
+            std::swap( pkmn[ p_a ], pkmn[ p_b ] );
+            if( p_opponent ) { std::swap( _yieldEXP[ p_a ], _yieldEXP[ p_b ] ); }
+        };
+
+        if( p_opponent && isMultiBattle( ) ) {
+            for( u8 owner : { OWNER_A, OWNER_B } ) {
+                restoreGroup( owner, 2, groupLen( len, owner, true ), perm, swapRestoreAt );
             }
+            return;
         }
+        restoreGroup( OWNER_A, 1, len, perm, swapRestoreAt );
     }
 
     void battle::resetBattleTransformations( bool p_opponent ) {
@@ -425,19 +437,17 @@ namespace BATTLE {
                             u8 oldlv = _playerTeam[ i ].m_level;
                             if( _playerTeam[ i ].m_level < 100 ) {
                                 _playerTeam[ i ].gainExperience( curexp );
-                                snprintf(
-                                    buffer, TMP_BUFFER_SIZE,
-                                    GET_STRING( IO::STR_BATTLE_EXP_GAINED ),
-                                    _playerTeam[ i ].m_boxdata.getNameS( ).c_str( ),
-                                    FS::kanaWrap( curexp, CURRENT_LANGUAGE ) );
+                                snprintf( buffer, TMP_BUFFER_SIZE,
+                                          GET_STRING( IO::STR_BATTLE_EXP_GAINED ),
+                                          _playerTeam[ i ].m_boxdata.getNameS( ).c_str( ),
+                                          FS::kanaWrap( curexp, CURRENT_LANGUAGE ) );
                                 _battleUI.log( buffer );
                                 if( _playerTeam[ i ].m_level != oldlv ) {
-                                    snprintf(
-                                        buffer, TMP_BUFFER_SIZE,
-                                        GET_STRING( IO::STR_BATTLE_ADVANCE_LEVEL ),
-                                        _playerTeam[ i ].m_boxdata.getNameS( ).c_str( ),
-                                        FS::kanaWrap( _playerTeam[ i ].m_level,
-                                                      CURRENT_LANGUAGE ) );
+                                    snprintf( buffer, TMP_BUFFER_SIZE,
+                                              GET_STRING( IO::STR_BATTLE_ADVANCE_LEVEL ),
+                                              _playerTeam[ i ].m_boxdata.getNameS( ).c_str( ),
+                                              FS::kanaWrap( _playerTeam[ i ].m_level,
+                                                            CURRENT_LANGUAGE ) );
                                     _battleUI.log( buffer );
                                 }
                             }

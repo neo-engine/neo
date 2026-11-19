@@ -62,17 +62,19 @@ namespace BATTLE {
                 WAIT( THREEHALF_SEC );
             }
         } else if( !_isWildBattle ) {
+            u32 winnings = _opponent.m_data.m_moneyMultiplier
+                           + ( isMultiBattle( ) ? _opponent2.m_data.m_moneyMultiplier : 0 );
+
             if( p_battleEndReason == BATTLE_PLAYER_WON ) {
                 SOUND::playBGM( SOUND::BGMforTrainerWin( _opponent.m_data.m_trainerClass ) );
                 _battleUI.handleBattleEnd( true );
 
-                if( _opponent.m_data.m_moneyMultiplier ) {
-                    snprintf(
-                        buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_WIN_MONEY ),
-                        FS::kanaWrap( _opponent.m_data.m_moneyMultiplier, CURRENT_LANGUAGE ) );
+                if( winnings ) {
+                    snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_WIN_MONEY ),
+                              FS::kanaWrap( winnings, CURRENT_LANGUAGE ) );
                     _battleUI.log( buffer );
                     WAIT( FULL_SEC );
-                    SAVE::CURRENT_FILE->m_money += _opponent.m_data.m_moneyMultiplier;
+                    SAVE::CURRENT_FILE->m_money += winnings;
                     if( SAVE::CURRENT_FILE->m_money > 999'999'999 ) {
                         SAVE::CURRENT_FILE->m_money = 999'999'999;
                     }
@@ -81,17 +83,16 @@ namespace BATTLE {
             if( p_battleEndReason == BATTLE_OPPONENT_WON ) {
                 _battleUI.handleBattleEnd( false );
 
-                if( _opponent.m_data.m_moneyMultiplier ) {
-                    snprintf(
-                        buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_LOSE_MONEY ),
-                        FS::kanaWrap( _opponent.m_data.m_moneyMultiplier, CURRENT_LANGUAGE ) );
+                if( winnings ) {
+                    snprintf( buffer, TMP_BUFFER_SIZE, GET_STRING( IO::STR_BATTLE_LOSE_MONEY ),
+                              FS::kanaWrap( winnings, CURRENT_LANGUAGE ) );
                     _battleUI.log( buffer );
                     WAIT( FULL_SEC );
 
-                    if( SAVE::CURRENT_FILE->m_money < _opponent.m_data.m_moneyMultiplier ) {
+                    if( SAVE::CURRENT_FILE->m_money < winnings ) {
                         SAVE::CURRENT_FILE->m_money = 0;
                     } else {
-                        SAVE::CURRENT_FILE->m_money -= _opponent.m_data.m_moneyMultiplier;
+                        SAVE::CURRENT_FILE->m_money -= winnings;
                     }
                 }
             }

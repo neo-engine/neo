@@ -808,6 +808,8 @@ namespace MAP {
 
         bool checkTrainerEye( u16 p_globPlayerX, u16 p_globPlayerY );
 
+        void runTrainerPairEvent( u8 p_objectA, u8 p_objectB );
+
         bool canMove( position p_start, direction p_direction, moveMode p_moveMode = WALK,
                       bool p_events = true );
         void movePlayer( direction p_direction, bool p_fast = false );

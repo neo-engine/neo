@@ -26,6 +26,7 @@
 */
 
 #pragma once
+#include <functional>
 #include <string>
 #include <nds/ndstypes.h>
 #include "defines.h"
@@ -34,6 +35,11 @@
 #include "pokemon.h"
 
 namespace BATTLE {
+    constexpr u8 OWNER_A        = 0;
+    constexpr u8 OWNER_B        = 1;
+    constexpr u8 NO_PKMN        = 255;
+    constexpr u8 MULTI_MAX_SIZE = 12;
+
     struct trainerStrings {
         static constexpr u8 NAME_LENGTH = 16;
         static constexpr u8 MSG_LENGTH  = 200;
@@ -101,5 +107,50 @@ namespace BATTLE {
         default: break;
         }
         return false;
+    }
+
+    constexpr u8 getTeamIndex( u8 p_owner, u8 p_position, bool p_multi ) {
+        return p_multi ? u8( 2 * p_position + p_owner ) : p_position;
+    }
+
+    constexpr u8 teamIndexToOwner( u8 p_teamIndex, bool p_multi ) {
+        return p_multi ? u8( p_teamIndex & 1 ) : OWNER_A;
+    }
+
+    constexpr u8 nextBenchIndex( const std::function<bool( u8 )>& p_canBattle, u8 p_teamSize,
+                                 u8 p_activeCount, u8 p_owner, bool p_multi ) {
+        for( u8 i = p_activeCount; i < p_teamSize; ++i ) {
+            if( p_multi && u8( i & 1 ) != p_owner ) { continue; }
+            if( p_canBattle( i ) ) { return i; }
+        }
+        return NO_PKMN;
+    }
+
+    constexpr void sortGroup( u8 p_offset, u8 p_step, u8 p_groupLen,
+                              const std::function<bool( u8 )>&     p_canBattle,
+                              const std::function<void( u8, u8 )>& p_swap ) {
+        for( u8 i = 0; i + 1 < p_groupLen; ++i ) {
+            if( !p_canBattle( p_offset ) ) {
+                for( u8 j = 1; j + i < p_groupLen; ++j ) {
+                    p_swap( u8( p_offset + ( j - 1 ) * p_step ), u8( p_offset + j * p_step ) );
+                }
+            }
+        }
+    }
+
+    constexpr void restoreGroup( u8 p_offset, u8 p_step, u8 p_groupLen, u8* p_perm,
+                                 const std::function<void( u8, u8 )>& p_swap ) {
+        for( u8 k = 0; k + 1 < p_groupLen; ++k ) {
+            const u8 i = u8( p_offset + k * p_step );
+            while( p_perm[ i ] != i ) {
+                p_swap( i, p_perm[ i ] );
+                std::swap( p_perm[ i ], p_perm[ p_perm[ i ] ] );
+            }
+        }
+    }
+
+    constexpr u8 groupLen( u8 p_size, u8 p_owner, bool p_multi ) {
+        if( !p_multi ) { return p_size; }
+        return u8( ( p_size - p_owner + 1 ) / 2 );
     }
 } // namespace BATTLE

@@ -40,11 +40,10 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound/sound.h"
 
 namespace BATTLE {
-    u8 battle::getNextAIPokemon( ) const {
-        for( u8 i = getBattlingPKMNCount( _policy.m_mode ); i < _opponentTeamSize; ++i ) {
-            if( _opponentTeam[ i ].canBattle( ) ) { return i; }
-        }
-        return 255;
+    u8 battle::getNextAIPokemon( u8 p_owner ) const {
+        return nextBenchIndex( [ this ]( u8 p_i ) { return _opponentTeam[ p_i ].canBattle( ); },
+                               _opponentTeamSize, getBattlingPKMNCount( _policy.m_mode ), p_owner,
+                               isMultiBattle( ) );
     }
 
     battleMoveSelection battle::getAIMove( u8 p_slot ) {
@@ -53,9 +52,11 @@ namespace BATTLE {
         auto pkmn               = _field.getPkmn( field::OPPONENT_SIDE, p_slot );
         if( pkmn == nullptr ) { return res; }
 
+        const auto& trdata = getOpponent( getOwner( p_slot ) ).m_data;
+
         // Use item if remotely sensible
         for( u8 i = 0; i < trainerData::NUM_ITEMS; ++i ) {
-            switch( _opponent.m_data.m_items[ i ] ) {
+            switch( trdata.m_items[ i ] ) {
             case I_POTION:
             case I_FRESH_WATER:
             case I_ENERGY_POWDER:
@@ -69,7 +70,7 @@ namespace BATTLE {
             case I_FULL_RESTORE:
                 if( pkmn->m_stats.m_curHP * 5 < pkmn->m_stats.m_maxHP ) {
                     res.m_type  = MT_USE_ITEM;
-                    res.m_param = _opponent.m_data.m_items[ i ];
+                    res.m_param = trdata.m_items[ i ];
                     return res;
                 }
                 break;
@@ -77,7 +78,7 @@ namespace BATTLE {
             case I_FULL_HEAL:
                 if( pkmn->m_statusint ) {
                     res.m_type  = MT_USE_ITEM;
-                    res.m_param = _opponent.m_data.m_items[ i ];
+                    res.m_param = trdata.m_items[ i ];
                     return res;
                 }
                 break;
@@ -88,7 +89,7 @@ namespace BATTLE {
             case I_X_SP_ATK:
             case I_X_SP_DEF:
                 res.m_type  = MT_USE_ITEM;
-                res.m_param = _opponent.m_data.m_items[ i ];
+                res.m_param = trdata.m_items[ i ];
                 return res;
             default: break;
             }

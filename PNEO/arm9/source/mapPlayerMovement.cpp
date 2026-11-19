@@ -48,6 +48,15 @@ namespace MAP {
         bool hadBattle = false;
         if( _scriptRunning ) [[unlikely]] { return false; }
 
+        struct spottedTrainer {
+            u8        m_object;
+            direction m_trainerDir;
+            direction m_playerDir;
+        };
+
+        std::array<spottedTrainer, SAVE::MAX_MAPOBJECT> spotted{ };
+        u8                                              numSpotted = 0;
+
         // Check for trainer
         for( u8 i = 0; i < SAVE::CURRENT_FILE->m_mapObjectCount; ++i ) {
             auto& o = SAVE::CURRENT_FILE->m_mapObjects[ i ];
@@ -113,27 +122,93 @@ namespace MAP {
                 // player has only a single pkmn, the battle is optional
                 if( !BATTLE::isDoubleBattleTrainerClass( tr.m_data.m_trainerClass )
                     || SAVE::CURRENT_FILE->countAlivePkmn( ) >= 2 ) {
-                    AM_GUARD_UNAWARE( amGuard );
-
-                    SAVE::CURRENT_FILE->m_mapObjects[ i ].second.m_movement = NO_MOVEMENT;
-                    showExclamationAboveMapObject( i );
-                    SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
-
-                    // walk trainer to player
-                    redirectPlayer( playerDir, false );
-
-                    while( dist( p_globX, p_globY, o.second.m_pos.m_posX, o.second.m_pos.m_posY )
-                           > 1 ) {
-                        for( u8 j = 0; j < 16; ++j ) {
-                            moveMapObject( i, { trainerDir, j } );
-                            swiWaitForVBlank( );
-                        }
-                    }
-                    runEvent( o.second.m_event, i );
-                    hadBattle = true;
+                    spotted[ numSpotted++ ] = { i, trainerDir, playerDir };
                 }
             }
         }
+
+        auto getTrainerId = [ & ]( u8 p_object ) {
+            return SAVE::CURRENT_FILE->m_mapObjects[ p_object ]
+                .second.m_event.m_data.m_trainer.m_trainerId;
+        };
+
+        auto nextTileTaken = [ & ]( u8 p_object, direction p_dir ) {
+            const auto& me = SAVE::CURRENT_FILE->m_mapObjects[ p_object ].second;
+            for( u8 s = 0; s < numSpotted; ++s ) {
+                u8 otherId = spotted[ s ].m_object;
+                if( otherId == p_object ) { continue; }
+                const auto& other = SAVE::CURRENT_FILE->m_mapObjects[ otherId ].second;
+                if( me.m_pos.m_posX + dir[ p_dir ][ 0 ] == other.m_pos.m_posX
+                    && me.m_pos.m_posY + dir[ p_dir ][ 1 ] == other.m_pos.m_posY ) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        u8 pos = 0;
+        while( pos + 2 <= numSpotted && SAVE::CURRENT_FILE->countAlivePkmn( ) >= 2 ) {
+            AM_GUARD_UNAWARE( amGuard );
+
+            for( u8 k = pos; k < pos + 2; ++k ) {
+                SAVE::CURRENT_FILE->m_mapObjects[ spotted[ k ].m_object ].second.m_movement
+                    = NO_MOVEMENT;
+            }
+            for( u8 k = pos; k < pos + 2; ++k ) {
+                showExclamationAboveMapObject( spotted[ k ].m_object );
+                auto tr = FS::getBattleTrainer( getTrainerId( spotted[ k ].m_object ) );
+                SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
+
+                const auto& spot   = spotted[ k ];
+                const u8    spotId = spot.m_object;
+                redirectPlayer( spot.m_playerDir, false );
+                while( dist( p_globX, p_globY,
+                             SAVE::CURRENT_FILE->m_mapObjects[ spotId ].second.m_pos.m_posX,
+                             SAVE::CURRENT_FILE->m_mapObjects[ spotId ].second.m_pos.m_posY )
+                       > 1 ) {
+                    if( nextTileTaken( spotId, spot.m_trainerDir ) ) { break; }
+                    for( u8 j = 0; j < 16; ++j ) {
+                        moveMapObject( spotId, { spot.m_trainerDir, j } );
+                        swiWaitForVBlank( );
+                    }
+                }
+
+                printMapMessage( tr.m_strings.m_message1, MSG_NORMAL );
+            }
+            runTrainerPairEvent( spotted[ pos ].m_object, spotted[ pos + 1 ].m_object );
+            hadBattle = true;
+            pos += 2;
+        }
+
+        for( u8 k = pos; k < numSpotted; ++k ) {
+            if( SAVE::CURRENT_FILE->checkFlag(
+                    SAVE::F_TRAINER_BATTLED( getTrainerId( spotted[ k ].m_object ) ) ) ) {
+                continue;
+            }
+            u8 spotId = spotted[ k ].m_object;
+            AM_GUARD_UNAWARE( amGuard );
+
+            SAVE::CURRENT_FILE->m_mapObjects[ spotId ].second.m_movement = NO_MOVEMENT;
+            showExclamationAboveMapObject( spotId );
+            auto tr = FS::getBattleTrainer( getTrainerId( spotId ) );
+            SOUND::playBGM( SOUND::BGMforTrainerEncounter( tr.m_data.m_trainerClass ) );
+
+            redirectPlayer( spotted[ k ].m_playerDir, false );
+
+            while( dist( p_globX, p_globY,
+                         SAVE::CURRENT_FILE->m_mapObjects[ spotId ].second.m_pos.m_posX,
+                         SAVE::CURRENT_FILE->m_mapObjects[ spotId ].second.m_pos.m_posY )
+                   > 1 ) {
+                if( nextTileTaken( spotId, spotted[ k ].m_trainerDir ) ) { break; }
+                for( u8 j = 0; j < 16; ++j ) {
+                    moveMapObject( spotId, { spotted[ k ].m_trainerDir, j } );
+                    swiWaitForVBlank( );
+                }
+            }
+            runEvent( SAVE::CURRENT_FILE->m_mapObjects[ spotId ].second.m_event, spotId );
+            hadBattle = true;
+        }
+
         return hadBattle;
     }
 

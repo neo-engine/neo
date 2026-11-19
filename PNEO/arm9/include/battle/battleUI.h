@@ -166,7 +166,8 @@ namespace BATTLE {
         battleMode     _mode;
         bool           _isWildBattle;
         bool           _allowItems;
-        battleTrainer* _battleTrainer = nullptr;
+        battleTrainer* _battleTrainer  = nullptr;
+        battleTrainer* _battleTrainer2 = nullptr;
 
         u8 _currentLogLine = 0;
 
@@ -377,7 +378,7 @@ namespace BATTLE {
         /*
          * @brief: plays the intro for the given trainer
          */
-        void startTrainerBattle( battleTrainer* p_trainer );
+        void startTrainerBattle( battleTrainer* p_trainer, battleTrainer* p_trainer2 = nullptr );
 
         /*
          * @brief: Shows the move selection for the given pkmn ("attack", "item", "pkmn",

@@ -258,18 +258,14 @@ namespace BATTLE {
     const u8 defaultSlotConditionDurations[ MAX_SLOT_CONDITIONS ] = { 2, 0, 0, 2 };
 
     enum battleMode {
-        BM_SINGLE         = 0,
-        BM_DOUBLE         = 1,
-        BM_MOCK           = 2,
-        BM_MULTI_OPPONENT = 3,
-        BM_MULTI_PLAYER   = 4
+        BM_SINGLE = 0,
+        BM_DOUBLE = 1,
+        BM_MOCK   = 2,
     };
 
     constexpr u8 getBattlingPKMNCount( battleMode p_mode ) {
         switch( p_mode ) {
-        case BM_DOUBLE:
-        case BM_MULTI_OPPONENT:
-        case BM_MULTI_PLAYER: return 2;
+        case BM_DOUBLE: return 2;
         default: return 1;
         }
     }
@@ -295,7 +291,7 @@ namespace BATTLE {
     constexpr battlePolicy DEFAULT_DOUBLE_TRAINER_POLICY
         = { BM_DOUBLE, true, true, true, false, WE_NONE, 5, 0 };
     constexpr battlePolicy DEFAULT_MULTI_TRAINER_POLICY
-        = { BM_MULTI_OPPONENT, true, true, true, false, WE_NONE, 5, 0 };
+        = { BM_DOUBLE, true, true, true, false, WE_NONE, 5, 0 };
     constexpr battlePolicy DEFAULT_WILD_POLICY
         = { BM_SINGLE, true, true, true, true, WE_NONE, 0, 0 };
     constexpr battlePolicy FACILITY_TRAINER_POLICY

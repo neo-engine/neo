@@ -784,18 +784,30 @@ namespace BATTLE {
             }
         }
         resetLog( );
-        IO::loadTrainerSprite( _battleTrainer->m_data.m_trainerBG, WILD_BATTLE_SPRITE_X + 16,
-                               OPP_PLAT_Y - 96 + 35, SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ),
-                               SPR_PKMN_PAL( 2 * ( !p_playerWon ) ),
-                               SPR_PKMN_GFX( 2 * ( !p_playerWon ) ), false );
-        IO::OamTop->matrixBuffer[ 5 ].hdx                               = 1 << 7 | 1 << 6 | 1 << 5;
-        IO::OamTop->matrixBuffer[ 5 ].vdy                               = 1 << 7 | 1 << 6 | 1 << 5;
-        oam[ SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ) ].isRotateScale = true;
-        oam[ SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ) ].isSizeDouble  = true;
-        oam[ SPR_PKMN_START_OAM( 2 * ( !p_playerWon ) ) ].rotationIndex = 5;
 
-        oam[ SPR_PLATFORM_OAM + 2 ].priority = OBJPRIORITY_3;
-        oam[ SPR_PLATFORM_OAM + 3 ].priority = OBJPRIORITY_3;
+        u8 regA = 2 * ( !p_playerWon );
+        u8 regB = u8( 2 - regA );
+
+        IO::loadTrainerSprite( _battleTrainer->m_data.m_trainerBG, WILD_BATTLE_SPRITE_X + 16,
+                               OPP_PLAT_Y - 96 + 35, SPR_PKMN_START_OAM( regA ),
+                               SPR_PKMN_PAL( regA ), SPR_PKMN_GFX( regA ), false );
+        IO::OamTop->matrixBuffer[ 5 ].hdx               = 1 << 7 | 1 << 6 | 1 << 5;
+        IO::OamTop->matrixBuffer[ 5 ].vdy               = 1 << 7 | 1 << 6 | 1 << 5;
+        oam[ SPR_PKMN_START_OAM( regA ) ].isRotateScale = true;
+        oam[ SPR_PKMN_START_OAM( regA ) ].isSizeDouble  = true;
+        oam[ SPR_PKMN_START_OAM( regA ) ].rotationIndex = 5;
+
+        if( _battleTrainer2 != nullptr ) {
+            IO::loadTrainerSprite( _battleTrainer2->m_data.m_trainerBG,
+                                   WILD_BATTLE_SPRITE_X + 16 - 40, OPP_PLAT_Y - 96 + 35,
+                                   SPR_PKMN_START_OAM( regB ), SPR_PKMN_PAL( regB ),
+                                   SPR_PKMN_GFX( regB ), false );
+            IO::OamTop->matrixBuffer[ 6 ].hdx               = 1 << 7 | 1 << 6 | 1 << 5;
+            IO::OamTop->matrixBuffer[ 6 ].vdy               = 1 << 7 | 1 << 6 | 1 << 5;
+            oam[ SPR_PKMN_START_OAM( regB ) ].isRotateScale = true;
+            oam[ SPR_PKMN_START_OAM( regB ) ].isSizeDouble  = true;
+            oam[ SPR_PKMN_START_OAM( regB ) ].rotationIndex = 6;
+        }
 
         if( p_playerWon ) {
             IO::loadUIIcon( IO::ICON::MBOX1_START, SPR_MBOX_START_OAM, SPR_BALL_PAL,
@@ -808,33 +820,39 @@ namespace BATTLE {
             }
             IO::updateOAM( false );
 
-            const bool  kana = ( CURRENT_LANGUAGE == SAVE::JAP );
-            std::string msg  = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
-            for( char* pos = _battleTrainer->m_strings.m_message2; *pos; ++pos ) {
-                if( *pos == IO::KANA::ON || *pos == IO::KANA::OFF ) { continue; }
-                if( *pos == '[' ) {
-                    std::string accmd = "";
-                    while( *( ++pos ) != ']' && *pos != '\0' ) { accmd += *pos; }
-                    if( *pos == '\0' ) { break; }
-                    msg += IO::parseLogCmd( accmd );
-                    continue;
-                } else if( *pos == '\r' ) {
-                    if( kana ) { msg += IO::KANA::OFF; }
-                    printTopMessage( msg.c_str( ), false );
-                    IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-                    IO::waitForInteract( IO::animateMBS,
-                                         [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
-                    msg = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
-                    continue;
-                }
-                msg += *pos;
-            }
+            battleTrainer* endSpeakers[ 2 ] = { _battleTrainer, _battleTrainer2 };
 
-            printTopMessage( msg.c_str( ), false );
-            IO::regularFont->setColor( IO::BLACK_IDX, 1 );
-            IO::waitForInteract( IO::animateMBS,
-                                 [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
-            IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            for( battleTrainer* speaker : endSpeakers ) {
+                if( speaker == nullptr ) { continue; }
+
+                bool        kana = ( CURRENT_LANGUAGE == SAVE::JAP );
+                std::string msg  = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
+                for( char* pos = _battleTrainer->m_strings.m_message2; *pos; ++pos ) {
+                    if( *pos == IO::KANA::ON || *pos == IO::KANA::OFF ) { continue; }
+                    if( *pos == '[' ) {
+                        std::string accmd = "";
+                        while( *( ++pos ) != ']' && *pos != '\0' ) { accmd += *pos; }
+                        if( *pos == '\0' ) { break; }
+                        msg += IO::parseLogCmd( accmd );
+                        continue;
+                    } else if( *pos == '\r' ) {
+                        if( kana ) { msg += IO::KANA::OFF; }
+                        printTopMessage( msg.c_str( ), false );
+                        IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                        IO::waitForInteract( IO::animateMBS,
+                                             [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
+                        msg = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
+                        continue;
+                    }
+                    msg += *pos;
+                }
+
+                printTopMessage( msg.c_str( ), false );
+                IO::regularFont->setColor( IO::BLACK_IDX, 1 );
+                IO::waitForInteract( IO::animateMBS,
+                                     [ & ]( ) { SOUND::playSoundEffect( SFX_CHOOSE ); } );
+                IO::regularFont->setColor( IO::WHITE_IDX, 1 );
+            }
         } else {
             IO::updateOAM( false );
         }

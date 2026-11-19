@@ -236,6 +236,40 @@ namespace MAP {
         _forceNoFollow = oldforce;
     }
 
+    void mapDrawer::runTrainerPairEvent( u8 p_objectA, u8 p_objectB ) {
+        auto& oA = SAVE::CURRENT_FILE->m_mapObjects[ p_objectA ].second;
+        auto& oB = SAVE::CURRENT_FILE->m_mapObjects[ p_objectB ].second;
+
+        u16  idA = oA.m_event.m_data.m_trainer.m_trainerId;
+        u16  idB = oB.m_event.m_data.m_trainer.m_trainerId;
+        auto trA = FS::getBattleTrainer( idA );
+        auto trB = FS::getBattleTrainer( idB );
+
+        auto playerPrio = _mapSprites.getPriority( _playerSprite );
+
+        ANIMATE_MAP = false;
+        SOUND::playBGM( SOUND::BGMforTrainerBattle( trA.m_data.m_trainerClass ) );
+
+        FADE_TOP_DARK( );
+        swiWaitForVBlank( );
+
+        BATTLE::battle bt = BATTLE::battle( SAVE::CURRENT_FILE->m_pkmnTeam,
+                                            SAVE::CURRENT_FILE->getTeamPkmnCount( ), trA, trB,
+                                            BATTLE::DEFAULT_MULTI_TRAINER_POLICY );
+        if( bt.start( ) == BATTLE::battle::BATTLE_OPPONENT_WON ) {
+            faintPlayer( );
+            return;
+        }
+        SAVE::CURRENT_FILE->setFlag( SAVE::F_TRAINER_BATTLED( idA ), true );
+        SAVE::CURRENT_FILE->setFlag( SAVE::F_TRAINER_BATTLED( idB ), true );
+
+        FADE_TOP_DARK( );
+        IO::init( );
+        draw( playerPrio );
+        SOUND::restartBGM( );
+        ANIMATE_MAP = true;
+    }
+
     void mapDrawer::handleEvents( u16 p_globX, u16 p_globY, u8 p_z ) {
         u8 x = p_globX % SIZE;
         u8 y = p_globY % SIZE;

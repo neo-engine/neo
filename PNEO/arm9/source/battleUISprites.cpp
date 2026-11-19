@@ -553,8 +553,9 @@ namespace BATTLE {
         log( std::string( buffer.data( ) ) );
     }
 
-    void battleUI::startTrainerBattle( battleTrainer* p_trainer ) {
-        _battleTrainer = p_trainer;
+    void battleUI::startTrainerBattle( battleTrainer* p_trainer, battleTrainer* p_trainer2 ) {
+        _battleTrainer  = p_trainer;
+        _battleTrainer2 = p_trainer2;
 
         SpriteEntry* oam = IO::OamTop->oamBuffer;
 
@@ -576,6 +577,19 @@ namespace BATTLE {
         oam[ SPR_PKMN_START_OAM( 0 ) ].isSizeDouble  = true;
         oam[ SPR_PKMN_START_OAM( 0 ) ].rotationIndex = 5;
 
+        if( _battleTrainer2 != nullptr ) {
+            IO::loadTrainerSprite( _battleTrainer2->m_data.m_trainerBG,
+                                   WILD_BATTLE_SPRITE_X + 16 - 40, OPP_PLAT_Y - 96 + 35,
+                                   SPR_PKMN_START_OAM( 1 ), SPR_PKMN_PAL( 1 ), SPR_PKMN_GFX( 1 ),
+                                   false );
+
+            IO::OamTop->matrixBuffer[ 6 ].hdx            = 1 << 7 | 1 << 6 | 1 << 5;
+            IO::OamTop->matrixBuffer[ 6 ].vdy            = 1 << 7 | 1 << 6 | 1 << 5;
+            oam[ SPR_PKMN_START_OAM( 1 ) ].isRotateScale = true;
+            oam[ SPR_PKMN_START_OAM( 1 ) ].isSizeDouble  = true;
+            oam[ SPR_PKMN_START_OAM( 1 ) ].rotationIndex = 6;
+        }
+
         IO::updateOAM( false );
         std::array<char, 50> buffer{ };
         auto                 fmt = std::string( GET_STRING( IO::STR_BATTLE_CHALLENGED ) );
@@ -584,16 +598,29 @@ namespace BATTLE {
                   _battleTrainer->m_strings.m_name );
         log( std::string( buffer.data( ) ) );
 
-        // Slide trainer out
+        if( _battleTrainer2 != nullptr ) {
+            snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
+                      FS::getTrainerClassName( _battleTrainer2->getClass( ) ).c_str( ),
+                      _battleTrainer2->m_strings.m_name );
+            log( std::string( buffer.data( ) ) );
+        }
+
+        // Slide trainer(s) out
 
         for( u8 i = 40; i > 0; --i ) {
             oam[ SPR_PKMN_START_OAM( 0 ) ].x += 1;
+            if( _battleTrainer2 != nullptr ) { oam[ SPR_PKMN_START_OAM( 1 ) ].x += 1; }
             IO::updateOAM( false );
             swiWaitForVBlank( );
         }
         oam[ SPR_PKMN_START_OAM( 0 ) ].isRotateScale = false;
         oam[ SPR_PKMN_START_OAM( 0 ) ].isSizeDouble  = false;
         oam[ SPR_PKMN_START_OAM( 0 ) ].isHidden      = true;
+        if( _battleTrainer2 != nullptr ) {
+            oam[ SPR_PKMN_START_OAM( 1 ) ].isRotateScale = false;
+            oam[ SPR_PKMN_START_OAM( 1 ) ].isSizeDouble  = false;
+            oam[ SPR_PKMN_START_OAM( 1 ) ].isHidden      = true;
+        }
         IO::updateOAM( false );
     }
 
@@ -610,10 +637,11 @@ namespace BATTLE {
 
         std::array<char, 100> buffer{ };
         if( p_opponent ) {
-            auto fmt = std::string( GET_STRING( IO::STR_BATTLE_SENDS_OUT ) );
+            battleTrainer* tr  = ( _battleTrainer2 && p_pos ) ? _battleTrainer2 : _battleTrainer;
+            auto           fmt = std::string( GET_STRING( IO::STR_BATTLE_SENDS_OUT ) );
             snprintf( buffer.data( ), buffer.size( ), fmt.c_str( ),
-                      FS::getTrainerClassName( _battleTrainer->getClass( ) ).c_str( ),
-                      _battleTrainer->m_strings.m_name, p_pokemon->m_boxdata.getNameS( ).c_str( ) );
+                      FS::getTrainerClassName( tr->getClass( ) ).c_str( ), tr->m_strings.m_name,
+                      p_pokemon->m_boxdata.getNameS( ).c_str( ) );
             log( std::string( buffer.data( ) ) );
         } else {
             snprintf( buffer.data( ), buffer.size( ), GET_STRING( IO::STR_BATTLE_SEND_OUT_GO ),

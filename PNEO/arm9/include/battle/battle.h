@@ -48,199 +48,228 @@
 
 namespace BATTLE {
     class battle {
-        public:
-            enum battleEndReason {
-                BATTLE_ROUND_LIMIT  = 0,
-                BATTLE_OPPONENT_WON = -1,
-                BATTLE_PLAYER_WON   = 1,
-                BATTLE_NONE         = 2,
-                BATTLE_RUN          = 3,
-                BATTLE_CAPTURE      = 4,
-                BATTLE_OPPONENT_RAN = 5,
-            };
+      public:
+        enum battleEndReason {
+            BATTLE_ROUND_LIMIT  = 0,
+            BATTLE_OPPONENT_WON = -1,
+            BATTLE_PLAYER_WON   = 1,
+            BATTLE_NONE         = 2,
+            BATTLE_RUN          = 3,
+            BATTLE_CAPTURE      = 4,
+            BATTLE_OPPONENT_RAN = 5,
+        };
 
-            static constexpr u8 BEFORE_BATTLE = 0;
-            static constexpr u8 AFTER_BATTLE  = 1;
+        static constexpr u8 BEFORE_BATTLE     = 0;
+        static constexpr u8 AFTER_BATTLE      = 1;
+        static constexpr u8 MAX_OPPONENT_TEAM = MULTI_MAX_SIZE;
 
-        private:
-            u16   _round, _maxRounds, _AILevel;
-            field _field;
+      private:
+        u16   _round, _maxRounds, _AILevel;
+        field _field;
 
-            bool _isMockBattle; // Catching demonstration
+        bool _isMockBattle; // Catching demonstration
 
-            battleUI _battleUI;
+        battleUI _battleUI;
 
-            battleTrainer _opponent;
-            pokemon       _opponentTeam[ SAVE::NUM_PARTY_SLOTS ];
-            std::set<u8>  _yieldEXP[ SAVE::NUM_PARTY_SLOTS ]; // idx's of the player's pkmn that will
-                                                              // receive EXP when the pkmn faints
-            u8            _opponentTeamSize;
-            u8            _opponentPkmnPerm[ SAVE::NUM_PARTY_SLOTS ];
+        battleTrainer _opponent;
+        battleTrainer _opponent2;
+        pokemon       _opponentTeam[ MAX_OPPONENT_TEAM ];
+        std::set<u8>  _yieldEXP[ MAX_OPPONENT_TEAM ]; // idx's of the player's pkmn that will
+                                                      // receive EXP when the pkmn faints
+        u8            _opponentTeamSize;
+        u8            _opponentPkmnPerm[ MAX_OPPONENT_TEAM ];
 
-            pokemon* _playerTeam;
-            u8       _playerTeamSize;
-            u8       _playerPkmnPerm[ SAVE::NUM_PARTY_SLOTS ];
+        pokemon* _playerTeam;
+        u8       _playerTeamSize;
+        u8       _playerPkmnPerm[ SAVE::NUM_PARTY_SLOTS ];
 
-            u8 _playerPkmnOrigLevel[ SAVE::NUM_PARTY_SLOTS ]; // unaffected by permutation
+        u8 _playerPkmnOrigLevel[ SAVE::NUM_PARTY_SLOTS ]; // unaffected by permutation
 
-            battlePolicy _policy;
-            bool         _isWildBattle;
-            bool         _opponentRuns; // wild pkmn tries to run whenever possible
+        battlePolicy _policy;
+        bool         _isWildBattle;
+        bool         _opponentRuns; // wild pkmn tries to run whenever possible
+        bool         _isMultiBattle = false;
 
-            u8 _lastMoveChoice = 0;
+        u8 _lastMoveChoice = 0;
 
-            /*
-             * @brief: Initializes the battle.
-             */
-            void initBattle( bool p_followPkmn );
+        void adjustAIDifficulty( );
 
-            /*
-             * @brief: Computes the move target for single battles or lets the player choose a
-             * target for double battles.
-             */
-            battleMoveSelection chooseTarget( const battleMoveSelection& p_move );
+        /*
+         * @brief: Initializes the battle.
+         */
+        void initBattle( bool p_followPkmn );
 
-            /*
-             * @brief: Handles the event when the player presses A while having selected a
-             * selection during the move selection.
-             */
-            battleMoveSelection handleMoveSelectionSelection( u8 p_slot, bool p_allowMegaEvolution,
-                    u8 p_button );
+        /*
+         * @brief: Computes the move target for single battles or lets the player choose a
+         * target for double battles.
+         */
+        battleMoveSelection chooseTarget( const battleMoveSelection& p_move );
 
-            /*
-             * @brief: Makes the player select a move for the pokemon in slot p_slot.
-             * @returns: a NO_OP move if the corresponding pokemon cannot move.
-             */
-            battleMoveSelection getMoveSelection( u8 p_slot, bool p_allowMegaEvolution );
+        /*
+         * @brief: Handles the event when the player presses A while having selected a
+         * selection during the move selection.
+         */
+        battleMoveSelection handleMoveSelectionSelection( u8 p_slot, bool p_allowMegaEvolution,
+                                                          u8 p_button );
 
-            /*
-             * @brief: Makes the player select an attack for the pokemon in slot p_slot.
-             * A player may not be presented with a choice if the pkmn is forced to use an
-             * attack or has no PP left.
-             * @returns: A valid battleMoveSelection. May be of type CANCEL if the player
-             * didn't choose a move.
-             */
-            battleMoveSelection chooseAttack( u8 p_slot, bool p_allowMegaEvolution );
+        /*
+         * @brief: Makes the player select a move for the pokemon in slot p_slot.
+         * @returns: a NO_OP move if the corresponding pokemon cannot move.
+         */
+        battleMoveSelection getMoveSelection( u8 p_slot, bool p_allowMegaEvolution );
 
-            /*
-             * @brief: Computes an AI move for the opposing pokemon in slot p_slot.
-             */
-            battleMoveSelection getAIMove( u8 p_slot );
+        /*
+         * @brief: Makes the player select an attack for the pokemon in slot p_slot.
+         * A player may not be presented with a choice if the pkmn is forced to use an
+         * attack or has no PP left.
+         * @returns: A valid battleMoveSelection. May be of type CANCEL if the player
+         * didn't choose a move.
+         */
+        battleMoveSelection chooseAttack( u8 p_slot, bool p_allowMegaEvolution );
 
-            /*
-             * @brief: Chooses which pokemon the ai sends out when one of its pokemon fainted.
-             */
-            u8 getNextAIPokemon( ) const;
+        /*
+         * @brief: Computes an AI move for the opposing pokemon in slot p_slot.
+         */
+        battleMoveSelection getAIMove( u8 p_slot );
 
-            /*
-             * @brief: Checks whether the battle hit an end
-             */
-            bool endConditionHit( battleEndReason& p_out );
+        /*
+         * @brief: Chooses which pokemon the ai sends out when one of its pokemon fainted.
+         */
+        u8 getNextAIPokemon( u8 p_owner = OWNER_A ) const;
 
-            /*
-             * @brief: Ends the battle due to the given reason.
-             */
-            void endBattle( battleEndReason p_battleEndReason );
+        /*
+         * @brief: Checks whether the battle hit an end
+         */
+        bool endConditionHit( battleEndReason& p_out );
 
-            /*
-             * @brief: Player tries to run.
-             */
-            bool playerRuns( );
+        /*
+         * @brief: Ends the battle due to the given reason.
+         */
+        void endBattle( battleEndReason p_battleEndReason );
 
-            /*
-             * @brief: Player tries to capture to wild pokemon with the specified pokemon.
-             * @param p_pokeball: Item id of the pokeball used.
-             */
-            bool playerCaptures( u16 p_pokeball );
+        /*
+         * @brief: Player tries to run.
+         */
+        bool playerRuns( );
 
-            /*
-             * @brief: Handles the capture of the wild Pokémon.
-             */
-            void handleCapture( );
+        /*
+         * @brief: Player tries to capture to wild pokemon with the specified pokemon.
+         * @param p_pokeball: Item id of the pokeball used.
+         */
+        bool playerCaptures( u16 p_pokeball );
 
-            /*
-             * @brief: Mega evolves the pokemon at the specified position.
-             */
-            void megaEvolve( fieldPosition p_position );
+        /*
+         * @brief: Handles the capture of the wild Pokémon.
+         */
+        void handleCapture( );
 
-            /*
-             * @brief: Checks for slots with the given type and refills them if necessary.
-             */
-            void checkAndRefillBattleSpots( slot::status p_checkType );
+        /*
+         * @brief: Mega evolves the pokemon at the specified position.
+         */
+        void megaEvolve( fieldPosition p_position );
 
-            /*
-             * @brief: Switches the pokemon at the field position with the p_newIndex-th pokemon
-             * of the corresponding trainer.
-             */
-            void switchPokemon( fieldPosition p_toSwitch, u16 p_newIndex );
+        /*
+         * @brief: Checks for slots with the given type and refills them if necessary.
+         */
+        void checkAndRefillBattleSpots( slot::status p_checkType );
 
-            /*
-             * @brief: Uses the specified item on the pokemon at the field position.
-             */
-            void useItem( fieldPosition p_target, u16 p_item );
+        /*
+         * @brief: Switches the pokemon at the field position with the p_newIndex-th pokemon
+         * of the corresponding trainer.
+         */
+        void switchPokemon( fieldPosition p_toSwitch, u16 p_newIndex );
 
-            /*
-             * @brief: Moves pkmn that cannot battle to the end of the list.
-             */
-            void sortPkmn( bool p_opponent );
+        /*
+         * @brief: Uses the specified item on the pokemon at the field position.
+         */
+        void useItem( fieldPosition p_target, u16 p_item );
 
-            /*
-             * @brief: Restores the order the pkmn were at the start of the battle
-             */
-            void restoreInitialOrder( bool p_opponent );
+        /*
+         * @brief: Moves pkmn that cannot battle to the end of the list.
+         */
+        void sortPkmn( bool p_opponent );
 
-            /*
-             * @brief: Resets any battle-time only transformations of pkmn.
-             */
-            void resetBattleTransformations( bool p_opponent );
+        /*
+         * @brief: Restores the order the pkmn were at the start of the battle
+         */
+        void restoreInitialOrder( bool p_opponent );
 
-            /*
-             * @brief: Checks if any of the opponent's pkmn fainted and distributes EXP
-             * correspondingly.
-             */
-            void distributeEXP( );
+        /*
+         * @brief: Resets any battle-time only transformations of pkmn.
+         */
+        void resetBattleTransformations( bool p_opponent );
 
-        public:
-            /*
-             * @brief: Creates a new trainer battle.
-             */
-            battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponent,
-                    battlePolicy = DEFAULT_TRAINER_POLICY );
+        /*
+         * @brief: Checks if any of the opponent's pkmn fainted and distributes EXP
+         * correspondingly.
+         */
+        void distributeEXP( );
 
-            /*
-             * @brief: Creates a new trainer battle.
-             */
-            battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const bfTrainer& p_opponent,
-                    const bfPokemon p_opponentTeam[ 6 ], u8 p_opponentTeamSize, u8 p_level, u8 p_iv,
-                    battlePolicy = FACILITY_TRAINER_POLICY );
+        bool isMultiBattle( ) const {
+            return _isMultiBattle;
+        }
 
-            /*
-             * @brief: Creates a new trainer battle, reads trainer data from FS.
-             */
-            battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
-                    battlePolicy = DEFAULT_TRAINER_POLICY );
+        battleTrainer& getOpponent( u8 p_owner ) {
+            return p_owner ? _opponent2 : _opponent;
+        }
 
-            /*
-             * @brief: Creates a new wild pkmn battle.
-             */
-            battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform = 10,
-                    u8 p_platform2 = 10, u8 p_background = 0, battlePolicy = DEFAULT_WILD_POLICY,
-                    bool p_wildPkmnRuns = false );
+        const battleTrainer& getOpponent( u8 p_owner ) const {
+            return p_owner ? _opponent2 : _opponent;
+        }
 
-            /*
-             * @brief: Starts the battle.
-             * @returns: positive values if the player won the battle; negative value if the
-             * player lost.
-             * @param p_firstPkmnIsFollowing: Switch to a different send out animation for the
-             * first pkmn of the player party.
-             */
-            battleEndReason start( bool p_firstPkmnIsFollowing = false );
+        u8 getOwner( u8 p_slot ) const {
+            return isMultiBattle( ) ? teamIndexToOwner( p_slot, true ) : OWNER_A;
+        }
 
-            /*
-             * @brief: Returns messages of the battle trainer.
-             */
-            const char* getMessage( u8 p_stringId );
+      public:
+        /*
+         * @brief: Creates a new trainer battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponent,
+                battlePolicy p_policy = DEFAULT_TRAINER_POLICY );
 
-            bool canRecallPokemon( bool p_opponent );
+        /*
+         * @brief: Creates a new multi-trainer battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponent,
+                const battleTrainer& p_opponent2,
+                battlePolicy         p_policy = DEFAULT_MULTI_TRAINER_POLICY );
+
+        /*
+         * @brief: Creates a new trainer battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const bfTrainer& p_opponent,
+                const bfPokemon p_opponentTeam[ 6 ], u8 p_opponentTeamSize, u8 p_level, u8 p_iv,
+                battlePolicy p_policy = FACILITY_TRAINER_POLICY );
+
+        /*
+         * @brief: Creates a new trainer battle, reads trainer data from FS.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
+                battlePolicy p_policy = DEFAULT_TRAINER_POLICY );
+
+        /*
+         * @brief: Creates a new multi-trainer battle, reads trainer data from FS.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId, u16 p_opponentId2,
+                battlePolicy p_policy = DEFAULT_MULTI_TRAINER_POLICY );
+
+        /*
+         * @brief: Creates a new wild pkmn battle.
+         */
+        battle( pokemon* p_playerTeam, u8 p_playerTeamSize, pokemon p_opponent, u8 p_platform = 10,
+                u8 p_platform2 = 10, u8 p_background = 0,
+                battlePolicy p_policy = DEFAULT_WILD_POLICY, bool p_wildPkmnRuns = false );
+
+        /*
+         * @brief: Starts the battle.
+         * @returns: positive values if the player won the battle; negative value if the
+         * player lost.
+         * @param p_firstPkmnIsFollowing: Switch to a different send out animation for the
+         * first pkmn of the player party.
+         */
+        battleEndReason start( bool p_firstPkmnIsFollowing = false );
+
+        bool canRecallPokemon( bool p_opponent );
     };
 } // namespace BATTLE

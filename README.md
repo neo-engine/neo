@@ -26,7 +26,7 @@ _Partially_ implemented features are in _italics_.
         * [x] Locations where (and when) the Pokémon can be found in-game
     * [x] A working battle engine including
         * [x] Single and double trainer battles
-        * [ ] Multi trainer battles
+        * [x] Multi trainer battles
         * [x] Wild Pokémon battles
         * [x] Switch Pokémon, use moves, use items
         * [x] Move effects, item effects, ability effects

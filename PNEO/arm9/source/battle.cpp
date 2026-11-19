@@ -76,69 +76,60 @@ namespace BATTLE {
 
         _opponentRuns = false;
 
-        // adjust difficulty
         _opponentTeamSize = _opponent.m_data.m_numPokemon;
-
-        auto playermaxlv = 0;
-        for( auto i = 0; i < p_playerTeamSize; ++i ) {
-            if( p_playerTeam[ i ].getLevel( ) > playermaxlv ) {
-                playermaxlv = p_playerTeam[ i ].getLevel( );
-            }
-        }
-        auto oppmaxlv = 0;
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
             _opponentTeam[ i ] = pokemon( _opponent.m_data.m_pokemon[ i ] );
             _yieldEXP[ i ]     = std::set<u8>( );
-            if( _opponentTeam[ i ].getLevel( ) > oppmaxlv ) {
-                oppmaxlv = _opponentTeam[ i ].getLevel( );
-            }
         }
+        adjustAIDifficulty( );
+    }
 
-        switch( SAVE::CURRENT_FILE->m_options.getDifficulty( ) ) {
-        case 0: {
-            // easy
-            auto targetlv = std::max( int( MIN_OPP_LEVEL ),
-                                      playermaxlv - DIFF_EASY_LEVEL_DEC - DIFF_HARD_LEVEL_INC );
-            if( targetlv > MAX_PKMN_LEVEL ) { targetlv = MAX_PKMN_LEVEL; }
-            auto leveladjust = 0;
-            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const battleTrainer& p_opponent,
+                    const battleTrainer& p_opponent2, battlePolicy p_policy )
+        : _field{ this, p_policy.m_mode, false, p_policy.m_weather } {
+        _playerTeam     = p_playerTeam;
+        _playerTeamSize = p_playerTeamSize;
 
-            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
-                _opponentTeam[ i ].m_boxdata.m_moves[ 3 ] = 0;
-            }
-            break;
-        }
-        case 3:
-        default: {
-            // normal
-            auto targetlv = std::max( int( MIN_OPP_LEVEL ), playermaxlv - DIFF_HARD_LEVEL_INC );
-            if( targetlv > MAX_PKMN_LEVEL ) { targetlv = MAX_PKMN_LEVEL; }
-            auto leveladjust = 0;
-            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+        _opponent      = p_opponent;
+        _opponent2     = p_opponent2;
+        _isMultiBattle = true;
 
-            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
-            }
-            break;
-        }
-        case 6: {
-            // hard
-            auto targetlv    = playermaxlv;
-            auto leveladjust = 0;
-            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+        _policy       = p_policy;
+        _isMockBattle = false;
+        _isWildBattle = false;
 
-            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
-                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
-            }
-            break;
+        _AILevel  = std::max( _opponent.m_data.m_AILevel, _opponent2.m_data.m_AILevel );
+        _battleUI = battleUI( _opponent.m_data.m_battlePlat1, _opponent.m_data.m_battlePlat2,
+                              _opponent.m_data.m_battleBG, _policy.m_mode, false,
+                              _policy.m_distributeEXP );
+
+        _opponentRuns = false;
+        u8 nA         = std::min<u8>( u8( _opponent.m_data.m_numPokemon ), SAVE::NUM_PARTY_SLOTS );
+        u8 nB         = std::min<u8>( u8( _opponent2.m_data.m_numPokemon ), SAVE::NUM_PARTY_SLOTS );
+        _opponentTeamSize = u8( 2 * std::max( nA, nB ) );
+        for( u8 i = 0; i < MAX_OPPONENT_TEAM; ++i ) {
+            memset( &_opponentTeam[ i ], 0, sizeof( pokemon ) );
+            _yieldEXP[ i ] = std::set<u8>( );
         }
+        for( u8 i = 0; i < nA; ++i ) {
+            _opponentTeam[ getTeamIndex( OWNER_A, i, true ) ]
+                = pokemon( _opponent.m_data.m_pokemon[ i ] );
         }
+        for( u8 i = 0; i < nB; ++i ) {
+            _opponentTeam[ getTeamIndex( OWNER_B, i, true ) ]
+                = pokemon( _opponent2.m_data.m_pokemon[ i ] );
+        }
+        adjustAIDifficulty( );
     }
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId,
                     battlePolicy p_policy )
         : battle( p_playerTeam, p_playerTeamSize, FS::getBattleTrainer( p_opponentId ), p_policy ) {
+    }
+    battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, u16 p_opponentId, u16 p_opponentId2,
+                    battlePolicy p_policy )
+        : battle( p_playerTeam, p_playerTeamSize, FS::getBattleTrainer( p_opponentId ),
+                  FS::getBattleTrainer( p_opponentId2 ), p_policy ) {
     }
 
     battle::battle( pokemon* p_playerTeam, u8 p_playerTeamSize, const bfTrainer& p_opponent,
@@ -212,6 +203,62 @@ namespace BATTLE {
         _opponentRuns = p_wildPkmnRuns;
     }
 
+    void battle::adjustAIDifficulty( ) {
+        auto playermaxlv = 0;
+        for( auto i = 0; i < _playerTeamSize; ++i ) {
+            if( _playerTeam[ i ].getLevel( ) > playermaxlv ) {
+                playermaxlv = _playerTeam[ i ].getLevel( );
+            }
+        }
+        auto oppmaxlv = 0;
+        for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+            if( _opponentTeam[ i ].getLevel( ) > oppmaxlv ) {
+                oppmaxlv = _opponentTeam[ i ].getLevel( );
+            }
+        }
+
+        switch( SAVE::CURRENT_FILE->m_options.getDifficulty( ) ) {
+        case 0: {
+            // easy
+            auto targetlv = std::max( int( MIN_OPP_LEVEL ),
+                                      playermaxlv - DIFF_EASY_LEVEL_DEC - DIFF_HARD_LEVEL_INC );
+            if( targetlv > MAX_PKMN_LEVEL ) { targetlv = MAX_PKMN_LEVEL; }
+            auto leveladjust = 0;
+            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+
+            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
+                _opponentTeam[ i ].m_boxdata.m_moves[ 3 ] = 0;
+            }
+            break;
+        }
+        case 3:
+        default: {
+            // normal
+            auto targetlv = std::max( int( MIN_OPP_LEVEL ), playermaxlv - DIFF_HARD_LEVEL_INC );
+            if( targetlv > MAX_PKMN_LEVEL ) { targetlv = MAX_PKMN_LEVEL; }
+            auto leveladjust = 0;
+            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+
+            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
+            }
+            break;
+        }
+        case 6: {
+            // hard
+            auto targetlv    = playermaxlv;
+            auto leveladjust = 0;
+            if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
+
+            for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
+            }
+            break;
+        }
+        }
+    }
+
     battle::battleEndReason battle::start( bool p_firstPkmnIsFollowing ) {
         if( !_opponentTeamSize || !_playerTeamSize ) { return battle::BATTLE_NONE; }
 
@@ -281,7 +328,7 @@ namespace BATTLE {
                     break;
                 }
 
-                if( _policy.m_mode == BM_DOUBLE || _policy.m_mode == BM_MULTI_OPPONENT ) {
+                if( _policy.m_mode == BM_DOUBLE ) {
                     if( _field.getPkmn( field::PLAYER_SIDE, field::PKMN_1 ) == nullptr ) {
                         // There is no second pkmn, so it cannot move.
                         moves[ field::PLAYER_SIDE ][ field::PKMN_1 ] = NO_OP_SELECTION;
@@ -512,6 +559,7 @@ namespace BATTLE {
         _battleUI.init( _field.getWeather( ), _field.getTerrain( ) );
 
         // prepare pkmn permutation; used to restore pkmn order after battle
+        for( u8 i = 0; i < MAX_OPPONENT_TEAM; ++i ) { _opponentPkmnPerm[ i ] = i; }
         for( u8 i = 0; i < SAVE::NUM_PARTY_SLOTS; ++i ) {
             _opponentPkmnPerm[ i ]    = i;
             _playerPkmnPerm[ i ]      = i;
@@ -525,7 +573,7 @@ namespace BATTLE {
             _battleUI.startWildBattle( &_opponentTeam[ 0 ] );
             _field.setSlot( field::OPPONENT_SIDE, field::PKMN_0, &_opponentTeam[ 0 ] );
         } else {
-            _battleUI.startTrainerBattle( &_opponent );
+            _battleUI.startTrainerBattle( &_opponent, isMultiBattle( ) ? &_opponent2 : nullptr );
         }
 
         // send out pkmn (for opponent only if not a wild pkmn)
@@ -606,16 +654,6 @@ namespace BATTLE {
         }
 
         return false;
-    }
-    const char* battle::getMessage( u8 p_stringId ) {
-        if( _isWildBattle ) { return 0; }
-
-        switch( p_stringId ) {
-        case battle::BEFORE_BATTLE: return _opponent.m_strings.m_message1;
-        case battle::AFTER_BATTLE: return _opponent.m_strings.m_message2;
-        default: break;
-        }
-        return 0;
     }
 
     bool battle::canRecallPokemon( bool p_opponent ) {
