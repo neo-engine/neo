@@ -288,8 +288,8 @@ namespace MAP {
                 auto& o = SAVE::CURRENT_FILE->m_mapObjects[ i ].second;
                 if( ( o.m_pos.m_posX == nx && o.m_pos.m_posY == ny )
                     || ( o.m_currentMovement.m_frame
-                         && o.m_pos.m_posX + dir[ o.m_currentMovement.m_direction ][ 0 ] == nx
-                         && o.m_pos.m_posY + dir[ o.m_currentMovement.m_direction ][ 1 ] == ny ) ) {
+                         && o.m_pos.m_posX - dir[ o.m_currentMovement.m_direction ][ 0 ] == nx
+                         && o.m_pos.m_posY - dir[ o.m_currentMovement.m_direction ][ 1 ] == ny ) ) {
                     switch( o.m_event.m_type ) {
                     case EVENT_HMOBJECT:
                         if( o.m_event.m_data.m_hmObject.m_hmType

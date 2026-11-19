@@ -81,6 +81,19 @@ namespace IO {
     const u16 OFFSET_MULTIPLIER       = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX[ 0 ] ) );
     const u16 OFFSET_MULTIPLIER_SUB   = ( BOUNDARY_VALUE / sizeof( SPRITE_GFX_SUB[ 0 ] ) );
 
+    class spriteDmaGuard {
+        int m_oldIME;
+
+      public:
+        spriteDmaGuard( ) : m_oldIME( enterCriticalSection( ) ) {
+        }
+        ~spriteDmaGuard( ) {
+            leaveCriticalSection( m_oldIME );
+        }
+        spriteDmaGuard( const spriteDmaGuard& )            = delete;
+        spriteDmaGuard& operator=( const spriteDmaGuard& ) = delete;
+    };
+
     // Lower-y of bounding box of sprite
     // (identify -format "%[bounding-box]" $i.png | string match -r '\d+$')
     const std::vector<u16> SPECIES_HEIGHTS{
@@ -199,6 +212,7 @@ namespace IO {
     }
     void copySpritePal( const unsigned short* p_spritePal, const u8 p_palIdx, const u8 p_startIdx,
                         const u16 p_palLen, bool p_bottom ) {
+        spriteDmaGuard dmaGuard;
         if( p_spritePal ) { DC_FlushRange( p_spritePal, p_palLen ); }
         if( !p_bottom && p_spritePal )
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spritePal,
@@ -211,6 +225,7 @@ namespace IO {
     }
     void copySpriteData( const unsigned int* p_spriteData, const u16 p_tileCnt,
                          const u32 p_spriteDataLen, bool p_bottom ) {
+        spriteDmaGuard dmaGuard;
         if( p_spriteData ) { DC_FlushRange( p_spriteData, p_spriteDataLen ); }
         if( !p_bottom && p_spriteData )
             dmaCopyHalfWords( SPRITE_DMA_CHANNEL, p_spriteData,
@@ -281,7 +296,7 @@ namespace IO {
                      const u8 p_width, const u8 p_height, const unsigned short* p_spriteData,
                      const u32 p_spriteDataLen, bool p_flipX, bool p_flipY, bool p_hidden,
                      ObjPriority p_priority, bool p_bottom, u8 p_transparency ) {
-
+        spriteDmaGuard dmaGuard;
         auto res = setSpriteData( p_oamIdx, p_transparency, p_tileCnt, p_posX, p_posY, p_width,
                                   p_height, p_spriteDataLen, p_flipX, p_flipY, p_hidden, p_priority,
                                   p_bottom, (ObjBlendMode) SpriteColorFormat_Bmp, (ObjColMode) 0 );

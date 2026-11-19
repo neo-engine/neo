@@ -28,6 +28,7 @@ along with Pokémon neo.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include <nds.h>
 
+#include "io/font.h"
 #include "io/kana.h"
 
 namespace IO::KANA {
@@ -114,9 +115,9 @@ namespace IO::KANA {
         case 'a':
         case 'A': return 0x01;
         case 'o':
-        case 'O': return 0x09;
+        case 'O': return 0x0A;
         case 'u':
-        case 'U': return 0x0A;
+        case 'U': return 0x09;
         default: return NONE;
         }
     }

@@ -495,6 +495,12 @@ namespace MAP {
                         }
                     } else if( ( nox == curx && noy == cury ) || ( nox == cx2 && noy == cy2 ) ) {
                         nomove = true;
+                    } else if( !canMove( o.second.m_pos, o.second.m_currentMovement.m_direction,
+                                         WALK ) ) {
+                        auto turnaround
+                            = direction( ( o.second.m_currentMovement.m_direction + 2 ) % 4 );
+                        o.second.m_currentMovement = { turnaround, 0 };
+                        nomove                     = true;
                     }
                 }
                 if( !nomove ) {
@@ -542,6 +548,12 @@ namespace MAP {
                         }
                     } else if( ( nox == curx && noy == cury ) || ( nox == cx2 && noy == cy2 ) ) {
                         nomove = true;
+                    } else if( !canMove( o.second.m_pos, o.second.m_currentMovement.m_direction,
+                                         WALK ) ) {
+                        auto turnaround
+                            = direction( ( o.second.m_currentMovement.m_direction + 2 ) % 4 );
+                        o.second.m_currentMovement = { turnaround, 0 };
+                        nomove                     = true;
                     }
                 }
                 if( !nomove ) {
