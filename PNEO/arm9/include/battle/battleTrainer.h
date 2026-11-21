@@ -41,8 +41,8 @@ namespace BATTLE {
     constexpr u8 MULTI_MAX_SIZE = 12;
 
     struct trainerStrings {
-        static constexpr u8 NAME_LENGTH = 16;
-        static constexpr u8 MSG_LENGTH  = 200;
+        static constexpr u8  NAME_LENGTH = TRAINERNAME_LEN;
+        static constexpr u16 MSG_LENGTH  = TRAINERMSG_LEN;
 
         char m_name[ NAME_LENGTH ];
         char m_message1[ MSG_LENGTH ];

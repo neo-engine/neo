@@ -136,7 +136,7 @@ constexpr u16 BADGENAME_LEN   = 50;
 constexpr u16 ACHIEVEMENT_LEN = 100;
 constexpr u16 PKMNPHRS_LEN    = 150;
 constexpr u16 TRAINERNAME_LEN = 16;
-constexpr u16 TRAINERMSG_LEN  = 200;
+constexpr u16 TRAINERMSG_LEN  = 480;
 
 enum GameMod : u8 { DEVELOPER, ALPHA, BETA, RELEASE, EMULATOR, FCARD };
 extern GameMod gMod;
