@@ -57,6 +57,13 @@ namespace IO {
                 return "tiyAnn";
             }
         }
+        if( p_cmd == "CHAN" ) {
+            if( SAVE::CURRENT_FILE->m_appearance == 0 ) {
+                return "tiyAnn";
+            } else {
+                return "kunn";
+            }
+        }
         if( p_cmd == "RIVAL" ) {
             if( SAVE::CURRENT_FILE->checkFlag( SAVE::F_RIVAL_APPEARANCE ) ) {
                 return std::string( GET_STRING( 383 ) );

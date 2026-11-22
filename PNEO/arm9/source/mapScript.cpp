@@ -316,7 +316,8 @@ namespace MAP {
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
                         moveMapObject( par1, m, playerAttachedToObject,
-                                       SAVE::CURRENT_FILE->m_player.m_direction );
+                                       SAVE::CURRENT_FILE->m_player.m_direction,
+                                       playerAttachedToObject );
                         m.m_frame = ( m.m_frame + 1 ) & 15;
                         swiWaitForVBlank( );
                     }
@@ -338,7 +339,8 @@ namespace MAP {
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
                         moveMapObject( par1, m, playerAttachedToObject,
-                                       SAVE::CURRENT_FILE->m_player.m_direction );
+                                       SAVE::CURRENT_FILE->m_player.m_direction,
+                                       playerAttachedToObject );
                         m.m_frame = ( m.m_frame + 1 ) & 15;
                         if( i & 1 ) { swiWaitForVBlank( ); }
                     }
@@ -520,7 +522,8 @@ namespace MAP {
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
                         moveMapObject( registers[ par1 ], m, playerAttachedToObject,
-                                       SAVE::CURRENT_FILE->m_player.m_direction );
+                                       SAVE::CURRENT_FILE->m_player.m_direction,
+                                       playerAttachedToObject );
                         m.m_frame = ( m.m_frame + 1 ) & 15;
                         swiWaitForVBlank( );
                     }
@@ -552,7 +555,8 @@ namespace MAP {
                 for( u8 j = 0; j < par3; ++j ) {
                     for( u8 i = 0; i < 16; ++i ) {
                         moveMapObject( registers[ par1 ], m, playerAttachedToObject,
-                                       SAVE::CURRENT_FILE->m_player.m_direction );
+                                       SAVE::CURRENT_FILE->m_player.m_direction,
+                                       playerAttachedToObject );
                         m.m_frame = ( m.m_frame + 1 ) & 15;
                         if( i & 1 ) { swiWaitForVBlank( ); }
                     }

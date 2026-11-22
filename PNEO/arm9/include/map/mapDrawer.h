@@ -491,9 +491,9 @@ namespace MAP {
         void showExclamationAboveMapObject( u8 p_objectId );
         void moveMapObject( mapObject& p_mapObject, u8 p_spriteId, movement p_movement,
                             bool p_movePlayer = false, direction p_playerMovement = DOWN,
-                            bool p_adjustAnim = true );
+                            bool p_adjustAnim = false );
         void moveMapObject( u8 p_objectId, movement p_movement, bool p_movePlayer = false,
-                            direction p_playerMovement = DOWN, bool p_adjustAnim = true );
+                            direction p_playerMovement = DOWN, bool p_adjustAnim = false );
 
         void moveCamera( direction p_direction, bool p_updatePlayer, bool p_autoLoadRows = true );
 
