@@ -221,6 +221,14 @@ namespace BATTLE {
             return isMultiBattle( ) ? teamIndexToOwner( p_slot, true ) : OWNER_A;
         }
 
+        bool isPopulated( u8 p_teamIndex ) const {
+            u8 count  = _opponent.m_data.m_numPokemon;
+            u8 count2 = _opponent2.m_data.m_numPokemon;
+            if( count > SAVE::NUM_PARTY_SLOTS ) { count = SAVE::NUM_PARTY_SLOTS; }
+            if( count2 > SAVE::NUM_PARTY_SLOTS ) { count2 = SAVE::NUM_PARTY_SLOTS; }
+            return holdsMember( p_teamIndex, count, count2, isMultiBattle( ) );
+        }
+
       public:
         /*
          * @brief: Creates a new trainer battle.

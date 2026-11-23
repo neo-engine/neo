@@ -153,4 +153,9 @@ namespace BATTLE {
         if( !p_multi ) { return p_size; }
         return u8( ( p_size - p_owner + 1 ) / 2 );
     }
+
+    constexpr bool holdsMember( u8 p_teamIndex, u8 p_count, u8 p_count2, bool p_multi ) {
+        if( !p_multi ) { return true; }
+        return ( p_teamIndex >> 1 ) < ( ( p_teamIndex & 1 ) ? p_count2 : p_count );
+    }
 } // namespace BATTLE

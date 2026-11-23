@@ -827,7 +827,7 @@ namespace BATTLE {
 
                 bool        kana = ( CURRENT_LANGUAGE == SAVE::JAP );
                 std::string msg  = kana ? std::string( 1, IO::KANA::ON ) : std::string( );
-                for( char* pos = _battleTrainer->m_strings.m_message2; *pos; ++pos ) {
+                for( char* pos = speaker->m_strings.m_message2; *pos; ++pos ) {
                     if( *pos == IO::KANA::ON || *pos == IO::KANA::OFF ) { continue; }
                     if( *pos == '[' ) {
                         std::string accmd = "";

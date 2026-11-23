@@ -59,7 +59,8 @@ namespace BATTLE {
 
         _opponent = p_opponentId;
 
-        _policy = p_policy;
+        _policy    = p_policy;
+        _maxRounds = p_policy.m_roundLimit;
 
         if( _policy.m_mode == BM_MOCK ) {
             _policy.m_mode = BM_SINGLE;
@@ -95,6 +96,7 @@ namespace BATTLE {
         _isMultiBattle = true;
 
         _policy       = p_policy;
+        _maxRounds    = p_policy.m_roundLimit;
         _isMockBattle = false;
         _isWildBattle = false;
 
@@ -151,7 +153,8 @@ namespace BATTLE {
         _opponent.m_data.m_trainerClass = p_opponent.m_trainerClass;
         _opponent.m_data.m_trainerBG    = p_opponent.m_trainerBG;
 
-        _policy = p_policy;
+        _policy    = p_policy;
+        _maxRounds = p_policy.m_roundLimit;
 
         if( _policy.m_mode == BM_MOCK ) {
             _policy.m_mode = BM_SINGLE;
@@ -186,7 +189,8 @@ namespace BATTLE {
         _yieldEXP[ 0 ]     = std::set<u8>( );
         _opponentTeamSize  = 1;
 
-        _policy = p_policy;
+        _policy    = p_policy;
+        _maxRounds = p_policy.m_roundLimit;
         if( _policy.m_mode == BM_MOCK ) {
             _policy.m_mode = BM_SINGLE;
             _isMockBattle  = true;
@@ -212,6 +216,7 @@ namespace BATTLE {
         }
         auto oppmaxlv = 0;
         for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+            if( !isPopulated( i ) ) { continue; }
             if( _opponentTeam[ i ].getLevel( ) > oppmaxlv ) {
                 oppmaxlv = _opponentTeam[ i ].getLevel( );
             }
@@ -227,6 +232,7 @@ namespace BATTLE {
             if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
 
             for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                if( !isPopulated( i ) ) { continue; }
                 _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
                 _opponentTeam[ i ].m_boxdata.m_moves[ 3 ] = 0;
             }
@@ -241,6 +247,7 @@ namespace BATTLE {
             if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
 
             for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                if( !isPopulated( i ) ) { continue; }
                 _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
             }
             break;
@@ -252,6 +259,7 @@ namespace BATTLE {
             if( oppmaxlv < targetlv ) { leveladjust = targetlv - oppmaxlv; }
 
             for( u8 i = 0; i < _opponentTeamSize; ++i ) {
+                if( !isPopulated( i ) ) { continue; }
                 _opponentTeam[ i ].setLevel( _opponentTeam[ i ].getLevel( ) + leveladjust );
             }
             break;
